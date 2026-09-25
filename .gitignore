@@ -49,3 +49,11 @@ next-env.d.ts
 
 # Generated
 *.tsbuildinfo
+
+# Credential scratch files — never commit these.
+# Keep real keys in .env.local (already ignored above) or a password manager.
+nexgcr.txt
+*credential*
+*secret*
+*.pem
+*.key
