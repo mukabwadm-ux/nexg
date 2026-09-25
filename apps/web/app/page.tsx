@@ -1,36 +1,430 @@
-import { Card, CardDescription, CardTitle, Tag } from '@nexg/ui';
+import { Button, Card, Tag } from '@nexg/ui';
+import {
+  ArrowRight,
+  Car,
+  Gift,
+  Landmark,
+  Martini,
+  Plane,
+  Shirt,
+  Sparkles,
+  Ticket,
+} from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+
+import { LeadForm } from '@/components/home/lead-form';
+import { NotifyForm } from '@/components/home/notify-form';
+import { SiteFooter } from '@/components/site-footer';
+import { SiteHeader } from '@/components/site-header';
+import { createClient } from '@/lib/supabase/server';
+
+export const metadata: Metadata = {
+  title: 'Everything at your Doorstep',
+  description:
+    'Tell us where you are staying and what you need. A vetted local concierge confirms the plan, the price and the timing, and delivers it to your door.',
+};
+
+/* Copy below comes from the `BookingFirst` artboard and is signed off. */
+
+const HOW_IT_WORKS = [
+  {
+    title: 'Ask in a sentence',
+    body: 'Type or voice-note what you need. No forms, no menus to dig through.',
+  },
+  {
+    title: 'A concierge takes it',
+    body: 'A vetted local concierge confirms the plan, the price and the timing with you.',
+  },
+  {
+    title: 'Track and pay',
+    body: "Follow it live in the app and settle by card or M-Pesa when it's done.",
+  },
+] as const;
+
+const POPULAR_REQUESTS = [
+  'Late-night dinner to my room',
+  'Airport pickup at JKIA',
+  'Laundry back by morning',
+  'Birthday flowers, same day',
+  'Pharmacy run',
+  'Wine and ice for tonight',
+  'Hair and nails at the hotel',
+  'Car and driver for the day',
+  'Groceries for the apartment',
+] as const;
+
+const CATEGORIES = [
+  { label: 'Airport transfers', icon: Plane },
+  { label: 'Alcohol & beverages', icon: Martini },
+  { label: 'Fashion & apparel', icon: Shirt },
+  { label: 'Beauty', icon: Sparkles },
+  { label: 'Vehicle rentals', icon: Car },
+  { label: 'Experiences', icon: Ticket },
+  { label: 'Financial services', icon: Landmark },
+  { label: 'Flowers & gifts', icon: Gift },
+] as const;
 
 /**
- * Placeholder. The real homepage (artboard `BookingFirst`) is built in M3 —
- * spec section 4.1. M1 ships only the repository and the design system, so
- * nothing here pretends to be the product.
+ * Featured merchant slots. Section 4.1: no real slots exist yet, so the
+ * designed placeholder cards render instead — bracketed names, [COVER PHOTO],
+ * and the Sponsored label. No invented merchant is presented as real.
  */
-export default function HomePage() {
+const FEATURED_PLACEHOLDERS = [
+  {
+    name: '[Italian restaurant]',
+    meta: 'Fine dining · Westlands',
+    eta: '25–35 min',
+    cta: 'View menu',
+  },
+  { name: '[Wine & spirits shop]', meta: 'Drinks · Parklands', eta: '20–30 min', cta: 'Shop' },
+  { name: '[Florist]', meta: 'Flowers & gifts · Kilimani', eta: 'Same day', cta: 'Shop' },
+  {
+    name: '[Laundry & dry cleaning]',
+    meta: 'Wash, iron, press · Kilimani',
+    eta: 'Next day',
+    cta: 'View services',
+  },
+] as const;
+
+export default async function HomePage({ searchParams }: { searchParams?: { need?: string } }) {
+  const supabase = createClient();
+
+  // Live and soft-launch cities first, then the waitlist — as designed.
+  const { data: cities } = await supabase
+    .from('city')
+    .select('id, slug, name, status')
+    .order('sort', { ascending: true });
+
+  const allCities = cities ?? [];
+  const openCities = allCities.filter((c) => c.status !== 'waitlist');
+  const shown = allCities.slice(0, 5);
+
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-6 px-4 py-16">
-      <div className="flex items-center gap-2">
-        <Tag tone="gold">Milestone M1</Tag>
-        <Tag>Repository and design system</Tag>
-      </div>
+    <>
+      <SiteHeader action={{ label: 'Sign in', href: '/sign-in' }} />
 
-      <div>
-        <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-          <span className="text-gold-text">NexG</span> public site
-        </h1>
-        <p className="text-muted mt-3 text-base leading-relaxed">
-          The monorepo, design tokens and shared components are in place. The homepage, rider
-          application and merchant application arrive in M3 to M5.
-        </p>
-      </div>
+      <main>
+        {/* ------------------------------------------------------------ hero */}
+        <section className="mx-auto max-w-6xl px-4 pb-10 pt-8 sm:px-6 lg:pb-16 lg:pt-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_26rem] lg:gap-12">
+            <div className="lg:pt-6">
+              <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
+                <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
+                Concierges available now in Nairobi
+              </span>
 
-      <Card>
-        <CardTitle>What exists today</CardTitle>
-        <CardDescription className="mt-2">
-          Manrope is loaded through <code className="font-mono text-xs">next/font</code>, the
-          section 2 tokens are applied, and every shared component is reviewable on the admin
-          console at <code className="font-mono text-xs">/ui-kit</code>.
-        </CardDescription>
-      </Card>
-    </main>
+              <h1 className="mt-5 text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+                <span className="text-gold">Everything</span>
+                <br />
+                at your Doorstep
+              </h1>
+
+              <p className="mt-4 text-xl font-extrabold tracking-tight sm:text-2xl">
+                <span className="text-gold-text">You Want it!</span>{' '}
+                <span className="text-ink">We Got You!</span>
+              </p>
+
+              <p className="text-muted mt-4 max-w-md text-base leading-relaxed">
+                Tell us where you&apos;re staying — hotel or Airbnb — and what you need. We will
+                deliver it to you.
+              </p>
+
+              <dl className="mt-7 flex flex-wrap gap-x-10 gap-y-4">
+                {[
+                  { value: allCities.length || '—', label: 'cities' },
+                  { value: CATEGORIES.length, label: 'service categories' },
+                  { value: '100%', label: 'Tracking' },
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <dt className="sr-only">{stat.label}</dt>
+                    <dd>
+                      <span className="block text-2xl font-extrabold tracking-tight">
+                        {stat.value}
+                      </span>
+                      <span className="text-muted-light block text-xs">{stat.label}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <LeadForm {...(searchParams?.need ? { initialNeed: searchParams.need } : {})} />
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------- how it works */}
+        <section id="how-it-works" className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
+          <ol className="grid gap-4 sm:grid-cols-3">
+            {HOW_IT_WORKS.map((step, index) => (
+              <li key={step.title}>
+                <Card tone="gold" className="h-full">
+                  <span
+                    aria-hidden="true"
+                    className="bg-ink flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white"
+                  >
+                    {index + 1}
+                  </span>
+                  <h3 className="mt-4 text-base font-extrabold">{step.title}</h3>
+                  <p className="text-ink/70 mt-1.5 text-sm leading-relaxed">{step.body}</p>
+                </Card>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* ------------------------------------------------ popular requests */}
+        <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight">
+              <span
+                aria-hidden="true"
+                className="bg-ink text-gold flex h-7 w-7 items-center justify-center rounded-full"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+              </span>
+              Popular requests right now
+            </h2>
+            <p className="text-muted-light text-xs">
+              Tap one to start — a concierge takes it from there.
+            </p>
+          </div>
+
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {POPULAR_REQUESTS.map((request) => (
+              <li key={request}>
+                <Link
+                  href={`/?need=${encodeURIComponent(request)}#start`}
+                  className="border-border-strong bg-surface hover:border-ink/40 hover:bg-bg focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="bg-gold-soft text-gold-text flex h-5 w-5 items-center justify-center rounded-full text-[0.625rem]"
+                  >
+                    ★
+                  </span>
+                  {request}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link
+                href="/#start"
+                className="bg-ink hover:bg-ink/90 focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center rounded-full px-4 py-2 text-sm font-bold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              >
+                Something else
+              </Link>
+            </li>
+          </ul>
+        </section>
+
+        {/* ------------------------------------------------------- featured */}
+        <section className="bg-ink py-14 text-white">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <Tag tone="gold" size="sm" className="uppercase tracking-wide">
+              Featured merchants · Nairobi
+            </Tag>
+
+            <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2 className="text-3xl font-extrabold tracking-tight">
+                  Delivering to your door tonight
+                </h2>
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/60">
+                  A selection of partners in your city. Featured placements are paid for by the
+                  merchant and marked as sponsored.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="border-white/20 bg-transparent text-white hover:bg-white/10"
+              >
+                <Link href="/explore">
+                  Explore all merchants <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+            <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {FEATURED_PLACEHOLDERS.map((merchant) => (
+                <li
+                  key={merchant.name}
+                  className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]"
+                >
+                  <div className="relative flex h-28 items-center justify-center bg-gradient-to-br from-white/[0.06] to-transparent">
+                    <span className="absolute left-2 top-2">
+                      <Tag tone="sponsored" size="sm" className="uppercase tracking-wide">
+                        Sponsored
+                      </Tag>
+                    </span>
+                    <span className="text-[0.625rem] uppercase tracking-widest text-white/35">
+                      [Cover photo]
+                    </span>
+                    <span className="bg-gold text-ink absolute bottom-2 right-2 rounded-full px-2 py-0.5 text-[0.625rem] font-bold">
+                      {merchant.eta}
+                    </span>
+                  </div>
+                  <div className="p-3">
+                    <p className="truncate text-sm font-bold">{merchant.name}</p>
+                    <p className="mt-0.5 truncate text-xs text-white/50">{merchant.meta}</p>
+                    <span className="bg-gold text-ink mt-3 block rounded-md py-1.5 text-center text-xs font-bold">
+                      {merchant.cta}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-white/40">
+                Own a business? Featured slots are limited per city and category.
+              </p>
+              <Link
+                href="/merchants#featured"
+                className="text-gold text-xs font-bold hover:underline"
+              >
+                Get featured on the homepage →
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* -------------------------------------------- everything we arrange */}
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-3xl font-extrabold tracking-tight">Everything we arrange</h2>
+            <Link href="/explore" className="text-sm font-bold underline underline-offset-4">
+              Browse all services
+            </Link>
+          </div>
+
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              return (
+                <li key={category.label}>
+                  <Card className="flex h-full items-center gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                    >
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="text-sm font-bold">{category.label}</span>
+                  </Card>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        {/* ---------------------------------------------------------- cities */}
+        <section id="cities" className="bg-[#F1EDE4] py-14">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2 className="text-3xl font-extrabold tracking-tight">Cities where we deliver</h2>
+                <p className="text-muted mt-2 max-w-md text-sm leading-relaxed">
+                  {allCities.length} cities across East Africa, one concierge. The same account and
+                  the same standard wherever you land.
+                </p>
+              </div>
+              <p className="text-muted-light text-sm">
+                1–{shown.length} of {allCities.length}
+              </p>
+            </div>
+
+            <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+              {shown.map((city) => (
+                <li key={city.id} className="flex flex-col items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="border-gold/70 from-gold/25 to-ink/10 h-28 w-28 rounded-full border-4 bg-gradient-to-br"
+                  />
+                  <span className="border-border bg-surface shadow-card rounded-full border px-3 py-1 text-sm font-bold">
+                    {city.name}
+                  </span>
+                  {city.status !== 'live' && (
+                    <span className="text-muted-light text-[0.625rem] font-bold uppercase tracking-wide">
+                      {city.status === 'soft_launch' ? 'Soft launch' : 'Waitlist'}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {openCities.length > 0 && (
+              <p className="text-muted-light mt-6 text-center text-xs">
+                Open for orders in {openCities.map((c) => c.name).join(', ')}.
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* --------------------------------------------------- partner band */}
+        <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+          <Card
+            tone="ink"
+            className="flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between"
+          >
+            <div>
+              <h2 className="text-2xl font-extrabold tracking-tight">Host, ride, list or join.</h2>
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-white/60">
+                Airbnb hosts give their guests a concierge. Riders and merchants make it happen. A
+                small team builds it.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="gold" size="sm" asChild>
+                <Link href="/hosts">List Your Airbnb</Link>
+              </Button>
+              <Button size="sm" asChild className="text-ink bg-white hover:bg-white/90">
+                <Link href="/riders">Become A Rider</Link>
+              </Button>
+              <Button size="sm" asChild className="text-ink bg-white hover:bg-white/90">
+                <Link href="/merchants">Register Your Business</Link>
+              </Button>
+              <Button size="sm" asChild className="text-ink bg-white hover:bg-white/90">
+                <Link href="/careers">View Openings</Link>
+              </Button>
+            </div>
+          </Card>
+        </section>
+
+        {/* ------------------------------------------------------------- app */}
+        <section className="bg-gold py-14">
+          <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:items-center">
+            <div>
+              <span className="bg-ink inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.625rem] font-bold uppercase tracking-wide text-white">
+                <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
+                The NexG app · Coming soon
+              </span>
+
+              <h2 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+                Your concierge, in
+                <br />
+                your pocket.
+              </h2>
+
+              <p className="text-ink/70 mt-4 max-w-md text-sm leading-relaxed">
+                Ask for anything in a sentence, watch your concierge move on the map, and pay by
+                card or M-Pesa when it&apos;s done. Launching first in Nairobi, then across East
+                Africa.
+              </p>
+
+              <NotifyForm />
+            </div>
+
+            <div className="hidden justify-center lg:flex" aria-hidden="true">
+              <div className="border-ink bg-surface shadow-raised h-80 w-44 rounded-[2rem] border-[6px]" />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <SiteFooter />
+    </>
   );
 }
