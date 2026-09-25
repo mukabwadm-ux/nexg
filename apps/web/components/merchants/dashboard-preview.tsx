@@ -56,7 +56,7 @@ export function DashboardPreview() {
           <h2 className="max-w-lg text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
             Every order, rider and shilling in one place.
           </h2>
-          <p className="max-w-xs text-sm leading-relaxed text-white/60">
+          <p className="max-w-xs text-sm font-semibold leading-relaxed text-white/60">
             Accept with one tap, watch the rider arrive, and see what you&apos;ve sold today without
             leaving the counter.
           </p>

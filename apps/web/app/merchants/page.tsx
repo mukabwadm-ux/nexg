@@ -149,7 +149,7 @@ export default async function MerchantsPage() {
                 <span className="text-gold">every guest&apos;s</span> hands.
               </h1>
 
-              <p className="text-muted mt-4 max-w-md text-base leading-relaxed">
+              <p className="text-muted mt-4 max-w-md text-base font-semibold leading-relaxed">
                 Hotel guests, travellers and expats ask NexG for what they need. List your
                 restaurant, bar, laundry, florist or boutique and let our riders bring your products
                 to their door.
@@ -281,7 +281,7 @@ export default async function MerchantsPage() {
           <h2 className="max-w-lg text-3xl font-extrabold leading-tight tracking-tight">
             A new front door, without a new headache
           </h2>
-          <p className="text-muted mt-2 max-w-xl text-sm leading-relaxed">
+          <p className="text-muted mt-2 max-w-xl text-sm font-semibold leading-relaxed">
             You keep cooking, pressing, arranging and selling. NexG handles the guest, the rider and
             the payment.
           </p>
@@ -299,7 +299,9 @@ export default async function MerchantsPage() {
                       <Icon className="h-4 w-4" />
                     </span>
                     <h3 className="mt-4 text-sm font-extrabold">{benefit.title}</h3>
-                    <p className="text-ink/70 mt-1.5 text-xs leading-relaxed">{benefit.body}</p>
+                    <p className="text-ink/70 mt-1.5 text-xs font-semibold leading-relaxed">
+                      {benefit.body}
+                    </p>
                   </Card>
                 </li>
               );
@@ -330,7 +332,7 @@ export default async function MerchantsPage() {
                       </span>
                       <span>
                         <span className="block text-sm font-extrabold">{step.title}</span>
-                        <span className="text-muted mt-1 block text-xs leading-relaxed">
+                        <span className="text-muted mt-1 block text-xs font-semibold leading-relaxed">
                           {step.body}
                         </span>
                       </span>
@@ -385,7 +387,7 @@ export default async function MerchantsPage() {
             <h2 className="mt-4 text-3xl font-extrabold tracking-tight">
               Put your store on the <span className="text-gold">homepage.</span>
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/60">
+            <p className="mt-2 max-w-xl text-sm font-semibold leading-relaxed text-white/60">
               Once you&apos;re live, you can buy a featured slot and be the first store guests see
               when they open NexG. Slots are limited per city, so every featured merchant actually
               gets seen.
@@ -426,7 +428,7 @@ export default async function MerchantsPage() {
           <div className="grid gap-8 lg:grid-cols-[1fr_28rem] lg:items-start">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight">Register your business</h2>
-              <p className="text-muted mt-2 max-w-md text-sm leading-relaxed">
+              <p className="text-muted mt-2 max-w-md text-sm font-semibold leading-relaxed">
                 Two minutes now. A member of the merchant team will call to confirm details and walk
                 you through the dashboard.
               </p>
@@ -489,7 +491,9 @@ export default async function MerchantsPage() {
                         −
                       </span>
                     </summary>
-                    <p className="text-muted mt-2 text-sm leading-relaxed">{item.a}</p>
+                    <p className="text-muted mt-2 text-sm font-semibold leading-relaxed">
+                      {item.a}
+                    </p>
                   </details>
                 </li>
               ))}

@@ -37,7 +37,7 @@ export function CityCarousel({ cities }: { cities: City[] }) {
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
             Cities where we deliver
           </h2>
-          <p className="text-muted mt-2 max-w-md text-sm leading-relaxed">
+          <p className="text-muted mt-2 max-w-md text-sm font-semibold leading-relaxed">
             {spellOut(cities.length)} cities across East Africa, one concierge. The same account and
             the same standard wherever you land.
           </p>

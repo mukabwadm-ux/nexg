@@ -131,7 +131,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 <span className="text-ink">We Got You!</span>
               </p>
 
-              <p className="text-muted mt-4 max-w-md text-base leading-relaxed">
+              <p className="text-muted mt-4 max-w-md text-base font-semibold leading-relaxed">
                 Tell us where you&apos;re staying — hotel or Airbnb — and what you need. We will
                 deliver it to you.
               </p>
@@ -172,7 +172,9 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                     {index + 1}
                   </span>
                   <h3 className="mt-4 text-base font-extrabold">{step.title}</h3>
-                  <p className="text-ink/70 mt-1.5 text-sm leading-relaxed">{step.body}</p>
+                  <p className="text-ink/70 mt-1.5 text-sm font-semibold leading-relaxed">
+                    {step.body}
+                  </p>
                 </Card>
               </li>
             ))}
@@ -239,7 +241,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 <h2 className="text-3xl font-extrabold tracking-tight">
                   Delivering to your door tonight
                 </h2>
-                <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/60">
+                <p className="mt-2 max-w-lg text-sm font-semibold leading-relaxed text-white/60">
                   A selection of partners in your city. Featured placements are paid for by the
                   merchant and marked as sponsored.
                 </p>
@@ -349,7 +351,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
           >
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight">Host, ride, list or join.</h2>
-              <p className="mt-2 max-w-md text-sm leading-relaxed text-white/60">
+              <p className="mt-2 max-w-md text-sm font-semibold leading-relaxed text-white/60">
                 Airbnb hosts give their guests a concierge. Riders and merchants make it happen. A
                 small team builds it.
               </p>
@@ -386,7 +388,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 your pocket.
               </h2>
 
-              <p className="text-ink/70 mt-4 max-w-md text-sm leading-relaxed">
+              <p className="text-ink/70 mt-4 max-w-md text-sm font-semibold leading-relaxed">
                 Ask for anything in a sentence, watch your concierge move on the map, and pay by
                 card or M-Pesa when it&apos;s done. Launching first in Nairobi, then across East
                 Africa.

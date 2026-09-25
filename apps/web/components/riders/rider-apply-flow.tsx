@@ -233,7 +233,7 @@ export function RiderApplyFlow({
 
           <Card tone="muted" className="mt-5 flex items-start gap-3">
             <Info className="text-gold-text mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            <p className="text-muted text-xs leading-relaxed">
+            <p className="text-muted text-xs font-semibold leading-relaxed">
               Uploading needs a verified phone number, and SMS verification is not switched on yet —
               the provider account is still being set up. Your application is saved; come back here
               once we have sent you a code.

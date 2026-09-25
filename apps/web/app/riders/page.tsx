@@ -149,7 +149,7 @@ export default async function RidersPage() {
                 Earn on your terms.
               </h1>
 
-              <p className="text-muted mt-4 max-w-md text-base leading-relaxed">
+              <p className="text-muted mt-4 max-w-md text-base font-semibold leading-relaxed">
                 Deliver food, drinks, laundry, flowers and more to guests across the city. You
                 choose when you ride. We keep the requests coming.
               </p>
@@ -203,7 +203,7 @@ export default async function RidersPage() {
         {/* ------------------------------------------------------------- why */}
         <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <h2 className="text-3xl font-extrabold tracking-tight">Why riders choose NexG</h2>
-          <p className="text-muted mt-2 max-w-lg text-sm leading-relaxed">
+          <p className="text-muted mt-2 max-w-lg text-sm font-semibold leading-relaxed">
             Fewer, better requests from hotels and guests — not a race to the bottom on every
             corner.
           </p>
@@ -221,7 +221,9 @@ export default async function RidersPage() {
                       <Icon className="h-4 w-4" />
                     </span>
                     <h3 className="mt-4 text-sm font-extrabold">{item.title}</h3>
-                    <p className="text-ink/70 mt-1.5 text-xs leading-relaxed">{item.body}</p>
+                    <p className="text-ink/70 mt-1.5 text-xs font-semibold leading-relaxed">
+                      {item.body}
+                    </p>
                   </Card>
                 </li>
               );
@@ -251,7 +253,9 @@ export default async function RidersPage() {
                     {index + 1}
                   </span>
                   <h3 className="mt-4 text-sm font-extrabold">{step.title}</h3>
-                  <p className="text-muted mt-1.5 text-xs leading-relaxed">{step.body}</p>
+                  <p className="text-muted mt-1.5 text-xs font-semibold leading-relaxed">
+                    {step.body}
+                  </p>
                 </li>
               ))}
             </ol>
@@ -315,7 +319,7 @@ export default async function RidersPage() {
               <h2 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight">
                 Built for the road, not the office.
               </h2>
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/60">
+              <p className="mt-4 max-w-md text-sm font-semibold leading-relaxed text-white/60">
                 Big buttons, one-tap navigation and a clear view of what you&apos;ve earned today.
                 Accept a request, follow the route, confirm the hand-off, done.
               </p>
@@ -379,7 +383,9 @@ export default async function RidersPage() {
                         −
                       </span>
                     </summary>
-                    <p className="text-muted mt-2 text-sm leading-relaxed">{item.a}</p>
+                    <p className="text-muted mt-2 text-sm font-semibold leading-relaxed">
+                      {item.a}
+                    </p>
                   </details>
                 </li>
               ))}
