@@ -128,7 +128,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
               */}
               <h1
                 aria-label="Everything at your Doorstep"
-                className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl"
+                className="mt-5 text-4xl font-extrabold leading-[1.16] tracking-tight sm:text-5xl lg:text-6xl"
               >
                 <RotatingWord />
                 <span aria-hidden="true" className="block">
@@ -136,7 +136,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 </span>
               </h1>
 
-              <p className="mt-4 text-xl font-extrabold tracking-tight sm:text-2xl">
+              <p className="mt-6 text-xl font-extrabold tracking-tight sm:text-2xl">
                 <span className="text-gold">You Want it!</span>{' '}
                 <span className="text-ink">We Got You!</span>
               </p>
