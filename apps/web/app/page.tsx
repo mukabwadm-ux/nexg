@@ -2,17 +2,24 @@ import { Button, Card, Tag } from '@nexg/ui';
 import {
   ArrowRight,
   Car,
+  Flower2,
   Gift,
   Landmark,
   Martini,
+  Pill,
   Plane,
+  Scissors,
   Shirt,
+  ShoppingCart,
   Sparkles,
   Ticket,
+  UtensilsCrossed,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { AppPreview, StoreBadges } from '@/components/home/app-preview';
+import { CityCarousel } from '@/components/home/city-carousel';
 import { LeadForm } from '@/components/home/lead-form';
 import { NotifyForm } from '@/components/home/notify-form';
 import { SiteFooter } from '@/components/site-footer';
@@ -43,15 +50,15 @@ const HOW_IT_WORKS = [
 ] as const;
 
 const POPULAR_REQUESTS = [
-  'Late-night dinner to my room',
-  'Airport pickup at JKIA',
-  'Laundry back by morning',
-  'Birthday flowers, same day',
-  'Pharmacy run',
-  'Wine and ice for tonight',
-  'Hair and nails at the hotel',
-  'Car and driver for the day',
-  'Groceries for the apartment',
+  { label: 'Late-night dinner to my room', icon: UtensilsCrossed },
+  { label: 'Airport pickup at JKIA', icon: Plane },
+  { label: 'Laundry back by morning', icon: Shirt },
+  { label: 'Birthday flowers, same day', icon: Flower2 },
+  { label: 'Pharmacy run', icon: Pill },
+  { label: 'Wine and ice for tonight', icon: Martini },
+  { label: 'Hair and nails at the hotel', icon: Scissors },
+  { label: 'Car and driver for the day', icon: Car },
+  { label: 'Groceries for the apartment', icon: ShoppingCart },
 ] as const;
 
 const CATEGORIES = [
@@ -98,7 +105,6 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
 
   const allCities = cities ?? [];
   const openCities = allCities.filter((c) => c.status !== 'waitlist');
-  const shown = allCities.slice(0, 5);
 
   return (
     <>
@@ -191,22 +197,25 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
           </div>
 
           <ul className="mt-4 flex flex-wrap gap-2">
-            {POPULAR_REQUESTS.map((request) => (
-              <li key={request}>
-                <Link
-                  href={`/?need=${encodeURIComponent(request)}#start`}
-                  className="border-border-strong bg-surface hover:border-ink/40 hover:bg-bg focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="bg-gold-soft text-gold-text flex h-5 w-5 items-center justify-center rounded-full text-[0.625rem]"
+            {POPULAR_REQUESTS.map((request) => {
+              const Icon = request.icon;
+              return (
+                <li key={request.label}>
+                  <Link
+                    href={`/?need=${encodeURIComponent(request.label)}#start`}
+                    className="border-border-strong bg-surface hover:border-ink/40 hover:bg-bg focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                   >
-                    ★
-                  </span>
-                  {request}
-                </Link>
-              </li>
-            ))}
+                    <span
+                      aria-hidden="true"
+                      className="bg-gold-soft text-gold-text flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                    </span>
+                    {request.label}
+                  </Link>
+                </li>
+              );
+            })}
             <li>
               <Link
                 href="/#start"
@@ -321,42 +330,11 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
         </section>
 
         {/* ---------------------------------------------------------- cities */}
-        <section id="cities" className="bg-[#F1EDE4] py-14">
+        <section id="cities" className="bg-[#F1EDE4] py-14 sm:py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <h2 className="text-3xl font-extrabold tracking-tight">Cities where we deliver</h2>
-                <p className="text-muted mt-2 max-w-md text-sm leading-relaxed">
-                  {allCities.length} cities across East Africa, one concierge. The same account and
-                  the same standard wherever you land.
-                </p>
-              </div>
-              <p className="text-muted-light text-sm">
-                1–{shown.length} of {allCities.length}
-              </p>
-            </div>
-
-            <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-              {shown.map((city) => (
-                <li key={city.id} className="flex flex-col items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="border-gold/70 from-gold/25 to-ink/10 h-28 w-28 rounded-full border-4 bg-gradient-to-br"
-                  />
-                  <span className="border-border bg-surface shadow-card rounded-full border px-3 py-1 text-sm font-bold">
-                    {city.name}
-                  </span>
-                  {city.status !== 'live' && (
-                    <span className="text-muted-light text-[0.625rem] font-bold uppercase tracking-wide">
-                      {city.status === 'soft_launch' ? 'Soft launch' : 'Waitlist'}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-
+            <CityCarousel cities={allCities} />
             {openCities.length > 0 && (
-              <p className="text-muted-light mt-6 text-center text-xs">
+              <p className="text-muted-light mt-8 text-center text-xs">
                 Open for orders in {openCities.map((c) => c.name).join(', ')}.
               </p>
             )}
@@ -415,10 +393,11 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
               </p>
 
               <NotifyForm />
+              <StoreBadges />
             </div>
 
-            <div className="hidden justify-center lg:flex" aria-hidden="true">
-              <div className="border-ink bg-surface shadow-raised h-80 w-44 rounded-[2rem] border-[6px]" />
+            <div className="hidden lg:block">
+              <AppPreview />
             </div>
           </div>
         </section>
