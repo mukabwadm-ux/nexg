@@ -118,8 +118,8 @@ const FAQ = [
 export default async function RidersPage() {
   const supabase = createClient();
 
-  // Riders may only apply in cities that are open (section 4.2). Waitlist
-  // cities are captured separately, so they are not offered here.
+  // The cities open for applications (section 4.2). The card adds an
+  // "Other" chip, which is how someone in a waitlist city reaches us.
   const { data: cities } = await supabase
     .from('city')
     .select('id, name, slug, status')
@@ -136,7 +136,7 @@ export default async function RidersPage() {
       <main>
         {/* ------------------------------------------------------------ hero */}
         <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-8 sm:px-8 lg:px-16 lg:pb-14 lg:pt-12">
-          <div className="grid gap-8 lg:grid-cols-[1fr_32rem] lg:gap-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_31rem] lg:gap-12">
             <div className="lg:pt-6">
               <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
                 <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
