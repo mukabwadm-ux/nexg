@@ -268,7 +268,7 @@ export function MerchantApplyFlow({
 
           <Card tone="muted" className="mt-4 flex items-start gap-3">
             <Info className="text-gold-text mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            <p className="text-muted text-xs font-semibold leading-relaxed">
+            <p className="text-muted text-xs leading-[1.7]">
               The map pin comes with the Google Maps key, which is still being set up. For now the
               address text is enough — the merchant team confirms the exact pin on the call.
             </p>
@@ -304,7 +304,7 @@ export function MerchantApplyFlow({
 
           <Card tone="muted" className="mt-5 flex items-start gap-3">
             <Info className="text-gold-text mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            <p className="text-muted text-xs font-semibold leading-relaxed">
+            <p className="text-muted text-xs leading-[1.7]">
               Uploading needs the verification link we send to your email. Your registration is
               already saved — the merchant team will send it when they call.
             </p>

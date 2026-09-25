@@ -128,7 +128,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
               */}
               <h1
                 aria-label="Everything at your Doorstep"
-                className="mt-5 text-4xl font-extrabold leading-[1.16] tracking-tight sm:text-5xl lg:text-6xl"
+                className="mt-5 text-4xl/[1.16] font-extrabold tracking-tight sm:text-5xl/[1.16] lg:text-6xl/[1.16]"
               >
                 <RotatingWord />
                 <span aria-hidden="true" className="block">
@@ -136,12 +136,12 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 </span>
               </h1>
 
-              <p className="mt-6 text-xl font-extrabold tracking-tight sm:text-2xl">
+              <p className="mt-6 text-2xl font-extrabold tracking-tight sm:text-[2rem]">
                 <span className="text-gold">You Want it!</span>{' '}
                 <span className="text-ink">We Got You!</span>
               </p>
 
-              <p className="text-muted mt-4 max-w-md text-base font-semibold leading-relaxed">
+              <p className="text-muted mt-4 max-w-md text-[1.0625rem] leading-[1.7]">
                 Tell us where you&apos;re staying — hotel or Airbnb — and what you need. We will
                 deliver it to you.
               </p>
@@ -182,9 +182,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                     {index + 1}
                   </span>
                   <h3 className="mt-4 text-base font-extrabold">{step.title}</h3>
-                  <p className="text-ink/70 mt-1.5 text-sm font-semibold leading-relaxed">
-                    {step.body}
-                  </p>
+                  <p className="text-ink/70 mt-1.5 text-[0.9375rem] leading-[1.7]">{step.body}</p>
                 </Card>
               </li>
             ))}
@@ -248,10 +246,10 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
 
             <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
               <div>
-                <h2 className="text-3xl font-extrabold tracking-tight">
+                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
                   Delivering to your door tonight
                 </h2>
-                <p className="mt-2 max-w-lg text-sm font-semibold leading-relaxed text-white/60">
+                <p className="mt-2 max-w-lg text-[0.9375rem] leading-[1.7] text-white/60">
                   A selection of partners in your city. Featured placements are paid for by the
                   merchant and marked as sponsored.
                 </p>
@@ -313,36 +311,40 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
         </section>
 
         {/* -------------------------------------------- everything we arrange */}
-        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-3xl font-extrabold tracking-tight">Everything we arrange</h2>
-            <Link href="/explore" className="text-sm font-bold underline underline-offset-4">
-              Browse all services
-            </Link>
-          </div>
+        <section className="bg-surface">
+          <div className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
+                Everything we arrange
+              </h2>
+              <Link href="/explore" className="text-sm font-bold underline underline-offset-4">
+                Browse all services
+              </Link>
+            </div>
 
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {CATEGORIES.map((category) => {
-              const Icon = category.icon;
-              return (
-                <li key={category.label}>
-                  <Card className="flex h-full items-center gap-3">
-                    <span
-                      aria-hidden="true"
-                      className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                    >
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <span className="text-sm font-bold">{category.label}</span>
-                  </Card>
-                </li>
-              );
-            })}
-          </ul>
+            <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {CATEGORIES.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <li key={category.label}>
+                    <Card className="flex h-full items-center gap-3">
+                      <span
+                        aria-hidden="true"
+                        className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                      >
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span className="text-sm font-bold">{category.label}</span>
+                    </Card>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </section>
 
         {/* ---------------------------------------------------------- cities */}
-        <section id="cities" className="bg-[#F1EDE4] py-14 sm:py-16">
+        <section id="cities" className="py-14 sm:py-16">
           <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <CityCarousel cities={allCities} />
             {openCities.length > 0 && (
@@ -361,7 +363,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
           >
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight">Host, ride, list or join.</h2>
-              <p className="mt-2 max-w-md text-sm font-semibold leading-relaxed text-white/60">
+              <p className="mt-2 max-w-md text-[0.9375rem] leading-[1.7] text-white/60">
                 Airbnb hosts give their guests a concierge. Riders and merchants make it happen. A
                 small team builds it.
               </p>
@@ -392,13 +394,13 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 The NexG app · Coming soon
               </span>
 
-              <h2 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+              <h2 className="mt-5 text-4xl/[1.06] font-extrabold tracking-tight sm:text-[3.125rem]/[1.06]">
                 Your concierge, in
                 <br />
                 your pocket.
               </h2>
 
-              <p className="text-ink/70 mt-4 max-w-md text-sm font-semibold leading-relaxed">
+              <p className="text-ink/70 mt-4 max-w-md text-[0.9375rem] leading-[1.7]">
                 Ask for anything in a sentence, watch your concierge move on the map, and pay by
                 card or M-Pesa when it&apos;s done. Launching first in Nairobi, then across East
                 Africa.

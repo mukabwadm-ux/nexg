@@ -143,13 +143,13 @@ export default async function RidersPage() {
                 Now recruiting riders in Nairobi
               </span>
 
-              <h1 className="mt-5 text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
+              <h1 className="mt-5 text-4xl/[1.06] font-extrabold tracking-tight sm:text-5xl/[1.06] lg:text-[4.375rem]/[1.06]">
                 Ride with <span className="text-gold">NexG.</span>
                 <br />
                 Earn on your terms.
               </h1>
 
-              <p className="text-muted mt-4 max-w-md text-base font-semibold leading-relaxed">
+              <p className="text-muted mt-4 max-w-md text-[1.0625rem] leading-[1.7]">
                 Deliver food, drinks, laundry, flowers and more to guests across the city. You
                 choose when you ride. We keep the requests coming.
               </p>
@@ -202,8 +202,10 @@ export default async function RidersPage() {
 
         {/* ------------------------------------------------------------- why */}
         <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
-          <h2 className="text-3xl font-extrabold tracking-tight">Why riders choose NexG</h2>
-          <p className="text-muted mt-2 max-w-lg text-sm font-semibold leading-relaxed">
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
+            Why riders choose NexG
+          </h2>
+          <p className="text-muted mt-2 max-w-lg text-[0.9375rem] leading-[1.7]">
             Fewer, better requests from hotels and guests — not a race to the bottom on every
             corner.
           </p>
@@ -221,9 +223,7 @@ export default async function RidersPage() {
                       <Icon className="h-4 w-4" />
                     </span>
                     <h3 className="mt-4 text-sm font-extrabold">{item.title}</h3>
-                    <p className="text-ink/70 mt-1.5 text-xs font-semibold leading-relaxed">
-                      {item.body}
-                    </p>
+                    <p className="text-ink/70 mt-1.5 text-xs leading-[1.7]">{item.body}</p>
                   </Card>
                 </li>
               );
@@ -234,7 +234,7 @@ export default async function RidersPage() {
         {/* ----------------------------------------------------------- steps */}
         <section id="how" className="border-border bg-surface border-y py-14">
           <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
-            <h2 className="text-3xl font-extrabold tracking-tight">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
               From application to first delivery
             </h2>
             <p className="text-muted mt-2 text-sm">
@@ -253,9 +253,7 @@ export default async function RidersPage() {
                     {index + 1}
                   </span>
                   <h3 className="mt-4 text-sm font-extrabold">{step.title}</h3>
-                  <p className="text-muted mt-1.5 text-xs font-semibold leading-relaxed">
-                    {step.body}
-                  </p>
+                  <p className="text-muted mt-1.5 text-xs leading-[1.7]">{step.body}</p>
                 </li>
               ))}
             </ol>
@@ -266,7 +264,9 @@ export default async function RidersPage() {
         <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
-              <h2 className="text-3xl font-extrabold tracking-tight">What you&apos;ll need</h2>
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
+                What you&apos;ll need
+              </h2>
               <p className="text-gold-text mt-2 text-sm">
                 Nothing unusual — if you already ride for a living, you probably have all of this.
               </p>
@@ -319,7 +319,7 @@ export default async function RidersPage() {
               <h2 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight">
                 Built for the road, not the office.
               </h2>
-              <p className="mt-4 max-w-md text-sm font-semibold leading-relaxed text-white/60">
+              <p className="mt-4 max-w-md text-[0.9375rem] leading-[1.7] text-white/60">
                 Big buttons, one-tap navigation and a clear view of what you&apos;ve earned today.
                 Accept a request, follow the route, confirm the hand-off, done.
               </p>
@@ -352,7 +352,9 @@ export default async function RidersPage() {
         <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
             <div>
-              <h2 className="text-3xl font-extrabold tracking-tight">Questions riders ask</h2>
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
+                Questions riders ask
+              </h2>
               <p className="text-muted mt-2 text-sm">
                 Anything else, message us — a person answers.
               </p>
@@ -383,9 +385,7 @@ export default async function RidersPage() {
                         −
                       </span>
                     </summary>
-                    <p className="text-muted mt-2 text-sm font-semibold leading-relaxed">
-                      {item.a}
-                    </p>
+                    <p className="text-muted mt-2 text-[0.9375rem] leading-[1.7]">{item.a}</p>
                   </details>
                 </li>
               ))}
