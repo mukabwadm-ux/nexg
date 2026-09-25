@@ -47,7 +47,7 @@ const STATE_STYLES: Record<string, string> = {
 export function DashboardPreview() {
   return (
     <section className="bg-ink py-14 text-white sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
         <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
           Merchant dashboard
         </span>

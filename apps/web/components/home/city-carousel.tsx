@@ -75,15 +75,15 @@ export function CityCarousel({ cities }: { cities: City[] }) {
           <li key={city.id} className="flex flex-col items-center">
             <span
               aria-hidden="true"
-              className="ring-gold/70 relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full ring-4 sm:h-28 sm:w-28"
+              className="ring-gold/70 relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full ring-4 sm:h-36 sm:w-36 lg:h-[10.5rem] lg:w-[10.5rem]"
               style={{ background: portraitFor(city.slug) }}
             >
-              <span className="text-[0.5rem] font-bold uppercase tracking-[0.2em] text-white/60">
+              <span className="text-[0.625rem] font-bold uppercase tracking-[0.25em] text-white/50">
                 {city.name.slice(0, 3)}
               </span>
             </span>
 
-            <span className="border-border bg-surface shadow-card -mt-3.5 rounded-full border px-3.5 py-1.5 text-sm font-bold">
+            <span className="border-border bg-surface shadow-card relative z-10 -mt-4 rounded-full border px-4 py-1.5 text-sm font-bold">
               {city.name}
             </span>
 

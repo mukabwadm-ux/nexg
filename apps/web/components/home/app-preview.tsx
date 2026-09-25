@@ -11,9 +11,9 @@ import { Bell, Home, MessageSquare, Search, User, UtensilsCrossed } from 'lucide
  */
 export function AppPreview() {
   return (
-    <div aria-hidden="true" className="relative mx-auto h-[26rem] w-full max-w-md">
+    <div aria-hidden="true" className="relative mx-auto h-[30rem] w-full max-w-lg">
       {/* Behind: the live map. */}
-      <div className="border-ink shadow-raised absolute left-0 top-6 h-[22rem] w-44 -rotate-6 overflow-hidden rounded-[1.75rem] border-[5px] bg-[#EFEBE2]">
+      <div className="border-ink shadow-raised absolute left-2 top-8 h-[25rem] w-52 -rotate-6 overflow-hidden rounded-[1.75rem] border-[5px] bg-[#EFEBE2]">
         <div className="border-border border-b px-2.5 py-2">
           <p className="text-muted-light text-[0.5rem] font-bold uppercase tracking-widest">
             Live · concierge on the way
@@ -46,7 +46,7 @@ export function AppPreview() {
       </div>
 
       {/* In front: the concierge home. */}
-      <div className="border-ink bg-surface shadow-raised absolute right-0 top-0 h-[24rem] w-48 overflow-hidden rounded-[1.75rem] border-[5px]">
+      <div className="border-ink bg-surface shadow-raised absolute right-0 top-0 h-[28rem] w-56 overflow-hidden rounded-[1.75rem] border-[5px]">
         <div className="flex items-start justify-between gap-2 px-3 pb-2 pt-3">
           <span>
             <span className="text-muted-light block text-[0.5rem]">Good evening</span>

@@ -18,7 +18,7 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   return (
     <header className="border-border/60 bg-bg/90 sticky top-0 z-30 border-b backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-[96rem] items-center justify-between gap-3 px-4 py-3 sm:px-8 lg:px-16">
         <Link href="/" aria-label="NexG Concierge, home">
           <Logo />
         </Link>

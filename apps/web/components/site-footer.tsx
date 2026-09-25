@@ -12,7 +12,7 @@ const LINKS = [
 export function SiteFooter() {
   return (
     <footer className="border-border bg-bg border-t">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto flex max-w-[96rem] flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-16">
         <Logo />
         <div className="flex flex-col gap-2 sm:items-end">
           <nav aria-label="Footer" className="flex flex-wrap gap-4">

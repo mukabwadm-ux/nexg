@@ -135,8 +135,8 @@ export default async function MerchantsPage() {
 
       <main>
         {/* ------------------------------------------------------------ hero */}
-        <section className="mx-auto max-w-6xl px-4 pb-10 pt-8 sm:px-6 lg:pb-14 lg:pt-12">
-          <div className="grid gap-8 lg:grid-cols-[1fr_24rem] lg:gap-12">
+        <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-8 sm:px-8 lg:px-16 lg:pb-14 lg:pt-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_26rem] lg:gap-12">
             <div className="lg:pt-6">
               <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
                 <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
@@ -242,7 +242,7 @@ export default async function MerchantsPage() {
 
         {/* ------------------------------------------------------ categories */}
         <section className="border-border bg-surface border-y py-12">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 className="text-2xl font-extrabold tracking-tight">
                 Built for the businesses guests ask for most
@@ -277,7 +277,7 @@ export default async function MerchantsPage() {
         </section>
 
         {/* -------------------------------------------------------- benefits */}
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <h2 className="max-w-lg text-3xl font-extrabold leading-tight tracking-tight">
             A new front door, without a new headache
           </h2>
@@ -310,7 +310,7 @@ export default async function MerchantsPage() {
         <DashboardPreview />
 
         {/* ------------------------------------------- steps and pricing */}
-        <section id="how" className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+        <section id="how" className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
           <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight">Live in three steps</h2>
@@ -378,7 +378,7 @@ export default async function MerchantsPage() {
 
         {/* ------------------------------------------------------- featured */}
         <section id="featured" className="bg-ink py-14 text-white">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
               Get featured
             </span>
@@ -422,7 +422,7 @@ export default async function MerchantsPage() {
         </section>
 
         {/* -------------------------------------------------------- register */}
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <div className="grid gap-8 lg:grid-cols-[1fr_28rem] lg:items-start">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight">Register your business</h2>
@@ -455,7 +455,7 @@ export default async function MerchantsPage() {
         </section>
 
         {/* ------------------------------------------------------------- FAQ */}
-        <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
           <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight">Questions merchants ask</h2>
@@ -498,7 +498,7 @@ export default async function MerchantsPage() {
         </section>
 
         {/* ------------------------------------------------------------- CTA */}
-        <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
           <Card
             tone="gold"
             className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"

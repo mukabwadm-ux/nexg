@@ -135,8 +135,8 @@ export default async function RidersPage() {
 
       <main>
         {/* ------------------------------------------------------------ hero */}
-        <section className="mx-auto max-w-6xl px-4 pb-10 pt-8 sm:px-6 lg:pb-14 lg:pt-12">
-          <div className="grid gap-8 lg:grid-cols-[1fr_26rem] lg:gap-12">
+        <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-8 sm:px-8 lg:px-16 lg:pb-14 lg:pt-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_32rem] lg:gap-12">
             <div className="lg:pt-6">
               <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
                 <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
@@ -188,7 +188,7 @@ export default async function RidersPage() {
 
         {/* ---------------------------------------------------------- ticker */}
         <div className="bg-ink overflow-x-auto py-3">
-          <ul className="text-gold mx-auto flex max-w-6xl items-center gap-6 px-4 text-xs font-bold uppercase tracking-widest sm:px-6">
+          <ul className="text-gold mx-auto flex max-w-[96rem] items-center gap-6 px-4 text-xs font-bold uppercase tracking-widest sm:px-8 lg:px-16">
             {TICKER.map((item) => (
               <li key={item} className="flex shrink-0 items-center gap-6">
                 {item}
@@ -201,7 +201,7 @@ export default async function RidersPage() {
         </div>
 
         {/* ------------------------------------------------------------- why */}
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <h2 className="text-3xl font-extrabold tracking-tight">Why riders choose NexG</h2>
           <p className="text-muted mt-2 max-w-lg text-sm leading-relaxed">
             Fewer, better requests from hotels and guests — not a race to the bottom on every
@@ -231,7 +231,7 @@ export default async function RidersPage() {
 
         {/* ----------------------------------------------------------- steps */}
         <section id="how" className="border-border bg-surface border-y py-14">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <h2 className="text-3xl font-extrabold tracking-tight">
               From application to first delivery
             </h2>
@@ -259,7 +259,7 @@ export default async function RidersPage() {
         </section>
 
         {/* ---------------------------------------------------- requirements */}
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight">What you&apos;ll need</h2>
@@ -307,7 +307,7 @@ export default async function RidersPage() {
 
         {/* ------------------------------------------------------- rider app */}
         <section className="bg-ink mt-6 py-14 text-white">
-          <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:items-center">
+          <div className="mx-auto grid max-w-[96rem] gap-8 px-4 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-16">
             <div>
               <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
                 The rider app
@@ -345,7 +345,7 @@ export default async function RidersPage() {
         </section>
 
         {/* ------------------------------------------------------------- FAQ */}
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight">Questions riders ask</h2>
@@ -388,7 +388,7 @@ export default async function RidersPage() {
         </section>
 
         {/* ------------------------------------------------------------- CTA */}
-        <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
           <Card
             tone="gold"
             className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"

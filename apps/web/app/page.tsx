@@ -112,8 +112,8 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
 
       <main>
         {/* ------------------------------------------------------------ hero */}
-        <section className="mx-auto max-w-6xl px-4 pb-10 pt-8 sm:px-6 lg:pb-16 lg:pt-12">
-          <div className="grid gap-8 lg:grid-cols-[1fr_26rem] lg:gap-12">
+        <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-8 sm:px-8 lg:px-16 lg:pb-16 lg:pt-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_32rem] lg:gap-12">
             <div className="lg:pt-6">
               <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
                 <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
@@ -160,7 +160,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
         </section>
 
         {/* ---------------------------------------------------- how it works */}
-        <section id="how-it-works" className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
+        <section id="how-it-works" className="mx-auto max-w-[96rem] px-4 pb-12 sm:px-8 lg:px-16">
           <ol className="grid gap-4 sm:grid-cols-3">
             {HOW_IT_WORKS.map((step, index) => (
               <li key={step.title}>
@@ -180,7 +180,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
         </section>
 
         {/* ------------------------------------------------ popular requests */}
-        <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight">
               <span
@@ -229,7 +229,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
 
         {/* ------------------------------------------------------- featured */}
         <section className="bg-ink py-14 text-white">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <Tag tone="gold" size="sm" className="uppercase tracking-wide">
               Featured merchants · Nairobi
             </Tag>
@@ -301,7 +301,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
         </section>
 
         {/* -------------------------------------------- everything we arrange */}
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-3xl font-extrabold tracking-tight">Everything we arrange</h2>
             <Link href="/explore" className="text-sm font-bold underline underline-offset-4">
@@ -331,7 +331,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
 
         {/* ---------------------------------------------------------- cities */}
         <section id="cities" className="bg-[#F1EDE4] py-14 sm:py-16">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <CityCarousel cities={allCities} />
             {openCities.length > 0 && (
               <p className="text-muted-light mt-8 text-center text-xs">
@@ -342,7 +342,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
         </section>
 
         {/* --------------------------------------------------- partner band */}
-        <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
           <Card
             tone="ink"
             className="flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between"
@@ -373,7 +373,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
 
         {/* ------------------------------------------------------------- app */}
         <section className="bg-gold py-14">
-          <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:items-center">
+          <div className="mx-auto grid max-w-[96rem] gap-8 px-4 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-16">
             <div>
               <span className="bg-ink inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.625rem] font-bold uppercase tracking-wide text-white">
                 <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
