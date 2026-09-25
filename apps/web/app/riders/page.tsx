@@ -1,0 +1,412 @@
+import { Button, Card } from '@nexg/ui';
+import {
+  ArrowRight,
+  Banknote,
+  Check,
+  Clock,
+  MessageSquare,
+  Navigation,
+  ShieldCheck,
+  Wallet,
+} from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+
+import { RiderApplyCard } from '@/components/riders/rider-apply-card';
+import { SiteFooter } from '@/components/site-footer';
+import { SiteHeader } from '@/components/site-header';
+import { createClient } from '@/lib/supabase/server';
+
+export const metadata: Metadata = {
+  title: 'Ride with NexG',
+  description:
+    'Deliver food, drinks, laundry, flowers and more to guests across the city. You choose when you ride. Weekly M-Pesa payouts.',
+};
+
+/* Copy from the `Riders` artboard, signed off (ground rule 6). */
+
+const TICKER = [
+  'Food',
+  'Drinks',
+  'Laundry',
+  'Flowers',
+  'Beauty products',
+  'Pharmacy runs',
+  'Hotel errands',
+] as const;
+
+const WHY = [
+  {
+    icon: Banknote,
+    title: 'Paid every week',
+    body: 'Earnings land in your M-Pesa every week, with a clear breakdown of every delivery.',
+  },
+  {
+    icon: Clock,
+    title: 'Ride when you want',
+    body: 'Go online for a morning, an evening or a full day. No minimum shifts, no penalties for logging off.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Guests you can trust',
+    body: 'Every request comes from a verified guest or partner hotel, with the address and contact confirmed before you set off.',
+  },
+  {
+    icon: MessageSquare,
+    title: 'A real person on the line',
+    body: 'Rider support seven days a week, in the app or by phone, for anything from a wrong gate to a flat tyre.',
+  },
+] as const;
+
+const STEPS = [
+  {
+    title: 'Apply online',
+    body: 'Your name, phone, city and vehicle. Two minutes, no paperwork yet.',
+  },
+  {
+    title: 'Upload your documents',
+    body: 'ID, licence, vehicle papers and a good conduct certificate. We verify and come back to you.',
+  },
+  {
+    title: 'Onboard and collect your kit',
+    body: 'A short session on how NexG works with hotels and guests, then your branded bag and jacket.',
+  },
+  {
+    title: 'Go online and ride',
+    body: 'Open the rider app, accept your first request and get paid at the end of the week.',
+  },
+] as const;
+
+const REQUIREMENTS = [
+  '18 years or older with a valid national ID',
+  'A valid driving licence for your vehicle class',
+  'Your own motorbike, bicycle, car or tuk-tuk, insured and roadworthy',
+  'An Android or iPhone with data for the rider app',
+  'A certificate of good conduct and an M-Pesa line in your name',
+] as const;
+
+const APP_FEATURES = [
+  { icon: Navigation, label: 'Live pickup and drop-off navigation' },
+  { icon: Wallet, label: 'Earnings and payout history, always visible' },
+  { icon: MessageSquare, label: 'In-app chat with the concierge and support' },
+] as const;
+
+const FAQ = [
+  {
+    q: 'How and when do I get paid?',
+    a: 'Every delivery you complete is added to your balance in the app. Balances are paid out to your M-Pesa line every week, and you can see the full breakdown any time.',
+  },
+  {
+    q: 'Do I need my own vehicle?',
+    a: 'Yes. You ride your own motorbike, bicycle, car or tuk-tuk, and it needs to be insured and roadworthy. We check the papers during onboarding.',
+  },
+  {
+    q: 'Can I ride for other apps at the same time?',
+    a: 'Yes. You choose when you go online with us, and there are no minimum shifts or exclusivity requirements.',
+  },
+  {
+    q: "What happens if a guest isn't there?",
+    a: 'Call the guest from the app. If they do not answer, rider support takes over and tells you what to do with the order. You are not left deciding on your own.',
+  },
+  {
+    q: 'Which cities are you recruiting in?',
+    a: 'We are onboarding riders in the cities that are live and soft-launching now, and building a waitlist everywhere else.',
+  },
+] as const;
+
+export default async function RidersPage() {
+  const supabase = createClient();
+
+  // Riders may only apply in cities that are open (section 4.2). Waitlist
+  // cities are captured separately, so they are not offered here.
+  const { data: cities } = await supabase
+    .from('city')
+    .select('id, name, slug, status')
+    .neq('status', 'waitlist')
+    .order('sort', { ascending: true });
+
+  return (
+    <>
+      <SiteHeader
+        signIn={{ label: 'Rider sign in', href: '/riders/sign-in' }}
+        action={{ label: 'Apply now', href: '/riders/apply' }}
+      />
+
+      <main>
+        {/* ------------------------------------------------------------ hero */}
+        <section className="mx-auto max-w-6xl px-4 pb-10 pt-8 sm:px-6 lg:pb-14 lg:pt-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_26rem] lg:gap-12">
+            <div className="lg:pt-6">
+              <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
+                <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
+                Now recruiting riders in Nairobi
+              </span>
+
+              <h1 className="mt-5 text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
+                Ride with <span className="text-gold">NexG.</span>
+                <br />
+                Earn on your terms.
+              </h1>
+
+              <p className="text-muted mt-4 max-w-md text-base leading-relaxed">
+                Deliver food, drinks, laundry, flowers and more to guests across the city. You
+                choose when you ride. We keep the requests coming.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                <Button size="lg" asChild>
+                  <Link href="/riders/apply">Start your application</Link>
+                </Button>
+                <Button variant="outline" size="lg" asChild>
+                  <Link href="#how">How it works</Link>
+                </Button>
+              </div>
+
+              <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4">
+                {[
+                  { value: 'Weekly', label: 'M-Pesa payouts' },
+                  { value: 'You', label: 'choose the hours' },
+                  { value: '7 days', label: 'rider support' },
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <dt className="sr-only">{stat.label}</dt>
+                    <dd>
+                      <span className="block text-xl font-extrabold tracking-tight">
+                        {stat.value}
+                      </span>
+                      <span className="text-muted-light block text-xs">{stat.label}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <RiderApplyCard cities={cities ?? []} />
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------------- ticker */}
+        <div className="bg-ink overflow-x-auto py-3">
+          <ul className="text-gold mx-auto flex max-w-6xl items-center gap-6 px-4 text-xs font-bold uppercase tracking-widest sm:px-6">
+            {TICKER.map((item) => (
+              <li key={item} className="flex shrink-0 items-center gap-6">
+                {item}
+                <span aria-hidden="true" className="text-gold/40">
+                  ◆
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ------------------------------------------------------------- why */}
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <h2 className="text-3xl font-extrabold tracking-tight">Why riders choose NexG</h2>
+          <p className="text-muted mt-2 max-w-lg text-sm leading-relaxed">
+            Fewer, better requests from hotels and guests — not a race to the bottom on every
+            corner.
+          </p>
+
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {WHY.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.title}>
+                  <Card tone="gold" className="h-full">
+                    <span
+                      aria-hidden="true"
+                      className="bg-ink text-gold flex h-8 w-8 items-center justify-center rounded-lg"
+                    >
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <h3 className="mt-4 text-sm font-extrabold">{item.title}</h3>
+                    <p className="text-ink/70 mt-1.5 text-xs leading-relaxed">{item.body}</p>
+                  </Card>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        {/* ----------------------------------------------------------- steps */}
+        <section id="how" className="border-border bg-surface border-y py-14">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <h2 className="text-3xl font-extrabold tracking-tight">
+              From application to first delivery
+            </h2>
+            <p className="text-muted mt-2 text-sm">
+              Four steps. Most riders are on the road within the week.
+            </p>
+
+            <ol className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {STEPS.map((step, index) => (
+                <li key={step.title}>
+                  <span
+                    aria-hidden="true"
+                    className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
+                      index === 0 ? 'bg-ink text-white' : 'bg-gold text-ink'
+                    }`}
+                  >
+                    {index + 1}
+                  </span>
+                  <h3 className="mt-4 text-sm font-extrabold">{step.title}</h3>
+                  <p className="text-muted mt-1.5 text-xs leading-relaxed">{step.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------- requirements */}
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight">What you&apos;ll need</h2>
+              <p className="text-gold-text mt-2 text-sm">
+                Nothing unusual — if you already ride for a living, you probably have all of this.
+              </p>
+
+              <ul className="mt-6 space-y-2.5">
+                {REQUIREMENTS.map((requirement) => (
+                  <li
+                    key={requirement}
+                    className="border-border bg-surface shadow-card flex items-center gap-3 rounded-xl border px-3 py-3"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="bg-gold text-ink flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="text-sm font-semibold">{requirement}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="relative">
+              <div
+                aria-hidden="true"
+                className="from-ink/80 to-ink h-64 rounded-xl bg-gradient-to-br lg:h-80"
+              />
+              <Card tone="ink" className="absolute -bottom-4 left-4 right-8 sm:right-24">
+                <p className="text-gold text-[0.625rem] font-bold uppercase tracking-widest">
+                  Rider kit included
+                </p>
+                <p className="mt-1.5 text-sm font-extrabold">
+                  Branded delivery bag, reflective jacket and phone mount.
+                </p>
+                <p className="mt-1 text-xs text-white/50">
+                  Issued at onboarding, yours to keep while you ride with us.
+                </p>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------- rider app */}
+        <section className="bg-ink mt-6 py-14 text-white">
+          <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:items-center">
+            <div>
+              <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
+                The rider app
+              </span>
+              <h2 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight">
+                Built for the road, not the office.
+              </h2>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/60">
+                Big buttons, one-tap navigation and a clear view of what you&apos;ve earned today.
+                Accept a request, follow the route, confirm the hand-off, done.
+              </p>
+
+              <ul className="mt-6 space-y-3">
+                {APP_FEATURES.map((feature) => {
+                  const Icon = feature.icon;
+                  return (
+                    <li key={feature.label} className="flex items-center gap-3">
+                      <span
+                        aria-hidden="true"
+                        className="bg-gold text-ink flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="text-sm font-semibold">{feature.label}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            <div className="hidden justify-center lg:flex" aria-hidden="true">
+              <div className="bg-surface h-80 w-44 rounded-[2rem] border-[6px] border-white/15" />
+            </div>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------- FAQ */}
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight">Questions riders ask</h2>
+              <p className="text-muted mt-2 text-sm">
+                Anything else, message us — a person answers.
+              </p>
+              <Link
+                href="/help"
+                className="mt-3 inline-block text-sm font-bold underline underline-offset-4"
+              >
+                Talk to the rider team
+              </Link>
+            </div>
+
+            <ul className="space-y-2">
+              {FAQ.map((item) => (
+                <li key={item.q}>
+                  <details className="border-border bg-surface shadow-card group rounded-xl border px-4 py-3">
+                    <summary className="focus-visible:ring-gold flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold focus-visible:outline-none focus-visible:ring-2">
+                      {item.q}
+                      <span
+                        aria-hidden="true"
+                        className="text-muted-light shrink-0 text-lg group-open:hidden"
+                      >
+                        +
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="text-gold-text hidden shrink-0 text-lg group-open:block"
+                      >
+                        −
+                      </span>
+                    </summary>
+                    <p className="text-muted mt-2 text-sm leading-relaxed">{item.a}</p>
+                  </details>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------- CTA */}
+        <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+          <Card
+            tone="gold"
+            className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div>
+              <h2 className="text-2xl font-extrabold tracking-tight">Ready to ride with NexG?</h2>
+              <p className="text-ink/70 mt-1.5 max-w-md text-sm">
+                Apply today, upload your documents when you&apos;re ready, and we&apos;ll get you on
+                the road.
+              </p>
+            </div>
+            <Button size="lg" asChild trailingIcon={<ArrowRight className="h-4 w-4" />}>
+              <Link href="/riders/apply">Become A Rider</Link>
+            </Button>
+          </Card>
+        </section>
+      </main>
+
+      <SiteFooter />
+    </>
+  );
+}
