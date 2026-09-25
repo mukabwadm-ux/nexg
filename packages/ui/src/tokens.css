@@ -1,0 +1,72 @@
+/**
+ * NexG design tokens — spec section 2.
+ *
+ * Each colour is published twice on purpose:
+ *   --x       the literal hex from the spec table, for hand-written CSS and for
+ *             anyone reading the token list against the design canvas.
+ *   --x-rgb   the same colour as space-separated RGB channels, which is what the
+ *             Tailwind preset consumes so that `bg-ink/60` style opacity
+ *             modifiers keep working.
+ * The two must always describe the same colour.
+ */
+
+:root {
+  /* Surface */
+  --bg: #f6f3ec;
+  --bg-rgb: 246 243 236;
+  --surface: #ffffff;
+  --surface-rgb: 255 255 255;
+
+  /* Ink */
+  --ink: #141414;
+  --ink-rgb: 20 20 20;
+
+  /* Gold */
+  --gold: #d4a72c;
+  --gold-rgb: 212 167 44;
+  --gold-text: #b8901f;
+  --gold-text-rgb: 184 144 31;
+  --gold-soft: #fbf7ea;
+  --gold-soft-rgb: 251 247 234;
+
+  /* Borders */
+  --border: #ece8df;
+  --border-rgb: 236 232 223;
+  --border-strong: #ddd8cc;
+  --border-strong-rgb: 221 216 204;
+
+  /* Muted text */
+  --muted: #4d4a44;
+  --muted-rgb: 77 74 68;
+  --muted-light: #6f6a61;
+  --muted-light-rgb: 111 106 97;
+
+  /* Status: success */
+  --success: #1f7a3a;
+  --success-rgb: 31 122 58;
+  --success-bg: #e9f5ec;
+  --success-bg-rgb: 233 245 236;
+
+  /* Status: danger */
+  --danger: #b42318;
+  --danger-rgb: 180 35 24;
+  --danger-bg: #fdecea;
+  --danger-bg-rgb: 253 236 234;
+
+  /* Status: warning */
+  --warning: #8a6a10;
+  --warning-rgb: 138 106 16;
+  --warning-bg: #fbf7ea;
+  --warning-bg-rgb: 251 247 234;
+
+  /* Console shell — the dark sidebar in the admin artboards. */
+  --shell: #141414;
+  --shell-rgb: 20 20 20;
+  --shell-muted: #8b8780;
+  --shell-muted-rgb: 139 135 128;
+  --shell-border: #2a2a28;
+  --shell-border-rgb: 42 42 40;
+
+  /* Geometry */
+  --radius: 0.625rem;
+}

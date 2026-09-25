@@ -1,0 +1,37 @@
+{
+  "name": "@nexg/admin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NexG admin console: staff sign-in, pipelines, document review",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
+    "lint": "next lint --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rimraf .turbo .next node_modules"
+  },
+  "dependencies": {
+    "@nexg/db": "workspace:*",
+    "@nexg/ui": "workspace:*",
+    "lucide-react": "0.469.0",
+    "next": "14.2.21",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@nexg/config": "workspace:*",
+    "@types/node": "20.17.10",
+    "@types/react": "18.3.17",
+    "@types/react-dom": "18.3.5",
+    "autoprefixer": "10.4.20",
+    "eslint": "8.57.1",
+    "eslint-config-next": "14.2.21",
+    "postcss": "8.4.49",
+    "rimraf": "6.0.1",
+    "tailwindcss": "3.4.17",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
+  }
+}

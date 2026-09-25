@@ -1,0 +1,10 @@
+{
+  "extends": "@nexg/config/tsconfig/react-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["src", "*.cjs", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist", ".turbo"]
+}

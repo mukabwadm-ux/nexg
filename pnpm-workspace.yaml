@@ -1,0 +1,10 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# Native postinstall scripts we explicitly trust. pnpm blocks every build
+# script by default and fails the install until each one is decided here.
+# (pnpm 11 renamed this from `onlyBuiltDependencies`.)
+allowBuilds:
+  esbuild: true # Vitest's bundler
+  unrs-resolver: true # ESLint import resolution

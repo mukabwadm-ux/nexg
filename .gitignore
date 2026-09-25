@@ -38,3 +38,22 @@ Thumbs.db
 coverage/
 playwright-report/
 test-results/
+
+# Turborepo
+.turbo/
+
+# Next.js
+.next/
+next-env.d.ts
+.vercel
+
+# Generated
+*.tsbuildinfo
+
+# Credential scratch files — never commit these.
+# Keep real keys in .env.local (already ignored above) or a password manager.
+nexgcr.txt
+*credential*
+*secret*
+*.pem
+*.key
