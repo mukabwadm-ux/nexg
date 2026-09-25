@@ -15,6 +15,48 @@ env:
   NEXT_TELEMETRY_DISABLED: 1
 
 jobs:
+  database:
+    name: Migrations, RLS and audit chain
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up the Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Proves the schema rebuilds from an empty database, which is the M2
+      # definition of done — not just that it applies to whatever is lying around.
+      - name: Start Supabase
+        run: supabase start
+
+      - name: Reset from zero
+        run: supabase db reset --local
+
+      - name: Lint the schema
+        run: supabase db lint --local --level warning
+
+      - name: RLS, audit chain and status gate tests
+        run: supabase test db
+
+      # The committed types must match the schema they claim to describe.
+      - name: Check generated types are current
+        run: |
+          supabase gen types typescript --local --schema public \
+            > /tmp/types.generated.ts
+          npx --yes prettier@3.4.2 --write /tmp/types.generated.ts
+          if ! diff -u packages/db/src/types.generated.ts /tmp/types.generated.ts; then
+            echo "::error::packages/db/src/types.generated.ts is stale. Run 'pnpm db:types' and commit the result."
+            exit 1
+          fi
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop --no-backup
+
   verify:
     name: Install, build, lint, typecheck, test
     runs-on: ubuntu-latest
