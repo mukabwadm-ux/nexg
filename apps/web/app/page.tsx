@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { CityCarousel } from '@/components/home/city-carousel';
 import { LeadForm } from '@/components/home/lead-form';
+import { RotatingWord } from '@/components/home/rotating-word';
 import { NotifyForm } from '@/components/home/notify-form';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -120,10 +121,19 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 Concierges available now in Nairobi
               </span>
 
-              <h1 className="mt-5 text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-                <span className="text-gold">Everything</span>
-                <br />
-                at your Doorstep
+              {/*
+                The accessible name stays "Everything at your Doorstep" however
+                the gold word is cycling; RotatingWord is hidden from assistive
+                technology and reserves its own space so nothing below shifts.
+              */}
+              <h1
+                aria-label="Everything at your Doorstep"
+                className="mt-5 text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
+              >
+                <RotatingWord />
+                <span aria-hidden="true" className="block">
+                  at your Doorstep
+                </span>
               </h1>
 
               <p className="mt-4 text-xl font-extrabold tracking-tight sm:text-2xl">
@@ -232,7 +242,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
         {/* ------------------------------------------------------- featured */}
         <section className="bg-ink py-14 text-white">
           <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
-            <Tag tone="gold" size="sm" className="uppercase tracking-wide">
+            <Tag tone="gold" className="px-3 py-1 uppercase tracking-[0.12em]">
               Featured merchants · Nairobi
             </Tag>
 
@@ -262,9 +272,9 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
               {FEATURED_PLACEHOLDERS.map((merchant) => (
                 <li
                   key={merchant.name}
-                  className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]"
+                  className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F]"
                 >
-                  <div className="relative flex h-28 items-center justify-center bg-gradient-to-br from-white/[0.06] to-transparent">
+                  <div className="relative flex h-36 items-center justify-center bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E]">
                     <span className="absolute left-2 top-2">
                       <Tag tone="sponsored" size="sm" className="uppercase tracking-wide">
                         Sponsored
