@@ -32,12 +32,15 @@ apps currently show a placeholder at `/`.
 
 | Tool           | Version                       | Why                                                   |
 | -------------- | ----------------------------- | ----------------------------------------------------- |
-| Node           | 20 LTS (see `.nvmrc`)         | Runtime. `nvm use` or `fnm use` picks it up.          |
+| Node           | 22 LTS (see `.nvmrc`)         | Runtime. `nvm use` or `fnm use` picks it up.          |
 | pnpm           | 11+ (`npm i -g pnpm`)         | Workspace package manager.                            |
 | Docker Desktop | current                       | Runs local Postgres for Supabase. **Needed from M2.** |
 | Supabase CLI   | current (`npm i -g supabase`) | Migrations and type generation. **Needed from M2.**   |
 
 Neither Docker nor the Supabase CLI is required to work on M1.
+
+> The M0 checklist in the build plan says Node 20. pnpm 11 refuses to run on anything
+> below Node 22.13, so the repository pins Node 22 LTS instead.
 
 ## Local setup
 
