@@ -785,6 +785,19 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_merchant_apply: {
+        Args: {
+          p_category: Database['public']['Enums']['merchant_category'];
+          p_category_other?: string;
+          p_city_id: string;
+          p_contact_email: string;
+          p_contact_name: string;
+          p_contact_phone: string;
+          p_legal_name: string;
+          p_trading_name: string;
+        };
+        Returns: string;
+      };
       rpc_merchant_go_live: {
         Args: { p_merchant_id: string; p_reason?: string };
         Returns: {
@@ -813,6 +826,17 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_rider_apply: {
+        Args: {
+          p_city_id: string;
+          p_first_name: string;
+          p_last_name: string;
+          p_phone: string;
+          p_plate_no?: string;
+          p_vehicle: Database['public']['Enums']['vehicle_type'];
+        };
+        Returns: string;
       };
     };
     Enums: {
