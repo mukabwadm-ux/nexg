@@ -24,7 +24,6 @@ import {
   type StatusKey,
   Stepper,
   Tag,
-  Toast,
   useToast,
   VALUE_PLACEHOLDER,
 } from '@nexg/ui';
@@ -778,7 +777,10 @@ export default function UiKitPage() {
 
         {/* ----------------------------------------------------------- Toast */}
         <Section name="Toast" summary="Transient feedback. Radix announces it in a live region.">
-          <State label="Trigger one" note="Appears bottom-right; swipe or Escape to dismiss.">
+          <State
+            label="Every tone"
+            note="Appears bottom-right; swipe or Escape to dismiss. Trigger several in a row to compare the tones side by side."
+          >
             <Row>
               <Button
                 variant="outline"
@@ -830,27 +832,6 @@ export default function UiKitPage() {
                 Loading
               </Button>
             </Row>
-          </State>
-
-          <State label="Every tone, pinned" note="Rendered inline so the styling can be compared.">
-            <div className="flex flex-col gap-2">
-              <Toast
-                open
-                title="Request received"
-                description="A concierge will reply shortly."
-                tone="info"
-              />
-              <Toast open title="Document verified" tone="success" />
-              <Toast open title="Insurance expires in 12 days" tone="warning" />
-              <Toast
-                open
-                title="Could not save"
-                description="Check your connection and try again."
-                tone="danger"
-                action={{ label: 'Retry', onClick: () => undefined }}
-              />
-              <Toast open title="Uploading document…" tone="loading" />
-            </div>
           </State>
         </Section>
 
