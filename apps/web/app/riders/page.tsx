@@ -12,6 +12,7 @@ import {
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { RiderAppPreview } from '@/components/riders/rider-app-preview';
 import { RiderApplyCard } from '@/components/riders/rider-apply-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -337,8 +338,8 @@ export default async function RidersPage() {
               </ul>
             </div>
 
-            <div className="hidden justify-center lg:flex" aria-hidden="true">
-              <div className="bg-surface h-80 w-44 rounded-[2rem] border-[6px] border-white/15" />
+            <div className="hidden justify-center lg:flex">
+              <RiderAppPreview />
             </div>
           </div>
         </section>

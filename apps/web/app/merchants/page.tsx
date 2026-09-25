@@ -17,6 +17,7 @@ import {
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { DashboardPreview } from '@/components/merchants/dashboard-preview';
 import { MerchantRegisterCard } from '@/components/merchants/merchant-register-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -305,6 +306,8 @@ export default async function MerchantsPage() {
             })}
           </ul>
         </section>
+
+        <DashboardPreview />
 
         {/* ------------------------------------------- steps and pricing */}
         <section id="how" className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
