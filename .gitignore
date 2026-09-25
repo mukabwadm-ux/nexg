@@ -38,3 +38,14 @@ Thumbs.db
 coverage/
 playwright-report/
 test-results/
+
+# Turborepo
+.turbo/
+
+# Next.js
+.next/
+next-env.d.ts
+.vercel
+
+# Generated
+*.tsbuildinfo

@@ -1,0 +1,37 @@
+{
+  "name": "@nexg/config",
+  "version": "0.1.0",
+  "private": true,
+  "files": [
+    "eslint",
+    "tsconfig",
+    "tailwind"
+  ],
+  "exports": {
+    "./eslint/base": "./eslint/base.cjs",
+    "./eslint/next": "./eslint/next.cjs",
+    "./eslint/react": "./eslint/react.cjs",
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/nextjs.json": "./tsconfig/nextjs.json",
+    "./tsconfig/react-library.json": "./tsconfig/react-library.json",
+    "./tailwind/preset": "./tailwind/preset.cjs"
+  },
+  "scripts": {
+    "lint": "echo \"@nexg/config: no source to lint\"",
+    "typecheck": "echo \"@nexg/config: no types to check\"",
+    "test": "echo \"@nexg/config: no tests\"",
+    "clean": "rimraf .turbo node_modules"
+  },
+  "devDependencies": {
+    "rimraf": "6.0.1"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "8.18.1",
+    "@typescript-eslint/parser": "8.18.1",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.2",
+    "eslint-plugin-react-hooks": "5.1.0",
+    "tailwindcss-animate": "1.0.7"
+  }
+}
