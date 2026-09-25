@@ -30,7 +30,7 @@ test.describe('admin ui-kit', () => {
       'Toast',
       'EmptyState',
     ]) {
-      await expect(page.getByRole('heading', { name, level: 2 })).toBeVisible();
+      await expect(page.getByRole('heading', { name, level: 2, exact: true })).toBeVisible();
     }
   });
 

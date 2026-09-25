@@ -2,6 +2,7 @@
 
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import * as React from 'react';
 
 import { cn } from '../lib/cn';
 import { EmptyState } from './empty-state';
@@ -30,8 +31,8 @@ export interface DetailPanelProps {
  * The right-side drawer used across the console for document review and record
  * detail (spec section 2, artboards B7 and A13).
  *
- * Radix Dialog handles the focus trap, Escape, scroll lock and restoring focus
- * to whatever opened the panel. On a 390px viewport it becomes full width.
+ * Radix Dialog handles the focus trap, Escape and scroll lock; focus
+ * restoration is handled below. On a 390px viewport it becomes full width.
  */
 export function DetailPanel({
   open,
@@ -46,6 +47,23 @@ export function DetailPanel({
   width = 'md',
   children,
 }: DetailPanelProps) {
+  /*
+   * Radix restores focus on close by focusing its <Dialog.Trigger>, and this
+   * panel has no trigger — it is opened from table rows and toolbar buttons all
+   * over the console. Without this, closing the drawer drops focus to the
+   * document body, which strands anyone working a review queue by keyboard.
+   *
+   * Capture during render rather than in an effect: child effects run before
+   * parent effects, so by the time an effect here fired Radix would already
+   * have moved focus into the panel.
+   */
+  const restoreFocusTo = React.useRef<HTMLElement | null>(null);
+  const wasOpen = React.useRef(false);
+  if (open && !wasOpen.current && typeof document !== 'undefined') {
+    restoreFocusTo.current = document.activeElement as HTMLElement | null;
+  }
+  wasOpen.current = open;
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -56,6 +74,10 @@ export function DetailPanel({
           )}
         />
         <Dialog.Content
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            restoreFocusTo.current?.focus();
+          }}
           className={cn(
             'bg-surface shadow-panel fixed inset-y-0 right-0 z-50 flex w-full flex-col',
             'focus:outline-none',
