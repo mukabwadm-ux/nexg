@@ -566,6 +566,9 @@ export default function UiKitPage() {
             </Row>
             <Row className="bg-ink mt-3 rounded-lg p-3">
               <Tag tone="sponsored">Sponsored</Tag>
+              <Tag tone="goldOutline" className="uppercase tracking-[0.12em]">
+                Featured merchants · Nairobi
+              </Tag>
             </Row>
           </State>
 

@@ -242,7 +242,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
         {/* ------------------------------------------------------- featured */}
         <section className="bg-ink py-14 text-white">
           <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
-            <Tag tone="gold" className="px-3 py-1 uppercase tracking-[0.12em]">
+            <Tag tone="goldOutline" className="px-3 py-1 uppercase tracking-[0.12em]">
               Featured merchants · Nairobi
             </Tag>
 
