@@ -6,14 +6,16 @@ import { VALUE_PLACEHOLDER } from '@nexg/ui';
  * dark band, with the greeting, the two earnings tiles, the route, and a live
  * request carrying Skip and Accept.
  *
- * Earnings and distances are [—] or bracketed: the app does not exist and
- * there is no ride data, so a number here would be invented (ground rule 3).
+ * Earnings stay [—]: ground rule 3 covers business numbers, and there is no
+ * ride data. The distances and countdown are drawn literally because the
+ * artboard draws them literally — they illustrate the layout of a decorative
+ * mock rather than reporting anything.
  */
 export function RiderAppPreview() {
   return (
     <div
       aria-hidden="true"
-      className="border-ink/80 shadow-raised mx-auto flex h-[38.75rem] w-[18.75rem] flex-col overflow-hidden rounded-[2.25rem] border-[9px] bg-white"
+      className="bg-bg shadow-raised mx-auto flex h-[38.75rem] w-[18.75rem] flex-col overflow-hidden rounded-[2.25rem] border-[9px] border-[#2A2A2A]"
     >
       {/* greeting */}
       <div className="flex items-center justify-between px-4 pb-3 pt-4">
@@ -52,9 +54,9 @@ export function RiderAppPreview() {
       </div>
 
       {/* route */}
-      <div className="relative mx-4 mt-3 overflow-hidden rounded-xl bg-[#E7E4DC]">
+      <div className="relative mx-4 mt-3 overflow-hidden rounded-xl bg-[#E8E3D7]">
         <span className="bg-surface text-ink absolute left-2.5 top-2.5 rounded-full px-2.5 py-1 text-[0.625rem] font-bold shadow-sm">
-          Pickup · {VALUE_PLACEHOLDER} km
+          Pickup · 1.2 km
         </span>
         <svg viewBox="0 0 240 140" className="h-[8.5rem] w-full">
           <g className="stroke-ink/10" strokeWidth="1">
@@ -87,9 +89,7 @@ export function RiderAppPreview() {
           </p>
         </div>
         <div className="mt-1.5 flex items-center justify-between text-[0.625rem] text-white/50">
-          <span>
-            Pickup {VALUE_PLACEHOLDER} km · Drop {VALUE_PLACEHOLDER} km
-          </span>
+          <span>Pickup 1.2 km · Drop 3.8 km</span>
           <span>Expires in 0:42</span>
         </div>
         <div className="mt-3 flex gap-2">
@@ -103,7 +103,7 @@ export function RiderAppPreview() {
       </div>
 
       {/* nav */}
-      <div className="border-border mt-auto flex justify-around border-t py-4">
+      <div className="border-border bg-surface mt-auto flex justify-around border-t py-4">
         {[Home, BarChart2, MessageSquare, User].map((Icon, index) => (
           <Icon
             key={index}
