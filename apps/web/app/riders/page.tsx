@@ -326,7 +326,20 @@ export default async function RidersPage() {
         </section>
 
         {/* ------------------------------------------------------- rider app */}
-        <section className="bg-ink mt-6 py-16 text-white lg:py-[6.625rem]">
+        <section className="bg-ink relative isolate mt-6 overflow-hidden py-16 text-white lg:py-[6.625rem]">
+          {/*
+            The warm bloom behind the phone. Mapped off the artboard: it peaks
+            at #282214 around 70% across and 33% down the band, which is amber
+            at roughly 11% over the ink ground, falling off over ~250px.
+          */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-[70%] top-[33%] -z-10 h-[38rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(210,146,30,0.16) 0%, rgba(210,146,30,0.07) 42%, transparent 68%)',
+            }}
+          />
           <div className="mx-auto grid max-w-[96rem] gap-8 px-4 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-16">
             <div>
               <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
@@ -358,7 +371,7 @@ export default async function RidersPage() {
               </ul>
             </div>
 
-            <div className="hidden justify-center lg:flex">
+            <div className="hidden lg:flex lg:justify-end lg:pr-[4.5rem]">
               <RiderAppPreview />
             </div>
           </div>

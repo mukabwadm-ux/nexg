@@ -15,7 +15,7 @@ export function RiderAppPreview() {
   return (
     <div
       aria-hidden="true"
-      className="bg-bg shadow-raised mx-auto flex h-[38.75rem] w-[18.75rem] flex-col overflow-hidden rounded-[2.25rem] border-[9px] border-[#2A2A2A]"
+      className="bg-bg shadow-raised flex h-[38.75rem] w-[18.75rem] flex-col overflow-hidden rounded-[2.25rem] border-[9px] border-[#2A2A2A]"
     >
       {/* greeting */}
       <div className="flex items-center justify-between px-4 pb-3 pt-4">
