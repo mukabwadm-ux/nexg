@@ -78,6 +78,9 @@ export function MerchantRegisterCard({ cities }: { cities: CityOption[] }) {
   };
 
   return (
+    /* The artboard draws no required markers here, so the fields carry none:
+       /merchants/apply is where they are formally required, and onContinue
+       validates every one of them on click. */
     <div>
       <div className="grid gap-3 sm:grid-cols-2">
         <Input
