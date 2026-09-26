@@ -1,7 +1,8 @@
 import { cn } from '@nexg/ui';
 
 /**
- * The NexG lockup: the pin, the NEXG wordmark, and CONCIERGE beneath.
+ * The NexG lockup as the artboards draw it: the pin above, the NEXG wordmark
+ * beneath, and CONCIERGE between two rules.
  *
  * The wordmark paths are the supplied `nexg logo.svg` verbatim (also kept at
  * /brand/nexg-logo.svg for favicons and social cards). It is inlined here
@@ -10,34 +11,46 @@ import { cn } from '@nexg/ui';
  * Those paths use currentColor instead, so the same mark reads correctly on
  * cream, on white and on the dark bands — only the X and G stay gold, exactly
  * as drawn.
+ *
+ * The pin, cloche and speed lines are drawn here: the supplied file contains
+ * only the wordmark (its two mark-layer paths are empty move-to stubs), so
+ * the mark is reconstructed from the artboard at 58x50.
  */
 export function Logo({ className, onDark = false }: { className?: string; onDark?: boolean }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-2',
+        'inline-flex flex-col items-center gap-1',
         onDark ? 'text-white' : 'text-ink',
         className,
       )}
     >
-      {/* Pin and speed lines. */}
-      <svg viewBox="0 0 40 44" className="h-9 w-8 shrink-0" aria-hidden="true">
+      {/* Pin, cloche and speed lines, measured off the artboard at 58x50. */}
+      <svg viewBox="0 0 58 50" className="h-[2.875rem] w-[3.3125rem]" aria-hidden="true">
+        {/* Pin body. */}
         <path
-          d="M24 2.5c-7.7 0-14 6.1-14 13.7 0 9.6 11.9 22.3 13.1 23.6a1.2 1.2 0 0 0 1.8 0C26.1 38.5 38 25.8 38 16.2 38 8.6 31.7 2.5 24 2.5Z"
-          className="fill-gold"
+          d="M38.5 50 L23.68 32.68 A19.5 19.5 0 1 1 53.32 32.68 Z"
+          className={onDark ? 'fill-white' : 'fill-ink'}
         />
-        <circle cx="24" cy="15.5" r="5" className={onDark ? 'fill-ink' : 'fill-ink'} />
+        {/* The lit face inside the ring, cut off at the cloche base. */}
         <path
-          d="M2 21h11M2 27h8M2 33h5"
-          className="stroke-gold"
-          strokeWidth="2.6"
-          strokeLinecap="round"
+          d="M24.43 25.5 A15.5 15.5 0 1 1 52.57 25.5 Z"
+          className={onDark ? 'fill-ink' : 'fill-bg'}
         />
+        {/* Cloche. */}
+        <path d="M26.4 21.8 A11.8 13.5 0 0 1 50 21.8 Z" className="fill-gold" />
+        <rect x="24" y="21.4" width="28" height="4.2" rx="2.1" className="fill-gold" />
+        <rect x="37.1" y="5.6" width="2.4" height="3.4" rx="1.2" className="fill-gold" />
+        <circle cx="38.3" cy="5.2" r="2.3" className="fill-gold" />
+        {/* Speed lines, drawn over the pin as the artboard has them. */}
+        <rect x="0" y="15.4" width="27" height="4.2" rx="2.1" className="fill-gold" />
+        <rect x="3.5" y="22" width="23.5" height="3.8" rx="1.9" className="fill-gold" />
+        <rect x="9" y="28.4" width="18" height="3.8" rx="1.9" className="fill-gold" />
       </svg>
 
-      <span className="flex flex-col leading-none">
+      <span className="flex flex-col items-center leading-none">
         {/* NEXG — supplied artwork, light strokes switched to currentColor. */}
-        <svg viewBox="8 184 376 136" className="h-[1.35rem] w-auto" role="img" aria-label="NexG">
+        <svg viewBox="8 184 376 136" className="h-auto w-[4.75rem]" role="img" aria-label="NexG">
           <path
             fill="currentColor"
             d="M16.7,205.9H29c1.3,0,2.5,0.7,3.2,1.7l34.5,56.5c1.8,3,6.8,1.8,6.8-1.6v-53.2c0-1.9,1.6-3.4,3.7-3.4h11.6 c2,0,3.7,1.5,3.7,3.4V308c0,1.9-1.6,3.4-3.7,3.4H76.4c-1.3,0-2.5-0.7-3.2-1.7l-34.5-56.3c-1.8-3-6.9-1.8-6.9,1.6v53 c0,1.9-1.6,3.4-3.7,3.4H16.7c-2,0-3.7-1.5-3.7-3.4v-98.8C13,207.4,14.7,205.9,16.7,205.9z"
@@ -74,13 +87,12 @@ export function Logo({ className, onDark = false }: { className?: string; onDark
           />
         </svg>
 
-        <span
-          className={cn(
-            'mt-1 text-[0.5rem] font-bold uppercase tracking-[0.34em]',
-            onDark ? 'text-white/50' : 'text-muted-light',
-          )}
-        >
-          Concierge
+        <span aria-hidden="true" className="mt-1 flex w-full items-center gap-1.5">
+          <span className="bg-gold/70 h-px flex-1" />
+          <span className="text-gold px-0.5 text-[0.4375rem] font-bold uppercase tracking-[0.1em]">
+            Concierge
+          </span>
+          <span className="bg-gold/70 h-px flex-1" />
         </span>
       </span>
     </span>
