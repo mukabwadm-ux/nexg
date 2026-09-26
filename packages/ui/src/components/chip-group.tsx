@@ -26,6 +26,16 @@ interface ChipGroupBaseProps {
   labelHidden?: boolean;
   className?: string;
   emptyMessage?: string;
+  /**
+   * `pill` is the default rounded chip. `tile` is the larger boxed control the
+   * rider hero uses for vehicle choice: icon above label, ink fill when chosen.
+   */
+  variant?: 'pill' | 'tile';
+  /**
+   * Fill for the chosen chip. The rider hero uses gold, the merchant register
+   * card and the console filters use ink; both are drawn that way.
+   */
+  selectedTone?: 'ink' | 'gold';
 }
 
 export type ChipGroupProps = ChipGroupBaseProps &
@@ -54,6 +64,8 @@ export function ChipGroup(props: ChipGroupProps) {
     labelHidden,
     className,
     emptyMessage = 'No options available',
+    variant = 'pill',
+    selectedTone = 'ink',
   } = props;
 
   const multiple = props.multiple === true;
@@ -146,7 +158,7 @@ export function ChipGroup(props: ChipGroupProps) {
           role={multiple ? 'group' : 'radiogroup'}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-          className="flex flex-wrap gap-2"
+          className={cn('flex flex-wrap gap-2', variant === 'tile' && 'gap-2.5')}
         >
           {options.map((option, index) => {
             const isSelected = selected.has(option.value);
@@ -169,13 +181,26 @@ export function ChipGroup(props: ChipGroupProps) {
                 onClick={() => toggle(option)}
                 onKeyDown={(event) => handleKeyDown(event, index)}
                 className={cn(
-                  'inline-flex min-h-[2.5rem] items-center gap-1.5 rounded-full border px-4 py-2',
-                  'text-sm font-semibold transition-colors',
+                  'transition-colors',
                   'focus-visible:ring-gold focus-visible:ring-offset-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                   'disabled:cursor-not-allowed disabled:opacity-45',
-                  isSelected
-                    ? 'border-ink bg-ink text-white'
-                    : 'border-border-strong bg-surface text-ink hover:border-ink/40 hover:bg-bg',
+                  variant === 'tile'
+                    ? cn(
+                        'flex min-h-[4.375rem] flex-1 basis-24 flex-col items-center justify-center gap-1.5 rounded-xl border px-3 py-3',
+                        'text-sm font-bold',
+                        isSelected
+                          ? 'border-ink bg-ink text-gold'
+                          : 'border-border-strong bg-surface text-ink hover:border-ink/40',
+                      )
+                    : cn(
+                        'inline-flex min-h-[2.5rem] items-center gap-1.5 rounded-full border px-4 py-2',
+                        'text-sm font-semibold',
+                        isSelected
+                          ? selectedTone === 'gold'
+                            ? 'border-gold bg-gold text-ink'
+                            : 'border-ink bg-ink text-white'
+                          : 'border-border-strong bg-surface text-ink hover:border-ink/40 hover:bg-bg',
+                      ),
                   error && !isSelected && 'border-danger/40',
                 )}
               >
