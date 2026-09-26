@@ -177,12 +177,14 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 <Card tone="gold" className="h-full">
                   <span
                     aria-hidden="true"
-                    className="bg-ink flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white"
+                    className="bg-ink text-gold flex h-11 w-11 items-center justify-center rounded-xl text-sm font-extrabold"
                   >
                     {index + 1}
                   </span>
                   <h3 className="mt-4 text-base font-extrabold">{step.title}</h3>
-                  <p className="text-ink/80 mt-1.5 text-[0.9375rem] leading-[1.7]">{step.body}</p>
+                  <p className="text-ink/80 mt-1.5 text-[0.9375rem] font-semibold leading-[1.7]">
+                    {step.body}
+                  </p>
                 </Card>
               </li>
             ))}

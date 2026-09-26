@@ -294,12 +294,12 @@ export default async function MerchantsPage() {
                   <Card tone="gold" className="h-full">
                     <span
                       aria-hidden="true"
-                      className="bg-ink text-gold flex h-8 w-8 items-center justify-center rounded-lg"
+                      className="bg-ink text-gold flex h-12 w-12 items-center justify-center rounded-xl"
                     >
                       <Icon className="h-4 w-4" />
                     </span>
                     <h3 className="mt-4 text-[1.0625rem] font-extrabold">{benefit.title}</h3>
-                    <p className="text-ink/80 mt-1.5 text-[0.875rem] leading-[1.7]">
+                    <p className="text-ink/80 mt-1.5 text-[0.875rem] font-semibold leading-[1.7]">
                       {benefit.body}
                     </p>
                   </Card>
