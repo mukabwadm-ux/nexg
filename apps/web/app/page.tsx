@@ -21,6 +21,7 @@ import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { CityCarousel } from '@/components/home/city-carousel';
+import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { LeadForm } from '@/components/home/lead-form';
 import { RotatingWord } from '@/components/home/rotating-word';
 import { NotifyForm } from '@/components/home/notify-form';
@@ -77,36 +78,23 @@ const CATEGORIES = [
   { label: 'Flowers & gifts', icon: Gift },
 ] as const;
 
-/**
- * Featured merchant slots. Section 4.1: no real slots exist yet, so the
- * designed placeholder cards render instead — bracketed names, [COVER PHOTO],
- * and the Sponsored label. No invented merchant is presented as real.
- */
-const FEATURED_PLACEHOLDERS = [
-  {
-    name: '[Italian restaurant]',
-    meta: 'Fine dining · Westlands',
-    eta: '25–35 min',
-    cta: 'View menu',
-  },
-  { name: '[Wine & spirits shop]', meta: 'Drinks · Parklands', eta: '20–30 min', cta: 'Shop' },
-  { name: '[Florist]', meta: 'Flowers & gifts · Kilimani', eta: 'Same day', cta: 'Shop' },
-  {
-    name: '[Laundry & dry cleaning]',
-    meta: 'Wash, iron, press · Kilimani',
-    eta: 'Next day',
-    cta: 'View services',
-  },
-] as const;
-
 export default async function HomePage({ searchParams }: { searchParams?: { need?: string } }) {
   const supabase = createClient();
 
   // Live and soft-launch cities first, then the waitlist — as designed.
-  const { data: cities } = await supabase
-    .from('city')
-    .select('id, slug, name, status')
-    .order('sort', { ascending: true });
+  const [{ data: cities }, { data: featured }] = await Promise.all([
+    supabase.from('city').select('id, slug, name, status').order('sort', { ascending: true }),
+    /*
+     * Section 4.1: the band reads public.merchant_public, which only ever
+     * returns live merchants. Production has none until real slots are sold,
+     * and the component falls back to the designed placeholder cards.
+     */
+    supabase
+      .from('merchant_public')
+      .select('id, trading_name, category, city_name, branch_name, cover_photo_path')
+      .eq('featured', true)
+      .limit(4),
+  ]);
 
   const allCities = cities ?? [];
   const openCities = allCities.filter((c) => c.status !== 'waitlist');
@@ -299,37 +287,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
               </Button>
             </div>
 
-            <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {FEATURED_PLACEHOLDERS.map((merchant) => (
-                <li
-                  key={merchant.name}
-                  className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F]"
-                >
-                  <div className="relative flex h-36 items-center justify-center bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E]">
-                    <span className="absolute left-2 top-2">
-                      <Tag tone="sponsored" size="sm" className="uppercase tracking-wide">
-                        Sponsored
-                      </Tag>
-                    </span>
-                    <span className="text-[0.625rem] uppercase tracking-widest text-white/35">
-                      [Cover photo]
-                    </span>
-                    <span className="bg-gold text-ink absolute bottom-2 right-2 rounded-full px-2 py-0.5 text-[0.625rem] font-bold">
-                      {merchant.eta}
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <p className="truncate text-sm font-bold">{merchant.name}</p>
-                    <p className="mt-0.5 truncate text-xs font-semibold text-white/50">
-                      {merchant.meta}
-                    </p>
-                    <span className="bg-gold text-ink mt-3 block rounded-md py-1.5 text-center text-xs font-bold">
-                      {merchant.cta}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <FeaturedMerchants merchants={featured ?? []} />
 
             <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-semibold text-white/40">

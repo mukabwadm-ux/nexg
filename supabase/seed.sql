@@ -87,3 +87,50 @@ where not exists (
   select 1 from public.merchant_branch
   where merchant_id = '00000000-0000-4000-8000-00000000000c'::uuid and is_primary
 );
+
+-- ------------------------------------------------- featured merchants (demo)
+--
+-- Four live, featured merchants so the homepage's featured band has something
+-- to render. This file runs only on `supabase db reset`, so production stays
+-- empty and the homepage falls back to the designed placeholder cards until
+-- real merchants go live (spec section 4.1).
+--
+-- Names are invented and generic on purpose. A plausible-looking real business
+-- on a public homepage is one a guest could try to order from.
+--
+-- cover_photo_path is null: no cover photography exists yet, so the card
+-- renders the branded fallback rather than a broken image.
+
+insert into public.merchant (
+  id, legal_name, trading_name, category, contact_name, contact_phone,
+  contact_email, city_id, status, went_live_at, featured, cover_photo_path
+)
+select
+  d.id::uuid, d.legal_name, d.trading_name, d.category::public.merchant_category,
+  d.contact_name, d.phone, d.email,
+  (select id from public.city where slug = 'nairobi'),
+  'live', now(), true, null
+from (values
+  ('00000000-0000-4000-8000-00000000d001', 'Westlands Trattoria Limited', 'Westlands Trattoria',
+   'restaurant', 'Demo Contact', '+254700000101', 'demo.trattoria@example.com'),
+  ('00000000-0000-4000-8000-00000000d002', 'Parklands Cellar Limited', 'Parklands Cellar',
+   'bar_liquor', 'Demo Contact', '+254700000102', 'demo.cellar@example.com'),
+  ('00000000-0000-4000-8000-00000000d003', 'Kilimani Blooms Limited', 'Kilimani Blooms',
+   'florist', 'Demo Contact', '+254700000103', 'demo.blooms@example.com'),
+  ('00000000-0000-4000-8000-00000000d004', 'Kilimani Press & Fold Limited', 'Kilimani Press & Fold',
+   'laundry', 'Demo Contact', '+254700000104', 'demo.laundry@example.com')
+) as d(id, legal_name, trading_name, category, contact_name, phone, email)
+on conflict (id) do nothing;
+
+insert into public.merchant_branch (merchant_id, name, address_text, is_primary)
+select m.id, b.branch, b.addr, true
+from (values
+  ('00000000-0000-4000-8000-00000000d001', 'Westlands', 'Woodvale Grove, Westlands'),
+  ('00000000-0000-4000-8000-00000000d002', 'Parklands', 'Ojijo Road, Parklands'),
+  ('00000000-0000-4000-8000-00000000d003', 'Kilimani', 'Argwings Kodhek Road, Kilimani'),
+  ('00000000-0000-4000-8000-00000000d004', 'Kilimani', 'Lenana Road, Kilimani')
+) as b(id, branch, addr)
+join public.merchant m on m.id = b.id::uuid
+where not exists (
+  select 1 from public.merchant_branch mb where mb.merchant_id = m.id and mb.is_primary
+);
