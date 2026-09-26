@@ -298,8 +298,10 @@ export default async function MerchantsPage() {
                     >
                       <Icon className="h-4 w-4" />
                     </span>
-                    <h3 className="mt-4 text-sm font-extrabold">{benefit.title}</h3>
-                    <p className="text-ink/70 mt-1.5 text-xs leading-[1.7]">{benefit.body}</p>
+                    <h3 className="mt-4 text-[1.0625rem] font-extrabold">{benefit.title}</h3>
+                    <p className="text-ink/80 mt-1.5 text-[0.875rem] leading-[1.7]">
+                      {benefit.body}
+                    </p>
                   </Card>
                 </li>
               );
@@ -513,7 +515,7 @@ export default async function MerchantsPage() {
               <h2 className="text-2xl font-extrabold tracking-tight">
                 Ready to reach thousands of guests?
               </h2>
-              <p className="text-ink/70 mt-1.5 max-w-md text-sm">
+              <p className="text-ink/80 mt-1.5 max-w-md text-sm">
                 Register today and be on the concierge&apos;s list before the next check-in.
               </p>
             </div>

@@ -182,7 +182,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                     {index + 1}
                   </span>
                   <h3 className="mt-4 text-base font-extrabold">{step.title}</h3>
-                  <p className="text-ink/70 mt-1.5 text-[0.9375rem] leading-[1.7]">{step.body}</p>
+                  <p className="text-ink/80 mt-1.5 text-[0.9375rem] leading-[1.7]">{step.body}</p>
                 </Card>
               </li>
             ))}
@@ -400,7 +400,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                 your pocket.
               </h2>
 
-              <p className="text-ink/70 mt-4 max-w-md text-[0.9375rem] leading-[1.7]">
+              <p className="text-ink/80 mt-4 max-w-md text-[0.9375rem] leading-[1.7]">
                 Ask for anything in a sentence, watch your concierge move on the map, and pay by
                 card or M-Pesa when it&apos;s done. Launching first in Nairobi, then across East
                 Africa.
