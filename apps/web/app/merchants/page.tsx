@@ -18,6 +18,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { DashboardPreview } from '@/components/merchants/dashboard-preview';
+import { FeaturedSlots } from '@/components/merchants/featured-slots';
+import { StorefrontPreview } from '@/components/merchants/storefront-preview';
 import { MerchantRegisterCard } from '@/components/merchants/merchant-register-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -135,8 +137,8 @@ export default async function MerchantsPage() {
 
       <main>
         {/* ------------------------------------------------------------ hero */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-8 sm:px-8 lg:px-16 lg:pb-14 lg:pt-12">
-          <div className="grid gap-8 lg:grid-cols-[1fr_26rem] lg:gap-12">
+        <section className="mx-auto max-w-[96rem] px-4 pb-16 pt-8 sm:px-8 lg:px-16 lg:pb-[6.75rem] lg:pt-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_32.375rem] lg:gap-11">
             <div className="lg:pt-6">
               <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
                 <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
@@ -149,14 +151,18 @@ export default async function MerchantsPage() {
                 <span className="text-gold">every guest&apos;s</span> hands.
               </h1>
 
-              <p className="text-muted mt-4 max-w-md text-[1.0625rem] leading-[1.7]">
+              <p className="text-muted mt-4 max-w-[32.5rem] text-[1.0625rem] font-semibold leading-[1.7]">
                 Hotel guests, travellers and expats ask NexG for what they need. List your
                 restaurant, bar, laundry, florist or boutique and let our riders bring your products
                 to their door.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-2">
-                <Button size="lg" asChild>
+                <Button
+                  size="lg"
+                  asChild
+                  trailingIcon={<ArrowRight className="text-gold h-4 w-4" />}
+                >
                   <Link href="/merchants/apply">Register Your Business</Link>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
@@ -164,13 +170,16 @@ export default async function MerchantsPage() {
                 </Button>
               </div>
 
-              <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4">
+              <dl className="mt-8 flex flex-wrap gap-y-4 sm:gap-x-0">
                 {[
                   { value: 'Zero', label: 'riders to hire' },
                   { value: 'Weekly', label: 'M-Pesa settlement' },
                   { value: cityCount ?? VALUE_PLACEHOLDER, label: 'cities to grow into' },
                 ].map((stat) => (
-                  <div key={stat.label}>
+                  <div
+                    key={stat.label}
+                    className="border-border-strong first:border-0 first:pl-0 sm:border-l sm:pl-10"
+                  >
                     <dt className="sr-only">{stat.label}</dt>
                     <dd>
                       <span className="block text-xl font-extrabold tracking-tight">
@@ -183,88 +192,35 @@ export default async function MerchantsPage() {
               </dl>
             </div>
 
-            {/* How the merchant's card will look to a guest once live. */}
-            <Card className="self-start p-3">
-              <div className="flex items-center justify-between">
-                <p className="text-muted-light text-[0.625rem] font-bold uppercase tracking-widest">
-                  How guests will see you
-                </p>
-                <span className="text-success flex items-center gap-1 text-[0.625rem] font-bold">
-                  <span aria-hidden="true" className="bg-success h-1.5 w-1.5 rounded-full" />
-                  Open now
-                </span>
-              </div>
-
-              <div
-                aria-hidden="true"
-                className="bg-bg text-muted-light mt-2 flex h-28 items-center justify-center rounded-lg text-[0.625rem] uppercase tracking-widest"
-              >
-                [Your cover photo]
-              </div>
-
-              <p className="mt-3 text-sm font-extrabold">[Your business name]</p>
-              <p className="text-muted-light text-xs">
-                Restaurant · Westlands, Nairobi · Delivers in {VALUE_PLACEHOLDER} min
-              </p>
-
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {['Popular', 'Mains', 'Drinks', 'Desserts'].map((tab, index) => (
-                  <span
-                    key={tab}
-                    className={`rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold ${
-                      index === 0 ? 'bg-gold text-ink' : 'bg-bg text-muted'
-                    }`}
-                  >
-                    {tab}
-                  </span>
-                ))}
-              </div>
-
-              <ul className="mt-3 space-y-2">
-                {[1, 2].map((item) => (
-                  <li
-                    key={item}
-                    className="border-border flex items-baseline justify-between gap-3 border-t pt-2"
-                  >
-                    <span className="min-w-0">
-                      <span className="block truncate text-xs font-bold">[Menu item]</span>
-                      <span className="text-muted-light block truncate text-[0.6875rem]">
-                        [Short description]
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-xs font-bold">KES {VALUE_PLACEHOLDER}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+            <StorefrontPreview />
           </div>
         </section>
 
         {/* ------------------------------------------------------ categories */}
-        <section className="border-border bg-surface border-y py-12">
+        <section className="border-border bg-surface border-y py-[4.5rem]">
           <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="text-2xl font-extrabold tracking-tight">
+              <h2 className="text-[1.75rem] font-extrabold tracking-tight">
                 Built for the businesses guests ask for most
               </h2>
-              <p className="text-muted-light text-xs">
+              <p className="text-muted-light text-xs font-semibold">
                 Don&apos;t see yours? Register anyway — we add categories as demand grows.
               </p>
             </div>
 
-            <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+            <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
               {CATEGORY_TILES.map((category) => {
                 const Icon = category.icon;
                 return (
                   <li
                     key={category.label}
-                    className="bg-bg flex flex-col items-center gap-2 rounded-xl px-2 py-4 text-center"
+                    className="bg-bg flex flex-col items-center gap-3 rounded-xl px-2 py-6 text-center"
                   >
                     <span
                       aria-hidden="true"
-                      className="bg-gold text-ink flex h-9 w-9 items-center justify-center rounded-lg"
+                      className="bg-gold text-ink flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-xl"
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-6 w-6" />
                     </span>
                     <span className="text-[0.6875rem] font-bold leading-tight">
                       {category.label}
@@ -277,28 +233,28 @@ export default async function MerchantsPage() {
         </section>
 
         {/* -------------------------------------------------------- benefits */}
-        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[96rem] px-4 py-[5.5rem] sm:px-8 lg:px-16">
           <h2 className="max-w-lg text-3xl font-extrabold leading-tight tracking-tight">
             A new front door, without a new headache
           </h2>
-          <p className="text-muted mt-2 max-w-xl text-[0.9375rem] leading-[1.7]">
+          <p className="text-muted mt-2 max-w-xl text-[0.9375rem] font-semibold leading-[1.7]">
             You keep cooking, pressing, arranging and selling. NexG handles the guest, the rider and
             the payment.
           </p>
 
-          <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {BENEFITS.map((benefit) => {
               const Icon = benefit.icon;
               return (
                 <li key={benefit.title}>
-                  <Card tone="gold" className="h-full">
+                  <Card tone="gold" className="h-full p-7">
                     <span
                       aria-hidden="true"
-                      className="bg-ink text-gold flex h-12 w-12 items-center justify-center rounded-xl"
+                      className="bg-ink text-gold flex h-14 w-14 items-center justify-center rounded-xl"
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-5 w-5" />
                     </span>
-                    <h3 className="mt-4 text-[1.0625rem] font-extrabold">{benefit.title}</h3>
+                    <h3 className="mt-6 text-[1.0625rem] font-extrabold">{benefit.title}</h3>
                     <p className="text-ink/80 mt-1.5 text-[0.875rem] font-semibold leading-[1.7]">
                       {benefit.body}
                     </p>
@@ -312,29 +268,32 @@ export default async function MerchantsPage() {
         <DashboardPreview />
 
         {/* ------------------------------------------- steps and pricing */}
-        <section id="how" className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
-          <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+        <section
+          id="how"
+          className="mx-auto max-w-[96rem] px-4 pb-[5.625rem] pt-[5.9375rem] sm:px-8 lg:px-16"
+        >
+          <div className="grid gap-6 lg:grid-cols-[1fr_27.5rem] lg:gap-[4.125rem]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
                 Live in three steps
               </h2>
-              <p className="text-muted mt-2 text-sm">
+              <p className="text-muted mt-2 text-sm font-semibold">
                 Most merchants are taking orders within a few days of registering.
               </p>
 
-              <ol className="mt-6 space-y-3">
+              <ol className="mt-8 space-y-3.5">
                 {STEPS.map((step, index) => (
                   <li key={step.title}>
-                    <Card className="flex gap-4">
+                    <Card className="flex gap-4 p-6">
                       <span
                         aria-hidden="true"
-                        className="bg-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                        className="bg-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
                       >
                         {index + 1}
                       </span>
                       <span>
-                        <span className="block text-sm font-extrabold">{step.title}</span>
-                        <span className="text-muted mt-1 block text-xs leading-[1.7]">
+                        <span className="block text-[0.9375rem] font-extrabold">{step.title}</span>
+                        <span className="text-muted mt-1.5 block text-[0.8125rem] font-semibold leading-[1.7]">
                           {step.body}
                         </span>
                       </span>
@@ -350,30 +309,34 @@ export default async function MerchantsPage() {
              * this renders [—] rather than a number nobody has agreed to
              * (ground rule 3).
              */}
-            <Card tone="ink" className="self-start">
-              <p className="text-gold text-[0.625rem] font-bold uppercase tracking-widest">
+            <Card tone="ink" className="self-start p-8">
+              <p className="text-gold text-[0.6875rem] font-extrabold uppercase tracking-[0.18em]">
                 Simple pricing
               </p>
-              <p className="mt-3 text-5xl font-extrabold tracking-tight">
+              <p className="mt-3 text-[3.5rem] font-extrabold leading-none tracking-tight">
                 {commissionValue === null ? VALUE_PLACEHOLDER : String(commissionValue)}%
               </p>
-              <p className="mt-1 text-xs text-white/60">per completed order. That&apos;s it.</p>
+              <p className="mt-2 text-sm font-semibold text-white/55">
+                per completed order. That&apos;s it.
+              </p>
 
-              <ul className="mt-4 space-y-2">
+              <hr className="mt-6 border-white/10" />
+
+              <ul className="mt-6 space-y-4">
                 {PRICING_POINTS.map((point) => (
-                  <li key={point} className="flex items-center gap-2">
+                  <li key={point} className="flex items-center gap-3">
                     <span
                       aria-hidden="true"
-                      className="bg-gold text-ink flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
+                      className="bg-gold text-ink flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
                     >
-                      <Check className="h-2.5 w-2.5" />
+                      <Check className="h-3.5 w-3.5" />
                     </span>
-                    <span className="text-xs text-white/80">{point}</span>
+                    <span className="text-sm font-semibold text-white/85">{point}</span>
                   </li>
                 ))}
               </ul>
 
-              <Button variant="gold" block className="mt-5" asChild>
+              <Button variant="gold" block className="mt-7 h-14 rounded-xl text-base" asChild>
                 <Link href="/merchants/apply">Register Your Business</Link>
               </Button>
             </Card>
@@ -381,63 +344,21 @@ export default async function MerchantsPage() {
         </section>
 
         {/* ------------------------------------------------------- featured */}
-        <section id="featured" className="bg-ink py-14 text-white">
-          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
-            <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
-              Get featured
-            </span>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight">
-              Put your store on the <span className="text-gold">homepage.</span>
-            </h2>
-            <p className="mt-2 max-w-xl text-[0.9375rem] leading-[1.7] text-white/60">
-              Once you&apos;re live, you can buy a featured slot and be the first store guests see
-              when they open NexG. Slots are limited per city, so every featured merchant actually
-              gets seen.
-            </p>
-
-            <ul className="mt-6 grid gap-4 sm:grid-cols-3">
-              {[
-                { name: 'Homepage spot', note: 'Featured on the homepage, in your city.' },
-                { name: 'Category top', note: 'First result when guests browse your category.' },
-                { name: 'Popular request', note: 'Your best-seller pinned in Popular Requests.' },
-              ].map((slot) => (
-                <li
-                  key={slot.name}
-                  className="rounded-xl border border-white/10 bg-white/[0.04] p-4"
-                >
-                  <p className="text-[0.625rem] font-bold uppercase tracking-widest text-white/40">
-                    Sponsored slot
-                  </p>
-                  <p className="mt-2 text-sm font-extrabold">{slot.name}</p>
-                  <p className="mt-2 text-2xl font-extrabold tracking-tight">
-                    KES {VALUE_PLACEHOLDER}
-                    <span className="text-sm font-semibold text-white/50"> / week</span>
-                  </p>
-                  <p className="mt-2 text-xs text-white/50">{slot.note}</p>
-                </li>
-              ))}
-            </ul>
-
-            <p className="mt-5 text-xs text-white/40">
-              Available to live merchants in good standing. Ask about featured placement once
-              you&apos;re taking orders.
-            </p>
-          </div>
-        </section>
+        <FeaturedSlots />
 
         {/* -------------------------------------------------------- register */}
-        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
-          <div className="grid gap-8 lg:grid-cols-[1fr_28rem] lg:items-start">
+        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
+          <div className="bg-surface grid gap-8 rounded-2xl px-6 py-10 sm:px-10 sm:py-12 lg:grid-cols-[1fr_39.9375rem] lg:items-center lg:gap-12 lg:p-14">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
                 Register your business
               </h2>
-              <p className="text-muted mt-2 max-w-md text-[0.9375rem] leading-[1.7]">
+              <p className="text-muted mt-2 max-w-md text-[0.9375rem] font-semibold leading-[1.7]">
                 Two minutes now. A member of the merchant team will call to confirm details and walk
                 you through the dashboard.
               </p>
 
-              <ul className="mt-6 space-y-2.5">
+              <ul className="mt-7 space-y-3.5">
                 {[
                   'Valid business permit',
                   'A physical location in one of our cities',
@@ -446,11 +367,11 @@ export default async function MerchantsPage() {
                   <li key={item} className="flex items-center gap-3">
                     <span
                       aria-hidden="true"
-                      className="bg-gold text-ink flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                      className="bg-gold text-ink flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
                     >
-                      <Check className="h-3 w-3" />
+                      <Check className="h-3.5 w-3.5" />
                     </span>
-                    <span className="text-sm font-semibold">{item}</span>
+                    <span className="text-sm font-bold">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -462,12 +383,12 @@ export default async function MerchantsPage() {
 
         {/* ------------------------------------------------------------- FAQ */}
         <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
-          <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
+          <div className="grid gap-8 lg:grid-cols-[27.5rem_1fr] lg:gap-12">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
                 Questions merchants ask
               </h2>
-              <p className="text-muted mt-2 text-sm">
+              <p className="text-muted mt-2 text-sm font-semibold">
                 Anything else, the merchant team is a call away.
               </p>
               <Link
@@ -479,9 +400,12 @@ export default async function MerchantsPage() {
             </div>
 
             <ul className="space-y-2">
-              {FAQ.map((item) => (
+              {FAQ.map((item, index) => (
                 <li key={item.q}>
-                  <details className="border-border bg-surface shadow-card group rounded-xl border px-4 py-3">
+                  <details
+                    open={index === 0}
+                    className="border-border bg-surface shadow-card group rounded-xl border px-4 py-3"
+                  >
                     <summary className="focus-visible:ring-gold flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold focus-visible:outline-none focus-visible:ring-2">
                       {item.q}
                       <span
@@ -492,12 +416,14 @@ export default async function MerchantsPage() {
                       </span>
                       <span
                         aria-hidden="true"
-                        className="text-gold-text hidden shrink-0 text-lg group-open:block"
+                        className="bg-gold text-ink hidden h-6 w-6 shrink-0 items-center justify-center rounded-full text-base leading-none group-open:flex"
                       >
                         −
                       </span>
                     </summary>
-                    <p className="text-muted mt-2 text-[0.9375rem] leading-[1.7]">{item.a}</p>
+                    <p className="text-muted mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
+                      {item.a}
+                    </p>
                   </details>
                 </li>
               ))}
@@ -509,17 +435,22 @@ export default async function MerchantsPage() {
         <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
           <Card
             tone="gold"
-            className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-12"
           >
             <div>
-              <h2 className="text-2xl font-extrabold tracking-tight">
+              <h2 className="max-w-lg text-[2rem] font-extrabold leading-tight tracking-tight">
                 Ready to reach thousands of guests?
               </h2>
-              <p className="text-ink/80 mt-1.5 max-w-md text-sm">
+              <p className="text-ink/80 mt-3 max-w-md text-[0.9375rem] font-semibold">
                 Register today and be on the concierge&apos;s list before the next check-in.
               </p>
             </div>
-            <Button size="lg" asChild trailingIcon={<ArrowRight className="h-4 w-4" />}>
+            <Button
+              size="lg"
+              asChild
+              className="h-14 shrink-0 rounded-xl"
+              trailingIcon={<ArrowRight className="text-gold h-4 w-4" />}
+            >
               <Link href="/merchants/apply">Register Your Business</Link>
             </Button>
           </Card>
