@@ -1,6 +1,150 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
+  audit: {
+    Tables: {
+      audit_event: {
+        Row: {
+          action: string;
+          actor_id: string | null;
+          actor_role: string | null;
+          actor_type: Database['public']['Enums']['actor_type'];
+          after: Json | null;
+          approved_by: string | null;
+          at: string;
+          before: Json | null;
+          city_id: string | null;
+          hash: string;
+          id: number;
+          ip: unknown;
+          module: string;
+          prev_hash: string | null;
+          reason: string | null;
+          session_id: string | null;
+          severity: Database['public']['Enums']['audit_severity'];
+          target_id: string | null;
+          target_type: string | null;
+          user_agent: string | null;
+          canonical: string | null;
+        };
+        Insert: {
+          action: string;
+          actor_id?: string | null;
+          actor_role?: string | null;
+          actor_type: Database['public']['Enums']['actor_type'];
+          after?: Json | null;
+          approved_by?: string | null;
+          at?: string;
+          before?: Json | null;
+          city_id?: string | null;
+          hash: string;
+          id?: never;
+          ip?: unknown;
+          module: string;
+          prev_hash?: string | null;
+          reason?: string | null;
+          session_id?: string | null;
+          severity?: Database['public']['Enums']['audit_severity'];
+          target_id?: string | null;
+          target_type?: string | null;
+          user_agent?: string | null;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string | null;
+          actor_role?: string | null;
+          actor_type?: Database['public']['Enums']['actor_type'];
+          after?: Json | null;
+          approved_by?: string | null;
+          at?: string;
+          before?: Json | null;
+          city_id?: string | null;
+          hash?: string;
+          id?: never;
+          ip?: unknown;
+          module?: string;
+          prev_hash?: string | null;
+          reason?: string | null;
+          session_id?: string | null;
+          severity?: Database['public']['Enums']['audit_severity'];
+          target_id?: string | null;
+          target_type?: string | null;
+          user_agent?: string | null;
+        };
+        Relationships: [];
+      };
+      chain_check: {
+        Row: {
+          detail: string | null;
+          events_checked: number;
+          first_bad_id: number | null;
+          id: number;
+          ok: boolean;
+          ran_at: string;
+        };
+        Insert: {
+          detail?: string | null;
+          events_checked: number;
+          first_bad_id?: number | null;
+          id?: never;
+          ok: boolean;
+          ran_at?: string;
+        };
+        Update: {
+          detail?: string | null;
+          events_checked?: number;
+          first_bad_id?: number | null;
+          id?: never;
+          ok?: boolean;
+          ran_at?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      canonical: {
+        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Returns: string;
+      };
+      log: {
+        Args: {
+          p_action: string;
+          p_actor_id?: string;
+          p_actor_role?: string;
+          p_actor_type: Database['public']['Enums']['actor_type'];
+          p_after?: Json;
+          p_approved_by?: string;
+          p_before?: Json;
+          p_city_id?: string;
+          p_module: string;
+          p_reason?: string;
+          p_severity?: Database['public']['Enums']['audit_severity'];
+          p_target_id?: string;
+          p_target_type?: string;
+        };
+        Returns: number;
+      };
+      run_chain_check: { Args: Record<PropertyKey, never>; Returns: undefined };
+      verify_chain: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          detail: string;
+          events_checked: number;
+          first_bad_id: number;
+          ok: boolean;
+        }[];
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
       city: {
@@ -757,6 +901,19 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_document_submit: {
+        Args: {
+          p_expires_at?: string;
+          p_issued_at?: string;
+          p_mime: string;
+          p_owner_id: string;
+          p_owner_type: Database['public']['Enums']['document_owner_type'];
+          p_requirement_kind: string;
+          p_size_bytes: number;
+          p_storage_path: string;
+        };
+        Returns: string;
+      };
       rpc_document_verify: {
         Args: { p_document_id: string };
         Returns: {
@@ -826,6 +983,16 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_merchant_set_primary_branch: {
+        Args: {
+          p_address_text: string;
+          p_latitude?: number;
+          p_longitude?: number;
+          p_merchant_id: string;
+          p_name?: string;
+        };
+        Returns: string;
       };
       rpc_rider_apply: {
         Args: {
@@ -986,6 +1153,9 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  audit: {
+    Enums: {},
+  },
   public: {
     Enums: {
       actor_type: ['staff', 'merchant_user', 'rider', 'guest', 'host_user', 'system'],

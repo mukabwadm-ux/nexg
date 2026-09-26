@@ -16,6 +16,10 @@ import Link from 'next/link';
 import * as React from 'react';
 
 import { type ApplyResult, submitMerchantApplication } from '@/app/merchants/apply/actions';
+import { createClient } from '@/lib/supabase/client';
+import { ensureApplicantSession } from '@/lib/uploads';
+
+import { useDocumentUploads } from '../use-document-uploads';
 import { MERCHANT_CATEGORIES } from './merchant-register-card';
 
 export interface CityOption {
@@ -84,9 +88,15 @@ export function MerchantApplyFlow({
   );
   const [address, setAddress] = React.useState('');
   const [errors, setErrors] = React.useState<Record<string, string>>({});
-  const [files, setFiles] = React.useState<Record<string, File>>({});
+  const [merchantId, setMerchantId] = React.useState<string | null>(null);
 
   const applicable = requirements.filter((r) => appliesTo(r, category ?? 'restaurant'));
+
+  const uploads = useDocumentUploads({
+    ownerType: 'merchant',
+    ownerId: merchantId,
+    requirements: applicable,
+  });
 
   const submitStepOne = async () => {
     const next: Record<string, string> = {};
@@ -103,6 +113,22 @@ export function MerchantApplyFlow({
     if (Object.keys(next).length > 0) return;
 
     setPending(true);
+
+    /*
+     * Identity first: rpc_merchant_apply makes this session the owner, and
+     * an unowned business cannot be uploaded to.
+     */
+    const session = await ensureApplicantSession();
+    if (!session) {
+      setPending(false);
+      toast({
+        title: 'We could not start a secure session',
+        description: 'Check your connection and try again.',
+        tone: 'danger',
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.set('legal_name', legalName);
     formData.set('trading_name', tradingName);
@@ -121,12 +147,44 @@ export function MerchantApplyFlow({
       return;
     }
 
+    setMerchantId(result.merchantId ?? null);
     toast({
       title: 'Registration started',
       description: 'Now tell us where a rider collects from.',
       tone: 'success',
     });
     setStep(2);
+  };
+
+  /*
+   * Step two saves the collection address. It is a real write, not a local
+   * field: a reviewer needs somewhere to send a rider, and rpc_merchant_go_live
+   * has nothing to dispatch against without it.
+   */
+  const submitStepTwo = async () => {
+    if (!merchantId) {
+      toast({
+        title: 'We lost your registration',
+        description: 'Go back a step and save your details again.',
+        tone: 'danger',
+      });
+      return;
+    }
+
+    setPending(true);
+    const supabase = createClient();
+    const { error } = await supabase.rpc('rpc_merchant_set_primary_branch', {
+      p_merchant_id: merchantId,
+      p_address_text: address,
+    });
+    setPending(false);
+
+    if (error) {
+      toast({ title: 'We could not save that', description: error.message, tone: 'danger' });
+      return;
+    }
+
+    setStep(3);
   };
 
   return (
@@ -285,7 +343,14 @@ export function MerchantApplyFlow({
             <Button variant="outline" size="lg" onClick={() => setStep(1)}>
               Back
             </Button>
-            <Button block size="lg" disabled={!address.trim()} onClick={() => setStep(3)}>
+            <Button
+              block
+              size="lg"
+              loading={pending}
+              loadingText="Saving…"
+              disabled={!address.trim()}
+              onClick={submitStepTwo}
+            >
               Continue
             </Button>
           </div>
@@ -302,60 +367,86 @@ export function MerchantApplyFlow({
             Category-specific licences appear automatically.
           </p>
 
-          <Card tone="muted" className="mt-5 flex items-start gap-3">
-            <Info className="text-gold-text mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            <p className="text-muted text-xs leading-[1.7]">
-              Uploading needs the verification link we send to your email. Your registration is
-              already saved — the merchant team will send it when they call.
-            </p>
-          </Card>
-
           <ul className="mt-5 space-y-4">
-            {applicable.map((requirement) => (
-              <li key={requirement.id}>
-                <FileDrop
-                  id={`doc_${requirement.kind}`}
-                  label={requirement.label}
-                  {...(requirement.help_text ? { hint: requirement.help_text } : {})}
-                  {...(files[requirement.kind] ? { file: files[requirement.kind]! } : {})}
-                  onFileSelect={(file) =>
-                    setFiles((current) => ({ ...current, [requirement.kind]: file }))
-                  }
-                  onRemove={() =>
-                    setFiles((current) => {
-                      const next = { ...current };
-                      delete next[requirement.kind];
-                      return next;
-                    })
-                  }
-                  onValidationError={(message) =>
-                    toast({
-                      title: 'That file will not work',
-                      description: message,
-                      tone: 'danger',
-                    })
-                  }
-                  required
-                />
-                {requirement.has_expiry && (
-                  <div className="mt-2">
-                    <Input
-                      id={`expiry_${requirement.kind}`}
-                      type="date"
-                      label={`${requirement.label} — expiry date`}
-                    />
-                  </div>
-                )}
-              </li>
-            ))}
+            {applicable.map((requirement) => {
+              const slot = uploads.slotFor(requirement.kind);
+              const awaitingExpiry = requirement.has_expiry && !!slot.file && !slot.expiresAt;
+
+              return (
+                <li key={requirement.id}>
+                  <FileDrop
+                    id={`doc_${requirement.kind}`}
+                    label={requirement.label}
+                    {...(requirement.help_text ? { hint: requirement.help_text } : {})}
+                    {...(slot.file ? { file: slot.file } : {})}
+                    {...(slot.saved
+                      ? {
+                          existing: {
+                            name: slot.saved.name,
+                            sizeBytes: slot.saved.sizeBytes,
+                            mime: slot.saved.mime,
+                          },
+                        }
+                      : {})}
+                    loading={slot.uploading}
+                    {...(slot.error
+                      ? { error: slot.error }
+                      : awaitingExpiry
+                        ? { error: 'Add the expiry date below and this will save.' }
+                        : {})}
+                    onFileSelect={(file) => uploads.onFileSelect(requirement.kind, file)}
+                    onRemove={() => uploads.onRemove(requirement.kind)}
+                    onValidationError={(message) =>
+                      toast({
+                        title: 'That file will not work',
+                        description: message,
+                        tone: 'danger',
+                      })
+                    }
+                    required
+                  />
+
+                  {requirement.has_expiry && (
+                    <div className="mt-2">
+                      <Input
+                        id={`expiry_${requirement.kind}`}
+                        type="date"
+                        label={`${requirement.label} — expiry date`}
+                        value={slot.expiresAt}
+                        onChange={(event) =>
+                          uploads.onExpiryChange(requirement.kind, event.target.value)
+                        }
+                        disabled={!!slot.saved}
+                      />
+                    </div>
+                  )}
+
+                  {slot.saved?.status === 'rejected' && (
+                    <p className="text-danger mt-2 text-xs font-semibold">
+                      Rejected: {slot.saved.rejectionReason} Upload a replacement.
+                    </p>
+                  )}
+                  {slot.saved?.status === 'verified' && (
+                    <p className="text-success mt-2 text-xs font-semibold">Verified.</p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
+
+          <p className="text-muted mt-5 text-sm font-semibold">
+            {uploads.uploaded} of {applicable.length} saved.{' '}
+            {uploads.outstanding.length === 0
+              ? 'That is everything — send it for review.'
+              : 'Each one saves on its own, so you can leave and come back.'}
+          </p>
 
           <div className="mt-6 flex gap-2">
             <Button variant="outline" size="lg" onClick={() => setStep(2)}>
               Back
             </Button>
             <Button block size="lg" onClick={() => setStep(4)}>
-              Done for now
+              {uploads.outstanding.length === 0 ? 'Send for review' : 'Finish later'}
             </Button>
           </div>
         </section>

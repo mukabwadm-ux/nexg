@@ -11,11 +11,14 @@ import {
   Stepper,
   useToast,
 } from '@nexg/ui';
-import { ArrowRight, CheckCircle2, Info } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
 import { type ApplyResult, submitRiderApplication } from '@/app/riders/apply/actions';
+import { ensureApplicantSession } from '@/lib/uploads';
+
+import { useDocumentUploads } from '../use-document-uploads';
 
 export interface CityOption {
   id: string;
@@ -84,10 +87,16 @@ export function RiderApplyFlow({
   const [vehicle, setVehicle] = React.useState<string | null>(prefill.vehicle);
   const [plate, setPlate] = React.useState('');
   const [errors, setErrors] = React.useState<Record<string, string>>({});
-  const [files, setFiles] = React.useState<Record<string, File>>({});
+  const [riderId, setRiderId] = React.useState<string | null>(null);
 
   const needsPlate = vehicle !== null && vehicle !== 'bicycle';
   const applicable = requirements.filter((r) => appliesTo(r, vehicle ?? 'motorbike'));
+
+  const uploads = useDocumentUploads({
+    ownerType: 'rider',
+    ownerId: riderId,
+    requirements: applicable,
+  });
 
   const submitStepOne = async () => {
     const next: Record<string, string> = {};
@@ -100,6 +109,22 @@ export function RiderApplyFlow({
     if (Object.keys(next).length > 0) return;
 
     setPending(true);
+
+    /*
+     * Identity first: rpc_rider_apply claims the application for whoever is
+     * calling, and an unclaimed application cannot be uploaded to.
+     */
+    const session = await ensureApplicantSession();
+    if (!session) {
+      setPending(false);
+      toast({
+        title: 'We could not start a secure session',
+        description: 'Check your connection and try again.',
+        tone: 'danger',
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.set('first_name', firstName);
     formData.set('last_name', lastName);
@@ -116,6 +141,7 @@ export function RiderApplyFlow({
       return;
     }
 
+    setRiderId(result.riderId ?? null);
     toast({
       title: 'Application started',
       description: 'Now add your documents. You can leave and come back to finish.',
@@ -227,65 +253,90 @@ export function RiderApplyFlow({
           <h1 className="text-2xl font-extrabold tracking-tight">Your documents</h1>
           <p className="text-muted mt-1 text-sm">
             {applicable.length} documents for a{' '}
-            {VEHICLES.find((v) => v.value === vehicle)?.label.toLowerCase()}. Each one saves on its
-            own — you can leave and come back.
+            {VEHICLES.find((v) => v.value === vehicle)?.label.toLowerCase()}. Photograph each one
+            flat, in good light, with every corner in frame.
           </p>
 
-          <Card tone="muted" className="mt-5 flex items-start gap-3">
-            <Info className="text-gold-text mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            <p className="text-muted text-xs leading-[1.7]">
-              Uploading needs a verified phone number, and SMS verification is not switched on yet —
-              the provider account is still being set up. Your application is saved; come back here
-              once we have sent you a code.
-            </p>
-          </Card>
-
           <ul className="mt-5 space-y-4">
-            {applicable.map((requirement) => (
-              <li key={requirement.id}>
-                <FileDrop
-                  id={`doc_${requirement.kind}`}
-                  label={requirement.label}
-                  {...(requirement.help_text ? { hint: requirement.help_text } : {})}
-                  {...(files[requirement.kind] ? { file: files[requirement.kind]! } : {})}
-                  onFileSelect={(file) =>
-                    setFiles((current) => ({ ...current, [requirement.kind]: file }))
-                  }
-                  onRemove={() =>
-                    setFiles((current) => {
-                      const next = { ...current };
-                      delete next[requirement.kind];
-                      return next;
-                    })
-                  }
-                  onValidationError={(message) =>
-                    toast({
-                      title: 'That file will not work',
-                      description: message,
-                      tone: 'danger',
-                    })
-                  }
-                  required
-                />
-                {requirement.has_expiry && (
-                  <div className="mt-2">
-                    <Input
-                      id={`expiry_${requirement.kind}`}
-                      type="date"
-                      label={`${requirement.label} — expiry date`}
-                    />
-                  </div>
-                )}
-              </li>
-            ))}
+            {applicable.map((requirement) => {
+              const slot = uploads.slotFor(requirement.kind);
+              const awaitingExpiry = requirement.has_expiry && !!slot.file && !slot.expiresAt;
+
+              return (
+                <li key={requirement.id}>
+                  <FileDrop
+                    id={`doc_${requirement.kind}`}
+                    label={requirement.label}
+                    {...(requirement.help_text ? { hint: requirement.help_text } : {})}
+                    {...(slot.file ? { file: slot.file } : {})}
+                    {...(slot.saved
+                      ? {
+                          existing: {
+                            name: slot.saved.name,
+                            sizeBytes: slot.saved.sizeBytes,
+                            mime: slot.saved.mime,
+                          },
+                        }
+                      : {})}
+                    loading={slot.uploading}
+                    {...(slot.error
+                      ? { error: slot.error }
+                      : awaitingExpiry
+                        ? { error: 'Add the expiry date below and this will save.' }
+                        : {})}
+                    onFileSelect={(file) => uploads.onFileSelect(requirement.kind, file)}
+                    onRemove={() => uploads.onRemove(requirement.kind)}
+                    onValidationError={(message) =>
+                      toast({
+                        title: 'That file will not work',
+                        description: message,
+                        tone: 'danger',
+                      })
+                    }
+                    required
+                  />
+
+                  {requirement.has_expiry && (
+                    <div className="mt-2">
+                      <Input
+                        id={`expiry_${requirement.kind}`}
+                        type="date"
+                        label={`${requirement.label} — expiry date`}
+                        value={slot.expiresAt}
+                        onChange={(event) =>
+                          uploads.onExpiryChange(requirement.kind, event.target.value)
+                        }
+                        disabled={!!slot.saved}
+                      />
+                    </div>
+                  )}
+
+                  {slot.saved?.status === 'rejected' && (
+                    <p className="text-danger mt-2 text-xs font-semibold">
+                      Rejected: {slot.saved.rejectionReason} Upload a replacement.
+                    </p>
+                  )}
+                  {slot.saved?.status === 'verified' && (
+                    <p className="text-success mt-2 text-xs font-semibold">Verified.</p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
+
+          <p className="text-muted mt-5 text-sm font-semibold">
+            {uploads.uploaded} of {applicable.length} saved.{' '}
+            {uploads.outstanding.length === 0
+              ? 'That is everything — send it for review.'
+              : 'Each one saves on its own, so you can leave and come back.'}
+          </p>
 
           <div className="mt-6 flex gap-2">
             <Button variant="outline" size="lg" onClick={() => setStep(1)}>
               Back
             </Button>
             <Button block size="lg" onClick={() => setStep(3)}>
-              Done for now
+              {uploads.outstanding.length === 0 ? 'Send for review' : 'Finish later'}
             </Button>
           </div>
         </section>
