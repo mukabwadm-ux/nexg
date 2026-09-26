@@ -54,7 +54,7 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
       className="border-border bg-surface shadow-raised rounded-2xl border p-4 sm:p-5"
     >
       <h2 className="text-lg font-extrabold tracking-tight">Start your order</h2>
-      <p className="text-muted-light mt-0.5 text-xs">
+      <p className="text-muted-light mt-0.5 text-xs font-semibold">
         Takes about a minute. No account needed to ask.
       </p>
 
@@ -137,7 +137,7 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
         <SubmitButton />
       </div>
 
-      <p className="text-muted-light mt-2 text-center text-[0.6875rem]">
+      <p className="text-muted-light mt-2 text-center text-[0.6875rem] font-semibold">
         You&apos;ll see the price and delivery time before you confirm.
       </p>
     </form>

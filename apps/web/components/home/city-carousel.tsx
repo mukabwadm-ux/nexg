@@ -37,14 +37,14 @@ export function CityCarousel({ cities }: { cities: City[] }) {
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
             Cities where we deliver
           </h2>
-          <p className="text-muted mt-2 max-w-md text-[0.9375rem] leading-[1.7]">
+          <p className="text-muted mt-2 max-w-md text-[0.9375rem] font-semibold leading-[1.7]">
             {spellOut(cities.length)} cities across East Africa, one concierge. The same account and
             the same standard wherever you land.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <p className="text-muted-light text-sm">
+          <p className="text-muted-light text-sm font-semibold">
             {start + 1}–{start + shown.length} of {cities.length}
           </p>
           <div className="flex gap-2">
