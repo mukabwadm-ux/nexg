@@ -10,6 +10,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { RiderAppPreview } from '@/components/riders/rider-app-preview';
@@ -294,10 +295,21 @@ export default async function RidersPage() {
             </div>
 
             <div className="relative">
-              <div
-                aria-hidden="true"
-                className="from-ink/80 to-ink h-64 rounded-xl bg-gradient-to-br lg:h-80"
-              />
+              {/*
+                The artboard's photo block is 584x520 at this breakpoint, so the
+                frame is 7:5 and the photograph is cropped to fill it. `sizes`
+                keeps a phone from pulling the full-width asset over 3G.
+              */}
+              <div className="relative aspect-[7/5] overflow-hidden rounded-xl">
+                <Image
+                  src="/images/nairobi-skyline.jpg"
+                  alt="The Nairobi skyline, looking across the central business district"
+                  fill
+                  sizes="(min-width: 1024px) 45vw, 100vw"
+                  className="object-cover"
+                  priority={false}
+                />
+              </div>
               <Card tone="ink" className="absolute -bottom-4 left-4 right-8 sm:right-24">
                 <p className="text-gold text-[0.625rem] font-bold uppercase tracking-widest">
                   Rider kit included
