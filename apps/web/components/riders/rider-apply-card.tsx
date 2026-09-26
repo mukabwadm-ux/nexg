@@ -111,7 +111,9 @@ export function RiderApplyCard({ cities }: { cities: CityOption[] }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-[1.1875rem] font-extrabold tracking-tight">Become a rider</h2>
-          <p className="text-muted-light mt-0.5 text-[0.8125rem]">Takes about two minutes.</p>
+          <p className="text-muted-light mt-0.5 text-[0.8125rem] font-semibold">
+            Takes about two minutes.
+          </p>
         </div>
         <span className="bg-gold text-ink shrink-0 rounded-full px-3 py-1.5 text-[0.6875rem] font-extrabold uppercase tracking-[0.06em]">
           Step 1 of 3
@@ -176,7 +178,7 @@ export function RiderApplyCard({ cities }: { cities: CityOption[] }) {
         </Button>
       </div>
 
-      <p className="text-muted-light mt-3 text-center text-[0.75rem]">
+      <p className="text-muted-light mt-3 text-center text-[0.75rem] font-semibold">
         Next: your documents, then a short onboarding session.
       </p>
     </div>
