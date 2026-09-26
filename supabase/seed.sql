@@ -10,10 +10,19 @@
 
 -- A staff account for poking at the console locally. The auth user is created
 -- with a known id so it can be signed in via the local Auth API.
+/*
+ * The token columns are written as empty strings rather than left to default.
+ * They are nullable in the schema but GoTrue scans them into non-nullable Go
+ * strings, so a NULL here fails every sign-in with "Database error querying
+ * schema" — which looks like a credentials problem and is not one.
+ */
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
   email_confirmed_at, created_at, updated_at,
-  raw_app_meta_data, raw_user_meta_data
+  raw_app_meta_data, raw_user_meta_data,
+  confirmation_token, recovery_token,
+  email_change, email_change_token_new, email_change_token_current,
+  phone_change, phone_change_token, reauthentication_token
 )
 values (
   '00000000-0000-0000-0000-000000000000',
@@ -23,7 +32,8 @@ values (
   crypt('devpassword', gen_salt('bf')),
   now(), now(), now(),
   '{"provider":"email","providers":["email"]}'::jsonb,
-  '{"full_name":"[Dev Admin]"}'::jsonb
+  '{"full_name":"[Dev Admin]"}'::jsonb,
+  '', '', '', '', '', '', '', ''
 )
 on conflict (id) do nothing;
 

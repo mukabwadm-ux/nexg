@@ -1,41 +1,70 @@
-import { Button, Card, CardDescription, CardTitle, Tag } from '@nexg/ui';
+import { Card } from '@nexg/ui';
 import Link from 'next/link';
 
+import { ConsoleHeader } from '@/components/console-header';
+import { ConsoleShell } from '@/components/console-shell';
+import { requireStaff } from '@/lib/staff';
+import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
+
 /**
- * Placeholder. Staff sign-in and the console shell (artboard `A0_StaffSignIn`)
- * are built in M6 — spec section 5.1. M1 ships the design system, so the only
- * useful route here is the ui-kit.
+ * What is waiting for a person right now.
+ *
+ * No invented figures: every count here is a real `count` query, and the
+ * things the artboard shows that no data exists for — time to active, pass
+ * rates — are left out rather than filled with plausible numbers
+ * (ground rule 3).
  */
-export default function AdminHomePage() {
+export default async function OverviewPage() {
+  const staff = await requireStaff();
+  const supabase = createClient();
+
+  const pending = ['applied', 'documents_pending', 'under_review'];
+
+  const [riderQueue, merchantQueue, riderActive, merchantLive, docsWaiting] = await Promise.all([
+    supabase.from('rider').select('id', { count: 'exact', head: true }).in('status', pending),
+    supabase.from('merchant').select('id', { count: 'exact', head: true }).in('status', pending),
+    supabase.from('rider').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('merchant').select('id', { count: 'exact', head: true }).eq('status', 'live'),
+    supabase
+      .from('document')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'uploaded')
+      .is('superseded_at', null),
+  ]);
+
+  const tiles = [
+    { label: 'Riders in the pipeline', value: riderQueue.count ?? 0, href: '/riders' },
+    { label: 'Merchants in the pipeline', value: merchantQueue.count ?? 0, href: '/merchants' },
+    { label: 'Documents awaiting review', value: docsWaiting.count ?? 0, href: '/riders' },
+    { label: 'Active riders', value: riderActive.count ?? 0, href: '/riders' },
+    { label: 'Live merchants', value: merchantLive.count ?? 0, href: '/merchants' },
+  ];
+
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-6 px-4 py-16">
-      <div className="flex items-center gap-2">
-        <Tag tone="gold">Milestone M1</Tag>
-        <Tag>Repository and design system</Tag>
-      </div>
+    <ConsoleShell staff={staff} current="/">
+      <ConsoleHeader
+        title={`Good to see you, ${staff.displayName.replace(/[[\]]/g, '').split(' ')[0]}`}
+        breadcrumb="Overview"
+      />
 
-      <div>
-        <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-          NexG <span className="text-gold-text">admin</span>
-        </h1>
-        <p className="text-muted mt-3 text-base leading-relaxed">
-          Staff sign-in, the rider and merchant pipelines and document review arrive in M6. For now
-          the console hosts the design system review page.
-        </p>
-      </div>
-
-      <Card>
-        <CardTitle>Review the design system</CardTitle>
-        <CardDescription className="mt-2">
-          Every component, in every state, on one page — loading, error, disabled and empty
-          included.
-        </CardDescription>
-        <div className="mt-4">
-          <Button asChild>
-            <Link href="/ui-kit">Open the ui-kit</Link>
-          </Button>
-        </div>
-      </Card>
-    </main>
+      <main className="px-4 py-6 sm:px-8">
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {tiles.map((tile) => (
+            <li key={tile.label}>
+              <Link href={tile.href} className="block">
+                <Card className="hover:shadow-raised p-5 transition-shadow">
+                  <p className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-[0.16em]">
+                    {tile.label}
+                  </p>
+                  <p className="mt-2 text-4xl font-extrabold tracking-tight">{tile.value}</p>
+                </Card>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </main>
+    </ConsoleShell>
   );
 }

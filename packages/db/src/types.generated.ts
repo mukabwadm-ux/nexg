@@ -788,6 +788,7 @@ export type Database = {
           cover_photo_path: string | null;
           featured: boolean | null;
           id: string | null;
+          listed_at: string | null;
           trading_name: string | null;
         };
         Relationships: [];
@@ -957,6 +958,35 @@ export type Database = {
       };
       rpc_merchant_go_live: {
         Args: { p_merchant_id: string; p_reason?: string };
+        Returns: {
+          category: Database['public']['Enums']['merchant_category'];
+          category_other: string | null;
+          city_id: string;
+          contact_email: string;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          featured: boolean;
+          id: string;
+          legal_name: string;
+          settlement_account: Json | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          trading_name: string;
+          updated_at: string;
+          went_live_at: string | null;
+          went_live_by: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_set_featured: {
+        Args: { p_featured: boolean; p_merchant_id: string; p_reason?: string };
         Returns: {
           category: Database['public']['Enums']['merchant_category'];
           category_other: string | null;

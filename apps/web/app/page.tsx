@@ -93,6 +93,15 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
       .from('merchant_public')
       .select('id, trading_name, category, city_name, branch_name, cover_photo_path')
       .eq('featured', true)
+      /*
+       * Newest first. The band has four slots and nothing yet decides which
+       * featured merchant wins one — that is what
+       * setting.homepage_featured_slots_per_city is for, and it is seeded
+       * null because no number has been agreed (ground rule 3). Until it is,
+       * an explicit order beats whatever Postgres happens to return, and a
+       * business that has just been featured can actually see itself there.
+       */
+      .order('listed_at', { ascending: false })
       .limit(4),
   ]);
 
