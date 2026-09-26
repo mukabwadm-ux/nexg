@@ -2,6 +2,7 @@
 
 import { cn } from '@nexg/ui';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import * as React from 'react';
 
 export interface City {
@@ -18,9 +19,9 @@ const PER_PAGE = 5;
  * portraits with a gold ring, paged five at a time, with the counter, arrows
  * and dots the design shows.
  *
- * The portraits are a brand duotone rather than a photograph. Real city
- * photography is content the founder supplies; a gradient is stable per city
- * and never pretends to be a photo of somewhere it is not.
+ * Each city carries a photograph, centre-cropped square and served through
+ * next/image. A city without one falls back to a brand duotone rather than
+ * borrowing a picture of somewhere else.
  */
 export function CityCarousel({ cities }: { cities: City[] }) {
   const [page, setPage] = React.useState(0);
@@ -74,13 +75,25 @@ export function CityCarousel({ cities }: { cities: City[] }) {
         {shown.map((city) => (
           <li key={city.id} className="flex flex-col items-center">
             <span
-              aria-hidden="true"
               className="ring-gold/70 relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full ring-4 sm:h-36 sm:w-36 lg:h-[10.5rem] lg:w-[10.5rem]"
-              style={{ background: portraitFor(city.slug) }}
+              style={hasPhoto(city.slug) ? undefined : { background: portraitFor(city.slug) }}
             >
-              <span className="text-[0.625rem] font-bold uppercase tracking-[0.25em] text-white/50">
-                {city.name.slice(0, 3)}
-              </span>
+              {hasPhoto(city.slug) ? (
+                <Image
+                  src={`/images/cities/${city.slug}.jpg`}
+                  alt={city.name}
+                  fill
+                  sizes="(min-width: 1024px) 168px, (min-width: 640px) 144px, 112px"
+                  className="object-cover"
+                />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="text-[0.625rem] font-bold uppercase tracking-[0.25em] text-white/50"
+                >
+                  {city.name.slice(0, 3)}
+                </span>
+              )}
             </span>
 
             <span className="border-border bg-surface shadow-card relative z-10 -mt-4 rounded-full border px-4 py-1.5 text-sm font-bold">
@@ -134,6 +147,25 @@ const PORTRAITS = [
   'linear-gradient(150deg, #6F6A5C, #23211C)',
   'linear-gradient(150deg, #D4A72C, #5A4212)',
 ] as const;
+
+/** Cities with supplied photography, by slug. */
+const PHOTOGRAPHED = new Set([
+  'nairobi',
+  'mombasa',
+  'kisumu',
+  'nakuru',
+  'kampala',
+  'dar-es-salaam',
+  'kigali',
+  'arusha',
+  'entebbe',
+  'eldoret',
+  'zanzibar',
+]);
+
+function hasPhoto(slug: string): boolean {
+  return PHOTOGRAPHED.has(slug);
+}
 
 function portraitFor(slug: string): string {
   let hash = 0;
