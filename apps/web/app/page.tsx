@@ -175,7 +175,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
 
         {/* ---------------------------------------------------- how it works */}
         <section id="how-it-works" className="mx-auto max-w-[96rem] px-4 pb-12 sm:px-8 lg:px-16">
-          <ol className="grid gap-4 sm:grid-cols-3">
+          <ol className="grid gap-4 sm:grid-cols-3 sm:gap-6">
             {HOW_IT_WORKS.map((step, index) => (
               <li
                 key={step.title}
@@ -184,7 +184,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                    that, hence the exception. */
                 // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                 tabIndex={0}
-                className="focus-visible:ring-gold focus-visible:ring-offset-bg group relative aspect-[16/9] overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                className="focus-visible:ring-gold focus-visible:ring-offset-bg group relative aspect-[418/197] min-h-[11rem] overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               >
                 {/* Decorative: the panel below carries the same meaning in text. */}
                 <Image
