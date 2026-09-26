@@ -314,7 +314,7 @@ export default async function RidersPage() {
         </section>
 
         {/* ------------------------------------------------------- rider app */}
-        <section className="bg-ink mt-6 py-14 text-white">
+        <section className="bg-ink mt-6 py-16 text-white lg:py-[6.625rem]">
           <div className="mx-auto grid max-w-[96rem] gap-8 px-4 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-16">
             <div>
               <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
