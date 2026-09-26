@@ -19,11 +19,13 @@ const COLUMNS = [
   { key: 'suspended', label: 'Suspended', tone: 'bg-danger' },
 ] as const;
 
-function sinceLabel(iso: string | null): string {
-  if (!iso) return '—';
+/** The whole phrase, because "today ago" is not English. */
+function sinceLabel(iso: string | null, verb: string): string {
+  if (!iso) return `${verb} — date unknown`;
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
-  if (days <= 0) return 'today';
-  return `${days} d`;
+  if (days <= 0) return `${verb} today`;
+  if (days === 1) return `${verb} yesterday`;
+  return `${verb} ${days} days ago`;
 }
 
 export default async function RiderPipelinePage() {
@@ -74,7 +76,7 @@ export default async function RiderPipelinePage() {
           id: rider.id,
           title: `${rider.first_name} ${rider.last_name}`.trim(),
           meta: [rider.vehicle, city?.name].filter(Boolean).join(' · '),
-          note: `Applied ${sinceLabel(rider.created_at)} ago`,
+          note: sinceLabel(rider.created_at, 'Applied'),
           href: `/riders/${rider.id}`,
           progress:
             column.key === 'applied' || column.key === 'active'

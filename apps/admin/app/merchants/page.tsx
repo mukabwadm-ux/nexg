@@ -17,10 +17,13 @@ const COLUMNS = [
   { key: 'paused', label: 'Paused', tone: 'bg-danger' },
 ] as const;
 
-function sinceLabel(iso: string | null): string {
-  if (!iso) return '—';
+/** The whole phrase, because "today ago" is not English. */
+function sinceLabel(iso: string | null, verb: string): string {
+  if (!iso) return `${verb} — date unknown`;
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
-  return days <= 0 ? 'today' : `${days} d`;
+  if (days <= 0) return `${verb} today`;
+  if (days === 1) return `${verb} yesterday`;
+  return `${verb} ${days} days ago`;
 }
 
 export default async function MerchantPipelinePage() {
@@ -65,7 +68,7 @@ export default async function MerchantPipelinePage() {
           id: merchant.id,
           title: merchant.trading_name,
           meta: [merchant.category.replace(/_/g, ' '), city?.name].filter(Boolean).join(' · '),
-          note: `Registered ${sinceLabel(merchant.created_at)} ago`,
+          note: sinceLabel(merchant.created_at, 'Registered'),
           href: `/merchants/${merchant.id}`,
           progress:
             column.key === 'applied' || column.key === 'live'
