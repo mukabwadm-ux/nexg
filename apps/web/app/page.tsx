@@ -172,7 +172,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
                    that, hence the exception. */
                 // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                 tabIndex={0}
-                className="focus-visible:ring-gold focus-visible:ring-offset-bg group relative aspect-[418/197] min-h-[11rem] overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                className="focus-visible:ring-gold focus-visible:ring-offset-bg group relative aspect-[418/197] min-w-0 overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               >
                 {/* Decorative: the panel below carries the same meaning in text. */}
                 <Image
