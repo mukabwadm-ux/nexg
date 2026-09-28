@@ -376,6 +376,53 @@ export type Database = {
         };
         Relationships: [];
       };
+      job_application: {
+        Row: {
+          city_id: string | null;
+          created_at: string;
+          email: string;
+          full_name: string;
+          id: string;
+          link: string | null;
+          note: string | null;
+          phone: string | null;
+          role_title: string;
+          team: string | null;
+        };
+        Insert: {
+          city_id?: string | null;
+          created_at?: string;
+          email: string;
+          full_name: string;
+          id?: string;
+          link?: string | null;
+          note?: string | null;
+          phone?: string | null;
+          role_title: string;
+          team?: string | null;
+        };
+        Update: {
+          city_id?: string | null;
+          created_at?: string;
+          email?: string;
+          full_name?: string;
+          id?: string;
+          link?: string | null;
+          note?: string | null;
+          phone?: string | null;
+          role_title?: string;
+          team?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'job_application_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       legal_acceptance: {
         Row: {
           accepted_at: string;
@@ -1141,6 +1188,18 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_job_apply: {
+        Args: {
+          p_email: string;
+          p_full_name: string;
+          p_link?: string;
+          p_note?: string;
+          p_phone?: string;
+          p_role_title: string;
+          p_team?: string;
+        };
+        Returns: string;
       };
       rpc_legal_accept: {
         Args: {
