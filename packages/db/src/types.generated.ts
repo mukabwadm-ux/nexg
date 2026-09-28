@@ -1057,6 +1057,22 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_audit_recent: {
+        Args: { p_limit?: number; p_module?: string };
+        Returns: {
+          action: string;
+          actor_type: Database['public']['Enums']['actor_type'];
+          at: string;
+          city_id: string;
+          city_name: string;
+          id: number;
+          module: string;
+          reason: string;
+          severity: Database['public']['Enums']['audit_severity'];
+          target_id: string;
+          target_type: string;
+        }[];
+      };
       rpc_document_reject: {
         Args: { p_document_id: string; p_reason: string };
         Returns: {
