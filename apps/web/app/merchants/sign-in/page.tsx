@@ -1,19 +1,12 @@
-import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-import { ComingSoon } from '@/components/coming-soon';
-
-export const metadata: Metadata = { title: 'Merchant sign in' };
-
-export default function MerchantSignInPage() {
-  return (
-    <ComingSoon
-      milestone="Merchant portal in progress"
-      title="The Merchant portal is not open yet."
-      body="Applications are reviewed by the NexG team and we come back to you directly — there is nothing to sign in to while that happens. The portal where you will track your own status arrives with the next milestone."
-      actions={[
-        { label: 'Check what we ask for', href: '/merchants' },
-        { label: 'Start an application', href: '/merchants/apply', variant: 'outline' },
-      ]}
-    />
-  );
+/**
+ * There is one sign-in page for everybody.
+ *
+ * This route exists because the header links to it and people bookmark it,
+ * but a separate merchant login would be a second place to keep correct for no
+ * benefit — the role buttons on /sign-in already decide where you land.
+ */
+export default function MerchantSignInRedirect() {
+  redirect('/sign-in');
 }
