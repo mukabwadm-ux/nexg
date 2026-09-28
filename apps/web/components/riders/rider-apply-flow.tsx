@@ -8,6 +8,7 @@ import {
   FileDrop,
   Input,
   PhoneInput,
+  Spinner,
   Stepper,
   useToast,
 } from '@nexg/ui';
@@ -16,7 +17,7 @@ import Link from 'next/link';
 import * as React from 'react';
 
 import { type ApplyResult, submitRiderApplication } from '@/app/riders/apply/actions';
-import { ensureApplicantSession } from '@/lib/uploads';
+import { ensureApplicantSession, findMyOpenRiderApplication } from '@/lib/uploads';
 
 import { useDocumentUploads } from '../use-document-uploads';
 
@@ -98,6 +99,36 @@ export function RiderApplyFlow({
     requirements: applicable,
   });
 
+  /*
+   * Pick up where they left off. The step-two copy promises they can leave and
+   * come back; landing them on an empty step one would make that a lie, and
+   * their uploads are already saved against the application this browser owns.
+   */
+  const [resuming, setResuming] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    void findMyOpenRiderApplication().then((open) => {
+      if (cancelled) return;
+      if (open) {
+        setRiderId(open.id);
+        setFirstName(open.firstName);
+        setLastName(open.lastName);
+        setPhone(open.phone);
+        setCityId(open.cityId);
+        setVehicle(open.vehicle);
+        setPlate(open.plateNo ?? '');
+        setStep(2);
+      }
+      setResuming(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const submitStepOne = async () => {
     const next: Record<string, string> = {};
     if (!firstName.trim()) next['firstName'] = 'Enter your first name.';
@@ -149,6 +180,14 @@ export function RiderApplyFlow({
     });
     setStep(2);
   };
+
+  if (resuming) {
+    return (
+      <div className="flex min-h-[20rem] items-center justify-center">
+        <Spinner aria-label="Looking for your application" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -272,7 +311,10 @@ export function RiderApplyFlow({
                     {...(slot.saved
                       ? {
                           existing: {
-                            name: slot.saved.name,
+                            /* The stored name is the object's uuid, which
+                               tells a returning applicant nothing. What they
+                               need to know is that this one is done. */
+                            name: `${requirement.label} — on file`,
                             sizeBytes: slot.saved.sizeBytes,
                             mime: slot.saved.mime,
                           },

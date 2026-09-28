@@ -8,6 +8,7 @@ import {
   FileDrop,
   Input,
   PhoneInput,
+  Spinner,
   Stepper,
   useToast,
 } from '@nexg/ui';
@@ -17,7 +18,7 @@ import * as React from 'react';
 
 import { type ApplyResult, submitMerchantApplication } from '@/app/merchants/apply/actions';
 import { createClient } from '@/lib/supabase/client';
-import { ensureApplicantSession } from '@/lib/uploads';
+import { ensureApplicantSession, findMyOpenMerchantApplication } from '@/lib/uploads';
 
 import { useDocumentUploads } from '../use-document-uploads';
 import { MERCHANT_CATEGORIES } from './merchant-register-card';
@@ -97,6 +98,39 @@ export function MerchantApplyFlow({
     ownerId: merchantId,
     requirements: applicable,
   });
+
+  /*
+   * Same as the rider flow: an owner coming back should land on the step they
+   * stopped at, with what they have already uploaded showing.
+   */
+  const [resuming, setResuming] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    void findMyOpenMerchantApplication().then((open) => {
+      if (cancelled) return;
+      if (open) {
+        setMerchantId(open.id);
+        setLegalName(open.legalName);
+        setTradingName(open.tradingName);
+        setCategory(open.category);
+        setContactName(open.contactName);
+        setPhone(open.contactPhone);
+        setEmail(open.contactEmail);
+        setCityId(open.cityId);
+        setAddress(open.addressText ?? '');
+        // Straight to documents when the address is already in; otherwise the
+        // address step is genuinely the next thing they owe us.
+        setStep(open.addressText ? 3 : 2);
+      }
+      setResuming(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const submitStepOne = async () => {
     const next: Record<string, string> = {};
@@ -186,6 +220,14 @@ export function MerchantApplyFlow({
 
     setStep(3);
   };
+
+  if (resuming) {
+    return (
+      <div className="flex min-h-[20rem] items-center justify-center">
+        <Spinner aria-label="Looking for your registration" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -382,7 +424,10 @@ export function MerchantApplyFlow({
                     {...(slot.saved
                       ? {
                           existing: {
-                            name: slot.saved.name,
+                            /* The stored name is the object's uuid, which
+                               tells a returning applicant nothing. What they
+                               need to know is that this one is done. */
+                            name: `${requirement.label} — on file`,
                             sizeBytes: slot.saved.sizeBytes,
                             mime: slot.saved.mime,
                           },
