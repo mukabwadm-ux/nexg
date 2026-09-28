@@ -934,6 +934,123 @@ export type Database = {
         };
         Relationships: [];
       };
+      support_message: {
+        Row: {
+          body: string;
+          created_at: string;
+          from_staff_id: string | null;
+          id: string;
+          internal: boolean;
+          ticket_id: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          from_staff_id?: string | null;
+          id?: string;
+          internal?: boolean;
+          ticket_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          from_staff_id?: string | null;
+          id?: string;
+          internal?: boolean;
+          ticket_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'support_message_from_staff_id_fkey';
+            columns: ['from_staff_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'support_message_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'support_ticket';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      support_ticket: {
+        Row: {
+          assigned_to: string | null;
+          body: string;
+          channel: Database['public']['Enums']['ticket_channel'];
+          city_id: string | null;
+          created_at: string;
+          email: string | null;
+          first_reply_at: string | null;
+          from_role: Database['public']['Enums']['ticket_from'];
+          full_name: string | null;
+          id: string;
+          order_reference: string | null;
+          phone: string | null;
+          reference: string;
+          resolved_at: string | null;
+          status: Database['public']['Enums']['ticket_status'];
+          topic: Database['public']['Enums']['ticket_topic'];
+          updated_at: string;
+        };
+        Insert: {
+          assigned_to?: string | null;
+          body: string;
+          channel?: Database['public']['Enums']['ticket_channel'];
+          city_id?: string | null;
+          created_at?: string;
+          email?: string | null;
+          first_reply_at?: string | null;
+          from_role?: Database['public']['Enums']['ticket_from'];
+          full_name?: string | null;
+          id?: string;
+          order_reference?: string | null;
+          phone?: string | null;
+          reference: string;
+          resolved_at?: string | null;
+          status?: Database['public']['Enums']['ticket_status'];
+          topic?: Database['public']['Enums']['ticket_topic'];
+          updated_at?: string;
+        };
+        Update: {
+          assigned_to?: string | null;
+          body?: string;
+          channel?: Database['public']['Enums']['ticket_channel'];
+          city_id?: string | null;
+          created_at?: string;
+          email?: string | null;
+          first_reply_at?: string | null;
+          from_role?: Database['public']['Enums']['ticket_from'];
+          full_name?: string | null;
+          id?: string;
+          order_reference?: string | null;
+          phone?: string | null;
+          reference?: string;
+          resolved_at?: string | null;
+          status?: Database['public']['Enums']['ticket_status'];
+          topic?: Database['public']['Enums']['ticket_topic'];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'support_ticket_assigned_to_fkey';
+            columns: ['assigned_to'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'support_ticket_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       waitlist_signup: {
         Row: {
           city_id: string | null;
@@ -1437,6 +1554,78 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_support_ticket_create: {
+        Args: {
+          p_body: string;
+          p_email?: string;
+          p_from_role?: Database['public']['Enums']['ticket_from'];
+          p_full_name?: string;
+          p_order_reference?: string;
+          p_phone?: string;
+          p_topic?: Database['public']['Enums']['ticket_topic'];
+        };
+        Returns: string;
+      };
+      rpc_support_ticket_reply: {
+        Args: { p_body: string; p_internal?: boolean; p_ticket_id: string };
+        Returns: {
+          assigned_to: string | null;
+          body: string;
+          channel: Database['public']['Enums']['ticket_channel'];
+          city_id: string | null;
+          created_at: string;
+          email: string | null;
+          first_reply_at: string | null;
+          from_role: Database['public']['Enums']['ticket_from'];
+          full_name: string | null;
+          id: string;
+          order_reference: string | null;
+          phone: string | null;
+          reference: string;
+          resolved_at: string | null;
+          status: Database['public']['Enums']['ticket_status'];
+          topic: Database['public']['Enums']['ticket_topic'];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'support_ticket';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_support_ticket_set_status: {
+        Args: {
+          p_assign_to_me?: boolean;
+          p_status: Database['public']['Enums']['ticket_status'];
+          p_ticket_id: string;
+        };
+        Returns: {
+          assigned_to: string | null;
+          body: string;
+          channel: Database['public']['Enums']['ticket_channel'];
+          city_id: string | null;
+          created_at: string;
+          email: string | null;
+          first_reply_at: string | null;
+          from_role: Database['public']['Enums']['ticket_from'];
+          full_name: string | null;
+          id: string;
+          order_reference: string | null;
+          phone: string | null;
+          reference: string;
+          resolved_at: string | null;
+          status: Database['public']['Enums']['ticket_status'];
+          topic: Database['public']['Enums']['ticket_topic'];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'support_ticket';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
     };
     Enums: {
       actor_type: 'staff' | 'merchant_user' | 'rider' | 'guest' | 'host_user' | 'system';
@@ -1481,6 +1670,18 @@ export type Database = {
         | 'offboarded';
       setting_scope: 'global' | 'city';
       staff_status: 'active' | 'suspended' | 'offboarded';
+      ticket_channel: 'web_form' | 'whatsapp' | 'phone' | 'email' | 'in_app';
+      ticket_from: 'guest' | 'rider' | 'merchant' | 'hotel';
+      ticket_status: 'open' | 'assigned' | 'answered' | 'resolved' | 'closed';
+      ticket_topic:
+        | 'order_problem'
+        | 'payment_or_refund'
+        | 'account'
+        | 'concierge_request'
+        | 'partner_rider'
+        | 'partner_merchant'
+        | 'hotel_partnership'
+        | 'something_else';
       vehicle_type: 'motorbike' | 'bicycle' | 'car' | 'tuktuk';
     };
     CompositeTypes: {
@@ -1646,6 +1847,19 @@ export const Constants = {
       ],
       setting_scope: ['global', 'city'],
       staff_status: ['active', 'suspended', 'offboarded'],
+      ticket_channel: ['web_form', 'whatsapp', 'phone', 'email', 'in_app'],
+      ticket_from: ['guest', 'rider', 'merchant', 'hotel'],
+      ticket_status: ['open', 'assigned', 'answered', 'resolved', 'closed'],
+      ticket_topic: [
+        'order_problem',
+        'payment_or_refund',
+        'account',
+        'concierge_request',
+        'partner_rider',
+        'partner_merchant',
+        'hotel_partnership',
+        'something_else',
+      ],
       vehicle_type: ['motorbike', 'bicycle', 'car', 'tuktuk'],
     },
   },

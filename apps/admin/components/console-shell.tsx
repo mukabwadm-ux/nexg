@@ -15,6 +15,10 @@ import type { StaffContext } from '@/lib/staff';
  */
 const SECTIONS = [
   {
+    heading: 'Operate',
+    items: [{ label: 'Concierge desk', href: '/concierge' }],
+  },
+  {
     heading: 'Partners',
     items: [
       { label: 'Riders', href: '/riders' },
