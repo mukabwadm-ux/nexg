@@ -66,6 +66,49 @@ from public.role r
 where r.key in ('rider_ops', 'merchant_ops', 'growth')
 on conflict do nothing;
 
+-- A second staff account, because one person cannot demonstrate a
+-- two-person rule. Ops manager in Nairobi only, so it also shows what a
+-- scoped role sees versus the super admin.
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, created_at, updated_at,
+  raw_app_meta_data, raw_user_meta_data,
+  confirmation_token, recovery_token,
+  email_change, email_change_token_new, email_change_token_current,
+  phone_change, phone_change_token, reauthentication_token
+)
+values (
+  '00000000-0000-0000-0000-000000000000',
+  '00000000-0000-4000-8000-000000000002',
+  'authenticated', 'authenticated',
+  'dev.ops@nexgapp.com',
+  crypt('devpassword', gen_salt('bf')),
+  now(), now(), now(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"[Dev Ops]"}'::jsonb,
+  '', '', '', '', '', '', '', ''
+)
+on conflict (id) do nothing;
+
+insert into public.staff_user (id, user_id, email, display_name)
+values (
+  '00000000-0000-4000-8000-00000000000b',
+  '00000000-0000-4000-8000-000000000002',
+  'dev.ops@nexgapp.com',
+  '[Dev Ops]'
+)
+on conflict (id) do nothing;
+
+insert into public.role_grant (staff_user_id, role_id, city_id, granted_by)
+select
+  '00000000-0000-4000-8000-00000000000b',
+  r.id,
+  (select id from public.city where slug = 'nairobi'),
+  '00000000-0000-4000-8000-00000000000a'
+from public.role r
+where r.key in ('merchant_ops', 'rider_ops')
+on conflict do nothing;
+
 -- ------------------------------------------------------- a rider mid-pipeline
 
 insert into public.rider (id, first_name, last_name, phone, city_id, vehicle, plate_no)

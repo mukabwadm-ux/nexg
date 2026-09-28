@@ -147,6 +147,79 @@ export type Database = {
   };
   public: {
     Tables: {
+      approval_request: {
+        Row: {
+          city_id: string | null;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          id: string;
+          kind: Database['public']['Enums']['approval_kind'];
+          payload: NonNullable<Json>;
+          reason: string;
+          requested_by: string;
+          status: Database['public']['Enums']['approval_status'];
+          target_id: string;
+          target_type: string;
+          updated_at: string;
+        };
+        Insert: {
+          city_id?: string | null;
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          id?: string;
+          kind: Database['public']['Enums']['approval_kind'];
+          payload?: NonNullable<Json>;
+          reason: string;
+          requested_by: string;
+          status?: Database['public']['Enums']['approval_status'];
+          target_id: string;
+          target_type: string;
+          updated_at?: string;
+        };
+        Update: {
+          city_id?: string | null;
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          id?: string;
+          kind?: Database['public']['Enums']['approval_kind'];
+          payload?: NonNullable<Json>;
+          reason?: string;
+          requested_by?: string;
+          status?: Database['public']['Enums']['approval_status'];
+          target_id?: string;
+          target_type?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'approval_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'approval_request_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'approval_request_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       city: {
         Row: {
           country: string;
@@ -303,19 +376,89 @@ export type Database = {
         };
         Relationships: [];
       };
+      legal_acceptance: {
+        Row: {
+          accepted_at: string;
+          accepted_by_name: string | null;
+          created_at: string;
+          document: Database['public']['Enums']['legal_document_key'];
+          id: string;
+          ip: unknown;
+          merchant_id: string | null;
+          rider_id: string | null;
+          user_agent: string | null;
+          user_id: string | null;
+          version: string;
+        };
+        Insert: {
+          accepted_at?: string;
+          accepted_by_name?: string | null;
+          created_at?: string;
+          document: Database['public']['Enums']['legal_document_key'];
+          id?: string;
+          ip?: unknown;
+          merchant_id?: string | null;
+          rider_id?: string | null;
+          user_agent?: string | null;
+          user_id?: string | null;
+          version: string;
+        };
+        Update: {
+          accepted_at?: string;
+          accepted_by_name?: string | null;
+          created_at?: string;
+          document?: Database['public']['Enums']['legal_document_key'];
+          id?: string;
+          ip?: unknown;
+          merchant_id?: string | null;
+          rider_id?: string | null;
+          user_agent?: string | null;
+          user_id?: string | null;
+          version?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       merchant: {
         Row: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
           category: Database['public']['Enums']['merchant_category'];
           category_other: string | null;
           city_id: string;
+          concierge_pick: boolean;
           contact_email: string;
           contact_name: string;
           contact_phone: string;
           cover_photo_path: string | null;
           created_at: string;
+          explore_visible: boolean;
           featured: boolean;
           id: string;
           legal_name: string;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
           settlement_account: Json | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
@@ -325,17 +468,23 @@ export type Database = {
           went_live_by: string | null;
         };
         Insert: {
+          accepting_orders?: boolean;
+          accepting_orders_changed_at?: string | null;
           category: Database['public']['Enums']['merchant_category'];
           category_other?: string | null;
           city_id: string;
+          concierge_pick?: boolean;
           contact_email: string;
           contact_name: string;
           contact_phone: string;
           cover_photo_path?: string | null;
           created_at?: string;
+          explore_visible?: boolean;
           featured?: boolean;
           id?: string;
           legal_name: string;
+          pay_on_delivery?: boolean;
+          pay_on_delivery_cap_kes?: number | null;
           settlement_account?: Json | null;
           status?: Database['public']['Enums']['partner_status'];
           status_reason?: string | null;
@@ -345,17 +494,23 @@ export type Database = {
           went_live_by?: string | null;
         };
         Update: {
+          accepting_orders?: boolean;
+          accepting_orders_changed_at?: string | null;
           category?: Database['public']['Enums']['merchant_category'];
           category_other?: string | null;
           city_id?: string;
+          concierge_pick?: boolean;
           contact_email?: string;
           contact_name?: string;
           contact_phone?: string;
           cover_photo_path?: string | null;
           created_at?: string;
+          explore_visible?: boolean;
           featured?: boolean;
           id?: string;
           legal_name?: string;
+          pay_on_delivery?: boolean;
+          pay_on_delivery_cap_kes?: number | null;
           settlement_account?: Json | null;
           status?: Database['public']['Enums']['partner_status'];
           status_reason?: string | null;
@@ -777,6 +932,7 @@ export type Database = {
     Views: {
       merchant_public: {
         Row: {
+          accepting_orders: boolean | null;
           branch_address: string | null;
           branch_latitude: number | null;
           branch_longitude: number | null;
@@ -785,7 +941,9 @@ export type Database = {
           category_other: string | null;
           city_name: string | null;
           city_slug: string | null;
+          concierge_pick: boolean | null;
           cover_photo_path: string | null;
+          explore_visible: boolean | null;
           featured: boolean | null;
           id: string | null;
           listed_at: string | null;
@@ -874,6 +1032,31 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_approval_decide: {
+        Args: { p_approve: boolean; p_note?: string; p_request_id: string };
+        Returns: {
+          city_id: string | null;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          id: string;
+          kind: Database['public']['Enums']['approval_kind'];
+          payload: NonNullable<Json>;
+          reason: string;
+          requested_by: string;
+          status: Database['public']['Enums']['approval_status'];
+          target_id: string;
+          target_type: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'approval_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_document_reject: {
         Args: { p_document_id: string; p_reason: string };
         Returns: {
@@ -943,6 +1126,34 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_legal_accept: {
+        Args: {
+          p_accepted_by_name?: string;
+          p_document: Database['public']['Enums']['legal_document_key'];
+          p_merchant_id?: string;
+          p_rider_id?: string;
+          p_version: string;
+        };
+        Returns: {
+          accepted_at: string;
+          accepted_by_name: string | null;
+          created_at: string;
+          document: Database['public']['Enums']['legal_document_key'];
+          id: string;
+          ip: unknown;
+          merchant_id: string | null;
+          rider_id: string | null;
+          user_agent: string | null;
+          user_id: string | null;
+          version: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'legal_acceptance';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_merchant_apply: {
         Args: {
           p_category: Database['public']['Enums']['merchant_category'];
@@ -959,17 +1170,92 @@ export type Database = {
       rpc_merchant_go_live: {
         Args: { p_merchant_id: string; p_reason?: string };
         Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
           category: Database['public']['Enums']['merchant_category'];
           category_other: string | null;
           city_id: string;
+          concierge_pick: boolean;
           contact_email: string;
           contact_name: string;
           contact_phone: string;
           cover_photo_path: string | null;
           created_at: string;
+          explore_visible: boolean;
           featured: boolean;
           id: string;
           legal_name: string;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
+          settlement_account: Json | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          trading_name: string;
+          updated_at: string;
+          went_live_at: string | null;
+          went_live_by: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_request_suspension: {
+        Args: { p_merchant_id: string; p_reason: string };
+        Returns: {
+          city_id: string | null;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          id: string;
+          kind: Database['public']['Enums']['approval_kind'];
+          payload: NonNullable<Json>;
+          reason: string;
+          requested_by: string;
+          status: Database['public']['Enums']['approval_status'];
+          target_id: string;
+          target_type: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'approval_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_set_controls: {
+        Args: {
+          p_accepting_orders?: boolean;
+          p_clear_cap?: boolean;
+          p_concierge_pick?: boolean;
+          p_explore_visible?: boolean;
+          p_merchant_id: string;
+          p_pay_on_delivery?: boolean;
+          p_pay_on_delivery_cap_kes?: number;
+          p_reason?: string;
+        };
+        Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
+          category: Database['public']['Enums']['merchant_category'];
+          category_other: string | null;
+          city_id: string;
+          concierge_pick: boolean;
+          contact_email: string;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          explore_visible: boolean;
+          featured: boolean;
+          id: string;
+          legal_name: string;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
           settlement_account: Json | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
@@ -988,17 +1274,58 @@ export type Database = {
       rpc_merchant_set_featured: {
         Args: { p_featured: boolean; p_merchant_id: string; p_reason?: string };
         Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
           category: Database['public']['Enums']['merchant_category'];
           category_other: string | null;
           city_id: string;
+          concierge_pick: boolean;
           contact_email: string;
           contact_name: string;
           contact_phone: string;
           cover_photo_path: string | null;
           created_at: string;
+          explore_visible: boolean;
           featured: boolean;
           id: string;
           legal_name: string;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
+          settlement_account: Json | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          trading_name: string;
+          updated_at: string;
+          went_live_at: string | null;
+          went_live_by: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_set_paused: {
+        Args: { p_merchant_id: string; p_paused: boolean; p_reason?: string };
+        Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
+          category: Database['public']['Enums']['merchant_category'];
+          category_other: string | null;
+          city_id: string;
+          concierge_pick: boolean;
+          contact_email: string;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          explore_visible: boolean;
+          featured: boolean;
+          id: string;
+          legal_name: string;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
           settlement_account: Json | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
@@ -1038,10 +1365,19 @@ export type Database = {
     };
     Enums: {
       actor_type: 'staff' | 'merchant_user' | 'rider' | 'guest' | 'host_user' | 'system';
+      approval_kind: 'merchant_suspension';
+      approval_status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
       audit_severity: 'info' | 'notice' | 'high';
       city_status: 'live' | 'soft_launch' | 'waitlist';
       document_owner_type: 'rider' | 'merchant';
       document_status: 'uploaded' | 'verified' | 'rejected' | 'expired';
+      legal_document_key:
+        | 'terms'
+        | 'privacy'
+        | 'cookies'
+        | 'refunds'
+        | 'merchant_terms'
+        | 'rider_agreement';
       merchant_category:
         | 'restaurant'
         | 'bar_liquor'
@@ -1059,6 +1395,7 @@ export type Database = {
         | 'under_review'
         | 'live'
         | 'paused'
+        | 'suspended'
         | 'delisted';
       rider_status:
         | 'applied'
@@ -1189,10 +1526,20 @@ export const Constants = {
   public: {
     Enums: {
       actor_type: ['staff', 'merchant_user', 'rider', 'guest', 'host_user', 'system'],
+      approval_kind: ['merchant_suspension'],
+      approval_status: ['pending', 'approved', 'rejected', 'withdrawn'],
       audit_severity: ['info', 'notice', 'high'],
       city_status: ['live', 'soft_launch', 'waitlist'],
       document_owner_type: ['rider', 'merchant'],
       document_status: ['uploaded', 'verified', 'rejected', 'expired'],
+      legal_document_key: [
+        'terms',
+        'privacy',
+        'cookies',
+        'refunds',
+        'merchant_terms',
+        'rider_agreement',
+      ],
       merchant_category: [
         'restaurant',
         'bar_liquor',
@@ -1211,6 +1558,7 @@ export const Constants = {
         'under_review',
         'live',
         'paused',
+        'suspended',
         'delisted',
       ],
       rider_status: [
