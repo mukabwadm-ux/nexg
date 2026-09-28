@@ -24,10 +24,7 @@ export default async function CareersPage() {
 
   return (
     <>
-      <SiteHeader
-        signIn={{ label: 'Sign in', href: '/sign-in' }}
-        action={{ label: 'See open roles', href: '#roles' }}
-      />
+      <SiteHeader action={{ label: 'See open roles', href: '#roles' }} />
 
       <main>
         {/* ------------------------------------------------------------ hero */}
