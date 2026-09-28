@@ -10,51 +10,56 @@ own.
 
 ---
 
-## 1. Supabase: a hosted project (~15 min)
+## 1. Supabase — already done
 
-The site currently talks to `127.0.0.1`. Vercel cannot.
+The project exists and the schema is on it:
 
-1. Go to https://supabase.com → **New project**.
-   - Organisation: yours.
-   - Name: `nexg-staging`.
-   - **Region: `eu-central-1` (Frankfurt)** — the closest Supabase region to
-     Kenya. There is no East African region; Frankfurt is about 150 ms from
-     Nairobi, Singapore and Mumbai are further in practice.
-   - Database password: generate one and put it in your password manager, not
-     in a file in the repo.
-2. Wait for it to finish provisioning.
-3. From **Project Settings → API**, copy:
-   - `Project URL`
-   - `anon` `public` key
-4. From **Project Settings → General**, copy the **Reference ID**.
+| | |
+| --- | --- |
+| Project URL | `https://bmrrifvtfvgagkhrmitv.supabase.co` |
+| Region | `eu-west-1` (Ireland) |
+| Pooler host | `aws-1-eu-west-1.pooler.supabase.com` — note the `aws-1` prefix; newer projects are not on `aws-0`, and the direct `db.<ref>.supabase.co` host is IPv6-only |
 
-Then push the schema from your machine:
+All 29 migrations are applied: 16 tables, RLS on 15 of them, 11 cities, 8
+roles, 13 document requirements and the private `partner-documents` bucket.
+No seed ran, which is correct — `seed.sql` creates the `dev.admin` account and
+demo merchants, and neither belongs here.
+
+Verified against it directly: the public reads the site needs all work, the
+raw `merchant` table is denied to anonymous callers, `rider` and `staff_user`
+return nothing, and a careers application inserts.
+
+### Two settings you must flip
+
+Both are in **Authentication → Sign In / Providers**. Without them the site
+looks broken in ways that give no useful error.
+
+1. **Anonymous sign-ins → ON.** Currently off. Every document upload fails
+   without it: the storage policies ask whether the caller owns the
+   application, and an applicant with no session owns nothing.
+2. **Email → "Confirm email" → OFF.** Currently on. With it on, an account is
+   created and then cannot sign in — `email_not_confirmed` — because no SMTP
+   is configured and Supabase's built-in sender is rate-limited to a couple of
+   messages an hour. Turn it back on when you have real email set up.
+
+### A gotcha worth knowing
+
+Supabase rejects `@example.com` and similar as invalid addresses. Testers must
+use a real domain. This is Supabase's validation, not ours.
+
+### Re-pushing the schema later
 
 ```bash
-npx supabase link --project-ref <REFERENCE_ID>     # asks for the db password
-npx supabase db push                               # runs all 29 migrations
+npx supabase db push --db-url   "postgresql://postgres.bmrrifvtfvgagkhrmitv:<URL-ENCODED-PASSWORD>@aws-1-eu-west-1.pooler.supabase.com:5432/postgres"
 ```
 
-`db push` applies migrations only. It does **not** run `seed.sql`, which is
-correct — that file creates the `dev.admin` account and demo merchants, and
-neither belongs on a hosted project.
-
-You do need cities, roles and document requirements, but those live in
-migrations rather than the seed, so `db push` brings them.
-
-**Enable anonymous sign-ins** — the apply flows depend on them:
-Authentication → Providers → **Anonymous sign-ins: on**.
-
-**Email confirmations**: Authentication → Providers → Email. Confirmations are
-off by default on a new project, which is what you want for testers — with
-them on, nobody can sign in until you configure SMTP.
-
----
+The password contains an `@`, which must be percent-encoded as `%40` or it
+terminates the userinfo part of the URL and the connection fails with a
+confusing host error.
 
 ## 2. Vercel: the public site (~15 min)
 
-1. https://vercel.com → **Add New → Project** → import
-   `mukabwadm-ux/nexg`.
+1. The project already exists and is connected to the repo.
 2. **Root Directory: `apps/web`.** This is the setting people miss. Leave it at
    the repo root and the build fails, because the root is a Turborepo
    workspace, not a Next.js app.
@@ -65,8 +70,8 @@ them on, nobody can sign in until you configure SMTP.
 
    | Name | Value |
    | --- | --- |
-   | `NEXT_PUBLIC_SUPABASE_URL` | the Project URL from step 1 |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | the anon key from step 1 |
+   | `NEXT_PUBLIC_SUPABASE_URL` | `https://bmrrifvtfvgagkhrmitv.supabase.co` |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | the **publishable** key (`sb_publishable_…`) |
    | `NEXT_PUBLIC_SITE_URL` | `https://<your-project>.vercel.app` |
 
    The anon key is meant to be public — it is in the browser bundle either way.
@@ -97,9 +102,10 @@ Five minutes, in order. Each one exercises a different layer.
 
 1. `/` loads and the city carousel shows photographs → **static assets fine**
 2. `/explore` lists nothing at all → **database reachable, and correctly
-   empty**, since `db push` seeds no merchants
-3. `/sign-in?tab=create` → create an account with a real email → you land on
-   `/` → **auth working**
+   empty**, since no seed ran
+3. `/sign-in?tab=create` → create an account with a **real** email domain →
+   you land on `/` → **auth working**. Fails with `email_not_confirmed` if you
+   have not turned confirmations off.
 4. `/riders/apply` → complete step one, upload one document → **storage and
    RLS working**. This is the one that catches a missed anonymous-sign-ins
    setting.
