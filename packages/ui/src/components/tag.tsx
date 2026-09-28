@@ -12,6 +12,14 @@ const tagVariants = cva(
       tone: {
         neutral: 'border-border-strong bg-surface text-muted',
         gold: 'border-gold/40 bg-gold-soft text-gold-text',
+        /**
+         * The gold pill on a dark band — "FEATURED MERCHANTS · NAIROBI".
+         * Sampled from the artboard over #141414: fill #312A18, border
+         * #725C20, text #D4A72C, which resolve to gold at 15% and 50%.
+         * The cream `gold` tone is for light backgrounds and reads as a
+         * bright slab against the dark.
+         */
+        goldOutline: 'border-gold/50 bg-gold/15 text-gold',
         ink: 'border-ink bg-ink text-white',
         /** The "SPONSORED" marker on featured merchant cards. */
         sponsored: 'border-transparent bg-white/15 text-white',

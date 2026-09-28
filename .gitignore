@@ -57,3 +57,6 @@ nexgcr.txt
 *secret*
 *.pem
 *.key
+
+# Dev-server output, kept separate from the production build.
+.next-dev/

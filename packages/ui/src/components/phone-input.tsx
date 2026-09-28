@@ -32,6 +32,14 @@ export interface PhoneInputProps {
   value?: string | null;
   defaultCountry?: CountryCode;
   /**
+   * Render the dial code as a fixed label rather than a picker. The rider hero
+   * in the artboard shows a plain "+254 7…" field with no dropdown; the value
+   * emitted is still E.164, so nothing downstream changes.
+   */
+  fixedCountry?: boolean;
+  /** Classes for the bordered wrapper; `className` styles the field around it. */
+  wrapperClassName?: string;
+  /**
    * Fires on every keystroke. `e164` is null until the number is valid for the
    * selected country, so callers can gate submission on it directly.
    */
@@ -57,6 +65,8 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     className,
     value,
     defaultCountry = DEFAULT_PHONE_COUNTRY,
+    fixedCountry = false,
+    wrapperClassName,
     onChange,
     onBlur,
   },
@@ -114,28 +124,35 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           'focus-within:ring-gold focus-within:ring-offset-bg focus-within:ring-2 focus-within:ring-offset-1',
           error ? 'border-danger focus-within:ring-danger' : 'border-border-strong',
           (disabled || loading) && 'bg-border/40',
+          wrapperClassName,
         )}
       >
-        <div className="relative flex items-center">
-          {/* A native select keeps the country picker usable one-handed on Android. */}
-          <select
-            aria-label="Country dialling code"
-            value={country}
-            onChange={handleCountry}
-            disabled={disabled || loading}
-            className={cn(
-              'h-11 cursor-pointer appearance-none rounded-l-lg bg-transparent py-0 pl-3 pr-1',
-              'text-ink text-sm font-bold focus:outline-none disabled:cursor-not-allowed',
-            )}
-          >
-            {PHONE_COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.flag} {c.dialCode}
-              </option>
-            ))}
-          </select>
-          <span aria-hidden="true" className="bg-border-strong h-5 w-px" />
-        </div>
+        {fixedCountry ? (
+          <span className="text-ink flex items-center pl-3 text-sm font-bold">
+            {selected.dialCode}
+          </span>
+        ) : (
+          <div className="relative flex items-center">
+            {/* A native select keeps the country picker usable one-handed on Android. */}
+            <select
+              aria-label="Country dialling code"
+              value={country}
+              onChange={handleCountry}
+              disabled={disabled || loading}
+              className={cn(
+                'h-11 cursor-pointer appearance-none rounded-l-lg bg-transparent py-0 pl-3 pr-1',
+                'text-ink text-sm font-bold focus:outline-none disabled:cursor-not-allowed',
+              )}
+            >
+              {PHONE_COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.dialCode}
+                </option>
+              ))}
+            </select>
+            <span aria-hidden="true" className="bg-border-strong h-5 w-px" />
+          </div>
+        )}
 
         <input
           ref={ref}

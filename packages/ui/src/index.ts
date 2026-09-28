@@ -59,6 +59,7 @@ export {
   type StatusKey,
 } from './components/status-badge';
 export { Tag, tagVariants, type TagProps } from './components/tag';
+export { Switch, type SwitchProps } from './components/switch';
 export {
   Card,
   CardContent,

@@ -321,6 +321,15 @@ export default function UiKitPage() {
             </div>
           </State>
 
+          <State
+            label="Fixed country"
+            note="No picker; the dial code is a label. Still emits E.164."
+          >
+            <div className="max-w-md">
+              <PhoneInput id="k-phone-fixed" label="Phone (M-Pesa)" fixedCountry />
+            </div>
+          </State>
+
           <State label="Prefilled from a stored E.164 value">
             <div className="max-w-md">
               <PhoneInput id="k-phone-filled" label="Phone" value="+254712345678" />
@@ -411,6 +420,25 @@ export default function UiKitPage() {
               value={categories}
               onChange={setCategories}
             />
+          </State>
+
+          <State label="Tile variant and gold selection" note="Used by the rider hero.">
+            <div className="grid gap-5">
+              <ChipGroup
+                id="k-chip-tile"
+                label="What will you ride?"
+                variant="tile"
+                options={VEHICLES}
+                value="motorbike"
+              />
+              <ChipGroup
+                id="k-chip-gold"
+                label="Where will you ride?"
+                options={CITIES}
+                value="nairobi"
+                selectedTone="gold"
+              />
+            </div>
           </State>
 
           <State label="Error, disabled, loading and empty">
@@ -566,6 +594,9 @@ export default function UiKitPage() {
             </Row>
             <Row className="bg-ink mt-3 rounded-lg p-3">
               <Tag tone="sponsored">Sponsored</Tag>
+              <Tag tone="goldOutline" className="uppercase tracking-[0.12em]">
+                Featured merchants · Nairobi
+              </Tag>
             </Row>
           </State>
 

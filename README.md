@@ -126,6 +126,74 @@ the `font-sans` stack.
 Never invent a number. Where a figure has no configured value the UI renders `[—]`
 (`VALUE_PLACEHOLDER`), never a plausible-looking zero — see the `KpiTile` tests.
 
+## Database
+
+Migrations live in [`supabase/migrations/`](supabase/migrations/) and run in filename order. Every
+one is forward-only: to change something, add a migration, never edit one that has been applied.
+
+```bash
+pnpm db:start     # local Postgres, Auth and Storage in Docker
+pnpm db:reset     # drop everything, replay migrations, run seed.sql
+pnpm db:test      # pgTAP: RLS, the audit chain, the status gate
+pnpm db:types     # regenerate packages/db/src/types.generated.ts
+```
+
+Every one of these passes `--local`. None of them can touch a hosted project, whatever the CLI
+happens to be linked to — `db:reset` drops the whole database, and that guard is deliberate.
+
+**Reference data lives in migrations, not `seed.sql`.** Cities, roles, document requirements and
+setting keys ship with the schema because production needs them too. `seed.sql` holds only local
+development fixtures and never runs anywhere else.
+
+### Three rules the database enforces, not the interface
+
+- **Nothing is public until it is approved.** `public.merchant_public` is the only merchant data
+  `anon` can read, and it cannot return a merchant that is not `live`. The frontend never filters
+  on status (ground rule 5).
+- **Status is derived, activation is decided.** `fn_partner_recompute_status` moves an applicant
+  between `documents_pending` and `under_review` as documents arrive, and pulls an approved partner
+  back if one later expires. It cannot produce `active` or `live`: only `rpc_activate_rider` and
+  `rpc_merchant_go_live` do that, and only with every required document verified.
+- **Every state change is logged.** `audit.audit_event` is append-only and hash-chained. UPDATE and
+  DELETE raise for every role, `service_role` included, and `audit.verify_chain()` runs nightly
+  and names the first row that does not fit (ground rule 4).
+
+### Adding a document requirement
+
+Add a row to `document_requirement` in a new migration. `applies_when` decides who is asked:
+
+```sql
+insert into public.document_requirement
+  (owner_type, kind, label, help_text, applies_when, has_expiry, required, sort)
+values
+  ('merchant', 'halal_cert', 'Halal certificate',
+   'Issued by your certifying body.',
+   '{"category": ["restaurant"]}'::jsonb,   -- {} means every applicant
+   true, true, 80);
+```
+
+Nothing else needs changing. `fn_merchant_required_docs` picks it up, the status gate starts
+counting it, and the application flow renders it. Adding a requirement immediately makes every
+existing partner in that category incomplete, so plan the rollout before merging.
+
+### Granting a role
+
+Grants are rows in `role_grant`. A null `city_id` means every city.
+
+```sql
+insert into public.role_grant (staff_user_id, role_id, city_id, granted_by)
+select
+  (select id from public.staff_user where email = 'someone@nexgapp.com'),
+  (select id from public.role where key = 'rider_ops'),
+  (select id from public.city where slug = 'nairobi'),
+  (select id from public.staff_user where email = 'you@nexgapp.com');
+```
+
+`finance` and `super_admin` additionally require `approved_by`, and it must be someone other than
+`granted_by` — the insert is refused otherwise. Only `super_admin` may insert grants at all.
+
+To revoke, set `revoked_at`; never delete the row, or you lose the record that it existed.
+
 ## Environment variables
 
 Every variable is listed in [`.env.example`](.env.example) with its source. Copy it to `.env.local`
