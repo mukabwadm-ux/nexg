@@ -68,3 +68,7 @@ nexgcr.txt
 
 # Dev-server output, kept separate from the production build.
 .next-dev/
+
+# Claude Code personal settings. Local to one machine, and this repo is
+# public — a permission rule is nobody else's business.
+.claude/settings.local.json
