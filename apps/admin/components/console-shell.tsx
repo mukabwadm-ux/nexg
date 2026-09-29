@@ -5,27 +5,19 @@ import { Logo } from '@/components/logo';
 import type { StaffContext } from '@/lib/staff';
 
 /**
- * The console chrome from the pipeline artboards: dark rail on the left,
- * grouped by what the section is for, with the signed-in staff member pinned
- * to the bottom.
+ * The console chrome: dark rail on the left, grouped by what the section is
+ * for, with the signed-in staff member pinned to the bottom.
  *
- * Only the sections that exist are listed. The artboard draws the whole
- * console — concierge desk, dispatch, finance — and linking to routes that
- * 404 would be worse than leaving them out until they are built.
+ * The rail is built from role_module_access, not from a list in this file.
+ * A module a role cannot reach is simply absent — which is what the
+ * permission matrix promises, and the only way to keep that promise is for
+ * both to read the same table.
+ *
+ * Modules that are designed but not built are shown greyed rather than
+ * linked. Leaving them out entirely would make the console look smaller
+ * than the plan; linking them would 404.
  */
-const SECTIONS = [
-  {
-    heading: 'Operate',
-    items: [{ label: 'Concierge desk', href: '/concierge' }],
-  },
-  {
-    heading: 'Partners',
-    items: [
-      { label: 'Riders', href: '/riders' },
-      { label: 'Merchants', href: '/merchants' },
-    ],
-  },
-] as const;
+const SECTION_ORDER = ['Operate', 'Partners', 'Grow', 'Money', 'Control'];
 
 export function ConsoleShell({
   staff,
@@ -45,6 +37,17 @@ export function ConsoleShell({
     .join('')
     .toUpperCase();
 
+  const sections = SECTION_ORDER.map((heading) => ({
+    heading,
+    items: staff.modules.filter((m) => m.section === heading),
+  })).filter((s) => s.items.length > 0);
+
+  const scope = staff.allCities
+    ? 'All cities'
+    : staff.cities.length > 0
+      ? staff.cities.join(', ')
+      : 'No city scope';
+
   return (
     <div className="lg:grid lg:min-h-dvh lg:grid-cols-[15rem_minmax(0,1fr)]">
       <aside aria-label="Console sidebar" className="bg-ink flex flex-col text-white lg:min-h-dvh">
@@ -55,36 +58,45 @@ export function ConsoleShell({
           </span>
         </div>
 
-        <nav className="flex-1 px-3 pb-4" aria-label="Console">
-          <Link
-            href="/"
-            className={`block rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
-              current === '/' ? 'bg-gold text-ink' : 'text-white/70 hover:text-white'
-            }`}
-          >
-            Overview
-          </Link>
-
-          {SECTIONS.map((section) => (
-            <div key={section.heading} className="mt-6">
+        <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Console">
+          {sections.map((section) => (
+            <div key={section.heading} className="mt-5 first:mt-0">
               <p className="px-3 text-[0.5625rem] font-extrabold uppercase tracking-[0.18em] text-white/35">
                 {section.heading}
               </p>
               <ul className="mt-2 space-y-1">
-                {section.items.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={`block rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
-                        current.startsWith(item.href)
-                          ? 'bg-gold text-ink'
-                          : 'text-white/70 hover:text-white'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
+                {section.items.map((item) => {
+                  const active =
+                    item.href === '/'
+                      ? current === '/'
+                      : !!item.href && current.startsWith(item.href);
+
+                  if (!item.href) {
+                    return (
+                      <li key={item.key}>
+                        <span
+                          title="Designed, not built yet"
+                          className="block cursor-default rounded-lg px-3 py-2 text-sm font-bold text-white/25"
+                        >
+                          {item.label}
+                        </span>
+                      </li>
+                    );
+                  }
+
+                  return (
+                    <li key={item.key}>
+                      <Link
+                        href={item.href}
+                        className={`block rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
+                          active ? 'bg-gold text-ink' : 'text-white/70 hover:text-white'
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -98,9 +110,11 @@ export function ConsoleShell({
             {initials || '—'}
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-[0.8125rem] font-bold">{staff.displayName}</span>
+            <span className="block truncate text-[0.8125rem] font-bold">{staff.email}</span>
             <span className="block truncate text-[0.625rem] font-semibold uppercase tracking-wide text-white/40">
-              {staff.isSuperAdmin ? 'Super admin' : staff.roles.join(' · ') || 'No role granted'}
+              {(staff.isSuperAdmin ? 'Super admin' : staff.roles.join(' · ') || 'No role') +
+                ' · ' +
+                scope}
             </span>
           </span>
           <form action={signOut}>

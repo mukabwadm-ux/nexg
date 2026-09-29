@@ -278,6 +278,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      console_module: {
+        Row: {
+          href: string | null;
+          key: string;
+          label: string;
+          section: string;
+          sort: number;
+        };
+        Insert: {
+          href?: string | null;
+          key: string;
+          label: string;
+          section: string;
+          sort: number;
+        };
+        Update: {
+          href?: string | null;
+          key?: string;
+          label?: string;
+          section?: string;
+          sort?: number;
+        };
+        Relationships: [];
+      };
       document: {
         Row: {
           created_at: string;
@@ -1349,6 +1373,7 @@ export type Database = {
           id: string;
           key: string;
           label: string;
+          landing_module: string | null;
           updated_at: string;
         };
         Insert: {
@@ -1357,6 +1382,7 @@ export type Database = {
           id?: string;
           key: string;
           label: string;
+          landing_module?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -1365,9 +1391,18 @@ export type Database = {
           id?: string;
           key?: string;
           label?: string;
+          landing_module?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'role_landing_module_fkey';
+            columns: ['landing_module'];
+            isOneToOne: false;
+            referencedRelation: 'console_module';
+            referencedColumns: ['key'];
+          },
+        ];
       };
       role_grant: {
         Row: {
@@ -1441,6 +1476,35 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      role_module_access: {
+        Row: {
+          level: string;
+          module_key: string;
+          note: string | null;
+          role_key: string;
+        };
+        Insert: {
+          level: string;
+          module_key: string;
+          note?: string | null;
+          role_key: string;
+        };
+        Update: {
+          level?: string;
+          module_key?: string;
+          note?: string | null;
+          role_key?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'role_module_access_role_key_fkey';
+            columns: ['role_key'];
+            isOneToOne: false;
+            referencedRelation: 'role';
+            referencedColumns: ['key'];
           },
         ];
       };
@@ -2136,6 +2200,7 @@ export type Database = {
         }[];
       };
       rpc_book_slot: { Args: { p_rider_id: string; p_slot_id: string }; Returns: Json };
+      rpc_bootstrap_super_admin: { Args: Record<PropertyKey, never>; Returns: string };
       rpc_document_reject: {
         Args: { p_document_id: string; p_reason: string };
         Returns: {
@@ -2177,34 +2242,20 @@ export type Database = {
             };
             Returns: Json;
           };
-      rpc_document_submit:
-        | {
-            Args: {
-              p_expires_at?: string;
-              p_issued_at?: string;
-              p_mime: string;
-              p_owner_id: string;
-              p_owner_type: Database['public']['Enums']['document_owner_type'];
-              p_requirement_kind: string;
-              p_size_bytes: number;
-              p_storage_path: string;
-            };
-            Returns: string;
-          }
-        | {
-            Args: {
-              p_expires_at?: string;
-              p_issued_at?: string;
-              p_mime: string;
-              p_owner_id: string;
-              p_owner_type: Database['public']['Enums']['document_owner_type'];
-              p_requirement_kind: string;
-              p_side?: string;
-              p_size_bytes: number;
-              p_storage_path: string;
-            };
-            Returns: string;
-          };
+      rpc_document_submit: {
+        Args: {
+          p_expires_at?: string;
+          p_issued_at?: string;
+          p_mime: string;
+          p_owner_id: string;
+          p_owner_type: Database['public']['Enums']['document_owner_type'];
+          p_requirement_kind: string;
+          p_side?: string;
+          p_size_bytes: number;
+          p_storage_path: string;
+        };
+        Returns: string;
+      };
       rpc_document_verify: {
         Args: { p_document_id: string };
         Returns: {
@@ -2690,6 +2741,70 @@ export type Database = {
       rpc_rider_submit: { Args: { p_rider_id: string }; Returns: Json };
       rpc_rider_verify_phone_code: { Args: { p_code: string; p_rider_id: string }; Returns: Json };
       rpc_rider_waitlist: { Args: { p_city_id: string; p_rider_id: string }; Returns: Json };
+      rpc_role_grant_request: {
+        Args: { p_reason: string; p_role: string; p_staff_id: string };
+        Returns: {
+          city_id: string | null;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          id: string;
+          kind: Database['public']['Enums']['approval_kind'];
+          payload: NonNullable<Json>;
+          reason: string;
+          requested_by: string;
+          status: Database['public']['Enums']['approval_status'];
+          target_id: string;
+          target_type: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'approval_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_staff_directory: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          access_expires_at: string;
+          active_sessions: number;
+          all_cities: boolean;
+          cities: string[];
+          created_at: string;
+          display_name: string;
+          email: string;
+          invited: boolean;
+          last_sign_in_at: string;
+          mfa_enrolled: boolean;
+          primary_role: string;
+          primary_role_label: string;
+          role_labels: string[];
+          roles: string[];
+          staff_id: string;
+          status: Database['public']['Enums']['staff_status'];
+        }[];
+      };
+      rpc_staff_invite: {
+        Args: { p_display_name: string; p_email: string; p_roles?: string[] };
+        Returns: Json;
+      };
+      rpc_staff_set_roles: { Args: { p_roles: string[]; p_staff_id: string }; Returns: string[] };
+      rpc_staff_set_scope: {
+        Args: { p_city_id?: string; p_expires_at?: string; p_staff_id: string };
+        Returns: number;
+      };
+      rpc_staff_set_status: {
+        Args: {
+          p_reason?: string;
+          p_staff_id: string;
+          p_status: Database['public']['Enums']['staff_status'];
+        };
+        Returns: Database['public']['Enums']['staff_status'];
+      };
+      rpc_staff_sign_out_everywhere: { Args: { p_staff_id: string }; Returns: number };
       rpc_support_ticket_create: {
         Args: {
           p_body: string;
@@ -2777,7 +2892,7 @@ export type Database = {
     };
     Enums: {
       actor_type: 'staff' | 'merchant_user' | 'rider' | 'guest' | 'host_user' | 'system';
-      approval_kind: 'merchant_suspension';
+      approval_kind: 'merchant_suspension' | 'staff_role_grant';
       approval_status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
       audit_severity: 'info' | 'notice' | 'high';
       city_status: 'live' | 'soft_launch' | 'waitlist';
@@ -2959,7 +3074,7 @@ export const Constants = {
   public: {
     Enums: {
       actor_type: ['staff', 'merchant_user', 'rider', 'guest', 'host_user', 'system'],
-      approval_kind: ['merchant_suspension'],
+      approval_kind: ['merchant_suspension', 'staff_role_grant'],
       approval_status: ['pending', 'approved', 'rejected', 'withdrawn'],
       audit_severity: ['info', 'notice', 'high'],
       city_status: ['live', 'soft_launch', 'waitlist'],

@@ -149,10 +149,13 @@ where email like 'dev.%@nexgapp.com';
 --     and granter.email   = 'you@yourdomain.com'
 --     and r.key = 'super_admin';
 --
--- Worth knowing: with exactly two people the only available approver is the
--- recipient, and the trigger permits that — it checks the approver is not the
--- granter, not that the approver is not the beneficiary. So a pair can grant
--- each other super_admin unchallenged. That is weaker than the rule reads,
--- and worth tightening before the team is large enough for it to matter.
+-- None of this is needed any more: the console does it. Staff & roles has an
+-- Add staff button, and super_admin is proposed there and accepted by the
+-- person receiving it. This file is the way in when there is no console
+-- account yet, and after that it is history.
 --
--- The same applies to `finance`.
+-- On the approver: the rule is that it must not be the requester. The
+-- person receiving the role may accept it themselves, which sounds weak and
+-- is the only thing that works — requiring a third party means a project
+-- can never get from one super admin to two. Nobody can promote themselves,
+-- and nobody can promote someone else without that person accepting.
