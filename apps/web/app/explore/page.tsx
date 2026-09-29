@@ -13,7 +13,7 @@ import {
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
   title: 'Explore',
@@ -46,7 +46,7 @@ export default async function ExplorePage({
     q?: string;
   };
 }) {
-  const supabase = createClient();
+  const supabase = createPublicClient();
 
   const { data: cities } = await supabase
     .from('city')

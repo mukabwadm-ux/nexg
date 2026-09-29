@@ -2,6 +2,7 @@
 
 import { Button, cn, Input, useToast } from '@nexg/ui';
 import { ArrowRight, MapPin } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 
@@ -25,7 +26,17 @@ const NEEDS = [
 ] as const;
 
 export function LeadForm({ initialNeed }: { initialNeed?: string }) {
-  const [need, setNeed] = React.useState<string>(initialNeed ?? 'Food');
+  /*
+   * Read here rather than on the page. `searchParams` in a server component
+   * makes the whole route dynamic, and the homepage was paying for a render
+   * and a database round trip on every visit to prefill one field. Reading it
+   * in the client component that uses it lets the page be static.
+   */
+  const params = useSearchParams();
+  const fromQuery = params.get('need') ?? undefined;
+  const seeded = initialNeed ?? fromQuery;
+
+  const [need, setNeed] = React.useState<string>(seeded ?? 'Food');
   const [when, setWhen] = React.useState<'asap' | 'later'>('asap');
   const [state, formAction] = useFormState<ActionResult | null, FormData>(submitLead, null);
   const { toast } = useToast();
@@ -33,8 +44,8 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
 
   // A chip clicked in "Popular requests" prefills this form (section 4.1).
   React.useEffect(() => {
-    if (initialNeed) setNeed(initialNeed);
-  }, [initialNeed]);
+    if (seeded) setNeed(seeded);
+  }, [seeded]);
 
   React.useEffect(() => {
     if (state && state !== announced.current) {

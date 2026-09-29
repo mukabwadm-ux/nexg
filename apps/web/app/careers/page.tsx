@@ -7,17 +7,22 @@ import { RoleList } from '@/components/careers/role-list';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { BENEFITS, HIRING_STEPS, PRINCIPLES, ROLES, TEAMS } from '@/content/careers';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
   title: 'Careers',
   description: 'Help us build the front desk of East Africa. Roles in Nairobi and remote.',
 };
 
-export const dynamic = 'force-dynamic';
+/*
+ * Cached and re-rendered at most once a minute. Everything on this page is the
+ * same for every visitor, so re-querying it per request bought nothing and
+ * cost a round trip to the database on each one.
+ */
+export const revalidate = 60;
 
 export default async function CareersPage() {
-  const supabase = createClient();
+  const supabase = createPublicClient();
   const { count: cityCount } = await supabase
     .from('city')
     .select('id', { count: 'exact', head: true });

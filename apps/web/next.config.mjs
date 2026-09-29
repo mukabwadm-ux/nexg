@@ -15,7 +15,9 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    optimizePackageImports: ['lucide-react'],
+    // Without @nexg/ui here, importing a Button from the barrel pulls in
+    // PhoneInput and therefore libphonenumber-js on every page.
+    optimizePackageImports: ['lucide-react', '@nexg/ui'],
   },
 };
 

@@ -18,6 +18,7 @@ import {
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { CityCarousel } from '@/components/home/city-carousel';
@@ -27,7 +28,7 @@ import { RotatingWord } from '@/components/home/rotating-word';
 import { NotifyForm } from '@/components/home/notify-form';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
   title: 'Everything at your Doorstep',
@@ -78,8 +79,15 @@ const CATEGORIES = [
   { label: 'Flowers & gifts', icon: Gift },
 ] as const;
 
-export default async function HomePage({ searchParams }: { searchParams?: { need?: string } }) {
-  const supabase = createClient();
+/*
+ * Cached and re-rendered at most once a minute. Everything on this page is the
+ * same for every visitor, so re-querying it per request bought nothing and
+ * cost a round trip to the database on each one.
+ */
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const supabase = createPublicClient();
 
   // Live and soft-launch cities first, then the waitlist — as designed.
   const [{ data: cities }, { data: featured }] = await Promise.all([
@@ -166,7 +174,16 @@ export default async function HomePage({ searchParams }: { searchParams?: { need
               </dl>
             </div>
 
-            <LeadForm {...(searchParams?.need ? { initialNeed: searchParams.need } : {})} />
+            {/*
+              LeadForm reads ?need= to prefill itself, which needs a boundary
+              for the page to prerender. The fallback is the card's own shape
+              so nothing jumps when it hydrates.
+            */}
+            <Suspense
+              fallback={<div className="bg-surface shadow-raised min-h-[28rem] rounded-2xl" />}
+            >
+              <LeadForm />
+            </Suspense>
           </div>
         </section>
 

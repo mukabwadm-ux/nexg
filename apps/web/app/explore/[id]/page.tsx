@@ -8,15 +8,19 @@ import { notFound } from 'next/navigation';
 import { CATEGORY_ICON, CATEGORY_LABEL, MerchantCard } from '@/components/explore/merchant-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
-export const dynamic = 'force-dynamic';
+/*
+ * Cached for a minute. A merchant's public details do not change between
+ * page views, and re-querying them per request cost a round trip each time.
+ */
+export const revalidate = 60;
 
 const SELECT =
   'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const supabase = createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from('merchant_public')
     .select('trading_name, city_name')
@@ -31,7 +35,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export default async function MerchantPage({ params }: { params: { id: string } }) {
-  const supabase = createClient();
+  const supabase = createPublicClient();
 
   /*
    * Read through merchant_public, never the base table. It cannot return a

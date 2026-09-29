@@ -17,7 +17,7 @@ import { RiderAppPreview } from '@/components/riders/rider-app-preview';
 import { RiderApplyCard } from '@/components/riders/rider-apply-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
   title: 'Ride with NexG',
@@ -116,8 +116,15 @@ const FAQ = [
   },
 ] as const;
 
+/*
+ * Cached and re-rendered at most once a minute. Everything on this page is the
+ * same for every visitor, so re-querying it per request bought nothing and
+ * cost a round trip to the database on each one.
+ */
+export const revalidate = 60;
+
 export default async function RidersPage() {
-  const supabase = createClient();
+  const supabase = createPublicClient();
 
   // The cities open for applications (section 4.2). The card adds an
   // "Other" chip, which is how someone in a waitlist city reaches us.

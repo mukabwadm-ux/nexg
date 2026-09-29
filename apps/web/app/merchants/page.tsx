@@ -23,7 +23,7 @@ import { StorefrontPreview } from '@/components/merchants/storefront-preview';
 import { MerchantRegisterCard } from '@/components/merchants/merchant-register-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
   title: 'List your business',
@@ -108,8 +108,15 @@ const FAQ = [
   },
 ] as const;
 
+/*
+ * Cached and re-rendered at most once a minute. Everything on this page is the
+ * same for every visitor, so re-querying it per request bought nothing and
+ * cost a round trip to the database on each one.
+ */
+export const revalidate = 60;
+
 export default async function MerchantsPage() {
-  const supabase = createClient();
+  const supabase = createPublicClient();
 
   const [{ data: cities }, { count: cityCount }, { data: commission }] = await Promise.all([
     supabase
