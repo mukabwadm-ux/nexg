@@ -85,13 +85,15 @@ inserted as (
     d.contact_name, d.contact_phone, d.contact_email, c.nairobi,
     'live', now() - (random() * interval '120 days'),
     /*
-     * Null until the photograph is actually committed to
-     * apps/web/public/images/merchants/. next/image on a missing file
-     * renders a broken image, which looks worse than the category mark
-     * the component falls back to. Flip this to d.cover once the files
-     * are in the repo.
+     * Only where the file exists. next/image on a missing path renders a
+     * broken image, which looks worse than the category mark the card falls
+     * back to — and no usable public-domain pharmacy photograph turned up,
+     * so that one deliberately has none.
      */
-    null,
+    case when d.cover is not null
+      and d.cover <> '/images/merchants/pharmacy.jpg'
+      then d.cover
+    end,
     d.featured, d.concierge_pick, true, true,
     true
   from demo d, city_ids c
