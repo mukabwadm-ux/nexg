@@ -554,7 +554,14 @@ export function Builder({
             className="mt-4 w-full"
             size="lg"
             loading={sending}
-            disabled={!view || view.blocks.length === 0}
+            /*
+             * The same rule rpc_send_plan applies: a day of nothing but a
+             * free afternoon is not a day. Without this the button is
+             * live against an empty catalogue and the guest taps it to be
+             * told no — which is how production looks right now, before
+             * any partner is signed.
+             */
+            disabled={!view || view.blocks.filter((b) => b.kind !== 'free').length === 0}
             onClick={async () => {
               await flushNow();
               setAskContact(true);

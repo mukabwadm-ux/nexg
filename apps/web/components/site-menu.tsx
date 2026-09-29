@@ -31,9 +31,16 @@ import { Logo } from './logo';
 
 const SECTIONS = [
   { number: '01', label: 'Explore', href: '/explore', note: null, live: false },
-  { number: '02', label: 'How it works', href: '/#how-it-works', note: null, live: false },
-  { number: '03', label: 'Cities', href: '/#cities', note: '11 across East Africa', live: false },
-  { number: '04', label: 'Ask a concierge', href: '/#start', note: 'Online now', live: true },
+  {
+    number: '02',
+    label: 'Customize your experience',
+    href: '/experience',
+    note: 'Build a day to your budget',
+    live: false,
+  },
+  { number: '03', label: 'How it works', href: '/#how-it-works', note: null, live: false },
+  { number: '04', label: 'Cities', href: '/#cities', note: '11 across East Africa', live: false },
+  { number: '05', label: 'Ask a concierge', href: '/#start', note: 'Online now', live: true },
 ] as const;
 
 const PARTNER_LINKS = [
