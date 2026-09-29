@@ -39,7 +39,15 @@ export function WelcomeConsent({ locale }: { locale: Locale }) {
     locale: null,
   });
 
+  /*
+   * The language may change during this card's own lifetime — "Allow
+   * both" applies it and then reports where we placed them. Built from
+   * the applied locale rather than the prop, so the confirmation is not
+   * in English on a page that has just become Swahili.
+   */
+  const effective = preferred.locale ?? locale;
   const t = translator(locale);
+  const tAfter = translator(effective);
 
   React.useEffect(() => {
     const languages = navigator.languages?.length
@@ -77,6 +85,7 @@ export function WelcomeConsent({ locale }: { locale: Locale }) {
     return false;
   };
 
+
   const allowBoth = async () => {
     setBusy('both');
     const changedLanguage = await applyLanguage();
@@ -108,12 +117,12 @@ export function WelcomeConsent({ locale }: { locale: Locale }) {
          */
         const live = result.city?.status === 'live' || result.city?.status === 'soft_launch';
         toast({
-          title: t('consent.title'),
+          title: tAfter('consent.title'),
           description: result.city
             ? live
-              ? t('consent.located', { city: result.city.name })
-              : t('consent.locatedWaitlist', { city: result.city.name })
-            : t('consent.locatedFar'),
+              ? tAfter('consent.located', { city: result.city.name })
+              : tAfter('consent.locatedWaitlist', { city: result.city.name })
+            : tAfter('consent.locatedFar'),
           tone: result.city && live ? 'success' : undefined,
         });
 
@@ -125,7 +134,7 @@ export function WelcomeConsent({ locale }: { locale: Locale }) {
            of them is an error worth showing as one. */
         await markAsked();
         setBusy(null);
-        toast({ title: t('consent.title'), description: t('consent.denied') });
+        toast({ title: tAfter('consent.title'), description: tAfter('consent.denied') });
         setVisible(false);
         router.refresh();
       },
