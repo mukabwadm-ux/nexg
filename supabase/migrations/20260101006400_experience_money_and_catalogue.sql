@@ -490,14 +490,22 @@ as
 select
   k.city_id,
   k.mood,
-  k.default_slot as slot,
   k.swap_group,
+  /*
+   * Grouped by swap_group alone, not by slot as well. The group is the
+   * unit the allocator chooses within, and a component sitting an hour
+   * later than its siblings — an orphanage with one feeding at 11:00 —
+   * is still one of the alternatives. Splitting by slot made a group of
+   * four tiers report as four groups of one, which reads as "no swaps
+   * available" and is the opposite of the truth.
+   */
+  array_agg(distinct k.default_slot::text order by k.default_slot::text) as slots,
   count(*) filter (where k.status = 'live') as live_components,
   count(distinct k.tier) filter (where k.status = 'live') as tiers,
   min(k.price_kes) filter (where k.status = 'live') as cheapest_kes,
   count(*) filter (where k.status = 'draft' and k.price_kes is null) as drafts_without_a_price
 from public.experience_component k
-group by k.city_id, k.mood, k.default_slot, k.swap_group;
+group by k.city_id, k.mood, k.swap_group;
 
 comment on view public.catalogue_health is
   'Per city, mood and swap group: how much the allocator actually has to choose from. One live component in a group means no swap and no budget fitting.';

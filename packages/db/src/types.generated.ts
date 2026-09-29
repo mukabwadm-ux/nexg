@@ -4322,6 +4322,60 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_experience_guests: {
+        Args: { p_city_id?: string; p_filter?: string };
+        Returns: {
+          city_name: string;
+          completed_days: number;
+          days: number;
+          first_day: string;
+          guest_name: string;
+          guest_phone: string;
+          is_repeat: boolean;
+          last_date: string;
+          last_plan_id: string;
+          last_reference: string;
+          last_status: Database['public']['Enums']['plan_status'];
+          last_title: string;
+          review_asked_at: string;
+          review_id: string;
+          review_rating: number;
+          review_status: Database['public']['Enums']['review_status'];
+          spent_kes: number;
+          stay_label: string;
+          user_id: string;
+        }[];
+      };
+      rpc_experience_queue: {
+        Args: { p_city_id?: string };
+        Returns: {
+          blocks_settled: number;
+          blocks_total: number;
+          budget_kes: number;
+          city_name: string;
+          concierge_id: string;
+          concierge_name: string;
+          date: string;
+          estimate_total_kes: number;
+          first_reply_at: string;
+          first_reply_due_in_s: number;
+          flags: Json;
+          guest_name: string;
+          holds_pending: number;
+          id: string;
+          moods: Database['public']['Enums']['mood'][];
+          party_size: number;
+          party_type: string;
+          quote_expires_in_s: number;
+          quote_total_kes: number;
+          reference: string;
+          sent_at: string;
+          status: Database['public']['Enums']['plan_status'];
+          stay_label: string;
+          title: string;
+        }[];
+      };
+      rpc_experience_stats: { Args: { p_city_id?: string }; Returns: Json };
       rpc_expire_quotes: { Args: Record<PropertyKey, never>; Returns: number };
       rpc_handover_plan: {
         Args: { p_plan_id: string; p_reason: string; p_to: string };
