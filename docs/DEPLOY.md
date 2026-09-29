@@ -129,19 +129,26 @@ something on screen:
    `apps/admin/.env.local` at the hosted project, restart `pnpm dev`, and sign
    in as a staff user.
 3. You will need a staff account on the hosted project, which the seed did not
-   create. Make one:
+   create. Two steps:
 
-```sql
--- Supabase Studio → SQL Editor, after creating the user in
--- Authentication → Users (email + password, "Auto Confirm User" ticked).
-insert into public.staff_user (user_id, email, display_name)
-values ('<the new auth user id>', 'you@yourdomain.com', 'Your Name');
+   **In Supabase Studio → Authentication → Users → Add user:** your email, a
+   password from a password manager, "Auto Confirm User" ticked. The password
+   is set here and nowhere else.
 
-insert into public.role_grant (staff_user_id, role_id, city_id, granted_by)
-select s.id, r.id, null, s.id
-from public.staff_user s, public.role r
-where s.email = 'you@yourdomain.com' and r.key = 'ops_manager';
-```
+   **Then in SQL Editor:** paste `supabase/bootstrap-staff.sql`, edit the two
+   values at the top, and run it. It is idempotent and it prints what it made.
+
+   Do not hand-write the grants. An earlier version of this page granted
+   `ops_manager` alone, which is not enough: `can_manage_merchants` wants
+   `merchant_ops` or `super_admin`, so that account could open the pipeline
+   and verify nothing. The script grants the four roles the console actually
+   reads — `ops_manager`, `merchant_ops`, `rider_ops`, `growth`.
+
+   It deliberately does not grant `super_admin`, and cannot: a trigger refuses
+   that role without a second approver who is not the granter. You do not need
+   it to run the console — it only gates editing cities, changing which
+   documents we demand, and adding staff. The script's footer has the
+   two-person version for when a colleague has an account.
 
 4. Take the merchant live and feature it. It now shows on the homepage and in
    Explore.
