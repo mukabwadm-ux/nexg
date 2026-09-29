@@ -5,14 +5,22 @@
 -- so the seed never runs against a hosted project and a real account has to be
 -- made by hand. This is that, made short.
 --
--- Before running this, create the person in Supabase Studio:
+-- There are two halves: an account to sign in with, and the powers that go
+-- with it. Do the first either way you like, then run this whole file in
+-- Studio → SQL Editor.
 --
---   Authentication → Users → Add user → Create new user
---   Email, a password from a password manager, "Auto Confirm User" ticked
+-- The account, in the dashboard:
+--   Authentication (the people icon in the left rail) → Users
+--   → the green "Add user" button, top right → "Create new user"
+--   Email, a password from a password manager, "Auto Confirm User" ticked.
 --
--- Then edit the two values in the `me` block below and run the whole file in
--- Studio → SQL Editor. The password is set in that dialog and never appears
--- here, which is the point: this file is in git.
+-- Or, if you cannot find that button, uncomment the block marked OPTION B
+-- below and it will make the account for you.
+--
+-- Either way the password is typed into your own browser and never appears
+-- in this file, which matters because this file is in git. If you use
+-- OPTION B, type the password into the SQL Editor and do not save it back
+-- into the repository.
 --
 -- Safe to run twice. Nothing is deleted and every insert is conditional.
 
@@ -24,6 +32,32 @@ select
   lower(trim('you@yourdomain.com')) as email,
               'Your Name'           as display_name;
 -- ───────────────────────────────────────────────────────────────────────
+
+-- ═══════════════════════════════════════════════════════════════════════
+-- OPTION B — only if you could not find "Add user" in the dashboard.
+-- Uncomment, replace the password, run. Delete the password afterwards.
+-- ═══════════════════════════════════════════════════════════════════════
+--
+-- insert into auth.users (
+--   instance_id, id, aud, role, email, encrypted_password,
+--   email_confirmed_at, created_at, updated_at,
+--   raw_app_meta_data, raw_user_meta_data,
+--   confirmation_token, recovery_token, email_change,
+--   email_change_token_new, email_change_token_current,
+--   phone_change, phone_change_token, reauthentication_token
+-- )
+-- select
+--   '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
+--   'authenticated', 'authenticated', me.email,
+--   -- ↓ replace this, and only in the SQL editor
+--   crypt('PUT-A-STRONG-PASSWORD-HERE', gen_salt('bf')),
+--   -- email_confirmed_at set, because no mail can reach this address yet
+--   now(), now(), now(),
+--   '{"provider":"email","providers":["email"]}'::jsonb,
+--   jsonb_build_object('full_name', me.display_name),
+--   '', '', '', '', '', '', '', ''
+-- from me
+-- where not exists (select 1 from auth.users u where lower(u.email) = me.email);
 
 -- The person. Inserts nothing — quietly — if no auth user has that email,
 -- which the check at the bottom reports.
