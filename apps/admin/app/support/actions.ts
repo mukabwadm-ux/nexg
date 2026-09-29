@@ -32,7 +32,7 @@ export async function reply(
   });
   if (error) return { ok: false, message: error.message };
 
-  revalidatePath('/concierge');
+  revalidatePath('/support');
   return {
     ok: true,
     message: internal
@@ -99,7 +99,7 @@ export async function setStatus(
     }
   }
 
-  revalidatePath('/concierge');
+  revalidatePath('/support');
   revalidatePath('/');
   return { ok: true, message: `Ticket is now ${status}.${note}` };
 }

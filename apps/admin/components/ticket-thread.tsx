@@ -14,7 +14,8 @@ export interface ThreadMessage {
 }
 
 /**
- * The conversation and the reply box, from the Concierge desk artboard.
+ * The conversation and the reply box on Support & tickets, from the desk
+ * artboard.
  *
  * An internal note and a reply are the same control with a different
  * destination, because they are the same action for the person using it —

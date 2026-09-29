@@ -1,5 +1,5 @@
 import { Button, KpiTile } from '@nexg/ui';
-import { Clock, FileCheck2, ShieldAlert, Store, UserRound } from 'lucide-react';
+import { Clock, FileCheck2, MessageSquare, ShieldAlert, Store, UserRound } from 'lucide-react';
 import Link from 'next/link';
 
 import { decideApproval } from '@/app/merchants/actions';
@@ -29,9 +29,15 @@ const KPIS: { label: string; caption: string; unit?: string }[] = [
 
 const STALE_DAYS = 2;
 
-export default async function OverviewPage() {
+export default async function OverviewPage({
+  searchParams,
+}: {
+  searchParams?: { denied?: string };
+}) {
   const staff = await requireStaff();
   const supabase = createClient();
+
+  const reachesSupport = staff.modules.some((m) => m.key === 'support');
 
   const staleBefore = new Date(Date.now() - STALE_DAYS * 86_400_000).toISOString();
   const pendingStatuses = ['applied', 'documents_pending', 'under_review'];
@@ -77,6 +83,33 @@ export default async function OverviewPage() {
     ]);
 
   const needsFirstSuperAdmin = (superAdmins.count ?? 0) === 0;
+
+  /*
+   * Open tickets from the Help page. Only asked for when this person can
+   * open the desk — a row telling somebody about work they are not allowed
+   * to see is a leak with a link on it.
+   */
+  const openTickets = reachesSupport
+    ? await supabase
+        .from('support_ticket')
+        .select('created_at', { count: 'exact' })
+        .eq('status', 'open')
+        .order('created_at', { ascending: true })
+        .limit(1)
+    : { count: 0, data: [] as { created_at: string }[] };
+
+  /*
+   * requireModule sends people here with the module they tried in the URL.
+   * Landing on the overview with no explanation reads as a bug — it did once
+   * already — so say which door was shut and why.
+   */
+  const { data: deniedModule } = searchParams?.denied
+    ? await supabase
+        .from('console_module')
+        .select('label')
+        .eq('key', searchParams.denied)
+        .maybeSingle()
+    : { data: null };
 
   /*
    * "Needs a human now". Every row here is a real query — an empty list means
@@ -126,6 +159,23 @@ export default async function OverviewPage() {
     });
   }
 
+  if ((openTickets.count ?? 0) > 0) {
+    const oldest = openTickets.data?.[0]?.created_at;
+    const hours = oldest
+      ? Math.floor((Date.now() - new Date(oldest).getTime()) / 3_600_000)
+      : null;
+    queue.push({
+      icon: <MessageSquare className="h-4 w-4" />,
+      title: `${openTickets.count} support ticket${openTickets.count === 1 ? '' : 's'} nobody has picked up`,
+      detail:
+        hours === null
+          ? 'Logged from the Help page'
+          : `Logged from the Help page · oldest waiting ${hours < 1 ? 'under an hour' : hours < 24 ? `${hours} h` : `${Math.floor(hours / 24)} d`}`,
+      href: '/support',
+      cta: 'Open the desk',
+    });
+  }
+
   if ((approvals.data ?? []).length > 0) {
     queue.push({
       icon: <ShieldAlert className="h-4 w-4" />,
@@ -160,6 +210,18 @@ export default async function OverviewPage() {
       />
 
       <main className="px-4 py-6 sm:px-8">
+        {searchParams?.denied && (
+          <div className="border-border-strong bg-bg mb-6 rounded-2xl border p-4">
+            <p className="text-[0.8125rem] font-extrabold">
+              {deniedModule?.label ?? 'That section'} is not open to your role
+            </p>
+            <p className="text-muted mt-1.5 max-w-3xl text-xs font-semibold leading-[1.7]">
+              You hold {staff.roles.join(', ') || 'no role'}. A super admin can widen that on Staff
+              &amp; roles, where the permission matrix shows exactly which roles reach it.
+            </p>
+          </div>
+        )}
+
         {needsFirstSuperAdmin && (
           <div className="border-warning/40 bg-warning-bg mb-6 rounded-2xl border p-5">
             <p className="text-warning text-[0.9375rem] font-extrabold">Nobody can add staff yet</p>

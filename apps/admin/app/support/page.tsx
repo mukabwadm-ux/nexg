@@ -3,14 +3,14 @@ import { Inbox } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { reply, setStatus } from '@/app/concierge/actions';
+import { reply, setStatus } from '@/app/support/actions';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { TicketThread, type ThreadMessage } from '@/components/ticket-thread';
-import { requireStaff } from '@/lib/staff';
+import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Concierge desk' };
+export const metadata: Metadata = { title: 'Support & tickets' };
 export const dynamic = 'force-dynamic';
 
 const QUEUES = [
@@ -48,12 +48,13 @@ function waitedFor(iso: string): string {
   return `${Math.floor(hours / 24)} d`;
 }
 
-export default async function ConciergeDeskPage({
+export default async function SupportAndTicketsPage({
   searchParams,
 }: {
   searchParams?: { queue?: string; ticket?: string };
 }) {
   const staff = await requireStaff();
+  requireModule(staff, 'support');
   const supabase = createClient();
 
   const queueKey = QUEUES.some((q) => q.key === searchParams?.queue)
@@ -103,16 +104,21 @@ export default async function ConciergeDeskPage({
     if (q !== 'queue') params.set('queue', q);
     if (patch.ticket) params.set('ticket', patch.ticket);
     const search = params.toString();
-    return search ? `/concierge?${search}` : '/concierge';
+    return search ? `/support?${search}` : '/support';
   };
 
   const waiting = all.filter((t) => t.status === 'open').length;
 
   return (
-    <ConsoleShell staff={staff} current="/concierge">
+    <ConsoleShell staff={staff} current="/support">
       <ConsoleHeader
-        title="Concierge desk"
-        breadcrumb={`${waiting} waiting · ${all.length} tickets in total`}
+        title="Support & tickets"
+        breadcrumb="Operate → Support & tickets · everything logged from the Help page"
+        action={
+          <span className="text-muted text-xs font-semibold">
+            {waiting} waiting · {all.length} in total
+          </span>
+        }
       />
 
       <main className="px-4 py-5 sm:px-8">

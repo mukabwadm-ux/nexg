@@ -17,6 +17,14 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  /*
+   * The support desk was called `Concierge desk` and lived at /concierge.
+   * Permanent, because the old path is not coming back: `concierge` is the
+   * name the orders domain will want.
+   */
+  async redirects() {
+    return [{ source: '/concierge', destination: '/support', permanent: true }];
+  },
 };
 
 export default nextConfig;
