@@ -1,12 +1,13 @@
 # Putting NexG online
 
-Goal: a shareable link for testers. Public site only — the staff console stays
-on your machine, so nothing with staff powers is exposed and the seeded
-`dev.admin` password never reaches the internet.
+Goal: a shareable link for testers. Sections 1–4 put the public site online
+and keep the staff console on your machine. Section 5 gives the console its
+own URL, which you need once other people are testing and registrations
+arrive while you are away from your laptop.
 
-There are two accounts to create and roughly forty minutes of work. Supabase
-first: Vercel is useless without it, because the site has no database of its
-own.
+There are two accounts to create and roughly forty minutes of work, plus
+twenty for the console. Supabase first: Vercel is useless without it, because
+the site has no database of its own.
 
 ---
 
@@ -144,6 +145,80 @@ where s.email = 'you@yourdomain.com' and r.key = 'ops_manager';
 
 4. Take the merchant live and feature it. It now shows on the homepage and in
    Explore.
+
+---
+
+## 5. Putting the console online (~20 min)
+
+Section 4 assumes you are at your own machine when a registration comes in.
+Once other people are testing, that stops being true: someone registers a
+business on Tuesday evening and nobody can approve it until you are back at
+your laptop. This gives the console its own URL.
+
+It is a **separate Vercel project** pointing at the same repository. Do not
+try to serve both apps from one — they have different root directories and
+different audiences.
+
+### Is it safe to put a staff console on the internet?
+
+Yes, and not because of the sign-in page. Every table the console reads is
+behind RLS that checks `staff_user` and `role_grant`, and the console holds
+**no service role key** — it reads as the signed-in staff member and nothing
+more. A stranger who finds the URL gets a sign-in form; a stranger who forges
+a session cookie gets an empty console rather than somebody's documents. The
+middleware redirect is convenience, not the fence.
+
+Two things you must get right, because they are the fence:
+
+- **No `devpassword` anywhere.** That account comes from `seed.sql`, which has
+  never run on the hosted project and must not. Check before you share the
+  URL: `select email from public.staff_user;` should list only real people.
+- **Never add `SUPABASE_SERVICE_ROLE_KEY`.** Nothing in the console uses it,
+  and it bypasses every policy above.
+
+### Steps
+
+1. **New Vercel project**, same GitHub repository, with:
+
+   | Setting | Value |
+   | --- | --- |
+   | Root Directory | `apps/admin` — the setting people miss |
+   | Framework | Next.js (detected) |
+   | Build command | leave default |
+
+2. **Environment variables** (Production and Preview):
+
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://bmrrifvtfvgagkhrmitv.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<the publishable key>
+   STAFF_EMAIL_DOMAIN=nexgapp.com
+   ```
+
+   `STAFF_EMAIL_DOMAIN` refuses any sign-in that is not a work address before
+   it reaches Supabase. Set it to whatever domain your team's email is on. Set
+   `RESEND_API_KEY` and `EMAIL_FROM` too once Resend exists, or ticket replies
+   will be recorded and never sent.
+
+3. **Create your staff account** on the hosted project, using the SQL in
+   section 4. Give it a real password from a password manager, not one you
+   will type from memory.
+
+4. **Check it**, in this order, before telling anyone the URL:
+
+   - Open the URL signed out → you land on `/sign-in`.
+   - Sign in with a personal email → refused by the domain check.
+   - Sign in properly → the merchant pipeline loads.
+   - Open `/merchants` in a private window → redirected to sign-in.
+
+`apps/admin/vercel.json` already pins the console to `dub1` (Dublin), beside
+the database. Without it Vercel picks a US region and every page pays a
+transatlantic round trip per query — the console makes a lot of them.
+
+### Before real traffic
+
+Add a second factor. Supabase Auth supports TOTP, and a console that can take
+a merchant live and read uploaded national IDs deserves more than a password.
+That is a change to `apps/admin/app/sign-in`, not a setting.
 
 ---
 
