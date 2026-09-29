@@ -60,24 +60,32 @@ select is(
   'a bicycle rider needs only the three that always apply'
 );
 
--- A pharmacy needs the category-specific licence (acceptance test 3).
-insert into public.merchant (id, legal_name, trading_name, category, contact_name, contact_phone, contact_email, city_id)
+-- A pharmacy needs the category-specific licences (acceptance test 3).
+--
+-- The counts changed with the onboarding rebuild, in two ways the artboards
+-- asked for. The premises photo is no longer counted as paperwork, so the
+-- universal set is three rather than four — a laundry is told it needs three
+-- documents and it needs three. And the Pharmacy and Poisons Board issues two
+-- separate things: one for the address, one for the superintendent. Only a
+-- pharmacy that dispenses needs the second.
+insert into public.merchant (id, legal_name, trading_name, category, contact_name, contact_phone, contact_email, city_id, answers)
 values ('cccccccc-0000-0000-0000-00000000000f', 'Afya Pharmacy Ltd', 'Afya Pharmacy', 'pharmacy',
         'Ann Owner', '+254744000001', 'afya@example.com',
-        (select id from public.city where slug = 'nairobi'));
+        (select id from public.city where slug = 'nairobi'),
+        '{"dispenses_rx": "yes"}'::jsonb);
 
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-00000000000f')),
   5,
-  'a pharmacy needs the four universal documents plus its licence'
+  'a dispensing pharmacy needs the three universal documents plus both licences'
 );
 
 select ok(
   exists (
     select 1 from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-00000000000f')
-    where kind = 'pharmacy_licence'
+    where kind = 'pharmacy_premises_licence'
   ),
-  'and the pharmacy licence is one of them'
+  'the PPB premises licence is one of them'
 );
 
 -- ------------------------------------------------- uploading moves the status

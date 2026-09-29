@@ -1,150 +1,6 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
-  audit: {
-    Tables: {
-      audit_event: {
-        Row: {
-          action: string;
-          actor_id: string | null;
-          actor_role: string | null;
-          actor_type: Database['public']['Enums']['actor_type'];
-          after: Json | null;
-          approved_by: string | null;
-          at: string;
-          before: Json | null;
-          city_id: string | null;
-          hash: string;
-          id: number;
-          ip: unknown;
-          module: string;
-          prev_hash: string | null;
-          reason: string | null;
-          session_id: string | null;
-          severity: Database['public']['Enums']['audit_severity'];
-          target_id: string | null;
-          target_type: string | null;
-          user_agent: string | null;
-          canonical: string | null;
-        };
-        Insert: {
-          action: string;
-          actor_id?: string | null;
-          actor_role?: string | null;
-          actor_type: Database['public']['Enums']['actor_type'];
-          after?: Json | null;
-          approved_by?: string | null;
-          at?: string;
-          before?: Json | null;
-          city_id?: string | null;
-          hash: string;
-          id?: never;
-          ip?: unknown;
-          module: string;
-          prev_hash?: string | null;
-          reason?: string | null;
-          session_id?: string | null;
-          severity?: Database['public']['Enums']['audit_severity'];
-          target_id?: string | null;
-          target_type?: string | null;
-          user_agent?: string | null;
-        };
-        Update: {
-          action?: string;
-          actor_id?: string | null;
-          actor_role?: string | null;
-          actor_type?: Database['public']['Enums']['actor_type'];
-          after?: Json | null;
-          approved_by?: string | null;
-          at?: string;
-          before?: Json | null;
-          city_id?: string | null;
-          hash?: string;
-          id?: never;
-          ip?: unknown;
-          module?: string;
-          prev_hash?: string | null;
-          reason?: string | null;
-          session_id?: string | null;
-          severity?: Database['public']['Enums']['audit_severity'];
-          target_id?: string | null;
-          target_type?: string | null;
-          user_agent?: string | null;
-        };
-        Relationships: [];
-      };
-      chain_check: {
-        Row: {
-          detail: string | null;
-          events_checked: number;
-          first_bad_id: number | null;
-          id: number;
-          ok: boolean;
-          ran_at: string;
-        };
-        Insert: {
-          detail?: string | null;
-          events_checked: number;
-          first_bad_id?: number | null;
-          id?: never;
-          ok: boolean;
-          ran_at?: string;
-        };
-        Update: {
-          detail?: string | null;
-          events_checked?: number;
-          first_bad_id?: number | null;
-          id?: never;
-          ok?: boolean;
-          ran_at?: string;
-        };
-        Relationships: [];
-      };
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      canonical: {
-        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
-        Returns: string;
-      };
-      log: {
-        Args: {
-          p_action: string;
-          p_actor_id?: string;
-          p_actor_role?: string;
-          p_actor_type: Database['public']['Enums']['actor_type'];
-          p_after?: Json;
-          p_approved_by?: string;
-          p_before?: Json;
-          p_city_id?: string;
-          p_module: string;
-          p_reason?: string;
-          p_severity?: Database['public']['Enums']['audit_severity'];
-          p_target_id?: string;
-          p_target_type?: string;
-        };
-        Returns: number;
-      };
-      run_chain_check: { Args: Record<PropertyKey, never>; Returns: undefined };
-      verify_chain: {
-        Args: Record<PropertyKey, never>;
-        Returns: {
-          detail: string;
-          events_checked: number;
-          first_bad_id: number;
-          ok: boolean;
-        }[];
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
   public: {
     Tables: {
       approval_request: {
@@ -335,6 +191,54 @@ export type Database = {
           },
         ];
       };
+      category_config: {
+        Row: {
+          badge_rules: NonNullable<Json>;
+          card_kind: string;
+          category: Database['public']['Enums']['merchant_category'];
+          created_at: string;
+          eta_style: string;
+          extra_doc_rules: NonNullable<Json>;
+          featured_eligible: boolean;
+          icon: string;
+          label: string;
+          questions: NonNullable<Json>;
+          requires_ops_mapping: boolean;
+          sort: number;
+          updated_at: string;
+        };
+        Insert: {
+          badge_rules?: NonNullable<Json>;
+          card_kind: string;
+          category: Database['public']['Enums']['merchant_category'];
+          created_at?: string;
+          eta_style: string;
+          extra_doc_rules?: NonNullable<Json>;
+          featured_eligible?: boolean;
+          icon: string;
+          label: string;
+          questions?: NonNullable<Json>;
+          requires_ops_mapping?: boolean;
+          sort?: number;
+          updated_at?: string;
+        };
+        Update: {
+          badge_rules?: NonNullable<Json>;
+          card_kind?: string;
+          category?: Database['public']['Enums']['merchant_category'];
+          created_at?: string;
+          eta_style?: string;
+          extra_doc_rules?: NonNullable<Json>;
+          featured_eligible?: boolean;
+          icon?: string;
+          label?: string;
+          questions?: NonNullable<Json>;
+          requires_ops_mapping?: boolean;
+          sort?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       city: {
         Row: {
           country: string;
@@ -449,10 +353,62 @@ export type Database = {
           },
         ];
       };
+      document_request: {
+        Row: {
+          channel: string;
+          created_at: string;
+          fulfilled_document_id: string | null;
+          id: string;
+          owner_id: string;
+          owner_type: Database['public']['Enums']['document_owner_type'];
+          requirement_id: string;
+          sent_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          channel?: string;
+          created_at?: string;
+          fulfilled_document_id?: string | null;
+          id?: string;
+          owner_id: string;
+          owner_type: Database['public']['Enums']['document_owner_type'];
+          requirement_id: string;
+          sent_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          channel?: string;
+          created_at?: string;
+          fulfilled_document_id?: string | null;
+          id?: string;
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['document_owner_type'];
+          requirement_id?: string;
+          sent_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'document_request_fulfilled_document_id_fkey';
+            columns: ['fulfilled_document_id'];
+            isOneToOne: false;
+            referencedRelation: 'document';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'document_request_requirement_id_fkey';
+            columns: ['requirement_id'];
+            isOneToOne: false;
+            referencedRelation: 'document_requirement';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       document_requirement: {
         Row: {
           applies_when: NonNullable<Json>;
           created_at: string;
+          essential: boolean;
           has_expiry: boolean;
           help_text: string | null;
           id: string;
@@ -462,10 +418,12 @@ export type Database = {
           required: boolean;
           sort: number;
           updated_at: string;
+          why_text: string | null;
         };
         Insert: {
           applies_when?: NonNullable<Json>;
           created_at?: string;
+          essential?: boolean;
           has_expiry?: boolean;
           help_text?: string | null;
           id?: string;
@@ -475,10 +433,12 @@ export type Database = {
           required?: boolean;
           sort?: number;
           updated_at?: string;
+          why_text?: string | null;
         };
         Update: {
           applies_when?: NonNullable<Json>;
           created_at?: string;
+          essential?: boolean;
           has_expiry?: boolean;
           help_text?: string | null;
           id?: string;
@@ -488,6 +448,7 @@ export type Database = {
           required?: boolean;
           sort?: number;
           updated_at?: string;
+          why_text?: string | null;
         };
         Relationships: [];
       };
@@ -606,80 +567,179 @@ export type Database = {
         Row: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
-          category: Database['public']['Enums']['merchant_category'];
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
-          city_id: string;
+          city_id: string | null;
           concierge_pick: boolean;
-          contact_email: string;
+          contact_email: string | null;
           contact_name: string;
           contact_phone: string;
           cover_photo_path: string | null;
           created_at: string;
+          credentials_sent_at: string | null;
           explore_visible: boolean;
           featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          hours: Json | null;
+          hours_pattern: string | null;
           id: string;
-          legal_name: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
           settlement_account: Json | null;
+          source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          submitted_at: string | null;
           trading_name: string;
           updated_at: string;
+          waitlisted_at: string | null;
           went_live_at: string | null;
           went_live_by: string | null;
+          when_busy: string;
         };
         Insert: {
           accepting_orders?: boolean;
           accepting_orders_changed_at?: string | null;
-          category: Database['public']['Enums']['merchant_category'];
+          answers?: NonNullable<Json>;
+          branch_count_band?: string | null;
+          category?: Database['public']['Enums']['merchant_category'] | null;
           category_other?: string | null;
-          city_id: string;
+          city_id?: string | null;
           concierge_pick?: boolean;
-          contact_email: string;
+          contact_email?: string | null;
           contact_name: string;
           contact_phone: string;
           cover_photo_path?: string | null;
           created_at?: string;
+          credentials_sent_at?: string | null;
           explore_visible?: boolean;
           featured?: boolean;
+          fleet_dispatch_preference?: string;
+          has_own_riders?: boolean;
+          hours?: Json | null;
+          hours_pattern?: string | null;
           id?: string;
-          legal_name: string;
+          landmark?: string | null;
+          late_night_until?: string | null;
+          legal_name?: string | null;
+          onboarding_call_at?: string | null;
+          onboarding_source?: string | null;
+          onboarding_step?: number;
+          order_channels?: string[];
+          packaging?: string | null;
+          password_set_at?: string | null;
           pay_on_delivery?: boolean;
           pay_on_delivery_cap_kes?: number | null;
+          payout_account?: Json | null;
+          payout_name_lookup?: Json | null;
+          payout_rail?: string | null;
+          phone_code_attempts?: number;
+          phone_code_expires_at?: string | null;
+          phone_code_hash?: string | null;
+          phone_verified_at?: string | null;
+          pickup_instructions?: string | null;
+          prep_minutes?: number;
+          price_band?: string | null;
+          requires_ops_mapping?: boolean;
+          resume_token_expires_at?: string | null;
+          resume_token_hash?: string | null;
+          rider_parking?: string | null;
           settlement_account?: Json | null;
+          source_url?: string | null;
           status?: Database['public']['Enums']['partner_status'];
           status_reason?: string | null;
+          submitted_at?: string | null;
           trading_name: string;
           updated_at?: string;
+          waitlisted_at?: string | null;
           went_live_at?: string | null;
           went_live_by?: string | null;
+          when_busy?: string;
         };
         Update: {
           accepting_orders?: boolean;
           accepting_orders_changed_at?: string | null;
-          category?: Database['public']['Enums']['merchant_category'];
+          answers?: NonNullable<Json>;
+          branch_count_band?: string | null;
+          category?: Database['public']['Enums']['merchant_category'] | null;
           category_other?: string | null;
-          city_id?: string;
+          city_id?: string | null;
           concierge_pick?: boolean;
-          contact_email?: string;
+          contact_email?: string | null;
           contact_name?: string;
           contact_phone?: string;
           cover_photo_path?: string | null;
           created_at?: string;
+          credentials_sent_at?: string | null;
           explore_visible?: boolean;
           featured?: boolean;
+          fleet_dispatch_preference?: string;
+          has_own_riders?: boolean;
+          hours?: Json | null;
+          hours_pattern?: string | null;
           id?: string;
-          legal_name?: string;
+          landmark?: string | null;
+          late_night_until?: string | null;
+          legal_name?: string | null;
+          onboarding_call_at?: string | null;
+          onboarding_source?: string | null;
+          onboarding_step?: number;
+          order_channels?: string[];
+          packaging?: string | null;
+          password_set_at?: string | null;
           pay_on_delivery?: boolean;
           pay_on_delivery_cap_kes?: number | null;
+          payout_account?: Json | null;
+          payout_name_lookup?: Json | null;
+          payout_rail?: string | null;
+          phone_code_attempts?: number;
+          phone_code_expires_at?: string | null;
+          phone_code_hash?: string | null;
+          phone_verified_at?: string | null;
+          pickup_instructions?: string | null;
+          prep_minutes?: number;
+          price_band?: string | null;
+          requires_ops_mapping?: boolean;
+          resume_token_expires_at?: string | null;
+          resume_token_hash?: string | null;
+          rider_parking?: string | null;
           settlement_account?: Json | null;
+          source_url?: string | null;
           status?: Database['public']['Enums']['partner_status'];
           status_reason?: string | null;
+          submitted_at?: string | null;
           trading_name?: string;
           updated_at?: string;
+          waitlisted_at?: string | null;
           went_live_at?: string | null;
           went_live_by?: string | null;
+          when_busy?: string;
         };
         Relationships: [
           {
@@ -700,38 +760,50 @@ export type Database = {
       };
       merchant_branch: {
         Row: {
-          address_text: string;
+          address_text: string | null;
           created_at: string;
           id: string;
+          inherits_hours: boolean;
           is_primary: boolean;
           latitude: number | null;
+          location: unknown;
           longitude: number | null;
           merchant_id: string;
-          name: string;
+          name: string | null;
+          sort: number;
+          source: string;
           updated_at: string;
           zone_id: string | null;
         };
         Insert: {
-          address_text: string;
+          address_text?: string | null;
           created_at?: string;
           id?: string;
+          inherits_hours?: boolean;
           is_primary?: boolean;
           latitude?: number | null;
+          location?: unknown;
           longitude?: number | null;
           merchant_id: string;
-          name: string;
+          name?: string | null;
+          sort?: number;
+          source?: string;
           updated_at?: string;
           zone_id?: string | null;
         };
         Update: {
-          address_text?: string;
+          address_text?: string | null;
           created_at?: string;
           id?: string;
+          inherits_hours?: boolean;
           is_primary?: boolean;
           latitude?: number | null;
+          location?: unknown;
           longitude?: number | null;
           merchant_id?: string;
-          name?: string;
+          name?: string | null;
+          sort?: number;
+          source?: string;
           updated_at?: string;
           zone_id?: string | null;
         };
@@ -748,6 +820,110 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone_bounds';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_fleet_rider: {
+        Row: {
+          branch_id: string | null;
+          created_at: string;
+          declared_by: string | null;
+          id: string;
+          invite_expires_at: string | null;
+          invite_status: Database['public']['Enums']['fleet_invite_status'];
+          invite_token_hash: string | null;
+          invited_at: string | null;
+          merchant_id: string;
+          name: string;
+          phone: string;
+          plate_no: string | null;
+          rider_id: string | null;
+          updated_at: string;
+          vehicle: Database['public']['Enums']['vehicle_type'];
+        };
+        Insert: {
+          branch_id?: string | null;
+          created_at?: string;
+          declared_by?: string | null;
+          id?: string;
+          invite_expires_at?: string | null;
+          invite_status?: Database['public']['Enums']['fleet_invite_status'];
+          invite_token_hash?: string | null;
+          invited_at?: string | null;
+          merchant_id: string;
+          name: string;
+          phone: string;
+          plate_no?: string | null;
+          rider_id?: string | null;
+          updated_at?: string;
+          vehicle: Database['public']['Enums']['vehicle_type'];
+        };
+        Update: {
+          branch_id?: string | null;
+          created_at?: string;
+          declared_by?: string | null;
+          id?: string;
+          invite_expires_at?: string | null;
+          invite_status?: Database['public']['Enums']['fleet_invite_status'];
+          invite_token_hash?: string | null;
+          invited_at?: string | null;
+          merchant_id?: string;
+          name?: string;
+          phone?: string;
+          plate_no?: string | null;
+          rider_id?: string | null;
+          updated_at?: string;
+          vehicle?: Database['public']['Enums']['vehicle_type'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_fleet_rider_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_declared_by_fkey';
+            columns: ['declared_by'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
             referencedColumns: ['id'];
           },
         ];
@@ -889,12 +1065,52 @@ export type Database = {
           },
         ];
       };
+      notification_log: {
+        Row: {
+          channel: string;
+          created_at: string;
+          error: string | null;
+          id: string;
+          payload: NonNullable<Json>;
+          provider_id: string | null;
+          recipient: string;
+          sent_at: string | null;
+          status: string;
+          template: string;
+        };
+        Insert: {
+          channel: string;
+          created_at?: string;
+          error?: string | null;
+          id?: string;
+          payload?: NonNullable<Json>;
+          provider_id?: string | null;
+          recipient: string;
+          sent_at?: string | null;
+          status?: string;
+          template: string;
+        };
+        Update: {
+          channel?: string;
+          created_at?: string;
+          error?: string | null;
+          id?: string;
+          payload?: NonNullable<Json>;
+          provider_id?: string | null;
+          recipient?: string;
+          sent_at?: string | null;
+          status?: string;
+          template?: string;
+        };
+        Relationships: [];
+      };
       rider: {
         Row: {
           activated_at: string | null;
           activated_by: string | null;
           city_id: string;
           created_at: string;
+          employer_merchant_id: string | null;
           first_name: string;
           id: string;
           kit_issued: boolean;
@@ -902,6 +1118,7 @@ export type Database = {
           onboarding_session_at: string | null;
           phone: string;
           plate_no: string | null;
+          source: string;
           status: Database['public']['Enums']['rider_status'];
           status_reason: string | null;
           updated_at: string;
@@ -913,6 +1130,7 @@ export type Database = {
           activated_by?: string | null;
           city_id: string;
           created_at?: string;
+          employer_merchant_id?: string | null;
           first_name: string;
           id?: string;
           kit_issued?: boolean;
@@ -920,6 +1138,7 @@ export type Database = {
           onboarding_session_at?: string | null;
           phone: string;
           plate_no?: string | null;
+          source?: string;
           status?: Database['public']['Enums']['rider_status'];
           status_reason?: string | null;
           updated_at?: string;
@@ -931,6 +1150,7 @@ export type Database = {
           activated_by?: string | null;
           city_id?: string;
           created_at?: string;
+          employer_merchant_id?: string | null;
           first_name?: string;
           id?: string;
           kit_issued?: boolean;
@@ -938,6 +1158,7 @@ export type Database = {
           onboarding_session_at?: string | null;
           phone?: string;
           plate_no?: string | null;
+          source?: string;
           status?: Database['public']['Enums']['rider_status'];
           status_reason?: string | null;
           updated_at?: string;
@@ -957,6 +1178,20 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
           },
         ];
@@ -1302,6 +1537,56 @@ export type Database = {
           },
         ];
       };
+      zone: {
+        Row: {
+          active: boolean;
+          city_id: string;
+          cod_allowed: boolean;
+          created_at: string;
+          eta_max: number;
+          eta_min: number;
+          id: string;
+          name: string;
+          polygon: unknown;
+          tier: Database['public']['Enums']['zone_tier'];
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          city_id: string;
+          cod_allowed?: boolean;
+          created_at?: string;
+          eta_max: number;
+          eta_min: number;
+          id?: string;
+          name: string;
+          polygon: unknown;
+          tier: Database['public']['Enums']['zone_tier'];
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          city_id?: string;
+          cod_allowed?: boolean;
+          created_at?: string;
+          eta_max?: number;
+          eta_min?: number;
+          id?: string;
+          name?: string;
+          polygon?: unknown;
+          tier?: Database['public']['Enums']['zone_tier'];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       merchant_public: {
@@ -1325,15 +1610,145 @@ export type Database = {
         };
         Relationships: [];
       };
+      zone_bounds: {
+        Row: {
+          city_id: string | null;
+          cod_allowed: boolean | null;
+          east: number | null;
+          eta_max: number | null;
+          eta_min: number | null;
+          id: string | null;
+          name: string | null;
+          north: number | null;
+          south: number | null;
+          tier: Database['public']['Enums']['zone_tier'] | null;
+          west: number | null;
+        };
+        Insert: {
+          city_id?: string | null;
+          cod_allowed?: boolean | null;
+          east?: never;
+          eta_max?: number | null;
+          eta_min?: number | null;
+          id?: string | null;
+          name?: string | null;
+          north?: never;
+          south?: never;
+          tier?: Database['public']['Enums']['zone_tier'] | null;
+          west?: never;
+        };
+        Update: {
+          city_id?: string | null;
+          cod_allowed?: boolean | null;
+          east?: never;
+          eta_max?: number | null;
+          eta_min?: number | null;
+          id?: string | null;
+          name?: string | null;
+          north?: never;
+          south?: never;
+          tier?: Database['public']['Enums']['zone_tier'] | null;
+          west?: never;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Functions: {
+      distance_to_nearest_zone: {
+        Args: { p_lat: number; p_lng: number };
+        Returns: {
+          city_id: string;
+          city_name: string;
+          km: number;
+          zone_name: string;
+        }[];
+      };
+      fn_answer_matches: { Args: { p_answers: Json; p_condition: Json }; Returns: boolean };
       fn_expire_documents: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_merchant_draft_for_write: {
+        Args: { p_merchant_id: string };
+        Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          category_other: string | null;
+          city_id: string | null;
+          concierge_pick: boolean;
+          contact_email: string | null;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          credentials_sent_at: string | null;
+          explore_visible: boolean;
+          featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          hours: Json | null;
+          hours_pattern: string | null;
+          id: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          password_set_at: string | null;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
+          settlement_account: Json | null;
+          source_url: string | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          submitted_at: string | null;
+          trading_name: string;
+          updated_at: string;
+          waitlisted_at: string | null;
+          went_live_at: string | null;
+          went_live_by: string | null;
+          when_busy: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
+      fn_merchant_readiness: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_required_docs: {
         Args: { p_merchant_id: string };
         Returns: {
           applies_when: NonNullable<Json>;
           created_at: string;
+          essential: boolean;
           has_expiry: boolean;
           help_text: string | null;
           id: string;
@@ -1343,6 +1758,7 @@ export type Database = {
           required: boolean;
           sort: number;
           updated_at: string;
+          why_text: string | null;
         }[];
         SetofOptions: {
           from: '*';
@@ -1363,6 +1779,7 @@ export type Database = {
         Returns: {
           applies_when: NonNullable<Json>;
           created_at: string;
+          essential: boolean;
           has_expiry: boolean;
           help_text: string | null;
           id: string;
@@ -1372,6 +1789,7 @@ export type Database = {
           required: boolean;
           sort: number;
           updated_at: string;
+          why_text: string | null;
         }[];
         SetofOptions: {
           from: '*';
@@ -1380,6 +1798,7 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      neighbourhoods_for_zone: { Args: { p_zone_id: string }; Returns: string[] };
       rpc_activate_rider: {
         Args: { p_reason?: string; p_rider_id: string };
         Returns: {
@@ -1387,6 +1806,7 @@ export type Database = {
           activated_by: string | null;
           city_id: string;
           created_at: string;
+          employer_merchant_id: string | null;
           first_name: string;
           id: string;
           kit_issued: boolean;
@@ -1394,6 +1814,7 @@ export type Database = {
           onboarding_session_at: string | null;
           phone: string;
           plate_no: string | null;
+          source: string;
           status: Database['public']['Enums']['rider_status'];
           status_reason: string | null;
           updated_at: string;
@@ -1475,6 +1896,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_document_request_via_whatsapp: {
+        Args: { p_merchant_id: string; p_requirement_kind: string };
+        Returns: Json;
       };
       rpc_document_submit: {
         Args: {
@@ -1570,33 +1995,70 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_merchant_declare_fleet: {
+        Args: { p_merchant_id: string; p_preference?: string; p_riders: Json };
+        Returns: Json;
+      };
       rpc_merchant_go_live: {
         Args: { p_merchant_id: string; p_reason?: string };
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
-          category: Database['public']['Enums']['merchant_category'];
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
-          city_id: string;
+          city_id: string | null;
           concierge_pick: boolean;
-          contact_email: string;
+          contact_email: string | null;
           contact_name: string;
           contact_phone: string;
           cover_photo_path: string | null;
           created_at: string;
+          credentials_sent_at: string | null;
           explore_visible: boolean;
           featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          hours: Json | null;
+          hours_pattern: string | null;
           id: string;
-          legal_name: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
           settlement_account: Json | null;
+          source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          submitted_at: string | null;
           trading_name: string;
           updated_at: string;
+          waitlisted_at: string | null;
           went_live_at: string | null;
           went_live_by: string | null;
+          when_busy: string;
         };
         SetofOptions: {
           from: '*';
@@ -1605,6 +2067,8 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_request_phone_code: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_request_suspension: {
         Args: { p_merchant_id: string; p_reason: string };
         Returns: {
@@ -1630,6 +2094,25 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_merchant_resume_claim: { Args: { p_token: string }; Returns: Json };
+      rpc_merchant_resume_token: { Args: { p_merchant_id: string }; Returns: string };
+      rpc_merchant_save_step: {
+        Args: { p_merchant_id: string; p_patch?: Json; p_step: number };
+        Returns: Json;
+      };
+      rpc_merchant_set_branches: {
+        Args: { p_branches: Json; p_merchant_id: string };
+        Returns: Json;
+      };
+      rpc_merchant_set_category: {
+        Args: {
+          p_answers?: Json;
+          p_category: Database['public']['Enums']['merchant_category'];
+          p_category_other?: string;
+          p_merchant_id: string;
+        };
+        Returns: Json;
+      };
       rpc_merchant_set_controls: {
         Args: {
           p_accepting_orders?: boolean;
@@ -1644,28 +2127,61 @@ export type Database = {
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
-          category: Database['public']['Enums']['merchant_category'];
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
-          city_id: string;
+          city_id: string | null;
           concierge_pick: boolean;
-          contact_email: string;
+          contact_email: string | null;
           contact_name: string;
           contact_phone: string;
           cover_photo_path: string | null;
           created_at: string;
+          credentials_sent_at: string | null;
           explore_visible: boolean;
           featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          hours: Json | null;
+          hours_pattern: string | null;
           id: string;
-          legal_name: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
           settlement_account: Json | null;
+          source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          submitted_at: string | null;
           trading_name: string;
           updated_at: string;
+          waitlisted_at: string | null;
           went_live_at: string | null;
           went_live_by: string | null;
+          when_busy: string;
         };
         SetofOptions: {
           from: '*';
@@ -1679,28 +2195,61 @@ export type Database = {
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
-          category: Database['public']['Enums']['merchant_category'];
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
-          city_id: string;
+          city_id: string | null;
           concierge_pick: boolean;
-          contact_email: string;
+          contact_email: string | null;
           contact_name: string;
           contact_phone: string;
           cover_photo_path: string | null;
           created_at: string;
+          credentials_sent_at: string | null;
           explore_visible: boolean;
           featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          hours: Json | null;
+          hours_pattern: string | null;
           id: string;
-          legal_name: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
           settlement_account: Json | null;
+          source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          submitted_at: string | null;
           trading_name: string;
           updated_at: string;
+          waitlisted_at: string | null;
           went_live_at: string | null;
           went_live_by: string | null;
+          when_busy: string;
         };
         SetofOptions: {
           from: '*';
@@ -1714,28 +2263,61 @@ export type Database = {
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
-          category: Database['public']['Enums']['merchant_category'];
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
-          city_id: string;
+          city_id: string | null;
           concierge_pick: boolean;
-          contact_email: string;
+          contact_email: string | null;
           contact_name: string;
           contact_phone: string;
           cover_photo_path: string | null;
           created_at: string;
+          credentials_sent_at: string | null;
           explore_visible: boolean;
           featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          hours: Json | null;
+          hours_pattern: string | null;
           id: string;
-          legal_name: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
           settlement_account: Json | null;
+          source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          submitted_at: string | null;
           trading_name: string;
           updated_at: string;
+          waitlisted_at: string | null;
           went_live_at: string | null;
           went_live_by: string | null;
+          when_busy: string;
         };
         SetofOptions: {
           from: '*';
@@ -1753,6 +2335,26 @@ export type Database = {
           p_name?: string;
         };
         Returns: string;
+      };
+      rpc_merchant_start: {
+        Args: {
+          p_contact_email?: string;
+          p_contact_name: string;
+          p_contact_phone: string;
+          p_source?: string;
+          p_source_url?: string;
+          p_trading_name: string;
+        };
+        Returns: string;
+      };
+      rpc_merchant_submit: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_verify_phone_code: {
+        Args: { p_code: string; p_merchant_id: string };
+        Returns: Json;
+      };
+      rpc_merchant_waitlist: {
+        Args: { p_area?: string; p_lat: number; p_lng: number; p_merchant_id: string };
+        Returns: Json;
       };
       rpc_notification_mark: {
         Args: {
@@ -1846,6 +2448,18 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      zone_for_point: {
+        Args: { p_lat: number; p_lng: number };
+        Returns: {
+          city_id: string;
+          cod_allowed: boolean;
+          eta_max: number;
+          eta_min: number;
+          id: string;
+          name: string;
+          tier: Database['public']['Enums']['zone_tier'];
+        }[];
+      };
     };
     Enums: {
       actor_type: 'staff' | 'merchant_user' | 'rider' | 'guest' | 'host_user' | 'system';
@@ -1855,6 +2469,13 @@ export type Database = {
       city_status: 'live' | 'soft_launch' | 'waitlist';
       document_owner_type: 'rider' | 'merchant';
       document_status: 'uploaded' | 'verified' | 'rejected' | 'expired';
+      fleet_invite_status:
+        | 'invited'
+        | 'started'
+        | 'under_review'
+        | 'active'
+        | 'declined'
+        | 'expired';
       legal_document_key:
         | 'terms'
         | 'privacy'
@@ -1905,6 +2526,7 @@ export type Database = {
         | 'hotel_partnership'
         | 'something_else';
       vehicle_type: 'motorbike' | 'bicycle' | 'car' | 'tuktuk';
+      zone_tier: 'core' | 'extended' | 'trial';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -2018,9 +2640,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  audit: {
-    Enums: {},
-  },
   public: {
     Enums: {
       actor_type: ['staff', 'merchant_user', 'rider', 'guest', 'host_user', 'system'],
@@ -2030,6 +2649,7 @@ export const Constants = {
       city_status: ['live', 'soft_launch', 'waitlist'],
       document_owner_type: ['rider', 'merchant'],
       document_status: ['uploaded', 'verified', 'rejected', 'expired'],
+      fleet_invite_status: ['invited', 'started', 'under_review', 'active', 'declined', 'expired'],
       legal_document_key: [
         'terms',
         'privacy',
@@ -2085,6 +2705,7 @@ export const Constants = {
         'something_else',
       ],
       vehicle_type: ['motorbike', 'bicycle', 'car', 'tuktuk'],
+      zone_tier: ['core', 'extended', 'trial'],
     },
   },
 } as const;

@@ -160,7 +160,7 @@ export default async function MerchantsPage({
                           {application.trading_name}
                         </span>
                         <span className="text-muted-light block truncate text-xs font-semibold">
-                          {application.category.replace(/_/g, ' ')} ·{' '}
+                          {application.category?.replace(/_/g, ' ') ?? 'category not chosen'} ·{' '}
                           {(application.city as { name: string } | null)?.name} ·{' '}
                           {ageLabel(application.created_at)}
                         </span>
@@ -221,7 +221,8 @@ export default async function MerchantsPage({
                                   {merchant.trading_name}
                                 </span>
                                 <span className="text-muted-light block truncate text-xs font-semibold">
-                                  {merchant.category.replace(/_/g, ' ')} · {city?.name}
+                                  {merchant.category?.replace(/_/g, ' ') ?? 'category not chosen'} ·{' '}
+                                  {city?.name}
                                   {merchant.featured && ' · featured'}
                                   {merchant.concierge_pick && ' · pick'}
                                 </span>
@@ -264,7 +265,8 @@ export default async function MerchantsPage({
               merchant={{
                 id: selected.id,
                 tradingName: selected.trading_name,
-                category: selected.category,
+                /* A draft may not have chosen one yet. */
+                category: selected.category ?? 'other',
                 status: selected.status,
                 featured: selected.featured,
                 cityName: (selected.city as { name: string } | null)?.name ?? null,

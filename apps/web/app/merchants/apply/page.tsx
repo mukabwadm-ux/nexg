@@ -1,65 +1,45 @@
-import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-import { MerchantApplyFlow } from '@/components/merchants/merchant-apply-flow';
-import { SiteFooter } from '@/components/site-footer';
-import { SiteHeader } from '@/components/site-header';
+import { pathForStep } from '@/components/onboarding/types';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = {
-  title: 'Register your business',
-  description: 'List your business on NexG. Four steps, about two minutes to start.',
-};
+/**
+ * /merchants/apply is not a screen — it is "put me back where I was".
+ *
+ * A merchant who abandoned at the documents step and came back a week later
+ * should land on the documents step, not at the beginning being asked their
+ * name again.
+ *
+ * The query string is carried through rather than dropped: the register card
+ * on the marketing page collects a name and a number before sending people
+ * here, and making them type it a second time would be a poor thank-you for
+ * having already filled it in.
+ */
+export const dynamic = 'force-dynamic';
 
-export default async function MerchantApplyPage({
+export default async function ApplyIndex({
   searchParams,
 }: {
-  searchParams?: {
-    trading_name?: string;
-    contact_name?: string;
-    phone?: string;
-    email?: string;
-    category?: string;
-    city?: string;
-  };
+  searchParams?: Record<string, string | string[] | undefined>;
 }) {
   const supabase = createClient();
 
-  const [{ data: cities }, { data: requirements }] = await Promise.all([
-    supabase
-      .from('city')
-      .select('id, name, slug, status')
-      .neq('status', 'waitlist')
-      .order('sort', { ascending: true }),
-    supabase
-      .from('document_requirement')
-      .select('id, kind, label, help_text, has_expiry, applies_when, sort')
-      .eq('owner_type', 'merchant')
-      .order('sort', { ascending: true }),
-  ]);
+  const { data } = await supabase
+    .from('merchant')
+    .select('onboarding_step, submitted_at')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  return (
-    <>
-      <SiteHeader
-        signIn={{ label: 'Merchant sign in', href: '/merchants/sign-in' }}
-        action={{ label: 'Help', href: '/help' }}
-      />
+  if (data?.submitted_at) redirect('/merchants/status');
 
-      <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
-        <MerchantApplyFlow
-          cities={cities ?? []}
-          requirements={requirements ?? []}
-          prefill={{
-            tradingName: searchParams?.trading_name ?? '',
-            contactName: searchParams?.contact_name ?? '',
-            phone: searchParams?.phone ?? null,
-            email: searchParams?.email ?? '',
-            category: searchParams?.category ?? 'restaurant',
-            cityId: searchParams?.city ?? null,
-          }}
-        />
-      </main>
+  const step = data?.onboarding_step ?? 1;
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams ?? {})) {
+    if (typeof value === 'string' && value) query.set(key, value);
+  }
 
-      <SiteFooter />
-    </>
-  );
+  /* Only step 1 has anything to prefill; a draft already holds the answers. */
+  const suffix = step === 1 && query.size > 0 ? `?${query.toString()}` : '';
+  redirect(`${pathForStep(step)}${suffix}`);
 }
