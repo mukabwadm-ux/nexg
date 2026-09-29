@@ -220,6 +220,121 @@ export type Database = {
           },
         ];
       };
+      catalogue_item: {
+        Row: {
+          age_restricted: boolean;
+          available: boolean;
+          created_at: string;
+          description: string | null;
+          highlighted: boolean;
+          id: string;
+          merchant_id: string;
+          name: string;
+          photo_path: string | null;
+          price_kes: number | null;
+          section_id: string;
+          sort: number;
+          updated_at: string;
+        };
+        Insert: {
+          age_restricted?: boolean;
+          available?: boolean;
+          created_at?: string;
+          description?: string | null;
+          highlighted?: boolean;
+          id?: string;
+          merchant_id: string;
+          name: string;
+          photo_path?: string | null;
+          price_kes?: number | null;
+          section_id: string;
+          sort?: number;
+          updated_at?: string;
+        };
+        Update: {
+          age_restricted?: boolean;
+          available?: boolean;
+          created_at?: string;
+          description?: string | null;
+          highlighted?: boolean;
+          id?: string;
+          merchant_id?: string;
+          name?: string;
+          photo_path?: string | null;
+          price_kes?: number | null;
+          section_id?: string;
+          sort?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_section_id_fkey';
+            columns: ['section_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_section';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      catalogue_section: {
+        Row: {
+          blurb: string | null;
+          created_at: string;
+          id: string;
+          merchant_id: string;
+          name: string;
+          sort: number;
+          updated_at: string;
+        };
+        Insert: {
+          blurb?: string | null;
+          created_at?: string;
+          id?: string;
+          merchant_id: string;
+          name: string;
+          sort?: number;
+          updated_at?: string;
+        };
+        Update: {
+          blurb?: string | null;
+          created_at?: string;
+          id?: string;
+          merchant_id?: string;
+          name?: string;
+          sort?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       city: {
         Row: {
           country: string;
@@ -630,6 +745,54 @@ export type Database = {
           },
           {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_hours: {
+        Row: {
+          closed: boolean;
+          closes: string | null;
+          created_at: string;
+          day_of_week: number;
+          id: string;
+          merchant_id: string;
+          opens: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          closed?: boolean;
+          closes?: string | null;
+          created_at?: string;
+          day_of_week: number;
+          id?: string;
+          merchant_id: string;
+          opens?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          closed?: boolean;
+          closes?: string | null;
+          created_at?: string;
+          day_of_week?: number;
+          id?: string;
+          merchant_id?: string;
+          opens?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_public';
@@ -1165,6 +1328,7 @@ export type Database = {
     };
     Functions: {
       fn_expire_documents: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_required_docs: {
         Args: { p_merchant_id: string };
         Returns: {

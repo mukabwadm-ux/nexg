@@ -5,6 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import {
+  Catalogue,
+  type CatalogueSection,
+  type HoursRow,
+  OpeningHours,
+} from '@/components/explore/catalogue';
 import { CATEGORY_ICON, CATEGORY_LABEL, MerchantCard } from '@/components/explore/merchant-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -50,12 +56,41 @@ export default async function MerchantPage({ params }: { params: { id: string } 
 
   if (!merchant?.id || !merchant.trading_name) notFound();
 
-  const { data: nearby } = await supabase
-    .from('merchant_public')
-    .select(SELECT)
-    .eq('city_slug', merchant.city_slug ?? '')
-    .neq('id', merchant.id)
-    .limit(4);
+  const [{ data: nearby }, { data: sections }, { data: hours }] = await Promise.all([
+    supabase
+      .from('merchant_public')
+      .select(SELECT)
+      .eq('city_slug', merchant.city_slug ?? '')
+      .neq('id', merchant.id)
+      .limit(4),
+    /*
+     * The policy on these tables only returns rows for a live business, so
+     * nothing here has to re-check the status the page already relied on.
+     */
+    supabase
+      .from('catalogue_section')
+      .select(
+        'id, name, blurb, sort, catalogue_item(id, name, description, price_kes, available, age_restricted, highlighted, sort)',
+      )
+      .eq('merchant_id', params.id)
+      .order('sort', { ascending: true }),
+    supabase
+      .from('merchant_hours')
+      .select('day_of_week, opens, closes, closed')
+      .eq('merchant_id', params.id),
+  ]);
+
+  const menu: CatalogueSection[] = (sections ?? [])
+    .map((section) => ({
+      id: section.id,
+      name: section.name,
+      blurb: section.blurb,
+      items: [...((section.catalogue_item as CatalogueSection['items']) ?? [])].sort(
+        (a, b) => ((a as { sort?: number }).sort ?? 0) - ((b as { sort?: number }).sort ?? 0),
+      ),
+    }))
+    // A section with nothing in it is a heading over blank space.
+    .filter((section) => section.items.length > 0);
 
   const category = merchant.category ?? 'other';
   const Icon = CATEGORY_ICON[category] ?? Store;
@@ -164,30 +199,35 @@ export default async function MerchantPage({ params }: { params: { id: string } 
         {/* --------------------------------------------------------- catalogue */}
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
           <section aria-label="Catalogue">
-            <div className="border-border bg-surface rounded-2xl border p-6 sm:p-8">
-              <span
-                aria-hidden="true"
-                className="bg-bg text-muted-light flex h-12 w-12 items-center justify-center rounded-xl"
-              >
-                <Info className="h-5 w-5" />
-              </span>
-              <h2 className="mt-4 text-xl font-extrabold tracking-tight">
-                The menu isn’t online yet
-              </h2>
-              <p className="text-muted mt-2 max-w-xl text-[0.9375rem] leading-[1.8]">
-                {merchant.trading_name} is registered and taking orders through the concierge desk,
-                but hasn’t loaded its catalogue into NexG yet. Tell a concierge what you want and
-                they will confirm the price and the timing with the shop before anything is bought.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Button asChild>
-                  <Link href="/#ask">Ask for something from here</Link>
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link href="/explore">Back to Explore</Link>
-                </Button>
+            {menu.length > 0 ? (
+              <Catalogue merchantName={merchant.trading_name} sections={menu} />
+            ) : (
+              <div className="border-border bg-surface rounded-2xl border p-6 sm:p-8">
+                <span
+                  aria-hidden="true"
+                  className="bg-bg text-muted-light flex h-12 w-12 items-center justify-center rounded-xl"
+                >
+                  <Info className="h-5 w-5" />
+                </span>
+                <h2 className="mt-4 text-xl font-extrabold tracking-tight">
+                  The menu isn’t online yet
+                </h2>
+                <p className="text-muted mt-2 max-w-xl text-[0.9375rem] leading-[1.8]">
+                  {merchant.trading_name} is registered and taking orders through the concierge
+                  desk, but hasn’t loaded its catalogue into NexG yet. Tell a concierge what you
+                  want and they will confirm the price and the timing with the shop before anything
+                  is bought.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Button asChild>
+                    <Link href="/#ask">Ask for something from here</Link>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link href="/explore">Back to Explore</Link>
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </section>
 
           {/* ------------------------------------------------------- aside */}
@@ -203,9 +243,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
 
             <div className="border-border bg-surface rounded-2xl border p-5">
               <h2 className="text-sm font-extrabold uppercase tracking-wide">Opening hours</h2>
-              <p className="text-muted mt-3 text-[0.875rem] leading-[1.7]">
-                Not published yet. The desk knows who is open — ask and they will check.
-              </p>
+              <OpeningHours hours={(hours ?? []) as HoursRow[]} />
             </div>
 
             <div className="border-border bg-surface rounded-2xl border p-5">
