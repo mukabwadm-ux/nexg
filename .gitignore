@@ -9,6 +9,14 @@ dist-ssr/
 build/
 .vite/
 
+# ...but `build/` is a route name as well as an output directory, and a
+# bare pattern matches at every depth. /experience/build is a page, and
+# without this it is silently never committed and never deployed.
+!apps/web/app/**/build/
+!apps/web/app/**/build/**
+!apps/admin/app/**/build/
+!apps/admin/app/**/build/**
+
 # Environment
 .env
 .env.*
