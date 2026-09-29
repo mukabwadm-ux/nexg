@@ -49,7 +49,7 @@ export function ConsoleShell({
     <div className="lg:grid lg:min-h-dvh lg:grid-cols-[15rem_minmax(0,1fr)]">
       <aside aria-label="Console sidebar" className="bg-ink flex flex-col text-white lg:min-h-dvh">
         <div className="flex items-center gap-2 px-5 py-5">
-          <BrandMark className="h-9 w-10 shrink-0" onDark />
+          <BrandMark className="h-9 w-auto shrink-0" onDark />
           <span className="border-gold/40 text-gold rounded-full border px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
             Admin
           </span>

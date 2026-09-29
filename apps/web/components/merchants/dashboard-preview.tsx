@@ -73,7 +73,7 @@ export function DashboardPreview() {
           <div className="flex">
             <aside className="border-border bg-surface hidden w-56 shrink-0 flex-col border-r p-5 sm:flex">
               <p className="flex items-center gap-2 text-[0.8125rem] font-extrabold">
-                <BrandMark className="h-6 w-7 shrink-0" />
+                <BrandMark className="h-6 w-auto shrink-0" />
                 [Your business]
               </p>
               <ul className="mt-4 space-y-1.5">

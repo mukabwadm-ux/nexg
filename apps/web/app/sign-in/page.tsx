@@ -23,7 +23,7 @@ export default function SignInPage({ searchParams }: { searchParams?: { tab?: st
           the first screen for no benefit. */}
       <div className="bg-ink relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex">
         <Link href="/" className="flex items-center gap-3">
-          <BrandMark className="h-11 w-12" onDark />
+          <BrandMark className="h-12 w-auto" onDark />
           <span className="text-sm font-extrabold uppercase tracking-[0.18em]">Nexg Concierge</span>
         </Link>
 

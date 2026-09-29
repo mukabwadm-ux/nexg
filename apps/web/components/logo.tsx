@@ -26,7 +26,7 @@ export function Logo({ className, onDark = false }: { className?: string; onDark
         className,
       )}
     >
-      <BrandMark className="h-[2.875rem] w-[3.3125rem]" onDark={onDark} />
+      <BrandMark className="h-[2.875rem] w-auto" onDark={onDark} priority />
 
       <span className="flex flex-col items-center leading-none">
         {/* NEXG — supplied artwork, light strokes switched to currentColor. */}
