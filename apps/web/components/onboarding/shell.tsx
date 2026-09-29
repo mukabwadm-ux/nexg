@@ -5,7 +5,7 @@ import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
-import { BrandMark } from '@/components/brand-mark';
+import { Logo } from '@/components/logo';
 
 import { LivePreview } from './preview';
 import { ResumeButton } from './resume-button';
@@ -46,7 +46,7 @@ export function OnboardingShell({
       <header className="border-border bg-bg sticky top-0 z-30 border-b">
         <div className="mx-auto flex h-[4.75rem] max-w-[90rem] items-center gap-4 px-4 sm:px-8">
           <Link href="/" className="flex shrink-0 items-center gap-3">
-            <BrandMark className="h-8 w-auto" priority />
+            <Logo className="h-7 w-auto" />
             <span aria-hidden="true" className="bg-border-strong hidden h-6 w-px sm:block" />
             <span className="text-muted hidden text-sm font-bold sm:block">
               Merchant onboarding

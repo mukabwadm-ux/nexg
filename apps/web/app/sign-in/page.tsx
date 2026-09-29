@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { AuthPanel } from '@/components/auth/auth-panel';
-import { BrandMark } from '@/components/brand-mark';
+import { Logo } from '@/components/logo';
 
 export const metadata: Metadata = {
   title: 'Sign in',
@@ -23,8 +23,11 @@ export default function SignInPage({ searchParams }: { searchParams?: { tab?: st
           the first screen for no benefit. */}
       <div className="bg-ink relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex">
         <Link href="/" className="flex items-center gap-3">
-          <BrandMark className="h-12 w-auto" onDark />
-          <span className="text-sm font-extrabold uppercase tracking-[0.18em]">Nexg Concierge</span>
+          <Logo className="h-10 w-auto" onDark />
+          {/* The wordmark says NexG; this says which part of it. */}
+          <span className="text-gold/90 text-sm font-extrabold uppercase tracking-[0.18em]">
+            Concierge
+          </span>
         </Link>
 
         <div className="max-w-lg">
