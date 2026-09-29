@@ -13,6 +13,8 @@ import {
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { unstable_cache } from 'next/cache';
+
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
@@ -34,6 +36,35 @@ const CATEGORY_ORDER = [
   'gift_shop',
 ] as const;
 
+/*
+ * The listing is dynamic because the filters live in the query string, so the
+ * page itself cannot be cached — but the data behind it is the same for
+ * everyone looking at a given city. Caching the query means the filters cost
+ * nothing but a re-render.
+ */
+const listingFor = unstable_cache(
+  async (citySlug: string) => {
+    const supabase = createPublicClient();
+    const [{ data: merchants }, { data: cities }] = await Promise.all([
+      supabase
+        .from('merchant_public')
+        .select(
+          'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
+        )
+        .eq('city_slug', citySlug)
+        .order('listed_at', { ascending: false }),
+      supabase
+        .from('city')
+        .select('slug, name, status')
+        .neq('status', 'waitlist')
+        .order('sort', { ascending: true }),
+    ]);
+    return { merchants: merchants ?? [], cities: cities ?? [] };
+  },
+  ['explore-listing'],
+  { revalidate: 60, tags: ['merchants'] },
+);
+
 export default async function ExplorePage({
   searchParams,
 }: {
@@ -46,15 +77,14 @@ export default async function ExplorePage({
     q?: string;
   };
 }) {
-  const supabase = createPublicClient();
-
-  const { data: cities } = await supabase
-    .from('city')
-    .select('slug, name, status')
-    .neq('status', 'waitlist')
-    .order('sort', { ascending: true });
-
-  const citySlug = searchParams?.city ?? cities?.[0]?.slug ?? 'nairobi';
+  /*
+   * The city has to be known before the cache key, and the city list is part
+   * of what is cached — so resolve it from the default city first, then use
+   * whatever the visitor asked for.
+   */
+  const { cities: allCities } = await listingFor('nairobi');
+  const citySlug = searchParams?.city ?? allCities[0]?.slug ?? 'nairobi';
+  const { merchants: all, cities } = await listingFor(citySlug);
   const cityName = cities?.find((c) => c.slug === citySlug)?.name ?? 'your city';
 
   /*
@@ -63,14 +93,6 @@ export default async function ExplorePage({
    * separate switch staff control — it narrows this listing, it does not
    * widen what anyone can see.
    */
-  const { data: all } = await supabase
-    .from('merchant_public')
-    .select(
-      'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
-    )
-    .eq('city_slug', citySlug)
-    .order('listed_at', { ascending: false });
-
   const listed = (all ?? []).filter(
     (m): m is typeof m & { id: string; trading_name: string } =>
       Boolean(m.id) && Boolean(m.trading_name) && m.explore_visible !== false,
