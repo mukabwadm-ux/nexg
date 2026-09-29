@@ -5,118 +5,123 @@
 -- so the seed never runs against a hosted project and a real account has to be
 -- made by hand. This is that, made short.
 --
--- There are two halves: an account to sign in with, and the powers that go
--- with it. Do the first either way you like, then run this whole file in
--- Studio → SQL Editor.
+-- Paste the whole file into Supabase → SQL Editor, change the three values at
+-- the top of the block, and run it.
 --
--- The account, in the dashboard:
---   Authentication (the people icon in the left rail) → Users
---   → the green "Add user" button, top right → "Create new user"
---   Email, a password from a password manager, "Auto Confirm User" ticked.
+--   https://supabase.com/dashboard/project/<your-project-ref>/sql/new
 --
--- Or, if you cannot find that button, uncomment the block marked OPTION B
--- below and it will make the account for you.
+-- This is the database, not Vercel. Vercel runs the apps; both of them read
+-- this one Supabase, so a staff account is made here once and both see it.
 --
--- Either way the password is typed into your own browser and never appears
--- in this file, which matters because this file is in git. If you use
--- OPTION B, type the password into the SQL Editor and do not save it back
--- into the repository.
+-- It will create the login for you. If you would rather make it in the
+-- dashboard — Authentication → Users → Add user → Create new user, with
+-- "Auto Confirm User" ticked — do that first and leave v_password as it is;
+-- this will find the account and just grant the roles.
+--
+-- The password is typed into the SQL editor and must not be saved back into
+-- this file, which is in git. Clear the editor when you are done.
 --
 -- Safe to run twice. Nothing is deleted and every insert is conditional.
-
-begin;
-
--- ─────────────────────────────────────────────── edit these two lines ──
-create temporary table me on commit drop as
-select
-  lower(trim('you@yourdomain.com')) as email,
-              'Your Name'           as display_name;
--- ───────────────────────────────────────────────────────────────────────
-
--- ═══════════════════════════════════════════════════════════════════════
--- OPTION B — only if you could not find "Add user" in the dashboard.
--- Uncomment, replace the password, run. Delete the password afterwards.
--- ═══════════════════════════════════════════════════════════════════════
 --
--- insert into auth.users (
---   instance_id, id, aud, role, email, encrypted_password,
---   email_confirmed_at, created_at, updated_at,
---   raw_app_meta_data, raw_user_meta_data,
---   confirmation_token, recovery_token, email_change,
---   email_change_token_new, email_change_token_current,
---   phone_change, phone_change_token, reauthentication_token
--- )
--- select
---   '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
---   'authenticated', 'authenticated', me.email,
---   -- ↓ replace this, and only in the SQL editor
---   crypt('PUT-A-STRONG-PASSWORD-HERE', gen_salt('bf')),
---   -- email_confirmed_at set, because no mail can reach this address yet
---   now(), now(), now(),
---   '{"provider":"email","providers":["email"]}'::jsonb,
---   jsonb_build_object('full_name', me.display_name),
---   '', '', '', '', '', '', '', ''
--- from me
--- where not exists (select 1 from auth.users u where lower(u.email) = me.email);
+-- One deliberate omission: super_admin. A trigger refuses that role, and
+-- finance, without a second approver who is not the granter — so the first
+-- account on a project cannot grant it to itself. The four roles below are
+-- everything the console does day to day. See the footer for the rest.
 
--- The person. Inserts nothing — quietly — if no auth user has that email,
--- which the check at the bottom reports.
-insert into public.staff_user (user_id, email, display_name)
-select u.id, me.email, me.display_name
-from me
-join auth.users u on lower(u.email) = me.email
-on conflict (email) do nothing;
+do $$
+declare
+  -- ──────────────────────────────── change these three ────────────────────
+  v_email    text := lower(trim('you@yourdomain.com'));
+  v_name     text := 'Your Name';
+  -- Leave as-is if you already made the account in the dashboard.
+  v_password text := 'SET-A-PASSWORD-OR-LEAVE-THIS';
+  -- ────────────────────────────────────────────────────────────────────────
+  v_user  uuid;
+  v_staff uuid;
+  v_new   int;
+begin
+  select id into v_user from auth.users where lower(email) = v_email;
 
-/*
- * The powers, minus the two that cannot be self-granted.
- *
- * These four are everything the console does day to day: review and verify
- * documents, take a merchant or rider live, suspend one, work the concierge
- * desk, read the waitlist. It is the same set the seeded dev.admin account
- * holds locally.
- *
- * `super_admin` and `finance` are deliberately not here. A trigger refuses
- * them without a second approver who is not the granter, so the first account
- * on a project cannot grant itself either — which is the rule working, not an
- * obstacle to route around. See the block after this one.
- *
- * granted_by is this same account. For these four roles that is allowed;
- * approved_by stays null so the row reads as a bootstrap rather than as a
- * properly countersigned grant.
- */
-insert into public.role_grant (staff_user_id, role_id, city_id, granted_by)
-select s.id, r.id, null, s.id
-from me
-join public.staff_user s on s.email = me.email
-cross join public.role r
-where r.key in ('ops_manager', 'merchant_ops', 'rider_ops', 'growth')
-  and not exists (
-    select 1 from public.role_grant g
-    where g.staff_user_id = s.id
-      and g.role_id = r.id
-      and g.city_id is null
-      and g.revoked_at is null
-  );
+  if v_user is null then
+    if v_password = 'SET-A-PASSWORD-OR-LEAVE-THIS' then
+      raise exception
+        'There is no account for %. Either create it in Authentication → Users, or put a password in v_password and run this again.',
+        v_email;
+    end if;
+
+    /*
+     * The same insert seed.sql uses. email_confirmed_at is set because no
+     * mail can reach this address from here — without it the account waits
+     * for a confirmation that never arrives and you are locked out.
+     */
+    insert into auth.users (
+      instance_id, id, aud, role, email, encrypted_password,
+      email_confirmed_at, created_at, updated_at,
+      raw_app_meta_data, raw_user_meta_data,
+      confirmation_token, recovery_token, email_change,
+      email_change_token_new, email_change_token_current,
+      phone_change, phone_change_token, reauthentication_token
+    )
+    values (
+      '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
+      'authenticated', 'authenticated', v_email,
+      crypt(v_password, gen_salt('bf')),
+      now(), now(), now(),
+      '{"provider":"email","providers":["email"]}'::jsonb,
+      jsonb_build_object('full_name', v_name),
+      '', '', '', '', '', '', '', ''
+    )
+    returning id into v_user;
+
+    raise notice 'Created the login for %', v_email;
+  else
+    raise notice 'Found an existing login for %', v_email;
+  end if;
+
+  insert into public.staff_user (user_id, email, display_name)
+  values (v_user, v_email, v_name)
+  on conflict (email) do nothing;
+
+  select id into v_staff from public.staff_user where email = v_email;
+
+  /*
+   * granted_by is this same account, which is allowed for these four;
+   * approved_by stays null so the row reads as a bootstrap rather than as a
+   * properly countersigned grant.
+   */
+  insert into public.role_grant (staff_user_id, role_id, city_id, granted_by)
+  select v_staff, r.id, null, v_staff
+  from public.role r
+  where r.key in ('ops_manager', 'merchant_ops', 'rider_ops', 'growth')
+    and not exists (
+      select 1 from public.role_grant g
+      where g.staff_user_id = v_staff
+        and g.role_id = r.id
+        and g.city_id is null
+        and g.revoked_at is null
+    );
+  get diagnostics v_new = row_count;
+
+  raise notice 'Staff record in place; % new role grant(s).', v_new;
+end;
+$$;
 
 -- ──────────────────────────────────────────────────────────── check it ──
+--
+-- One row, with four roles. If it is empty, the block above raised and
+-- nothing was written.
 
--- No rows here means there is no auth user with that email yet. Go back to
--- Authentication → Users and create it.
-select
-  s.email,
-  s.display_name,
-  s.status,
-  string_agg(r.key, ', ' order by r.key) as roles
-from me
-join public.staff_user s on s.email = me.email
+select s.email, s.display_name, s.status,
+       string_agg(r.key, ', ' order by r.key) as roles
+from public.staff_user s
 left join public.role_grant g on g.staff_user_id = s.id and g.revoked_at is null
 left join public.role r on r.id = g.role_id
-group by s.email, s.display_name, s.status;
-
-commit;
+group by s.email, s.display_name, s.status
+order by s.email;
 
 -- The laptop account must not have followed you here. This must return
 -- nothing; if it returns a row, delete it before sharing the console's URL.
+
 select email as delete_this_before_going_live
 from public.staff_user
 where email like 'dev.%@nexgapp.com';
@@ -126,14 +131,13 @@ where email like 'dev.%@nexgapp.com';
 -- Later: super_admin, once a second person has an account
 -- ═══════════════════════════════════════════════════════════════════════
 --
--- super_admin is not needed to run the console. It gates three things:
--- editing cities, changing which documents we demand, and adding or removing
--- staff. Each is a decision that outlives whoever made it, which is why the
--- schema will not let one person grant it alone — the trigger refuses a grant
--- with no approver, and refuses one approved by the person granting it.
+-- super_admin is a superset of the four roles above — verified by giving an
+-- account nothing else and watching it read every table and write the five
+-- it alone may: cities, settings, document requirements, staff records and
+-- role grants. Adding staff is the one thing you will miss day to day.
 --
--- So it waits for a second staff account. Then, with the emails the right way
--- round, one of you grants it and the other is recorded as the approver:
+-- It waits for a second staff account because the schema will not let one
+-- person grant it alone. Once two exist, one grants and the other approves:
 --
 --   insert into public.role_grant
 --     (staff_user_id, role_id, city_id, granted_by, approved_by)
