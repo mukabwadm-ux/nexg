@@ -679,6 +679,53 @@ export type Database = {
           },
         ];
       };
+      notification: {
+        Row: {
+          attempts: number;
+          created_at: string;
+          error: string | null;
+          id: string;
+          kind: Database['public']['Enums']['notification_kind'];
+          provider_message_id: string | null;
+          sent_at: string;
+          status: Database['public']['Enums']['notification_status'];
+          ticket_id: string | null;
+          to_email: string | null;
+        };
+        Insert: {
+          attempts?: number;
+          created_at?: string;
+          error?: string | null;
+          id?: string;
+          kind: Database['public']['Enums']['notification_kind'];
+          provider_message_id?: string | null;
+          sent_at?: string;
+          status?: Database['public']['Enums']['notification_status'];
+          ticket_id?: string | null;
+          to_email?: string | null;
+        };
+        Update: {
+          attempts?: number;
+          created_at?: string;
+          error?: string | null;
+          id?: string;
+          kind?: Database['public']['Enums']['notification_kind'];
+          provider_message_id?: string | null;
+          sent_at?: string;
+          status?: Database['public']['Enums']['notification_status'];
+          ticket_id?: string | null;
+          to_email?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'notification_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'support_ticket';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       rider: {
         Row: {
           activated_at: string | null;
@@ -1543,6 +1590,15 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_notification_mark: {
+        Args: {
+          p_error?: string;
+          p_notification_id: string;
+          p_provider_message_id?: string;
+          p_status: Database['public']['Enums']['notification_status'];
+        };
+        Returns: undefined;
+      };
       rpc_rider_apply: {
         Args: {
           p_city_id: string;
@@ -1564,7 +1620,7 @@ export type Database = {
           p_phone?: string;
           p_topic?: Database['public']['Enums']['ticket_topic'];
         };
-        Returns: string;
+        Returns: Json;
       };
       rpc_support_ticket_reply: {
         Args: { p_body: string; p_internal?: boolean; p_ticket_id: string };
@@ -1653,6 +1709,8 @@ export type Database = {
         | 'gift_shop'
         | 'other';
       merchant_user_role: 'owner' | 'manager';
+      notification_kind: 'ticket_received' | 'ticket_resolved';
+      notification_status: 'pending' | 'sent' | 'failed' | 'no_address';
       partner_status:
         | 'applied'
         | 'documents_pending'
@@ -1828,6 +1886,8 @@ export const Constants = {
         'other',
       ],
       merchant_user_role: ['owner', 'manager'],
+      notification_kind: ['ticket_received', 'ticket_resolved'],
+      notification_status: ['pending', 'sent', 'failed', 'no_address'],
       partner_status: [
         'applied',
         'documents_pending',

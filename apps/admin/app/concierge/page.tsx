@@ -73,6 +73,14 @@ export default async function ConciergeDeskPage({
 
   const selected = all.find((t) => t.id === searchParams?.ticket) ?? inQueue[0] ?? all[0] ?? null;
 
+  const { data: notices } = selected
+    ? await supabase
+        .from('notification')
+        .select('kind, status, error, sent_at')
+        .eq('ticket_id', selected.id)
+        .order('created_at', { ascending: true })
+    : { data: [] };
+
   const { data: thread } = selected
     ? await supabase
         .from('support_message')
@@ -251,13 +259,48 @@ export default async function ConciergeDeskPage({
                   </dl>
 
                   {/*
-                   * Replies are recorded here, not sent. There is no email or
-                   * SMS provider wired up, so the desk still has to contact
-                   * the person — saying otherwise would lose real messages.
+                   * What the person has actually been told. Shown because a
+                   * desk that cannot see a failed acknowledgement will assume
+                   * one went out.
                    */}
+                  <h2 className="border-border mt-5 border-t pt-4 text-sm font-extrabold uppercase tracking-wide">
+                    What they have been told
+                  </h2>
+                  <ul className="mt-3 space-y-2">
+                    {(notices ?? []).length === 0 ? (
+                      <li className="text-muted-light text-xs font-semibold">Nothing queued.</li>
+                    ) : (
+                      (notices ?? []).map((notice, index) => (
+                        <li key={index} className="text-xs">
+                          <span className="flex items-center justify-between gap-2">
+                            <span className="font-bold">
+                              {notice.kind === 'ticket_received' ? 'Acknowledgement' : 'Resolved'}
+                            </span>
+                            <span
+                              className={`shrink-0 rounded-full px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide ${
+                                notice.status === 'sent'
+                                  ? 'bg-success-bg text-success'
+                                  : notice.status === 'no_address'
+                                    ? 'bg-bg text-muted-light'
+                                    : 'bg-danger-bg text-danger'
+                              }`}
+                            >
+                              {notice.status === 'no_address' ? 'no email' : notice.status}
+                            </span>
+                          </span>
+                          {notice.error && (
+                            <span className="text-muted-light mt-0.5 block leading-snug">
+                              {notice.error}
+                            </span>
+                          )}
+                        </li>
+                      ))
+                    )}
+                  </ul>
+
                   <p className="text-muted border-border mt-4 border-t pt-3 text-xs font-semibold leading-[1.7]">
-                    Replies are saved to the ticket, not delivered. Email and SMS are not connected
-                    yet, so reach them on the contact above and keep the thread here as the record.
+                    Replies in the thread are recorded, not delivered — reach them on the contact
+                    above. Only the acknowledgement and the resolved notice are emailed.
                   </p>
                 </aside>
               </div>

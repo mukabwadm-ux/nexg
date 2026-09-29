@@ -4,7 +4,7 @@ import { Button, Card, Input, Select } from '@nexg/ui';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import * as React from 'react';
 
-import { createClient } from '@/lib/supabase/client';
+import { submitTicket } from '@/app/help/actions';
 
 type Role = 'guest' | 'rider' | 'merchant' | 'hotel';
 
@@ -70,25 +70,31 @@ export function ContactForm() {
     setError(null);
 
     const form = new FormData(event.currentTarget);
-    const supabase = createClient();
-    const { data, error: rpcError } = await supabase.rpc('rpc_support_ticket_create', {
-      p_body: String(form.get('body') ?? ''),
-      p_from_role: role,
-      p_topic: topic as never,
-      ...(form.get('full_name') ? { p_full_name: String(form.get('full_name')) } : {}),
-      ...(form.get('email') ? { p_email: String(form.get('email')) } : {}),
-      ...(form.get('phone') ? { p_phone: String(form.get('phone')) } : {}),
-      ...(form.get('order_reference')
-        ? { p_order_reference: String(form.get('order_reference')) }
-        : {}),
+    const value = (key: string) => {
+      const raw = form.get(key);
+      return typeof raw === 'string' && raw.trim() ? raw.trim() : undefined;
+    };
+
+    /*
+     * A server action, not a direct RPC: the acknowledgement email has to be
+     * sent with a provider key that must never reach the browser.
+     */
+    const result = await submitTicket({
+      body: String(form.get('body') ?? ''),
+      fromRole: role,
+      topic,
+      ...(value('full_name') ? { fullName: value('full_name')! } : {}),
+      ...(value('email') ? { email: value('email')! } : {}),
+      ...(value('phone') ? { phone: value('phone')! } : {}),
+      ...(value('order_reference') ? { orderReference: value('order_reference')! } : {}),
     });
 
     setPending(false);
-    if (rpcError) {
-      setError(rpcError.message);
+    if (!result.ok) {
+      setError(result.message);
       return;
     }
-    setReference(data as unknown as string);
+    setReference(result.reference ?? null);
   };
 
   if (reference) {
