@@ -36,32 +36,47 @@ export default async function OverviewPage() {
   const staleBefore = new Date(Date.now() - STALE_DAYS * 86_400_000).toISOString();
   const pendingStatuses = ['applied', 'documents_pending', 'under_review'];
 
-  const [staleMerchants, staleRiders, waitingDocuments, approvals, audit] = await Promise.all([
-    supabase
-      .from('merchant')
-      .select('id, trading_name, city(name)')
-      .in('status', pendingStatuses)
-      .lt('created_at', staleBefore),
-    supabase
-      .from('rider')
-      .select('id, first_name, last_name, city(name)')
-      .in('status', pendingStatuses)
-      .lt('created_at', staleBefore),
-    supabase
-      .from('document')
-      .select('id, owner_type', { count: 'exact' })
-      .eq('status', 'uploaded')
-      .is('superseded_at', null),
-    supabase
-      .from('approval_request')
-      .select(
-        'id, kind, reason, requested_by, created_at, staff_user!approval_request_requested_by_fkey(display_name)',
-      )
-      .eq('status', 'pending')
-      .order('created_at', { ascending: true }),
-    /* Through an RPC, not the table: see migration 20260101002700. */
-    supabase.rpc('rpc_audit_recent', { p_limit: 6 }),
-  ]);
+  /*
+   * Whether anyone holds super_admin yet. Until someone does, nobody can
+   * add staff, edit a city or change a fee — and the page that fixes that
+   * is itself behind the role, so it has to be offered from here.
+   */
+  const superAdminCount = supabase
+    .from('role_grant')
+    .select('role!inner(key)', { count: 'exact', head: true })
+    .is('revoked_at', null)
+    .eq('role.key', 'super_admin');
+
+  const [staleMerchants, staleRiders, waitingDocuments, approvals, audit, superAdmins] =
+    await Promise.all([
+      supabase
+        .from('merchant')
+        .select('id, trading_name, city(name)')
+        .in('status', pendingStatuses)
+        .lt('created_at', staleBefore),
+      supabase
+        .from('rider')
+        .select('id, first_name, last_name, city(name)')
+        .in('status', pendingStatuses)
+        .lt('created_at', staleBefore),
+      supabase
+        .from('document')
+        .select('id, owner_type', { count: 'exact' })
+        .eq('status', 'uploaded')
+        .is('superseded_at', null),
+      supabase
+        .from('approval_request')
+        .select(
+          'id, kind, reason, requested_by, created_at, staff_user!approval_request_requested_by_fkey(display_name)',
+        )
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true }),
+      /* Through an RPC, not the table: see migration 20260101002700. */
+      supabase.rpc('rpc_audit_recent', { p_limit: 6 }),
+      superAdminCount,
+    ]);
+
+  const needsFirstSuperAdmin = (superAdmins.count ?? 0) === 0;
 
   /*
    * "Needs a human now". Every row here is a real query — an empty list means
@@ -145,6 +160,19 @@ export default async function OverviewPage() {
       />
 
       <main className="px-4 py-6 sm:px-8">
+        {needsFirstSuperAdmin && (
+          <div className="border-warning/40 bg-warning-bg mb-6 rounded-2xl border p-5">
+            <p className="text-warning text-[0.9375rem] font-extrabold">Nobody can add staff yet</p>
+            <p className="text-warning mt-2 max-w-3xl text-[0.8125rem] font-semibold leading-[1.7]">
+              This project has no super admin, so adding colleagues, opening a city and changing
+              fees are all closed. The first one cannot be countersigned — there is nobody to
+              countersign it — so claiming it is recorded in the audit trail as exactly that.
+            </p>
+            <Button className="mt-4" asChild>
+              <Link href="/staff">Set up staff &amp; roles</Link>
+            </Button>
+          </div>
+        )}
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {KPIS.map((kpi) => (
             <li key={kpi.label}>

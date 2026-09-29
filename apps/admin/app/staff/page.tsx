@@ -20,9 +20,27 @@ export default async function StaffPage({
   searchParams?: { tab?: string; person?: string };
 }) {
   const staff = await requireStaff();
-  requireModule(staff, 'staff');
-
   const supabase = createClient();
+
+  /*
+   * The bootstrap banner lives on this page, and only a super admin may
+   * reach this page — so the first admin could never get to the thing that
+   * makes them one. The page is open to any staff member while the project
+   * has no super admin at all, which is exactly the state the banner is for
+   * and closes the moment it is used.
+   *
+   * Nothing is handed over by letting them look: every write on this page
+   * goes through an RPC that checks super_admin itself, and rpc_staff_directory
+   * returns no rows to anyone else. A non-admin arriving here in the
+   * bootstrap state sees an empty table and the Claim it button.
+   */
+  const { count: superAdmins } = await supabase
+    .from('role_grant')
+    .select('role!inner(key)', { count: 'exact', head: true })
+    .is('revoked_at', null)
+    .eq('role.key', 'super_admin');
+
+  if ((superAdmins ?? 0) > 0) requireModule(staff, 'staff');
 
   const [
     { data: directory },
