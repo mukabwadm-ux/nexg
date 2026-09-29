@@ -14,8 +14,8 @@ export interface SiteHeaderProps {
   signIn?: { label: string; href: string };
 }
 
-export function SiteHeader({ action, signIn }: SiteHeaderProps) {
-  const { locale, t } = getTranslations();
+export async function SiteHeader({ action, signIn }: SiteHeaderProps) {
+  const { locale, t } = await getTranslations();
 
   /* Defaulted here rather than in the signature so the fallback label is
      translated too — a hard-coded default parameter cannot be. */

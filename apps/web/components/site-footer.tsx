@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { LanguageSwitcher } from '@/components/consent/language-switcher';
-import { getTranslations } from '@/lib/i18n';
+import { availableLocales, getTranslations } from '@/lib/i18n';
 
 import { Logo } from './logo';
 
@@ -12,8 +12,9 @@ const LINKS = [
   { key: 'footer.contact', href: '/help' },
 ] as const;
 
-export function SiteFooter() {
-  const { locale, t } = getTranslations();
+export async function SiteFooter() {
+  const { locale, t } = await getTranslations();
+  const locales = await availableLocales();
 
   return (
     <footer className="border-border bg-bg border-t">
@@ -31,7 +32,7 @@ export function SiteFooter() {
               </Link>
             ))}
           </nav>
-          <LanguageSwitcher locale={locale} />
+          <LanguageSwitcher locale={locale} locales={locales} />
           <p className="text-muted-light text-xs">
             © {new Date().getFullYear()} NexG Concierge. All rights reserved.
           </p>

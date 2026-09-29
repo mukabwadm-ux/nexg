@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { markAsked, setLocale, setLocationFromCoords } from '@/app/consent-actions';
-import { pickLocale, translator, type Locale } from '@/lib/i18n/dictionaries';
+import { isAuthored, localeName, pickLocale, translator, type Locale } from '@/lib/i18n/dictionaries';
 
 /**
  * The welcome card.
@@ -27,7 +27,14 @@ import { pickLocale, translator, type Locale } from '@/lib/i18n/dictionaries';
  * site into another language is startling, and because the answer is
  * the visitor's to give.
  */
-export function WelcomeConsent({ locale }: { locale: Locale }) {
+export function WelcomeConsent({
+  locale,
+  canTranslate,
+}: {
+  locale: Locale;
+  /** Whether a machine can produce a language we have not written out. */
+  canTranslate: boolean;
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [visible, setVisible] = React.useState(false);
@@ -55,18 +62,18 @@ export function WelcomeConsent({ locale }: { locale: Locale }) {
       : [navigator.language];
     const match = pickLocale(languages);
 
-    let label = languages[0] ?? 'English';
-    try {
-      const display = new Intl.DisplayNames([languages[0] ?? 'en'], { type: 'language' });
-      label = display.of(languages[0] ?? 'en') ?? label;
-    } catch {
-      /* Intl.DisplayNames is not everywhere. The raw tag will do. */
-    }
+    /*
+     * Offerable when somebody wrote it out by hand, or when a machine
+     * can produce it. Without a provider there is nothing to offer for
+     * anything but English and Kiswahili, and the card says so rather
+     * than promising a language it cannot deliver.
+     */
+    const offerable = match && (isAuthored(match) || canTranslate) ? match : null;
 
-    setPreferred({ label, locale: match });
+    setPreferred({ label: localeName(languages[0] ?? 'en'), locale: offerable });
     /* Mounted at all means the server decided they have not been asked. */
     setVisible(true);
-  }, []);
+  }, [canTranslate]);
 
   if (!visible) return null;
 

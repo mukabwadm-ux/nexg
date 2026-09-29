@@ -2,7 +2,8 @@
 
 import { cookies } from 'next/headers';
 
-import { COOKIE, COOKIE_MAX_AGE, isSupported } from '@/lib/i18n';
+import { COOKIE, COOKIE_MAX_AGE, DEFAULT_LOCALE, isAuthored, isLocaleTag } from '@/lib/i18n';
+import { canMachineTranslate, fillTranslations } from '@/lib/i18n/translate';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export interface ConsentResult {
@@ -81,14 +82,51 @@ export async function setLocationFromCoords(
   };
 }
 
-/** Switch language. Used by the card and by the footer switcher. */
+/**
+ * Switch language, generating it first if this is the first time anybody
+ * has asked for it.
+ *
+ * The generation happens here, inside the click, rather than in the
+ * background. It is a second or two, once ever, at the moment somebody
+ * has just pressed a button and expects something to happen — which is
+ * a far better place to spend it than on the next page load, where it
+ * would look like the site is slow.
+ *
+ * If there is no provider the cookie is still set and the site stays in
+ * English. That is not a failure worth an error message: the visitor
+ * asked for their language and we do not have it, which the welcome
+ * card already told them.
+ */
 export async function setLocale(locale: string): Promise<ConsentResult> {
-  if (!isSupported(locale)) {
-    return { ok: false, message: 'We do not have that language yet.' };
+  if (!isLocaleTag(locale)) {
+    return { ok: false, message: 'That is not a language.' };
   }
-  remember(COOKIE.locale, locale);
+
+  const tag = locale.toLowerCase();
+  remember(COOKIE.locale, tag);
   remember(COOKIE.asked, '1');
-  return { ok: true };
+
+  const supabase = createPublicClient();
+
+  /* Counted whether or not we can serve it, so the languages people
+     actually arrive in are visible rather than guessed at. */
+  await supabase.rpc('rpc_note_locale', { p_locale: tag });
+
+  if (tag === DEFAULT_LOCALE || isAuthored(tag) || !canMachineTranslate()) {
+    return { ok: true };
+  }
+
+  /* Already generated? Then there is nothing to pay for. */
+  const { data: existing } = await supabase.rpc('fn_translations', { p_locale: tag });
+  if (Object.keys((existing as Record<string, string> | null) ?? {}).length > 0) {
+    return { ok: true };
+  }
+
+  const result = await fillTranslations(tag, async (rows) => {
+    await supabase.rpc('rpc_translations_put', { p_locale: tag, p_rows: rows });
+  });
+
+  return { ok: true, message: result.ok ? undefined : result.message };
 }
 
 /** Let someone pick a city by hand, without sharing a location. */

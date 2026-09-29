@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 
 import { WelcomeConsent } from '@/components/consent/welcome';
-import { getLocale, hasBeenAsked } from '@/lib/i18n';
+import { canMachineTranslate, getLocale, hasBeenAsked } from '@/lib/i18n';
 
 /**
  * Manrope 400/600/700/800 (spec section 2), self-hosted by next/font so there
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {/* Rendered only when they have not answered, so a returning
               visitor never sees it and nothing flickers on their screen
               while the client works out whether to hide it. */}
-          {!asked && <WelcomeConsent locale={locale} />}
+          {!asked && <WelcomeConsent locale={locale} canTranslate={canMachineTranslate()} />}
         </ToastProvider>
       </body>
     </html>

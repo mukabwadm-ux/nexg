@@ -4,26 +4,39 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { setLocale } from '@/app/consent-actions';
-import { LOCALES, LOCALE_NAMES, type Locale } from '@/lib/i18n/dictionaries';
+import { localeName } from '@/lib/i18n/dictionaries';
 
 /**
  * Change language, from the footer.
  *
  * The welcome card asks once and then never again, so without this a
- * visitor who tapped "Not now" — or who was on a friend's phone — has no
+ * visitor who tapped "Not now" — or who is on a friend's phone — has no
  * way back. A consent you cannot revisit is not really a choice.
  *
- * Each language is named in itself: somebody looking for Kiswahili is
- * looking for the word "Kiswahili", not for "Swahili" written in a
- * language they are trying to leave.
+ * The list is the languages the site can actually speak today: the ones
+ * written by hand plus the ones a machine has already been asked to
+ * fill. Not every language in the world, because offering one we have
+ * nothing for would be a button that does nothing.
+ *
+ * Each is named in itself — 中文, not "Chinese". Somebody looking for
+ * their own language is scanning for their own word for it, not for the
+ * English name of it in a language they are trying to leave.
  */
-export function LanguageSwitcher({ locale }: { locale: Locale }) {
+export function LanguageSwitcher({
+  locale,
+  locales,
+}: {
+  locale: string;
+  locales: string[];
+}) {
   const router = useRouter();
-  const [busy, setBusy] = React.useState(false);
+  const [busy, setBusy] = React.useState<string | null>(null);
+
+  if (locales.length < 2) return null;
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      {LOCALES.map((option) => {
+      {locales.map((option) => {
         const on = option === locale;
         return (
           <button
@@ -31,20 +44,18 @@ export function LanguageSwitcher({ locale }: { locale: Locale }) {
             type="button"
             lang={option}
             aria-current={on ? 'true' : undefined}
-            disabled={busy || on}
+            disabled={busy !== null || on}
             onClick={async () => {
-              setBusy(true);
+              setBusy(option);
               await setLocale(option);
-              setBusy(false);
+              setBusy(null);
               router.refresh();
             }}
             className={`rounded-full px-2.5 py-1 text-xs font-bold transition-colors ${
-              on
-                ? 'bg-ink text-white'
-                : 'text-muted hover:text-ink disabled:opacity-50'
+              on ? 'bg-ink text-white' : 'text-muted hover:text-ink disabled:opacity-50'
             }`}
           >
-            {LOCALE_NAMES[option]}
+            {busy === option ? '…' : localeName(option)}
           </button>
         );
       })}

@@ -26,19 +26,47 @@
  * pipeline; they need an object and a lookup.
  */
 
-export const LOCALES = ['en', 'sw'] as const;
+/**
+ * A BCP-47 tag. Any of them: a phone set to `zh-CN` is `zh-CN`, and
+ * whether this site can say anything in it is a separate question that
+ * the translation cache answers.
+ */
+export type Locale = string;
 
-export type Locale = (typeof LOCALES)[number];
+/** The languages with a dictionary written by a person in this file. */
+export const AUTHORED_LOCALES = ['en', 'sw'] as const;
 
-export const DEFAULT_LOCALE: Locale = 'en';
+export type AuthoredLocale = (typeof AUTHORED_LOCALES)[number];
 
-/** What each language calls itself — never translated. */
-export const LOCALE_NAMES: Record<Locale, string> = {
+export const DEFAULT_LOCALE = 'en';
+
+/** What the hand-written languages call themselves. Never translated. */
+export const LOCALE_NAMES: Record<string, string> = {
   en: 'English',
   sw: 'Kiswahili',
 };
 
-type Dictionary = Record<string, string>;
+/**
+ * What a language calls itself, asked of the browser where we do not
+ * know. `Intl.DisplayNames` in the language's own locale gives 中文 for
+ * `zh`, not "Chinese" — which is what somebody looking for their own
+ * language is scanning for.
+ */
+export function localeName(tag: string): string {
+  if (LOCALE_NAMES[tag]) return LOCALE_NAMES[tag];
+  try {
+    return new Intl.DisplayNames([tag], { type: 'language' }).of(tag) ?? tag;
+  } catch {
+    return tag;
+  }
+}
+
+/** Well-formed enough to be a language and not an injection. */
+export function isLocaleTag(value: string | null | undefined): value is Locale {
+  return !!value && /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/i.test(value) && value.length <= 20;
+}
+
+export type Dictionary = Record<string, string>;
 
 const en: Dictionary = {
   // ── the welcome card
@@ -62,6 +90,64 @@ const en: Dictionary = {
   'consent.locatedWaitlist': 'You are near {city}, where NexG has not opened yet.',
   'consent.locatedFar': 'We could not find a NexG city near you.',
   'consent.denied': 'No location shared — pick a city whenever you like.',
+
+  // ── the homepage
+  'home.availableNow': 'Concierges available now in Nairobi',
+  'home.title': 'Everything at your Doorstep',
+  'home.atYourDoorstep': 'at your Doorstep',
+  'home.youWantIt': 'You Want it!',
+  'home.weGotYou': 'We Got You!',
+  'home.lede':
+    'Tell us where you’re staying — hotel or Airbnb — and what you need. We will deliver it to you.',
+  'home.stat.cities': 'cities',
+  'home.stat.categories': 'service categories',
+  'home.stat.tracking': 'Tracking',
+  'home.step1.title': 'Ask in a sentence',
+  'home.step1.body': 'Type or voice-note what you need. No forms, no menus to dig through.',
+  'home.step2.title': 'A concierge takes it',
+  'home.step2.body': 'A vetted local concierge confirms the plan, the price and the timing with you.',
+  'home.step3.title': 'Track and pay',
+  'home.step3.body': 'Follow it live in the app and settle by card or M-Pesa when it’s done.',
+  'home.popular.heading': 'Popular requests right now',
+  'home.popular.sub': 'Tap one to start — a concierge takes it from there.',
+  'home.popular.other': 'Something else',
+  'home.req.dinner': 'Late-night dinner to my room',
+  'home.req.airport': 'Airport pickup at JKIA',
+  'home.req.laundry': 'Laundry back by morning',
+  'home.req.flowers': 'Birthday flowers, same day',
+  'home.req.pharmacy': 'Pharmacy run',
+  'home.req.wine': 'Wine and ice for tonight',
+  'home.req.beauty': 'Hair and nails at the hotel',
+  'home.req.driver': 'Car and driver for the day',
+  'home.req.groceries': 'Groceries for the apartment',
+  'home.cat.transfers': 'Airport transfers',
+  'home.cat.alcohol': 'Alcohol & beverages',
+  'home.cat.fashion': 'Fashion & apparel',
+  'home.cat.beauty': 'Beauty',
+  'home.cat.rentals': 'Vehicle rentals',
+  'home.cat.experiences': 'Experiences',
+  'home.cat.financial': 'Financial services',
+  'home.cat.flowers': 'Flowers & gifts',
+  'home.featured.eyebrow': 'Featured merchants · Nairobi',
+  'home.featured.heading': 'Delivering to your door tonight',
+  'home.featured.note':
+    'A selection of partners in your city. Featured placements are paid for by the merchant and marked as sponsored.',
+  'home.featured.exploreAll': 'Explore all merchants',
+  'home.featured.ownBusiness': 'Own a business? Featured slots are limited per city and category.',
+  'home.featured.getFeatured': 'Get featured on the homepage →',
+  'home.services.heading': 'Everything we arrange',
+  'home.services.browseAll': 'Browse all services',
+  'home.join.heading': 'Host, ride, list or join.',
+  'home.join.body':
+    'Airbnb hosts give their guests a concierge. Riders and merchants make it happen. A small team builds it.',
+  'home.join.listAirbnb': 'List Your Airbnb',
+  'home.join.becomeRider': 'Become A Rider',
+  'home.join.registerBusiness': 'Register Your Business',
+  'home.join.viewOpenings': 'View Openings',
+  'home.app.eyebrow': 'The NexG app · Coming soon',
+  'home.app.heading': 'Your concierge, in',
+  'home.app.body':
+    'Ask for anything in a sentence, watch your concierge move on the map, and pay by card or M-Pesa when it’s done. Launching first in Nairobi, then across East Africa.',
 
   // ── chrome
   'nav.explore': 'Explore',
@@ -141,6 +227,64 @@ const sw: Dictionary = {
   'consent.locatedFar': 'Hatukupata jiji la NexG karibu nawe.',
   'consent.denied': 'Hukushiriki mahali ulipo — chagua jiji wakati wowote.',
 
+  // ── ukurasa wa mwanzo
+  'home.availableNow': 'Wasaidizi wanapatikana sasa Nairobi',
+  'home.title': 'Kila kitu Mlangoni Pako',
+  'home.atYourDoorstep': 'Mlangoni Pako',
+  'home.youWantIt': 'Unakitaka!',
+  'home.weGotYou': 'Tunakupata!',
+  'home.lede':
+    'Tuambie unapokaa — hoteli au Airbnb — na unachohitaji. Tutakuletea.',
+  'home.stat.cities': 'miji',
+  'home.stat.categories': 'aina za huduma',
+  'home.stat.tracking': 'Ufuatiliaji',
+  'home.step1.title': 'Uliza kwa sentensi moja',
+  'home.step1.body': 'Andika au tuma ujumbe wa sauti. Hakuna fomu, hakuna menyu za kupekua.',
+  'home.step2.title': 'Msaidizi anachukua',
+  'home.step2.body': 'Msaidizi wa hapa aliyehakikiwa atathibitisha mpango, bei na muda pamoja nawe.',
+  'home.step3.title': 'Fuatilia na ulipe',
+  'home.step3.body': 'Fuatilia moja kwa moja kwenye programu na ulipe kwa kadi au M-Pesa ikiisha.',
+  'home.popular.heading': 'Maombi maarufu sasa hivi',
+  'home.popular.sub': 'Gusa moja uanze — msaidizi atachukua kutoka hapo.',
+  'home.popular.other': 'Kitu kingine',
+  'home.req.dinner': 'Chakula cha usiku hadi chumbani kwangu',
+  'home.req.airport': 'Kuchukuliwa uwanja wa ndege JKIA',
+  'home.req.laundry': 'Nguo zifuliwe zirudi asubuhi',
+  'home.req.flowers': 'Maua ya siku ya kuzaliwa, siku hiyohiyo',
+  'home.req.pharmacy': 'Kuchukua dawa',
+  'home.req.wine': 'Mvinyo na barafu kwa leo usiku',
+  'home.req.beauty': 'Nywele na kucha hotelini',
+  'home.req.driver': 'Gari na dereva kwa siku nzima',
+  'home.req.groceries': 'Mboga na vyakula kwa nyumba',
+  'home.cat.transfers': 'Usafiri wa uwanja wa ndege',
+  'home.cat.alcohol': 'Pombe na vinywaji',
+  'home.cat.fashion': 'Mavazi na mitindo',
+  'home.cat.beauty': 'Urembo',
+  'home.cat.rentals': 'Kukodisha magari',
+  'home.cat.experiences': 'Matukio',
+  'home.cat.financial': 'Huduma za kifedha',
+  'home.cat.flowers': 'Maua na zawadi',
+  'home.featured.eyebrow': 'Wafanyabiashara maalum · Nairobi',
+  'home.featured.heading': 'Tunawasilisha mlangoni pako leo usiku',
+  'home.featured.note':
+    'Baadhi ya washirika katika jiji lako. Nafasi maalum hulipiwa na mfanyabiashara na huwekwa alama ya udhamini',
+  'home.featured.exploreAll': 'Gundua wafanyabiashara wote',
+  'home.featured.ownBusiness': 'Una biashara? Nafasi maalum ni chache kwa kila jiji na aina.',
+  'home.featured.getFeatured': 'Pata nafasi maalum ukurasa wa mwanzo →',
+  'home.services.heading': 'Kila kitu tunachopanga',
+  'home.services.browseAll': 'Vinjari huduma zote',
+  'home.join.heading': 'Karibisha, endesha, orodhesha au jiunge.',
+  'home.join.body':
+    'Wenyeji wa Airbnb huwapa wageni wao msaidizi. Waendeshaji na wafanyabiashara hulifanya liwezekane. Timu ndogo hulijenga.',
+  'home.join.listAirbnb': 'Orodhesha Airbnb Yako',
+  'home.join.becomeRider': 'Kuwa Rider',
+  'home.join.registerBusiness': 'Sajili Biashara Yako',
+  'home.join.viewOpenings': 'Tazama Nafasi za Kazi',
+  'home.app.eyebrow': 'Programu ya NexG · Inakuja hivi karibuni',
+  'home.app.heading': 'Msaidizi wako, ndani ya',
+  'home.app.body':
+    'Omba chochote kwa sentensi moja, mfuatilie msaidizi wako kwenye ramani, na ulipe kwa kadi au M-Pesa ikiisha. Tunaanza Nairobi, kisha Afrika Mashariki nzima.',
+
   // ── menyu
   'nav.explore': 'Gundua',
   'nav.experience': 'Panga siku yako',
@@ -196,25 +340,28 @@ const sw: Dictionary = {
     'NexG haipandishi bei ya tikiti kamwe. Pale mwandaaji anaporuhusu tuzishike, tunazishika kwa bei yake halisi, na tunatoza kwa siku iliyojengwa kuizunguka.',
 };
 
-export const DICTIONARIES: Record<Locale, Dictionary> = { en, sw };
+export const DICTIONARIES: Record<string, Dictionary> = { en, sw };
 
-/** True for a locale we actually have strings for. */
-export function isSupported(value: string | null | undefined): value is Locale {
-  return !!value && (LOCALES as readonly string[]).includes(value);
+/** True where a person has written this language out by hand. */
+export function isAuthored(value: string | null | undefined): value is AuthoredLocale {
+  return !!value && (AUTHORED_LOCALES as readonly string[]).includes(value);
 }
 
 /**
- * The best locale for a browser's list of preferences.
+ * What the browser is actually asking for.
  *
- * `navigator.languages` is ordered by preference and carries regions —
- * `sw-KE` before `en-GB`. The region is dropped: we have one Kiswahili
- * and one English, and refusing `sw-KE` because it is not exactly `sw`
- * would be pedantry with no upside.
+ * `navigator.languages` is ordered by preference and carries regions.
+ * The region is kept when we do not have the bare language — `pt-BR`
+ * and `pt-PT` are worth translating separately — but a hand-written
+ * `sw` answers `sw-KE`, because refusing it over a region suffix would
+ * be pedantry with no upside.
  */
 export function pickLocale(preferences: readonly string[]): Locale | null {
   for (const preference of preferences) {
+    if (!isLocaleTag(preference)) continue;
     const base = preference.toLowerCase().split('-')[0];
-    if (isSupported(base)) return base;
+    if (isAuthored(base)) return base;
+    return preference.toLowerCase();
   }
   return null;
 }
@@ -234,7 +381,7 @@ export type Translate = (key: string, vars?: Record<string, string>) => string;
  */
 export function translator(locale: Locale): Translate {
   const dictionary = DICTIONARIES[locale] ?? {};
-  const fallback = DICTIONARIES[DEFAULT_LOCALE];
+  const fallback = DICTIONARIES[DEFAULT_LOCALE] ?? {};
 
   return (key, vars) => {
     let text = dictionary[key] ?? fallback[key] ?? key;

@@ -37,7 +37,7 @@ export default async function ExperienceHome({
   searchParams?: { city?: string };
 }) {
   const supabase = createPublicClient();
-  const { t } = getTranslations();
+  const { t } = await getTranslations();
 
   /* A city in the URL beats the one we detected, which beats the default:
      a link somebody was sent is a stronger signal than where they are. */

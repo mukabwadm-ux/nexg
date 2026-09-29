@@ -1218,6 +1218,30 @@ export type Database = {
           },
         ];
       };
+      locale_request: {
+        Row: {
+          first_seen: string;
+          generated_at: string | null;
+          last_seen: string;
+          locale: string;
+          requests: number;
+        };
+        Insert: {
+          first_seen?: string;
+          generated_at?: string | null;
+          last_seen?: string;
+          locale: string;
+          requests?: number;
+        };
+        Update: {
+          first_seen?: string;
+          generated_at?: string | null;
+          last_seen?: string;
+          locale?: string;
+          requests?: number;
+        };
+        Relationships: [];
+      };
       merchant: {
         Row: {
           accepting_orders: boolean;
@@ -2981,6 +3005,53 @@ export type Database = {
           },
         ];
       };
+      translation: {
+        Row: {
+          created_at: string;
+          engine: Database['public']['Enums']['translation_engine'];
+          locale: string;
+          reviewed: boolean;
+          reviewed_by: string | null;
+          source_hash: string;
+          source_key: string;
+          source_text: string;
+          translated: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          engine?: Database['public']['Enums']['translation_engine'];
+          locale: string;
+          reviewed?: boolean;
+          reviewed_by?: string | null;
+          source_hash: string;
+          source_key: string;
+          source_text: string;
+          translated: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          engine?: Database['public']['Enums']['translation_engine'];
+          locale?: string;
+          reviewed?: boolean;
+          reviewed_by?: string | null;
+          source_hash?: string;
+          source_key?: string;
+          source_text?: string;
+          translated?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'translation_reviewed_by_fkey';
+            columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       waitlist_signup: {
         Row: {
           city_id: string | null;
@@ -3632,6 +3703,7 @@ export type Database = {
           title: string;
         }[];
       };
+      fn_translations: { Args: { p_locale: string }; Returns: Json };
       neighbourhoods_for_zone: { Args: { p_zone_id: string }; Returns: string[] };
       rpc_activate_rider: {
         Args: { p_reason?: string; p_rider_id: string };
@@ -4914,6 +4986,7 @@ export type Database = {
         Args: { p_area?: string; p_lat: number; p_lng: number; p_merchant_id: string };
         Returns: Json;
       };
+      rpc_note_locale: { Args: { p_locale: string }; Returns: undefined };
       rpc_notification_mark: {
         Args: {
           p_error?: string;
@@ -5478,6 +5551,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_translations_put: { Args: { p_locale: string; p_rows: Json }; Returns: number };
       zone_for_point: {
         Args: { p_lat: number; p_lng: number };
         Returns: {
@@ -5611,6 +5685,7 @@ export type Database = {
         | 'partner_merchant'
         | 'hotel_partnership'
         | 'something_else';
+      translation_engine: 'human' | 'machine';
       vehicle_ownership: 'own' | 'rented' | 'family';
       vehicle_type: 'motorbike' | 'bicycle' | 'car' | 'tuktuk';
       zone_tier: 'core' | 'extended' | 'trial';
@@ -5843,6 +5918,7 @@ export const Constants = {
         'hotel_partnership',
         'something_else',
       ],
+      translation_engine: ['human', 'machine'],
       vehicle_ownership: ['own', 'rented', 'family'],
       vehicle_type: ['motorbike', 'bicycle', 'car', 'tuktuk'],
       zone_tier: ['core', 'extended', 'trial'],
