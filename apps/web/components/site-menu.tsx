@@ -16,6 +16,8 @@ import {
 import Link from 'next/link';
 import * as React from 'react';
 
+import { DEFAULT_LOCALE, translator, type Locale } from '@/lib/i18n/dictionaries';
+
 import { Logo } from './logo';
 
 /**
@@ -30,24 +32,32 @@ import { Logo } from './logo';
  */
 
 const SECTIONS = [
-  { number: '01', label: 'Explore', href: '/explore', note: null, live: false },
+  { number: '01', key: 'nav.explore', href: '/explore', noteKey: null, note: null, live: false },
   {
     number: '02',
-    label: 'Customize your experience',
+    key: 'nav.experience',
     href: '/experience',
-    note: 'Build a day to your budget',
+    noteKey: 'nav.experience.note',
+    note: null,
     live: false,
   },
-  { number: '03', label: 'How it works', href: '/#how-it-works', note: null, live: false },
-  { number: '04', label: 'Cities', href: '/#cities', note: '11 across East Africa', live: false },
-  { number: '05', label: 'Ask a concierge', href: '/#start', note: 'Online now', live: true },
+  { number: '03', key: 'nav.howItWorks', href: '/#how-it-works', noteKey: null, note: null, live: false },
+  {
+    number: '04',
+    key: 'nav.cities',
+    href: '/#cities',
+    noteKey: null,
+    note: '11 across East Africa',
+    live: false,
+  },
+  { number: '05', key: 'nav.askConcierge', href: '/#start', noteKey: null, note: 'Online now', live: true },
 ] as const;
 
 const PARTNER_LINKS = [
-  { label: 'For Airbnb hosts', note: 'Give guests a concierge', href: '/hosts', icon: Home },
-  { label: 'Become a Rider', note: 'Earn on your terms', href: '/riders', icon: Bike },
-  { label: 'Register Your Business', note: 'Reach every guest', href: '/merchants', icon: Store },
-  { label: 'Careers', note: 'Build with us', href: '/careers', icon: Briefcase },
+  { key: 'nav.hosts', noteKey: 'nav.hosts.note', href: '/hosts', icon: Home },
+  { key: 'nav.riders', noteKey: 'nav.riders.note', href: '/riders', icon: Bike },
+  { key: 'nav.merchants', noteKey: 'nav.merchants.note', href: '/merchants', icon: Store },
+  { key: 'nav.careers', noteKey: 'nav.careers.note', href: '/careers', icon: Briefcase },
 ] as const;
 
 /** The X mark; lucide's `X` is a close icon, not the wordmark. */
@@ -66,7 +76,15 @@ const SOCIALS = [
   { label: 'WhatsApp', href: 'https://wa.me/', icon: MessageCircle },
 ] as const;
 
-export function SiteMenu({ children }: { children: React.ReactNode }) {
+export function SiteMenu({
+  children,
+  locale = DEFAULT_LOCALE,
+}: {
+  children: React.ReactNode;
+  locale?: Locale;
+}) {
+  const t = translator(locale);
+
   const [open, setOpen] = React.useState(false);
   const close = () => setOpen(false);
 
@@ -117,7 +135,7 @@ export function SiteMenu({ children }: { children: React.ReactNode }) {
             <nav aria-label="Main" className="mt-5">
               <ul>
                 {SECTIONS.map((section) => (
-                  <li key={section.label} className="border-border/70 border-b last:border-0">
+                  <li key={section.key} className="border-border/70 border-b last:border-0">
                     <Link
                       href={section.href}
                       onClick={close}
@@ -127,14 +145,14 @@ export function SiteMenu({ children }: { children: React.ReactNode }) {
                         {section.number}
                       </span>
                       <span className="flex-1 text-[1.625rem] font-extrabold leading-none tracking-tight">
-                        {section.label}
+                        {t(section.key)}
                       </span>
-                      {section.note && (
+                      {(section.noteKey || section.note) && (
                         <span className="text-muted-light flex shrink-0 items-center gap-1.5 text-xs">
                           {section.live && (
                             <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
                           )}
-                          {section.note}
+                          {section.noteKey ? t(section.noteKey) : section.note}
                         </span>
                       )}
                     </Link>
@@ -150,7 +168,7 @@ export function SiteMenu({ children }: { children: React.ReactNode }) {
                 {PARTNER_LINKS.map((link) => {
                   const Icon = link.icon;
                   return (
-                    <li key={link.label} className="border-b border-white/10 last:border-0">
+                    <li key={link.key} className="border-b border-white/10 last:border-0">
                       <Link
                         href={link.href}
                         onClick={close}
@@ -163,9 +181,9 @@ export function SiteMenu({ children }: { children: React.ReactNode }) {
                           <Icon className="h-4 w-4" />
                         </span>
                         <span className="flex-1 text-[0.9375rem] font-extrabold text-white">
-                          {link.label}
+                          {t(link.key)}
                         </span>
-                        <span className="shrink-0 text-xs text-white/50">{link.note}</span>
+                        <span className="shrink-0 text-xs text-white/50">{t(link.noteKey)}</span>
                       </Link>
                     </li>
                   );

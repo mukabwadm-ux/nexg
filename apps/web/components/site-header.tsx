@@ -2,6 +2,8 @@ import { Button } from '@nexg/ui';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
 
+import { getTranslations } from '@/lib/i18n';
+
 import { Logo } from './logo';
 import { SiteMenu } from './site-menu';
 
@@ -12,10 +14,13 @@ export interface SiteHeaderProps {
   signIn?: { label: string; href: string };
 }
 
-export function SiteHeader({
-  action = { label: 'Sign in', href: '/sign-in' },
-  signIn,
-}: SiteHeaderProps) {
+export function SiteHeader({ action, signIn }: SiteHeaderProps) {
+  const { locale, t } = getTranslations();
+
+  /* Defaulted here rather than in the signature so the fallback label is
+     translated too — a hard-coded default parameter cannot be. */
+  const cta = action ?? { label: t('nav.signIn'), href: '/sign-in' };
+
   return (
     <header className="border-border/60 bg-bg/90 sticky top-0 z-30 border-b backdrop-blur">
       <div className="mx-auto flex max-w-[96rem] items-center justify-between gap-3 px-4 py-3 sm:px-8 lg:px-16">
@@ -34,10 +39,10 @@ export function SiteHeader({
           )}
 
           <Button variant="gold" size="sm" asChild>
-            <Link href={action.href}>{action.label}</Link>
+            <Link href={cta.href}>{cta.label}</Link>
           </Button>
 
-          <SiteMenu>
+          <SiteMenu locale={locale}>
             <button
               type="button"
               aria-label="Open menu"

@@ -241,6 +241,7 @@ export type Database = {
       };
       city: {
         Row: {
+          centre: unknown;
           country: string;
           created_at: string;
           currency: string;
@@ -253,6 +254,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          centre?: unknown;
           country: string;
           created_at?: string;
           currency: string;
@@ -265,6 +267,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          centre?: unknown;
           country?: string;
           created_at?: string;
           currency?: string;
@@ -362,6 +365,7 @@ export type Database = {
       console_module: {
         Row: {
           href: string | null;
+          icon: string | null;
           key: string;
           label: string;
           section: string;
@@ -369,6 +373,7 @@ export type Database = {
         };
         Insert: {
           href?: string | null;
+          icon?: string | null;
           key: string;
           label: string;
           section: string;
@@ -376,6 +381,7 @@ export type Database = {
         };
         Update: {
           href?: string | null;
+          icon?: string | null;
           key?: string;
           label?: string;
           section?: string;
@@ -3075,7 +3081,7 @@ export type Database = {
           drafts_without_a_price: number | null;
           live_components: number | null;
           mood: Database['public']['Enums']['mood'] | null;
-          slot: Database['public']['Enums']['block_slot'] | null;
+          slots: string[] | null;
           swap_group: string | null;
           tiers: number | null;
         };
@@ -3373,6 +3379,17 @@ export type Database = {
         Returns: string;
       };
       fn_build_plan: { Args: { p_plan_id: string }; Returns: undefined };
+      fn_city_for_point: {
+        Args: { p_lat: number; p_lng: number };
+        Returns: {
+          distance_m: number;
+          id: string;
+          inside_a_zone: boolean;
+          name: string;
+          slug: string;
+          status: Database['public']['Enums']['city_status'];
+        }[];
+      };
       fn_component_cost: {
         Args: {
           p_basis: Database['public']['Enums']['price_basis'];

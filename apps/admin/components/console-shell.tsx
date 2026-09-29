@@ -1,3 +1,20 @@
+import {
+  Bike,
+  Briefcase,
+  Building,
+  CircleDot,
+  Home,
+  LifeBuoy,
+  Radio,
+  Scroll,
+  Settings,
+  ShoppingBag,
+  Sparkles,
+  Star,
+  Store,
+  Users,
+  Wallet,
+} from 'lucide-react';
 import Link from 'next/link';
 
 import { signOut } from '@/app/sign-in/actions';
@@ -18,6 +35,29 @@ import type { StaffContext } from '@/lib/staff';
  * than the plan; linking them would 404.
  */
 const SECTION_ORDER = ['Operate', 'Partners', 'Grow', 'Money', 'Control'];
+
+/*
+ * console_module.icon holds a name; this is the only place that decides
+ * what it looks like. An unknown name gets the neutral dot rather than
+ * nothing, so a module added by someone editing rows arrives with a rail
+ * entry that reads properly instead of a gap where the icon should be.
+ */
+const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  home: Home,
+  'life-buoy': LifeBuoy,
+  radio: Radio,
+  'shopping-bag': ShoppingBag,
+  store: Store,
+  bike: Bike,
+  building: Building,
+  star: Star,
+  sparkles: Sparkles,
+  briefcase: Briefcase,
+  wallet: Wallet,
+  users: Users,
+  settings: Settings,
+  'scroll-text': Scroll,
+};
 
 export function ConsoleShell({
   staff,
@@ -71,14 +111,17 @@ export function ConsoleShell({
                       ? current === '/'
                       : !!item.href && current.startsWith(item.href);
 
+                  const Icon = ICONS[item.icon ?? ''] ?? CircleDot;
+
                   if (!item.href) {
                     return (
                       <li key={item.key}>
                         <span
                           title="Designed, not built yet"
-                          className="block cursor-default rounded-lg px-3 py-2 text-sm font-bold text-white/25"
+                          className="flex cursor-default items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-bold text-white/25"
                         >
-                          {item.label}
+                          <Icon className="h-[1.05rem] w-[1.05rem] shrink-0" />
+                          <span className="min-w-0 truncate">{item.label}</span>
                         </span>
                       </li>
                     );
@@ -88,11 +131,19 @@ export function ConsoleShell({
                     <li key={item.key}>
                       <Link
                         href={item.href}
-                        className={`block rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
-                          active ? 'bg-gold text-ink' : 'text-white/70 hover:text-white'
+                        aria-current={active ? 'page' : undefined}
+                        className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
+                          active
+                            ? 'bg-gold text-ink'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
                         }`}
                       >
-                        {item.label}
+                        <Icon
+                          className={`h-[1.05rem] w-[1.05rem] shrink-0 ${
+                            active ? '' : 'text-white/45'
+                          }`}
+                        />
+                        <span className="min-w-0 truncate">{item.label}</span>
                       </Link>
                     </li>
                   );

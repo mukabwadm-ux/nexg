@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { CuratedDay, EventCard } from '@/components/experience/types';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { getCityPreference, getTranslations } from '@/lib/i18n';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
@@ -14,7 +15,11 @@ export const metadata: Metadata = {
     'Pick how long, how much and who. Tap the moods you want and watch a day arrange itself against your budget. A concierge confirms every booking before you pay once.',
 };
 
-export const revalidate = 300;
+/*
+ * Cookies decide the language and the city, so this cannot be cached
+ * across visitors. The catalogue underneath is still cheap.
+ */
+export const dynamic = 'force-dynamic';
 
 /**
  * Customize Your Experience · the front door.
@@ -32,7 +37,11 @@ export default async function ExperienceHome({
   searchParams?: { city?: string };
 }) {
   const supabase = createPublicClient();
-  const slug = searchParams?.city ?? 'nairobi';
+  const { t } = getTranslations();
+
+  /* A city in the URL beats the one we detected, which beats the default:
+     a link somebody was sent is a stronger signal than where they are. */
+  const slug = searchParams?.city ?? getCityPreference() ?? 'nairobi';
 
   const { data: city } = await supabase
     .from('city')
@@ -71,15 +80,13 @@ export default async function ExperienceHome({
         {/* ─────────────────────────────────────────────────── hero */}
         <section className="mx-auto max-w-[96rem] px-4 pb-12 pt-14 sm:px-8 lg:px-16">
           <span className="border-gold/40 text-gold-text inline-block rounded-full border px-3 py-1 text-[0.6875rem] font-extrabold">
-            A concierge is a message away
+            {t('xp.eyebrow')}
           </span>
           <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-6xl">
-            Customize your experience.
+            {t('xp.title')}
           </h1>
           <p className="text-muted mt-5 max-w-2xl text-base leading-[1.9] sm:text-lg">
-            Tell us how long, how much and who. Tap the moods you want and watch a day arrange
-            itself against your budget — swap any piece up or down until it feels right. Then a
-            person confirms every booking before you pay once.
+            {t('xp.body')}
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -87,7 +94,7 @@ export default async function ExperienceHome({
               href="/experience/build"
               className="bg-ink hover:bg-ink/90 inline-flex h-12 items-center gap-2 rounded-lg px-6 text-base font-bold text-white transition-colors"
             >
-              Build my day
+              {t('xp.build')}
               <span aria-hidden="true" className="text-gold">
                 →
               </span>
@@ -96,7 +103,7 @@ export default async function ExperienceHome({
               href="/help#concierge"
               className="border-border-strong bg-surface text-ink hover:border-ink inline-flex h-12 items-center rounded-lg border px-6 text-base font-bold transition-colors"
             >
-              Or just tell us what you need
+              {t('xp.orTell')}
             </Link>
           </div>
 
@@ -110,18 +117,18 @@ export default async function ExperienceHome({
             {[
               {
                 icon: Wallet,
-                title: 'Your budget',
-                body: 'You set it. The day is built to fit it, and anything over is shown as over.',
+                title: t('xp.tile.budget'),
+                body: t('xp.tile.budget.body'),
               },
               {
                 icon: UserRound,
-                title: 'One concierge',
-                body: 'The same person for the whole day. They call every place on your list.',
+                title: t('xp.tile.concierge'),
+                body: t('xp.tile.concierge.body'),
               },
               {
                 icon: Clock,
-                title: 'Pay once',
-                body: 'After you approve a quote. Park fees and tickets stay separate, at face value.',
+                title: t('xp.tile.pay'),
+                body: t('xp.tile.pay.body'),
               },
             ].map((tile) => (
               <li key={tile.title}>
@@ -145,15 +152,13 @@ export default async function ExperienceHome({
         {/* ──────────────────────────────────────────── curated days */}
         <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
           <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-            Days we have already put together in {where}
+            {t('xp.curated.heading', { city: where })}
           </h2>
 
           {curated.length === 0 ? (
             <Card tone="muted" className="mt-5 p-6">
               <p className="text-muted text-[0.9375rem] leading-[1.8]">
-                None published in {where} yet — we are still signing the operators, drivers and
-                venues that make one up. Build your own and a concierge will put it together from
-                scratch.
+                {t('xp.curated.empty', { city: where })}
               </p>
             </Card>
           ) : (
@@ -172,11 +177,12 @@ export default async function ExperienceHome({
                         {day.tagline}
                       </p>
                       <p className="border-border mt-4 border-t pt-3 text-[0.8125rem] font-extrabold">
+                        {t('xp.curated.from')}{' '}
                         {day.price_per_person_kes === null
-                          ? 'from KES [—]'
-                          : `from KES ${day.price_per_person_kes.toLocaleString('en-KE')}`}
+                          ? 'KES [—]'
+                          : `KES ${day.price_per_person_kes.toLocaleString('en-KE')}`}
                         <span className="text-muted-light ml-1 font-semibold">
-                          per person · make it yours
+                          {t('xp.curated.perPerson')}
                         </span>
                       </p>
                     </Card>
@@ -190,14 +196,13 @@ export default async function ExperienceHome({
         {/* ───────────────────────────────────────────────── events */}
         <section className="mx-auto max-w-[96rem] px-4 pb-20 sm:px-8 lg:px-16">
           <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-            Upcoming in {where}
+            {t('xp.events.heading', { city: where })}
           </h2>
 
           {upcoming.length === 0 ? (
             <Card tone="muted" className="mt-5 p-6">
               <p className="text-muted text-[0.9375rem] leading-[1.8]">
-                Nothing listed yet. Tell a concierge what you are trying to get to and they will
-                build the evening around it.
+                {t('xp.events.empty')}
               </p>
             </Card>
           ) : (
@@ -242,11 +247,11 @@ export default async function ExperienceHome({
 
                         <p className="border-border text-muted-light mt-3 border-t pt-3 text-[0.6875rem] font-semibold leading-[1.6]">
                           {event.nexg_can_hold_tickets
-                            ? 'Tickets held for you · pay only when you approve'
-                            : 'Tickets via the organiser · we handle everything around it'}
+                            ? t('xp.events.held')
+                            : t('xp.events.organiser')}
                         </p>
                         <p className="text-gold-text mt-2 text-[0.8125rem] font-extrabold">
-                          Build a day around it →
+                          {t('xp.events.buildAround')}
                         </p>
                       </Card>
                     </Link>
@@ -257,8 +262,7 @@ export default async function ExperienceHome({
           )}
 
           <p className="text-muted-light mt-6 text-xs font-semibold leading-[1.7]">
-            NexG never marks up a ticket. Where an organiser lets us hold them we do, at face value,
-            and we charge for the day built around it.
+            {t('xp.events.noMarkup')}
           </p>
         </section>
       </main>

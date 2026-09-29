@@ -17,6 +17,8 @@ export interface ConsoleModule {
   section: string;
   href: string | null;
   sort: number;
+  /** A lucide name; the shell maps it to a component. */
+  icon: string | null;
   level: AccessLevel;
   note: string | null;
 }
@@ -101,7 +103,7 @@ export async function requireStaff(): Promise<StaffContext> {
 
   /* Modules, merged across every role held. */
   const [{ data: modules }, { data: access }] = await Promise.all([
-    supabase.from('console_module').select('key, label, section, href, sort').order('sort'),
+    supabase.from('console_module').select('key, label, section, href, sort, icon').order('sort'),
     roles.length > 0
       ? supabase.from('role_module_access').select('module_key, level, note').in('role_key', roles)
       : Promise.resolve({ data: [] }),
@@ -126,6 +128,7 @@ export async function requireStaff(): Promise<StaffContext> {
       section: string;
       href: string | null;
       sort: number;
+      icon: string | null;
     }[]
   )
     .map((m) => ({

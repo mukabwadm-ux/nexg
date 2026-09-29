@@ -4,6 +4,7 @@ import { Builder } from '@/components/experience/builder';
 import type { EventCard, MoodChip } from '@/components/experience/types';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { getCityPreference } from '@/lib/i18n';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
@@ -13,12 +14,11 @@ export const metadata: Metadata = {
 };
 
 /*
- * The catalogue is the same for everyone, so it is read without cookies
- * and the page can be cached. The guest's own plan is loaded in the
- * browser against their session — which is the only thing here that
- * depends on who is asking.
+ * The catalogue is the same for everyone, but the city it is read for
+ * comes from the visitor's own cookie, so this cannot be shared across
+ * them. Their plan is loaded in the browser against their session.
  */
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 export default async function BuildPage({
   searchParams,
@@ -26,7 +26,7 @@ export default async function BuildPage({
   searchParams?: { event?: string; from?: string; city?: string };
 }) {
   const supabase = createPublicClient();
-  const slug = searchParams?.city ?? 'nairobi';
+  const slug = searchParams?.city ?? getCityPreference() ?? 'nairobi';
 
   const { data: city } = await supabase
     .from('city')
