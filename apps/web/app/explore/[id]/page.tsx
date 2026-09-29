@@ -11,10 +11,10 @@ import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
 
 /*
- * Cached for a minute. A merchant's public details do not change between
+ * Cached for an hour. A merchant's public details do not change between
  * page views, and re-querying them per request cost a round trip each time.
  */
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const SELECT =
   'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at';

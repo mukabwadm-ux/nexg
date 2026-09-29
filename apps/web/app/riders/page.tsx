@@ -117,11 +117,11 @@ const FAQ = [
 ] as const;
 
 /*
- * Cached and re-rendered at most once a minute. Everything on this page is the
+ * Cached and re-rendered at most once an hour. Everything on this page is the
  * same for every visitor, so re-querying it per request bought nothing and
  * cost a round trip to the database on each one.
  */
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default async function RidersPage() {
   const supabase = createPublicClient();

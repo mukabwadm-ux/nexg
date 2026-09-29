@@ -62,7 +62,7 @@ const listingFor = unstable_cache(
     return { merchants: merchants ?? [], cities: cities ?? [] };
   },
   ['explore-listing'],
-  { revalidate: 60, tags: ['merchants'] },
+  { revalidate: 3600, tags: ['merchants'] },
 );
 
 export default async function ExplorePage({
