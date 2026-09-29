@@ -285,12 +285,15 @@ export type Database = {
           id: string;
           issued_at: string | null;
           mime: string;
+          ocr: Json | null;
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
+          quality: Json | null;
           rejection_reason: string | null;
           requirement_id: string;
           reviewed_at: string | null;
           reviewed_by: string | null;
+          side: string | null;
           size_bytes: number;
           status: Database['public']['Enums']['document_status'];
           storage_path: string;
@@ -304,12 +307,15 @@ export type Database = {
           id?: string;
           issued_at?: string | null;
           mime: string;
+          ocr?: Json | null;
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
+          quality?: Json | null;
           rejection_reason?: string | null;
           requirement_id: string;
           reviewed_at?: string | null;
           reviewed_by?: string | null;
+          side?: string | null;
           size_bytes: number;
           status?: Database['public']['Enums']['document_status'];
           storage_path: string;
@@ -323,12 +329,15 @@ export type Database = {
           id?: string;
           issued_at?: string | null;
           mime?: string;
+          ocr?: Json | null;
           owner_id?: string;
           owner_type?: Database['public']['Enums']['document_owner_type'];
+          quality?: Json | null;
           rejection_reason?: string | null;
           requirement_id?: string;
           reviewed_at?: string | null;
           reviewed_by?: string | null;
+          side?: string | null;
           size_bytes?: number;
           status?: Database['public']['Enums']['document_status'];
           storage_path?: string;
@@ -559,6 +568,13 @@ export type Database = {
             columns: ['rider_id'];
             isOneToOne: false;
             referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
         ];
@@ -926,6 +942,13 @@ export type Database = {
             referencedRelation: 'rider';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'merchant_fleet_rider_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
         ];
       };
       merchant_hours: {
@@ -1104,66 +1127,182 @@ export type Database = {
         };
         Relationships: [];
       };
+      onboarding_slot: {
+        Row: {
+          booked: number;
+          capacity: number;
+          city_id: string;
+          created_at: string;
+          hub_name: string;
+          id: string;
+          starts_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          booked?: number;
+          capacity: number;
+          city_id: string;
+          created_at?: string;
+          hub_name: string;
+          id?: string;
+          starts_at: string;
+          updated_at?: string;
+        };
+        Update: {
+          booked?: number;
+          capacity?: number;
+          city_id?: string;
+          created_at?: string;
+          hub_name?: string;
+          id?: string;
+          starts_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'onboarding_slot_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       rider: {
         Row: {
           activated_at: string | null;
           activated_by: string | null;
-          city_id: string;
+          areas: string[];
+          bike_max_km: number | null;
+          cash_cap: number | null;
+          cash_ok: boolean;
+          city_id: string | null;
           created_at: string;
           employer_merchant_id: string | null;
+          face_photo_path: string | null;
           first_name: string;
           id: string;
-          kit_issued: boolean;
-          last_name: string;
+          insurance: Database['public']['Enums']['insurance_type'] | null;
+          kit_has: string[];
+          kit_issued_at: string | null;
+          last_name: string | null;
+          notes: string | null;
           onboarding_session_at: string | null;
+          onboarding_slot_id: string | null;
+          onboarding_step: number;
+          owner_name: string | null;
+          owner_phone: string | null;
+          ownership: Database['public']['Enums']['vehicle_ownership'] | null;
+          payout_msisdn: string | null;
+          payout_name_lookup: Json | null;
           phone: string;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
           plate_no: string | null;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          shifts: string[];
           source: string;
           status: Database['public']['Enums']['rider_status'];
           status_reason: string | null;
+          submitted_at: string | null;
           updated_at: string;
           user_id: string | null;
-          vehicle: Database['public']['Enums']['vehicle_type'];
+          vehicle: Database['public']['Enums']['vehicle_type'] | null;
+          waitlisted_at: string | null;
+          years_riding: string | null;
         };
         Insert: {
           activated_at?: string | null;
           activated_by?: string | null;
-          city_id: string;
+          areas?: string[];
+          bike_max_km?: number | null;
+          cash_cap?: number | null;
+          cash_ok?: boolean;
+          city_id?: string | null;
           created_at?: string;
           employer_merchant_id?: string | null;
+          face_photo_path?: string | null;
           first_name: string;
           id?: string;
-          kit_issued?: boolean;
-          last_name: string;
+          insurance?: Database['public']['Enums']['insurance_type'] | null;
+          kit_has?: string[];
+          kit_issued_at?: string | null;
+          last_name?: string | null;
+          notes?: string | null;
           onboarding_session_at?: string | null;
+          onboarding_slot_id?: string | null;
+          onboarding_step?: number;
+          owner_name?: string | null;
+          owner_phone?: string | null;
+          ownership?: Database['public']['Enums']['vehicle_ownership'] | null;
+          payout_msisdn?: string | null;
+          payout_name_lookup?: Json | null;
           phone: string;
+          phone_code_attempts?: number;
+          phone_code_expires_at?: string | null;
+          phone_code_hash?: string | null;
+          phone_verified_at?: string | null;
           plate_no?: string | null;
+          resume_token_expires_at?: string | null;
+          resume_token_hash?: string | null;
+          shifts?: string[];
           source?: string;
           status?: Database['public']['Enums']['rider_status'];
           status_reason?: string | null;
+          submitted_at?: string | null;
           updated_at?: string;
           user_id?: string | null;
-          vehicle: Database['public']['Enums']['vehicle_type'];
+          vehicle?: Database['public']['Enums']['vehicle_type'] | null;
+          waitlisted_at?: string | null;
+          years_riding?: string | null;
         };
         Update: {
           activated_at?: string | null;
           activated_by?: string | null;
-          city_id?: string;
+          areas?: string[];
+          bike_max_km?: number | null;
+          cash_cap?: number | null;
+          cash_ok?: boolean;
+          city_id?: string | null;
           created_at?: string;
           employer_merchant_id?: string | null;
+          face_photo_path?: string | null;
           first_name?: string;
           id?: string;
-          kit_issued?: boolean;
-          last_name?: string;
+          insurance?: Database['public']['Enums']['insurance_type'] | null;
+          kit_has?: string[];
+          kit_issued_at?: string | null;
+          last_name?: string | null;
+          notes?: string | null;
           onboarding_session_at?: string | null;
+          onboarding_slot_id?: string | null;
+          onboarding_step?: number;
+          owner_name?: string | null;
+          owner_phone?: string | null;
+          ownership?: Database['public']['Enums']['vehicle_ownership'] | null;
+          payout_msisdn?: string | null;
+          payout_name_lookup?: Json | null;
           phone?: string;
+          phone_code_attempts?: number;
+          phone_code_expires_at?: string | null;
+          phone_code_hash?: string | null;
+          phone_verified_at?: string | null;
           plate_no?: string | null;
+          resume_token_expires_at?: string | null;
+          resume_token_hash?: string | null;
+          shifts?: string[];
           source?: string;
           status?: Database['public']['Enums']['rider_status'];
           status_reason?: string | null;
+          submitted_at?: string | null;
           updated_at?: string;
           user_id?: string | null;
-          vehicle?: Database['public']['Enums']['vehicle_type'];
+          vehicle?: Database['public']['Enums']['vehicle_type'] | null;
+          waitlisted_at?: string | null;
+          years_riding?: string | null;
         };
         Relationships: [
           {
@@ -1192,6 +1331,13 @@ export type Database = {
             columns: ['employer_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_onboarding_slot_id_fkey';
+            columns: ['onboarding_slot_id'];
+            isOneToOne: false;
+            referencedRelation: 'onboarding_slot';
             referencedColumns: ['id'];
           },
         ];
@@ -1610,6 +1756,41 @@ export type Database = {
         };
         Relationships: [];
       };
+      rider_public: {
+        Row: {
+          city_id: string | null;
+          face_photo_path: string | null;
+          first_name: string | null;
+          id: string | null;
+          plate_no: string | null;
+          vehicle: Database['public']['Enums']['vehicle_type'] | null;
+        };
+        Insert: {
+          city_id?: string | null;
+          face_photo_path?: string | null;
+          first_name?: string | null;
+          id?: string | null;
+          plate_no?: string | null;
+          vehicle?: Database['public']['Enums']['vehicle_type'] | null;
+        };
+        Update: {
+          city_id?: string | null;
+          face_photo_path?: string | null;
+          first_name?: string | null;
+          id?: string | null;
+          plate_no?: string | null;
+          vehicle?: Database['public']['Enums']['vehicle_type'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       zone_bounds: {
         Row: {
           city_id: string | null;
@@ -1774,6 +1955,66 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_plate_matches: { Args: { p_plate: string; p_read: string }; Returns: boolean };
+      fn_rider_condition_matches: {
+        Args: { p_condition: Json; p_rider: Database['public']['Tables']['rider']['Row'] };
+        Returns: boolean;
+      };
+      fn_rider_draft_for_write: {
+        Args: { p_rider_id: string };
+        Returns: {
+          activated_at: string | null;
+          activated_by: string | null;
+          areas: string[];
+          bike_max_km: number | null;
+          cash_cap: number | null;
+          cash_ok: boolean;
+          city_id: string | null;
+          created_at: string;
+          employer_merchant_id: string | null;
+          face_photo_path: string | null;
+          first_name: string;
+          id: string;
+          insurance: Database['public']['Enums']['insurance_type'] | null;
+          kit_has: string[];
+          kit_issued_at: string | null;
+          last_name: string | null;
+          notes: string | null;
+          onboarding_session_at: string | null;
+          onboarding_slot_id: string | null;
+          onboarding_step: number;
+          owner_name: string | null;
+          owner_phone: string | null;
+          ownership: Database['public']['Enums']['vehicle_ownership'] | null;
+          payout_msisdn: string | null;
+          payout_name_lookup: Json | null;
+          phone: string;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          plate_no: string | null;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          shifts: string[];
+          source: string;
+          status: Database['public']['Enums']['rider_status'];
+          status_reason: string | null;
+          submitted_at: string | null;
+          updated_at: string;
+          user_id: string | null;
+          vehicle: Database['public']['Enums']['vehicle_type'] | null;
+          waitlisted_at: string | null;
+          years_riding: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'rider';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      fn_rider_readiness: { Args: { p_rider_id: string }; Returns: Json };
       fn_rider_required_docs: {
         Args: { p_rider_id: string };
         Returns: {
@@ -1804,22 +2045,47 @@ export type Database = {
         Returns: {
           activated_at: string | null;
           activated_by: string | null;
-          city_id: string;
+          areas: string[];
+          bike_max_km: number | null;
+          cash_cap: number | null;
+          cash_ok: boolean;
+          city_id: string | null;
           created_at: string;
           employer_merchant_id: string | null;
+          face_photo_path: string | null;
           first_name: string;
           id: string;
-          kit_issued: boolean;
-          last_name: string;
+          insurance: Database['public']['Enums']['insurance_type'] | null;
+          kit_has: string[];
+          kit_issued_at: string | null;
+          last_name: string | null;
+          notes: string | null;
           onboarding_session_at: string | null;
+          onboarding_slot_id: string | null;
+          onboarding_step: number;
+          owner_name: string | null;
+          owner_phone: string | null;
+          ownership: Database['public']['Enums']['vehicle_ownership'] | null;
+          payout_msisdn: string | null;
+          payout_name_lookup: Json | null;
           phone: string;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
           plate_no: string | null;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          shifts: string[];
           source: string;
           status: Database['public']['Enums']['rider_status'];
           status_reason: string | null;
+          submitted_at: string | null;
           updated_at: string;
           user_id: string | null;
-          vehicle: Database['public']['Enums']['vehicle_type'];
+          vehicle: Database['public']['Enums']['vehicle_type'] | null;
+          waitlisted_at: string | null;
+          years_riding: string | null;
         };
         SetofOptions: {
           from: '*';
@@ -1869,6 +2135,7 @@ export type Database = {
           target_type: string;
         }[];
       };
+      rpc_book_slot: { Args: { p_rider_id: string; p_slot_id: string }; Returns: Json };
       rpc_document_reject: {
         Args: { p_document_id: string; p_reason: string };
         Returns: {
@@ -1877,12 +2144,15 @@ export type Database = {
           id: string;
           issued_at: string | null;
           mime: string;
+          ocr: Json | null;
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
+          quality: Json | null;
           rejection_reason: string | null;
           requirement_id: string;
           reviewed_at: string | null;
           reviewed_by: string | null;
+          side: string | null;
           size_bytes: number;
           status: Database['public']['Enums']['document_status'];
           storage_path: string;
@@ -1897,23 +2167,44 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_document_request_via_whatsapp: {
-        Args: { p_merchant_id: string; p_requirement_kind: string };
-        Returns: Json;
-      };
-      rpc_document_submit: {
-        Args: {
-          p_expires_at?: string;
-          p_issued_at?: string;
-          p_mime: string;
-          p_owner_id: string;
-          p_owner_type: Database['public']['Enums']['document_owner_type'];
-          p_requirement_kind: string;
-          p_size_bytes: number;
-          p_storage_path: string;
-        };
-        Returns: string;
-      };
+      rpc_document_request_via_whatsapp:
+        | { Args: { p_merchant_id: string; p_requirement_kind: string }; Returns: Json }
+        | {
+            Args: {
+              p_owner_id: string;
+              p_owner_type: Database['public']['Enums']['document_owner_type'];
+              p_requirement_kind: string;
+            };
+            Returns: Json;
+          };
+      rpc_document_submit:
+        | {
+            Args: {
+              p_expires_at?: string;
+              p_issued_at?: string;
+              p_mime: string;
+              p_owner_id: string;
+              p_owner_type: Database['public']['Enums']['document_owner_type'];
+              p_requirement_kind: string;
+              p_size_bytes: number;
+              p_storage_path: string;
+            };
+            Returns: string;
+          }
+        | {
+            Args: {
+              p_expires_at?: string;
+              p_issued_at?: string;
+              p_mime: string;
+              p_owner_id: string;
+              p_owner_type: Database['public']['Enums']['document_owner_type'];
+              p_requirement_kind: string;
+              p_side?: string;
+              p_size_bytes: number;
+              p_storage_path: string;
+            };
+            Returns: string;
+          };
       rpc_document_verify: {
         Args: { p_document_id: string };
         Returns: {
@@ -1922,12 +2213,15 @@ export type Database = {
           id: string;
           issued_at: string | null;
           mime: string;
+          ocr: Json | null;
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
+          quality: Json | null;
           rejection_reason: string | null;
           requirement_id: string;
           reviewed_at: string | null;
           reviewed_by: string | null;
+          side: string | null;
           size_bytes: number;
           status: Database['public']['Enums']['document_status'];
           storage_path: string;
@@ -2376,6 +2670,26 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_rider_issue_kit: { Args: { p_rider_id: string }; Returns: string };
+      rpc_rider_payout_name_check: { Args: { p_rider_id: string }; Returns: Json };
+      rpc_rider_request_phone_code: { Args: { p_rider_id: string }; Returns: Json };
+      rpc_rider_resume_claim: { Args: { p_token: string }; Returns: Json };
+      rpc_rider_resume_token: { Args: { p_rider_id: string }; Returns: string };
+      rpc_rider_save_step: {
+        Args: { p_patch?: Json; p_rider_id: string; p_step: number };
+        Returns: Json;
+      };
+      rpc_rider_set_vehicle: {
+        Args: { p_rider_id: string; p_vehicle: Database['public']['Enums']['vehicle_type'] };
+        Returns: Json;
+      };
+      rpc_rider_start: {
+        Args: { p_city_id?: string; p_first_name: string; p_fleet_token?: string; p_phone: string };
+        Returns: string;
+      };
+      rpc_rider_submit: { Args: { p_rider_id: string }; Returns: Json };
+      rpc_rider_verify_phone_code: { Args: { p_code: string; p_rider_id: string }; Returns: Json };
+      rpc_rider_waitlist: { Args: { p_city_id: string; p_rider_id: string }; Returns: Json };
       rpc_support_ticket_create: {
         Args: {
           p_body: string;
@@ -2476,6 +2790,7 @@ export type Database = {
         | 'active'
         | 'declined'
         | 'expired';
+      insurance_type: 'comprehensive' | 'third_party' | 'none';
       legal_document_key:
         | 'terms'
         | 'privacy'
@@ -2525,6 +2840,7 @@ export type Database = {
         | 'partner_merchant'
         | 'hotel_partnership'
         | 'something_else';
+      vehicle_ownership: 'own' | 'rented' | 'family';
       vehicle_type: 'motorbike' | 'bicycle' | 'car' | 'tuktuk';
       zone_tier: 'core' | 'extended' | 'trial';
     };
@@ -2650,6 +2966,7 @@ export const Constants = {
       document_owner_type: ['rider', 'merchant'],
       document_status: ['uploaded', 'verified', 'rejected', 'expired'],
       fleet_invite_status: ['invited', 'started', 'under_review', 'active', 'declined', 'expired'],
+      insurance_type: ['comprehensive', 'third_party', 'none'],
       legal_document_key: [
         'terms',
         'privacy',
@@ -2704,6 +3021,7 @@ export const Constants = {
         'hotel_partnership',
         'something_else',
       ],
+      vehicle_ownership: ['own', 'rented', 'family'],
       vehicle_type: ['motorbike', 'bicycle', 'car', 'tuktuk'],
       zone_tier: ['core', 'extended', 'trial'],
     },

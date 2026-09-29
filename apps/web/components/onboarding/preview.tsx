@@ -1,12 +1,12 @@
 'use client';
 
-import { Check } from 'lucide-react';
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
+import { ReadyRing } from './shell-frame';
 import { useOnboarding } from './store';
-import { READINESS_CHECKS, type BadgeRule, type Readiness } from './types';
+import { READINESS_CHECKS, type BadgeRule } from './types';
 
 /**
  * "How guests will see you", and how close they are to being seen.
@@ -179,7 +179,12 @@ export function LivePreview() {
         </div>
       </div>
 
-      <ReadyRing pct={readiness?.pct ?? 0} readiness={readiness} />
+      <ReadyRing
+        heading="Ready to go live"
+        pct={readiness?.pct ?? 0}
+        checks={READINESS_CHECKS}
+        state={readiness as unknown as Record<string, unknown> | null}
+      />
     </div>
   );
 }
@@ -221,82 +226,6 @@ function Pill({
     >
       {children}
     </span>
-  );
-}
-
-/**
- * The ring.
- *
- * The percentage is computed in the database by fn_merchant_readiness, not
- * here, so the number the merchant watches climb is the same one the merchant
- * team sees in the console. A ring that reads 83% to one and 67% to the other
- * would be worse than no ring at all.
- */
-export function ReadyRing({ pct, readiness }: { pct: number; readiness: Readiness | null }) {
-  const radius = 34;
-  const circumference = 2 * Math.PI * radius;
-
-  return (
-    <div className="bg-ink rounded-2xl p-5 text-white">
-      <p className="text-gold text-xs font-extrabold uppercase tracking-[0.14em]">
-        Ready to go live
-      </p>
-
-      <div className="mt-4 flex items-center gap-5">
-        <div className="relative h-[5.25rem] w-[5.25rem] shrink-0">
-          <svg viewBox="0 0 84 84" className="h-full w-full -rotate-90">
-            <circle
-              cx="42"
-              cy="42"
-              r={radius}
-              fill="none"
-              stroke="rgb(255 255 255 / 0.18)"
-              strokeWidth="7"
-            />
-            <circle
-              cx="42"
-              cy="42"
-              r={radius}
-              fill="none"
-              stroke="rgb(var(--gold-rgb))"
-              strokeWidth="7"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={circumference * (1 - pct / 100)}
-              className="transition-[stroke-dashoffset] duration-[250ms] ease-out"
-            />
-          </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-lg font-extrabold">
-            {pct}%
-          </span>
-        </div>
-
-        <ul className="grid flex-1 grid-cols-2 gap-x-3 gap-y-2.5">
-          {READINESS_CHECKS.map((check) => {
-            const done = readiness?.[check.key] === true;
-            return (
-              <li key={check.key} className="flex items-center gap-2">
-                <span
-                  aria-hidden="true"
-                  className={`flex h-[1.125rem] w-[1.125rem] shrink-0 items-center justify-center rounded-full ${
-                    done ? 'bg-gold text-ink' : 'bg-white'
-                  }`}
-                >
-                  {done && <Check className="h-3 w-3" strokeWidth={3.5} />}
-                </span>
-                <span
-                  className={`text-[0.6875rem] font-bold leading-tight ${
-                    done ? 'text-white' : 'text-white/55'
-                  }`}
-                >
-                  {check.label}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </div>
   );
 }
 

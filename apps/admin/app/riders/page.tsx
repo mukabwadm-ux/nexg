@@ -71,11 +71,12 @@ export default async function RiderPipelinePage() {
       .filter((rider) => rider.status === column.key)
       .map((rider) => {
         const city = rider.city as { name: string } | null;
-        const total = requiredFor(rider.vehicle);
+        /* A draft may not have chosen a vehicle yet. */
+        const total = rider.vehicle ? requiredFor(rider.vehicle) : 0;
         return {
           id: rider.id,
-          title: `${rider.first_name} ${rider.last_name}`.trim(),
-          meta: [rider.vehicle, city?.name].filter(Boolean).join(' · '),
+          title: `${rider.first_name} ${rider.last_name ?? ''}`.trim(),
+          meta: [rider.vehicle ?? 'no vehicle yet', city?.name].filter(Boolean).join(' · '),
           note: sinceLabel(rider.created_at, 'Applied'),
           href: `/riders/${rider.id}`,
           progress:

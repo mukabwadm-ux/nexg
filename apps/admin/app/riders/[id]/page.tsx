@@ -8,6 +8,7 @@ import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { DocumentReview, type ReviewDocument } from '@/components/document-review';
+import { RiderRecordPanel, type RiderRecord } from '@/components/rider-record';
 import { requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -20,7 +21,7 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
 
   const { data: rider } = await supabase
     .from('rider')
-    .select('id, first_name, last_name, phone, status, vehicle, plate_no, created_at, city(name)')
+    .select('*, city(name)')
     .eq('id', params.id)
     .maybeSingle();
 
@@ -28,25 +29,38 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
   // and "not yours" are deliberately the same answer.
   if (!rider) notFound();
 
-  const [{ data: requirements }, { data: documents }] = await Promise.all([
-    supabase
-      .from('document_requirement')
-      .select('id, kind, label, help_text, required, applies_when, sort')
-      .eq('owner_type', 'rider')
-      .order('sort', { ascending: true }),
-    supabase
-      .from('document')
-      .select('id, requirement_id, status, storage_path, mime, expires_at, rejection_reason')
-      .eq('owner_type', 'rider')
-      .eq('owner_id', params.id)
-      .is('superseded_at', null),
-  ]);
+  const [{ data: requirements }, { data: documents }, { data: readiness }, { data: employer }] =
+    await Promise.all([
+      /*
+       * The same function the rider's own documents step called, rather than
+       * a second copy of the rules here. This page used to filter on vehicle
+       * alone, so it would have missed the owner's permission letter and the
+       * insurance certificate entirely — both of which now hang off answers
+       * rather than the vehicle.
+       */
+      supabase.rpc('fn_rider_required_docs', { p_rider_id: params.id }),
+      supabase
+        .from('document')
+        .select(
+          'id, requirement_id, side, status, storage_path, mime, expires_at, rejection_reason',
+        )
+        .eq('owner_type', 'rider')
+        .eq('owner_id', params.id)
+        .is('superseded_at', null),
+      supabase.rpc('fn_rider_readiness', { p_rider_id: params.id }),
+      rider.employer_merchant_id
+        ? supabase
+            .from('merchant')
+            .select('trading_name')
+            .eq('id', rider.employer_merchant_id)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
+    ]);
 
-  const applicable = (requirements ?? []).filter((requirement) => {
-    const when = requirement.applies_when as Record<string, string[]> | null;
-    const vehicles = when?.['vehicle'];
-    return !vehicles || vehicles.includes(rider.vehicle);
-  });
+  const applicable =
+    (requirements as
+      | { id: string; kind: string; label: string; why_text: string | null; essential: boolean }[]
+      | null) ?? [];
 
   const byRequirement = new Map((documents ?? []).map((d) => [d.requirement_id, d]));
 
@@ -71,8 +85,8 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
         id: document?.id ?? null,
         kind: requirement.kind,
         label: requirement.label,
-        helpText: requirement.help_text,
-        required: requirement.required,
+        helpText: requirement.why_text,
+        required: requirement.essential,
         status: (document?.status ?? 'missing') as ReviewDocument['status'],
         expiresAt: document?.expires_at ?? null,
         rejectionReason: document?.rejection_reason ?? null,
@@ -88,7 +102,7 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
   return (
     <ConsoleShell staff={staff} current="/riders">
       <ConsoleHeader
-        title={`${rider.first_name} ${rider.last_name}`.trim()}
+        title={`${rider.first_name} ${rider.last_name ?? ''}`.trim()}
         breadcrumb="Riders → Application"
         action={<StatusBadge status={rider.status as StatusKey} />}
       />
@@ -102,27 +116,35 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
         </Link>
 
         <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-          <div>
-            <h2 className="text-lg font-extrabold tracking-tight">Documents</h2>
-            <p className="text-muted mt-1 text-sm font-semibold">
-              {outstanding.length === 0
-                ? 'Everything required is verified.'
-                : `${outstanding.length} of ${review.filter((d) => d.required).length} still to verify.`}
-            </p>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-lg font-extrabold tracking-tight">Documents</h2>
+              <p className="text-muted mt-1 text-sm font-semibold">
+                {outstanding.length === 0
+                  ? 'Everything required is verified.'
+                  : `${outstanding.length} of ${review.filter((d) => d.required).length} still to verify.`}
+              </p>
 
-            <div className="mt-4">
-              <DocumentReview
-                documents={review}
-                onVerify={async (documentId) => {
-                  'use server';
-                  return verifyDocument(documentId, params.id);
-                }}
-                onReject={async (documentId, reason) => {
-                  'use server';
-                  return rejectDocument(documentId, params.id, reason);
-                }}
-              />
+              <div className="mt-4">
+                <DocumentReview
+                  documents={review}
+                  onVerify={async (documentId) => {
+                    'use server';
+                    return verifyDocument(documentId, params.id);
+                  }}
+                  onReject={async (documentId, reason) => {
+                    'use server';
+                    return rejectDocument(documentId, params.id, reason);
+                  }}
+                />
+              </div>
             </div>
+
+            <RiderRecordPanel
+              rider={rider as unknown as RiderRecord}
+              readiness={readiness as Record<string, unknown> | null}
+              merchantName={(employer as { trading_name: string } | null)?.trading_name ?? null}
+            />
           </div>
 
           <div className="space-y-4">
@@ -131,8 +153,12 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
               <dl className="mt-3 space-y-2 text-sm">
                 {[
                   ['Phone', rider.phone],
+                  [
+                    'Phone verified',
+                    rider.phone_verified_at ? 'Yes, by code' : 'No — confirm on the call',
+                  ],
                   ['City', city?.name ?? '—'],
-                  ['Vehicle', rider.vehicle],
+                  ['Vehicle', rider.vehicle ?? '— not chosen'],
                   ['Plate', rider.plate_no ?? '—'],
                 ].map(([label, value]) => (
                   <div key={label} className="flex justify-between gap-3">

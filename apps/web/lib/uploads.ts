@@ -52,12 +52,15 @@ export async function uploadDocument({
   kind,
   file,
   expiresAt,
+  side,
 }: {
   ownerType: OwnerType;
   ownerId: string;
   kind: string;
   file: File;
   expiresAt?: string | null;
+  /** Front or back, for a document that has two — a national ID. */
+  side?: 'front' | 'back';
 }): Promise<UploadOutcome> {
   const supabase = createClient();
 
@@ -90,6 +93,7 @@ export async function uploadDocument({
     p_mime: file.type,
     p_size_bytes: file.size,
     ...(expiresAt ? { p_expires_at: expiresAt } : {}),
+    ...(side ? { p_side: side } : {}),
   });
 
   if (error) {
@@ -142,123 +146,4 @@ export async function fetchSavedDocuments(
       },
     ];
   });
-}
-
-export interface ResumableRider {
-  id: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  vehicle: string;
-  plateNo: string | null;
-  cityId: string;
-}
-
-export interface ResumableMerchant {
-  id: string;
-  legalName: string;
-  tradingName: string;
-  category: string;
-  contactName: string;
-  contactPhone: string;
-  contactEmail: string;
-  cityId: string;
-  addressText: string | null;
-}
-
-/**
- * The open application this browser already owns, if there is one.
- *
- * Deliberately does not create a session. Calling ensureApplicantSession here
- * would mint an anonymous user for every visitor who merely loads the page,
- * which is both wasteful and a quiet way to fill auth.users with nothing. If
- * there is no session there is nothing to resume, and that is the whole
- * answer.
- *
- * Row-level security does the filtering: a rider row is readable when
- * rider.user_id is the caller, a merchant through merchant_user. Neither
- * query can return somebody else's application.
- */
-export async function findMyOpenRiderApplication(): Promise<ResumableRider | null> {
-  const supabase = createClient();
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session?.user) return null;
-
-  const { data } = await supabase
-    .from('rider')
-    .select('id, first_name, last_name, phone, vehicle, plate_no, city_id, status')
-    .in('status', ['applied', 'documents_pending', 'under_review'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (!data) return null;
-
-  return {
-    id: data.id,
-    firstName: data.first_name,
-    lastName: data.last_name,
-    phone: data.phone,
-    vehicle: data.vehicle,
-    plateNo: data.plate_no,
-    cityId: data.city_id,
-  };
-}
-
-export async function findMyOpenMerchantApplication(): Promise<ResumableMerchant | null> {
-  const supabase = createClient();
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session?.user) return null;
-
-  const { data } = await supabase
-    .from('merchant_user')
-    .select(
-      'merchant(id, legal_name, trading_name, category, contact_name, contact_phone, contact_email, city_id, status)',
-    )
-    .limit(1)
-    .maybeSingle();
-
-  const merchant = data?.merchant as
-    | {
-        id: string;
-        legal_name: string;
-        trading_name: string;
-        category: string;
-        contact_name: string;
-        contact_phone: string;
-        contact_email: string;
-        city_id: string;
-        status: string;
-      }
-    | null
-    | undefined;
-
-  if (!merchant || !['applied', 'documents_pending', 'under_review'].includes(merchant.status)) {
-    return null;
-  }
-
-  const { data: branch } = await supabase
-    .from('merchant_branch')
-    .select('address_text')
-    .eq('merchant_id', merchant.id)
-    .eq('is_primary', true)
-    .maybeSingle();
-
-  return {
-    id: merchant.id,
-    legalName: merchant.legal_name,
-    tradingName: merchant.trading_name,
-    category: merchant.category,
-    contactName: merchant.contact_name,
-    contactPhone: merchant.contact_phone,
-    contactEmail: merchant.contact_email,
-    cityId: merchant.city_id,
-    addressText: branch?.address_text ?? null,
-  };
 }

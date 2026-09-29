@@ -35,11 +35,16 @@ select
   (select id from public.city where slug = 'nairobi'),
   'aaaaaaaa-0000-0000-0000-000000000004';
 
--- A motorbike rider: six required documents (section 3.2 seed).
-insert into public.rider (id, user_id, first_name, last_name, phone, city_id, vehicle, plate_no)
+-- A motorbike rider: six required documents.
+--
+-- The insurance certificate is now demanded only from a rider who said they
+-- have cover, so the fixture has to say so. Asking a rider who answered "not
+-- yet" for a certificate they do not have was noise on their screen and a
+-- count that did not match what they were told.
+insert into public.rider (id, user_id, first_name, last_name, phone, city_id, vehicle, plate_no, insurance)
 values ('ffffffff-0000-0000-0000-000000000001', 'b1111111-1111-1111-1111-111111111111',
         'Gate', 'Rider', '+254733000001',
-        (select id from public.city where slug = 'nairobi'), 'motorbike', 'KMC 123A');
+        (select id from public.city where slug = 'nairobi'), 'motorbike', 'KMC 123A', 'third_party');
 
 -- ---------------------------------------------------- which documents apply
 
