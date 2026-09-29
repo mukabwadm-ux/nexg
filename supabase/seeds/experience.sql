@@ -283,8 +283,16 @@ where not exists (
 
 -- ────────────────────────────────────────────── somebody on shift
 
+/*
+ * Only accounts whose roles actually reach the module. dev.ops holds
+ * merchant_ops and rider_ops, which the matrix gives no Experiences
+ * access — putting them on shift meant the allocator handed days to
+ * somebody who could not open them. fn_pick_concierge now refuses that
+ * too, but a seed that creates the state is a seed that will find it
+ * again on the next reset.
+ */
 insert into public.concierge_shift (staff_user_id, city_id, online, capacity)
 select su.id, (select id from public.city where slug = 'nairobi'), true, 6
 from public.staff_user su
-where su.email in ('dev.admin@nexgapp.com', 'dev.ops@nexgapp.com')
+where su.email = 'dev.admin@nexgapp.com'
 on conflict (staff_user_id, city_id) do nothing;

@@ -40,10 +40,31 @@ async function read(planId: string): Promise<PlanView | undefined> {
 export async function ensurePlan(citySlug = 'nairobi'): Promise<PlanResult> {
   const supabase = createClient();
 
-  const {
+  /*
+   * The session is made here, on the server, and not in the browser.
+   *
+   * It used to be the browser's job, and two anonymous users were being
+   * created for one visitor: React StrictMode runs effects twice in
+   * development, both invocations saw no session, and both called
+   * signInAnonymously. The plan was then written for the first user
+   * while the cookie held the second — so every later save updated zero
+   * rows, silently, because an UPDATE that row-level security filters
+   * out is not an error. It would happen in production too, on any
+   * double mount or a fast second navigation.
+   *
+   * One server action is one request, so the sign-in and the cookie that
+   * carries it are written together and cannot race.
+   */
+  let {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, message: 'No session yet.' };
+
+  if (!user) {
+    const { data: fresh, error } = await supabase.auth.signInAnonymously();
+    if (error) return { ok: false, message: error.message };
+    user = fresh.user;
+  }
+  if (!user) return { ok: false, message: 'Could not start a session.' };
 
   const { data: existing } = await supabase
     .from('plan')
@@ -94,8 +115,21 @@ export interface PlanPatch {
 export async function savePlan(planId: string, patch: PlanPatch): Promise<PlanResult> {
   const supabase = createClient();
 
-  const { error } = await supabase.from('plan').update(patch).eq('id', planId);
+  /*
+   * `.select()` so we can tell the difference between "saved" and "row-level
+   * security matched nothing". An UPDATE that touches no rows returns no
+   * error, which made a broken session look like a successful save for
+   * every tap the guest made.
+   */
+  const { data: rows, error } = await supabase
+    .from('plan')
+    .update(patch)
+    .eq('id', planId)
+    .select('id');
   if (error) return { ok: false, message: error.message };
+  if (!rows || rows.length === 0) {
+    return { ok: false, message: 'That day is not yours to change any more.' };
+  }
 
   const { error: buildError } = await supabase.rpc('fn_build_plan', { p_plan_id: planId });
   if (buildError) return { ok: false, message: buildError.message };
@@ -275,5 +309,36 @@ export async function applyCuratedDay(planId: string, slug: string): Promise<Pla
 
   await supabase.from('plan').update({ estimate_total_kes: estimate }).eq('id', planId);
 
+  return { ok: true, planId, view: await read(planId) };
+}
+
+// ───────────────────────────────────── what the guest does with a quote
+
+export async function approvePlan(planId: string): Promise<PlanResult> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_approve_plan', { p_plan_id: planId });
+  if (error) return { ok: false, message: error.message.replace(/^.*?:\s*/, '') };
+  return {
+    ok: true,
+    planId,
+    view: await read(planId),
+    message: 'Approved. Your concierge is booking it.',
+  };
+}
+
+export async function requestChanges(planId: string, message: string): Promise<PlanResult> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_request_changes', {
+    p_plan_id: planId,
+    p_message: message,
+  });
+  if (error) return { ok: false, message: error.message.replace(/^.*?:\s*/, '') };
+  return { ok: true, planId, view: await read(planId), message: 'They will come back to you.' };
+}
+
+export async function sendGuestMessage(planId: string, body: string): Promise<PlanResult> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_plan_message', { p_plan_id: planId, p_body: body });
+  if (error) return { ok: false, message: error.message.replace(/^.*?:\s*/, '') };
   return { ok: true, planId, view: await read(planId) };
 }

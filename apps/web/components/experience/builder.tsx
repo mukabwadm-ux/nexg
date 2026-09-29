@@ -13,8 +13,6 @@ import {
   swapBlock,
   type PlanPatch,
 } from '@/app/experience/actions';
-import { ensureApplicantSession } from '@/lib/uploads';
-
 import { BudgetCard, DayTimeline } from './day-timeline';
 import { keslabel, type EventCard, type MoodChip, type Mood, type PlanView } from './types';
 import type { Json } from '@nexg/db';
@@ -120,13 +118,24 @@ export function Builder({
   const pending = React.useRef<PlanPatch>({});
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── the session, then the draft ────────────────────────────────────
+  /*
+   * StrictMode mounts, unmounts and remounts this in development, and a
+   * ref survives that — so this runs once, which is what matters when
+   * the thing it does is create a session.
+   *
+   * There is deliberately no `live` flag alongside it. The two together
+   * deadlocked: the ref stopped the second run, and the first run's
+   * cleanup had already set live = false, so nothing ever cleared the
+   * loading state and the page sat on "Getting your day ready…" forever.
+   */
+  const started = React.useRef(false);
+
+  // ── the draft, and the session that owns it ────────────────────────
   React.useEffect(() => {
-    let live = true;
+    if (started.current) return;
+    started.current = true;
     (async () => {
-      await ensureApplicantSession();
       const result = await ensurePlan();
-      if (!live) return;
       if (result.ok && result.view) {
         setView(result.view);
         setPlanId(result.planId ?? null);
@@ -148,16 +157,13 @@ export function Builder({
          */
         if (p.budget_kes === null) {
           const result2 = await savePlan(result.planId!, { budget_kes: DEFAULT_BUDGET_KES });
-          if (live && result2.ok && result2.view) setView(result2.view);
+          if (result2.ok && result2.view) setView(result2.view);
         }
       } else if (result.message) {
         toast({ title: 'Could not start', description: result.message, tone: 'danger' });
       }
       setStarting(false);
     })();
-    return () => {
-      live = false;
-    };
   }, [toast]);
 
   /* An event chosen on the events page arrives as a query parameter, and
