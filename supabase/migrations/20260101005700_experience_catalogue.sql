@@ -321,8 +321,14 @@ create table public.event (
   constraint event_name_not_blank check (length(trim(name)) > 0),
   constraint event_is_ordered check (ends_at is null or ends_at >= starts_at),
   constraint event_doors_before_start check (doors_at is null or doors_at <= starts_at),
-  constraint event_published_is_attributed check (
-    status <> 'published' or (published_at is not null and published_by is not null)
+  /*
+   * The time, not the person. `published_by` is `on delete set null`, so
+   * requiring it here means offboarding whoever published an event breaks
+   * every event they ever published. Who did it is in the audit log,
+   * which is the durable record and cannot be nulled by a staff change.
+   */
+  constraint event_published_is_timed check (
+    status <> 'published' or published_at is not null
   ),
   constraint event_holding_needs_a_holder check (
     not nexg_can_hold_tickets or ticket_partner_id is not null
@@ -378,7 +384,14 @@ comment on table public.event_feed is
 -- rather than trusting a status column read somewhere else.
 
 create view public.event_public
-with (security_invoker = true)
+with (security_invoker = false)
+/*
+ * Definer, not invoker. The base tables are closed to anon by RLS, so an
+ * invoker view returns an empty list to exactly the people it exists for.
+ * The view's own WHERE clause is the visibility rule — the same choice
+ * merchant_public makes, and the reason it restates the rule in full
+ * rather than trusting a status column read somewhere else.
+ */
 as
 select
   e.id, e.city_id, e.name, e.category, e.venue_name, e.venue_address,
@@ -392,7 +405,14 @@ where e.status = 'published'
   and c.status in ('live', 'soft_launch');
 
 create view public.curated_day_public
-with (security_invoker = true)
+with (security_invoker = false)
+/*
+ * Definer, not invoker. The base tables are closed to anon by RLS, so an
+ * invoker view returns an empty list to exactly the people it exists for.
+ * The view's own WHERE clause is the visibility rule — the same choice
+ * merchant_public makes, and the reason it restates the rule in full
+ * rather than trusting a status column read somewhere else.
+ */
 as
 select
   d.id, d.city_id, d.slug, d.title, d.tagline, d.cover_path, d.badge,
@@ -403,7 +423,14 @@ where d.status = 'live'
   and c.status in ('live', 'soft_launch');
 
 create view public.component_public
-with (security_invoker = true)
+with (security_invoker = false)
+/*
+ * Definer, not invoker. The base tables are closed to anon by RLS, so an
+ * invoker view returns an empty list to exactly the people it exists for.
+ * The view's own WHERE clause is the visibility rule — the same choice
+ * merchant_public makes, and the reason it restates the rule in full
+ * rather than trusting a status column read somewhere else.
+ */
 as
 select
   k.id, k.city_id, k.zone_id, k.kind, k.mood, k.title, k.subtitle,
