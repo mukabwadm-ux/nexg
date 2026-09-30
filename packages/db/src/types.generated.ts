@@ -3,6 +3,27 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      acquisition_source_rule: {
+        Row: {
+          channel: Database['public']['Enums']['acquisition_channel'];
+          id: string;
+          note: string | null;
+          pattern: string;
+        };
+        Insert: {
+          channel: Database['public']['Enums']['acquisition_channel'];
+          id?: string;
+          note?: string | null;
+          pattern: string;
+        };
+        Update: {
+          channel?: Database['public']['Enums']['acquisition_channel'];
+          id?: string;
+          note?: string | null;
+          pattern?: string;
+        };
+        Relationships: [];
+      };
       approval_request: {
         Row: {
           city_id: string | null;
@@ -76,6 +97,458 @@ export type Database = {
           },
         ];
       };
+      auto_message_rule: {
+        Row: {
+          city_id: string | null;
+          enabled: boolean;
+          id: string;
+          key: string;
+          params: NonNullable<Json>;
+        };
+        Insert: {
+          city_id?: string | null;
+          enabled?: boolean;
+          id?: string;
+          key: string;
+          params?: NonNullable<Json>;
+        };
+        Update: {
+          city_id?: string | null;
+          enabled?: boolean;
+          id?: string;
+          key?: string;
+          params?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'auto_message_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      branch_override: {
+        Row: {
+          branch_id: string;
+          field: string;
+          set_at: string;
+          set_by: string | null;
+          value: NonNullable<Json>;
+        };
+        Insert: {
+          branch_id: string;
+          field: string;
+          set_at?: string;
+          set_by?: string | null;
+          value: NonNullable<Json>;
+        };
+        Update: {
+          branch_id?: string;
+          field?: string;
+          set_at?: string;
+          set_by?: string | null;
+          value?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'branch_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'branch_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'branch_override_set_by_fkey';
+            columns: ['set_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      broadcast: {
+        Row: {
+          audience: NonNullable<Json>;
+          body: string;
+          channel: string;
+          created_at: string;
+          created_by: string | null;
+          delivered_count: number;
+          id: string;
+          read_count: number;
+          reply_count: number;
+          scheduled_for: string | null;
+          sent_at: string | null;
+          sent_count: number;
+          status: Database['public']['Enums']['broadcast_status'];
+          template_id: string | null;
+          title: string;
+        };
+        Insert: {
+          audience?: NonNullable<Json>;
+          body: string;
+          channel: string;
+          created_at?: string;
+          created_by?: string | null;
+          delivered_count?: number;
+          id?: string;
+          read_count?: number;
+          reply_count?: number;
+          scheduled_for?: string | null;
+          sent_at?: string | null;
+          sent_count?: number;
+          status?: Database['public']['Enums']['broadcast_status'];
+          template_id?: string | null;
+          title: string;
+        };
+        Update: {
+          audience?: NonNullable<Json>;
+          body?: string;
+          channel?: string;
+          created_at?: string;
+          created_by?: string | null;
+          delivered_count?: number;
+          id?: string;
+          read_count?: number;
+          reply_count?: number;
+          scheduled_for?: string | null;
+          sent_at?: string | null;
+          sent_count?: number;
+          status?: Database['public']['Enums']['broadcast_status'];
+          template_id?: string | null;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'broadcast_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'broadcast_template_id_fkey';
+            columns: ['template_id'];
+            isOneToOne: false;
+            referencedRelation: 'message_template';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      broadcast_recipient: {
+        Row: {
+          broadcast_id: string;
+          merchant_id: string;
+          notification_id: string | null;
+          state: string;
+        };
+        Insert: {
+          broadcast_id: string;
+          merchant_id: string;
+          notification_id?: string | null;
+          state?: string;
+        };
+        Update: {
+          broadcast_id?: string;
+          merchant_id?: string;
+          notification_id?: string | null;
+          state?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'broadcast_recipient_broadcast_id_fkey';
+            columns: ['broadcast_id'];
+            isOneToOne: false;
+            referencedRelation: 'broadcast';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_notification_id_fkey';
+            columns: ['notification_id'];
+            isOneToOne: false;
+            referencedRelation: 'notification';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      campaign_spend: {
+        Row: {
+          amount_kes: number;
+          channel: Database['public']['Enums']['acquisition_channel'];
+          entered_by: string | null;
+          id: string;
+          period_end: string;
+          period_start: string;
+        };
+        Insert: {
+          amount_kes: number;
+          channel: Database['public']['Enums']['acquisition_channel'];
+          entered_by?: string | null;
+          id?: string;
+          period_end: string;
+          period_start: string;
+        };
+        Update: {
+          amount_kes?: number;
+          channel?: Database['public']['Enums']['acquisition_channel'];
+          entered_by?: string | null;
+          id?: string;
+          period_end?: string;
+          period_start?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'campaign_spend_entered_by_fkey';
+            columns: ['entered_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      catalogue_edit_request: {
+        Row: {
+          catalogue_item_id: string | null;
+          created_at: string;
+          id: string;
+          kind: string;
+          merchant_id: string;
+          payload: NonNullable<Json>;
+          reason: string | null;
+          requested_by: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database['public']['Enums']['edit_approval_status'];
+        };
+        Insert: {
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          id?: string;
+          kind: string;
+          merchant_id: string;
+          payload?: NonNullable<Json>;
+          reason?: string | null;
+          requested_by?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database['public']['Enums']['edit_approval_status'];
+        };
+        Update: {
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          id?: string;
+          kind?: string;
+          merchant_id?: string;
+          payload?: NonNullable<Json>;
+          reason?: string | null;
+          requested_by?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database['public']['Enums']['edit_approval_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_edit_request_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_reviewed_by_fkey';
+            columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      catalogue_import: {
+        Row: {
+          applied_by: string | null;
+          created_at: string;
+          error: string | null;
+          id: string;
+          items_found: number | null;
+          merchant_id: string;
+          source: string;
+          status: string;
+          storage_path: string | null;
+        };
+        Insert: {
+          applied_by?: string | null;
+          created_at?: string;
+          error?: string | null;
+          id?: string;
+          items_found?: number | null;
+          merchant_id: string;
+          source: string;
+          status?: string;
+          storage_path?: string | null;
+        };
+        Update: {
+          applied_by?: string | null;
+          created_at?: string;
+          error?: string | null;
+          id?: string;
+          items_found?: number | null;
+          merchant_id?: string;
+          source?: string;
+          status?: string;
+          storage_path?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_import_applied_by_fkey';
+            columns: ['applied_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       catalogue_item: {
         Row: {
           age_restricted: boolean;
@@ -127,8 +600,36 @@ export type Database = {
             foreignKeyName: 'catalogue_item_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'catalogue_item_merchant_id_fkey';
@@ -142,6 +643,206 @@ export type Database = {
             columns: ['section_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_section';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      catalogue_photo_task: {
+        Row: {
+          assignee_id: string | null;
+          booked_for: string | null;
+          catalogue_item_id: string | null;
+          created_at: string;
+          id: string;
+          merchant_id: string;
+          status: string;
+        };
+        Insert: {
+          assignee_id?: string | null;
+          booked_for?: string | null;
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          id?: string;
+          merchant_id: string;
+          status?: string;
+        };
+        Update: {
+          assignee_id?: string | null;
+          booked_for?: string | null;
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          id?: string;
+          merchant_id?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_photo_task_assignee_id_fkey';
+            columns: ['assignee_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      catalogue_price_flag: {
+        Row: {
+          app_price_kes: number | null;
+          catalogue_item_id: string;
+          drift_pct: number | null;
+          id: string;
+          merchant_id: string;
+          observed_at: string;
+          observed_price_kes: number | null;
+          observed_source: string;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          status: Database['public']['Enums']['price_flag_status'];
+        };
+        Insert: {
+          app_price_kes?: number | null;
+          catalogue_item_id: string;
+          drift_pct?: number | null;
+          id?: string;
+          merchant_id: string;
+          observed_at?: string;
+          observed_price_kes?: number | null;
+          observed_source: string;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          status?: Database['public']['Enums']['price_flag_status'];
+        };
+        Update: {
+          app_price_kes?: number | null;
+          catalogue_item_id?: string;
+          drift_pct?: number | null;
+          id?: string;
+          merchant_id?: string;
+          observed_at?: string;
+          observed_price_kes?: number | null;
+          observed_source?: string;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          status?: Database['public']['Enums']['price_flag_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_price_flag_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_resolved_by_fkey';
+            columns: ['resolved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
         ];
@@ -179,8 +880,36 @@ export type Database = {
             foreignKeyName: 'catalogue_section_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'catalogue_section_merchant_id_fkey';
@@ -280,6 +1009,82 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      city_hours_exception: {
+        Row: {
+          applies_to_categories: string[] | null;
+          city_id: string;
+          created_at: string;
+          date: string;
+          default_close: string | null;
+          enabled: boolean;
+          id: string;
+          label: string;
+        };
+        Insert: {
+          applies_to_categories?: string[] | null;
+          city_id: string;
+          created_at?: string;
+          date: string;
+          default_close?: string | null;
+          enabled?: boolean;
+          id?: string;
+          label: string;
+        };
+        Update: {
+          applies_to_categories?: string[] | null;
+          city_id?: string;
+          created_at?: string;
+          date?: string;
+          default_close?: string | null;
+          enabled?: boolean;
+          id?: string;
+          label?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'city_hours_exception_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      commission_tier: {
+        Row: {
+          code: Database['public']['Enums']['commission_tier_code'];
+          criteria: string | null;
+          default_pct: number | null;
+          label: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          code: Database['public']['Enums']['commission_tier_code'];
+          criteria?: string | null;
+          default_pct?: number | null;
+          label: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          code?: Database['public']['Enums']['commission_tier_code'];
+          criteria?: string | null;
+          default_pct?: number | null;
+          label?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'commission_tier_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       component_availability: {
         Row: {
@@ -388,6 +1193,80 @@ export type Database = {
           sort?: number;
         };
         Relationships: [];
+      };
+      coverage_gap: {
+        Row: {
+          assigned_to: string | null;
+          category: Database['public']['Enums']['merchant_category'];
+          city_id: string;
+          computed_at: string;
+          filled_at: string | null;
+          hotel_count: number;
+          id: string;
+          merchant_count: number;
+          recruit_target_note: string | null;
+          severity: string;
+          status: string;
+          zone_id: string | null;
+        };
+        Insert: {
+          assigned_to?: string | null;
+          category: Database['public']['Enums']['merchant_category'];
+          city_id: string;
+          computed_at?: string;
+          filled_at?: string | null;
+          hotel_count?: number;
+          id?: string;
+          merchant_count?: number;
+          recruit_target_note?: string | null;
+          severity: string;
+          status?: string;
+          zone_id?: string | null;
+        };
+        Update: {
+          assigned_to?: string | null;
+          category?: Database['public']['Enums']['merchant_category'];
+          city_id?: string;
+          computed_at?: string;
+          filled_at?: string | null;
+          hotel_count?: number;
+          id?: string;
+          merchant_count?: number;
+          recruit_target_note?: string | null;
+          severity?: string;
+          status?: string;
+          zone_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'coverage_gap_assigned_to_fkey';
+            columns: ['assigned_to'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone_bounds';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       curated_day: {
         Row: {
@@ -507,6 +1386,156 @@ export type Database = {
           },
         ];
       };
+      dispute: {
+        Row: {
+          amount_claimed_kes: number | null;
+          amount_refunded_kes: number;
+          branch_id: string | null;
+          charged_to: string | null;
+          evidence: NonNullable<Json>;
+          fault: Database['public']['Enums']['dispute_fault'];
+          guest_note: string | null;
+          guest_user_id: string | null;
+          id: string;
+          merchant_id: string;
+          merchant_reply: string | null;
+          merchant_reply_due_at: string | null;
+          opened_at: string;
+          opened_by: string | null;
+          order_reference: string | null;
+          reason: string;
+          resolution: Database['public']['Enums']['dispute_resolution'] | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          rider_id: string | null;
+          status: Database['public']['Enums']['dispute_status'];
+        };
+        Insert: {
+          amount_claimed_kes?: number | null;
+          amount_refunded_kes?: number;
+          branch_id?: string | null;
+          charged_to?: string | null;
+          evidence?: NonNullable<Json>;
+          fault?: Database['public']['Enums']['dispute_fault'];
+          guest_note?: string | null;
+          guest_user_id?: string | null;
+          id?: string;
+          merchant_id: string;
+          merchant_reply?: string | null;
+          merchant_reply_due_at?: string | null;
+          opened_at?: string;
+          opened_by?: string | null;
+          order_reference?: string | null;
+          reason: string;
+          resolution?: Database['public']['Enums']['dispute_resolution'] | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          rider_id?: string | null;
+          status?: Database['public']['Enums']['dispute_status'];
+        };
+        Update: {
+          amount_claimed_kes?: number | null;
+          amount_refunded_kes?: number;
+          branch_id?: string | null;
+          charged_to?: string | null;
+          evidence?: NonNullable<Json>;
+          fault?: Database['public']['Enums']['dispute_fault'];
+          guest_note?: string | null;
+          guest_user_id?: string | null;
+          id?: string;
+          merchant_id?: string;
+          merchant_reply?: string | null;
+          merchant_reply_due_at?: string | null;
+          opened_at?: string;
+          opened_by?: string | null;
+          order_reference?: string | null;
+          reason?: string;
+          resolution?: Database['public']['Enums']['dispute_resolution'] | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          rider_id?: string | null;
+          status?: Database['public']['Enums']['dispute_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dispute_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'dispute_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_resolved_by_fkey';
+            columns: ['resolved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       document: {
         Row: {
           created_at: string;
@@ -585,6 +1614,41 @@ export type Database = {
           {
             foreignKeyName: 'document_reviewed_by_fkey';
             columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      document_automation_rule: {
+        Row: {
+          enabled: boolean;
+          key: string;
+          label: string;
+          params: NonNullable<Json>;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          enabled?: boolean;
+          key: string;
+          label: string;
+          params?: NonNullable<Json>;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          enabled?: boolean;
+          key?: string;
+          label?: string;
+          params?: NonNullable<Json>;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'document_automation_rule_updated_by_fkey';
+            columns: ['updated_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
@@ -1088,6 +2152,27 @@ export type Database = {
             foreignKeyName: 'experience_partner_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
           },
@@ -1095,7 +2180,49 @@ export type Database = {
             foreignKeyName: 'experience_partner_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      health_weight_config: {
+        Row: {
+          key: string;
+          label: string;
+          target: number | null;
+          updated_at: string;
+          updated_by: string | null;
+          weight_pct: number;
+        };
+        Insert: {
+          key: string;
+          label: string;
+          target?: number | null;
+          updated_at?: string;
+          updated_by?: string | null;
+          weight_pct: number;
+        };
+        Update: {
+          key?: string;
+          label?: string;
+          target?: number | null;
+          updated_at?: string;
+          updated_by?: string | null;
+          weight_pct?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'health_weight_config_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
         ];
@@ -1192,8 +2319,36 @@ export type Database = {
             foreignKeyName: 'legal_acceptance_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'legal_acceptance_merchant_id_fkey';
@@ -1246,11 +2401,19 @@ export type Database = {
         Row: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
           answers: NonNullable<Json>;
           branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
           category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
           city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
           concierge_pick: boolean;
           contact_email: string | null;
           contact_name: string;
@@ -1258,10 +2421,13 @@ export type Database = {
           cover_photo_path: string | null;
           created_at: string;
           credentials_sent_at: string | null;
+          delisted_at: string | null;
           explore_visible: boolean;
           featured: boolean;
           fleet_dispatch_preference: string;
           has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
@@ -1273,10 +2439,13 @@ export type Database = {
           onboarding_step: number;
           order_channels: string[];
           packaging: string | null;
+          parent_merchant_id: string | null;
           password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
           payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
           payout_name_lookup: Json | null;
           payout_rail: string | null;
           phone_code_attempts: number;
@@ -1286,6 +2455,8 @@ export type Database = {
           pickup_instructions: string | null;
           prep_minutes: number;
           price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
           requires_ops_mapping: boolean;
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
@@ -1294,7 +2465,12 @@ export type Database = {
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          strike_count: number;
           submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
           trading_name: string;
           updated_at: string;
           waitlisted_at: string | null;
@@ -1305,11 +2481,19 @@ export type Database = {
         Insert: {
           accepting_orders?: boolean;
           accepting_orders_changed_at?: string | null;
+          accepting_orders_source?: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel?: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source?: string | null;
           answers?: NonNullable<Json>;
           branch_count_band?: string | null;
+          busy_mode_until?: string | null;
+          capacity_per_15min?: number | null;
           category?: Database['public']['Enums']['merchant_category'] | null;
           category_other?: string | null;
           city_id?: string | null;
+          closed_early_at?: string | null;
+          commission_pct?: number | null;
+          commission_tier?: Database['public']['Enums']['commission_tier_code'];
           concierge_pick?: boolean;
           contact_email?: string | null;
           contact_name: string;
@@ -1317,10 +2501,13 @@ export type Database = {
           cover_photo_path?: string | null;
           created_at?: string;
           credentials_sent_at?: string | null;
+          delisted_at?: string | null;
           explore_visible?: boolean;
           featured?: boolean;
           fleet_dispatch_preference?: string;
           has_own_riders?: boolean;
+          health_band?: Database['public']['Enums']['health_band'] | null;
+          health_score?: number | null;
           hours?: Json | null;
           hours_pattern?: string | null;
           id?: string;
@@ -1332,10 +2519,13 @@ export type Database = {
           onboarding_step?: number;
           order_channels?: string[];
           packaging?: string | null;
+          parent_merchant_id?: string | null;
           password_set_at?: string | null;
           pay_on_delivery?: boolean;
           pay_on_delivery_cap_kes?: number | null;
           payout_account?: Json | null;
+          payout_hold?: boolean;
+          payout_hold_reason?: string | null;
           payout_name_lookup?: Json | null;
           payout_rail?: string | null;
           phone_code_attempts?: number;
@@ -1345,6 +2535,8 @@ export type Database = {
           pickup_instructions?: string | null;
           prep_minutes?: number;
           price_band?: string | null;
+          referred_by_id?: string | null;
+          referred_by_type?: string | null;
           requires_ops_mapping?: boolean;
           resume_token_expires_at?: string | null;
           resume_token_hash?: string | null;
@@ -1353,7 +2545,12 @@ export type Database = {
           source_url?: string | null;
           status?: Database['public']['Enums']['partner_status'];
           status_reason?: string | null;
+          strike_count?: number;
           submitted_at?: string | null;
+          suspended_at?: string | null;
+          suspended_by?: string | null;
+          suspension_reason?: string | null;
+          suspension_second_approver?: string | null;
           trading_name: string;
           updated_at?: string;
           waitlisted_at?: string | null;
@@ -1364,11 +2561,19 @@ export type Database = {
         Update: {
           accepting_orders?: boolean;
           accepting_orders_changed_at?: string | null;
+          accepting_orders_source?: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel?: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source?: string | null;
           answers?: NonNullable<Json>;
           branch_count_band?: string | null;
+          busy_mode_until?: string | null;
+          capacity_per_15min?: number | null;
           category?: Database['public']['Enums']['merchant_category'] | null;
           category_other?: string | null;
           city_id?: string | null;
+          closed_early_at?: string | null;
+          commission_pct?: number | null;
+          commission_tier?: Database['public']['Enums']['commission_tier_code'];
           concierge_pick?: boolean;
           contact_email?: string | null;
           contact_name?: string;
@@ -1376,10 +2581,13 @@ export type Database = {
           cover_photo_path?: string | null;
           created_at?: string;
           credentials_sent_at?: string | null;
+          delisted_at?: string | null;
           explore_visible?: boolean;
           featured?: boolean;
           fleet_dispatch_preference?: string;
           has_own_riders?: boolean;
+          health_band?: Database['public']['Enums']['health_band'] | null;
+          health_score?: number | null;
           hours?: Json | null;
           hours_pattern?: string | null;
           id?: string;
@@ -1391,10 +2599,13 @@ export type Database = {
           onboarding_step?: number;
           order_channels?: string[];
           packaging?: string | null;
+          parent_merchant_id?: string | null;
           password_set_at?: string | null;
           pay_on_delivery?: boolean;
           pay_on_delivery_cap_kes?: number | null;
           payout_account?: Json | null;
+          payout_hold?: boolean;
+          payout_hold_reason?: string | null;
           payout_name_lookup?: Json | null;
           payout_rail?: string | null;
           phone_code_attempts?: number;
@@ -1404,6 +2615,8 @@ export type Database = {
           pickup_instructions?: string | null;
           prep_minutes?: number;
           price_band?: string | null;
+          referred_by_id?: string | null;
+          referred_by_type?: string | null;
           requires_ops_mapping?: boolean;
           resume_token_expires_at?: string | null;
           resume_token_hash?: string | null;
@@ -1412,7 +2625,12 @@ export type Database = {
           source_url?: string | null;
           status?: Database['public']['Enums']['partner_status'];
           status_reason?: string | null;
+          strike_count?: number;
           submitted_at?: string | null;
+          suspended_at?: string | null;
+          suspended_by?: string | null;
+          suspension_reason?: string | null;
+          suspension_second_approver?: string | null;
           trading_name?: string;
           updated_at?: string;
           waitlisted_at?: string | null;
@@ -1426,6 +2644,62 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_suspended_by_fkey';
+            columns: ['suspended_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_suspension_second_approver_fkey';
+            columns: ['suspension_second_approver'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
           {
@@ -1491,8 +2765,36 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
@@ -1513,6 +2815,73 @@ export type Database = {
             columns: ['zone_id'];
             isOneToOne: false;
             referencedRelation: 'zone_bounds';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_chain_setting: {
+        Row: {
+          consolidated_statement: boolean;
+          parent_id: string;
+          shared_catalogue: boolean;
+          shared_hours: boolean;
+          single_payout: boolean;
+        };
+        Insert: {
+          consolidated_statement?: boolean;
+          parent_id: string;
+          shared_catalogue?: boolean;
+          shared_hours?: boolean;
+          single_payout?: boolean;
+        };
+        Update: {
+          consolidated_statement?: boolean;
+          parent_id?: string;
+          shared_catalogue?: boolean;
+          shared_hours?: boolean;
+          single_payout?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
           },
         ];
@@ -1574,6 +2943,13 @@ export type Database = {
             foreignKeyName: 'merchant_fleet_rider_branch_id_fkey';
             columns: ['branch_id'];
             isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_branch';
             referencedColumns: ['id'];
           },
@@ -1588,8 +2964,36 @@ export type Database = {
             foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
@@ -1610,6 +3014,100 @@ export type Database = {
             columns: ['rider_id'];
             isOneToOne: false;
             referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_health_snapshot: {
+        Row: {
+          acceptance_pct: number | null;
+          as_of: string;
+          band: Database['public']['Enums']['health_band'] | null;
+          cancel_pct: number | null;
+          created_at: string;
+          dashboard_response_s: number | null;
+          merchant_id: string;
+          missing_item_pct: number | null;
+          on_time_ready_pct: number | null;
+          orders_30d: number;
+          rating_avg: number | null;
+          score: number | null;
+          trend: number[];
+          weights: NonNullable<Json>;
+        };
+        Insert: {
+          acceptance_pct?: number | null;
+          as_of: string;
+          band?: Database['public']['Enums']['health_band'] | null;
+          cancel_pct?: number | null;
+          created_at?: string;
+          dashboard_response_s?: number | null;
+          merchant_id: string;
+          missing_item_pct?: number | null;
+          on_time_ready_pct?: number | null;
+          orders_30d?: number;
+          rating_avg?: number | null;
+          score?: number | null;
+          trend?: number[];
+          weights?: NonNullable<Json>;
+        };
+        Update: {
+          acceptance_pct?: number | null;
+          as_of?: string;
+          band?: Database['public']['Enums']['health_band'] | null;
+          cancel_pct?: number | null;
+          created_at?: string;
+          dashboard_response_s?: number | null;
+          merchant_id?: string;
+          missing_item_pct?: number | null;
+          on_time_ready_pct?: number | null;
+          orders_30d?: number;
+          rating_avg?: number | null;
+          score?: number | null;
+          trend?: number[];
+          weights?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
           },
         ];
@@ -1650,8 +3148,36 @@ export type Database = {
             foreignKeyName: 'merchant_hours_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_hours_merchant_id_fkey';
@@ -1661,6 +3187,794 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      merchant_hours_override: {
+        Row: {
+          branch_id: string | null;
+          closed: boolean;
+          closes: string | null;
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          id: string;
+          merchant_id: string;
+          opens: string | null;
+          reason: string | null;
+          source: Database['public']['Enums']['merchant_control_source'];
+        };
+        Insert: {
+          branch_id?: string | null;
+          closed?: boolean;
+          closes?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          date: string;
+          id?: string;
+          merchant_id: string;
+          opens?: string | null;
+          reason?: string | null;
+          source?: Database['public']['Enums']['merchant_control_source'];
+        };
+        Update: {
+          branch_id?: string | null;
+          closed?: boolean;
+          closes?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          id?: string;
+          merchant_id?: string;
+          opens?: string | null;
+          reason?: string | null;
+          source?: Database['public']['Enums']['merchant_control_source'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_hours_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_message: {
+        Row: {
+          actor_id: string | null;
+          body: string;
+          channel: string;
+          created_at: string;
+          direction: string;
+          id: string;
+          merchant_id: string;
+          notification_id: string | null;
+          read_at: string | null;
+          subject: string | null;
+        };
+        Insert: {
+          actor_id?: string | null;
+          body: string;
+          channel: string;
+          created_at?: string;
+          direction: string;
+          id?: string;
+          merchant_id: string;
+          notification_id?: string | null;
+          read_at?: string | null;
+          subject?: string | null;
+        };
+        Update: {
+          actor_id?: string | null;
+          body?: string;
+          channel?: string;
+          created_at?: string;
+          direction?: string;
+          id?: string;
+          merchant_id?: string;
+          notification_id?: string | null;
+          read_at?: string | null;
+          subject?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_message_actor_id_fkey';
+            columns: ['actor_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_notification_id_fkey';
+            columns: ['notification_id'];
+            isOneToOne: false;
+            referencedRelation: 'notification';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_penalty: {
+        Row: {
+          amount_kes: number;
+          applied_by: string | null;
+          created_at: string;
+          dispute_id: string | null;
+          id: string;
+          kind: string;
+          merchant_id: string;
+          order_reference: string | null;
+          status: string;
+        };
+        Insert: {
+          amount_kes: number;
+          applied_by?: string | null;
+          created_at?: string;
+          dispute_id?: string | null;
+          id?: string;
+          kind: string;
+          merchant_id: string;
+          order_reference?: string | null;
+          status?: string;
+        };
+        Update: {
+          amount_kes?: number;
+          applied_by?: string | null;
+          created_at?: string;
+          dispute_id?: string | null;
+          id?: string;
+          kind?: string;
+          merchant_id?: string;
+          order_reference?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_penalty_applied_by_fkey';
+            columns: ['applied_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_dispute_id_fkey';
+            columns: ['dispute_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispute';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_review: {
+        Row: {
+          checklist: NonNullable<Json>;
+          finished_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          outcome: string | null;
+          reviewer_id: string;
+          started_at: string;
+        };
+        Insert: {
+          checklist?: NonNullable<Json>;
+          finished_at?: string | null;
+          id?: string;
+          merchant_id: string;
+          notes?: string | null;
+          outcome?: string | null;
+          reviewer_id: string;
+          started_at?: string;
+        };
+        Update: {
+          checklist?: NonNullable<Json>;
+          finished_at?: string | null;
+          id?: string;
+          merchant_id?: string;
+          notes?: string | null;
+          outcome?: string | null;
+          reviewer_id?: string;
+          started_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_reviewer_id_fkey';
+            columns: ['reviewer_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_statement: {
+        Row: {
+          adjustments_kes: number;
+          approved_by: string | null;
+          commission_kes: number;
+          created_at: string;
+          gross_kes: number;
+          id: string;
+          ledger_hash: string | null;
+          merchant_id: string;
+          net_kes: number;
+          paid_at: string | null;
+          pdf_path: string | null;
+          penalties_kes: number;
+          period_end: string;
+          period_start: string;
+          provider_ref: string | null;
+          second_approver_id: string | null;
+          status: Database['public']['Enums']['statement_status'];
+          tax_withheld_kes: number;
+          updated_at: string;
+        };
+        Insert: {
+          adjustments_kes?: number;
+          approved_by?: string | null;
+          commission_kes?: number;
+          created_at?: string;
+          gross_kes?: number;
+          id?: string;
+          ledger_hash?: string | null;
+          merchant_id: string;
+          net_kes?: number;
+          paid_at?: string | null;
+          pdf_path?: string | null;
+          penalties_kes?: number;
+          period_end: string;
+          period_start: string;
+          provider_ref?: string | null;
+          second_approver_id?: string | null;
+          status?: Database['public']['Enums']['statement_status'];
+          tax_withheld_kes?: number;
+          updated_at?: string;
+        };
+        Update: {
+          adjustments_kes?: number;
+          approved_by?: string | null;
+          commission_kes?: number;
+          created_at?: string;
+          gross_kes?: number;
+          id?: string;
+          ledger_hash?: string | null;
+          merchant_id?: string;
+          net_kes?: number;
+          paid_at?: string | null;
+          pdf_path?: string | null;
+          penalties_kes?: number;
+          period_end?: string;
+          period_start?: string;
+          provider_ref?: string | null;
+          second_approver_id?: string | null;
+          status?: Database['public']['Enums']['statement_status'];
+          tax_withheld_kes?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_statement_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_second_approver_id_fkey';
+            columns: ['second_approver_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_status_change: {
+        Row: {
+          actor_id: string | null;
+          created_at: string;
+          from_status: Database['public']['Enums']['partner_status'] | null;
+          id: number;
+          merchant_id: string;
+          reason: string | null;
+          second_approver_id: string | null;
+          to_status: Database['public']['Enums']['partner_status'];
+        };
+        Insert: {
+          actor_id?: string | null;
+          created_at?: string;
+          from_status?: Database['public']['Enums']['partner_status'] | null;
+          id?: number;
+          merchant_id: string;
+          reason?: string | null;
+          second_approver_id?: string | null;
+          to_status: Database['public']['Enums']['partner_status'];
+        };
+        Update: {
+          actor_id?: string | null;
+          created_at?: string;
+          from_status?: Database['public']['Enums']['partner_status'] | null;
+          id?: number;
+          merchant_id?: string;
+          reason?: string | null;
+          second_approver_id?: string | null;
+          to_status?: Database['public']['Enums']['partner_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_status_change_actor_id_fkey';
+            columns: ['actor_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_second_approver_id_fkey';
+            columns: ['second_approver_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_strike: {
+        Row: {
+          cleared_at: string | null;
+          cleared_by: string | null;
+          expires_at: string | null;
+          id: string;
+          issued_at: string;
+          issued_by: string | null;
+          level: number;
+          merchant_id: string;
+          reason: string;
+        };
+        Insert: {
+          cleared_at?: string | null;
+          cleared_by?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          level: number;
+          merchant_id: string;
+          reason: string;
+        };
+        Update: {
+          cleared_at?: string | null;
+          cleared_by?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          level?: number;
+          merchant_id?: string;
+          reason?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_strike_cleared_by_fkey';
+            columns: ['cleared_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_issued_by_fkey';
+            columns: ['issued_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_terms_acceptance: {
+        Row: {
+          accepted_at: string;
+          accepted_by: string | null;
+          ip: unknown;
+          merchant_id: string;
+          terms_version_id: string;
+        };
+        Insert: {
+          accepted_at?: string;
+          accepted_by?: string | null;
+          ip?: unknown;
+          merchant_id: string;
+          terms_version_id: string;
+        };
+        Update: {
+          accepted_at?: string;
+          accepted_by?: string | null;
+          ip?: unknown;
+          merchant_id?: string;
+          terms_version_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_terms_version_id_fkey';
+            columns: ['terms_version_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_terms_version';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_terms_version: {
+        Row: {
+          created_at: string;
+          effective_from: string;
+          id: string;
+          pdf_path: string | null;
+          requires_reacceptance: boolean;
+          status: string;
+          version: string;
+        };
+        Insert: {
+          created_at?: string;
+          effective_from: string;
+          id?: string;
+          pdf_path?: string | null;
+          requires_reacceptance?: boolean;
+          status?: string;
+          version: string;
+        };
+        Update: {
+          created_at?: string;
+          effective_from?: string;
+          id?: string;
+          pdf_path?: string | null;
+          requires_reacceptance?: boolean;
+          status?: string;
+          version?: string;
+        };
+        Relationships: [];
       };
       merchant_user: {
         Row: {
@@ -1692,8 +4006,36 @@ export type Database = {
             foreignKeyName: 'merchant_user_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_user_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_user_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_user_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_user_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_user_merchant_id_fkey';
@@ -1704,6 +4046,45 @@ export type Database = {
           },
         ];
       };
+      message_template: {
+        Row: {
+          approved: boolean;
+          body: string;
+          channel: string;
+          created_at: string;
+          id: string;
+          key: string;
+          label: string;
+          provider_template_id: string | null;
+          updated_at: string;
+          variables: string[];
+        };
+        Insert: {
+          approved?: boolean;
+          body: string;
+          channel: string;
+          created_at?: string;
+          id?: string;
+          key: string;
+          label: string;
+          provider_template_id?: string | null;
+          updated_at?: string;
+          variables?: string[];
+        };
+        Update: {
+          approved?: boolean;
+          body?: string;
+          channel?: string;
+          created_at?: string;
+          id?: string;
+          key?: string;
+          label?: string;
+          provider_template_id?: string | null;
+          updated_at?: string;
+          variables?: string[];
+        };
+        Relationships: [];
+      };
       notification: {
         Row: {
           attempts: number;
@@ -1711,6 +4092,7 @@ export type Database = {
           error: string | null;
           id: string;
           kind: Database['public']['Enums']['notification_kind'];
+          merchant_id: string | null;
           plan_id: string | null;
           provider_message_id: string | null;
           sent_at: string;
@@ -1725,6 +4107,7 @@ export type Database = {
           error?: string | null;
           id?: string;
           kind: Database['public']['Enums']['notification_kind'];
+          merchant_id?: string | null;
           plan_id?: string | null;
           provider_message_id?: string | null;
           sent_at?: string;
@@ -1739,6 +4122,7 @@ export type Database = {
           error?: string | null;
           id?: string;
           kind?: Database['public']['Enums']['notification_kind'];
+          merchant_id?: string | null;
           plan_id?: string | null;
           provider_message_id?: string | null;
           sent_at?: string;
@@ -1748,6 +4132,48 @@ export type Database = {
           to_phone?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'notification_plan_id_fkey';
             columns: ['plan_id'];
@@ -2363,6 +4789,88 @@ export type Database = {
           },
         ];
       };
+      referral: {
+        Row: {
+          bonus_amount_kes: number | null;
+          code: string | null;
+          created_at: string;
+          id: string;
+          merchant_id: string;
+          paid_at: string | null;
+          referrer_id: string;
+          referrer_type: string;
+          status: string;
+          went_live_at: string | null;
+        };
+        Insert: {
+          bonus_amount_kes?: number | null;
+          code?: string | null;
+          created_at?: string;
+          id?: string;
+          merchant_id: string;
+          paid_at?: string | null;
+          referrer_id: string;
+          referrer_type: string;
+          status?: string;
+          went_live_at?: string | null;
+        };
+        Update: {
+          bonus_amount_kes?: number | null;
+          code?: string | null;
+          created_at?: string;
+          id?: string;
+          merchant_id?: string;
+          paid_at?: string | null;
+          referrer_id?: string;
+          referrer_type?: string;
+          status?: string;
+          went_live_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       review: {
         Row: {
           area_snapshot: string | null;
@@ -2646,8 +5154,36 @@ export type Database = {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
@@ -3166,6 +5702,71 @@ export type Database = {
           },
         ];
       };
+      catalogue_public: {
+        Row: {
+          age_restricted: boolean | null;
+          available: boolean | null;
+          description: string | null;
+          highlighted: boolean | null;
+          id: string | null;
+          merchant_id: string | null;
+          name: string | null;
+          price_kes: number | null;
+          section_id: string | null;
+          sort: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_section_id_fkey';
+            columns: ['section_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_section';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       component_public: {
         Row: {
           booking_lead_hours: number | null;
@@ -3218,6 +5819,76 @@ export type Database = {
           },
         ];
       };
+      console_merchant_directory_v: {
+        Row: {
+          accepting_orders: boolean | null;
+          branch_name: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_name: string | null;
+          city_slug: string | null;
+          concierge_pick: boolean | null;
+          created_at: string | null;
+          explore_visible: boolean | null;
+          featured: boolean | null;
+          gmv_30d_kes: number | null;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
+          id: string | null;
+          on_time_ready_pct: number | null;
+          open_disputes: number | null;
+          orders_30d: number | null;
+          parent_merchant_id: string | null;
+          payout_hold: boolean | null;
+          status: Database['public']['Enums']['partner_status'] | null;
+          submitted_at: string | null;
+          trading_name: string | null;
+          went_live_at: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       curated_day_public: {
         Row: {
           badge: string | null;
@@ -3242,6 +5913,23 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      dispatch_merchant_v: {
+        Row: {
+          accepting_orders: boolean | null;
+          branch_id: string | null;
+          busy_mode_until: string | null;
+          fleet_dispatch_preference: string | null;
+          has_active_fleet_riders: boolean | null;
+          landmark: string | null;
+          location: unknown;
+          merchant_id: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number | null;
+          rider_parking: string | null;
+          status: Database['public']['Enums']['partner_status'] | null;
+        };
+        Relationships: [];
       };
       event_public: {
         Row: {
@@ -3275,6 +5963,149 @@ export type Database = {
           },
         ];
       };
+      finance_merchant_v: {
+        Row: {
+          city_id: string | null;
+          commission_is_negotiated: boolean | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'] | null;
+          consolidated_statement: boolean | null;
+          effective_commission_pct: number | null;
+          merchant_id: string | null;
+          parent_merchant_id: string | null;
+          payout_account_masked: string | null;
+          payout_hold: boolean | null;
+          payout_hold_reason: string | null;
+          payout_rail: string | null;
+          single_payout: boolean | null;
+          trading_name: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_dashboard_v: {
+        Row: {
+          accepting_orders: boolean | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          busy_mode_until: string | null;
+          closed_early_at: string | null;
+          disputes_awaiting_reply: number | null;
+          edits_pending: number | null;
+          explore_visible: boolean | null;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
+          merchant_id: string | null;
+          next_reply_due_at: string | null;
+          pay_on_delivery: boolean | null;
+          pay_on_delivery_cap_kes: number | null;
+          payout_hold: boolean | null;
+          payout_hold_reason: string | null;
+          status: Database['public']['Enums']['partner_status'] | null;
+          status_reason: string | null;
+          strike_count: number | null;
+          suspension_reason: string | null;
+          terms_to_accept: boolean | null;
+          trading_name: string | null;
+          unread_messages: number | null;
+        };
+        Insert: {
+          accepting_orders?: boolean | null;
+          accepting_orders_source?: Database['public']['Enums']['merchant_control_source'] | null;
+          busy_mode_until?: string | null;
+          closed_early_at?: string | null;
+          disputes_awaiting_reply?: never;
+          edits_pending?: never;
+          explore_visible?: boolean | null;
+          health_band?: Database['public']['Enums']['health_band'] | null;
+          health_score?: number | null;
+          merchant_id?: string | null;
+          next_reply_due_at?: never;
+          pay_on_delivery?: boolean | null;
+          pay_on_delivery_cap_kes?: number | null;
+          payout_hold?: boolean | null;
+          payout_hold_reason?: string | null;
+          status?: Database['public']['Enums']['partner_status'] | null;
+          status_reason?: string | null;
+          strike_count?: number | null;
+          suspension_reason?: string | null;
+          terms_to_accept?: never;
+          trading_name?: string | null;
+          unread_messages?: never;
+        };
+        Update: {
+          accepting_orders?: boolean | null;
+          accepting_orders_source?: Database['public']['Enums']['merchant_control_source'] | null;
+          busy_mode_until?: string | null;
+          closed_early_at?: string | null;
+          disputes_awaiting_reply?: never;
+          edits_pending?: never;
+          explore_visible?: boolean | null;
+          health_band?: Database['public']['Enums']['health_band'] | null;
+          health_score?: number | null;
+          merchant_id?: string | null;
+          next_reply_due_at?: never;
+          pay_on_delivery?: boolean | null;
+          pay_on_delivery_cap_kes?: number | null;
+          payout_hold?: boolean | null;
+          payout_hold_reason?: string | null;
+          status?: Database['public']['Enums']['partner_status'] | null;
+          status_reason?: string | null;
+          strike_count?: number | null;
+          suspension_reason?: string | null;
+          terms_to_accept?: never;
+          trading_name?: string | null;
+          unread_messages?: never;
+        };
+        Relationships: [];
+      };
       merchant_public: {
         Row: {
           accepting_orders: boolean | null;
@@ -3282,19 +6113,72 @@ export type Database = {
           branch_latitude: number | null;
           branch_longitude: number | null;
           branch_name: string | null;
+          busy_mode_until: string | null;
           category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
           city_name: string | null;
           city_slug: string | null;
+          closed_early_at: string | null;
+          closed_today: boolean | null;
+          closes_today: string | null;
           concierge_pick: boolean | null;
           cover_photo_path: string | null;
           explore_visible: boolean | null;
           featured: boolean | null;
+          health_badge: string | null;
           id: string | null;
           listed_at: string | null;
+          opens_today: string | null;
+          parent_merchant_id: string | null;
+          pay_on_delivery_cap_kes: number | null;
+          pay_on_delivery_enabled: boolean | null;
+          prep_minutes: number | null;
           trading_name: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       review_public: {
         Row: {
@@ -3450,6 +6334,10 @@ export type Database = {
         Returns: string;
       };
       fn_build_plan: { Args: { p_plan_id: string }; Returns: undefined };
+      fn_catalogue_edit_needs_review: {
+        Args: { p_current_price: number; p_kind: string; p_payload: Json };
+        Returns: boolean;
+      };
       fn_city_for_point: {
         Args: { p_lat: number; p_lng: number };
         Returns: {
@@ -3478,11 +6366,19 @@ export type Database = {
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
           answers: NonNullable<Json>;
           branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
           category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
           city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
           concierge_pick: boolean;
           contact_email: string | null;
           contact_name: string;
@@ -3490,10 +6386,13 @@ export type Database = {
           cover_photo_path: string | null;
           created_at: string;
           credentials_sent_at: string | null;
+          delisted_at: string | null;
           explore_visible: boolean;
           featured: boolean;
           fleet_dispatch_preference: string;
           has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
@@ -3505,10 +6404,13 @@ export type Database = {
           onboarding_step: number;
           order_channels: string[];
           packaging: string | null;
+          parent_merchant_id: string | null;
           password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
           payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
           payout_name_lookup: Json | null;
           payout_rail: string | null;
           phone_code_attempts: number;
@@ -3518,6 +6420,8 @@ export type Database = {
           pickup_instructions: string | null;
           prep_minutes: number;
           price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
           requires_ops_mapping: boolean;
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
@@ -3526,7 +6430,12 @@ export type Database = {
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          strike_count: number;
           submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
           trading_name: string;
           updated_at: string;
           waitlisted_at: string | null;
@@ -3540,6 +6449,15 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      fn_merchant_effective_hours: {
+        Args: { p_branch_id?: string; p_date?: string; p_merchant_id: string };
+        Returns: {
+          closed: boolean;
+          closes: string;
+          opens: string;
+          source: string;
+        }[];
       };
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_readiness: { Args: { p_merchant_id: string }; Returns: Json };
@@ -4099,6 +7017,28 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_catalogue_edit_review: {
+        Args: { p_approve: boolean; p_reason?: string; p_request_id: string };
+        Returns: {
+          catalogue_item_id: string | null;
+          created_at: string;
+          id: string;
+          kind: string;
+          merchant_id: string;
+          payload: NonNullable<Json>;
+          reason: string | null;
+          requested_by: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database['public']['Enums']['edit_approval_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'catalogue_edit_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_change_block: {
         Args: { p_block_id: string; p_note: string; p_patch: Json };
         Returns: {
@@ -4321,6 +7261,147 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'review';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_dispute_ask_merchant: {
+        Args: { p_dispute_id: string; p_due_hours?: number };
+        Returns: {
+          amount_claimed_kes: number | null;
+          amount_refunded_kes: number;
+          branch_id: string | null;
+          charged_to: string | null;
+          evidence: NonNullable<Json>;
+          fault: Database['public']['Enums']['dispute_fault'];
+          guest_note: string | null;
+          guest_user_id: string | null;
+          id: string;
+          merchant_id: string;
+          merchant_reply: string | null;
+          merchant_reply_due_at: string | null;
+          opened_at: string;
+          opened_by: string | null;
+          order_reference: string | null;
+          reason: string;
+          resolution: Database['public']['Enums']['dispute_resolution'] | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          rider_id: string | null;
+          status: Database['public']['Enums']['dispute_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'dispute';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_dispute_merchant_reply: {
+        Args: { p_dispute_id: string; p_reply: string };
+        Returns: {
+          amount_claimed_kes: number | null;
+          amount_refunded_kes: number;
+          branch_id: string | null;
+          charged_to: string | null;
+          evidence: NonNullable<Json>;
+          fault: Database['public']['Enums']['dispute_fault'];
+          guest_note: string | null;
+          guest_user_id: string | null;
+          id: string;
+          merchant_id: string;
+          merchant_reply: string | null;
+          merchant_reply_due_at: string | null;
+          opened_at: string;
+          opened_by: string | null;
+          order_reference: string | null;
+          reason: string;
+          resolution: Database['public']['Enums']['dispute_resolution'] | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          rider_id: string | null;
+          status: Database['public']['Enums']['dispute_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'dispute';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_dispute_open: {
+        Args: {
+          p_amount_kes?: number;
+          p_evidence?: Json;
+          p_merchant_id: string;
+          p_note?: string;
+          p_order_reference?: string;
+          p_reason: string;
+        };
+        Returns: {
+          amount_claimed_kes: number | null;
+          amount_refunded_kes: number;
+          branch_id: string | null;
+          charged_to: string | null;
+          evidence: NonNullable<Json>;
+          fault: Database['public']['Enums']['dispute_fault'];
+          guest_note: string | null;
+          guest_user_id: string | null;
+          id: string;
+          merchant_id: string;
+          merchant_reply: string | null;
+          merchant_reply_due_at: string | null;
+          opened_at: string;
+          opened_by: string | null;
+          order_reference: string | null;
+          reason: string;
+          resolution: Database['public']['Enums']['dispute_resolution'] | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          rider_id: string | null;
+          status: Database['public']['Enums']['dispute_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'dispute';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_dispute_resolve: {
+        Args: {
+          p_amount_kes?: number;
+          p_dispute_id: string;
+          p_fault?: Database['public']['Enums']['dispute_fault'];
+          p_note?: string;
+          p_resolution: Database['public']['Enums']['dispute_resolution'];
+        };
+        Returns: {
+          amount_claimed_kes: number | null;
+          amount_refunded_kes: number;
+          branch_id: string | null;
+          charged_to: string | null;
+          evidence: NonNullable<Json>;
+          fault: Database['public']['Enums']['dispute_fault'];
+          guest_note: string | null;
+          guest_user_id: string | null;
+          id: string;
+          merchant_id: string;
+          merchant_reply: string | null;
+          merchant_reply_due_at: string | null;
+          opened_at: string;
+          opened_by: string | null;
+          order_reference: string | null;
+          reason: string;
+          resolution: Database['public']['Enums']['dispute_resolution'] | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          rider_id: string | null;
+          status: Database['public']['Enums']['dispute_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'dispute';
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -4625,20 +7706,31 @@ export type Database = {
         };
         Returns: string;
       };
-      rpc_merchant_declare_fleet: {
-        Args: { p_merchant_id: string; p_preference?: string; p_riders: Json };
-        Returns: Json;
-      };
-      rpc_merchant_go_live: {
-        Args: { p_merchant_id: string; p_reason?: string };
+      rpc_merchant_console_counts: { Args: { p_city_id?: string }; Returns: Json };
+      rpc_merchant_control: {
+        Args: {
+          p_control: string;
+          p_merchant_id: string;
+          p_reason?: string;
+          p_source?: Database['public']['Enums']['merchant_control_source'];
+          p_value: Json;
+        };
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
           answers: NonNullable<Json>;
           branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
           category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
           city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
           concierge_pick: boolean;
           contact_email: string | null;
           contact_name: string;
@@ -4646,10 +7738,13 @@ export type Database = {
           cover_photo_path: string | null;
           created_at: string;
           credentials_sent_at: string | null;
+          delisted_at: string | null;
           explore_visible: boolean;
           featured: boolean;
           fleet_dispatch_preference: string;
           has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
@@ -4661,10 +7756,13 @@ export type Database = {
           onboarding_step: number;
           order_channels: string[];
           packaging: string | null;
+          parent_merchant_id: string | null;
           password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
           payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
           payout_name_lookup: Json | null;
           payout_rail: string | null;
           phone_code_attempts: number;
@@ -4674,6 +7772,8 @@ export type Database = {
           pickup_instructions: string | null;
           prep_minutes: number;
           price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
           requires_ops_mapping: boolean;
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
@@ -4682,7 +7782,12 @@ export type Database = {
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          strike_count: number;
           submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
           trading_name: string;
           updated_at: string;
           waitlisted_at: string | null;
@@ -4693,6 +7798,130 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_declare_fleet: {
+        Args: { p_merchant_id: string; p_preference?: string; p_riders: Json };
+        Returns: Json;
+      };
+      rpc_merchant_go_live: {
+        Args: { p_merchant_id: string; p_reason?: string };
+        Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          category_other: string | null;
+          city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
+          concierge_pick: boolean;
+          contact_email: string | null;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          credentials_sent_at: string | null;
+          delisted_at: string | null;
+          explore_visible: boolean;
+          featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
+          hours: Json | null;
+          hours_pattern: string | null;
+          id: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          parent_merchant_id: string | null;
+          password_set_at: string | null;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
+          settlement_account: Json | null;
+          source_url: string | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          strike_count: number;
+          submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
+          trading_name: string;
+          updated_at: string;
+          waitlisted_at: string | null;
+          went_live_at: string | null;
+          went_live_by: string | null;
+          when_busy: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_hours_override: {
+        Args: {
+          p_branch_id?: string;
+          p_closed?: boolean;
+          p_closes?: string;
+          p_date: string;
+          p_merchant_id: string;
+          p_opens?: string;
+          p_reason?: string;
+          p_source?: Database['public']['Enums']['merchant_control_source'];
+        };
+        Returns: {
+          branch_id: string | null;
+          closed: boolean;
+          closes: string | null;
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          id: string;
+          merchant_id: string;
+          opens: string | null;
+          reason: string | null;
+          source: Database['public']['Enums']['merchant_control_source'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant_hours_override';
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -4726,6 +7955,133 @@ export type Database = {
       };
       rpc_merchant_resume_claim: { Args: { p_token: string }; Returns: Json };
       rpc_merchant_resume_token: { Args: { p_merchant_id: string }; Returns: string };
+      rpc_merchant_return_to_applicant: {
+        Args: { p_merchant_id: string; p_reasons: Json };
+        Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          category_other: string | null;
+          city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
+          concierge_pick: boolean;
+          contact_email: string | null;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          credentials_sent_at: string | null;
+          delisted_at: string | null;
+          explore_visible: boolean;
+          featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
+          hours: Json | null;
+          hours_pattern: string | null;
+          id: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          parent_merchant_id: string | null;
+          password_set_at: string | null;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
+          settlement_account: Json | null;
+          source_url: string | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          strike_count: number;
+          submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
+          trading_name: string;
+          updated_at: string;
+          waitlisted_at: string | null;
+          went_live_at: string | null;
+          went_live_by: string | null;
+          when_busy: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_review_save: {
+        Args: { p_checklist: Json; p_notes?: string; p_review_id: string };
+        Returns: {
+          checklist: NonNullable<Json>;
+          finished_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          outcome: string | null;
+          reviewer_id: string;
+          started_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant_review';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_review_start: {
+        Args: { p_merchant_id: string };
+        Returns: {
+          checklist: NonNullable<Json>;
+          finished_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          outcome: string | null;
+          reviewer_id: string;
+          started_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant_review';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_merchant_save_step: {
         Args: { p_merchant_id: string; p_patch?: Json; p_step: number };
         Returns: Json;
@@ -4757,11 +8113,19 @@ export type Database = {
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
           answers: NonNullable<Json>;
           branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
           category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
           city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
           concierge_pick: boolean;
           contact_email: string | null;
           contact_name: string;
@@ -4769,10 +8133,13 @@ export type Database = {
           cover_photo_path: string | null;
           created_at: string;
           credentials_sent_at: string | null;
+          delisted_at: string | null;
           explore_visible: boolean;
           featured: boolean;
           fleet_dispatch_preference: string;
           has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
@@ -4784,10 +8151,13 @@ export type Database = {
           onboarding_step: number;
           order_channels: string[];
           packaging: string | null;
+          parent_merchant_id: string | null;
           password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
           payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
           payout_name_lookup: Json | null;
           payout_rail: string | null;
           phone_code_attempts: number;
@@ -4797,6 +8167,8 @@ export type Database = {
           pickup_instructions: string | null;
           prep_minutes: number;
           price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
           requires_ops_mapping: boolean;
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
@@ -4805,7 +8177,12 @@ export type Database = {
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          strike_count: number;
           submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
           trading_name: string;
           updated_at: string;
           waitlisted_at: string | null;
@@ -4825,11 +8202,19 @@ export type Database = {
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
           answers: NonNullable<Json>;
           branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
           category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
           city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
           concierge_pick: boolean;
           contact_email: string | null;
           contact_name: string;
@@ -4837,10 +8222,13 @@ export type Database = {
           cover_photo_path: string | null;
           created_at: string;
           credentials_sent_at: string | null;
+          delisted_at: string | null;
           explore_visible: boolean;
           featured: boolean;
           fleet_dispatch_preference: string;
           has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
@@ -4852,10 +8240,13 @@ export type Database = {
           onboarding_step: number;
           order_channels: string[];
           packaging: string | null;
+          parent_merchant_id: string | null;
           password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
           payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
           payout_name_lookup: Json | null;
           payout_rail: string | null;
           phone_code_attempts: number;
@@ -4865,6 +8256,8 @@ export type Database = {
           pickup_instructions: string | null;
           prep_minutes: number;
           price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
           requires_ops_mapping: boolean;
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
@@ -4873,7 +8266,101 @@ export type Database = {
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          strike_count: number;
           submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
+          trading_name: string;
+          updated_at: string;
+          waitlisted_at: string | null;
+          went_live_at: string | null;
+          went_live_by: string | null;
+          when_busy: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_set_pause: {
+        Args: { p_merchant_id: string; p_paused: boolean; p_reason?: string };
+        Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          category_other: string | null;
+          city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
+          concierge_pick: boolean;
+          contact_email: string | null;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          credentials_sent_at: string | null;
+          delisted_at: string | null;
+          explore_visible: boolean;
+          featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
+          hours: Json | null;
+          hours_pattern: string | null;
+          id: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          parent_merchant_id: string | null;
+          password_set_at: string | null;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
+          settlement_account: Json | null;
+          source_url: string | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          strike_count: number;
+          submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
           trading_name: string;
           updated_at: string;
           waitlisted_at: string | null;
@@ -4893,11 +8380,19 @@ export type Database = {
         Returns: {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
           answers: NonNullable<Json>;
           branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
           category: Database['public']['Enums']['merchant_category'] | null;
           category_other: string | null;
           city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
           concierge_pick: boolean;
           contact_email: string | null;
           contact_name: string;
@@ -4905,10 +8400,13 @@ export type Database = {
           cover_photo_path: string | null;
           created_at: string;
           credentials_sent_at: string | null;
+          delisted_at: string | null;
           explore_visible: boolean;
           featured: boolean;
           fleet_dispatch_preference: string;
           has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
@@ -4920,10 +8418,13 @@ export type Database = {
           onboarding_step: number;
           order_channels: string[];
           packaging: string | null;
+          parent_merchant_id: string | null;
           password_set_at: string | null;
           pay_on_delivery: boolean;
           pay_on_delivery_cap_kes: number | null;
           payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
           payout_name_lookup: Json | null;
           payout_rail: string | null;
           phone_code_attempts: number;
@@ -4933,6 +8434,8 @@ export type Database = {
           pickup_instructions: string | null;
           prep_minutes: number;
           price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
           requires_ops_mapping: boolean;
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
@@ -4941,7 +8444,12 @@ export type Database = {
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
+          strike_count: number;
           submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
           trading_name: string;
           updated_at: string;
           waitlisted_at: string | null;
@@ -4978,6 +8486,120 @@ export type Database = {
         Returns: string;
       };
       rpc_merchant_submit: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_two_person_approve: {
+        Args: { p_request_id: string };
+        Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          category_other: string | null;
+          city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
+          concierge_pick: boolean;
+          contact_email: string | null;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          credentials_sent_at: string | null;
+          delisted_at: string | null;
+          explore_visible: boolean;
+          featured: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
+          hours: Json | null;
+          hours_pattern: string | null;
+          id: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          parent_merchant_id: string | null;
+          password_set_at: string | null;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
+          settlement_account: Json | null;
+          source_url: string | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          strike_count: number;
+          submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
+          trading_name: string;
+          updated_at: string;
+          waitlisted_at: string | null;
+          went_live_at: string | null;
+          went_live_by: string | null;
+          when_busy: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_two_person_request: {
+        Args: { p_kind: string; p_merchant_id: string; p_payload?: Json; p_reason: string };
+        Returns: {
+          city_id: string | null;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          id: string;
+          kind: Database['public']['Enums']['approval_kind'];
+          payload: NonNullable<Json>;
+          reason: string;
+          requested_by: string;
+          status: Database['public']['Enums']['approval_status'];
+          target_id: string;
+          target_type: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'approval_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_merchant_verify_phone_code: {
         Args: { p_code: string; p_merchant_id: string };
         Returns: Json;
@@ -5040,6 +8662,28 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'plan_message';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_price_flag_resolve: {
+        Args: { p_action: string; p_flag_id: string };
+        Returns: {
+          app_price_kes: number | null;
+          catalogue_item_id: string;
+          drift_pct: number | null;
+          id: string;
+          merchant_id: string;
+          observed_at: string;
+          observed_price_kes: number | null;
+          observed_source: string;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          status: Database['public']['Enums']['price_flag_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'catalogue_price_flag';
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -5566,15 +9210,39 @@ export type Database = {
       };
     };
     Enums: {
+      acquisition_channel:
+        | 'hotel_referral'
+        | 'city_lead'
+        | 'merchant_referral'
+        | 'self_signup'
+        | 'concierge_gap'
+        | 'paid_social'
+        | 'events';
       actor_type: 'staff' | 'merchant_user' | 'rider' | 'guest' | 'host_user' | 'system';
-      approval_kind: 'merchant_suspension' | 'staff_role_grant' | 'experience_refund';
+      approval_kind:
+        | 'merchant_suspension'
+        | 'staff_role_grant'
+        | 'experience_refund'
+        | 'merchant_delist'
+        | 'commission_tier_change';
       approval_status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
       audit_severity: 'info' | 'notice' | 'high';
       block_kind: 'activity' | 'meal' | 'venue' | 'transport' | 'stay' | 'event' | 'free';
       block_slot: 'early' | 'morning' | 'midday' | 'afternoon' | 'evening' | 'night' | 'late';
+      broadcast_status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'cancelled';
       city_status: 'live' | 'soft_launch' | 'waitlist';
+      commission_tier_code: 'T1' | 'T2' | 'T3';
+      dispute_fault: 'merchant' | 'rider' | 'guest' | 'nexg' | 'unknown';
+      dispute_resolution:
+        | 'full_refund_charge_merchant'
+        | 'partial_refund_charge_merchant'
+        | 'credit_wallet'
+        | 'no_refund'
+        | 'chargeback';
+      dispute_status: 'open' | 'awaiting_merchant' | 'resolved' | 'chargeback';
       document_owner_type: 'rider' | 'merchant' | 'experience_partner';
       document_status: 'uploaded' | 'verified' | 'rejected' | 'expired';
+      edit_approval_status: 'pending' | 'approved' | 'rejected';
       event_category:
         | 'sport'
         | 'music'
@@ -5598,6 +9266,7 @@ export type Database = {
         | 'active'
         | 'declined'
         | 'expired';
+      health_band: 'green' | 'amber' | 'red';
       hold_status: 'none' | 'requested' | 'held' | 'declined' | 'expired';
       insurance_type: 'comprehensive' | 'third_party' | 'none';
       legal_document_key:
@@ -5617,6 +9286,7 @@ export type Database = {
         | 'supermarket'
         | 'gift_shop'
         | 'other';
+      merchant_control_source: 'merchant' | 'staff' | 'system';
       merchant_user_role: 'owner' | 'manager';
       mood: 'wild' | 'taste' | 'night' | 'slow' | 'stay' | 'events';
       notification_kind:
@@ -5638,7 +9308,26 @@ export type Database = {
         | 'desk_sla_breach'
         | 'review_request'
         | 'review_reply'
-        | 'event_submission_reviewed';
+        | 'event_submission_reviewed'
+        | 'merchant_live'
+        | 'merchant_returned'
+        | 'merchant_paused'
+        | 'merchant_resumed'
+        | 'merchant_suspended'
+        | 'open_now_reminder'
+        | 'dispute_awaiting_reply'
+        | 'dispute_outcome'
+        | 'edit_approved'
+        | 'edit_rejected'
+        | 'price_align_request'
+        | 'statement_ready'
+        | 'payout_sent'
+        | 'document_expiring'
+        | 'document_expired_paused'
+        | 'terms_updated'
+        | 'health_warning_l1'
+        | 'merchant_broadcast'
+        | 'referral_bonus_paid';
       notification_status: 'pending' | 'sent' | 'failed' | 'no_address';
       partner_status:
         | 'applied'
@@ -5662,6 +9351,7 @@ export type Database = {
         | 'cancelled'
         | 'expired';
       price_basis: 'per_person' | 'per_group' | 'per_vehicle' | 'per_night' | 'face_value';
+      price_flag_status: 'open' | 'aligned' | 'dismissed';
       review_display: 'initial' | 'full_name' | 'anonymous';
       review_status: 'received' | 'approved' | 'kept_private';
       rider_status:
@@ -5673,6 +9363,7 @@ export type Database = {
         | 'offboarded';
       setting_scope: 'global' | 'city';
       staff_status: 'active' | 'suspended' | 'offboarded';
+      statement_status: 'draft' | 'ready' | 'sent' | 'disputed' | 'paid';
       ticket_channel: 'web_form' | 'whatsapp' | 'phone' | 'email' | 'in_app';
       ticket_from: 'guest' | 'rider' | 'merchant' | 'hotel';
       ticket_status: 'open' | 'assigned' | 'answered' | 'resolved' | 'closed';
@@ -5804,15 +9495,42 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      acquisition_channel: [
+        'hotel_referral',
+        'city_lead',
+        'merchant_referral',
+        'self_signup',
+        'concierge_gap',
+        'paid_social',
+        'events',
+      ],
       actor_type: ['staff', 'merchant_user', 'rider', 'guest', 'host_user', 'system'],
-      approval_kind: ['merchant_suspension', 'staff_role_grant', 'experience_refund'],
+      approval_kind: [
+        'merchant_suspension',
+        'staff_role_grant',
+        'experience_refund',
+        'merchant_delist',
+        'commission_tier_change',
+      ],
       approval_status: ['pending', 'approved', 'rejected', 'withdrawn'],
       audit_severity: ['info', 'notice', 'high'],
       block_kind: ['activity', 'meal', 'venue', 'transport', 'stay', 'event', 'free'],
       block_slot: ['early', 'morning', 'midday', 'afternoon', 'evening', 'night', 'late'],
+      broadcast_status: ['draft', 'scheduled', 'sending', 'sent', 'cancelled'],
       city_status: ['live', 'soft_launch', 'waitlist'],
+      commission_tier_code: ['T1', 'T2', 'T3'],
+      dispute_fault: ['merchant', 'rider', 'guest', 'nexg', 'unknown'],
+      dispute_resolution: [
+        'full_refund_charge_merchant',
+        'partial_refund_charge_merchant',
+        'credit_wallet',
+        'no_refund',
+        'chargeback',
+      ],
+      dispute_status: ['open', 'awaiting_merchant', 'resolved', 'chargeback'],
       document_owner_type: ['rider', 'merchant', 'experience_partner'],
       document_status: ['uploaded', 'verified', 'rejected', 'expired'],
+      edit_approval_status: ['pending', 'approved', 'rejected'],
       event_category: ['sport', 'music', 'food_drink', 'culture', 'family', 'nightlife', 'other'],
       event_status: ['draft', 'published', 'sold_out', 'cancelled', 'ended'],
       experience_partner_kind: [
@@ -5824,6 +9542,7 @@ export const Constants = {
         'merchant_link',
       ],
       fleet_invite_status: ['invited', 'started', 'under_review', 'active', 'declined', 'expired'],
+      health_band: ['green', 'amber', 'red'],
       hold_status: ['none', 'requested', 'held', 'declined', 'expired'],
       insurance_type: ['comprehensive', 'third_party', 'none'],
       legal_document_key: [
@@ -5845,6 +9564,7 @@ export const Constants = {
         'gift_shop',
         'other',
       ],
+      merchant_control_source: ['merchant', 'staff', 'system'],
       merchant_user_role: ['owner', 'manager'],
       mood: ['wild', 'taste', 'night', 'slow', 'stay', 'events'],
       notification_kind: [
@@ -5867,6 +9587,25 @@ export const Constants = {
         'review_request',
         'review_reply',
         'event_submission_reviewed',
+        'merchant_live',
+        'merchant_returned',
+        'merchant_paused',
+        'merchant_resumed',
+        'merchant_suspended',
+        'open_now_reminder',
+        'dispute_awaiting_reply',
+        'dispute_outcome',
+        'edit_approved',
+        'edit_rejected',
+        'price_align_request',
+        'statement_ready',
+        'payout_sent',
+        'document_expiring',
+        'document_expired_paused',
+        'terms_updated',
+        'health_warning_l1',
+        'merchant_broadcast',
+        'referral_bonus_paid',
       ],
       notification_status: ['pending', 'sent', 'failed', 'no_address'],
       partner_status: [
@@ -5893,6 +9632,7 @@ export const Constants = {
         'expired',
       ],
       price_basis: ['per_person', 'per_group', 'per_vehicle', 'per_night', 'face_value'],
+      price_flag_status: ['open', 'aligned', 'dismissed'],
       review_display: ['initial', 'full_name', 'anonymous'],
       review_status: ['received', 'approved', 'kept_private'],
       rider_status: [
@@ -5905,6 +9645,7 @@ export const Constants = {
       ],
       setting_scope: ['global', 'city'],
       staff_status: ['active', 'suspended', 'offboarded'],
+      statement_status: ['draft', 'ready', 'sent', 'disputed', 'paid'],
       ticket_channel: ['web_form', 'whatsapp', 'phone', 'email', 'in_app'],
       ticket_from: ['guest', 'rider', 'merchant', 'hotel'],
       ticket_status: ['open', 'assigned', 'answered', 'resolved', 'closed'],
