@@ -61,3 +61,19 @@ export async function activateRider(riderId: string, reason: string): Promise<Re
   revalidatePath('/riders');
   return { ok: true, message: 'Rider activated.' };
 }
+
+/*
+ * An SOS is acknowledged by a named person, not by a link somebody
+ * might follow by accident. A form post, so it cannot be triggered by a
+ * prefetch or a crawler, and the RPC records who and when.
+ */
+export async function acknowledgeSos(formData: FormData): Promise<void> {
+  const supabase = createClient();
+  const id = String(formData.get('incident_id') ?? '');
+  if (!id) return;
+
+  await supabase.rpc('rpc_incident_sos_ack', { p_incident_id: id });
+
+  revalidatePath('/riders');
+  revalidatePath(`/riders/incidents/${id}`);
+}
