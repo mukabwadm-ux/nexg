@@ -1729,6 +1729,97 @@ export type Database = {
           },
         ];
       };
+      data_request: {
+        Row: {
+          blocking_reasons: NonNullable<Json>;
+          bundle_expires_at: string | null;
+          bundle_path: string | null;
+          channel: string | null;
+          communication_log: NonNullable<Json>;
+          created_at: string;
+          due_at: string;
+          fulfilled_at: string | null;
+          guest_id: string | null;
+          handled_by: string | null;
+          id: string;
+          identity_method: string | null;
+          identity_verified_at: string | null;
+          kind: Database['public']['Enums']['data_request_kind'];
+          received_at: string;
+          refusal_reason: string | null;
+          requester_email: string | null;
+          requester_phone: string | null;
+          scope: string[];
+          status: Database['public']['Enums']['data_request_status'];
+        };
+        Insert: {
+          blocking_reasons?: NonNullable<Json>;
+          bundle_expires_at?: string | null;
+          bundle_path?: string | null;
+          channel?: string | null;
+          communication_log?: NonNullable<Json>;
+          created_at?: string;
+          due_at?: string;
+          fulfilled_at?: string | null;
+          guest_id?: string | null;
+          handled_by?: string | null;
+          id?: string;
+          identity_method?: string | null;
+          identity_verified_at?: string | null;
+          kind: Database['public']['Enums']['data_request_kind'];
+          received_at?: string;
+          refusal_reason?: string | null;
+          requester_email?: string | null;
+          requester_phone?: string | null;
+          scope?: string[];
+          status?: Database['public']['Enums']['data_request_status'];
+        };
+        Update: {
+          blocking_reasons?: NonNullable<Json>;
+          bundle_expires_at?: string | null;
+          bundle_path?: string | null;
+          channel?: string | null;
+          communication_log?: NonNullable<Json>;
+          created_at?: string;
+          due_at?: string;
+          fulfilled_at?: string | null;
+          guest_id?: string | null;
+          handled_by?: string | null;
+          id?: string;
+          identity_method?: string | null;
+          identity_verified_at?: string | null;
+          kind?: Database['public']['Enums']['data_request_kind'];
+          received_at?: string;
+          refusal_reason?: string | null;
+          requester_email?: string | null;
+          requester_phone?: string | null;
+          scope?: string[];
+          status?: Database['public']['Enums']['data_request_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'data_request_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'data_request_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'data_request_handled_by_fkey';
+            columns: ['handled_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       dispatch_zone_setting: {
         Row: {
           expires_at: string | null;
@@ -2616,6 +2707,211 @@ export type Database = {
           },
         ];
       };
+      folio_cap_usage: {
+        Row: {
+          hotel_id: string;
+          last_order_at: string | null;
+          room_no: string;
+          stay_key: string;
+          used: number;
+        };
+        Insert: {
+          hotel_id: string;
+          last_order_at?: string | null;
+          room_no: string;
+          stay_key: string;
+          used?: number;
+        };
+        Update: {
+          hotel_id?: string;
+          last_order_at?: string | null;
+          room_no?: string;
+          stay_key?: string;
+          used?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'folio_cap_usage_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'folio_cap_usage_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_cap_usage_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_cap_usage_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      folio_posting: {
+        Row: {
+          amount: number;
+          cap_check: NonNullable<Json>;
+          commission_amount: number | null;
+          created_at: string;
+          desk_action_at: string | null;
+          desk_note: string | null;
+          desk_user_id: string | null;
+          escalated_at: string | null;
+          folio_ref: string | null;
+          guest_id: string | null;
+          guest_surname: string;
+          hotel_id: string;
+          id: string;
+          order_reference: string;
+          pms_posted_at: string | null;
+          recharged_payment_ref: string | null;
+          room_no: string;
+          status: Database['public']['Enums']['folio_status'];
+          sync: Database['public']['Enums']['folio_sync'];
+          voided_reason: string | null;
+        };
+        Insert: {
+          amount: number;
+          cap_check?: NonNullable<Json>;
+          commission_amount?: number | null;
+          created_at?: string;
+          desk_action_at?: string | null;
+          desk_note?: string | null;
+          desk_user_id?: string | null;
+          escalated_at?: string | null;
+          folio_ref?: string | null;
+          guest_id?: string | null;
+          guest_surname: string;
+          hotel_id: string;
+          id?: string;
+          order_reference: string;
+          pms_posted_at?: string | null;
+          recharged_payment_ref?: string | null;
+          room_no: string;
+          status?: Database['public']['Enums']['folio_status'];
+          sync?: Database['public']['Enums']['folio_sync'];
+          voided_reason?: string | null;
+        };
+        Update: {
+          amount?: number;
+          cap_check?: NonNullable<Json>;
+          commission_amount?: number | null;
+          created_at?: string;
+          desk_action_at?: string | null;
+          desk_note?: string | null;
+          desk_user_id?: string | null;
+          escalated_at?: string | null;
+          folio_ref?: string | null;
+          guest_id?: string | null;
+          guest_surname?: string;
+          hotel_id?: string;
+          id?: string;
+          order_reference?: string;
+          pms_posted_at?: string | null;
+          recharged_payment_ref?: string | null;
+          room_no?: string;
+          status?: Database['public']['Enums']['folio_status'];
+          sync?: Database['public']['Enums']['folio_sync'];
+          voided_reason?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      folio_reconciliation: {
+        Row: {
+          hotel_amount: number | null;
+          hotel_line_ref: string | null;
+          id: string;
+          nexg_amount: number | null;
+          nexg_order_reference: string | null;
+          note: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          statement_id: string;
+          status: Database['public']['Enums']['recon_status'];
+        };
+        Insert: {
+          hotel_amount?: number | null;
+          hotel_line_ref?: string | null;
+          id?: string;
+          nexg_amount?: number | null;
+          nexg_order_reference?: string | null;
+          note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          statement_id: string;
+          status?: Database['public']['Enums']['recon_status'];
+        };
+        Update: {
+          hotel_amount?: number | null;
+          hotel_line_ref?: string | null;
+          id?: string;
+          nexg_amount?: number | null;
+          nexg_order_reference?: string | null;
+          note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          statement_id?: string;
+          status?: Database['public']['Enums']['recon_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'folio_reconciliation_resolved_by_fkey';
+            columns: ['resolved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_reconciliation_statement_id_fkey';
+            columns: ['statement_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_statement';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       fraud_rule: {
         Row: {
           enabled: boolean;
@@ -2744,6 +3040,176 @@ export type Database = {
           },
         ];
       };
+      guest: {
+        Row: {
+          anonymised_at: string | null;
+          block_reason: string | null;
+          blocked: boolean;
+          country_code: string | null;
+          created_at: string;
+          dispute_count: number;
+          id: string;
+          last_order_at: string | null;
+          last_stay: Json | null;
+          name: string | null;
+          payment_summary: NonNullable<Json>;
+          phone: string | null;
+          preferences: NonNullable<Json>;
+          refusal_count: number;
+          repeat_count: number;
+          staff_notes: string | null;
+          updated_at: string;
+          user_id: string | null;
+          vip: boolean;
+        };
+        Insert: {
+          anonymised_at?: string | null;
+          block_reason?: string | null;
+          blocked?: boolean;
+          country_code?: string | null;
+          created_at?: string;
+          dispute_count?: number;
+          id?: string;
+          last_order_at?: string | null;
+          last_stay?: Json | null;
+          name?: string | null;
+          payment_summary?: NonNullable<Json>;
+          phone?: string | null;
+          preferences?: NonNullable<Json>;
+          refusal_count?: number;
+          repeat_count?: number;
+          staff_notes?: string | null;
+          updated_at?: string;
+          user_id?: string | null;
+          vip?: boolean;
+        };
+        Update: {
+          anonymised_at?: string | null;
+          block_reason?: string | null;
+          blocked?: boolean;
+          country_code?: string | null;
+          created_at?: string;
+          dispute_count?: number;
+          id?: string;
+          last_order_at?: string | null;
+          last_stay?: Json | null;
+          name?: string | null;
+          payment_summary?: NonNullable<Json>;
+          phone?: string | null;
+          preferences?: NonNullable<Json>;
+          refusal_count?: number;
+          repeat_count?: number;
+          staff_notes?: string | null;
+          updated_at?: string;
+          user_id?: string | null;
+          vip?: boolean;
+        };
+        Relationships: [];
+      };
+      guest_block: {
+        Row: {
+          at: string;
+          by: string | null;
+          guest_id: string;
+          id: number;
+          lifted_at: string | null;
+          lifted_by: string | null;
+          reason: string;
+        };
+        Insert: {
+          at?: string;
+          by?: string | null;
+          guest_id: string;
+          id?: number;
+          lifted_at?: string | null;
+          lifted_by?: string | null;
+          reason: string;
+        };
+        Update: {
+          at?: string;
+          by?: string | null;
+          guest_id?: string;
+          id?: number;
+          lifted_at?: string | null;
+          lifted_by?: string | null;
+          reason?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'guest_block_by_fkey';
+            columns: ['by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'guest_block_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'guest_block_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'guest_block_lifted_by_fkey';
+            columns: ['lifted_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      guest_consent: {
+        Row: {
+          at: string;
+          granted: boolean;
+          guest_id: string;
+          id: number;
+          ip_hash: string | null;
+          kind: Database['public']['Enums']['guest_consent_kind'];
+          source: string;
+        };
+        Insert: {
+          at?: string;
+          granted: boolean;
+          guest_id: string;
+          id?: number;
+          ip_hash?: string | null;
+          kind: Database['public']['Enums']['guest_consent_kind'];
+          source: string;
+        };
+        Update: {
+          at?: string;
+          granted?: boolean;
+          guest_id?: string;
+          id?: number;
+          ip_hash?: string | null;
+          kind?: Database['public']['Enums']['guest_consent_kind'];
+          source?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'guest_consent_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'guest_consent_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       health_weight_config: {
         Row: {
           key: string;
@@ -2776,6 +3242,944 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      host: {
+        Row: {
+          areas: string[];
+          billing_details: NonNullable<Json>;
+          billing_method: string | null;
+          city_id: string | null;
+          contact_name: string | null;
+          created_at: string;
+          default_handoff: Database['public']['Enums']['handoff_mode'] | null;
+          display_name: string | null;
+          email: string | null;
+          id: string;
+          kind: Database['public']['Enums']['host_kind'];
+          listing_link: string | null;
+          notes: string | null;
+          onboarding_step: number;
+          packages_enabled: boolean;
+          paused_at: string | null;
+          phone: string;
+          referral_code: string | null;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          status: Database['public']['Enums']['host_status'];
+          status_reason: string | null;
+          submitted_at: string | null;
+          superhost_claimed: boolean;
+          tier: Database['public']['Enums']['host_tier'];
+          units_declared_band: string | null;
+          updated_at: string;
+          verification: NonNullable<Json>;
+          verified_at: string | null;
+          verified_by: string | null;
+          went_live_at: string | null;
+        };
+        Insert: {
+          areas?: string[];
+          billing_details?: NonNullable<Json>;
+          billing_method?: string | null;
+          city_id?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          default_handoff?: Database['public']['Enums']['handoff_mode'] | null;
+          display_name?: string | null;
+          email?: string | null;
+          id?: string;
+          kind?: Database['public']['Enums']['host_kind'];
+          listing_link?: string | null;
+          notes?: string | null;
+          onboarding_step?: number;
+          packages_enabled?: boolean;
+          paused_at?: string | null;
+          phone: string;
+          referral_code?: string | null;
+          resume_token_expires_at?: string | null;
+          resume_token_hash?: string | null;
+          status?: Database['public']['Enums']['host_status'];
+          status_reason?: string | null;
+          submitted_at?: string | null;
+          superhost_claimed?: boolean;
+          tier?: Database['public']['Enums']['host_tier'];
+          units_declared_band?: string | null;
+          updated_at?: string;
+          verification?: NonNullable<Json>;
+          verified_at?: string | null;
+          verified_by?: string | null;
+          went_live_at?: string | null;
+        };
+        Update: {
+          areas?: string[];
+          billing_details?: NonNullable<Json>;
+          billing_method?: string | null;
+          city_id?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          default_handoff?: Database['public']['Enums']['handoff_mode'] | null;
+          display_name?: string | null;
+          email?: string | null;
+          id?: string;
+          kind?: Database['public']['Enums']['host_kind'];
+          listing_link?: string | null;
+          notes?: string | null;
+          onboarding_step?: number;
+          packages_enabled?: boolean;
+          paused_at?: string | null;
+          phone?: string;
+          referral_code?: string | null;
+          resume_token_expires_at?: string | null;
+          resume_token_hash?: string | null;
+          status?: Database['public']['Enums']['host_status'];
+          status_reason?: string | null;
+          submitted_at?: string | null;
+          superhost_claimed?: boolean;
+          tier?: Database['public']['Enums']['host_tier'];
+          units_declared_band?: string | null;
+          updated_at?: string;
+          verification?: NonNullable<Json>;
+          verified_at?: string | null;
+          verified_by?: string | null;
+          went_live_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_verified_by_fkey';
+            columns: ['verified_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      host_billing_event: {
+        Row: {
+          amount_kes: number;
+          created_at: string;
+          host_id: string;
+          id: number;
+          invoice_id: string | null;
+          kind: string;
+          note: string | null;
+          package_order_id: string | null;
+        };
+        Insert: {
+          amount_kes: number;
+          created_at?: string;
+          host_id: string;
+          id?: number;
+          invoice_id?: string | null;
+          kind: string;
+          note?: string | null;
+          package_order_id?: string | null;
+        };
+        Update: {
+          amount_kes?: number;
+          created_at?: string;
+          host_id?: string;
+          id?: number;
+          invoice_id?: string | null;
+          kind?: string;
+          note?: string | null;
+          package_order_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_billing_event_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_billing_event_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_billing_event_invoice_id_fkey';
+            columns: ['invoice_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_invoice';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_billing_event_package_order_id_fkey';
+            columns: ['package_order_id'];
+            isOneToOne: false;
+            referencedRelation: 'package_order';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      host_invoice: {
+        Row: {
+          created_at: string;
+          due_at: string | null;
+          host_id: string;
+          id: string;
+          lines: NonNullable<Json>;
+          paid_at: string | null;
+          pdf_path: string | null;
+          period: string;
+          provider_ref: string | null;
+          status: Database['public']['Enums']['invoice_status'];
+          subtotal: number;
+          total: number;
+        };
+        Insert: {
+          created_at?: string;
+          due_at?: string | null;
+          host_id: string;
+          id?: string;
+          lines?: NonNullable<Json>;
+          paid_at?: string | null;
+          pdf_path?: string | null;
+          period: string;
+          provider_ref?: string | null;
+          status?: Database['public']['Enums']['invoice_status'];
+          subtotal?: number;
+          total?: number;
+        };
+        Update: {
+          created_at?: string;
+          due_at?: string | null;
+          host_id?: string;
+          id?: string;
+          lines?: NonNullable<Json>;
+          paid_at?: string | null;
+          pdf_path?: string | null;
+          period?: string;
+          provider_ref?: string | null;
+          status?: Database['public']['Enums']['invoice_status'];
+          subtotal?: number;
+          total?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_invoice_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_invoice_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      host_message: {
+        Row: {
+          actor_id: string | null;
+          body: string;
+          channel: string;
+          created_at: string;
+          direction: string;
+          host_id: string;
+          id: string;
+          subject: string | null;
+        };
+        Insert: {
+          actor_id?: string | null;
+          body: string;
+          channel: string;
+          created_at?: string;
+          direction: string;
+          host_id: string;
+          id?: string;
+          subject?: string | null;
+        };
+        Update: {
+          actor_id?: string | null;
+          body?: string;
+          channel?: string;
+          created_at?: string;
+          direction?: string;
+          host_id?: string;
+          id?: string;
+          subject?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_message_actor_id_fkey';
+            columns: ['actor_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_message_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_message_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      host_user: {
+        Row: {
+          accepted_at: string | null;
+          created_at: string;
+          host_id: string;
+          invited_by: string | null;
+          role: string;
+          units: string[] | null;
+          user_id: string;
+        };
+        Insert: {
+          accepted_at?: string | null;
+          created_at?: string;
+          host_id: string;
+          invited_by?: string | null;
+          role?: string;
+          units?: string[] | null;
+          user_id: string;
+        };
+        Update: {
+          accepted_at?: string | null;
+          created_at?: string;
+          host_id?: string;
+          invited_by?: string | null;
+          role?: string;
+          units?: string[] | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_user_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_user_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      hotel: {
+        Row: {
+          agreement_pdf_path: string | null;
+          agreement_signed_at: string | null;
+          agreement_version: string | null;
+          area: string | null;
+          brand: string | null;
+          city_id: string | null;
+          commission_pct: number | null;
+          created_at: string;
+          gm_name: string | null;
+          id: string;
+          invoice_terms_days: number;
+          lost_reason: string | null;
+          name: string;
+          next_action_at: string | null;
+          owner_staff_id: string | null;
+          paused_reason: string | null;
+          pms_integration: string;
+          pms_property_code: string | null;
+          pms_vendor: string | null;
+          point: unknown;
+          prospect_stage: string | null;
+          rooms: number | null;
+          star_rating: number | null;
+          status: Database['public']['Enums']['hotel_status'];
+          tier: Database['public']['Enums']['hotel_tier'] | null;
+          updated_at: string;
+        };
+        Insert: {
+          agreement_pdf_path?: string | null;
+          agreement_signed_at?: string | null;
+          agreement_version?: string | null;
+          area?: string | null;
+          brand?: string | null;
+          city_id?: string | null;
+          commission_pct?: number | null;
+          created_at?: string;
+          gm_name?: string | null;
+          id?: string;
+          invoice_terms_days?: number;
+          lost_reason?: string | null;
+          name: string;
+          next_action_at?: string | null;
+          owner_staff_id?: string | null;
+          paused_reason?: string | null;
+          pms_integration?: string;
+          pms_property_code?: string | null;
+          pms_vendor?: string | null;
+          point?: unknown;
+          prospect_stage?: string | null;
+          rooms?: number | null;
+          star_rating?: number | null;
+          status?: Database['public']['Enums']['hotel_status'];
+          tier?: Database['public']['Enums']['hotel_tier'] | null;
+          updated_at?: string;
+        };
+        Update: {
+          agreement_pdf_path?: string | null;
+          agreement_signed_at?: string | null;
+          agreement_version?: string | null;
+          area?: string | null;
+          brand?: string | null;
+          city_id?: string | null;
+          commission_pct?: number | null;
+          created_at?: string;
+          gm_name?: string | null;
+          id?: string;
+          invoice_terms_days?: number;
+          lost_reason?: string | null;
+          name?: string;
+          next_action_at?: string | null;
+          owner_staff_id?: string | null;
+          paused_reason?: string | null;
+          pms_integration?: string;
+          pms_property_code?: string | null;
+          pms_vendor?: string | null;
+          point?: unknown;
+          prospect_stage?: string | null;
+          rooms?: number | null;
+          star_rating?: number | null;
+          status?: Database['public']['Enums']['hotel_status'];
+          tier?: Database['public']['Enums']['hotel_tier'] | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_owner_staff_id_fkey';
+            columns: ['owner_staff_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      hotel_access_rule: {
+        Row: {
+          after_hours_handoff: string | null;
+          delivery_from: string | null;
+          delivery_to: string | null;
+          hotel_id: string;
+          id: string;
+          superseded_at: string | null;
+          text: string;
+          updated_at: string;
+          updated_by: string | null;
+          version: number;
+        };
+        Insert: {
+          after_hours_handoff?: string | null;
+          delivery_from?: string | null;
+          delivery_to?: string | null;
+          hotel_id: string;
+          id?: string;
+          superseded_at?: string | null;
+          text: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          version?: number;
+        };
+        Update: {
+          after_hours_handoff?: string | null;
+          delivery_from?: string | null;
+          delivery_to?: string | null;
+          hotel_id?: string;
+          id?: string;
+          superseded_at?: string | null;
+          text?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_access_rule_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_access_rule_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_access_rule_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_access_rule_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_access_rule_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      hotel_contact: {
+        Row: {
+          created_at: string;
+          email: string | null;
+          ext: string | null;
+          hotel_id: string;
+          id: string;
+          is_desk: boolean;
+          is_escalation: boolean;
+          is_finance: boolean;
+          name: string;
+          phone_encrypted: string | null;
+          phone_last2: string | null;
+          role: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          email?: string | null;
+          ext?: string | null;
+          hotel_id: string;
+          id?: string;
+          is_desk?: boolean;
+          is_escalation?: boolean;
+          is_finance?: boolean;
+          name: string;
+          phone_encrypted?: string | null;
+          phone_last2?: string | null;
+          role?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          email?: string | null;
+          ext?: string | null;
+          hotel_id?: string;
+          id?: string;
+          is_desk?: boolean;
+          is_escalation?: boolean;
+          is_finance?: boolean;
+          name?: string;
+          phone_encrypted?: string | null;
+          phone_last2?: string | null;
+          role?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_contact_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_contact_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_contact_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_contact_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      hotel_program_setting: {
+        Row: {
+          charge_cap_per_stay: number | null;
+          charge_to_room: boolean;
+          desk_sla_minutes: number;
+          escalate_after_minutes: number;
+          folio_sync: Database['public']['Enums']['folio_sync'];
+          folio_sync_time: string | null;
+          front_desk_ordering: boolean;
+          guest_pays_delivery: boolean;
+          hotel_id: string;
+          in_room_qr: boolean;
+          preferred_suppliers: string[];
+          room_cards_printed: number;
+          service_charge_pct: number | null;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          charge_cap_per_stay?: number | null;
+          charge_to_room?: boolean;
+          desk_sla_minutes?: number;
+          escalate_after_minutes?: number;
+          folio_sync?: Database['public']['Enums']['folio_sync'];
+          folio_sync_time?: string | null;
+          front_desk_ordering?: boolean;
+          guest_pays_delivery?: boolean;
+          hotel_id: string;
+          in_room_qr?: boolean;
+          preferred_suppliers?: string[];
+          room_cards_printed?: number;
+          service_charge_pct?: number | null;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          charge_cap_per_stay?: number | null;
+          charge_to_room?: boolean;
+          desk_sla_minutes?: number;
+          escalate_after_minutes?: number;
+          folio_sync?: Database['public']['Enums']['folio_sync'];
+          folio_sync_time?: string | null;
+          front_desk_ordering?: boolean;
+          guest_pays_delivery?: boolean;
+          hotel_id?: string;
+          in_room_qr?: boolean;
+          preferred_suppliers?: string[];
+          room_cards_printed?: number;
+          service_charge_pct?: number | null;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_program_setting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: true;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_program_setting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_program_setting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: true;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_program_setting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: true;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_program_setting_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      hotel_prospect_activity: {
+        Row: {
+          at: string;
+          by: string | null;
+          hotel_id: string;
+          id: number;
+          kind: string;
+          next_action_at: string | null;
+          notes: string | null;
+        };
+        Insert: {
+          at?: string;
+          by?: string | null;
+          hotel_id: string;
+          id?: number;
+          kind: string;
+          next_action_at?: string | null;
+          notes?: string | null;
+        };
+        Update: {
+          at?: string;
+          by?: string | null;
+          hotel_id?: string;
+          id?: number;
+          kind?: string;
+          next_action_at?: string | null;
+          notes?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_prospect_activity_by_fkey';
+            columns: ['by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_prospect_activity_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_prospect_activity_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_prospect_activity_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_prospect_activity_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      hotel_room: {
+        Row: {
+          floor: string | null;
+          hotel_id: string;
+          id: string;
+          room_no: string;
+          room_type: string | null;
+          status: string;
+        };
+        Insert: {
+          floor?: string | null;
+          hotel_id: string;
+          id?: string;
+          room_no: string;
+          room_type?: string | null;
+          status?: string;
+        };
+        Update: {
+          floor?: string | null;
+          hotel_id?: string;
+          id?: string;
+          room_no?: string;
+          room_type?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_room_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_room_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_room_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_room_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      hotel_statement: {
+        Row: {
+          commission: number;
+          created_at: string;
+          due_at: string | null;
+          gross: number;
+          hotel_id: string;
+          id: string;
+          net_invoiced: number;
+          paid_at: string | null;
+          pdf_path: string | null;
+          period: string;
+          postings_count: number;
+          provider_ref: string | null;
+          status: Database['public']['Enums']['invoice_status'];
+        };
+        Insert: {
+          commission?: number;
+          created_at?: string;
+          due_at?: string | null;
+          gross?: number;
+          hotel_id: string;
+          id?: string;
+          net_invoiced?: number;
+          paid_at?: string | null;
+          pdf_path?: string | null;
+          period: string;
+          postings_count?: number;
+          provider_ref?: string | null;
+          status?: Database['public']['Enums']['invoice_status'];
+        };
+        Update: {
+          commission?: number;
+          created_at?: string;
+          due_at?: string | null;
+          gross?: number;
+          hotel_id?: string;
+          id?: string;
+          net_invoiced?: number;
+          paid_at?: string | null;
+          pdf_path?: string | null;
+          period?: string;
+          postings_count?: number;
+          provider_ref?: string | null;
+          status?: Database['public']['Enums']['invoice_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_statement_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_statement_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_statement_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_statement_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      hotel_user: {
+        Row: {
+          accepted_at: string | null;
+          created_at: string;
+          desk_station: string | null;
+          hotel_id: string;
+          invited_by: string | null;
+          role: string;
+          user_id: string;
+        };
+        Insert: {
+          accepted_at?: string | null;
+          created_at?: string;
+          desk_station?: string | null;
+          hotel_id: string;
+          invited_by?: string | null;
+          role: string;
+          user_id: string;
+        };
+        Update: {
+          accepted_at?: string | null;
+          created_at?: string;
+          desk_station?: string | null;
+          hotel_id?: string;
+          invited_by?: string | null;
+          role?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_user_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_user_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_user_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_user_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
           },
         ];
       };
@@ -5179,6 +6583,98 @@ export type Database = {
           },
         ];
       };
+      package_order: {
+        Row: {
+          billed_invoice_id: string | null;
+          created_at: string;
+          for_checkin_at: string;
+          guest_name_optional: string | null;
+          host_id: string;
+          id: string;
+          order_reference: string | null;
+          package_id: string;
+          photo_path: string | null;
+          status: string;
+          unit_id: string;
+        };
+        Insert: {
+          billed_invoice_id?: string | null;
+          created_at?: string;
+          for_checkin_at: string;
+          guest_name_optional?: string | null;
+          host_id: string;
+          id?: string;
+          order_reference?: string | null;
+          package_id: string;
+          photo_path?: string | null;
+          status?: string;
+          unit_id: string;
+        };
+        Update: {
+          billed_invoice_id?: string | null;
+          created_at?: string;
+          for_checkin_at?: string;
+          guest_name_optional?: string | null;
+          host_id?: string;
+          id?: string;
+          order_reference?: string | null;
+          package_id?: string;
+          photo_path?: string | null;
+          status?: string;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'package_order_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'package_order_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'package_order_package_id_fkey';
+            columns: ['package_id'];
+            isOneToOne: false;
+            referencedRelation: 'welcome_package';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'package_order_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'package_order_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'package_order_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'package_order_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
       partner_hold: {
         Row: {
           channel: string;
@@ -5733,6 +7229,41 @@ export type Database = {
           },
         ];
       };
+      qr_scan: {
+        Row: {
+          at: string;
+          id: number;
+          order_reference: string | null;
+          outcome: string;
+          qr_id: string;
+          user_agent_hash: string | null;
+        };
+        Insert: {
+          at?: string;
+          id?: number;
+          order_reference?: string | null;
+          outcome?: string;
+          qr_id: string;
+          user_agent_hash?: string | null;
+        };
+        Update: {
+          at?: string;
+          id?: number;
+          order_reference?: string | null;
+          outcome?: string;
+          qr_id?: string;
+          user_agent_hash?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'qr_scan_qr_id_fkey';
+            columns: ['qr_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_qr';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       referral: {
         Row: {
           bonus_amount_kes: number | null;
@@ -5811,6 +7342,44 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: true;
             referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      retention_rule: {
+        Row: {
+          anonymise: boolean;
+          basis: string;
+          key: string;
+          retain_for: string | null;
+          subject: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          anonymise?: boolean;
+          basis: string;
+          key: string;
+          retain_for?: string | null;
+          subject: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          anonymise?: boolean;
+          basis?: string;
+          key?: string;
+          retain_for?: string | null;
+          subject?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'retention_rule_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
         ];
@@ -8407,6 +9976,247 @@ export type Database = {
           },
         ];
       };
+      unit: {
+        Row: {
+          address_line: string | null;
+          archived_at: string | null;
+          area: string | null;
+          askari_name: string | null;
+          askari_phone_encrypted: string | null;
+          building: string | null;
+          caretaker_confirmed_at: string | null;
+          caretaker_name: string | null;
+          caretaker_phone_encrypted: string | null;
+          checkin_time: string | null;
+          checkout_time: string | null;
+          city_id: string | null;
+          created_at: string;
+          delivery_hours: Json | null;
+          floor: string | null;
+          gate_code_encrypted: string | null;
+          handoff: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_note: string | null;
+          host_id: string;
+          house_rules_link: string | null;
+          id: string;
+          label_public: string | null;
+          lift_note: string | null;
+          name: string;
+          packages_default: string | null;
+          packages_schedule: Database['public']['Enums']['package_schedule'] | null;
+          parking_note: string | null;
+          paused_reason: string | null;
+          point: unknown;
+          readiness: NonNullable<Json>;
+          status: Database['public']['Enums']['unit_status'];
+          unit_no: string | null;
+          updated_at: string;
+          wifi_name: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          address_line?: string | null;
+          archived_at?: string | null;
+          area?: string | null;
+          askari_name?: string | null;
+          askari_phone_encrypted?: string | null;
+          building?: string | null;
+          caretaker_confirmed_at?: string | null;
+          caretaker_name?: string | null;
+          caretaker_phone_encrypted?: string | null;
+          checkin_time?: string | null;
+          checkout_time?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          delivery_hours?: Json | null;
+          floor?: string | null;
+          gate_code_encrypted?: string | null;
+          handoff?: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_note?: string | null;
+          host_id: string;
+          house_rules_link?: string | null;
+          id?: string;
+          label_public?: string | null;
+          lift_note?: string | null;
+          name: string;
+          packages_default?: string | null;
+          packages_schedule?: Database['public']['Enums']['package_schedule'] | null;
+          parking_note?: string | null;
+          paused_reason?: string | null;
+          point?: unknown;
+          readiness?: NonNullable<Json>;
+          status?: Database['public']['Enums']['unit_status'];
+          unit_no?: string | null;
+          updated_at?: string;
+          wifi_name?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          address_line?: string | null;
+          archived_at?: string | null;
+          area?: string | null;
+          askari_name?: string | null;
+          askari_phone_encrypted?: string | null;
+          building?: string | null;
+          caretaker_confirmed_at?: string | null;
+          caretaker_name?: string | null;
+          caretaker_phone_encrypted?: string | null;
+          checkin_time?: string | null;
+          checkout_time?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          delivery_hours?: Json | null;
+          floor?: string | null;
+          gate_code_encrypted?: string | null;
+          handoff?: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_note?: string | null;
+          host_id?: string;
+          house_rules_link?: string | null;
+          id?: string;
+          label_public?: string | null;
+          lift_note?: string | null;
+          name?: string;
+          packages_default?: string | null;
+          packages_schedule?: Database['public']['Enums']['package_schedule'] | null;
+          parking_note?: string | null;
+          paused_reason?: string | null;
+          point?: unknown;
+          readiness?: NonNullable<Json>;
+          status?: Database['public']['Enums']['unit_status'];
+          unit_no?: string | null;
+          updated_at?: string;
+          wifi_name?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone_bounds';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      unit_qr: {
+        Row: {
+          code: string;
+          first_scanned_at: string | null;
+          generated_at: string;
+          id: string;
+          placed_confirmed_at: string | null;
+          replaced_by: string | null;
+          room_id: string | null;
+          scans: number;
+          sent_at: string | null;
+          state: Database['public']['Enums']['qr_state'];
+          token_hash: string | null;
+          unit_id: string | null;
+          voided_at: string | null;
+        };
+        Insert: {
+          code: string;
+          first_scanned_at?: string | null;
+          generated_at?: string;
+          id?: string;
+          placed_confirmed_at?: string | null;
+          replaced_by?: string | null;
+          room_id?: string | null;
+          scans?: number;
+          sent_at?: string | null;
+          state?: Database['public']['Enums']['qr_state'];
+          token_hash?: string | null;
+          unit_id?: string | null;
+          voided_at?: string | null;
+        };
+        Update: {
+          code?: string;
+          first_scanned_at?: string | null;
+          generated_at?: string;
+          id?: string;
+          placed_confirmed_at?: string | null;
+          replaced_by?: string | null;
+          room_id?: string | null;
+          scans?: number;
+          sent_at?: string | null;
+          state?: Database['public']['Enums']['qr_state'];
+          token_hash?: string | null;
+          unit_id?: string | null;
+          voided_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'unit_qr';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_room_fk';
+            columns: ['room_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_room';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
       waitlist_signup: {
         Row: {
           city_id: string | null;
@@ -8444,6 +10254,101 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      welcome_package: {
+        Row: {
+          city_id: string | null;
+          created_at: string;
+          description: string | null;
+          id: string;
+          items: NonNullable<Json>;
+          lead_hours: number;
+          merchant_id: string | null;
+          name: string;
+          photo_path: string | null;
+          price: number | null;
+          sort: number;
+          status: string;
+        };
+        Insert: {
+          city_id?: string | null;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          items?: NonNullable<Json>;
+          lead_hours?: number;
+          merchant_id?: string | null;
+          name: string;
+          photo_path?: string | null;
+          price?: number | null;
+          sort?: number;
+          status?: string;
+        };
+        Update: {
+          city_id?: string | null;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          items?: NonNullable<Json>;
+          lead_hours?: number;
+          merchant_id?: string | null;
+          name?: string;
+          photo_path?: string | null;
+          price?: number | null;
+          sort?: number;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
           },
         ];
@@ -8628,6 +10533,21 @@ export type Database = {
           },
         ];
       };
+      checkout_hotel_context_v: {
+        Row: {
+          charge_cap_per_stay: number | null;
+          charge_to_room: boolean | null;
+          desk_sla_minutes: number | null;
+          guest_pays_delivery: boolean | null;
+          hotel_id: string | null;
+          hotel_name: string | null;
+          offer_charge_to_room: boolean | null;
+          preferred_suppliers: string[] | null;
+          service_charge_pct: number | null;
+          status: Database['public']['Enums']['hotel_status'] | null;
+        };
+        Relationships: [];
+      };
       component_public: {
         Row: {
           booking_lead_hours: number | null;
@@ -8676,6 +10596,260 @@ export type Database = {
             columns: ['zone_id'];
             isOneToOne: false;
             referencedRelation: 'zone_bounds';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_data_request_v: {
+        Row: {
+          blocking_reasons: Json | null;
+          channel: string | null;
+          days_left: number | null;
+          due_at: string | null;
+          fulfilled_at: string | null;
+          guest_id: string | null;
+          guest_name: string | null;
+          handled_by_name: string | null;
+          id: string | null;
+          identity_method: string | null;
+          identity_verified_at: string | null;
+          kind: Database['public']['Enums']['data_request_kind'] | null;
+          received_at: string | null;
+          refusal_reason: string | null;
+          requester_email: string | null;
+          requester_masked: string | null;
+          scope: string[] | null;
+          status: Database['public']['Enums']['data_request_status'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'data_request_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'data_request_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_folio_v: {
+        Row: {
+          age_minutes: number | null;
+          amount: number | null;
+          created_at: string | null;
+          desk_action_at: string | null;
+          desk_note: string | null;
+          desk_sla_minutes: number | null;
+          escalate_after_minutes: number | null;
+          escalated_at: string | null;
+          folio_ref: string | null;
+          guest_surname: string | null;
+          hotel_id: string | null;
+          hotel_name: string | null;
+          id: string | null;
+          order_reference: string | null;
+          recharged_payment_ref: string | null;
+          room_no: string | null;
+          status: Database['public']['Enums']['folio_status'] | null;
+          sync: Database['public']['Enums']['folio_sync'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      console_guest_v: {
+        Row: {
+          anonymised_at: string | null;
+          block_reason: string | null;
+          blocked: boolean | null;
+          consent_marketing: boolean | null;
+          consent_service_sms: boolean | null;
+          country_code: string | null;
+          created_at: string | null;
+          dispute_count: number | null;
+          has_account: boolean | null;
+          id: string | null;
+          last_order_at: string | null;
+          last_stay: Json | null;
+          name: string | null;
+          open_data_requests: number | null;
+          payment_summary: Json | null;
+          phone_masked: string | null;
+          preferences: Json | null;
+          refusal_count: number | null;
+          repeat_count: number | null;
+          staff_notes: string | null;
+          vip: boolean | null;
+        };
+        Insert: {
+          anonymised_at?: string | null;
+          block_reason?: string | null;
+          blocked?: boolean | null;
+          consent_marketing?: never;
+          consent_service_sms?: never;
+          country_code?: string | null;
+          created_at?: string | null;
+          dispute_count?: number | null;
+          has_account?: never;
+          id?: string | null;
+          last_order_at?: string | null;
+          last_stay?: Json | null;
+          name?: string | null;
+          open_data_requests?: never;
+          payment_summary?: Json | null;
+          phone_masked?: never;
+          preferences?: Json | null;
+          refusal_count?: number | null;
+          repeat_count?: number | null;
+          staff_notes?: string | null;
+          vip?: boolean | null;
+        };
+        Update: {
+          anonymised_at?: string | null;
+          block_reason?: string | null;
+          blocked?: boolean | null;
+          consent_marketing?: never;
+          consent_service_sms?: never;
+          country_code?: string | null;
+          created_at?: string | null;
+          dispute_count?: number | null;
+          has_account?: never;
+          id?: string | null;
+          last_order_at?: string | null;
+          last_stay?: Json | null;
+          name?: string | null;
+          open_data_requests?: never;
+          payment_summary?: Json | null;
+          phone_masked?: never;
+          preferences?: Json | null;
+          refusal_count?: number | null;
+          repeat_count?: number | null;
+          staff_notes?: string | null;
+          vip?: boolean | null;
+        };
+        Relationships: [];
+      };
+      console_hospitality_badges_v: {
+        Row: {
+          data_requests_due_soon: number | null;
+          data_requests_open: number | null;
+          folios_awaiting: number | null;
+          folios_over_sla: number | null;
+          folios_rejected_30d: number | null;
+          guests_blocked: number | null;
+          hosts_live: number | null;
+          hosts_verifying: number | null;
+          hotels_charge_to_room: number | null;
+          hotels_partner: number | null;
+          hotels_prospect: number | null;
+          invoices_due: number | null;
+          posted_this_month: number | null;
+          prospects_overdue: number | null;
+          recon_open: number | null;
+          rooms_covered: number | null;
+          units_setting_up: number | null;
+          units_stuck: number | null;
+        };
+        Relationships: [];
+      };
+      console_host_directory_v: {
+        Row: {
+          areas: string[] | null;
+          city_id: string | null;
+          city_name: string | null;
+          contact_name: string | null;
+          created_at: string | null;
+          display_name: string | null;
+          id: string | null;
+          kind: Database['public']['Enums']['host_kind'] | null;
+          orders_30d: number | null;
+          packages_enabled: boolean | null;
+          packages_month: number | null;
+          phone_masked: string | null;
+          qr_not_placed: number | null;
+          status: Database['public']['Enums']['host_status'] | null;
+          submitted_at: string | null;
+          superhost_claimed: boolean | null;
+          tier: Database['public']['Enums']['host_tier'] | null;
+          units: number | null;
+          units_live: number | null;
+          units_setting_up: number | null;
+          verified_at: string | null;
+          went_live_at: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_hotel_directory_v: {
+        Row: {
+          agreement_signed_at: string | null;
+          agreement_version: string | null;
+          area: string | null;
+          brand: string | null;
+          charge_cap_per_stay: number | null;
+          charge_to_room: boolean | null;
+          city_id: string | null;
+          city_name: string | null;
+          commission_pct: number | null;
+          gm_name: string | null;
+          id: string | null;
+          name: string | null;
+          next_action_at: string | null;
+          orders_30d: number | null;
+          posted_30d_kes: number | null;
+          postings_30d: number | null;
+          prospect_stage: string | null;
+          rooms: number | null;
+          star_rating: number | null;
+          status: Database['public']['Enums']['hotel_status'] | null;
+          tier: Database['public']['Enums']['hotel_tier'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
             referencedColumns: ['id'];
           },
         ];
@@ -9207,6 +11381,133 @@ export type Database = {
           },
         ];
       };
+      hospitality_points_v: {
+        Row: {
+          city_id: string | null;
+          kind: string | null;
+          point: unknown;
+          weight: number | null;
+        };
+        Relationships: [];
+      };
+      host_view_v: {
+        Row: {
+          area: string | null;
+          delivery_hours: Json | null;
+          guests_served: number | null;
+          handoff: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_sentence: string | null;
+          host_id: string | null;
+          label_public: string | null;
+          name: string | null;
+          orders_this_month: number | null;
+          packages_scheduled: number | null;
+          paused_reason: string | null;
+          placed_confirmed_at: string | null;
+          qr_code: string | null;
+          qr_scans: number | null;
+          qr_state: Database['public']['Enums']['qr_state'] | null;
+          readiness: Json | null;
+          status: Database['public']['Enums']['unit_status'] | null;
+          unit_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'unit_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      hotel_admin_v: {
+        Row: {
+          access_rule_text: string | null;
+          access_rule_version: number | null;
+          after_hours_handoff: string | null;
+          agreement_signed_at: string | null;
+          agreement_version: string | null;
+          charge_cap_per_stay: number | null;
+          charge_to_room: boolean | null;
+          commission_pct: number | null;
+          delivery_from: string | null;
+          delivery_to: string | null;
+          desk_sla_minutes: number | null;
+          escalate_after_minutes: number | null;
+          folio_sync: Database['public']['Enums']['folio_sync'] | null;
+          front_desk_ordering: boolean | null;
+          hotel_id: string | null;
+          in_room_qr: boolean | null;
+          invoice_terms_days: number | null;
+          name: string | null;
+          pms_integration: string | null;
+          preferred_suppliers: string[] | null;
+          room_cards_printed: number | null;
+          rooms: number | null;
+          rooms_configured: number | null;
+          status: Database['public']['Enums']['hotel_status'] | null;
+          tier: Database['public']['Enums']['hotel_tier'] | null;
+          users_count: number | null;
+        };
+        Relationships: [];
+      };
+      hotel_desk_v: {
+        Row: {
+          age_minutes: number | null;
+          amount: number | null;
+          created_at: string | null;
+          desk_action_at: string | null;
+          desk_sla_minutes: number | null;
+          escalate_after_minutes: number | null;
+          escalated_at: string | null;
+          folio_ref: string | null;
+          guest_surname: string | null;
+          hotel_id: string | null;
+          id: string | null;
+          order_reference: string | null;
+          room_no: string | null;
+          sla_state: string | null;
+          status: Database['public']['Enums']['folio_status'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'folio_posting_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
       merchant_dashboard_v: {
         Row: {
           accepting_orders: boolean | null;
@@ -9507,6 +11808,69 @@ export type Database = {
           },
         ];
       };
+      rider_handoff_v: {
+        Row: {
+          address_line: string | null;
+          after_hours_handoff: string | null;
+          askari_name: string | null;
+          building: string | null;
+          caretaker_name: string | null;
+          delivery_hours: Json | null;
+          floor: string | null;
+          handoff: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_note: string | null;
+          handoff_sentence: string | null;
+          has_gate_code: boolean | null;
+          hotel_access_text: string | null;
+          label_public: string | null;
+          lift_note: string | null;
+          parking_note: string | null;
+          point: unknown;
+          unit_id: string | null;
+          unit_no: string | null;
+        };
+        Insert: {
+          address_line?: string | null;
+          after_hours_handoff?: never;
+          askari_name?: string | null;
+          building?: string | null;
+          caretaker_name?: string | null;
+          delivery_hours?: Json | null;
+          floor?: string | null;
+          handoff?: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_note?: string | null;
+          handoff_sentence?: never;
+          has_gate_code?: never;
+          hotel_access_text?: never;
+          label_public?: string | null;
+          lift_note?: string | null;
+          parking_note?: string | null;
+          point?: unknown;
+          unit_id?: string | null;
+          unit_no?: string | null;
+        };
+        Update: {
+          address_line?: string | null;
+          after_hours_handoff?: never;
+          askari_name?: string | null;
+          building?: string | null;
+          caretaker_name?: string | null;
+          delivery_hours?: Json | null;
+          floor?: string | null;
+          handoff?: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_note?: string | null;
+          handoff_sentence?: never;
+          has_gate_code?: never;
+          hotel_access_text?: never;
+          label_public?: string | null;
+          lift_note?: string | null;
+          parking_note?: string | null;
+          point?: unknown;
+          unit_id?: string | null;
+          unit_no?: string | null;
+        };
+        Relationships: [];
+      };
       rider_public: {
         Row: {
           city_id: string | null;
@@ -9535,6 +11899,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      unit_context_v: {
+        Row: {
+          area: string | null;
+          charge_to_room_available: boolean | null;
+          checkin_time: string | null;
+          checkout_time: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          delivery_hours: Json | null;
+          handoff: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_sentence: string | null;
+          host_display_name: string | null;
+          hotel_id: string | null;
+          label_public: string | null;
+          point: unknown;
+          preferred_suppliers: string[] | null;
+          status: Database['public']['Enums']['unit_status'] | null;
+          unit_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'unit_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'city';
@@ -9594,6 +11987,7 @@ export type Database = {
       };
     };
     Functions: {
+      cron_retention: { Args: Record<PropertyKey, never>; Returns: number };
       distance_to_nearest_zone: {
         Args: { p_lat: number; p_lng: number };
         Returns: {
@@ -9603,6 +11997,7 @@ export type Database = {
           zone_name: string;
         }[];
       };
+      fn_anonymise_guest: { Args: { p_guest_id: string }; Returns: undefined };
       fn_answer_matches: { Args: { p_answers: Json; p_condition: Json }; Returns: boolean };
       fn_available_components: {
         Args: { p_plan_id: string };
@@ -9659,10 +12054,16 @@ export type Database = {
         Returns: number;
       };
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
+      fn_data_request_blockers: { Args: { p_request_id: string }; Returns: Json };
+      fn_decrypt_secret: { Args: { p_cipher: string }; Returns: string };
+      fn_encrypt_secret: { Args: { p_plain: string }; Returns: string };
       fn_event_anchor_effects: { Args: { p_plan_id: string }; Returns: undefined };
       fn_expire_documents: { Args: Record<PropertyKey, never>; Returns: number };
       fn_fit_budget: { Args: { p_plan_id: string }; Returns: undefined };
+      fn_folio_escalation_sweep: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
+      fn_mask_phone: { Args: { p_phone: string }; Returns: string };
       fn_match_deposit: {
         Args: { p_deposit_id: string };
         Returns: {
@@ -9990,6 +12391,7 @@ export type Database = {
         }[];
       };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
+      fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
       fn_zone_supply_gap: {
         Args: { p_at?: string; p_zone_id: string };
         Returns: {
@@ -10658,6 +13060,137 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_data_request_anonymise: {
+        Args: { p_request_id: string };
+        Returns: {
+          blocking_reasons: NonNullable<Json>;
+          bundle_expires_at: string | null;
+          bundle_path: string | null;
+          channel: string | null;
+          communication_log: NonNullable<Json>;
+          created_at: string;
+          due_at: string;
+          fulfilled_at: string | null;
+          guest_id: string | null;
+          handled_by: string | null;
+          id: string;
+          identity_method: string | null;
+          identity_verified_at: string | null;
+          kind: Database['public']['Enums']['data_request_kind'];
+          received_at: string;
+          refusal_reason: string | null;
+          requester_email: string | null;
+          requester_phone: string | null;
+          scope: string[];
+          status: Database['public']['Enums']['data_request_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'data_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_data_request_create: {
+        Args: {
+          p_channel?: string;
+          p_email?: string;
+          p_kind: Database['public']['Enums']['data_request_kind'];
+          p_phone?: string;
+          p_scope?: string[];
+        };
+        Returns: {
+          blocking_reasons: NonNullable<Json>;
+          bundle_expires_at: string | null;
+          bundle_path: string | null;
+          channel: string | null;
+          communication_log: NonNullable<Json>;
+          created_at: string;
+          due_at: string;
+          fulfilled_at: string | null;
+          guest_id: string | null;
+          handled_by: string | null;
+          id: string;
+          identity_method: string | null;
+          identity_verified_at: string | null;
+          kind: Database['public']['Enums']['data_request_kind'];
+          received_at: string;
+          refusal_reason: string | null;
+          requester_email: string | null;
+          requester_phone: string | null;
+          scope: string[];
+          status: Database['public']['Enums']['data_request_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'data_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_data_request_hold: {
+        Args: { p_reason: string; p_request_id: string };
+        Returns: {
+          blocking_reasons: NonNullable<Json>;
+          bundle_expires_at: string | null;
+          bundle_path: string | null;
+          channel: string | null;
+          communication_log: NonNullable<Json>;
+          created_at: string;
+          due_at: string;
+          fulfilled_at: string | null;
+          guest_id: string | null;
+          handled_by: string | null;
+          id: string;
+          identity_method: string | null;
+          identity_verified_at: string | null;
+          kind: Database['public']['Enums']['data_request_kind'];
+          received_at: string;
+          refusal_reason: string | null;
+          requester_email: string | null;
+          requester_phone: string | null;
+          scope: string[];
+          status: Database['public']['Enums']['data_request_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'data_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_data_request_preview_bundle: { Args: { p_request_id: string }; Returns: Json };
+      rpc_data_request_verify_identity: {
+        Args: { p_method?: string; p_request_id: string };
+        Returns: {
+          blocking_reasons: NonNullable<Json>;
+          bundle_expires_at: string | null;
+          bundle_path: string | null;
+          channel: string | null;
+          communication_log: NonNullable<Json>;
+          created_at: string;
+          due_at: string;
+          fulfilled_at: string | null;
+          guest_id: string | null;
+          handled_by: string | null;
+          id: string;
+          identity_method: string | null;
+          identity_verified_at: string | null;
+          kind: Database['public']['Enums']['data_request_kind'];
+          received_at: string;
+          refusal_reason: string | null;
+          requester_email: string | null;
+          requester_phone: string | null;
+          scope: string[];
+          status: Database['public']['Enums']['data_request_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'data_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_decide_review: {
         Args: {
           p_decision: Database['public']['Enums']['review_status'];
@@ -11022,6 +13555,78 @@ export type Database = {
       };
       rpc_experience_stats: { Args: { p_city_id?: string }; Returns: Json };
       rpc_expire_quotes: { Args: Record<PropertyKey, never>; Returns: number };
+      rpc_folio_desk_action: {
+        Args: { p_action: string; p_folio_ref?: string; p_note?: string; p_posting_id: string };
+        Returns: {
+          amount: number;
+          cap_check: NonNullable<Json>;
+          commission_amount: number | null;
+          created_at: string;
+          desk_action_at: string | null;
+          desk_note: string | null;
+          desk_user_id: string | null;
+          escalated_at: string | null;
+          folio_ref: string | null;
+          guest_id: string | null;
+          guest_surname: string;
+          hotel_id: string;
+          id: string;
+          order_reference: string;
+          pms_posted_at: string | null;
+          recharged_payment_ref: string | null;
+          room_no: string;
+          status: Database['public']['Enums']['folio_status'];
+          sync: Database['public']['Enums']['folio_sync'];
+          voided_reason: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'folio_posting';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_folio_request: {
+        Args: {
+          p_amount: number;
+          p_hotel_id: string;
+          p_order_reference: string;
+          p_room_no: string;
+          p_surname: string;
+        };
+        Returns: Json;
+      };
+      rpc_folio_void: {
+        Args: { p_posting_id: string; p_reason: string };
+        Returns: {
+          amount: number;
+          cap_check: NonNullable<Json>;
+          commission_amount: number | null;
+          created_at: string;
+          desk_action_at: string | null;
+          desk_note: string | null;
+          desk_user_id: string | null;
+          escalated_at: string | null;
+          folio_ref: string | null;
+          guest_id: string | null;
+          guest_surname: string;
+          hotel_id: string;
+          id: string;
+          order_reference: string;
+          pms_posted_at: string | null;
+          recharged_payment_ref: string | null;
+          room_no: string;
+          status: Database['public']['Enums']['folio_status'];
+          sync: Database['public']['Enums']['folio_sync'];
+          voided_reason: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'folio_posting';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_fraud_signal_review: {
         Args: { p_action: string; p_signal_id: string };
         Returns: {
@@ -11043,6 +13648,30 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_guest_consent_set: {
+        Args: {
+          p_granted: boolean;
+          p_guest_id: string;
+          p_kind: Database['public']['Enums']['guest_consent_kind'];
+          p_source?: string;
+        };
+        Returns: {
+          at: string;
+          granted: boolean;
+          guest_id: string;
+          id: number;
+          ip_hash: string | null;
+          kind: Database['public']['Enums']['guest_consent_kind'];
+          source: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'guest_consent';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_guest_reveal_phone: { Args: { p_guest_id: string; p_reason: string }; Returns: Json };
       rpc_handover_plan: {
         Args: { p_plan_id: string; p_reason: string; p_to: string };
         Returns: {
@@ -11092,6 +13721,231 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'plan';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_hospitality_counts: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_host_apply: { Args: { p_payload: Json }; Returns: Json };
+      rpc_host_verify: {
+        Args: { p_evidence?: Json; p_host_id: string; p_method: string };
+        Returns: {
+          areas: string[];
+          billing_details: NonNullable<Json>;
+          billing_method: string | null;
+          city_id: string | null;
+          contact_name: string | null;
+          created_at: string;
+          default_handoff: Database['public']['Enums']['handoff_mode'] | null;
+          display_name: string | null;
+          email: string | null;
+          id: string;
+          kind: Database['public']['Enums']['host_kind'];
+          listing_link: string | null;
+          notes: string | null;
+          onboarding_step: number;
+          packages_enabled: boolean;
+          paused_at: string | null;
+          phone: string;
+          referral_code: string | null;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          status: Database['public']['Enums']['host_status'];
+          status_reason: string | null;
+          submitted_at: string | null;
+          superhost_claimed: boolean;
+          tier: Database['public']['Enums']['host_tier'];
+          units_declared_band: string | null;
+          updated_at: string;
+          verification: NonNullable<Json>;
+          verified_at: string | null;
+          verified_by: string | null;
+          went_live_at: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'host';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_hotel_access_rule_publish: {
+        Args: {
+          p_after_hours?: string;
+          p_delivery_from?: string;
+          p_delivery_to?: string;
+          p_hotel_id: string;
+          p_text: string;
+        };
+        Returns: {
+          after_hours_handoff: string | null;
+          delivery_from: string | null;
+          delivery_to: string | null;
+          hotel_id: string;
+          id: string;
+          superseded_at: string | null;
+          text: string;
+          updated_at: string;
+          updated_by: string | null;
+          version: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'hotel_access_rule';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_hotel_activate_approve: {
+        Args: { p_request_id: string };
+        Returns: {
+          agreement_pdf_path: string | null;
+          agreement_signed_at: string | null;
+          agreement_version: string | null;
+          area: string | null;
+          brand: string | null;
+          city_id: string | null;
+          commission_pct: number | null;
+          created_at: string;
+          gm_name: string | null;
+          id: string;
+          invoice_terms_days: number;
+          lost_reason: string | null;
+          name: string;
+          next_action_at: string | null;
+          owner_staff_id: string | null;
+          paused_reason: string | null;
+          pms_integration: string;
+          pms_property_code: string | null;
+          pms_vendor: string | null;
+          point: unknown;
+          prospect_stage: string | null;
+          rooms: number | null;
+          star_rating: number | null;
+          status: Database['public']['Enums']['hotel_status'];
+          tier: Database['public']['Enums']['hotel_tier'] | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'hotel';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_hotel_activate_request: {
+        Args: {
+          p_commission_pct: number;
+          p_hotel_id: string;
+          p_reason: string;
+          p_tier: Database['public']['Enums']['hotel_tier'];
+        };
+        Returns: {
+          city_id: string | null;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          id: string;
+          kind: Database['public']['Enums']['approval_kind'];
+          payload: NonNullable<Json>;
+          reason: string;
+          requested_by: string;
+          status: Database['public']['Enums']['approval_status'];
+          target_id: string;
+          target_type: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'approval_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_hotel_prospect_upsert: {
+        Args: { p_hotel: Json; p_hotel_id?: string };
+        Returns: {
+          agreement_pdf_path: string | null;
+          agreement_signed_at: string | null;
+          agreement_version: string | null;
+          area: string | null;
+          brand: string | null;
+          city_id: string | null;
+          commission_pct: number | null;
+          created_at: string;
+          gm_name: string | null;
+          id: string;
+          invoice_terms_days: number;
+          lost_reason: string | null;
+          name: string;
+          next_action_at: string | null;
+          owner_staff_id: string | null;
+          paused_reason: string | null;
+          pms_integration: string;
+          pms_property_code: string | null;
+          pms_vendor: string | null;
+          point: unknown;
+          prospect_stage: string | null;
+          rooms: number | null;
+          star_rating: number | null;
+          status: Database['public']['Enums']['hotel_status'];
+          tier: Database['public']['Enums']['hotel_tier'] | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'hotel';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_hotel_setting_update: {
+        Args: { p_hotel_id: string; p_patch: Json };
+        Returns: {
+          charge_cap_per_stay: number | null;
+          charge_to_room: boolean;
+          desk_sla_minutes: number;
+          escalate_after_minutes: number;
+          folio_sync: Database['public']['Enums']['folio_sync'];
+          folio_sync_time: string | null;
+          front_desk_ordering: boolean;
+          guest_pays_delivery: boolean;
+          hotel_id: string;
+          in_room_qr: boolean;
+          preferred_suppliers: string[];
+          room_cards_printed: number;
+          service_charge_pct: number | null;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'hotel_program_setting';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_hotel_statement_build: {
+        Args: { p_hotel_id: string; p_period: string };
+        Returns: {
+          commission: number;
+          created_at: string;
+          due_at: string | null;
+          gross: number;
+          hotel_id: string;
+          id: string;
+          net_invoiced: number;
+          paid_at: string | null;
+          pdf_path: string | null;
+          period: string;
+          postings_count: number;
+          provider_ref: string | null;
+          status: Database['public']['Enums']['invoice_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'hotel_statement';
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -12422,6 +15276,54 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_qr_generate: {
+        Args: { p_room_id?: string; p_unit_id?: string };
+        Returns: {
+          code: string;
+          first_scanned_at: string | null;
+          generated_at: string;
+          id: string;
+          placed_confirmed_at: string | null;
+          replaced_by: string | null;
+          room_id: string | null;
+          scans: number;
+          sent_at: string | null;
+          state: Database['public']['Enums']['qr_state'];
+          token_hash: string | null;
+          unit_id: string | null;
+          voided_at: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'unit_qr';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_qr_mark_placed: {
+        Args: { p_qr_id: string };
+        Returns: {
+          code: string;
+          first_scanned_at: string | null;
+          generated_at: string;
+          id: string;
+          placed_confirmed_at: string | null;
+          replaced_by: string | null;
+          room_id: string | null;
+          scans: number;
+          sent_at: string | null;
+          state: Database['public']['Enums']['qr_state'];
+          token_hash: string | null;
+          unit_id: string | null;
+          voided_at: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'unit_qr';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_quote_plan: {
         Args: { p_plan_id: string };
         Returns: {
@@ -12501,6 +15403,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_reconciliation_import: {
+        Args: { p_lines: Json; p_statement_id: string };
+        Returns: number;
       };
       rpc_reject_event_submission: {
         Args: { p_event_id: string; p_reason: string };
@@ -12656,6 +15562,7 @@ export type Database = {
         };
       };
       rpc_request_review: { Args: { p_plan_id: string }; Returns: string };
+      rpc_resolve_qr: { Args: { p_code: string }; Returns: Json };
       rpc_rider_apply: {
         Args: {
           p_city_id: string;
@@ -13084,6 +15991,10 @@ export type Database = {
       rpc_rider_request_phone_code: { Args: { p_rider_id: string }; Returns: Json };
       rpc_rider_resume_claim: { Args: { p_token: string }; Returns: Json };
       rpc_rider_resume_token: { Args: { p_rider_id: string }; Returns: string };
+      rpc_rider_reveal_gate_code: {
+        Args: { p_lat?: number; p_lng?: number; p_order_reference: string; p_unit_id: string };
+        Returns: Json;
+      };
       rpc_rider_save_step: {
         Args: { p_patch?: Json; p_rider_id: string; p_step: number };
         Returns: Json;
@@ -13681,6 +16592,57 @@ export type Database = {
         };
       };
       rpc_translations_put: { Args: { p_locale: string; p_rows: Json }; Returns: number };
+      rpc_unit_caretaker_confirm: { Args: { p_token: string; p_unit_id: string }; Returns: Json };
+      rpc_unit_secret_reveal: {
+        Args: { p_reason: string; p_unit_id: string; p_which: string };
+        Returns: Json;
+      };
+      rpc_unit_upsert: {
+        Args: { p_host_id: string; p_unit: Json; p_unit_id?: string };
+        Returns: {
+          address_line: string | null;
+          archived_at: string | null;
+          area: string | null;
+          askari_name: string | null;
+          askari_phone_encrypted: string | null;
+          building: string | null;
+          caretaker_confirmed_at: string | null;
+          caretaker_name: string | null;
+          caretaker_phone_encrypted: string | null;
+          checkin_time: string | null;
+          checkout_time: string | null;
+          city_id: string | null;
+          created_at: string;
+          delivery_hours: Json | null;
+          floor: string | null;
+          gate_code_encrypted: string | null;
+          handoff: Database['public']['Enums']['handoff_mode'] | null;
+          handoff_note: string | null;
+          host_id: string;
+          house_rules_link: string | null;
+          id: string;
+          label_public: string | null;
+          lift_note: string | null;
+          name: string;
+          packages_default: string | null;
+          packages_schedule: Database['public']['Enums']['package_schedule'] | null;
+          parking_note: string | null;
+          paused_reason: string | null;
+          point: unknown;
+          readiness: NonNullable<Json>;
+          status: Database['public']['Enums']['unit_status'];
+          unit_no: string | null;
+          updated_at: string;
+          wifi_name: string | null;
+          zone_id: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'unit';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       zone_for_point: {
         Args: { p_lat: number; p_lng: number };
         Returns: {
@@ -13714,7 +16676,12 @@ export type Database = {
         | 'rider_offboard'
         | 'rider_cash_write_off'
         | 'rider_rate_card'
-        | 'rider_settlement_run';
+        | 'rider_settlement_run'
+        | 'hotel_activation'
+        | 'folio_void'
+        | 'reconciliation_write_off'
+        | 'guest_anonymise'
+        | 'guest_block';
       approval_status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
       audit_severity: 'info' | 'notice' | 'high';
       block_kind: 'activity' | 'meal' | 'venue' | 'transport' | 'stay' | 'event' | 'free';
@@ -13729,6 +16696,15 @@ export type Database = {
         | 'recovery_payment';
       city_status: 'live' | 'soft_launch' | 'waitlist';
       commission_tier_code: 'T1' | 'T2' | 'T3';
+      data_request_kind: 'access' | 'erasure' | 'rectification' | 'restriction';
+      data_request_status:
+        | 'received'
+        | 'identity_pending'
+        | 'in_progress'
+        | 'bundle_ready'
+        | 'fulfilled'
+        | 'refused'
+        | 'withdrawn';
       deposit_match_status: 'auto_matched' | 'manual_matched' | 'unmatched' | 'rejected';
       dispute_fault: 'merchant' | 'rider' | 'guest' | 'nexg' | 'unknown';
       dispute_resolution:
@@ -13764,6 +16740,15 @@ export type Database = {
         | 'active'
         | 'declined'
         | 'expired';
+      folio_status:
+        | 'awaiting_desk'
+        | 'posted'
+        | 'rejected_checked_out'
+        | 'rejected_name_mismatch'
+        | 'rejected_cap'
+        | 'recharged_card'
+        | 'void';
+      folio_sync: 'pms' | 'manual';
       fraud_signal_kind:
         | 'gps_jump'
         | 'delivered_far_from_pin'
@@ -13772,8 +16757,21 @@ export type Database = {
         | 'plate_photo_mismatch'
         | 'cash_marked_mpesa'
         | 'offer_farming';
+      guest_consent_kind: 'service_sms' | 'marketing' | 'analytics';
+      handoff_mode:
+        | 'guest_meets_at_gate'
+        | 'leave_with_askari'
+        | 'lockbox'
+        | 'call_guest_first'
+        | 'reception'
+        | 'caretaker';
       health_band: 'green' | 'amber' | 'red';
       hold_status: 'none' | 'requested' | 'held' | 'declined' | 'expired';
+      host_kind: 'single_unit' | 'multi_unit' | 'property_manager';
+      host_status: 'applied' | 'verifying' | 'live' | 'paused' | 'offboarded';
+      host_tier: 'listed' | 'silver' | 'gold';
+      hotel_status: 'prospect' | 'onboarding' | 'partner' | 'paused' | 'ended';
+      hotel_tier: 'listed' | 'silver' | 'gold';
       incident_kind:
         | 'accident'
         | 'harassment'
@@ -13787,6 +16785,7 @@ export type Database = {
       incident_severity: 'minor' | 'major' | 'critical';
       incident_status: 'open' | 'investigating' | 'resolved' | 'closed';
       insurance_type: 'comprehensive' | 'third_party' | 'none';
+      invoice_status: 'draft' | 'sent' | 'due' | 'overdue' | 'paid' | 'credited';
       legal_document_key:
         | 'terms'
         | 'privacy'
@@ -13871,8 +16870,35 @@ export type Database = {
         | 'strike_issued'
         | 'incident_received'
         | 'incident_resolved'
-        | 'sos_ack';
+        | 'sos_ack'
+        | 'host_ack'
+        | 'host_resume_link'
+        | 'host_verified'
+        | 'unit_live'
+        | 'qr_pack'
+        | 'caretaker_confirm'
+        | 'package_delivered'
+        | 'host_invoice_ready'
+        | 'host_invoice_due'
+        | 'unit_paused_by_staff'
+        | 'host_message'
+        | 'hotel_users_invite'
+        | 'folio_new'
+        | 'folio_escalated'
+        | 'statement_due'
+        | 'reconciliation_lines'
+        | 'access_rule_changed'
+        | 'charged_to_room'
+        | 'folio_rejected_pay_now'
+        | 'desk_ordered_for_you'
+        | 'data_request_received'
+        | 'data_request_identity_otp'
+        | 'data_request_bundle_ready'
+        | 'data_request_fulfilled'
+        | 'data_request_held'
+        | 'handoff_rule_changed_next_time';
       notification_status: 'pending' | 'sent' | 'failed' | 'no_address';
+      package_schedule: 'per_booking' | 'every_checkin' | 'manual';
       partner_status:
         | 'applied'
         | 'documents_pending'
@@ -13896,6 +16922,8 @@ export type Database = {
         | 'expired';
       price_basis: 'per_person' | 'per_group' | 'per_vehicle' | 'per_night' | 'face_value';
       price_flag_status: 'open' | 'aligned' | 'dismissed';
+      qr_state: 'generated' | 'sent' | 'placed' | 'scanned' | 'replaced';
+      recon_status: 'open' | 'matched' | 'missing_reference' | 'disputed' | 'reconciled';
       review_display: 'initial' | 'full_name' | 'anonymous';
       review_status: 'received' | 'approved' | 'kept_private';
       rider_control_source: 'rider' | 'staff' | 'system';
@@ -13932,6 +16960,7 @@ export type Database = {
         | 'hotel_partnership'
         | 'something_else';
       translation_engine: 'human' | 'machine';
+      unit_status: 'setting_up' | 'live' | 'paused' | 'archived';
       vehicle_ownership: 'own' | 'rented' | 'family';
       vehicle_type: 'motorbike' | 'bicycle' | 'car' | 'tuktuk';
       zone_tier: 'core' | 'extended' | 'trial';
@@ -14071,6 +17100,11 @@ export const Constants = {
         'rider_cash_write_off',
         'rider_rate_card',
         'rider_settlement_run',
+        'hotel_activation',
+        'folio_void',
+        'reconciliation_write_off',
+        'guest_anonymise',
+        'guest_block',
       ],
       approval_status: ['pending', 'approved', 'rejected', 'withdrawn'],
       audit_severity: ['info', 'notice', 'high'],
@@ -14087,6 +17121,16 @@ export const Constants = {
       ],
       city_status: ['live', 'soft_launch', 'waitlist'],
       commission_tier_code: ['T1', 'T2', 'T3'],
+      data_request_kind: ['access', 'erasure', 'rectification', 'restriction'],
+      data_request_status: [
+        'received',
+        'identity_pending',
+        'in_progress',
+        'bundle_ready',
+        'fulfilled',
+        'refused',
+        'withdrawn',
+      ],
       deposit_match_status: ['auto_matched', 'manual_matched', 'unmatched', 'rejected'],
       dispute_fault: ['merchant', 'rider', 'guest', 'nexg', 'unknown'],
       dispute_resolution: [
@@ -14111,6 +17155,16 @@ export const Constants = {
         'merchant_link',
       ],
       fleet_invite_status: ['invited', 'started', 'under_review', 'active', 'declined', 'expired'],
+      folio_status: [
+        'awaiting_desk',
+        'posted',
+        'rejected_checked_out',
+        'rejected_name_mismatch',
+        'rejected_cap',
+        'recharged_card',
+        'void',
+      ],
+      folio_sync: ['pms', 'manual'],
       fraud_signal_kind: [
         'gps_jump',
         'delivered_far_from_pin',
@@ -14120,8 +17174,22 @@ export const Constants = {
         'cash_marked_mpesa',
         'offer_farming',
       ],
+      guest_consent_kind: ['service_sms', 'marketing', 'analytics'],
+      handoff_mode: [
+        'guest_meets_at_gate',
+        'leave_with_askari',
+        'lockbox',
+        'call_guest_first',
+        'reception',
+        'caretaker',
+      ],
       health_band: ['green', 'amber', 'red'],
       hold_status: ['none', 'requested', 'held', 'declined', 'expired'],
+      host_kind: ['single_unit', 'multi_unit', 'property_manager'],
+      host_status: ['applied', 'verifying', 'live', 'paused', 'offboarded'],
+      host_tier: ['listed', 'silver', 'gold'],
+      hotel_status: ['prospect', 'onboarding', 'partner', 'paused', 'ended'],
+      hotel_tier: ['listed', 'silver', 'gold'],
       incident_kind: [
         'accident',
         'harassment',
@@ -14136,6 +17204,7 @@ export const Constants = {
       incident_severity: ['minor', 'major', 'critical'],
       incident_status: ['open', 'investigating', 'resolved', 'closed'],
       insurance_type: ['comprehensive', 'third_party', 'none'],
+      invoice_status: ['draft', 'sent', 'due', 'overdue', 'paid', 'credited'],
       legal_document_key: [
         'terms',
         'privacy',
@@ -14223,8 +17292,35 @@ export const Constants = {
         'incident_received',
         'incident_resolved',
         'sos_ack',
+        'host_ack',
+        'host_resume_link',
+        'host_verified',
+        'unit_live',
+        'qr_pack',
+        'caretaker_confirm',
+        'package_delivered',
+        'host_invoice_ready',
+        'host_invoice_due',
+        'unit_paused_by_staff',
+        'host_message',
+        'hotel_users_invite',
+        'folio_new',
+        'folio_escalated',
+        'statement_due',
+        'reconciliation_lines',
+        'access_rule_changed',
+        'charged_to_room',
+        'folio_rejected_pay_now',
+        'desk_ordered_for_you',
+        'data_request_received',
+        'data_request_identity_otp',
+        'data_request_bundle_ready',
+        'data_request_fulfilled',
+        'data_request_held',
+        'handoff_rule_changed_next_time',
       ],
       notification_status: ['pending', 'sent', 'failed', 'no_address'],
+      package_schedule: ['per_booking', 'every_checkin', 'manual'],
       partner_status: [
         'applied',
         'documents_pending',
@@ -14250,6 +17346,8 @@ export const Constants = {
       ],
       price_basis: ['per_person', 'per_group', 'per_vehicle', 'per_night', 'face_value'],
       price_flag_status: ['open', 'aligned', 'dismissed'],
+      qr_state: ['generated', 'sent', 'placed', 'scanned', 'replaced'],
+      recon_status: ['open', 'matched', 'missing_reference', 'disputed', 'reconciled'],
       review_display: ['initial', 'full_name', 'anonymous'],
       review_status: ['received', 'approved', 'kept_private'],
       rider_control_source: ['rider', 'staff', 'system'],
@@ -14282,6 +17380,7 @@ export const Constants = {
         'something_else',
       ],
       translation_engine: ['human', 'machine'],
+      unit_status: ['setting_up', 'live', 'paused', 'archived'],
       vehicle_ownership: ['own', 'rented', 'family'],
       vehicle_type: ['motorbike', 'bicycle', 'car', 'tuktuk'],
       zone_tier: ['core', 'extended', 'trial'],
