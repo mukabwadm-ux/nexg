@@ -149,6 +149,13 @@ const en: Dictionary = {
   'home.app.body':
     'Ask for anything in a sentence, watch your concierge move on the map, and pay by card or M-Pesa when it’s done. Launching first in Nairobi, then across East Africa.',
 
+  'merchant.sponsored': 'Sponsored',
+  'merchant.min': 'min',
+  'merchant.cta.menu': 'View menu',
+  'merchant.cta.shop': 'Shop',
+  'merchant.cta.services': 'View services',
+  'merchant.cta.view': 'View store',
+
   // ── chrome
   'nav.explore': 'Explore',
   'nav.experience': 'Customize your experience',
@@ -284,6 +291,13 @@ const sw: Dictionary = {
   'home.app.heading': 'Msaidizi wako, ndani ya',
   'home.app.body':
     'Omba chochote kwa sentensi moja, mfuatilie msaidizi wako kwenye ramani, na ulipe kwa kadi au M-Pesa ikiisha. Tunaanza Nairobi, kisha Afrika Mashariki nzima.',
+
+  'merchant.sponsored': 'Imedhaminiwa',
+  'merchant.min': 'dak',
+  'merchant.cta.menu': 'Tazama menyu',
+  'merchant.cta.shop': 'Nunua',
+  'merchant.cta.services': 'Tazama huduma',
+  'merchant.cta.view': 'Tazama duka',
 
   // ── menyu
   'nav.explore': 'Gundua',

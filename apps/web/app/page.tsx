@@ -299,7 +299,7 @@ export default async function HomePage() {
               </Button>
             </div>
 
-            <FeaturedMerchants merchants={featured ?? []} />
+            <FeaturedMerchants merchants={featured ?? []} t={t} />
 
             <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-semibold text-white/40">{t('home.featured.ownBusiness')}</p>
