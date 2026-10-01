@@ -117,7 +117,7 @@ export default async function HostsPage() {
 
       <main id="main">
         {/* ───────────────────────────────────────────── hero */}
-        <section className="mx-auto grid max-w-[80rem] gap-10 px-4 pb-16 pt-10 sm:px-8 lg:grid-cols-[1fr_28rem] lg:items-center lg:pt-16">
+        <section className="mx-auto grid max-w-[96rem] gap-10 px-4 pb-16 pt-10 sm:px-8 lg:grid-cols-[1fr_32rem] lg:items-center lg:gap-12 lg:px-16 lg:pt-16">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-[#DDD8CC] bg-white px-3 py-1.5 text-[0.6875rem] font-extrabold">
               <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#D4A72C]" />
@@ -160,7 +160,7 @@ export default async function HostsPage() {
         </section>
 
         {/* ──────────────────────────────────────── why hosts list */}
-        <section className="mx-auto max-w-[80rem] px-4 py-12 sm:px-8">
+        <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
           <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#8A8A8A]">
             Why hosts list
           </p>
@@ -187,7 +187,7 @@ export default async function HostsPage() {
         </section>
 
         {/* ─────────────────────────────────────── how it works */}
-        <section id="how" className="mx-auto max-w-[80rem] px-4 py-12 sm:px-8">
+        <section id="how" className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
           <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#8A8A8A]">
             How it works
           </p>
@@ -195,7 +195,7 @@ export default async function HostsPage() {
             Set up once. Every guest is looked after.
           </h2>
 
-          <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_24rem] lg:items-start">
+          <div className="mt-7 grid gap-8 lg:grid-cols-[1fr_28rem] lg:items-start lg:gap-12">
             <ol className="space-y-3">
               {STEPS.map((step, i) => (
                 <li key={step.title}>
@@ -222,9 +222,9 @@ export default async function HostsPage() {
         </section>
 
         {/* ──────────────────────────────────── welcome packages */}
-        <section className="mx-auto max-w-[80rem] px-4 py-12 sm:px-8">
+        <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
           <div className="rounded-2xl bg-[#D4A72C] p-6 sm:p-10">
-            <div className="grid gap-8 lg:grid-cols-[1fr_28rem] lg:items-start">
+            <div className="grid gap-8 lg:grid-cols-[1fr_34rem] lg:items-start lg:gap-12">
               <div>
                 <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#5B4708]">
                   Optional · for hosts who want more
@@ -280,9 +280,9 @@ export default async function HostsPage() {
         </section>
 
         {/* ─────────────────────────────────────────── the form */}
-        <section id="list" className="mx-auto max-w-[80rem] px-4 py-12 sm:px-8">
+        <section id="list" className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
           <div className="rounded-2xl border border-[#ECE8DF] bg-white p-6 sm:p-10">
-            <div className="grid gap-8 lg:grid-cols-[22rem_1fr] lg:items-start">
+            <div className="grid gap-8 lg:grid-cols-[26rem_1fr] lg:items-start lg:gap-14">
               <div>
                 <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#B8901F]">
                   List your Airbnb
@@ -319,8 +319,8 @@ export default async function HostsPage() {
         </section>
 
         {/* ────────────────────────────────────────────── FAQ */}
-        <section className="mx-auto max-w-[80rem] px-4 py-12 sm:px-8">
-          <div className="grid gap-8 lg:grid-cols-[22rem_1fr] lg:items-start">
+        <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
+          <div className="grid gap-8 lg:grid-cols-[26rem_1fr] lg:items-start lg:gap-14">
             <div>
               <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#8A8A8A]">
                 Host questions
@@ -330,7 +330,7 @@ export default async function HostsPage() {
               </h2>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid gap-3 md:grid-cols-2">
               {FAQ.map((item) => (
                 <Card key={item.q} className="p-5">
                   <h3 className="text-[0.9375rem] font-extrabold">{item.q}</h3>
@@ -344,7 +344,7 @@ export default async function HostsPage() {
         </section>
 
         {/* ────────────────────────────────────────── CTA band */}
-        <section className="mx-auto max-w-[80rem] px-4 pb-16 sm:px-8">
+        <section className="mx-auto max-w-[96rem] px-4 pb-16 sm:px-8 lg:px-16">
           <div className="flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-[#141414] p-8 sm:p-10">
             <div>
               <h2 className="text-[1.5rem] font-extrabold tracking-[-0.02em] text-white sm:text-[1.875rem]">
