@@ -3,10 +3,10 @@ import { Check } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { RoleList } from '@/components/careers/role-list';
+import { RoleList, type OpenRole } from '@/components/careers/role-list';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { BENEFITS, HIRING_STEPS, PRINCIPLES, ROLES, TEAMS } from '@/content/careers';
+import { BENEFITS, HIRING_STEPS, PRINCIPLES, TEAMS } from '@/content/careers';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
@@ -23,9 +23,28 @@ export const revalidate = 3600;
 
 export default async function CareersPage() {
   const supabase = createPublicClient();
-  const { count: cityCount } = await supabase
-    .from('city')
-    .select('id', { count: 'exact', head: true });
+
+  const [{ count: cityCount }, { data: roles }, { data: teams }] = await Promise.all([
+    /* Cities we actually operate in, not cities on the roadmap. */
+    supabase.from('city').select('id', { count: 'exact', head: true }).eq('status', 'live'),
+    supabase.from('careers_jobs_v').select('*').order('posted_at', { ascending: false }),
+    supabase.from('careers_teams_v').select('*').order('sort'),
+  ]);
+
+  const openRoles = (roles as OpenRole[] | null) ?? [];
+  const liveRoles = openRoles.filter((r) => !r.is_general);
+  const teamRows = (teams as
+    | { id: string; name: string; blurb: string | null; open_roles: number }[]
+    | null) ?? [];
+
+  /*
+   * "Five steps, about N weeks." Taken from the roles actually open,
+   * so the promise on the page matches the pipelines behind it rather
+   * than a number somebody typed once.
+   */
+  const weeks = liveRoles.length
+    ? Math.max(...liveRoles.map((r) => (r as { weeks_to_hire?: number }).weeks_to_hire ?? 2))
+    : 2;
 
   return (
     <>
@@ -62,7 +81,10 @@ export default async function CareersPage() {
 
               <dl className="mt-9 flex flex-wrap gap-y-4">
                 {[
-                  { value: String(ROLES.length), label: 'Open roles' },
+                  /* The real count. Printing the length of a hard-coded
+                     list told a candidate there were nine roles when
+                     there were none. */
+                  { value: String(liveRoles.length), label: 'Open roles' },
                   { value: cityCount ?? VALUE_PLACEHOLDER, label: 'Cities we operate in' },
                   { value: '24/7', label: 'Concierge desk hours' },
                 ].map((stat, index) => (
@@ -168,15 +190,22 @@ export default async function CareersPage() {
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
                 Where you could fit.
               </h2>
-              {/* The artboard says this and it stays true until a hiring
-                  manager confirms each one. */}
-              <p className="text-muted-light text-xs font-semibold">
-                Listings below are placeholders until roles are confirmed.
-              </p>
+              {/* Shown only while nothing is actually open — with real
+                  roles on the page it would be a lie about them. The
+                  note itself lives in RoleList, beside the rows it
+                  describes. */}
+              {liveRoles.length > 0 && (
+                <p className="text-muted-light text-xs font-semibold">
+                  {liveRoles.length === 1 ? '1 open role' : `${liveRoles.length} open roles`}
+                </p>
+              )}
             </div>
 
             <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {TEAMS.map((team) => (
+              {(teamRows.length > 0
+                ? teamRows.map((t) => ({ key: t.id, name: t.name, blurb: t.blurb ?? '' }))
+                : TEAMS.map((t) => ({ key: t.key, name: t.name, blurb: t.blurb }))
+              ).map((team) => (
                 <li key={team.key} className="border-border bg-bg/60 rounded-xl border p-4">
                   <h3 className="text-[0.875rem] font-extrabold">{team.name}</h3>
                   <p className="text-muted-light mt-1.5 text-xs font-semibold leading-[1.7]">
@@ -186,7 +215,7 @@ export default async function CareersPage() {
               ))}
             </ul>
 
-            <RoleList />
+            <RoleList roles={openRoles} />
           </div>
         </section>
 
@@ -201,7 +230,7 @@ export default async function CareersPage() {
                 How we hire
               </p>
               <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Five steps, about two weeks.
+                Five steps, about {weeks === 1 ? 'a week' : `${weeks} weeks`}.
               </h2>
               <p className="text-muted mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
                 We tell you where you stand at every step. If it’s a no, you’ll hear it from a

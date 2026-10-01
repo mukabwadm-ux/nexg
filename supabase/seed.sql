@@ -66,6 +66,18 @@ from public.role r
 where r.key in ('rider_ops', 'merchant_ops', 'growth')
 on conflict do nothing;
 
+/*
+ * Hiring and data protection, so the local account can open the
+ * Careers ATS and the KDPA queue. Both are deliberately narrow in
+ * production — a growth or ops role sees no candidate at all — so
+ * this grant exists for development and nowhere else.
+ */
+insert into public.role_grant (staff_user_id, role_id, city_id, granted_by)
+select '00000000-0000-4000-8000-00000000000a', r.id, null, '00000000-0000-4000-8000-00000000000a'
+from public.role r
+where r.key in ('recruiter', 'dpo', 'partnerships')
+on conflict do nothing;
+
 -- A second staff account, because one person cannot demonstrate a
 -- two-person rule. Ops manager in Nairobi only, so it also shows what a
 -- scoped role sees versus the super admin.

@@ -1,6 +1,1667 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
+  hr: {
+    Tables: {
+      application: {
+        Row: {
+          answers: NonNullable<Json>;
+          candidate_id: string;
+          created_at: string;
+          flags: NonNullable<Json>;
+          hired_at: string | null;
+          id: string;
+          job_id: string;
+          must_failed: string[];
+          on_file_until: string | null;
+          owner_id: string | null;
+          rejected_at: string | null;
+          rejected_by: string | null;
+          rejected_reason_code: string | null;
+          rejected_reason_text: string | null;
+          reopened_at: string | null;
+          screening_max: number | null;
+          screening_score: number | null;
+          source: Database['hr']['Enums']['source'];
+          source_detail: string | null;
+          stage: Database['hr']['Enums']['stage'];
+          stage_entered_at: string;
+          start_date: string | null;
+          status_token_expires_at: string | null;
+          status_token_hash: string | null;
+          updated_at: string;
+          why_nexg: string | null;
+          withdrawn_at: string | null;
+        };
+        Insert: {
+          answers?: NonNullable<Json>;
+          candidate_id: string;
+          created_at?: string;
+          flags?: NonNullable<Json>;
+          hired_at?: string | null;
+          id?: string;
+          job_id: string;
+          must_failed?: string[];
+          on_file_until?: string | null;
+          owner_id?: string | null;
+          rejected_at?: string | null;
+          rejected_by?: string | null;
+          rejected_reason_code?: string | null;
+          rejected_reason_text?: string | null;
+          reopened_at?: string | null;
+          screening_max?: number | null;
+          screening_score?: number | null;
+          source?: Database['hr']['Enums']['source'];
+          source_detail?: string | null;
+          stage?: Database['hr']['Enums']['stage'];
+          stage_entered_at?: string;
+          start_date?: string | null;
+          status_token_expires_at?: string | null;
+          status_token_hash?: string | null;
+          updated_at?: string;
+          why_nexg?: string | null;
+          withdrawn_at?: string | null;
+        };
+        Update: {
+          answers?: NonNullable<Json>;
+          candidate_id?: string;
+          created_at?: string;
+          flags?: NonNullable<Json>;
+          hired_at?: string | null;
+          id?: string;
+          job_id?: string;
+          must_failed?: string[];
+          on_file_until?: string | null;
+          owner_id?: string | null;
+          rejected_at?: string | null;
+          rejected_by?: string | null;
+          rejected_reason_code?: string | null;
+          rejected_reason_text?: string | null;
+          reopened_at?: string | null;
+          screening_max?: number | null;
+          screening_score?: number | null;
+          source?: Database['hr']['Enums']['source'];
+          source_detail?: string | null;
+          stage?: Database['hr']['Enums']['stage'];
+          stage_entered_at?: string;
+          start_date?: string | null;
+          status_token_expires_at?: string | null;
+          status_token_hash?: string | null;
+          updated_at?: string;
+          why_nexg?: string | null;
+          withdrawn_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'application_candidate_id_fkey';
+            columns: ['candidate_id'];
+            isOneToOne: false;
+            referencedRelation: 'candidate';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'application_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'application_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_metrics_v';
+            referencedColumns: ['job_id'];
+          },
+          {
+            foreignKeyName: 'application_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'job';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      candidate: {
+        Row: {
+          anonymised_at: string | null;
+          blocked: boolean;
+          city: string | null;
+          consent_at: string | null;
+          consent_version: string | null;
+          created_at: string;
+          cv_path: string | null;
+          cv_text: string | null;
+          email: string;
+          full_name: string | null;
+          id: string;
+          linkedin_url: string | null;
+          phone: string | null;
+          skills: string[];
+          talent_pool_opt_in: boolean;
+          talent_pool_until: string | null;
+          updated_at: string;
+          years_experience: number | null;
+        };
+        Insert: {
+          anonymised_at?: string | null;
+          blocked?: boolean;
+          city?: string | null;
+          consent_at?: string | null;
+          consent_version?: string | null;
+          created_at?: string;
+          cv_path?: string | null;
+          cv_text?: string | null;
+          email: string;
+          full_name?: string | null;
+          id?: string;
+          linkedin_url?: string | null;
+          phone?: string | null;
+          skills?: string[];
+          talent_pool_opt_in?: boolean;
+          talent_pool_until?: string | null;
+          updated_at?: string;
+          years_experience?: number | null;
+        };
+        Update: {
+          anonymised_at?: string | null;
+          blocked?: boolean;
+          city?: string | null;
+          consent_at?: string | null;
+          consent_version?: string | null;
+          created_at?: string;
+          cv_path?: string | null;
+          cv_text?: string | null;
+          email?: string;
+          full_name?: string | null;
+          id?: string;
+          linkedin_url?: string | null;
+          phone?: string | null;
+          skills?: string[];
+          talent_pool_opt_in?: boolean;
+          talent_pool_until?: string | null;
+          updated_at?: string;
+          years_experience?: number | null;
+        };
+        Relationships: [];
+      };
+      email: {
+        Row: {
+          application_id: string | null;
+          body_html: string | null;
+          candidate_id: string | null;
+          created_at: string;
+          id: string;
+          opened_at: string | null;
+          provider_id: string | null;
+          sent_at: string | null;
+          sent_by: string | null;
+          status: Database['hr']['Enums']['email_status'];
+          subject: string;
+          template_key: string | null;
+          to: string | null;
+        };
+        Insert: {
+          application_id?: string | null;
+          body_html?: string | null;
+          candidate_id?: string | null;
+          created_at?: string;
+          id?: string;
+          opened_at?: string | null;
+          provider_id?: string | null;
+          sent_at?: string | null;
+          sent_by?: string | null;
+          status?: Database['hr']['Enums']['email_status'];
+          subject: string;
+          template_key?: string | null;
+          to?: string | null;
+        };
+        Update: {
+          application_id?: string | null;
+          body_html?: string | null;
+          candidate_id?: string | null;
+          created_at?: string;
+          id?: string;
+          opened_at?: string | null;
+          provider_id?: string | null;
+          sent_at?: string | null;
+          sent_by?: string | null;
+          status?: Database['hr']['Enums']['email_status'];
+          subject?: string;
+          template_key?: string | null;
+          to?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'email_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'application';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'email_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_applicants_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'email_candidate_id_fkey';
+            columns: ['candidate_id'];
+            isOneToOne: false;
+            referencedRelation: 'candidate';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      email_template: {
+        Row: {
+          body_md: string;
+          editable_before_send: boolean;
+          id: string;
+          key: string;
+          requires_reason: boolean;
+          subject: string;
+          updated_at: string;
+          updated_by: string | null;
+          version: number;
+        };
+        Insert: {
+          body_md: string;
+          editable_before_send?: boolean;
+          id?: string;
+          key: string;
+          requires_reason?: boolean;
+          subject: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          version?: number;
+        };
+        Update: {
+          body_md?: string;
+          editable_before_send?: boolean;
+          id?: string;
+          key?: string;
+          requires_reason?: boolean;
+          subject?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          version?: number;
+        };
+        Relationships: [];
+      };
+      interview: {
+        Row: {
+          application_id: string;
+          calendar_event_id: string | null;
+          candidate_confirmed_at: string | null;
+          created_at: string;
+          duration_min: number;
+          id: string;
+          interviewers: string[];
+          kind: Database['hr']['Enums']['interview_kind'];
+          location: string | null;
+          meet_link: string | null;
+          proposed_slots: NonNullable<Json>;
+          reminder_24h_sent_at: string | null;
+          reminder_2h_sent_at: string | null;
+          scheduled_at: string | null;
+          status: Database['hr']['Enums']['interview_status'];
+        };
+        Insert: {
+          application_id: string;
+          calendar_event_id?: string | null;
+          candidate_confirmed_at?: string | null;
+          created_at?: string;
+          duration_min?: number;
+          id?: string;
+          interviewers?: string[];
+          kind: Database['hr']['Enums']['interview_kind'];
+          location?: string | null;
+          meet_link?: string | null;
+          proposed_slots?: NonNullable<Json>;
+          reminder_24h_sent_at?: string | null;
+          reminder_2h_sent_at?: string | null;
+          scheduled_at?: string | null;
+          status?: Database['hr']['Enums']['interview_status'];
+        };
+        Update: {
+          application_id?: string;
+          calendar_event_id?: string | null;
+          candidate_confirmed_at?: string | null;
+          created_at?: string;
+          duration_min?: number;
+          id?: string;
+          interviewers?: string[];
+          kind?: Database['hr']['Enums']['interview_kind'];
+          location?: string | null;
+          meet_link?: string | null;
+          proposed_slots?: NonNullable<Json>;
+          reminder_24h_sent_at?: string | null;
+          reminder_2h_sent_at?: string | null;
+          scheduled_at?: string | null;
+          status?: Database['hr']['Enums']['interview_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'interview_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'application';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'interview_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_applicants_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      job: {
+        Row: {
+          benefits_md: string | null;
+          city_id: string | null;
+          closed_at: string | null;
+          closed_reason: string | null;
+          closes_at: string | null;
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          created_at: string;
+          created_by: string | null;
+          description_md: string | null;
+          hiring_manager_id: string | null;
+          id: string;
+          is_general: boolean;
+          location_label: string | null;
+          nice_to_have_md: string | null;
+          openings: number;
+          posted_at: string | null;
+          recruiter_id: string | null;
+          referral_code: string | null;
+          requirements_md: string | null;
+          responsibilities_md: string | null;
+          salary_currency: string;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_public: boolean;
+          seo: NonNullable<Json>;
+          slug: string;
+          stage_targets: NonNullable<Json>;
+          status: Database['hr']['Enums']['job_status'];
+          team_id: string | null;
+          title: string;
+          updated_at: string;
+          work_mode: Database['hr']['Enums']['work_mode'] | null;
+          work_sample_candidate_md: string | null;
+          work_sample_internal_md: string | null;
+          work_sample_paid: boolean;
+          work_sample_pay_note: string | null;
+        };
+        Insert: {
+          benefits_md?: string | null;
+          city_id?: string | null;
+          closed_at?: string | null;
+          closed_reason?: string | null;
+          closes_at?: string | null;
+          contract?: Database['hr']['Enums']['contract_type'] | null;
+          created_at?: string;
+          created_by?: string | null;
+          description_md?: string | null;
+          hiring_manager_id?: string | null;
+          id?: string;
+          is_general?: boolean;
+          location_label?: string | null;
+          nice_to_have_md?: string | null;
+          openings?: number;
+          posted_at?: string | null;
+          recruiter_id?: string | null;
+          referral_code?: string | null;
+          requirements_md?: string | null;
+          responsibilities_md?: string | null;
+          salary_currency?: string;
+          salary_max?: number | null;
+          salary_min?: number | null;
+          salary_public?: boolean;
+          seo?: NonNullable<Json>;
+          slug: string;
+          stage_targets?: NonNullable<Json>;
+          status?: Database['hr']['Enums']['job_status'];
+          team_id?: string | null;
+          title: string;
+          updated_at?: string;
+          work_mode?: Database['hr']['Enums']['work_mode'] | null;
+          work_sample_candidate_md?: string | null;
+          work_sample_internal_md?: string | null;
+          work_sample_paid?: boolean;
+          work_sample_pay_note?: string | null;
+        };
+        Update: {
+          benefits_md?: string | null;
+          city_id?: string | null;
+          closed_at?: string | null;
+          closed_reason?: string | null;
+          closes_at?: string | null;
+          contract?: Database['hr']['Enums']['contract_type'] | null;
+          created_at?: string;
+          created_by?: string | null;
+          description_md?: string | null;
+          hiring_manager_id?: string | null;
+          id?: string;
+          is_general?: boolean;
+          location_label?: string | null;
+          nice_to_have_md?: string | null;
+          openings?: number;
+          posted_at?: string | null;
+          recruiter_id?: string | null;
+          referral_code?: string | null;
+          requirements_md?: string | null;
+          responsibilities_md?: string | null;
+          salary_currency?: string;
+          salary_max?: number | null;
+          salary_min?: number | null;
+          salary_public?: boolean;
+          seo?: NonNullable<Json>;
+          slug?: string;
+          stage_targets?: NonNullable<Json>;
+          status?: Database['hr']['Enums']['job_status'];
+          team_id?: string | null;
+          title?: string;
+          updated_at?: string;
+          work_mode?: Database['hr']['Enums']['work_mode'] | null;
+          work_sample_candidate_md?: string | null;
+          work_sample_internal_md?: string | null;
+          work_sample_paid?: boolean;
+          work_sample_pay_note?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'job_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'team';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      job_publish: {
+        Row: {
+          channel: Database['hr']['Enums']['source'];
+          enabled: boolean;
+          external_url: string | null;
+          job_id: string;
+          notes: string | null;
+          posted_at: string | null;
+          posted_by: string | null;
+          utm: string | null;
+        };
+        Insert: {
+          channel: Database['hr']['Enums']['source'];
+          enabled?: boolean;
+          external_url?: string | null;
+          job_id: string;
+          notes?: string | null;
+          posted_at?: string | null;
+          posted_by?: string | null;
+          utm?: string | null;
+        };
+        Update: {
+          channel?: Database['hr']['Enums']['source'];
+          enabled?: boolean;
+          external_url?: string | null;
+          job_id?: string;
+          notes?: string | null;
+          posted_at?: string | null;
+          posted_by?: string | null;
+          utm?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'job_publish_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'job_publish_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_metrics_v';
+            referencedColumns: ['job_id'];
+          },
+          {
+            foreignKeyName: 'job_publish_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'job';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      job_question: {
+        Row: {
+          auto_flag_template_id: string | null;
+          flag_key: string | null;
+          id: string;
+          job_id: string;
+          kind: Database['hr']['Enums']['question_kind'];
+          must_value: string | null;
+          options: Json | null;
+          points: number | null;
+          prompt: string;
+          public: boolean;
+          sort: number;
+          threshold: Json | null;
+        };
+        Insert: {
+          auto_flag_template_id?: string | null;
+          flag_key?: string | null;
+          id?: string;
+          job_id: string;
+          kind: Database['hr']['Enums']['question_kind'];
+          must_value?: string | null;
+          options?: Json | null;
+          points?: number | null;
+          prompt: string;
+          public?: boolean;
+          sort?: number;
+          threshold?: Json | null;
+        };
+        Update: {
+          auto_flag_template_id?: string | null;
+          flag_key?: string | null;
+          id?: string;
+          job_id?: string;
+          kind?: Database['hr']['Enums']['question_kind'];
+          must_value?: string | null;
+          options?: Json | null;
+          points?: number | null;
+          prompt?: string;
+          public?: boolean;
+          sort?: number;
+          threshold?: Json | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'job_question_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'job_question_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_metrics_v';
+            referencedColumns: ['job_id'];
+          },
+          {
+            foreignKeyName: 'job_question_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'job';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'question_template_fk';
+            columns: ['auto_flag_template_id'];
+            isOneToOne: false;
+            referencedRelation: 'email_template';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      note: {
+        Row: {
+          application_id: string;
+          author_id: string | null;
+          body: string;
+          created_at: string;
+          id: string;
+          interview_id: string | null;
+          kind: Database['hr']['Enums']['note_kind'];
+          recommend: Database['hr']['Enums']['recommendation'] | null;
+          score: number | null;
+          visible_to: string;
+        };
+        Insert: {
+          application_id: string;
+          author_id?: string | null;
+          body: string;
+          created_at?: string;
+          id?: string;
+          interview_id?: string | null;
+          kind?: Database['hr']['Enums']['note_kind'];
+          recommend?: Database['hr']['Enums']['recommendation'] | null;
+          score?: number | null;
+          visible_to?: string;
+        };
+        Update: {
+          application_id?: string;
+          author_id?: string | null;
+          body?: string;
+          created_at?: string;
+          id?: string;
+          interview_id?: string | null;
+          kind?: Database['hr']['Enums']['note_kind'];
+          recommend?: Database['hr']['Enums']['recommendation'] | null;
+          score?: number | null;
+          visible_to?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'note_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'application';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'note_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_applicants_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'note_interview_fk';
+            columns: ['interview_id'];
+            isOneToOne: false;
+            referencedRelation: 'interview';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      offer: {
+        Row: {
+          application_id: string;
+          approved_by: string | null;
+          conditions: string[];
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          created_at: string;
+          currency: string;
+          decline_reason: string | null;
+          equity_note: string | null;
+          expires_at: string | null;
+          id: string;
+          letter_path: string | null;
+          responded_at: string | null;
+          salary: number | null;
+          second_approver_id: string | null;
+          sent_at: string | null;
+          start_date: string | null;
+          status: Database['hr']['Enums']['offer_status'];
+        };
+        Insert: {
+          application_id: string;
+          approved_by?: string | null;
+          conditions?: string[];
+          contract?: Database['hr']['Enums']['contract_type'] | null;
+          created_at?: string;
+          currency?: string;
+          decline_reason?: string | null;
+          equity_note?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          letter_path?: string | null;
+          responded_at?: string | null;
+          salary?: number | null;
+          second_approver_id?: string | null;
+          sent_at?: string | null;
+          start_date?: string | null;
+          status?: Database['hr']['Enums']['offer_status'];
+        };
+        Update: {
+          application_id?: string;
+          approved_by?: string | null;
+          conditions?: string[];
+          contract?: Database['hr']['Enums']['contract_type'] | null;
+          created_at?: string;
+          currency?: string;
+          decline_reason?: string | null;
+          equity_note?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          letter_path?: string | null;
+          responded_at?: string | null;
+          salary?: number | null;
+          second_approver_id?: string | null;
+          sent_at?: string | null;
+          start_date?: string | null;
+          status?: Database['hr']['Enums']['offer_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'offer_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: true;
+            referencedRelation: 'application';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'offer_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_applicants_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      reference_check: {
+        Row: {
+          application_id: string;
+          by: string | null;
+          id: string;
+          notes: string | null;
+          received_at: string | null;
+          referee_contact: string | null;
+          referee_name: string | null;
+          relationship: string | null;
+          requested_at: string;
+          status: Database['hr']['Enums']['reference_status'];
+        };
+        Insert: {
+          application_id: string;
+          by?: string | null;
+          id?: string;
+          notes?: string | null;
+          received_at?: string | null;
+          referee_contact?: string | null;
+          referee_name?: string | null;
+          relationship?: string | null;
+          requested_at?: string;
+          status?: Database['hr']['Enums']['reference_status'];
+        };
+        Update: {
+          application_id?: string;
+          by?: string | null;
+          id?: string;
+          notes?: string | null;
+          received_at?: string | null;
+          referee_contact?: string | null;
+          referee_name?: string | null;
+          relationship?: string | null;
+          requested_at?: string;
+          status?: Database['hr']['Enums']['reference_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'reference_check_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'application';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reference_check_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_applicants_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      referral: {
+        Row: {
+          application_id: string | null;
+          code: string;
+          created_at: string;
+          id: string;
+          job_id: string | null;
+          referrer_staff_id: string | null;
+        };
+        Insert: {
+          application_id?: string | null;
+          code: string;
+          created_at?: string;
+          id?: string;
+          job_id?: string | null;
+          referrer_staff_id?: string | null;
+        };
+        Update: {
+          application_id?: string | null;
+          code?: string;
+          created_at?: string;
+          id?: string;
+          job_id?: string | null;
+          referrer_staff_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'referral_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'application';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'referral_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_applicants_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'referral_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'referral_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_metrics_v';
+            referencedColumns: ['job_id'];
+          },
+          {
+            foreignKeyName: 'referral_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'job';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      rejection_reason: {
+        Row: {
+          active: boolean;
+          candidate_text: string;
+          code: string;
+          label: string;
+          sort: number;
+        };
+        Insert: {
+          active?: boolean;
+          candidate_text: string;
+          code: string;
+          label: string;
+          sort?: number;
+        };
+        Update: {
+          active?: boolean;
+          candidate_text?: string;
+          code?: string;
+          label?: string;
+          sort?: number;
+        };
+        Relationships: [];
+      };
+      setting: {
+        Row: {
+          key: string;
+          label: string;
+          updated_at: string;
+          updated_by: string | null;
+          value: NonNullable<Json>;
+        };
+        Insert: {
+          key: string;
+          label: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value: NonNullable<Json>;
+        };
+        Update: {
+          key?: string;
+          label?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value?: NonNullable<Json>;
+        };
+        Relationships: [];
+      };
+      stage_event: {
+        Row: {
+          application_id: string;
+          at: string;
+          by: string | null;
+          email_id: string | null;
+          from_stage: Database['hr']['Enums']['stage'] | null;
+          id: number;
+          note: string | null;
+          to_stage: Database['hr']['Enums']['stage'];
+        };
+        Insert: {
+          application_id: string;
+          at?: string;
+          by?: string | null;
+          email_id?: string | null;
+          from_stage?: Database['hr']['Enums']['stage'] | null;
+          id?: number;
+          note?: string | null;
+          to_stage: Database['hr']['Enums']['stage'];
+        };
+        Update: {
+          application_id?: string;
+          at?: string;
+          by?: string | null;
+          email_id?: string | null;
+          from_stage?: Database['hr']['Enums']['stage'] | null;
+          id?: number;
+          note?: string | null;
+          to_stage?: Database['hr']['Enums']['stage'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'stage_event_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'application';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stage_event_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_applicants_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stage_event_email_fk';
+            columns: ['email_id'];
+            isOneToOne: false;
+            referencedRelation: 'email';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      team: {
+        Row: {
+          blurb: string | null;
+          id: string;
+          name: string;
+          sort: number;
+        };
+        Insert: {
+          blurb?: string | null;
+          id?: string;
+          name: string;
+          sort?: number;
+        };
+        Update: {
+          blurb?: string | null;
+          id?: string;
+          name?: string;
+          sort?: number;
+        };
+        Relationships: [];
+      };
+      work_sample: {
+        Row: {
+          application_id: string;
+          brief_sent_at: string | null;
+          due_at: string | null;
+          hours_reported: number | null;
+          id: string;
+          notes: string | null;
+          payment_amount: number | null;
+          payment_ref: string | null;
+          payment_status: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          score: number | null;
+          submission_path: string | null;
+          submission_url: string | null;
+          submitted_at: string | null;
+        };
+        Insert: {
+          application_id: string;
+          brief_sent_at?: string | null;
+          due_at?: string | null;
+          hours_reported?: number | null;
+          id?: string;
+          notes?: string | null;
+          payment_amount?: number | null;
+          payment_ref?: string | null;
+          payment_status?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          score?: number | null;
+          submission_path?: string | null;
+          submission_url?: string | null;
+          submitted_at?: string | null;
+        };
+        Update: {
+          application_id?: string;
+          brief_sent_at?: string | null;
+          due_at?: string | null;
+          hours_reported?: number | null;
+          id?: string;
+          notes?: string | null;
+          payment_amount?: number | null;
+          payment_ref?: string | null;
+          payment_status?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          score?: number | null;
+          submission_path?: string | null;
+          submission_url?: string | null;
+          submitted_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'work_sample_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: true;
+            referencedRelation: 'application';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'work_sample_application_id_fkey';
+            columns: ['application_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_applicants_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+    };
+    Views: {
+      console_applicants_v: {
+        Row: {
+          anonymised_at: string | null;
+          candidate_id: string | null;
+          city: string | null;
+          created_at: string | null;
+          days_in_stage: number | null;
+          email_masked: string | null;
+          flags: Json | null;
+          full_name: string | null;
+          has_cv: boolean | null;
+          id: string | null;
+          job_id: string | null;
+          job_slug: string | null;
+          job_title: string | null;
+          must_failed: string[] | null;
+          needs_action: boolean | null;
+          note_count: number | null;
+          on_file_until: string | null;
+          owner_name: string | null;
+          phone_masked: string | null;
+          public_stage: string | null;
+          rejected_reason_code: string | null;
+          rejected_reason_text: string | null;
+          screening_max: number | null;
+          screening_score: number | null;
+          source: Database['hr']['Enums']['source'] | null;
+          source_detail: string | null;
+          stage: Database['hr']['Enums']['stage'] | null;
+          stage_entered_at: string | null;
+          stage_target_days: number | null;
+          start_date: string | null;
+          talent_pool_opt_in: boolean | null;
+          why_nexg: string | null;
+          work_sample_hours: number | null;
+          work_sample_payment: string | null;
+          work_sample_score: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'application_candidate_id_fkey';
+            columns: ['candidate_id'];
+            isOneToOne: false;
+            referencedRelation: 'candidate';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'application_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'application_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_metrics_v';
+            referencedColumns: ['job_id'];
+          },
+          {
+            foreignKeyName: 'application_job_id_fkey';
+            columns: ['job_id'];
+            isOneToOne: false;
+            referencedRelation: 'job';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_badges_v: {
+        Row: {
+          applied_this_week: number | null;
+          draft_jobs: number | null;
+          hired: number | null;
+          needs_action: number | null;
+          new_applications: number | null;
+          offer_acceptance_pct: number | null;
+          offers_declined: number | null;
+          offers_open: number | null;
+          offers_total: number | null;
+          on_file: number | null;
+          open_jobs: number | null;
+          time_to_hire_days: number | null;
+          unreviewed: number | null;
+        };
+        Relationships: [];
+      };
+      console_jobs_v: {
+        Row: {
+          city_id: string | null;
+          city_name: string | null;
+          closes_at: string | null;
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          hiring_manager_name: string | null;
+          id: string | null;
+          in_interviews: number | null;
+          is_general: boolean | null;
+          location_label: string | null;
+          needs_a_manager: boolean | null;
+          new_applicants: number | null;
+          new_this_week: number | null;
+          offers: number | null;
+          openings: number | null;
+          posted_at: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_public: boolean | null;
+          slug: string | null;
+          stage_targets: Json | null;
+          status: Database['hr']['Enums']['job_status'] | null;
+          team_id: string | null;
+          team_name: string | null;
+          title: string | null;
+          total_applicants: number | null;
+          unreviewed_over_3d: number | null;
+          work_mode: Database['hr']['Enums']['work_mode'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'job_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'team';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_metrics_v: {
+        Row: {
+          avg_max: number | null;
+          avg_score: number | null;
+          in_pipeline: number | null;
+          job_id: string | null;
+          median_days_in_stage: number | null;
+          needs_action: number | null;
+          new_count: number | null;
+          new_to_offer_pct: number | null;
+          rejected_count: number | null;
+          rejected_with_feedback_pct: number | null;
+        };
+        Insert: {
+          avg_max?: never;
+          avg_score?: never;
+          in_pipeline?: never;
+          job_id?: string | null;
+          median_days_in_stage?: never;
+          needs_action?: never;
+          new_count?: never;
+          new_to_offer_pct?: never;
+          rejected_count?: never;
+          rejected_with_feedback_pct?: never;
+        };
+        Update: {
+          avg_max?: never;
+          avg_score?: never;
+          in_pipeline?: never;
+          job_id?: string | null;
+          median_days_in_stage?: never;
+          needs_action?: never;
+          new_count?: never;
+          new_to_offer_pct?: never;
+          rejected_count?: never;
+          rejected_with_feedback_pct?: never;
+        };
+        Relationships: [];
+      };
+    };
+    Functions: {
+      cron_hr_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_anonymise_candidate: { Args: { p_candidate_id: string }; Returns: undefined };
+      fn_application_for_token: {
+        Args: { p_token: string };
+        Returns: {
+          answers: NonNullable<Json>;
+          candidate_id: string;
+          created_at: string;
+          flags: NonNullable<Json>;
+          hired_at: string | null;
+          id: string;
+          job_id: string;
+          must_failed: string[];
+          on_file_until: string | null;
+          owner_id: string | null;
+          rejected_at: string | null;
+          rejected_by: string | null;
+          rejected_reason_code: string | null;
+          rejected_reason_text: string | null;
+          reopened_at: string | null;
+          screening_max: number | null;
+          screening_score: number | null;
+          source: Database['hr']['Enums']['source'];
+          source_detail: string | null;
+          stage: Database['hr']['Enums']['stage'];
+          stage_entered_at: string;
+          start_date: string | null;
+          status_token_expires_at: string | null;
+          status_token_hash: string | null;
+          updated_at: string;
+          why_nexg: string | null;
+          withdrawn_at: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'application';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      fn_has_submitted_feedback: { Args: { p_application_id: string }; Returns: boolean };
+      fn_needs_action: { Args: { p_application_id: string }; Returns: boolean };
+      fn_public_stage: { Args: { p_stage: Database['hr']['Enums']['stage'] }; Returns: string };
+      fn_public_step: { Args: { p_stage: Database['hr']['Enums']['stage'] }; Returns: number };
+      fn_score_application: { Args: { p_answers: Json; p_job_id: string }; Returns: Json };
+      fn_weeks_to_hire: { Args: { p_targets: Json }; Returns: number };
+      rpc_apply: { Args: { p_payload: Json }; Returns: Json };
+      rpc_apply_notice: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_candidate_confirm_slot: {
+        Args: { p_interview_id: string; p_slot: string; p_token: string };
+        Returns: Json;
+      };
+      rpc_candidate_request_deletion: { Args: { p_token: string }; Returns: Json };
+      rpc_candidate_respond_offer: {
+        Args: { p_accept: boolean; p_reason?: string; p_token: string };
+        Returns: Json;
+      };
+      rpc_candidate_reveal_phone: {
+        Args: { p_candidate_id: string; p_reason: string };
+        Returns: Json;
+      };
+      rpc_candidate_status: { Args: { p_token: string }; Returns: Json };
+      rpc_candidate_talent_pool: { Args: { p_opt_in: boolean; p_token: string }; Returns: Json };
+      rpc_candidate_withdraw: { Args: { p_reason?: string; p_token: string }; Returns: Json };
+      rpc_careers_counts: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_cv_path: { Args: { p_candidate_id: string }; Returns: Json };
+      rpc_interview_propose: {
+        Args: {
+          p_application_id: string;
+          p_duration_min?: number;
+          p_interviewers?: string[];
+          p_kind: Database['hr']['Enums']['interview_kind'];
+          p_slots: Json;
+        };
+        Returns: {
+          application_id: string;
+          calendar_event_id: string | null;
+          candidate_confirmed_at: string | null;
+          created_at: string;
+          duration_min: number;
+          id: string;
+          interviewers: string[];
+          kind: Database['hr']['Enums']['interview_kind'];
+          location: string | null;
+          meet_link: string | null;
+          proposed_slots: NonNullable<Json>;
+          reminder_24h_sent_at: string | null;
+          reminder_2h_sent_at: string | null;
+          scheduled_at: string | null;
+          status: Database['hr']['Enums']['interview_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'interview';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_job_status: {
+        Args: {
+          p_job_id: string;
+          p_reason?: string;
+          p_status: Database['hr']['Enums']['job_status'];
+        };
+        Returns: {
+          benefits_md: string | null;
+          city_id: string | null;
+          closed_at: string | null;
+          closed_reason: string | null;
+          closes_at: string | null;
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          created_at: string;
+          created_by: string | null;
+          description_md: string | null;
+          hiring_manager_id: string | null;
+          id: string;
+          is_general: boolean;
+          location_label: string | null;
+          nice_to_have_md: string | null;
+          openings: number;
+          posted_at: string | null;
+          recruiter_id: string | null;
+          referral_code: string | null;
+          requirements_md: string | null;
+          responsibilities_md: string | null;
+          salary_currency: string;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_public: boolean;
+          seo: NonNullable<Json>;
+          slug: string;
+          stage_targets: NonNullable<Json>;
+          status: Database['hr']['Enums']['job_status'];
+          team_id: string | null;
+          title: string;
+          updated_at: string;
+          work_mode: Database['hr']['Enums']['work_mode'] | null;
+          work_sample_candidate_md: string | null;
+          work_sample_internal_md: string | null;
+          work_sample_paid: boolean;
+          work_sample_pay_note: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'job';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_job_upsert: {
+        Args: { p_job: Json; p_job_id?: string };
+        Returns: {
+          benefits_md: string | null;
+          city_id: string | null;
+          closed_at: string | null;
+          closed_reason: string | null;
+          closes_at: string | null;
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          created_at: string;
+          created_by: string | null;
+          description_md: string | null;
+          hiring_manager_id: string | null;
+          id: string;
+          is_general: boolean;
+          location_label: string | null;
+          nice_to_have_md: string | null;
+          openings: number;
+          posted_at: string | null;
+          recruiter_id: string | null;
+          referral_code: string | null;
+          requirements_md: string | null;
+          responsibilities_md: string | null;
+          salary_currency: string;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_public: boolean;
+          seo: NonNullable<Json>;
+          slug: string;
+          stage_targets: NonNullable<Json>;
+          status: Database['hr']['Enums']['job_status'];
+          team_id: string | null;
+          title: string;
+          updated_at: string;
+          work_mode: Database['hr']['Enums']['work_mode'] | null;
+          work_sample_candidate_md: string | null;
+          work_sample_internal_md: string | null;
+          work_sample_paid: boolean;
+          work_sample_pay_note: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'job';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_note_add: {
+        Args: {
+          p_application_id: string;
+          p_body: string;
+          p_interview_id?: string;
+          p_kind?: Database['hr']['Enums']['note_kind'];
+          p_recommend?: Database['hr']['Enums']['recommendation'];
+          p_score?: number;
+        };
+        Returns: {
+          application_id: string;
+          author_id: string | null;
+          body: string;
+          created_at: string;
+          id: string;
+          interview_id: string | null;
+          kind: Database['hr']['Enums']['note_kind'];
+          recommend: Database['hr']['Enums']['recommendation'] | null;
+          score: number | null;
+          visible_to: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'note';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_offer_approve: {
+        Args: { p_application_id: string };
+        Returns: {
+          application_id: string;
+          approved_by: string | null;
+          conditions: string[];
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          created_at: string;
+          currency: string;
+          decline_reason: string | null;
+          equity_note: string | null;
+          expires_at: string | null;
+          id: string;
+          letter_path: string | null;
+          responded_at: string | null;
+          salary: number | null;
+          second_approver_id: string | null;
+          sent_at: string | null;
+          start_date: string | null;
+          status: Database['hr']['Enums']['offer_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'offer';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_offer_draft: {
+        Args: { p_application_id: string; p_offer: Json };
+        Returns: {
+          application_id: string;
+          approved_by: string | null;
+          conditions: string[];
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          created_at: string;
+          currency: string;
+          decline_reason: string | null;
+          equity_note: string | null;
+          expires_at: string | null;
+          id: string;
+          letter_path: string | null;
+          responded_at: string | null;
+          salary: number | null;
+          second_approver_id: string | null;
+          sent_at: string | null;
+          start_date: string | null;
+          status: Database['hr']['Enums']['offer_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'offer';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stage_move: {
+        Args: {
+          p_application_id: string;
+          p_note?: string;
+          p_reason_code?: string;
+          p_reason_text?: string;
+          p_template_key?: string;
+          p_to_stage: Database['hr']['Enums']['stage'];
+        };
+        Returns: {
+          answers: NonNullable<Json>;
+          candidate_id: string;
+          created_at: string;
+          flags: NonNullable<Json>;
+          hired_at: string | null;
+          id: string;
+          job_id: string;
+          must_failed: string[];
+          on_file_until: string | null;
+          owner_id: string | null;
+          rejected_at: string | null;
+          rejected_by: string | null;
+          rejected_reason_code: string | null;
+          rejected_reason_text: string | null;
+          reopened_at: string | null;
+          screening_max: number | null;
+          screening_score: number | null;
+          source: Database['hr']['Enums']['source'];
+          source_detail: string | null;
+          stage: Database['hr']['Enums']['stage'];
+          stage_entered_at: string;
+          start_date: string | null;
+          status_token_expires_at: string | null;
+          status_token_hash: string | null;
+          updated_at: string;
+          why_nexg: string | null;
+          withdrawn_at: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'application';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_work_sample_review: {
+        Args: { p_application_id: string; p_notes?: string; p_score: number };
+        Returns: {
+          application_id: string;
+          brief_sent_at: string | null;
+          due_at: string | null;
+          hours_reported: number | null;
+          id: string;
+          notes: string | null;
+          payment_amount: number | null;
+          payment_ref: string | null;
+          payment_status: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          score: number | null;
+          submission_path: string | null;
+          submission_url: string | null;
+          submitted_at: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'work_sample';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_work_sample_send: {
+        Args: {
+          p_amount?: number;
+          p_application_id: string;
+          p_due_days?: number;
+          p_paid?: boolean;
+        };
+        Returns: {
+          application_id: string;
+          brief_sent_at: string | null;
+          due_at: string | null;
+          hours_reported: number | null;
+          id: string;
+          notes: string | null;
+          payment_amount: number | null;
+          payment_ref: string | null;
+          payment_status: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          score: number | null;
+          submission_path: string | null;
+          submission_url: string | null;
+          submitted_at: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'work_sample';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+    };
+    Enums: {
+      contract_type: 'full_time' | 'part_time' | 'contract_6mo' | 'internship';
+      email_status: 'queued' | 'sent' | 'delivered' | 'bounced' | 'opened';
+      interview_kind: 'intro_call' | 'team_conversation' | 'work_sample_review';
+      interview_status: 'proposed' | 'confirmed' | 'done' | 'no_show' | 'rescheduled' | 'cancelled';
+      job_status: 'draft' | 'open' | 'paused' | 'closed' | 'always_open';
+      note_kind: 'note' | 'interview_feedback' | 'work_sample_review' | 'reference';
+      offer_status:
+        | 'drafted'
+        | 'awaiting_approval'
+        | 'sent'
+        | 'accepted'
+        | 'declined'
+        | 'expired'
+        | 'withdrawn';
+      question_kind:
+        | 'must_yes_no'
+        | 'points_yes_no'
+        | 'points_number'
+        | 'points_select'
+        | 'free_text';
+      recommendation: 'strong_yes' | 'yes' | 'no' | 'strong_no';
+      reference_status: 'requested' | 'received' | 'positive' | 'concern';
+      source:
+        | 'careers_page'
+        | 'linkedin'
+        | 'brightermonday'
+        | 'fuzu'
+        | 'whatsapp_card'
+        | 'referral'
+        | 'general_application'
+        | 'manual';
+      stage:
+        | 'new'
+        | 'screening'
+        | 'intro_call'
+        | 'work_sample'
+        | 'team_conversation'
+        | 'offer'
+        | 'hired'
+        | 'on_file'
+        | 'rejected'
+        | 'withdrawn';
+      work_mode: 'on_site' | 'on_site_shifts' | 'hybrid' | 'remote_eat';
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
       acquisition_source_rule: {
@@ -12057,6 +13718,101 @@ export type Database = {
       };
     };
     Views: {
+      careers_job_v: {
+        Row: {
+          benefits_md: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          closes_at: string | null;
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          description_md: string | null;
+          hiring_manager_name: string | null;
+          is_general: boolean | null;
+          location_label: string | null;
+          nice_to_have_md: string | null;
+          openings: number | null;
+          posted_at: string | null;
+          questions: Json | null;
+          requirements_md: string | null;
+          responsibilities_md: string | null;
+          salary_currency: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_public: boolean | null;
+          slug: string | null;
+          stage_targets: Json | null;
+          team_blurb: string | null;
+          team_name: string | null;
+          title: string | null;
+          weeks_to_hire: number | null;
+          work_mode: Database['hr']['Enums']['work_mode'] | null;
+          work_sample_candidate_md: string | null;
+          work_sample_paid: boolean | null;
+          work_sample_pay_note: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      careers_jobs_v: {
+        Row: {
+          city_id: string | null;
+          city_name: string | null;
+          contract: Database['hr']['Enums']['contract_type'] | null;
+          is_general: boolean | null;
+          location_label: string | null;
+          posted_at: string | null;
+          salary_currency: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          slug: string | null;
+          status: Database['hr']['Enums']['job_status'] | null;
+          team_blurb: string | null;
+          team_name: string | null;
+          title: string | null;
+          weeks_to_hire: number | null;
+          work_mode: Database['hr']['Enums']['work_mode'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      careers_teams_v: {
+        Row: {
+          blurb: string | null;
+          id: string | null;
+          name: string | null;
+          open_roles: number | null;
+          sort: number | null;
+        };
+        Insert: {
+          blurb?: string | null;
+          id?: string | null;
+          name?: string | null;
+          open_roles?: never;
+          sort?: number | null;
+        };
+        Update: {
+          blurb?: string | null;
+          id?: string | null;
+          name?: string | null;
+          open_roles?: never;
+          sort?: number | null;
+        };
+        Relationships: [];
+      };
       catalogue_health: {
         Row: {
           cheapest_kes: number | null;
@@ -15147,6 +16903,20 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_careers_apply: { Args: { p_payload: Json }; Returns: Json };
+      rpc_careers_confirm_slot: {
+        Args: { p_interview_id: string; p_slot: string; p_token: string };
+        Returns: Json;
+      };
+      rpc_careers_notice: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_careers_request_deletion: { Args: { p_token: string }; Returns: Json };
+      rpc_careers_respond_offer: {
+        Args: { p_accept: boolean; p_reason?: string; p_token: string };
+        Returns: Json;
+      };
+      rpc_careers_status: { Args: { p_token: string }; Returns: Json };
+      rpc_careers_talent_pool: { Args: { p_opt_in: boolean; p_token: string }; Returns: Json };
+      rpc_careers_withdraw: { Args: { p_reason?: string; p_token: string }; Returns: Json };
       rpc_cash_manual_adjustment: {
         Args: { p_amount_kes: number; p_reason: string; p_rider_id: string };
         Returns: {
@@ -20128,6 +21898,57 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  hr: {
+    Enums: {
+      contract_type: ['full_time', 'part_time', 'contract_6mo', 'internship'],
+      email_status: ['queued', 'sent', 'delivered', 'bounced', 'opened'],
+      interview_kind: ['intro_call', 'team_conversation', 'work_sample_review'],
+      interview_status: ['proposed', 'confirmed', 'done', 'no_show', 'rescheduled', 'cancelled'],
+      job_status: ['draft', 'open', 'paused', 'closed', 'always_open'],
+      note_kind: ['note', 'interview_feedback', 'work_sample_review', 'reference'],
+      offer_status: [
+        'drafted',
+        'awaiting_approval',
+        'sent',
+        'accepted',
+        'declined',
+        'expired',
+        'withdrawn',
+      ],
+      question_kind: [
+        'must_yes_no',
+        'points_yes_no',
+        'points_number',
+        'points_select',
+        'free_text',
+      ],
+      recommendation: ['strong_yes', 'yes', 'no', 'strong_no'],
+      reference_status: ['requested', 'received', 'positive', 'concern'],
+      source: [
+        'careers_page',
+        'linkedin',
+        'brightermonday',
+        'fuzu',
+        'whatsapp_card',
+        'referral',
+        'general_application',
+        'manual',
+      ],
+      stage: [
+        'new',
+        'screening',
+        'intro_call',
+        'work_sample',
+        'team_conversation',
+        'offer',
+        'hired',
+        'on_file',
+        'rejected',
+        'withdrawn',
+      ],
+      work_mode: ['on_site', 'on_site_shifts', 'hybrid', 'remote_eat'],
+    },
+  },
   public: {
     Enums: {
       acquisition_channel: [
