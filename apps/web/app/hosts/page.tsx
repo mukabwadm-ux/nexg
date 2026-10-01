@@ -340,85 +340,86 @@ export default async function HostsPage() {
          * and the cards are the same offer approached from two
          * directions: tell us, or look for yourself.
          */}
-        <section id="find" className="bg-ink py-14 text-white">
-          <div className="mx-auto grid max-w-[96rem] gap-10 px-4 sm:px-8 lg:grid-cols-[1fr_30rem] lg:items-center lg:gap-14 lg:px-16">
-            <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1.5 text-[0.6875rem] font-extrabold">
-                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#D4A72C]" />
-                Looking for a place, not listing one?
-              </p>
+        <section
+          id="find"
+          className="mx-auto grid max-w-[96rem] gap-10 px-4 py-12 sm:px-8 lg:grid-cols-[1fr_30rem] lg:items-center lg:gap-14 lg:px-16"
+        >
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-[#DDD8CC] bg-white px-3 py-1.5 text-[0.6875rem] font-extrabold">
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#D4A72C]" />
+              Looking for a place, not listing one?
+            </p>
 
-              <h2 className="mt-5 text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] sm:text-[2.75rem]">
-                Tell us what you need. We&rsquo;ll find the{' '}
-                <span className="text-[#E8C45F]">place</span>.
-              </h2>
+            <h2 className="mt-5 text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] sm:text-[2.75rem]">
+              Tell us what you need. We&rsquo;ll find the{' '}
+              <span className="text-[#B8901F]">place</span>.
+            </h2>
 
-              <p className="mt-4 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8] text-white/70">
-                Every place on NexG comes with a concierge already set up: food, laundry, a
-                charger at midnight, an airport run at five. Describe the stay and a person comes
-                back with two or three that actually fit.
-              </p>
+            <p className="mt-4 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8] text-[#5B5B5B]">
+              Every place on NexG comes with a concierge already set up: food, laundry, a charger
+              at midnight, an airport run at five. Describe the stay and a person comes back with
+              two or three that actually fit.
+            </p>
 
-              <dl className="mt-7 grid gap-4 sm:grid-cols-3">
-                {[
-                  { title: 'A person, not a filter', body: 'Somebody reads it and picks.' },
-                  {
-                    title: 'Concierge included',
-                    body: 'Deliveries follow the host’s rule, not a guess.',
-                  },
-                  { title: 'Nothing to pay to ask', body: 'No account, no card, no obligation.' },
-                ].map((item) => (
-                  <div key={item.title}>
-                    <dt className="text-[0.8125rem] font-extrabold">{item.title}</dt>
-                    <dd className="mt-1 text-[0.75rem] font-semibold leading-snug text-white/60">
-                      {item.body}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            <TailorForm areas={areas} />
+            <dl className="mt-7 grid gap-4 sm:grid-cols-3">
+              {[
+                { title: 'A person, not a filter', body: 'Somebody reads it and picks.' },
+                {
+                  title: 'Concierge included',
+                  body: 'Deliveries follow the host’s rule, not a guess.',
+                },
+                { title: 'Nothing to pay to ask', body: 'No account, no card, no obligation.' },
+              ].map((item) => (
+                <div key={item.title}>
+                  <dt className="text-[0.8125rem] font-extrabold">{item.title}</dt>
+                  <dd className="mt-1 text-[0.75rem] font-semibold leading-snug text-[#8A8A8A]">
+                    {item.body}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
+
+          <TailorForm areas={areas} />
         </section>
 
         {/* ─────────────────────────────────── already listed */}
         {teaser.length > 0 && (
-          <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#8A8A8A]">
-                  Already listed
-                </p>
-                <h2 className="mt-2 text-[1.75rem] font-extrabold tracking-[-0.02em] sm:text-[2rem]">
-                  Your unit, in front of guests looking now.
-                </h2>
-                <p className="mt-3 max-w-[38rem] text-[0.875rem] font-semibold leading-[1.8] text-[#5B5B5B]">
-                  Verified hosts can have their property shown on NexG, with each unit listed
-                  separately. Guests browse it, or tell us what they need and we come back with
-                  the places that fit.
-                </p>
+          /* Dark, so the white listing cards read as the thing being
+             shown off rather than as more page. */
+          <section className="bg-ink py-14 text-white">
+            <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+              <p className="text-gold text-[0.6875rem] font-extrabold uppercase tracking-[0.14em]">
+                Already listed
+              </p>
+              <h2 className="mt-2 text-[1.75rem] font-extrabold tracking-[-0.02em] sm:text-[2rem]">
+                Your unit, in front of guests looking now.
+              </h2>
+              <p className="mt-3 max-w-[38rem] text-[0.875rem] font-semibold leading-[1.8] text-white/70">
+                Verified hosts can have their property shown on NexG, with each unit listed
+                separately. Guests browse it, or tell us what they need and we come back with the
+                places that fit.
+              </p>
+
+              <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {teaser.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
               </div>
-            </div>
 
-            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {teaser.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
-            </div>
-
-            <div className="mt-7 text-center">
-              <Link
-                href="/stays"
-                className="border-border-strong hover:border-ink inline-flex items-center gap-2 rounded-lg border bg-white px-5 py-2.5 text-[0.8125rem] font-extrabold transition-colors"
-              >
-                {/* The count is real, so the link never promises more
-                    than there is. */}
-                {more > 0
-                  ? `See ${more} more ${more === 1 ? 'listing' : 'listings'}`
-                  : 'See every listing'}
-                <span aria-hidden="true">→</span>
-              </Link>
+              <div className="mt-8 text-center">
+                <Link
+                  href="/stays"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/25 px-5 py-2.5 text-[0.8125rem] font-extrabold text-white transition-colors hover:border-white hover:bg-white/5"
+                >
+                  {/* The count is real, so the link never promises more
+                      than there is. */}
+                  {more > 0
+                    ? `See ${more} more ${more === 1 ? 'listing' : 'listings'}`
+                    : 'See every listing'}
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
             </div>
           </section>
         )}
