@@ -14,6 +14,12 @@ import {
   type HotelRow,
 } from '@/components/hotels/shared';
 import {
+  ListingsTab,
+  type MatchRow,
+  type PropertyRow,
+  type StayRequestRow,
+} from '@/components/hotels/listings';
+import {
   ChargeTab,
   DataRequestsTab,
   DeskTab,
@@ -83,6 +89,7 @@ export default async function HotelsPage({
         <HotelTabs current={tab} />
 
         {tab === 'hosts' && (await loadHosts(supabase, badges, filter, selected))}
+        {tab === 'listings' && (await loadListings(supabase, filter, selected))}
         {tab === 'hotels' && (await loadHotels(supabase, badges, filter, selected))}
         {tab === 'charge' && (await loadCharge(supabase, badges, filter))}
         {tab === 'desk' && (await loadDesk(supabase))}
@@ -131,6 +138,38 @@ async function loadHosts(
       hosts={(hosts as HostRow[] | null) ?? []}
       units={(units as UnitRow[] | null) ?? []}
       badges={badges}
+      filter={filter}
+      selected={selected}
+    />
+  );
+}
+
+async function loadListings(
+  supabase: Supabase,
+  filter: string,
+  selected: string | null,
+) {
+  const [{ data: properties }, { data: requests }, { data: matches }] = await Promise.all([
+    supabase.from('console_property_v').select('*').order('name'),
+    supabase
+      .from('console_stay_request_v')
+      .select('*')
+      .order('created_at', { ascending: false }),
+    /* Only the selected request's options: the table shows a count. */
+    selected
+      ? supabase
+          .from('stay_request_match')
+          .select('*, unit:unit_id(label_public, name)')
+          .eq('request_id', selected)
+          .order('rank')
+      : Promise.resolve({ data: [] as unknown[] }),
+  ]);
+
+  return (
+    <ListingsTab
+      properties={(properties as PropertyRow[] | null) ?? []}
+      requests={(requests as StayRequestRow[] | null) ?? []}
+      matches={(matches as MatchRow[] | null) ?? []}
       filter={filter}
       selected={selected}
     />

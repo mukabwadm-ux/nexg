@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { HostRegisterCard } from '@/components/hosts/host-register-card';
+import { PropertyCard, type PropertyCardRow } from '@/components/stays/listing';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -98,7 +99,7 @@ export default async function HostsPage() {
    * right — a landing page that overstates the footprint is a promise
    * to a host in a town nobody delivers to.
    */
-  const [{ count: cityCount }, { data: packageRows }] = await Promise.all([
+  const [{ count: cityCount }, { data: packageRows }, { data: listed }] = await Promise.all([
     supabase.from('city').select('id', { count: 'exact', head: true }).eq('status', 'live'),
     /*
      * The catalogue is per city, so an unfiltered `limit(4)` returned
@@ -114,7 +115,16 @@ export default async function HostsPage() {
       .select('id, name, description, price, sort')
       .eq('status', 'live')
       .order('sort'),
+    /* Three of the properties already listed, as proof to a host that
+       this is a real shop window and not a promise. */
+    supabase
+      .from('property_public')
+      .select('*')
+      .order('from_rate_kes', { nullsFirst: false })
+      .limit(3),
   ]);
+
+  const teaser = (listed as PropertyCardRow[] | null) ?? [];
 
   const packages = Object.values(
     (packageRows ?? []).reduce<
@@ -308,6 +318,39 @@ export default async function HostsPage() {
             </div>
           </div>
         </section>
+
+        {/* ─────────────────────────────────── already listed */}
+        {teaser.length > 0 && (
+          <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#8A8A8A]">
+                  Already listed
+                </p>
+                <h2 className="mt-2 text-[1.75rem] font-extrabold tracking-[-0.02em] sm:text-[2rem]">
+                  Your unit, in front of guests looking now.
+                </h2>
+                <p className="mt-3 max-w-[38rem] text-[0.875rem] font-semibold leading-[1.8] text-[#5B5B5B]">
+                  Verified hosts can have their property shown on NexG, with each unit listed
+                  separately. Guests browse it, or tell us what they need and we come back with
+                  the places that fit.
+                </p>
+              </div>
+              <Link
+                href="/stays"
+                className="shrink-0 text-[0.8125rem] font-extrabold text-[#B8901F] hover:underline"
+              >
+                See every stay →
+              </Link>
+            </div>
+
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {teaser.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ─────────────────────────────────────────── the form */}
         <section id="list" className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">

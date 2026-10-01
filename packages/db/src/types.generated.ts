@@ -6656,6 +6656,13 @@ export type Database = {
             foreignKeyName: 'package_order_unit_id_fkey';
             columns: ['unit_id'];
             isOneToOne: false;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'package_order_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
             referencedRelation: 'rider_handoff_v';
             referencedColumns: ['unit_id'];
           },
@@ -7225,6 +7232,104 @@ export type Database = {
             columns: ['plan_id'];
             isOneToOne: false;
             referencedRelation: 'plan';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      property: {
+        Row: {
+          amenities: string[];
+          area: string | null;
+          check_in_from: string | null;
+          check_out_by: string | null;
+          city_id: string | null;
+          created_at: string;
+          description: string | null;
+          host_id: string;
+          id: string;
+          kind: Database['public']['Enums']['property_kind'];
+          listed: boolean;
+          listed_at: string | null;
+          listed_by: string | null;
+          name: string;
+          neighbourhood_note: string | null;
+          photos: NonNullable<Json>;
+          point: unknown;
+          slug: string;
+          summary: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          amenities?: string[];
+          area?: string | null;
+          check_in_from?: string | null;
+          check_out_by?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          description?: string | null;
+          host_id: string;
+          id?: string;
+          kind?: Database['public']['Enums']['property_kind'];
+          listed?: boolean;
+          listed_at?: string | null;
+          listed_by?: string | null;
+          name: string;
+          neighbourhood_note?: string | null;
+          photos?: NonNullable<Json>;
+          point?: unknown;
+          slug: string;
+          summary?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          amenities?: string[];
+          area?: string | null;
+          check_in_from?: string | null;
+          check_out_by?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          description?: string | null;
+          host_id?: string;
+          id?: string;
+          kind?: Database['public']['Enums']['property_kind'];
+          listed?: boolean;
+          listed_at?: string | null;
+          listed_by?: string | null;
+          name?: string;
+          neighbourhood_note?: string | null;
+          photos?: NonNullable<Json>;
+          point?: unknown;
+          slug?: string;
+          summary?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_listed_by_fkey';
+            columns: ['listed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
         ];
@@ -9757,6 +9862,198 @@ export type Database = {
         };
         Relationships: [];
       };
+      stay_request: {
+        Row: {
+          areas: string[];
+          assigned_to: string | null;
+          bedrooms_needed: number | null;
+          budget_per_night_kes: number | null;
+          check_in: string | null;
+          check_out: string | null;
+          city_id: string | null;
+          consent_marketing: boolean;
+          created_at: string;
+          decided_at: string | null;
+          guests: number | null;
+          id: string;
+          must_haves: string[];
+          notes: string | null;
+          outcome_note: string | null;
+          purpose: string | null;
+          reference: string;
+          requester_email: string | null;
+          requester_name: string | null;
+          requester_phone: string | null;
+          sent_at: string | null;
+          source: string;
+          status: Database['public']['Enums']['stay_request_status'];
+          updated_at: string;
+        };
+        Insert: {
+          areas?: string[];
+          assigned_to?: string | null;
+          bedrooms_needed?: number | null;
+          budget_per_night_kes?: number | null;
+          check_in?: string | null;
+          check_out?: string | null;
+          city_id?: string | null;
+          consent_marketing?: boolean;
+          created_at?: string;
+          decided_at?: string | null;
+          guests?: number | null;
+          id?: string;
+          must_haves?: string[];
+          notes?: string | null;
+          outcome_note?: string | null;
+          purpose?: string | null;
+          reference: string;
+          requester_email?: string | null;
+          requester_name?: string | null;
+          requester_phone?: string | null;
+          sent_at?: string | null;
+          source?: string;
+          status?: Database['public']['Enums']['stay_request_status'];
+          updated_at?: string;
+        };
+        Update: {
+          areas?: string[];
+          assigned_to?: string | null;
+          bedrooms_needed?: number | null;
+          budget_per_night_kes?: number | null;
+          check_in?: string | null;
+          check_out?: string | null;
+          city_id?: string | null;
+          consent_marketing?: boolean;
+          created_at?: string;
+          decided_at?: string | null;
+          guests?: number | null;
+          id?: string;
+          must_haves?: string[];
+          notes?: string | null;
+          outcome_note?: string | null;
+          purpose?: string | null;
+          reference?: string;
+          requester_email?: string | null;
+          requester_name?: string | null;
+          requester_phone?: string | null;
+          sent_at?: string | null;
+          source?: string;
+          status?: Database['public']['Enums']['stay_request_status'];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'stay_request_assigned_to_fkey';
+            columns: ['assigned_to'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      stay_request_match: {
+        Row: {
+          created_at: string;
+          guest_response: string | null;
+          id: string;
+          proposed_by: string | null;
+          quoted_nightly_kes: number | null;
+          rank: number;
+          request_id: string;
+          sent_at: string | null;
+          unit_id: string;
+          why: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          guest_response?: string | null;
+          id?: string;
+          proposed_by?: string | null;
+          quoted_nightly_kes?: number | null;
+          rank?: number;
+          request_id: string;
+          sent_at?: string | null;
+          unit_id: string;
+          why?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          guest_response?: string | null;
+          id?: string;
+          proposed_by?: string | null;
+          quoted_nightly_kes?: number | null;
+          rank?: number;
+          request_id?: string;
+          sent_at?: string | null;
+          unit_id?: string;
+          why?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'stay_request_match_proposed_by_fkey';
+            columns: ['proposed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_match_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_stay_request_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_match_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'stay_request';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_match_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_match_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_match_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_match_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_match_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
       supply_action: {
         Row: {
           applied_at: string;
@@ -9983,6 +10280,9 @@ export type Database = {
           area: string | null;
           askari_name: string | null;
           askari_phone_encrypted: string | null;
+          bathrooms: number | null;
+          bed_setup: string | null;
+          bedrooms: number | null;
           building: string | null;
           caretaker_confirmed_at: string | null;
           caretaker_name: string | null;
@@ -10001,15 +10301,24 @@ export type Database = {
           id: string;
           label_public: string | null;
           lift_note: string | null;
+          listed: boolean;
+          max_guests: number | null;
+          min_nights: number;
           name: string;
+          nightly_rate_kes: number | null;
           packages_default: string | null;
           packages_schedule: Database['public']['Enums']['package_schedule'] | null;
           parking_note: string | null;
           paused_reason: string | null;
+          photos: NonNullable<Json>;
           point: unknown;
+          property_id: string | null;
           readiness: NonNullable<Json>;
+          size_sqm: number | null;
           status: Database['public']['Enums']['unit_status'];
+          unit_amenities: string[];
           unit_no: string | null;
+          unit_summary: string | null;
           updated_at: string;
           wifi_name: string | null;
           zone_id: string | null;
@@ -10020,6 +10329,9 @@ export type Database = {
           area?: string | null;
           askari_name?: string | null;
           askari_phone_encrypted?: string | null;
+          bathrooms?: number | null;
+          bed_setup?: string | null;
+          bedrooms?: number | null;
           building?: string | null;
           caretaker_confirmed_at?: string | null;
           caretaker_name?: string | null;
@@ -10038,15 +10350,24 @@ export type Database = {
           id?: string;
           label_public?: string | null;
           lift_note?: string | null;
+          listed?: boolean;
+          max_guests?: number | null;
+          min_nights?: number;
           name: string;
+          nightly_rate_kes?: number | null;
           packages_default?: string | null;
           packages_schedule?: Database['public']['Enums']['package_schedule'] | null;
           parking_note?: string | null;
           paused_reason?: string | null;
+          photos?: NonNullable<Json>;
           point?: unknown;
+          property_id?: string | null;
           readiness?: NonNullable<Json>;
+          size_sqm?: number | null;
           status?: Database['public']['Enums']['unit_status'];
+          unit_amenities?: string[];
           unit_no?: string | null;
+          unit_summary?: string | null;
           updated_at?: string;
           wifi_name?: string | null;
           zone_id?: string | null;
@@ -10057,6 +10378,9 @@ export type Database = {
           area?: string | null;
           askari_name?: string | null;
           askari_phone_encrypted?: string | null;
+          bathrooms?: number | null;
+          bed_setup?: string | null;
+          bedrooms?: number | null;
           building?: string | null;
           caretaker_confirmed_at?: string | null;
           caretaker_name?: string | null;
@@ -10075,15 +10399,24 @@ export type Database = {
           id?: string;
           label_public?: string | null;
           lift_note?: string | null;
+          listed?: boolean;
+          max_guests?: number | null;
+          min_nights?: number;
           name?: string;
+          nightly_rate_kes?: number | null;
           packages_default?: string | null;
           packages_schedule?: Database['public']['Enums']['package_schedule'] | null;
           parking_note?: string | null;
           paused_reason?: string | null;
+          photos?: NonNullable<Json>;
           point?: unknown;
+          property_id?: string | null;
           readiness?: NonNullable<Json>;
+          size_sqm?: number | null;
           status?: Database['public']['Enums']['unit_status'];
+          unit_amenities?: string[];
           unit_no?: string | null;
+          unit_summary?: string | null;
           updated_at?: string;
           wifi_name?: string | null;
           zone_id?: string | null;
@@ -10108,6 +10441,27 @@ export type Database = {
             columns: ['host_id'];
             isOneToOne: false;
             referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_property_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'property';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_public';
             referencedColumns: ['id'];
           },
           {
@@ -10193,6 +10547,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'host_view_v';
             referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
           },
           {
             foreignKeyName: 'unit_qr_unit_id_fkey';
@@ -10924,6 +11285,52 @@ export type Database = {
           },
         ];
       };
+      console_property_v: {
+        Row: {
+          amenities: string[] | null;
+          area: string | null;
+          blocked_reason: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          from_rate_kes: number | null;
+          host_id: string | null;
+          host_name: string | null;
+          host_status: Database['public']['Enums']['host_status'] | null;
+          id: string | null;
+          kind: Database['public']['Enums']['property_kind'] | null;
+          listed: boolean | null;
+          listed_at: string | null;
+          name: string | null;
+          photo_count: number | null;
+          slug: string | null;
+          summary: string | null;
+          units: number | null;
+          units_listed: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       console_rider_badges_v: {
         Row: {
           active: number | null;
@@ -11030,6 +11437,44 @@ export type Database = {
             columns: ['employer_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_stay_request_v: {
+        Row: {
+          age_hours: number | null;
+          areas: string[] | null;
+          assigned_to_name: string | null;
+          bedrooms_needed: number | null;
+          budget_per_night_kes: number | null;
+          check_in: string | null;
+          check_out: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          created_at: string | null;
+          guests: number | null;
+          id: string | null;
+          must_haves: string[] | null;
+          nights: number | null;
+          notes: string | null;
+          options: number | null;
+          outcome_note: string | null;
+          phone_masked: string | null;
+          purpose: string | null;
+          reference: string | null;
+          requester_email: string | null;
+          requester_name: string | null;
+          sent_at: string | null;
+          source: string | null;
+          status: Database['public']['Enums']['stay_request_status'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
             referencedColumns: ['id'];
           },
         ];
@@ -11732,6 +12177,83 @@ export type Database = {
             columns: ['parent_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      property_public: {
+        Row: {
+          amenities: string[] | null;
+          area: string | null;
+          bedrooms_max: number | null;
+          bedrooms_min: number | null;
+          check_in_from: string | null;
+          check_out_by: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          description: string | null;
+          from_rate_kes: number | null;
+          id: string | null;
+          kind: Database['public']['Enums']['property_kind'] | null;
+          name: string | null;
+          neighbourhood_note: string | null;
+          photos: Json | null;
+          sleeps_max: number | null;
+          slug: string | null;
+          summary: string | null;
+          units_available: number | null;
+          units_without_rate: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      property_unit_public: {
+        Row: {
+          area: string | null;
+          bathrooms: number | null;
+          bed_setup: string | null;
+          bedrooms: number | null;
+          floor: string | null;
+          handoff_arranged: boolean | null;
+          id: string | null;
+          label_public: string | null;
+          max_guests: number | null;
+          min_nights: number | null;
+          name: string | null;
+          nightly_rate_kes: number | null;
+          photos: Json | null;
+          property_id: string | null;
+          size_sqm: number | null;
+          unit_amenities: string[] | null;
+          unit_summary: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_property_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'property';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_public';
             referencedColumns: ['id'];
           },
         ];
@@ -15206,6 +15728,37 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_property_set_listed: {
+        Args: { p_listed: boolean; p_property_id: string };
+        Returns: {
+          amenities: string[];
+          area: string | null;
+          check_in_from: string | null;
+          check_out_by: string | null;
+          city_id: string | null;
+          created_at: string;
+          description: string | null;
+          host_id: string;
+          id: string;
+          kind: Database['public']['Enums']['property_kind'];
+          listed: boolean;
+          listed_at: string | null;
+          listed_by: string | null;
+          name: string;
+          neighbourhood_note: string | null;
+          photos: NonNullable<Json>;
+          point: unknown;
+          slug: string;
+          summary: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'property';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_publish_curated_day: {
         Args: { p_day_id: string };
         Returns: {
@@ -16490,6 +17043,73 @@ export type Database = {
         Returns: Database['public']['Enums']['staff_status'];
       };
       rpc_staff_sign_out_everywhere: { Args: { p_staff_id: string }; Returns: number };
+      rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
+      rpc_stay_request_match: {
+        Args: {
+          p_quoted_nightly_kes?: number;
+          p_rank?: number;
+          p_request_id: string;
+          p_unit_id: string;
+          p_why: string;
+        };
+        Returns: {
+          created_at: string;
+          guest_response: string | null;
+          id: string;
+          proposed_by: string | null;
+          quoted_nightly_kes: number | null;
+          rank: number;
+          request_id: string;
+          sent_at: string | null;
+          unit_id: string;
+          why: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay_request_match';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_request_update: {
+        Args: {
+          p_note?: string;
+          p_request_id: string;
+          p_status: Database['public']['Enums']['stay_request_status'];
+        };
+        Returns: {
+          areas: string[];
+          assigned_to: string | null;
+          bedrooms_needed: number | null;
+          budget_per_night_kes: number | null;
+          check_in: string | null;
+          check_out: string | null;
+          city_id: string | null;
+          consent_marketing: boolean;
+          created_at: string;
+          decided_at: string | null;
+          guests: number | null;
+          id: string;
+          must_haves: string[];
+          notes: string | null;
+          outcome_note: string | null;
+          purpose: string | null;
+          reference: string;
+          requester_email: string | null;
+          requester_name: string | null;
+          requester_phone: string | null;
+          sent_at: string | null;
+          source: string;
+          status: Database['public']['Enums']['stay_request_status'];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay_request';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_submit_review: {
         Args: {
           p_body: string;
@@ -16605,6 +17225,9 @@ export type Database = {
           area: string | null;
           askari_name: string | null;
           askari_phone_encrypted: string | null;
+          bathrooms: number | null;
+          bed_setup: string | null;
+          bedrooms: number | null;
           building: string | null;
           caretaker_confirmed_at: string | null;
           caretaker_name: string | null;
@@ -16623,15 +17246,24 @@ export type Database = {
           id: string;
           label_public: string | null;
           lift_note: string | null;
+          listed: boolean;
+          max_guests: number | null;
+          min_nights: number;
           name: string;
+          nightly_rate_kes: number | null;
           packages_default: string | null;
           packages_schedule: Database['public']['Enums']['package_schedule'] | null;
           parking_note: string | null;
           paused_reason: string | null;
+          photos: NonNullable<Json>;
           point: unknown;
+          property_id: string | null;
           readiness: NonNullable<Json>;
+          size_sqm: number | null;
           status: Database['public']['Enums']['unit_status'];
+          unit_amenities: string[];
           unit_no: string | null;
+          unit_summary: string | null;
           updated_at: string;
           wifi_name: string | null;
           zone_id: string | null;
@@ -16896,7 +17528,9 @@ export type Database = {
         | 'data_request_bundle_ready'
         | 'data_request_fulfilled'
         | 'data_request_held'
-        | 'handoff_rule_changed_next_time';
+        | 'handoff_rule_changed_next_time'
+        | 'stay_request_received'
+        | 'stay_request_options_sent';
       notification_status: 'pending' | 'sent' | 'failed' | 'no_address';
       package_schedule: 'per_booking' | 'every_checkin' | 'manual';
       partner_status:
@@ -16922,6 +17556,15 @@ export type Database = {
         | 'expired';
       price_basis: 'per_person' | 'per_group' | 'per_vehicle' | 'per_night' | 'face_value';
       price_flag_status: 'open' | 'aligned' | 'dismissed';
+      property_kind:
+        | 'apartment'
+        | 'apartment_block'
+        | 'villa'
+        | 'townhouse'
+        | 'guest_house'
+        | 'cottage'
+        | 'penthouse'
+        | 'studio';
       qr_state: 'generated' | 'sent' | 'placed' | 'scanned' | 'replaced';
       recon_status: 'open' | 'matched' | 'missing_reference' | 'disputed' | 'reconciled';
       review_display: 'initial' | 'full_name' | 'anonymous';
@@ -16947,6 +17590,7 @@ export type Database = {
       shift_commitment_status: 'committed' | 'showed' | 'no_show' | 'released';
       staff_status: 'active' | 'suspended' | 'offboarded';
       statement_status: 'draft' | 'ready' | 'sent' | 'disputed' | 'paid';
+      stay_request_status: 'new' | 'reviewing' | 'matched' | 'sent' | 'won' | 'lost' | 'closed';
       ticket_channel: 'web_form' | 'whatsapp' | 'phone' | 'email' | 'in_app';
       ticket_from: 'guest' | 'rider' | 'merchant' | 'hotel';
       ticket_status: 'open' | 'assigned' | 'answered' | 'resolved' | 'closed';
@@ -17318,6 +17962,8 @@ export const Constants = {
         'data_request_fulfilled',
         'data_request_held',
         'handoff_rule_changed_next_time',
+        'stay_request_received',
+        'stay_request_options_sent',
       ],
       notification_status: ['pending', 'sent', 'failed', 'no_address'],
       package_schedule: ['per_booking', 'every_checkin', 'manual'],
@@ -17346,6 +17992,16 @@ export const Constants = {
       ],
       price_basis: ['per_person', 'per_group', 'per_vehicle', 'per_night', 'face_value'],
       price_flag_status: ['open', 'aligned', 'dismissed'],
+      property_kind: [
+        'apartment',
+        'apartment_block',
+        'villa',
+        'townhouse',
+        'guest_house',
+        'cottage',
+        'penthouse',
+        'studio',
+      ],
       qr_state: ['generated', 'sent', 'placed', 'scanned', 'replaced'],
       recon_status: ['open', 'matched', 'missing_reference', 'disputed', 'reconciled'],
       review_display: ['initial', 'full_name', 'anonymous'],
@@ -17366,6 +18022,7 @@ export const Constants = {
       shift_commitment_status: ['committed', 'showed', 'no_show', 'released'],
       staff_status: ['active', 'suspended', 'offboarded'],
       statement_status: ['draft', 'ready', 'sent', 'disputed', 'paid'],
+      stay_request_status: ['new', 'reviewing', 'matched', 'sent', 'won', 'lost', 'closed'],
       ticket_channel: ['web_form', 'whatsapp', 'phone', 'email', 'in_app'],
       ticket_from: ['guest', 'rider', 'merchant', 'hotel'],
       ticket_status: ['open', 'assigned', 'answered', 'resolved', 'closed'],

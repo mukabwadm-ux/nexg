@@ -8,6 +8,7 @@ import Link from 'next/link';
  */
 export const HOTEL_TABS = [
   { key: 'hosts', label: 'Airbnb hosts & units' },
+  { key: 'listings', label: 'Listings & requests' },
   { key: 'hotels', label: 'Hotels' },
   { key: 'charge', label: 'Charge to room' },
   { key: 'desk', label: 'Front desk & access' },
@@ -21,6 +22,10 @@ export const TAB_TITLE: Record<string, { title: string; subtitle: string }> = {
   hosts: {
     title: 'Airbnb hosts & units',
     subtitle: 'Hosts, property managers and every unit with its hand-off rule · QR packs · welcome packages',
+  },
+  listings: {
+    title: 'Listings & stay requests',
+    subtitle: 'What guests can see, and what they have asked for · match, send, record the outcome',
   },
   hotels: { title: 'Hotels', subtitle: 'Partner hotels, rooms and the prospect pipeline' },
   charge: {
