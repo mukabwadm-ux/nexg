@@ -98,15 +98,39 @@ export default async function HostsPage() {
    * right — a landing page that overstates the footprint is a promise
    * to a host in a town nobody delivers to.
    */
-  const [{ count: cityCount }, { data: packages }] = await Promise.all([
+  const [{ count: cityCount }, { data: packageRows }] = await Promise.all([
     supabase.from('city').select('id', { count: 'exact', head: true }).eq('status', 'live'),
+    /*
+     * The catalogue is per city, so an unfiltered `limit(4)` returned
+     * four copies of whichever package sorts first — the page showed
+     * "Essentials" four times.
+     *
+     * This page is not city-specific, so collapse to one card per
+     * package and take the lowest price across cities, which is what
+     * "from KES" actually claims.
+     */
     supabase
       .from('welcome_package')
-      .select('id, name, description, price')
+      .select('id, name, description, price, sort')
       .eq('status', 'live')
-      .order('sort')
-      .limit(4),
+      .order('sort'),
   ]);
+
+  const packages = Object.values(
+    (packageRows ?? []).reduce<
+      Record<string, { id: string; name: string; description: string | null; price: number | null; sort: number }>
+    >((acc, row) => {
+      const seen = acc[row.name];
+      if (!seen) {
+        acc[row.name] = row;
+      } else if (row.price !== null && (seen.price === null || row.price < seen.price)) {
+        acc[row.name] = { ...seen, price: row.price };
+      }
+      return acc;
+    }, {}),
+  )
+    .sort((a, b) => a.sort - b.sort)
+    .slice(0, 4);
 
   return (
     <>
@@ -222,8 +246,14 @@ export default async function HostsPage() {
         </section>
 
         {/* ──────────────────────────────────── welcome packages */}
-        <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
-          <div className="rounded-2xl bg-[#D4A72C] p-6 sm:p-10">
+        {/*
+         * Edge to edge, like the featured band on the homepage: the gold
+         * is on the section, the container is inside it, so the colour
+         * bleeds to the viewport while the content stays on the same
+         * 96rem grid as every other section.
+         */}
+        <section className="my-12 bg-[#D4A72C] py-12 sm:py-16">
+          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <div className="grid gap-8 lg:grid-cols-[1fr_34rem] lg:items-start lg:gap-12">
               <div>
                 <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#5B4708]">
@@ -251,7 +281,7 @@ export default async function HostsPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {(packages ?? []).map((pkg) => (
+                {packages.map((pkg) => (
                   <div key={pkg.id} className="rounded-xl bg-white p-3">
                     <div
                       aria-hidden="true"
