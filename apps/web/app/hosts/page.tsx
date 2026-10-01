@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { HostRegisterCard } from '@/components/hosts/host-register-card';
 import { PropertyCard, type PropertyCardRow } from '@/components/stays/listing';
+import { TailorForm } from '@/components/stays/tailor-form';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -99,7 +100,12 @@ export default async function HostsPage() {
    * right — a landing page that overstates the footprint is a promise
    * to a host in a town nobody delivers to.
    */
-  const [{ count: cityCount }, { data: packageRows }, { data: listed }] = await Promise.all([
+  const [
+    { count: cityCount },
+    { data: packageRows },
+    { data: listed },
+    { data: allAreas, count: listedCount },
+  ] = await Promise.all([
     supabase.from('city').select('id', { count: 'exact', head: true }).eq('status', 'live'),
     /*
      * The catalogue is per city, so an unfiltered `limit(4)` returned
@@ -121,10 +127,17 @@ export default async function HostsPage() {
       .from('property_public')
       .select('*')
       .order('from_rate_kes', { nullsFirst: false })
-      .limit(3),
+      .limit(4),
+    /* Every listed area, so the form's "where, roughly?" chips are not
+       limited to the four properties that fit on this page. */
+    supabase.from('property_public').select('area', { count: 'exact' }),
   ]);
 
   const teaser = (listed as PropertyCardRow[] | null) ?? [];
+  const more = Math.max((listedCount ?? 0) - teaser.length, 0);
+  const areas = [
+    ...new Set(((allAreas as { area: string | null }[] | null) ?? []).map((a) => a.area)),
+  ].filter(Boolean) as string[];
 
   const packages = Object.values(
     (packageRows ?? []).reduce<
@@ -319,6 +332,56 @@ export default async function HostsPage() {
           </div>
         </section>
 
+        {/*
+         * Looking for a place, rather than listing one.
+         *
+         * Two audiences on one page, so this says plainly which it is
+         * for. It sits immediately above the listings because the form
+         * and the cards are the same offer approached from two
+         * directions: tell us, or look for yourself.
+         */}
+        <section id="find" className="bg-ink py-14 text-white">
+          <div className="mx-auto grid max-w-[96rem] gap-10 px-4 sm:px-8 lg:grid-cols-[1fr_30rem] lg:items-center lg:gap-14 lg:px-16">
+            <div>
+              <p className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1.5 text-[0.6875rem] font-extrabold">
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#D4A72C]" />
+                Looking for a place, not listing one?
+              </p>
+
+              <h2 className="mt-5 text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] sm:text-[2.75rem]">
+                Tell us what you need. We&rsquo;ll find the{' '}
+                <span className="text-[#E8C45F]">place</span>.
+              </h2>
+
+              <p className="mt-4 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8] text-white/70">
+                Every place on NexG comes with a concierge already set up: food, laundry, a
+                charger at midnight, an airport run at five. Describe the stay and a person comes
+                back with two or three that actually fit.
+              </p>
+
+              <dl className="mt-7 grid gap-4 sm:grid-cols-3">
+                {[
+                  { title: 'A person, not a filter', body: 'Somebody reads it and picks.' },
+                  {
+                    title: 'Concierge included',
+                    body: 'Deliveries follow the host’s rule, not a guess.',
+                  },
+                  { title: 'Nothing to pay to ask', body: 'No account, no card, no obligation.' },
+                ].map((item) => (
+                  <div key={item.title}>
+                    <dt className="text-[0.8125rem] font-extrabold">{item.title}</dt>
+                    <dd className="mt-1 text-[0.75rem] font-semibold leading-snug text-white/60">
+                      {item.body}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <TailorForm areas={areas} />
+          </div>
+        </section>
+
         {/* ─────────────────────────────────── already listed */}
         {teaser.length > 0 && (
           <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
@@ -336,18 +399,26 @@ export default async function HostsPage() {
                   the places that fit.
                 </p>
               </div>
-              <Link
-                href="/stays"
-                className="shrink-0 text-[0.8125rem] font-extrabold text-[#B8901F] hover:underline"
-              >
-                See every stay →
-              </Link>
             </div>
 
-            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {teaser.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
+            </div>
+
+            <div className="mt-7 text-center">
+              <Link
+                href="/stays"
+                className="border-border-strong hover:border-ink inline-flex items-center gap-2 rounded-lg border bg-white px-5 py-2.5 text-[0.8125rem] font-extrabold transition-colors"
+              >
+                {/* The count is real, so the link never promises more
+                    than there is. */}
+                {more > 0
+                  ? `See ${more} more ${more === 1 ? 'listing' : 'listings'}`
+                  : 'See every listing'}
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
           </section>
         )}

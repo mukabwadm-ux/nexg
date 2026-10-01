@@ -1,21 +1,25 @@
 'use client';
 
 import { Button, ChipGroup, Input, PhoneInput, useToast } from '@nexg/ui';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import * as React from 'react';
 
 import { requestStay } from '@/app/stays/actions';
 
 /**
- * "Tell us what you need" — the hero form.
+ * "Tell us what you need" — three steps rather than one long column.
  *
- * The questions are the ones that actually narrow a shortlist: where,
- * when, how many of you, what the stay is for, and the two or three
- * things that would make it wrong. Everything else is a conversation
- * the desk has afterwards.
+ * The questions are the ones that actually narrow a shortlist: when,
+ * who, where, and the two or three things that would make a place
+ * wrong. Everything else is a conversation the desk has afterwards.
  *
- * Budget is optional and phrased as a ceiling, not a filter. Somebody
- * who leaves it blank gets a range back rather than nothing.
+ * Split into steps because the whole form is nine fields tall, which
+ * is taller than anything it sits beside. Each step is one question
+ * somebody can answer without scrolling, and none of them is required
+ * — a person who knows only their dates can still send it.
+ *
+ * Budget is phrased as a ceiling, not a filter. Left blank, they get a
+ * range back rather than nothing.
  */
 
 const PURPOSES = [
@@ -39,6 +43,8 @@ const MUST_HAVES = [
   'Step-free access',
 ];
 
+const STEPS = ['When & who', 'Where & what matters', 'How to reach you'] as const;
+
 export function TailorForm({
   areas,
   compact,
@@ -52,6 +58,8 @@ export function TailorForm({
   heading?: string;
 }) {
   const { toast } = useToast();
+  const [step, setStep] = React.useState(0);
+
   const [name, setName] = React.useState('');
   const [phone, setPhone] = React.useState<string | null>(null);
   const [email, setEmail] = React.useState('');
@@ -71,17 +79,33 @@ export function TailorForm({
   const toggle = (list: string[], set: (v: string[]) => void, value: string) =>
     set(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
 
+  /* Only two things can actually be wrong, and each belongs to a step. */
+  function problemsOn(which: number): Record<string, string> {
+    if (which === 0 && checkIn && checkOut && checkOut <= checkIn) {
+      return { dates: 'The second date needs to be after the first.' };
+    }
+    if (which === 2 && !phone && !email.trim()) {
+      return { contact: 'A phone number or an email — otherwise we cannot come back to you.' };
+    }
+    return {};
+  }
+
+  function next() {
+    const found = problemsOn(step);
+    setErrors(found);
+    if (Object.keys(found).length === 0) setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  }
+
   function submit(event: React.FormEvent) {
     event.preventDefault();
-    const next: Record<string, string> = {};
-    if (!phone && !email.trim()) {
-      next['contact'] = 'A phone number or an email — otherwise we cannot come back to you.';
+    /* Every step, not just the last — somebody can go back and break
+       an earlier one on the way through. */
+    const found = { ...problemsOn(0), ...problemsOn(2) };
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      setStep(found['dates'] ? 0 : 2);
+      return;
     }
-    if (checkIn && checkOut && checkOut <= checkIn) {
-      next['dates'] = 'The second date needs to be after the first.';
-    }
-    setErrors(next);
-    if (Object.keys(next).length > 0) return;
 
     startTransition(async () => {
       const result = await requestStay({
@@ -100,9 +124,10 @@ export function TailorForm({
         /* The place they were looking at leads the note, so the desk
            does not have to work out which one "the one with the
            balcony" was. */
-        notes: [subject ? `Asking about ${subject}.` : null, notes.trim() || null]
-          .filter(Boolean)
-          .join(' ') || null,
+        notes:
+          [subject ? `Asking about ${subject}.` : null, notes.trim() || null]
+            .filter(Boolean)
+            .join(' ') || null,
         consent_marketing: false,
         source: subject ? 'stays_property' : 'stays_hero',
       });
@@ -139,6 +164,8 @@ export function TailorForm({
     );
   }
 
+  const last = step === STEPS.length - 1;
+
   return (
     <form
       onSubmit={submit}
@@ -146,141 +173,197 @@ export function TailorForm({
       noValidate
     >
       {!compact && (
-        <>
-          <p className="text-gold-text text-[0.6875rem] font-extrabold uppercase tracking-[0.12em]">
-            {heading ?? 'Tell us what you need'}
-          </p>
-          <p className="text-muted mt-2 text-[0.8125rem] font-semibold leading-[1.7]">
-            A person reads this and comes back with two or three places that fit — not a list of
-            everything.
-          </p>
-        </>
+        <p className="text-gold-text text-[0.6875rem] font-extrabold uppercase tracking-[0.12em]">
+          {heading ?? 'Tell us what you need'}
+        </p>
       )}
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <Input
-          id="stay_in"
-          type="date"
-          label="Check in"
-          value={checkIn}
-          onChange={(e) => setCheckIn(e.target.value)}
-          {...(errors['dates'] ? { error: errors['dates'] } : {})}
-        />
-        <Input
-          id="stay_out"
-          type="date"
-          label="Check out"
-          value={checkOut}
-          onChange={(e) => setCheckOut(e.target.value)}
-        />
-        <Input
-          id="stay_guests"
-          type="number"
-          min={1}
-          label="Guests"
-          value={guests}
-          onChange={(e) => setGuests(e.target.value)}
-        />
-        <Input
-          id="stay_bedrooms"
-          type="number"
-          min={0}
-          label="Bedrooms"
-          placeholder="Any"
-          value={bedrooms}
-          onChange={(e) => setBedrooms(e.target.value)}
-        />
+      {/* ─────────────────────────────────────────── the steps */}
+      <div className="mt-3 flex items-center gap-2">
+        {STEPS.map((label, i) => (
+          <span
+            key={label}
+            aria-hidden="true"
+            className={`h-1 flex-1 rounded-full transition-colors ${
+              i <= step ? 'bg-gold' : 'bg-border'
+            }`}
+          />
+        ))}
       </div>
+      <p className="text-muted-light mt-2 text-[0.6875rem] font-bold">
+        Step {step + 1} of {STEPS.length} · {STEPS[step]}
+      </p>
 
-      {areas.length > 0 && (
-        <fieldset className="mt-5">
-          <legend className="text-muted text-[0.75rem] font-bold">Where, roughly?</legend>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {areas.map((area) => (
-              <Toggle
-                key={area}
-                on={pickedAreas.includes(area)}
-                onClick={() => toggle(pickedAreas, setPickedAreas, area)}
-              >
-                {area}
-              </Toggle>
-            ))}
+      {/* ───────────────────────────────── 1 · when and who */}
+      {step === 0 && (
+        <div className="mt-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              id="stay_in"
+              type="date"
+              label="Check in"
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+              {...(errors['dates'] ? { error: errors['dates'] } : {})}
+            />
+            <Input
+              id="stay_out"
+              type="date"
+              label="Check out"
+              value={checkOut}
+              onChange={(e) => setCheckOut(e.target.value)}
+            />
+            <Input
+              id="stay_guests"
+              type="number"
+              min={1}
+              label="Guests"
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+            />
+            <Input
+              id="stay_bedrooms"
+              type="number"
+              min={0}
+              label="Bedrooms"
+              placeholder="Any"
+              value={bedrooms}
+              onChange={(e) => setBedrooms(e.target.value)}
+            />
           </div>
-        </fieldset>
+          <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold">
+            Not fixed yet? Leave them blank — we will work around it.
+          </p>
+        </div>
       )}
 
-      <div className="mt-5">
-        <ChipGroup
-          id="stay_purpose"
-          label="What is the stay for?"
-          options={PURPOSES}
-          value={purpose}
-          onChange={setPurpose}
-          selectedTone="gold"
-        />
-      </div>
+      {/* ──────────────────────── 2 · where, and what matters */}
+      {step === 1 && (
+        <div className="mt-4">
+          {areas.length > 0 && (
+            <fieldset>
+              <legend className="text-muted text-[0.75rem] font-bold">Where, roughly?</legend>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {areas.map((area) => (
+                  <Toggle
+                    key={area}
+                    on={pickedAreas.includes(area)}
+                    onClick={() => toggle(pickedAreas, setPickedAreas, area)}
+                  >
+                    {area}
+                  </Toggle>
+                ))}
+              </div>
+            </fieldset>
+          )}
 
-      <fieldset className="mt-5">
-        <legend className="text-muted text-[0.75rem] font-bold">
-          Anything that would make it wrong without it?
-        </legend>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {MUST_HAVES.map((m) => (
-            <Toggle key={m} on={picked.includes(m)} onClick={() => toggle(picked, setPicked, m)}>
-              {m}
-            </Toggle>
-          ))}
+          <div className={areas.length > 0 ? 'mt-4' : ''}>
+            <ChipGroup
+              id="stay_purpose"
+              label="What is the stay for?"
+              options={PURPOSES}
+              value={purpose}
+              onChange={setPurpose}
+              selectedTone="gold"
+            />
+          </div>
+
+          <fieldset className="mt-4">
+            <legend className="text-muted text-[0.75rem] font-bold">
+              Anything that would make it wrong without it?
+            </legend>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {MUST_HAVES.map((m) => (
+                <Toggle
+                  key={m}
+                  on={picked.includes(m)}
+                  onClick={() => toggle(picked, setPicked, m)}
+                >
+                  {m}
+                </Toggle>
+              ))}
+            </div>
+          </fieldset>
         </div>
-      </fieldset>
+      )}
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <Input
-          id="stay_budget"
-          type="number"
-          min={0}
-          label="Up to, per night (KES)"
-          placeholder="Optional"
-          value={budget}
-          onChange={(e) => setBudget(e.target.value)}
-        />
-        <Input
-          id="stay_name"
-          label="Your name"
-          placeholder="Optional"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <PhoneInput
-          id="stay_phone"
-          label="Phone"
-          value={phone}
-          onChange={setPhone}
-          {...(errors['contact'] ? { error: errors['contact'] } : {})}
-        />
-        <Input
-          id="stay_email"
-          type="email"
-          label="Email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      {/* ───────────────────────────────── 3 · how to reach you */}
+      {step === 2 && (
+        <div className="mt-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              id="stay_name"
+              label="Your name"
+              placeholder="Optional"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <Input
+              id="stay_budget"
+              type="number"
+              min={0}
+              label="Up to, per night (KES)"
+              placeholder="Optional"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+            />
+            <PhoneInput
+              id="stay_phone"
+              label="Phone"
+              value={phone}
+              onChange={setPhone}
+              {...(errors['contact'] ? { error: errors['contact'] } : {})}
+            />
+            <Input
+              id="stay_email"
+              type="email"
+              label="Email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="mt-4">
+            <Input
+              id="stay_notes"
+              label="Anything else"
+              placeholder="Arriving late, travelling with a baby, a quiet street…"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ───────────────────────────────────────────── controls */}
+      <div className="mt-5 flex items-center gap-2">
+        {step > 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setStep((s) => Math.max(s - 1, 0))}
+          >
+            <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+            Back
+          </Button>
+        )}
+
+        {last ? (
+          <Button type="submit" className="flex-1" disabled={pending}>
+            {pending ? 'Sending…' : 'Find me a place'}
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </Button>
+        ) : (
+          /*
+           * A button, not a submit: pressing Enter on step one should
+           * move on, not send a half-written request.
+           */
+          <Button type="button" className="flex-1" onClick={next}>
+            Continue
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </Button>
+        )}
       </div>
-
-      <div className="mt-4">
-        <Input
-          id="stay_notes"
-          label="Anything else"
-          placeholder="Arriving late, travelling with a baby, need a quiet street…"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
-      </div>
-
-      <Button type="submit" className="mt-5 w-full" disabled={pending}>
-        {pending ? 'Sending…' : 'Find me a place'}
-        <ArrowRight aria-hidden="true" className="h-4 w-4" />
-      </Button>
 
       <p className="text-muted-light mt-3 text-center text-[0.6875rem] font-semibold leading-relaxed">
         No account, no payment, no obligation. We use these details to answer you and nothing else.
