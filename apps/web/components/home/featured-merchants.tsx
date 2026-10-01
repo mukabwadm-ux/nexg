@@ -6,17 +6,22 @@ import Link from 'next/link';
 import type { Translate } from '@/lib/i18n/dictionaries';
 
 /**
- * The featured merchant cards on the homepage (spec section 4.1).
+ * The featured merchant cards on the homepage.
  *
- * These read `public.merchant_public`, which is the only merchant data anon
- * can see and which cannot return a merchant that is not live (ground rule 5).
- * When nothing is featured — as in production until real slots are sold — the
- * designed placeholder cards render instead, bracketed as the artboard draws
- * them.
+ * These read `public.featured_live_v` — a sold, paid slot that is live
+ * this week, with an approved creative, for a merchant still visible
+ * in `merchant_public`. The view decides all of that; this component
+ * only draws it.
  *
- * A real card is a link to that merchant's page; a placeholder is not,
- * because there is no page behind `[Italian restaurant]` and a card that
- * looks pressable and 404s is worse than one that plainly is not.
+ * Every row arrives with `badge = 'SPONSORED'`, which is the point: a
+ * paid card cannot reach this list without the label, because the
+ * label comes from the same query as the card.
+ *
+ * When nothing is sold — production, until the first slot goes live —
+ * the designed placeholder cards render instead, bracketed as the
+ * artboard draws them. A real card links to that merchant; a
+ * placeholder does not, because there is no page behind
+ * `[Italian restaurant]`.
  */
 
 /**
@@ -25,12 +30,20 @@ import type { Translate } from '@/lib/i18n/dictionaries';
  * the essentials are dropped rather than rendered half-empty.
  */
 export interface FeaturedMerchant {
-  id: string | null;
+  booking_id: string | null;
+  merchant_id: string | null;
   trading_name: string | null;
-  category: string | null;
-  city_name: string | null;
+  merchant_category: string | null;
+  city_slug: string | null;
   branch_name: string | null;
   cover_photo_path: string | null;
+  /** The merchant's own line, approved by Growth before it ran. */
+  blurb: string | null;
+  badge: string | null;
+  position: number | null;
+  accepting_orders: boolean | null;
+  closed_today: boolean | null;
+  prep_minutes: number | null;
 }
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -118,8 +131,8 @@ export function FeaturedMerchants({
   t: Translate;
 }) {
   const rows = merchants.filter(
-    (m): m is FeaturedMerchant & { id: string; trading_name: string } =>
-      Boolean(m.id) && Boolean(m.trading_name),
+    (m): m is FeaturedMerchant & { merchant_id: string; trading_name: string } =>
+      Boolean(m.merchant_id) && Boolean(m.trading_name),
   );
 
   if (rows.length === 0) {
@@ -162,16 +175,16 @@ export function FeaturedMerchants({
   return (
     <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {rows.map((merchant) => {
-        const category = merchant.category ?? 'other';
+        const category = merchant.merchant_category ?? 'other';
         const Icon = CATEGORY_ICON[category] ?? Sparkles;
         const label = CATEGORY_LABEL[category] ?? 'Merchant';
-        const where = [label, merchant.branch_name ?? merchant.city_name]
-          .filter(Boolean)
-          .join(' · ');
+        /* The merchant's approved blurb replaces the generic line
+           when there is one — it is what they paid to say. */
+        const where = [label, merchant.branch_name].filter(Boolean).join(' · ');
 
         return (
           <li
-            key={merchant.id}
+            key={merchant.booking_id ?? merchant.merchant_id}
             className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F] transition-colors hover:border-white/20"
           >
             {/*
@@ -182,7 +195,9 @@ export function FeaturedMerchants({
              * than three that all go to the same place.
              */}
             <Link
-              href={`/explore/${merchant.id}`}
+              /* The booking id travels so a tap can be attributed to
+                 the slot that earned it, rather than guessed at later. */
+              href={`/explore/${merchant.merchant_id}?src=featured&b=${merchant.booking_id ?? ''}`}
               className="focus-visible:ring-gold block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
             >
               <Cover>
@@ -206,7 +221,9 @@ export function FeaturedMerchants({
               </Cover>
               <div className="p-3">
                 <p className="truncate text-sm font-bold">{merchant.trading_name}</p>
-                <p className="mt-0.5 truncate text-xs font-semibold text-white/50">{where}</p>
+                <p className="mt-0.5 truncate text-xs font-semibold text-white/50">
+                  {merchant.blurb ?? where}
+                </p>
                 <span className="bg-gold text-ink mt-3 block rounded-md py-1.5 text-center text-xs font-bold">
                   {t(CATEGORY_CTA[category] ?? 'merchant.cta.view')}
                 </span>

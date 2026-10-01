@@ -83,23 +83,25 @@ export default async function HomePage() {
   const [{ data: cities }, { data: featured }] = await Promise.all([
     supabase.from('city').select('id, slug, name, status').order('sort', { ascending: true }),
     /*
-     * Section 4.1: the band reads public.merchant_public, which only ever
-     * returns live merchants. Production has none until real slots are sold,
-     * and the component falls back to the designed placeholder cards.
+     * The band reads featured_live_v and nothing else.
+     *
+     * That view only returns a slot that is live this week, whose
+     * creative has been approved, and whose merchant is still in
+     * merchant_public — so a merchant suspended on Wednesday leaves
+     * the homepage on Wednesday. Every row carries badge =
+     * 'SPONSORED', which is why there is no code path here that can
+     * render a paid card without the label.
+     *
+     * Position is the slot number, so the order is the one that was
+     * sold rather than whatever Postgres returns.
      */
     supabase
-      .from('merchant_public')
-      .select('id, trading_name, category, city_name, branch_name, cover_photo_path')
-      .eq('featured', true)
-      /*
-       * Newest first. The band has four slots and nothing yet decides which
-       * featured merchant wins one — that is what
-       * setting.homepage_featured_slots_per_city is for, and it is seeded
-       * null because no number has been agreed (ground rule 3). Until it is,
-       * an explicit order beats whatever Postgres happens to return, and a
-       * business that has just been featured can actually see itself there.
-       */
-      .order('listed_at', { ascending: false })
+      .from('featured_live_v')
+      .select(
+        'booking_id, merchant_id, trading_name, merchant_category, city_slug, branch_name, cover_photo_path, blurb, badge, position, accepting_orders, closed_today, prep_minutes',
+      )
+      .eq('kind', 'homepage')
+      .order('position')
       .limit(4),
   ]);
 

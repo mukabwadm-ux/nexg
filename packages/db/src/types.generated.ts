@@ -756,6 +756,13 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'catalogue_edit_request_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
             foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
@@ -1041,6 +1048,13 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'catalogue_photo_task_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
             foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
@@ -1138,6 +1152,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
           },
           {
             foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
@@ -2703,6 +2724,1234 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_booking: {
+        Row: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        Insert: {
+          auto_renew?: boolean;
+          booked_by?: string | null;
+          branch_id?: string | null;
+          category?: Database['public']['Enums']['merchant_category'] | null;
+          city_id?: string | null;
+          confirmed_at?: string | null;
+          created_at?: string;
+          declined_reason?: string | null;
+          discount_approved_by?: string | null;
+          discount_pct?: number | null;
+          discount_reason?: string | null;
+          eligibility?: NonNullable<Json>;
+          end_date?: string | null;
+          end_reason?: string | null;
+          ended_at?: string | null;
+          hold_expires_at?: string | null;
+          id?: string;
+          merchant_id: string;
+          notes?: string | null;
+          pause_reason?: string | null;
+          pause_source?: string | null;
+          paused_at?: string | null;
+          placement_id?: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at?: string | null;
+          quoted_price?: number | null;
+          quoted_rate_card_id?: string | null;
+          renews_at?: string | null;
+          requested_at?: string;
+          requested_by?: string | null;
+          requested_via?: string;
+          start_date?: string | null;
+          status?: Database['public']['Enums']['booking_status'];
+          updated_at?: string;
+          waitlist_rank?: number | null;
+          wanted_start?: string | null;
+          weeks?: number;
+        };
+        Update: {
+          auto_renew?: boolean;
+          booked_by?: string | null;
+          branch_id?: string | null;
+          category?: Database['public']['Enums']['merchant_category'] | null;
+          city_id?: string | null;
+          confirmed_at?: string | null;
+          created_at?: string;
+          declined_reason?: string | null;
+          discount_approved_by?: string | null;
+          discount_pct?: number | null;
+          discount_reason?: string | null;
+          eligibility?: NonNullable<Json>;
+          end_date?: string | null;
+          end_reason?: string | null;
+          ended_at?: string | null;
+          hold_expires_at?: string | null;
+          id?: string;
+          merchant_id?: string;
+          notes?: string | null;
+          pause_reason?: string | null;
+          pause_source?: string | null;
+          paused_at?: string | null;
+          placement_id?: string | null;
+          placement_kind?: Database['public']['Enums']['placement_kind'];
+          quote_expires_at?: string | null;
+          quoted_price?: number | null;
+          quoted_rate_card_id?: string | null;
+          renews_at?: string | null;
+          requested_at?: string;
+          requested_by?: string | null;
+          requested_via?: string;
+          start_date?: string | null;
+          status?: Database['public']['Enums']['booking_status'];
+          updated_at?: string;
+          waitlist_rank?: number | null;
+          wanted_start?: string | null;
+          weeks?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_booking_booked_by_fkey';
+            columns: ['booked_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_discount_approved_by_fkey';
+            columns: ['discount_approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_placement';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_quoted_rate_card_id_fkey';
+            columns: ['quoted_rate_card_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_rate_card';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_creative: {
+        Row: {
+          blurb: string | null;
+          booking_id: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          headline: string | null;
+          id: string;
+          merchant_id: string;
+          pinned_item_id: string | null;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database['public']['Enums']['creative_status'];
+          updated_at: string;
+          version: number;
+        };
+        Insert: {
+          blurb?: string | null;
+          booking_id: string;
+          cover_photo_path?: string | null;
+          created_at?: string;
+          headline?: string | null;
+          id?: string;
+          merchant_id: string;
+          pinned_item_id?: string | null;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database['public']['Enums']['creative_status'];
+          updated_at?: string;
+          version?: number;
+        };
+        Update: {
+          blurb?: string | null;
+          booking_id?: string;
+          cover_photo_path?: string | null;
+          created_at?: string;
+          headline?: string | null;
+          id?: string;
+          merchant_id?: string;
+          pinned_item_id?: string | null;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database['public']['Enums']['creative_status'];
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_creative_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_pinned_item_id_fkey';
+            columns: ['pinned_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_pinned_item_id_fkey';
+            columns: ['pinned_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_pinned_item_id_fkey';
+            columns: ['pinned_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_reviewed_by_fkey';
+            columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_eligibility_run: {
+        Row: {
+          action: string;
+          booking_id: string;
+          id: number;
+          passed: boolean;
+          ran_at: string;
+          result: NonNullable<Json>;
+        };
+        Insert: {
+          action?: string;
+          booking_id: string;
+          id?: number;
+          passed: boolean;
+          ran_at?: string;
+          result: NonNullable<Json>;
+        };
+        Update: {
+          action?: string;
+          booking_id?: string;
+          id?: number;
+          passed?: boolean;
+          ran_at?: string;
+          result?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_eligibility_run_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_eligibility_run_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_eligibility_run_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_eligibility_run_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_eligibility_run_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_eligibility_run_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
+          },
+        ];
+      };
+      featured_event: {
+        Row: {
+          at: string;
+          booking_id: string;
+          guest_id: string | null;
+          id: number;
+          kind: Database['public']['Enums']['featured_event_kind'];
+          merchant_id: string;
+          order_reference: string | null;
+          placement_id: string | null;
+          session_hash: string;
+          surface: string;
+          view_hour: string | null;
+        };
+        Insert: {
+          at?: string;
+          booking_id: string;
+          guest_id?: string | null;
+          id?: number;
+          kind: Database['public']['Enums']['featured_event_kind'];
+          merchant_id: string;
+          order_reference?: string | null;
+          placement_id?: string | null;
+          session_hash: string;
+          surface: string;
+          view_hour?: never;
+        };
+        Update: {
+          at?: string;
+          booking_id?: string;
+          guest_id?: string | null;
+          id?: number;
+          kind?: Database['public']['Enums']['featured_event_kind'];
+          merchant_id?: string;
+          order_reference?: string | null;
+          placement_id?: string | null;
+          session_hash?: string;
+          surface?: string;
+          view_hour?: never;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_event_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_event_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_event_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_event_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_event_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_placement';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_fee_line: {
+        Row: {
+          booking_id: string;
+          created_at: string;
+          days_live: number;
+          fee_ex_vat: number;
+          fee_total: number | null;
+          id: string;
+          merchant_id: string;
+          placement_label: string;
+          pro_rata: boolean;
+          refund_amount: number | null;
+          refund_approved_by: string | null;
+          refund_reason: string | null;
+          refund_second_approver_id: string | null;
+          statement_id: string | null;
+          status: Database['public']['Enums']['fee_line_status'];
+          vat: number | null;
+          week_start: string;
+        };
+        Insert: {
+          booking_id: string;
+          created_at?: string;
+          days_live?: number;
+          fee_ex_vat: number;
+          fee_total?: number | null;
+          id?: string;
+          merchant_id: string;
+          placement_label: string;
+          pro_rata?: boolean;
+          refund_amount?: number | null;
+          refund_approved_by?: string | null;
+          refund_reason?: string | null;
+          refund_second_approver_id?: string | null;
+          statement_id?: string | null;
+          status?: Database['public']['Enums']['fee_line_status'];
+          vat?: number | null;
+          week_start: string;
+        };
+        Update: {
+          booking_id?: string;
+          created_at?: string;
+          days_live?: number;
+          fee_ex_vat?: number;
+          fee_total?: number | null;
+          id?: string;
+          merchant_id?: string;
+          placement_label?: string;
+          pro_rata?: boolean;
+          refund_amount?: number | null;
+          refund_approved_by?: string | null;
+          refund_reason?: string | null;
+          refund_second_approver_id?: string | null;
+          statement_id?: string | null;
+          status?: Database['public']['Enums']['fee_line_status'];
+          vat?: number | null;
+          week_start?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_fee_line_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_refund_approved_by_fkey';
+            columns: ['refund_approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_refund_second_approver_id_fkey';
+            columns: ['refund_second_approver_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_statement_id_fkey';
+            columns: ['statement_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_statement';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_metrics_daily: {
+        Row: {
+          booking_id: string;
+          conversion: number | null;
+          ctr: number | null;
+          day: string;
+          merchant_id: string;
+          order_value: number;
+          orders: number;
+          placement_id: string | null;
+          refreshed_at: string;
+          taps: number;
+          views: number;
+        };
+        Insert: {
+          booking_id: string;
+          conversion?: number | null;
+          ctr?: number | null;
+          day: string;
+          merchant_id: string;
+          order_value?: number;
+          orders?: number;
+          placement_id?: string | null;
+          refreshed_at?: string;
+          taps?: number;
+          views?: number;
+        };
+        Update: {
+          booking_id?: string;
+          conversion?: number | null;
+          ctr?: number | null;
+          day?: string;
+          merchant_id?: string;
+          order_value?: number;
+          orders?: number;
+          placement_id?: string | null;
+          refreshed_at?: string;
+          taps?: number;
+          views?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_metrics_daily_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_placement';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_placement: {
+        Row: {
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          enabled: boolean;
+          id: string;
+          kind: Database['public']['Enums']['placement_kind'];
+          label: string;
+          position: number;
+        };
+        Insert: {
+          category?: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          enabled?: boolean;
+          id?: string;
+          kind: Database['public']['Enums']['placement_kind'];
+          label: string;
+          position: number;
+        };
+        Update: {
+          category?: Database['public']['Enums']['merchant_category'] | null;
+          city_id?: string;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          enabled?: boolean;
+          id?: string;
+          kind?: Database['public']['Enums']['placement_kind'];
+          label?: string;
+          position?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_rate_card: {
+        Row: {
+          approved_by: string | null;
+          auto_renew_default: boolean;
+          city_id: string;
+          created_at: string;
+          effective_from: string;
+          hold_hours: number;
+          id: string;
+          max_weeks: number;
+          min_weeks: number;
+          notes: string | null;
+          prices: NonNullable<Json>;
+          quote_hours: number;
+          second_approver_id: string | null;
+          status: Database['public']['Enums']['rate_change_status'];
+          vat_pct: number | null;
+          version: string;
+        };
+        Insert: {
+          approved_by?: string | null;
+          auto_renew_default?: boolean;
+          city_id: string;
+          created_at?: string;
+          effective_from: string;
+          hold_hours?: number;
+          id?: string;
+          max_weeks?: number;
+          min_weeks?: number;
+          notes?: string | null;
+          prices?: NonNullable<Json>;
+          quote_hours?: number;
+          second_approver_id?: string | null;
+          status?: Database['public']['Enums']['rate_change_status'];
+          vat_pct?: number | null;
+          version: string;
+        };
+        Update: {
+          approved_by?: string | null;
+          auto_renew_default?: boolean;
+          city_id?: string;
+          created_at?: string;
+          effective_from?: string;
+          hold_hours?: number;
+          id?: string;
+          max_weeks?: number;
+          min_weeks?: number;
+          notes?: string | null;
+          prices?: NonNullable<Json>;
+          quote_hours?: number;
+          second_approver_id?: string | null;
+          status?: Database['public']['Enums']['rate_change_status'];
+          vat_pct?: number | null;
+          version?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_rate_card_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_second_approver_id_fkey';
+            columns: ['second_approver_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_report: {
+        Row: {
+          booking_id: string;
+          payload: NonNullable<Json>;
+          sent_at: string | null;
+          week_start: string;
+        };
+        Insert: {
+          booking_id: string;
+          payload: NonNullable<Json>;
+          sent_at?: string | null;
+          week_start: string;
+        };
+        Update: {
+          booking_id?: string;
+          payload?: NonNullable<Json>;
+          sent_at?: string | null;
+          week_start?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_report_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_report_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_report_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_report_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_report_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_report_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
+          },
+        ];
+      };
+      featured_rule: {
+        Row: {
+          key: string;
+          label: string;
+          updated_at: string;
+          updated_by: string | null;
+          value: NonNullable<Json>;
+        };
+        Insert: {
+          key: string;
+          label: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value: NonNullable<Json>;
+        };
+        Update: {
+          key?: string;
+          label?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_rule_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      featured_slot_week: {
+        Row: {
+          booking_id: string | null;
+          generated_at: string;
+          placement_id: string;
+          price: number | null;
+          status: Database['public']['Enums']['slot_status'];
+          week_start: string;
+        };
+        Insert: {
+          booking_id?: string | null;
+          generated_at?: string;
+          placement_id: string;
+          price?: number | null;
+          status?: Database['public']['Enums']['slot_status'];
+          week_start: string;
+        };
+        Update: {
+          booking_id?: string | null;
+          generated_at?: string;
+          placement_id?: string;
+          price?: number | null;
+          status?: Database['public']['Enums']['slot_status'];
+          week_start?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_placement';
             referencedColumns: ['id'];
           },
         ];
@@ -10999,6 +12248,344 @@ export type Database = {
           },
         ];
       };
+      console_featured_badges_v: {
+        Row: {
+          auto_paused: number | null;
+          blocked_by_health: number | null;
+          cities_without_prices: number | null;
+          creatives_pending: number | null;
+          eligible_now: number | null;
+          live: number | null;
+          open_requests: number | null;
+          open_this_week: number | null;
+          pro_rata_reviews: number | null;
+          quoted: number | null;
+          quotes_expiring: number | null;
+          slots_this_week: number | null;
+        };
+        Relationships: [];
+      };
+      console_featured_inventory_v: {
+        Row: {
+          auto_renew: boolean | null;
+          booking_id: string | null;
+          booking_status: Database['public']['Enums']['booking_status'] | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          city_name: string | null;
+          description: string | null;
+          enabled: boolean | null;
+          end_date: string | null;
+          hold_expires_at: string | null;
+          kind: Database['public']['Enums']['placement_kind'] | null;
+          label: string | null;
+          merchant_category: Database['public']['Enums']['merchant_category'] | null;
+          merchant_id: string | null;
+          pause_reason: string | null;
+          placement_id: string | null;
+          position: number | null;
+          price: number | null;
+          rate_card_price: number | null;
+          slot_status: Database['public']['Enums']['slot_status'] | null;
+          trading_name: string | null;
+          week_start: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_featured_performance_v: {
+        Row: {
+          booking_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          conversion: number | null;
+          ctr: number | null;
+          days_live: number | null;
+          fee_ex_vat: number | null;
+          fee_line_id: string | null;
+          fee_status: Database['public']['Enums']['fee_line_status'] | null;
+          fee_total: number | null;
+          kind: Database['public']['Enums']['placement_kind'] | null;
+          merchant_id: string | null;
+          order_value: number | null;
+          orders: number | null;
+          placement_label: string | null;
+          pro_rata: boolean | null;
+          taps: number | null;
+          trading_name: string | null;
+          vat: number | null;
+          views: number | null;
+          week_start: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_featured_requests_v: {
+        Row: {
+          auto_renew: boolean | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          city_name: string | null;
+          days_until_live_30d: number | null;
+          declined_reason: string | null;
+          eligibility: Json | null;
+          eligible: boolean | null;
+          end_date: string | null;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_green_days: number | null;
+          hold_expires_at: string | null;
+          id: string | null;
+          merchant_category: Database['public']['Enums']['merchant_category'] | null;
+          merchant_id: string | null;
+          merchant_status: Database['public']['Enums']['partner_status'] | null;
+          placement_kind: Database['public']['Enums']['placement_kind'] | null;
+          quote_expires_at: string | null;
+          quote_hours_left: number | null;
+          quoted_price: number | null;
+          rate_card_price: number | null;
+          renews_at: string | null;
+          requested_at: string | null;
+          requested_via: string | null;
+          stage: string | null;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'] | null;
+          trading_name: string | null;
+          waiting_days: number | null;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number | null;
+          went_live_at: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_featured_schedule_v: {
+        Row: {
+          booking_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          kind: Database['public']['Enums']['placement_kind'] | null;
+          label: string | null;
+          placement_id: string | null;
+          position: number | null;
+          price: number | null;
+          status: Database['public']['Enums']['slot_status'] | null;
+          trading_name: string | null;
+          week_start: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_placement';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       console_folio_v: {
         Row: {
           age_minutes: number | null;
@@ -11660,6 +13247,85 @@ export type Database = {
           },
         ];
       };
+      featured_live_v: {
+        Row: {
+          accepting_orders: boolean | null;
+          badge: string | null;
+          blurb: string | null;
+          booking_id: string | null;
+          branch_latitude: number | null;
+          branch_longitude: number | null;
+          branch_name: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          city_slug: string | null;
+          closed_today: boolean | null;
+          closes_today: string | null;
+          cover_photo_path: string | null;
+          kind: Database['public']['Enums']['placement_kind'] | null;
+          merchant_category: Database['public']['Enums']['merchant_category'] | null;
+          merchant_id: string | null;
+          opens_today: string | null;
+          pinned_item_id: string | null;
+          pinned_item_name: string | null;
+          pinned_item_price: number | null;
+          position: number | null;
+          prep_minutes: number | null;
+          trading_name: string | null;
+          valid_to: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       finance_merchant_v: {
         Row: {
           city_id: string | null;
@@ -12027,6 +13693,86 @@ export type Database = {
           unread_messages?: never;
         };
         Relationships: [];
+      };
+      merchant_featured_v: {
+        Row: {
+          auto_renew: boolean | null;
+          blurb: string | null;
+          booking_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          creative_status: Database['public']['Enums']['creative_status'] | null;
+          declined_reason: string | null;
+          eligibility: Json | null;
+          end_date: string | null;
+          merchant_id: string | null;
+          orders_this_week: number | null;
+          pause_reason: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'] | null;
+          placement_label: string | null;
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          rejection_reason: string | null;
+          renews_at: string | null;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'] | null;
+          taps_this_week: number | null;
+          views_this_week: number | null;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       merchant_fleet_rider_v: {
         Row: {
@@ -12509,6 +14255,8 @@ export type Database = {
       };
     };
     Functions: {
+      cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
       cron_retention: { Args: Record<PropertyKey, never>; Returns: number };
       distance_to_nearest_zone: {
         Args: { p_lat: number; p_lng: number };
@@ -12581,9 +14329,57 @@ export type Database = {
       fn_encrypt_secret: { Args: { p_plain: string }; Returns: string };
       fn_event_anchor_effects: { Args: { p_plan_id: string }; Returns: undefined };
       fn_expire_documents: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_featured_eligibility: {
+        Args: {
+          p_category?: Database['public']['Enums']['merchant_category'];
+          p_merchant_id: string;
+          p_placement_kind: Database['public']['Enums']['placement_kind'];
+        };
+        Returns: Json;
+      };
+      fn_featured_fee_for_week: {
+        Args: { p_booking_id: string; p_days_live?: number; p_week_start: string };
+        Returns: {
+          booking_id: string;
+          created_at: string;
+          days_live: number;
+          fee_ex_vat: number;
+          fee_total: number | null;
+          id: string;
+          merchant_id: string;
+          placement_label: string;
+          pro_rata: boolean;
+          refund_amount: number | null;
+          refund_approved_by: string | null;
+          refund_reason: string | null;
+          refund_second_approver_id: string | null;
+          statement_id: string | null;
+          status: Database['public']['Enums']['fee_line_status'];
+          vat: number | null;
+          week_start: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_fee_line';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      fn_featured_fill_schedule: { Args: { p_weeks?: number }; Returns: number };
+      fn_featured_price: {
+        Args: {
+          p_at?: string;
+          p_category?: Database['public']['Enums']['merchant_category'];
+          p_city_id: string;
+          p_kind: Database['public']['Enums']['placement_kind'];
+        };
+        Returns: number;
+      };
+      fn_featured_rollup: { Args: { p_day?: string }; Returns: number };
       fn_fit_budget: { Args: { p_plan_id: string }; Returns: undefined };
       fn_folio_escalation_sweep: { Args: Record<PropertyKey, never>; Returns: number };
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
+      fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
       fn_match_deposit: {
@@ -14077,6 +15873,569 @@ export type Database = {
       };
       rpc_experience_stats: { Args: { p_city_id?: string }; Returns: Json };
       rpc_expire_quotes: { Args: Record<PropertyKey, never>; Returns: number };
+      rpc_featured_auto_pause: {
+        Args: { p_booking_id: string; p_failing_check: string };
+        Returns: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_booking';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_cancel_renewal: {
+        Args: { p_booking_id: string };
+        Returns: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_booking';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_confirm: {
+        Args: { p_booking_id: string };
+        Returns: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_booking';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_counts: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_featured_creative_review: {
+        Args: { p_approve: boolean; p_creative_id: string; p_reason?: string };
+        Returns: {
+          blurb: string | null;
+          booking_id: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          headline: string | null;
+          id: string;
+          merchant_id: string;
+          pinned_item_id: string | null;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database['public']['Enums']['creative_status'];
+          updated_at: string;
+          version: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_creative';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_creative_submit: {
+        Args: { p_booking_id: string; p_patch: Json };
+        Returns: {
+          blurb: string | null;
+          booking_id: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          headline: string | null;
+          id: string;
+          merchant_id: string;
+          pinned_item_id: string | null;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database['public']['Enums']['creative_status'];
+          updated_at: string;
+          version: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_creative';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_decline: {
+        Args: { p_booking_id: string; p_reason: string };
+        Returns: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_booking';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_end_at_week_close: {
+        Args: { p_booking_id: string; p_reason: string };
+        Returns: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_booking';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_fee_resolve: {
+        Args: { p_final_days: number; p_line_id: string; p_note?: string };
+        Returns: {
+          booking_id: string;
+          created_at: string;
+          days_live: number;
+          fee_ex_vat: number;
+          fee_total: number | null;
+          id: string;
+          merchant_id: string;
+          placement_label: string;
+          pro_rata: boolean;
+          refund_amount: number | null;
+          refund_approved_by: string | null;
+          refund_reason: string | null;
+          refund_second_approver_id: string | null;
+          statement_id: string | null;
+          status: Database['public']['Enums']['fee_line_status'];
+          vat: number | null;
+          week_start: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_fee_line';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_hold_and_quote: {
+        Args: {
+          p_booking_id: string;
+          p_placement_id: string;
+          p_start_date: string;
+          p_weeks: number;
+        };
+        Returns: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_booking';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_rate_card_approve: {
+        Args: { p_card_id: string };
+        Returns: {
+          approved_by: string | null;
+          auto_renew_default: boolean;
+          city_id: string;
+          created_at: string;
+          effective_from: string;
+          hold_hours: number;
+          id: string;
+          max_weeks: number;
+          min_weeks: number;
+          notes: string | null;
+          prices: NonNullable<Json>;
+          quote_hours: number;
+          second_approver_id: string | null;
+          status: Database['public']['Enums']['rate_change_status'];
+          vat_pct: number | null;
+          version: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_rate_card';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_rate_card_propose: {
+        Args: {
+          p_city_id: string;
+          p_effective_from: string;
+          p_prices: Json;
+          p_vat_pct?: number;
+          p_version: string;
+        };
+        Returns: {
+          approved_by: string | null;
+          auto_renew_default: boolean;
+          city_id: string;
+          created_at: string;
+          effective_from: string;
+          hold_hours: number;
+          id: string;
+          max_weeks: number;
+          min_weeks: number;
+          notes: string | null;
+          prices: NonNullable<Json>;
+          quote_hours: number;
+          second_approver_id: string | null;
+          status: Database['public']['Enums']['rate_change_status'];
+          vat_pct: number | null;
+          version: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_rate_card';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_refund: {
+        Args: { p_amount: number; p_line_id: string; p_reason: string };
+        Returns: {
+          booking_id: string;
+          created_at: string;
+          days_live: number;
+          fee_ex_vat: number;
+          fee_total: number | null;
+          id: string;
+          merchant_id: string;
+          placement_label: string;
+          pro_rata: boolean;
+          refund_amount: number | null;
+          refund_approved_by: string | null;
+          refund_reason: string | null;
+          refund_second_approver_id: string | null;
+          statement_id: string | null;
+          status: Database['public']['Enums']['fee_line_status'];
+          vat: number | null;
+          week_start: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_fee_line';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_request: {
+        Args: {
+          p_auto_renew?: boolean;
+          p_category?: Database['public']['Enums']['merchant_category'];
+          p_merchant_id: string;
+          p_placement_kind: Database['public']['Enums']['placement_kind'];
+          p_wanted_start?: string;
+          p_weeks?: number;
+        };
+        Returns: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_booking';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_featured_restore: {
+        Args: { p_booking_id: string };
+        Returns: {
+          auto_renew: boolean;
+          booked_by: string | null;
+          branch_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          declined_reason: string | null;
+          discount_approved_by: string | null;
+          discount_pct: number | null;
+          discount_reason: string | null;
+          eligibility: NonNullable<Json>;
+          end_date: string | null;
+          end_reason: string | null;
+          ended_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          notes: string | null;
+          pause_reason: string | null;
+          pause_source: string | null;
+          paused_at: string | null;
+          placement_id: string | null;
+          placement_kind: Database['public']['Enums']['placement_kind'];
+          quote_expires_at: string | null;
+          quoted_price: number | null;
+          quoted_rate_card_id: string | null;
+          renews_at: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          requested_via: string;
+          start_date: string | null;
+          status: Database['public']['Enums']['booking_status'];
+          updated_at: string;
+          waitlist_rank: number | null;
+          wanted_start: string | null;
+          weeks: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'featured_booking';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_folio_desk_action: {
         Args: { p_action: string; p_folio_ref?: string; p_note?: string; p_posting_id: string };
         Returns: {
@@ -17313,11 +19672,26 @@ export type Database = {
         | 'folio_void'
         | 'reconciliation_write_off'
         | 'guest_anonymise'
-        | 'guest_block';
+        | 'guest_block'
+        | 'featured_rate_card'
+        | 'featured_refund'
+        | 'featured_eligibility_override';
       approval_status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
       audit_severity: 'info' | 'notice' | 'high';
       block_kind: 'activity' | 'meal' | 'venue' | 'transport' | 'stay' | 'event' | 'free';
       block_slot: 'early' | 'morning' | 'midday' | 'afternoon' | 'evening' | 'night' | 'late';
+      booking_status:
+        | 'requested'
+        | 'waitlisted'
+        | 'quoted'
+        | 'booked'
+        | 'live'
+        | 'auto_paused'
+        | 'paused'
+        | 'ended'
+        | 'declined'
+        | 'expired'
+        | 'cancelled';
       broadcast_status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'cancelled';
       cash_event_kind:
         | 'collected'
@@ -17328,6 +19702,7 @@ export type Database = {
         | 'recovery_payment';
       city_status: 'live' | 'soft_launch' | 'waitlist';
       commission_tier_code: 'T1' | 'T2' | 'T3';
+      creative_status: 'draft' | 'pending_review' | 'approved' | 'rejected' | 'archived';
       data_request_kind: 'access' | 'erasure' | 'rectification' | 'restriction';
       data_request_status:
         | 'received'
@@ -17349,6 +19724,12 @@ export type Database = {
       document_owner_type: 'rider' | 'merchant' | 'experience_partner';
       document_status: 'uploaded' | 'verified' | 'rejected' | 'expired';
       edit_approval_status: 'pending' | 'approved' | 'rejected';
+      eligibility_check:
+        | 'live_30d'
+        | 'health_green_30d'
+        | 'no_open_disputes'
+        | 'settlement_verified'
+        | 'not_holding_placement';
       event_category:
         | 'sport'
         | 'music'
@@ -17365,6 +19746,8 @@ export type Database = {
         | 'organiser'
         | 'host'
         | 'merchant_link';
+      featured_event_kind: 'view' | 'tap' | 'order';
+      fee_line_status: 'scheduled' | 'settled' | 'due' | 'pro_rata_review' | 'refunded' | 'waived';
       fleet_invite_status:
         | 'invited'
         | 'started'
@@ -17530,7 +19913,28 @@ export type Database = {
         | 'data_request_held'
         | 'handoff_rule_changed_next_time'
         | 'stay_request_received'
-        | 'stay_request_options_sent';
+        | 'stay_request_options_sent'
+        | 'featured_request_received'
+        | 'featured_waitlisted'
+        | 'featured_eligible_soon'
+        | 'featured_quote'
+        | 'featured_quote_expiring_6h'
+        | 'featured_quote_expired'
+        | 'featured_waitlist_offer'
+        | 'featured_booked'
+        | 'featured_creative_approved'
+        | 'featured_creative_rejected'
+        | 'featured_live'
+        | 'featured_renews_monday'
+        | 'featured_renewal_cancelled'
+        | 'featured_auto_paused'
+        | 'featured_restored'
+        | 'featured_ended'
+        | 'featured_declined'
+        | 'featured_monday_report'
+        | 'featured_fee_settled'
+        | 'featured_refund_issued'
+        | 'featured_rate_card_changing';
       notification_status: 'pending' | 'sent' | 'failed' | 'no_address';
       package_schedule: 'per_booking' | 'every_checkin' | 'manual';
       partner_status:
@@ -17541,6 +19945,7 @@ export type Database = {
         | 'paused'
         | 'suspended'
         | 'delisted';
+      placement_kind: 'homepage' | 'category_top' | 'popular_request';
       plan_block_status: 'proposed' | 'confirmed' | 'changed' | 'unavailable' | 'removed' | 'done';
       plan_status:
         | 'draft'
@@ -17566,6 +19971,7 @@ export type Database = {
         | 'penthouse'
         | 'studio';
       qr_state: 'generated' | 'sent' | 'placed' | 'scanned' | 'replaced';
+      rate_change_status: 'draft' | 'awaiting_approval' | 'scheduled' | 'current' | 'archived';
       recon_status: 'open' | 'matched' | 'missing_reference' | 'disputed' | 'reconciled';
       review_display: 'initial' | 'full_name' | 'anonymous';
       review_status: 'received' | 'approved' | 'kept_private';
@@ -17588,6 +19994,7 @@ export type Database = {
         | 'failed'
         | 'paid';
       shift_commitment_status: 'committed' | 'showed' | 'no_show' | 'released';
+      slot_status: 'open' | 'held' | 'booked' | 'live' | 'auto_paused' | 'paused' | 'ended';
       staff_status: 'active' | 'suspended' | 'offboarded';
       statement_status: 'draft' | 'ready' | 'sent' | 'disputed' | 'paid';
       stay_request_status: 'new' | 'reviewing' | 'matched' | 'sent' | 'won' | 'lost' | 'closed';
@@ -17749,11 +20156,27 @@ export const Constants = {
         'reconciliation_write_off',
         'guest_anonymise',
         'guest_block',
+        'featured_rate_card',
+        'featured_refund',
+        'featured_eligibility_override',
       ],
       approval_status: ['pending', 'approved', 'rejected', 'withdrawn'],
       audit_severity: ['info', 'notice', 'high'],
       block_kind: ['activity', 'meal', 'venue', 'transport', 'stay', 'event', 'free'],
       block_slot: ['early', 'morning', 'midday', 'afternoon', 'evening', 'night', 'late'],
+      booking_status: [
+        'requested',
+        'waitlisted',
+        'quoted',
+        'booked',
+        'live',
+        'auto_paused',
+        'paused',
+        'ended',
+        'declined',
+        'expired',
+        'cancelled',
+      ],
       broadcast_status: ['draft', 'scheduled', 'sending', 'sent', 'cancelled'],
       cash_event_kind: [
         'collected',
@@ -17765,6 +20188,7 @@ export const Constants = {
       ],
       city_status: ['live', 'soft_launch', 'waitlist'],
       commission_tier_code: ['T1', 'T2', 'T3'],
+      creative_status: ['draft', 'pending_review', 'approved', 'rejected', 'archived'],
       data_request_kind: ['access', 'erasure', 'rectification', 'restriction'],
       data_request_status: [
         'received',
@@ -17788,6 +20212,13 @@ export const Constants = {
       document_owner_type: ['rider', 'merchant', 'experience_partner'],
       document_status: ['uploaded', 'verified', 'rejected', 'expired'],
       edit_approval_status: ['pending', 'approved', 'rejected'],
+      eligibility_check: [
+        'live_30d',
+        'health_green_30d',
+        'no_open_disputes',
+        'settlement_verified',
+        'not_holding_placement',
+      ],
       event_category: ['sport', 'music', 'food_drink', 'culture', 'family', 'nightlife', 'other'],
       event_status: ['draft', 'published', 'sold_out', 'cancelled', 'ended'],
       experience_partner_kind: [
@@ -17798,6 +20229,8 @@ export const Constants = {
         'host',
         'merchant_link',
       ],
+      featured_event_kind: ['view', 'tap', 'order'],
+      fee_line_status: ['scheduled', 'settled', 'due', 'pro_rata_review', 'refunded', 'waived'],
       fleet_invite_status: ['invited', 'started', 'under_review', 'active', 'declined', 'expired'],
       folio_status: [
         'awaiting_desk',
@@ -17964,6 +20397,27 @@ export const Constants = {
         'handoff_rule_changed_next_time',
         'stay_request_received',
         'stay_request_options_sent',
+        'featured_request_received',
+        'featured_waitlisted',
+        'featured_eligible_soon',
+        'featured_quote',
+        'featured_quote_expiring_6h',
+        'featured_quote_expired',
+        'featured_waitlist_offer',
+        'featured_booked',
+        'featured_creative_approved',
+        'featured_creative_rejected',
+        'featured_live',
+        'featured_renews_monday',
+        'featured_renewal_cancelled',
+        'featured_auto_paused',
+        'featured_restored',
+        'featured_ended',
+        'featured_declined',
+        'featured_monday_report',
+        'featured_fee_settled',
+        'featured_refund_issued',
+        'featured_rate_card_changing',
       ],
       notification_status: ['pending', 'sent', 'failed', 'no_address'],
       package_schedule: ['per_booking', 'every_checkin', 'manual'],
@@ -17976,6 +20430,7 @@ export const Constants = {
         'suspended',
         'delisted',
       ],
+      placement_kind: ['homepage', 'category_top', 'popular_request'],
       plan_block_status: ['proposed', 'confirmed', 'changed', 'unavailable', 'removed', 'done'],
       plan_status: [
         'draft',
@@ -18003,6 +20458,7 @@ export const Constants = {
         'studio',
       ],
       qr_state: ['generated', 'sent', 'placed', 'scanned', 'replaced'],
+      rate_change_status: ['draft', 'awaiting_approval', 'scheduled', 'current', 'archived'],
       recon_status: ['open', 'matched', 'missing_reference', 'disputed', 'reconciled'],
       review_display: ['initial', 'full_name', 'anonymous'],
       review_status: ['received', 'approved', 'kept_private'],
@@ -18020,6 +20476,7 @@ export const Constants = {
       setting_scope: ['global', 'city'],
       settlement_line_status: ['ready', 'cash_netted', 'name_mismatch', 'held', 'failed', 'paid'],
       shift_commitment_status: ['committed', 'showed', 'no_show', 'released'],
+      slot_status: ['open', 'held', 'booked', 'live', 'auto_paused', 'paused', 'ended'],
       staff_status: ['active', 'suspended', 'offboarded'],
       statement_status: ['draft', 'ready', 'sent', 'disputed', 'paid'],
       stay_request_status: ['new', 'reviewing', 'matched', 'sent', 'won', 'lost', 'closed'],
