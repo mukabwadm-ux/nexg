@@ -226,9 +226,13 @@ select lives_ok(
 
 reset role;
 
+/* Scoped to this suite's own rider: the local audit seed logs a
+   location view of its own, and an unscoped count would make this
+   assertion depend on what else is in the database. */
 select is(
   (select count(*)::int from audit.audit_event
-   where action = 'pii.location_viewed'),
+   where action = 'pii.location_viewed'
+     and target_id = 'cccc1111-0000-4000-8000-00000000000a'),
   1,
   'and every look is written to the audit log'
 );

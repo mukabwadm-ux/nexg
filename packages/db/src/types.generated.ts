@@ -1,6 +1,1484 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
+  audit: {
+    Tables: {
+      access_review: {
+        Row: {
+          due_at: string | null;
+          id: string;
+          opened_at: string;
+          period: string;
+          signed_at: string | null;
+          signed_by: string | null;
+          signed_note: string | null;
+          state: string;
+        };
+        Insert: {
+          due_at?: string | null;
+          id?: string;
+          opened_at?: string;
+          period: string;
+          signed_at?: string | null;
+          signed_by?: string | null;
+          signed_note?: string | null;
+          state?: string;
+        };
+        Update: {
+          due_at?: string | null;
+          id?: string;
+          opened_at?: string;
+          period?: string;
+          signed_at?: string | null;
+          signed_by?: string | null;
+          signed_note?: string | null;
+          state?: string;
+        };
+        Relationships: [];
+      };
+      access_review_item: {
+        Row: {
+          city_id: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision: string | null;
+          last_used_at: string | null;
+          note: string | null;
+          review_id: string;
+          role_key: string;
+          staff_user_id: string;
+        };
+        Insert: {
+          city_id: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision?: string | null;
+          last_used_at?: string | null;
+          note?: string | null;
+          review_id: string;
+          role_key: string;
+          staff_user_id: string;
+        };
+        Update: {
+          city_id?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision?: string | null;
+          last_used_at?: string | null;
+          note?: string | null;
+          review_id?: string;
+          role_key?: string;
+          staff_user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'access_review_item_review_id_fkey';
+            columns: ['review_id'];
+            isOneToOne: false;
+            referencedRelation: 'access_review';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      action_registry: {
+        Row: {
+          action: string;
+          default_severity: Database['public']['Enums']['audit_severity'];
+          description: string | null;
+          module: string;
+          money: boolean;
+          needs_review: boolean;
+          pii_fields: string[];
+          two_person: boolean;
+        };
+        Insert: {
+          action: string;
+          default_severity?: Database['public']['Enums']['audit_severity'];
+          description?: string | null;
+          module: string;
+          money?: boolean;
+          needs_review?: boolean;
+          pii_fields?: string[];
+          two_person?: boolean;
+        };
+        Update: {
+          action?: string;
+          default_severity?: Database['public']['Enums']['audit_severity'];
+          description?: string | null;
+          module?: string;
+          money?: boolean;
+          needs_review?: boolean;
+          pii_fields?: string[];
+          two_person?: boolean;
+        };
+        Relationships: [];
+      };
+      alert: {
+        Row: {
+          acknowledged_at: string | null;
+          acknowledged_by: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          city_id: string | null;
+          event_count: number;
+          first_event_id: number | null;
+          id: string;
+          last_event_id: number | null;
+          raised_at: string;
+          resolution_note: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          rule_key: string;
+          severity: Database['public']['Enums']['audit_severity'];
+          state: string;
+          summary: string;
+          target_id: string | null;
+          target_type: string | null;
+        };
+        Insert: {
+          acknowledged_at?: string | null;
+          acknowledged_by?: string | null;
+          actor_id?: string | null;
+          actor_label?: string | null;
+          city_id?: string | null;
+          event_count?: number;
+          first_event_id?: number | null;
+          id?: string;
+          last_event_id?: number | null;
+          raised_at?: string;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          rule_key: string;
+          severity: Database['public']['Enums']['audit_severity'];
+          state?: string;
+          summary: string;
+          target_id?: string | null;
+          target_type?: string | null;
+        };
+        Update: {
+          acknowledged_at?: string | null;
+          acknowledged_by?: string | null;
+          actor_id?: string | null;
+          actor_label?: string | null;
+          city_id?: string | null;
+          event_count?: number;
+          first_event_id?: number | null;
+          id?: string;
+          last_event_id?: number | null;
+          raised_at?: string;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          rule_key?: string;
+          severity?: Database['public']['Enums']['audit_severity'];
+          state?: string;
+          summary?: string;
+          target_id?: string | null;
+          target_type?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'alert_rule_key_fkey';
+            columns: ['rule_key'];
+            isOneToOne: false;
+            referencedRelation: 'alert_rule';
+            referencedColumns: ['key'];
+          },
+        ];
+      };
+      alert_rule: {
+        Row: {
+          active: boolean;
+          description: string | null;
+          group_by: string;
+          key: string;
+          match_actions: string[];
+          match_modules: string[];
+          min_severity: Database['public']['Enums']['audit_severity'];
+          next_step: string | null;
+          severity: Database['public']['Enums']['audit_severity'];
+          threshold: number | null;
+          time_window: string;
+          title: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          active?: boolean;
+          description?: string | null;
+          group_by?: string;
+          key: string;
+          match_actions?: string[];
+          match_modules?: string[];
+          min_severity?: Database['public']['Enums']['audit_severity'];
+          next_step?: string | null;
+          severity?: Database['public']['Enums']['audit_severity'];
+          threshold?: number | null;
+          time_window?: string;
+          title: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          active?: boolean;
+          description?: string | null;
+          group_by?: string;
+          key?: string;
+          match_actions?: string[];
+          match_modules?: string[];
+          min_severity?: Database['public']['Enums']['audit_severity'];
+          next_step?: string | null;
+          severity?: Database['public']['Enums']['audit_severity'];
+          threshold?: number | null;
+          time_window?: string;
+          title?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [];
+      };
+      audit_event: {
+        Row: {
+          action: string;
+          actor_id: string | null;
+          actor_label: string | null;
+          actor_role: string | null;
+          actor_type: Database['public']['Enums']['actor_type'];
+          after: Json | null;
+          approved_by: string | null;
+          approver_label: string | null;
+          at: string;
+          before: Json | null;
+          city_id: string | null;
+          context: NonNullable<Json>;
+          diff: Json | null;
+          hash: string;
+          hash_version: number;
+          id: number;
+          ip: unknown;
+          module: string;
+          on_behalf_of: string | null;
+          prev_hash: string | null;
+          reason: string | null;
+          related: NonNullable<Json>;
+          session_id: string | null;
+          severity: Database['public']['Enums']['audit_severity'];
+          target_id: string | null;
+          target_label: string | null;
+          target_type: string | null;
+          user_agent: string | null;
+          canonical: string | null;
+          fn_sentence: string | null;
+        };
+        Insert: {
+          action: string;
+          actor_id?: string | null;
+          actor_label?: string | null;
+          actor_role?: string | null;
+          actor_type: Database['public']['Enums']['actor_type'];
+          after?: Json | null;
+          approved_by?: string | null;
+          approver_label?: string | null;
+          at?: string;
+          before?: Json | null;
+          city_id?: string | null;
+          context?: NonNullable<Json>;
+          diff?: Json | null;
+          hash: string;
+          hash_version?: number;
+          id?: never;
+          ip?: unknown;
+          module: string;
+          on_behalf_of?: string | null;
+          prev_hash?: string | null;
+          reason?: string | null;
+          related?: NonNullable<Json>;
+          session_id?: string | null;
+          severity?: Database['public']['Enums']['audit_severity'];
+          target_id?: string | null;
+          target_label?: string | null;
+          target_type?: string | null;
+          user_agent?: string | null;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string | null;
+          actor_label?: string | null;
+          actor_role?: string | null;
+          actor_type?: Database['public']['Enums']['actor_type'];
+          after?: Json | null;
+          approved_by?: string | null;
+          approver_label?: string | null;
+          at?: string;
+          before?: Json | null;
+          city_id?: string | null;
+          context?: NonNullable<Json>;
+          diff?: Json | null;
+          hash?: string;
+          hash_version?: number;
+          id?: never;
+          ip?: unknown;
+          module?: string;
+          on_behalf_of?: string | null;
+          prev_hash?: string | null;
+          reason?: string | null;
+          related?: NonNullable<Json>;
+          session_id?: string | null;
+          severity?: Database['public']['Enums']['audit_severity'];
+          target_id?: string | null;
+          target_label?: string | null;
+          target_type?: string | null;
+          user_agent?: string | null;
+        };
+        Relationships: [];
+      };
+      break_glass: {
+        Row: {
+          city_id: string | null;
+          closed_at: string | null;
+          closed_by: string | null;
+          expires_at: string;
+          id: string;
+          module_key: string | null;
+          opened_at: string;
+          reason: string;
+          review_note: string | null;
+          review_outcome: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          scope: string;
+          staff_user_id: string;
+        };
+        Insert: {
+          city_id?: string | null;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          expires_at: string;
+          id?: string;
+          module_key?: string | null;
+          opened_at?: string;
+          reason: string;
+          review_note?: string | null;
+          review_outcome?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          scope: string;
+          staff_user_id: string;
+        };
+        Update: {
+          city_id?: string | null;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          expires_at?: string;
+          id?: string;
+          module_key?: string | null;
+          opened_at?: string;
+          reason?: string;
+          review_note?: string | null;
+          review_outcome?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          scope?: string;
+          staff_user_id?: string;
+        };
+        Relationships: [];
+      };
+      chain_check: {
+        Row: {
+          detail: string | null;
+          events_checked: number;
+          first_bad_id: number | null;
+          id: number;
+          ok: boolean;
+          ran_at: string;
+          run_by: string | null;
+          trigger: string;
+        };
+        Insert: {
+          detail?: string | null;
+          events_checked: number;
+          first_bad_id?: number | null;
+          id?: never;
+          ok: boolean;
+          ran_at?: string;
+          run_by?: string | null;
+          trigger?: string;
+        };
+        Update: {
+          detail?: string | null;
+          events_checked?: number;
+          first_bad_id?: number | null;
+          id?: never;
+          ok?: boolean;
+          ran_at?: string;
+          run_by?: string | null;
+          trigger?: string;
+        };
+        Relationships: [];
+      };
+      event_meta: {
+        Row: {
+          event_id: number;
+          review_note: string | null;
+          review_state: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          shipped_at: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          event_id: number;
+          review_note?: string | null;
+          review_state?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          shipped_at?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          event_id?: number;
+          review_note?: string | null;
+          review_state?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          shipped_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_meta_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'audit_event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_meta_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_activity_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_meta_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_data_access_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_meta_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_money_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      evidence_pack: {
+        Row: {
+          chain_checked_at: string | null;
+          chain_ok: boolean | null;
+          content_hash: string | null;
+          created_at: string;
+          created_by: string | null;
+          event_count: number | null;
+          filter: NonNullable<Json>;
+          first_event_id: number | null;
+          from_at: string | null;
+          frozen_at: string | null;
+          id: string;
+          last_event_id: number | null;
+          legal_hold_id: string | null;
+          purpose: string;
+          reason: string;
+          reference: string;
+          requested_by: string;
+          shared_at: string | null;
+          shared_how: string | null;
+          shared_with: string | null;
+          state: string;
+          title: string;
+          to_at: string | null;
+          withdrawn_at: string | null;
+          withdrawn_reason: string | null;
+        };
+        Insert: {
+          chain_checked_at?: string | null;
+          chain_ok?: boolean | null;
+          content_hash?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          event_count?: number | null;
+          filter: NonNullable<Json>;
+          first_event_id?: number | null;
+          from_at?: string | null;
+          frozen_at?: string | null;
+          id?: string;
+          last_event_id?: number | null;
+          legal_hold_id?: string | null;
+          purpose: string;
+          reason: string;
+          reference: string;
+          requested_by: string;
+          shared_at?: string | null;
+          shared_how?: string | null;
+          shared_with?: string | null;
+          state?: string;
+          title: string;
+          to_at?: string | null;
+          withdrawn_at?: string | null;
+          withdrawn_reason?: string | null;
+        };
+        Update: {
+          chain_checked_at?: string | null;
+          chain_ok?: boolean | null;
+          content_hash?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          event_count?: number | null;
+          filter?: NonNullable<Json>;
+          first_event_id?: number | null;
+          from_at?: string | null;
+          frozen_at?: string | null;
+          id?: string;
+          last_event_id?: number | null;
+          legal_hold_id?: string | null;
+          purpose?: string;
+          reason?: string;
+          reference?: string;
+          requested_by?: string;
+          shared_at?: string | null;
+          shared_how?: string | null;
+          shared_with?: string | null;
+          state?: string;
+          title?: string;
+          to_at?: string | null;
+          withdrawn_at?: string | null;
+          withdrawn_reason?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'evidence_pack_legal_hold_id_fkey';
+            columns: ['legal_hold_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_legal_hold_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'evidence_pack_legal_hold_id_fkey';
+            columns: ['legal_hold_id'];
+            isOneToOne: false;
+            referencedRelation: 'legal_hold';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      evidence_pack_event: {
+        Row: {
+          event_id: number;
+          hash_at_freeze: string;
+          pack_id: string;
+        };
+        Insert: {
+          event_id: number;
+          hash_at_freeze: string;
+          pack_id: string;
+        };
+        Update: {
+          event_id?: number;
+          hash_at_freeze?: string;
+          pack_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'evidence_pack_event_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'audit_event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'evidence_pack_event_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_activity_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'evidence_pack_event_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_data_access_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'evidence_pack_event_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_money_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'evidence_pack_event_pack_id_fkey';
+            columns: ['pack_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_evidence_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'evidence_pack_event_pack_id_fkey';
+            columns: ['pack_id'];
+            isOneToOne: false;
+            referencedRelation: 'evidence_pack';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      export_log: {
+        Row: {
+          actor_label: string | null;
+          at: string;
+          contains_pii: boolean;
+          destination: string | null;
+          event_id: number | null;
+          filter: Json | null;
+          format: string | null;
+          id: string;
+          module: string;
+          reason: string;
+          row_count: number | null;
+          staff_user_id: string | null;
+          what: string;
+        };
+        Insert: {
+          actor_label?: string | null;
+          at?: string;
+          contains_pii?: boolean;
+          destination?: string | null;
+          event_id?: number | null;
+          filter?: Json | null;
+          format?: string | null;
+          id?: string;
+          module: string;
+          reason: string;
+          row_count?: number | null;
+          staff_user_id?: string | null;
+          what: string;
+        };
+        Update: {
+          actor_label?: string | null;
+          at?: string;
+          contains_pii?: boolean;
+          destination?: string | null;
+          event_id?: number | null;
+          filter?: Json | null;
+          format?: string | null;
+          id?: string;
+          module?: string;
+          reason?: string;
+          row_count?: number | null;
+          staff_user_id?: string | null;
+          what?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'audit_event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_activity_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_data_access_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_money_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      known_device: {
+        Row: {
+          countries: string[];
+          device_fingerprint: string;
+          device_label: string | null;
+          first_seen: string;
+          last_seen: string;
+          staff_user_id: string;
+          trusted: boolean;
+        };
+        Insert: {
+          countries?: string[];
+          device_fingerprint: string;
+          device_label?: string | null;
+          first_seen?: string;
+          last_seen?: string;
+          staff_user_id: string;
+          trusted?: boolean;
+        };
+        Update: {
+          countries?: string[];
+          device_fingerprint?: string;
+          device_label?: string | null;
+          first_seen?: string;
+          last_seen?: string;
+          staff_user_id?: string;
+          trusted?: boolean;
+        };
+        Relationships: [];
+      };
+      legal_hold: {
+        Row: {
+          city_id: string | null;
+          from_at: string | null;
+          id: string;
+          instructed_by: string;
+          placed_at: string;
+          placed_by: string | null;
+          reason: string;
+          reference: string;
+          release_reason: string | null;
+          released_at: string | null;
+          released_by: string | null;
+          subject_id: string | null;
+          subject_type: string;
+          title: string;
+          to_at: string | null;
+        };
+        Insert: {
+          city_id?: string | null;
+          from_at?: string | null;
+          id?: string;
+          instructed_by: string;
+          placed_at?: string;
+          placed_by?: string | null;
+          reason: string;
+          reference: string;
+          release_reason?: string | null;
+          released_at?: string | null;
+          released_by?: string | null;
+          subject_id?: string | null;
+          subject_type: string;
+          title: string;
+          to_at?: string | null;
+        };
+        Update: {
+          city_id?: string | null;
+          from_at?: string | null;
+          id?: string;
+          instructed_by?: string;
+          placed_at?: string;
+          placed_by?: string | null;
+          reason?: string;
+          reference?: string;
+          release_reason?: string | null;
+          released_at?: string | null;
+          released_by?: string | null;
+          subject_id?: string | null;
+          subject_type?: string;
+          title?: string;
+          to_at?: string | null;
+        };
+        Relationships: [];
+      };
+      saved_view: {
+        Row: {
+          created_at: string;
+          filter: NonNullable<Json>;
+          id: string;
+          name: string;
+          owner_id: string | null;
+          shared: boolean;
+          tab: string;
+        };
+        Insert: {
+          created_at?: string;
+          filter: NonNullable<Json>;
+          id?: string;
+          name: string;
+          owner_id?: string | null;
+          shared?: boolean;
+          tab: string;
+        };
+        Update: {
+          created_at?: string;
+          filter?: NonNullable<Json>;
+          id?: string;
+          name?: string;
+          owner_id?: string | null;
+          shared?: boolean;
+          tab?: string;
+        };
+        Relationships: [];
+      };
+      sign_in: {
+        Row: {
+          at: string;
+          auth_method: string | null;
+          device_fingerprint: string | null;
+          device_label: string | null;
+          email_attempted: string | null;
+          ended_at: string | null;
+          ended_reason: string | null;
+          first_from_country: boolean;
+          first_from_device: boolean;
+          id: number;
+          ip: unknown;
+          ip_country: string | null;
+          mfa_used: boolean;
+          outcome: string;
+          session_id: string | null;
+          staff_user_id: string | null;
+          user_agent: string | null;
+        };
+        Insert: {
+          at?: string;
+          auth_method?: string | null;
+          device_fingerprint?: string | null;
+          device_label?: string | null;
+          email_attempted?: string | null;
+          ended_at?: string | null;
+          ended_reason?: string | null;
+          first_from_country?: boolean;
+          first_from_device?: boolean;
+          id?: never;
+          ip?: unknown;
+          ip_country?: string | null;
+          mfa_used?: boolean;
+          outcome: string;
+          session_id?: string | null;
+          staff_user_id?: string | null;
+          user_agent?: string | null;
+        };
+        Update: {
+          at?: string;
+          auth_method?: string | null;
+          device_fingerprint?: string | null;
+          device_label?: string | null;
+          email_attempted?: string | null;
+          ended_at?: string | null;
+          ended_reason?: string | null;
+          first_from_country?: boolean;
+          first_from_device?: boolean;
+          id?: never;
+          ip?: unknown;
+          ip_country?: string | null;
+          mfa_used?: boolean;
+          outcome?: string;
+          session_id?: string | null;
+          staff_user_id?: string | null;
+          user_agent?: string | null;
+        };
+        Relationships: [];
+      };
+      vendor_access: {
+        Row: {
+          contract_reference: string | null;
+          country: string | null;
+          data_categories: string[];
+          dpa_signed: boolean;
+          granted_at: string;
+          id: string;
+          owner_staff_id: string | null;
+          purpose: string;
+          review_due: string | null;
+          revoked_at: string | null;
+          revoked_reason: string | null;
+          transfer_basis: string | null;
+          vendor: string;
+        };
+        Insert: {
+          contract_reference?: string | null;
+          country?: string | null;
+          data_categories?: string[];
+          dpa_signed?: boolean;
+          granted_at?: string;
+          id?: string;
+          owner_staff_id?: string | null;
+          purpose: string;
+          review_due?: string | null;
+          revoked_at?: string | null;
+          revoked_reason?: string | null;
+          transfer_basis?: string | null;
+          vendor: string;
+        };
+        Update: {
+          contract_reference?: string | null;
+          country?: string | null;
+          data_categories?: string[];
+          dpa_signed?: boolean;
+          granted_at?: string;
+          id?: string;
+          owner_staff_id?: string | null;
+          purpose?: string;
+          review_due?: string | null;
+          revoked_at?: string | null;
+          revoked_reason?: string | null;
+          transfer_basis?: string | null;
+          vendor?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: {
+      console_activity_v: {
+        Row: {
+          action: string | null;
+          action_label: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          actor_role: string | null;
+          actor_type: Database['public']['Enums']['actor_type'] | null;
+          after: Json | null;
+          ago: string | null;
+          approved_by: string | null;
+          approver_label: string | null;
+          at: string | null;
+          before: Json | null;
+          changed_fields: number | null;
+          city_id: string | null;
+          city_name: string | null;
+          context: Json | null;
+          diff: Json | null;
+          hash: string | null;
+          hash_version: number | null;
+          id: number | null;
+          is_money: boolean | null;
+          module: string | null;
+          needs_two_people: boolean | null;
+          on_behalf_of: string | null;
+          prev_hash: string | null;
+          reason: string | null;
+          related: Json | null;
+          review_note: string | null;
+          review_state: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          reviewed_by_name: string | null;
+          sentence: string | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          target_id: string | null;
+          target_label: string | null;
+          target_type: string | null;
+          touches_pii: boolean | null;
+          unregistered: boolean | null;
+        };
+        Relationships: [];
+      };
+      console_alert_v: {
+        Row: {
+          acknowledged_at: string | null;
+          acknowledged_by: string | null;
+          acknowledged_by_name: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          ago: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          event_count: number | null;
+          first_event_id: number | null;
+          id: string | null;
+          last_event_id: number | null;
+          next_step: string | null;
+          raised_at: string | null;
+          resolution_note: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          resolved_by_name: string | null;
+          rule_key: string | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          stale: boolean | null;
+          state: string | null;
+          summary: string | null;
+          target_id: string | null;
+          target_type: string | null;
+          title: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'alert_rule_key_fkey';
+            columns: ['rule_key'];
+            isOneToOne: false;
+            referencedRelation: 'alert_rule';
+            referencedColumns: ['key'];
+          },
+        ];
+      };
+      console_break_glass_v: {
+        Row: {
+          ago: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          closed_at: string | null;
+          events_during: number | null;
+          expired_unclosed: boolean | null;
+          expires_at: string | null;
+          id: string | null;
+          module_key: string | null;
+          open_now: boolean | null;
+          opened_at: string | null;
+          reason: string | null;
+          review_note: string | null;
+          review_outcome: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          reviewed_by_name: string | null;
+          scope: string | null;
+          staff_user_id: string | null;
+          who: string | null;
+        };
+        Relationships: [];
+      };
+      console_data_access_v: {
+        Row: {
+          action: string | null;
+          action_label: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          actor_role: string | null;
+          ago: string | null;
+          at: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          id: number | null;
+          ip_country: string | null;
+          module: string | null;
+          no_reason_given: boolean | null;
+          on_behalf_of: string | null;
+          pii_fields: string[] | null;
+          reason: string | null;
+          reveals_in_the_hour: number | null;
+          review_state: string | null;
+          reviewed_at: string | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          subject_label: string | null;
+          surface: string | null;
+          target_id: string | null;
+          target_type: string | null;
+        };
+        Relationships: [];
+      };
+      console_evidence_v: {
+        Row: {
+          chain_checked_at: string | null;
+          chain_ok: boolean | null;
+          content_hash_hex: string | null;
+          content_hash_short: string | null;
+          created_at: string | null;
+          created_by: string | null;
+          created_by_name: string | null;
+          event_count: number | null;
+          filter: Json | null;
+          first_event_id: number | null;
+          from_at: string | null;
+          frozen_at: string | null;
+          id: string | null;
+          last_event_id: number | null;
+          legal_hold_id: string | null;
+          legal_hold_reference: string | null;
+          purpose: string | null;
+          reason: string | null;
+          reference: string | null;
+          requested_by: string | null;
+          shared_at: string | null;
+          shared_how: string | null;
+          shared_with: string | null;
+          state: string | null;
+          still_matches_the_log: boolean | null;
+          title: string | null;
+          to_at: string | null;
+          withdrawn_at: string | null;
+          withdrawn_reason: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'evidence_pack_legal_hold_id_fkey';
+            columns: ['legal_hold_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_legal_hold_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'evidence_pack_legal_hold_id_fkey';
+            columns: ['legal_hold_id'];
+            isOneToOne: false;
+            referencedRelation: 'legal_hold';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_export_v: {
+        Row: {
+          ago: string | null;
+          at: string | null;
+          contains_pii: boolean | null;
+          destination: string | null;
+          event_id: number | null;
+          format: string | null;
+          id: string | null;
+          module: string | null;
+          outside_hours: boolean | null;
+          reason: string | null;
+          row_count: number | null;
+          staff_user_id: string | null;
+          what: string | null;
+          who: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'audit_event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_activity_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_data_access_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_money_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_health_v: {
+        Row: {
+          alerts_open: number | null;
+          break_glass_expired_unclosed: number | null;
+          break_glass_unreviewed: number | null;
+          chain_check_overdue: boolean | null;
+          chain_checked_at: string | null;
+          chain_detail: string | null;
+          chain_events_checked: number | null;
+          chain_first_bad_id: number | null;
+          chain_ok: boolean | null;
+          events_today: number | null;
+          events_total: number | null;
+          holds_active: number | null;
+          needs_review: number | null;
+          newest_event: string | null;
+          oldest_event: string | null;
+          retention_rules_unset: number | null;
+          unregistered_events: number | null;
+        };
+        Relationships: [];
+      };
+      console_legal_hold_v: {
+        Row: {
+          active: boolean | null;
+          city_id: string | null;
+          city_name: string | null;
+          from_at: string | null;
+          id: string | null;
+          instructed_by: string | null;
+          packs: number | null;
+          placed_at: string | null;
+          placed_by: string | null;
+          placed_by_name: string | null;
+          reason: string | null;
+          reference: string | null;
+          release_reason: string | null;
+          released_at: string | null;
+          released_by: string | null;
+          released_by_name: string | null;
+          subject_id: string | null;
+          subject_type: string | null;
+          title: string | null;
+          to_at: string | null;
+        };
+        Relationships: [];
+      };
+      console_module_v: {
+        Row: {
+          events: number | null;
+          events_7d: number | null;
+          high: number | null;
+          last_event_at: string | null;
+          module: string | null;
+          unregistered: number | null;
+        };
+        Relationships: [];
+      };
+      console_money_v: {
+        Row: {
+          action: string | null;
+          action_label: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          ago: string | null;
+          amount_cents: number | null;
+          amount_not_recorded: boolean | null;
+          approved_by: string | null;
+          approver_label: string | null;
+          at: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          currency: string | null;
+          diff: Json | null;
+          dispute_id: string | null;
+          id: number | null;
+          missing_second_person: boolean | null;
+          module: string | null;
+          needs_two_people: boolean | null;
+          order_reference: string | null;
+          reason: string | null;
+          review_state: string | null;
+          settlement_run_id: string | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          statement_id: string | null;
+          target_id: string | null;
+          target_label: string | null;
+          target_type: string | null;
+        };
+        Relationships: [];
+      };
+      console_retention_v: {
+        Row: {
+          anonymise: boolean | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          approved_by_name: string | null;
+          basis: string | null;
+          description: string | null;
+          key: string | null;
+          last_run_at: string | null;
+          last_run_held: number | null;
+          last_run_rows: number | null;
+          module: string | null;
+          not_approved: boolean | null;
+          not_running: boolean | null;
+          period_not_set: boolean | null;
+          retain_for: string | null;
+          retain_for_label: string | null;
+          second_approver_id: string | null;
+          second_approver_name: string | null;
+          subject: string | null;
+          updated_at: string | null;
+        };
+        Relationships: [];
+      };
+      console_sign_in_v: {
+        Row: {
+          ago: string | null;
+          at: string | null;
+          auth_method: string | null;
+          device_label: string | null;
+          email_attempted: string | null;
+          ended_at: string | null;
+          ended_reason: string | null;
+          first_from_country: boolean | null;
+          first_from_device: boolean | null;
+          flag: string | null;
+          id: number | null;
+          ip_country: string | null;
+          ip_masked: string | null;
+          mfa_used: boolean | null;
+          outcome: string | null;
+          recent_failures: number | null;
+          session_id: string | null;
+          session_live: boolean | null;
+          staff_status: Database['public']['Enums']['staff_status'] | null;
+          staff_user_id: string | null;
+          succeeded: boolean | null;
+          who: string | null;
+        };
+        Relationships: [];
+      };
+    };
+    Functions: {
+      canonical: {
+        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Returns: string;
+      };
+      cron_chain_check: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_run_alerts: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_ago: { Args: { p_at: string }; Returns: string };
+      fn_diff: { Args: { p_after: Json; p_before: Json }; Returns: Json };
+      fn_mask_email: { Args: { p_email: string }; Returns: string };
+      fn_mask_payload: { Args: { p_fields: string[]; p_payload: Json }; Returns: Json };
+      fn_require: { Args: { p_level: string }; Returns: string };
+      fn_sentence: {
+        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Returns: string;
+      };
+      fn_under_hold: { Args: { p_subject_id: string; p_subject_type: string }; Returns: boolean };
+      fn_visible: {
+        Args: { p_actor_id: string; p_city_id: string; p_module: string; p_money: boolean };
+        Returns: boolean;
+      };
+      log: {
+        Args: {
+          p_action: string;
+          p_actor_id?: string;
+          p_actor_label?: string;
+          p_actor_role?: string;
+          p_actor_type: Database['public']['Enums']['actor_type'];
+          p_after?: Json;
+          p_approved_by?: string;
+          p_approver_label?: string;
+          p_before?: Json;
+          p_city_id?: string;
+          p_context?: Json;
+          p_module: string;
+          p_on_behalf_of?: string;
+          p_reason?: string;
+          p_related?: Json;
+          p_severity?: Database['public']['Enums']['audit_severity'];
+          p_target_id?: string;
+          p_target_label?: string;
+          p_target_type?: string;
+        };
+        Returns: number;
+      };
+      rpc_alert_act: {
+        Args: { p_action: string; p_alert_id: string; p_note?: string };
+        Returns: Json;
+      };
+      rpc_break_glass_close: { Args: { p_id: string }; Returns: Json };
+      rpc_break_glass_open: {
+        Args: {
+          p_city_id?: string;
+          p_minutes?: number;
+          p_module_key?: string;
+          p_reason: string;
+          p_scope: string;
+        };
+        Returns: Json;
+      };
+      rpc_break_glass_review: {
+        Args: { p_id: string; p_note: string; p_outcome: string };
+        Returns: Json;
+      };
+      rpc_legal_hold_place: {
+        Args: {
+          p_city_id?: string;
+          p_from?: string;
+          p_instructed_by: string;
+          p_reason: string;
+          p_reference: string;
+          p_subject_id?: string;
+          p_subject_type: string;
+          p_title: string;
+          p_to?: string;
+        };
+        Returns: Json;
+      };
+      rpc_legal_hold_release: { Args: { p_id: string; p_reason: string }; Returns: Json };
+      rpc_pack_create: {
+        Args: {
+          p_filter: Json;
+          p_from?: string;
+          p_legal_hold_id?: string;
+          p_purpose: string;
+          p_reason: string;
+          p_reference: string;
+          p_requested_by: string;
+          p_title: string;
+          p_to?: string;
+        };
+        Returns: Json;
+      };
+      rpc_pack_freeze: { Args: { p_id: string }; Returns: Json };
+      rpc_pack_share: {
+        Args: { p_how: string; p_id: string; p_shared_with: string };
+        Returns: Json;
+      };
+      rpc_record_export: {
+        Args: {
+          p_contains_pii?: boolean;
+          p_destination?: string;
+          p_filter?: Json;
+          p_format?: string;
+          p_module: string;
+          p_reason: string;
+          p_row_count?: number;
+          p_what: string;
+        };
+        Returns: Json;
+      };
+      rpc_retention_approve: { Args: { p_key: string }; Returns: Json };
+      rpc_retention_set: {
+        Args: {
+          p_anonymise?: boolean;
+          p_basis: string;
+          p_description?: string;
+          p_key: string;
+          p_module?: string;
+          p_retain_for: string;
+          p_subject?: string;
+        };
+        Returns: Json;
+      };
+      rpc_review_event: {
+        Args: { p_event_id: number; p_note?: string; p_state: string };
+        Returns: Json;
+      };
+      rpc_revoke_sessions: { Args: { p_reason: string; p_staff_user_id: string }; Returns: Json };
+      rpc_sign_in_record: {
+        Args: {
+          p_auth_method?: string;
+          p_device_fingerprint?: string;
+          p_device_label?: string;
+          p_email: string;
+          p_ip?: unknown;
+          p_ip_country?: string;
+          p_mfa_used?: boolean;
+          p_outcome: string;
+          p_session_id?: string;
+          p_user_agent?: string;
+        };
+        Returns: Json;
+      };
+      rpc_sign_out: { Args: { p_reason?: string; p_session_id: string }; Returns: Json };
+      rpc_verify_chain: { Args: Record<PropertyKey, never>; Returns: Json };
+      run_chain_check: { Args: Record<PropertyKey, never>; Returns: undefined };
+      verify_chain: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          detail: string;
+          events_checked: number;
+          first_bad_id: number;
+          ok: boolean;
+        }[];
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   hr: {
     Tables: {
       application: {
@@ -10364,32 +11842,70 @@ export type Database = {
       retention_rule: {
         Row: {
           anonymise: boolean;
+          approved_at: string | null;
+          approved_by: string | null;
           basis: string;
+          description: string | null;
           key: string;
+          last_run_at: string | null;
+          last_run_held: number | null;
+          last_run_rows: number | null;
+          module: string | null;
           retain_for: string | null;
+          second_approver_id: string | null;
           subject: string;
           updated_at: string;
           updated_by: string | null;
         };
         Insert: {
           anonymise?: boolean;
+          approved_at?: string | null;
+          approved_by?: string | null;
           basis: string;
+          description?: string | null;
           key: string;
+          last_run_at?: string | null;
+          last_run_held?: number | null;
+          last_run_rows?: number | null;
+          module?: string | null;
           retain_for?: string | null;
+          second_approver_id?: string | null;
           subject: string;
           updated_at?: string;
           updated_by?: string | null;
         };
         Update: {
           anonymise?: boolean;
+          approved_at?: string | null;
+          approved_by?: string | null;
           basis?: string;
+          description?: string | null;
           key?: string;
+          last_run_at?: string | null;
+          last_run_held?: number | null;
+          last_run_rows?: number | null;
+          module?: string | null;
           retain_for?: string | null;
+          second_approver_id?: string | null;
           subject?: string;
           updated_at?: string;
           updated_by?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: 'retention_rule_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'retention_rule_second_approver_id_fkey';
+            columns: ['second_approver_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'retention_rule_updated_by_fkey';
             columns: ['updated_by'];
@@ -21898,6 +23414,9 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  audit: {
+    Enums: {},
+  },
   hr: {
     Enums: {
       contract_type: ['full_time', 'part_time', 'contract_6mo', 'internship'],
