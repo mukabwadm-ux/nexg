@@ -9,7 +9,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(42);
+select plan(44);
 
 /* psql meta-commands do not survive the test runner, so the ids the
    assertions need are parked in a temp table instead. */
@@ -371,6 +371,24 @@ select ok(
    where p.proname in ('fn_anonymise_guest', 'cron_retention')
      and n.nspname = 'public') > 0,
   'The hospitality anonymise and retention functions exist to be checked.');
+
+
+/*
+ * The two orderings agree. `lib/staff.ts` ranks own_city above
+ * limited; so must `authz.audit_level`, or the console labels
+ * somebody one thing and the RLS policy applies another. There is a
+ * real account on production holding both roles.
+ */
+select ok(
+  pg_get_functiondef('authz.audit_level()'::regprocedure)
+    ~ 'own_city.*limited',
+  'audit_level ranks own_city above limited, matching the console.');
+
+select is(
+  (select count(*)::int from public.role_module_access
+   where module_key = 'audit' and level is null),
+  0,
+  'Every role has a stated level for the audit module, including none.');
 
 select * from finish();
 rollback;
