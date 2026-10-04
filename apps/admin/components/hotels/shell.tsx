@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 /**
- * The six tabs, in the order the overview sheet lists them.
+ * The tabs, in the order the overview sheet lists them.
  *
  * Filters live in the URL, so a link pasted into Slack opens the same
  * screen the sender was looking at.
@@ -12,6 +12,7 @@ export const HOTEL_TABS = [
   { key: 'hotels', label: 'Hotels' },
   { key: 'charge', label: 'Charge to room' },
   { key: 'desk', label: 'Front desk & access' },
+  { key: 'qr', label: 'QR & attribution' },
   { key: 'guests', label: 'Guests' },
   { key: 'data', label: 'Data requests' },
 ] as const;
@@ -35,6 +36,11 @@ export const TAB_TITLE: Record<string, { title: string; subtitle: string }> = {
   desk: {
     title: 'Front desk & access',
     subtitle: 'Desk performance, the rules riders are given, and access incidents',
+  },
+  qr: {
+    title: 'QR & attribution',
+    subtitle:
+      'Every card NexG has printed, where it sits, and what guests did after scanning it',
   },
   guests: {
     title: 'Guests & data requests',

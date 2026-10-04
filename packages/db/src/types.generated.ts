@@ -185,6 +185,13 @@ export type Database = {
             referencedRelation: 'alert_rule';
             referencedColumns: ['key'];
           },
+          {
+            foreignKeyName: 'alert_rule_key_fkey';
+            columns: ['rule_key'];
+            isOneToOne: false;
+            referencedRelation: 'console_alert_rule_v';
+            referencedColumns: ['key'];
+          },
         ];
       };
       alert_rule: {
@@ -192,6 +199,8 @@ export type Database = {
           active: boolean;
           description: string | null;
           group_by: string;
+          hour_from: number | null;
+          hour_to: number | null;
           key: string;
           match_actions: string[];
           match_modules: string[];
@@ -208,6 +217,8 @@ export type Database = {
           active?: boolean;
           description?: string | null;
           group_by?: string;
+          hour_from?: number | null;
+          hour_to?: number | null;
           key: string;
           match_actions?: string[];
           match_modules?: string[];
@@ -224,6 +235,8 @@ export type Database = {
           active?: boolean;
           description?: string | null;
           group_by?: string;
+          hour_from?: number | null;
+          hour_to?: number | null;
           key?: string;
           match_actions?: string[];
           match_modules?: string[];
@@ -348,7 +361,8 @@ export type Database = {
           reviewed_at: string | null;
           reviewed_by: string | null;
           scope: string;
-          staff_user_id: string;
+          staff_label: string | null;
+          staff_user_id: string | null;
         };
         Insert: {
           city_id?: string | null;
@@ -364,7 +378,8 @@ export type Database = {
           reviewed_at?: string | null;
           reviewed_by?: string | null;
           scope: string;
-          staff_user_id: string;
+          staff_label?: string | null;
+          staff_user_id?: string | null;
         };
         Update: {
           city_id?: string | null;
@@ -380,7 +395,8 @@ export type Database = {
           reviewed_at?: string | null;
           reviewed_by?: string | null;
           scope?: string;
-          staff_user_id?: string;
+          staff_label?: string | null;
+          staff_user_id?: string | null;
         };
         Relationships: [];
       };
@@ -981,6 +997,66 @@ export type Database = {
         };
         Relationships: [];
       };
+      console_alert_rule_v: {
+        Row: {
+          active: boolean | null;
+          description: string | null;
+          group_by: string | null;
+          hour_from: number | null;
+          hour_to: number | null;
+          hours_label: string | null;
+          key: string | null;
+          last_raised: string | null;
+          match_actions: string[] | null;
+          match_modules: string[] | null;
+          min_severity: Database['public']['Enums']['audit_severity'] | null;
+          next_step: string | null;
+          open_alerts: number | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          threshold: number | null;
+          time_window: string | null;
+          title: string | null;
+        };
+        Insert: {
+          active?: boolean | null;
+          description?: string | null;
+          group_by?: string | null;
+          hour_from?: number | null;
+          hour_to?: number | null;
+          hours_label?: never;
+          key?: string | null;
+          last_raised?: never;
+          match_actions?: string[] | null;
+          match_modules?: string[] | null;
+          min_severity?: Database['public']['Enums']['audit_severity'] | null;
+          next_step?: string | null;
+          open_alerts?: never;
+          severity?: Database['public']['Enums']['audit_severity'] | null;
+          threshold?: number | null;
+          time_window?: string | null;
+          title?: string | null;
+        };
+        Update: {
+          active?: boolean | null;
+          description?: string | null;
+          group_by?: string | null;
+          hour_from?: number | null;
+          hour_to?: number | null;
+          hours_label?: never;
+          key?: string | null;
+          last_raised?: never;
+          match_actions?: string[] | null;
+          match_modules?: string[] | null;
+          min_severity?: Database['public']['Enums']['audit_severity'] | null;
+          next_step?: string | null;
+          open_alerts?: never;
+          severity?: Database['public']['Enums']['audit_severity'] | null;
+          threshold?: number | null;
+          time_window?: string | null;
+          title?: string | null;
+        };
+        Relationships: [];
+      };
       console_alert_v: {
         Row: {
           acknowledged_at: string | null;
@@ -1016,6 +1092,13 @@ export type Database = {
             columns: ['rule_key'];
             isOneToOne: false;
             referencedRelation: 'alert_rule';
+            referencedColumns: ['key'];
+          },
+          {
+            foreignKeyName: 'alert_rule_key_fkey';
+            columns: ['rule_key'];
+            isOneToOne: false;
+            referencedRelation: 'console_alert_rule_v';
             referencedColumns: ['key'];
           },
         ];
@@ -8149,6 +8232,62 @@ export type Database = {
           },
         ];
       };
+      hotel_area: {
+        Row: {
+          created_at: string;
+          delivery_point_note: string | null;
+          hotel_id: string;
+          id: string;
+          name: string;
+          status: string;
+        };
+        Insert: {
+          created_at?: string;
+          delivery_point_note?: string | null;
+          hotel_id: string;
+          id?: string;
+          name: string;
+          status?: string;
+        };
+        Update: {
+          created_at?: string;
+          delivery_point_note?: string | null;
+          hotel_id?: string;
+          id?: string;
+          name?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'hotel_area_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'hotel_area_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_area_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_area_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
       hotel_contact: {
         Row: {
           created_at: string;
@@ -11722,40 +11861,979 @@ export type Database = {
           },
         ];
       };
-      qr_scan: {
+      property_qr: {
         Row: {
-          at: string;
-          id: number;
-          order_reference: string | null;
-          outcome: string;
-          qr_id: string;
-          user_agent_hash: string | null;
+          batch_id: string | null;
+          city_id: string | null;
+          code: string;
+          first_scanned_at: string | null;
+          generated_at: string;
+          generated_by: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: string;
+          label: string | null;
+          last_scanned_at: string | null;
+          orders: number;
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placed_confirmed_at: string | null;
+          placement: Database['public']['Enums']['qr_placement'];
+          placement_photo_path: string | null;
+          replaced_by: string | null;
+          scans: number;
+          secret_hash: string;
+          sent_at: string | null;
+          sent_channel: string | null;
+          state: Database['public']['Enums']['qr_state'];
+          void_reason: string | null;
+          voided_at: string | null;
         };
         Insert: {
-          at?: string;
-          id?: number;
-          order_reference?: string | null;
-          outcome?: string;
-          qr_id: string;
-          user_agent_hash?: string | null;
+          batch_id?: string | null;
+          city_id?: string | null;
+          code: string;
+          first_scanned_at?: string | null;
+          generated_at?: string;
+          generated_by?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: string;
+          label?: string | null;
+          last_scanned_at?: string | null;
+          orders?: number;
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placed_confirmed_at?: string | null;
+          placement?: Database['public']['Enums']['qr_placement'];
+          placement_photo_path?: string | null;
+          replaced_by?: string | null;
+          scans?: number;
+          secret_hash: string;
+          sent_at?: string | null;
+          sent_channel?: string | null;
+          state?: Database['public']['Enums']['qr_state'];
+          void_reason?: string | null;
+          voided_at?: string | null;
         };
         Update: {
-          at?: string;
-          id?: number;
-          order_reference?: string | null;
-          outcome?: string;
-          qr_id?: string;
-          user_agent_hash?: string | null;
+          batch_id?: string | null;
+          city_id?: string | null;
+          code?: string;
+          first_scanned_at?: string | null;
+          generated_at?: string;
+          generated_by?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: string;
+          label?: string | null;
+          last_scanned_at?: string | null;
+          orders?: number;
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['qr_owner_type'];
+          placed_confirmed_at?: string | null;
+          placement?: Database['public']['Enums']['qr_placement'];
+          placement_photo_path?: string | null;
+          replaced_by?: string | null;
+          scans?: number;
+          secret_hash?: string;
+          sent_at?: string | null;
+          sent_channel?: string | null;
+          state?: Database['public']['Enums']['qr_state'];
+          void_reason?: string | null;
+          voided_at?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: 'qr_scan_qr_id_fkey';
-            columns: ['qr_id'];
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
             isOneToOne: false;
-            referencedRelation: 'unit_qr';
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_generated_by_fkey';
+            columns: ['generated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'property_attribution_v';
+            referencedColumns: ['qr_id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'property_qr';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'qr_health_v';
+            referencedColumns: ['qr_id'];
+          },
+        ];
+      };
+      qr_miss: {
+        Row: {
+          at: string;
+          code_attempted: string;
+          id: number;
+          ip_country: string | null;
+          reason: string;
+          session_id: string | null;
+        };
+        Insert: {
+          at?: string;
+          code_attempted: string;
+          id?: never;
+          ip_country?: string | null;
+          reason: string;
+          session_id?: string | null;
+        };
+        Update: {
+          at?: string;
+          code_attempted?: string;
+          id?: never;
+          ip_country?: string | null;
+          reason?: string;
+          session_id?: string | null;
+        };
+        Relationships: [];
+      };
+      qr_pack: {
+        Row: {
+          batch_id: string;
+          built_at: string;
+          built_by: string | null;
+          codes: number;
+          format: string;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: string;
+          pdf_path: string | null;
+          sent_at: string | null;
+          sent_channel: string | null;
+          void_reason: string | null;
+          voided_at: string | null;
+        };
+        Insert: {
+          batch_id?: string;
+          built_at?: string;
+          built_by?: string | null;
+          codes?: number;
+          format?: string;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: string;
+          pdf_path?: string | null;
+          sent_at?: string | null;
+          sent_channel?: string | null;
+          void_reason?: string | null;
+          voided_at?: string | null;
+        };
+        Update: {
+          batch_id?: string;
+          built_at?: string;
+          built_by?: string | null;
+          codes?: number;
+          format?: string;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: string;
+          pdf_path?: string | null;
+          sent_at?: string | null;
+          sent_channel?: string | null;
+          void_reason?: string | null;
+          voided_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'qr_pack_built_by_fkey';
+            columns: ['built_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_pack_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_pack_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_pack_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'qr_pack_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_pack_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_pack_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      qr_scan: {
+        Row: {
+          browsed_category: string | null;
+          city_id: string | null;
+          code: string;
+          device: NonNullable<Json>;
+          dow: number;
+          first_merchant_id: string | null;
+          geo_band: string | null;
+          guest_id: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: number;
+          ip_country: string | null;
+          is_bot: boolean;
+          is_test: boolean;
+          local_hour: number;
+          order_refs: string[];
+          ordered_at: string | null;
+          outcome: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token: string | null;
+          scanned_at: string;
+          session_id: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code?: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['qr_owner_type'];
+          placement?: Database['public']['Enums']['qr_placement'];
+          qr_id?: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
             referencedColumns: ['id'];
           },
         ];
+      };
+      qr_scan_2026_09: {
+        Row: {
+          browsed_category: string | null;
+          city_id: string | null;
+          code: string;
+          device: NonNullable<Json>;
+          dow: number;
+          first_merchant_id: string | null;
+          geo_band: string | null;
+          guest_id: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: number;
+          ip_country: string | null;
+          is_bot: boolean;
+          is_test: boolean;
+          local_hour: number;
+          order_refs: string[];
+          ordered_at: string | null;
+          outcome: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token: string | null;
+          scanned_at: string;
+          session_id: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code?: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['qr_owner_type'];
+          placement?: Database['public']['Enums']['qr_placement'];
+          qr_id?: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [];
+      };
+      qr_scan_2026_10: {
+        Row: {
+          browsed_category: string | null;
+          city_id: string | null;
+          code: string;
+          device: NonNullable<Json>;
+          dow: number;
+          first_merchant_id: string | null;
+          geo_band: string | null;
+          guest_id: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: number;
+          ip_country: string | null;
+          is_bot: boolean;
+          is_test: boolean;
+          local_hour: number;
+          order_refs: string[];
+          ordered_at: string | null;
+          outcome: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token: string | null;
+          scanned_at: string;
+          session_id: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code?: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['qr_owner_type'];
+          placement?: Database['public']['Enums']['qr_placement'];
+          qr_id?: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [];
+      };
+      qr_scan_2026_11: {
+        Row: {
+          browsed_category: string | null;
+          city_id: string | null;
+          code: string;
+          device: NonNullable<Json>;
+          dow: number;
+          first_merchant_id: string | null;
+          geo_band: string | null;
+          guest_id: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: number;
+          ip_country: string | null;
+          is_bot: boolean;
+          is_test: boolean;
+          local_hour: number;
+          order_refs: string[];
+          ordered_at: string | null;
+          outcome: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token: string | null;
+          scanned_at: string;
+          session_id: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code?: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['qr_owner_type'];
+          placement?: Database['public']['Enums']['qr_placement'];
+          qr_id?: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [];
+      };
+      qr_scan_2026_12: {
+        Row: {
+          browsed_category: string | null;
+          city_id: string | null;
+          code: string;
+          device: NonNullable<Json>;
+          dow: number;
+          first_merchant_id: string | null;
+          geo_band: string | null;
+          guest_id: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: number;
+          ip_country: string | null;
+          is_bot: boolean;
+          is_test: boolean;
+          local_hour: number;
+          order_refs: string[];
+          ordered_at: string | null;
+          outcome: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token: string | null;
+          scanned_at: string;
+          session_id: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code?: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['qr_owner_type'];
+          placement?: Database['public']['Enums']['qr_placement'];
+          qr_id?: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [];
+      };
+      qr_scan_2027_01: {
+        Row: {
+          browsed_category: string | null;
+          city_id: string | null;
+          code: string;
+          device: NonNullable<Json>;
+          dow: number;
+          first_merchant_id: string | null;
+          geo_band: string | null;
+          guest_id: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: number;
+          ip_country: string | null;
+          is_bot: boolean;
+          is_test: boolean;
+          local_hour: number;
+          order_refs: string[];
+          ordered_at: string | null;
+          outcome: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token: string | null;
+          scanned_at: string;
+          session_id: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code?: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['qr_owner_type'];
+          placement?: Database['public']['Enums']['qr_placement'];
+          qr_id?: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [];
+      };
+      qr_scan_overflow: {
+        Row: {
+          browsed_category: string | null;
+          city_id: string | null;
+          code: string;
+          device: NonNullable<Json>;
+          dow: number;
+          first_merchant_id: string | null;
+          geo_band: string | null;
+          guest_id: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: number;
+          ip_country: string | null;
+          is_bot: boolean;
+          is_test: boolean;
+          local_hour: number;
+          order_refs: string[];
+          ordered_at: string | null;
+          outcome: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token: string | null;
+          scanned_at: string;
+          session_id: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id: string;
+          owner_type: Database['public']['Enums']['qr_owner_type'];
+          placement: Database['public']['Enums']['qr_placement'];
+          qr_id: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          browsed_category?: string | null;
+          city_id?: string | null;
+          code?: string;
+          device?: NonNullable<Json>;
+          dow?: never;
+          first_merchant_id?: string | null;
+          geo_band?: string | null;
+          guest_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: never;
+          ip_country?: string | null;
+          is_bot?: boolean;
+          is_test?: boolean;
+          local_hour?: never;
+          order_refs?: string[];
+          ordered_at?: string | null;
+          outcome?: Database['public']['Enums']['qr_scan_outcome'];
+          owner_id?: string;
+          owner_type?: Database['public']['Enums']['qr_owner_type'];
+          placement?: Database['public']['Enums']['qr_placement'];
+          qr_id?: string;
+          referrer_kind?: Database['public']['Enums']['qr_referrer_kind'];
+          scan_token?: string | null;
+          scanned_at?: string;
+          session_id?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [];
       };
       referral: {
         Row: {
@@ -14906,104 +15984,6 @@ export type Database = {
           },
         ];
       };
-      unit_qr: {
-        Row: {
-          code: string;
-          first_scanned_at: string | null;
-          generated_at: string;
-          id: string;
-          placed_confirmed_at: string | null;
-          replaced_by: string | null;
-          room_id: string | null;
-          scans: number;
-          sent_at: string | null;
-          state: Database['public']['Enums']['qr_state'];
-          token_hash: string | null;
-          unit_id: string | null;
-          voided_at: string | null;
-        };
-        Insert: {
-          code: string;
-          first_scanned_at?: string | null;
-          generated_at?: string;
-          id?: string;
-          placed_confirmed_at?: string | null;
-          replaced_by?: string | null;
-          room_id?: string | null;
-          scans?: number;
-          sent_at?: string | null;
-          state?: Database['public']['Enums']['qr_state'];
-          token_hash?: string | null;
-          unit_id?: string | null;
-          voided_at?: string | null;
-        };
-        Update: {
-          code?: string;
-          first_scanned_at?: string | null;
-          generated_at?: string;
-          id?: string;
-          placed_confirmed_at?: string | null;
-          replaced_by?: string | null;
-          room_id?: string | null;
-          scans?: number;
-          sent_at?: string | null;
-          state?: Database['public']['Enums']['qr_state'];
-          token_hash?: string | null;
-          unit_id?: string | null;
-          voided_at?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'unit_qr_replaced_by_fkey';
-            columns: ['replaced_by'];
-            isOneToOne: false;
-            referencedRelation: 'unit_qr';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'unit_qr_room_fk';
-            columns: ['room_id'];
-            isOneToOne: false;
-            referencedRelation: 'hotel_room';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'unit_qr_unit_id_fkey';
-            columns: ['unit_id'];
-            isOneToOne: false;
-            referencedRelation: 'host_view_v';
-            referencedColumns: ['unit_id'];
-          },
-          {
-            foreignKeyName: 'unit_qr_unit_id_fkey';
-            columns: ['unit_id'];
-            isOneToOne: false;
-            referencedRelation: 'property_unit_public';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'unit_qr_unit_id_fkey';
-            columns: ['unit_id'];
-            isOneToOne: false;
-            referencedRelation: 'rider_handoff_v';
-            referencedColumns: ['unit_id'];
-          },
-          {
-            foreignKeyName: 'unit_qr_unit_id_fkey';
-            columns: ['unit_id'];
-            isOneToOne: false;
-            referencedRelation: 'unit';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'unit_qr_unit_id_fkey';
-            columns: ['unit_id'];
-            isOneToOne: false;
-            referencedRelation: 'unit_context_v';
-            referencedColumns: ['unit_id'];
-          },
-        ];
-      };
       waitlist_signup: {
         Row: {
           city_id: string | null;
@@ -16020,6 +17000,7 @@ export type Database = {
           packages_month: number | null;
           phone_masked: string | null;
           qr_not_placed: number | null;
+          qr_scans: number | null;
           status: Database['public']['Enums']['host_status'] | null;
           submitted_at: string | null;
           superhost_claimed: boolean | null;
@@ -16189,6 +17170,98 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      console_qr_scan_v: {
+        Row: {
+          browsed_category: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          code: string | null;
+          device: string | null;
+          first_merchant_id: string | null;
+          geo_band: string | null;
+          host_id: string | null;
+          host_name: string | null;
+          hotel_id: string | null;
+          hotel_name: string | null;
+          id: number | null;
+          ip_country: string | null;
+          is_bot: boolean | null;
+          is_test: boolean | null;
+          label: string | null;
+          local_hour: number | null;
+          order_refs: string[] | null;
+          ordered_at: string | null;
+          orders: number | null;
+          os: string | null;
+          outcome: Database['public']['Enums']['qr_scan_outcome'] | null;
+          owner_id: string | null;
+          owner_type: Database['public']['Enums']['qr_owner_type'] | null;
+          placement: Database['public']['Enums']['qr_placement'] | null;
+          referrer_kind: Database['public']['Enums']['qr_referrer_kind'] | null;
+          returning_session: boolean | null;
+          scanned_at: string | null;
+          session_hash: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_qr_summary_v: {
+        Row: {
+          cards_live: number | null;
+          conversion_30d: number | null;
+          misses_7d: number | null;
+          never_scanned: number | null;
+          old_cards_scanned: number | null;
+          orders_30d: number | null;
+          scans_7d: number | null;
+          scans_in_overflow: number | null;
+          sessions_7d: number | null;
+          share_of_all_orders: number | null;
+        };
+        Relationships: [];
       };
       console_rider_badges_v: {
         Row: {
@@ -16773,6 +17846,25 @@ export type Database = {
         };
         Relationships: [];
       };
+      host_qr_report_v: {
+        Row: {
+          categories: string[] | null;
+          code: string | null;
+          day: string | null;
+          host_id: string | null;
+          hour_histogram: Json | null;
+          label: string | null;
+          median_seconds_to_order: number | null;
+          ordered: number | null;
+          orders: number | null;
+          placement: Database['public']['Enums']['qr_placement'] | null;
+          qr_id: string | null;
+          scans: number | null;
+          sessions: number | null;
+          unit_id: string | null;
+        };
+        Relationships: [];
+      };
       host_view_v: {
         Row: {
           area: string | null;
@@ -16782,15 +17874,20 @@ export type Database = {
           handoff_sentence: string | null;
           host_id: string | null;
           label_public: string | null;
+          last_scanned_at: string | null;
           name: string | null;
           orders_this_month: number | null;
           packages_scheduled: number | null;
           paused_reason: string | null;
           placed_confirmed_at: string | null;
+          qr_cards: number | null;
           qr_code: string | null;
+          qr_orders: number | null;
+          qr_placement: Database['public']['Enums']['qr_placement'] | null;
           qr_scans: number | null;
           qr_state: Database['public']['Enums']['qr_state'] | null;
           readiness: Json | null;
+          scans_total: number | null;
           status: Database['public']['Enums']['unit_status'] | null;
           unit_id: string | null;
         };
@@ -16890,6 +17987,25 @@ export type Database = {
             referencedColumns: ['hotel_id'];
           },
         ];
+      };
+      hotel_qr_report_v: {
+        Row: {
+          categories: string[] | null;
+          code: string | null;
+          day: string | null;
+          hotel_id: string | null;
+          hour_histogram: Json | null;
+          label: string | null;
+          ordered: number | null;
+          orders: number | null;
+          owner_id: string | null;
+          owner_type: Database['public']['Enums']['qr_owner_type'] | null;
+          placement: Database['public']['Enums']['qr_placement'] | null;
+          qr_id: string | null;
+          scans: number | null;
+          sessions: number | null;
+        };
+        Relationships: [];
       };
       merchant_dashboard_v: {
         Row: {
@@ -17199,6 +18315,112 @@ export type Database = {
           },
         ];
       };
+      property_attribution_v: {
+        Row: {
+          average_basket: number | null;
+          batch_id: string | null;
+          categories: string[] | null;
+          city_id: string | null;
+          code: string | null;
+          conversion_30d: number | null;
+          first_scanned_at: string | null;
+          generated_at: string | null;
+          gmv_30d: number | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          label: string | null;
+          last_scanned_at: string | null;
+          median_seconds_to_order: number | null;
+          orders_30d: number | null;
+          orders_lifetime: number | null;
+          owner_id: string | null;
+          owner_type: Database['public']['Enums']['qr_owner_type'] | null;
+          placed_confirmed_at: string | null;
+          placement: Database['public']['Enums']['qr_placement'] | null;
+          qr_id: string | null;
+          replaced_by: string | null;
+          scans_30d: number | null;
+          scans_7d: number | null;
+          scans_lifetime: number | null;
+          sent_at: string | null;
+          sessions_30d: number | null;
+          state: Database['public']['Enums']['qr_state'] | null;
+          void_reason: string | null;
+          voided_at: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'property_attribution_v';
+            referencedColumns: ['qr_id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'property_qr';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'qr_health_v';
+            referencedColumns: ['qr_id'];
+          },
+        ];
+      };
       property_public: {
         Row: {
           amenities: string[] | null;
@@ -17275,6 +18497,117 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      qr_health_v: {
+        Row: {
+          city_id: string | null;
+          code: string | null;
+          far_scans: number | null;
+          finding: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          label: string | null;
+          last_scanned_at: string | null;
+          orders: number | null;
+          placement: Database['public']['Enums']['qr_placement'] | null;
+          qr_id: string | null;
+          scans: number | null;
+          sent_at: string | null;
+          what_to_do: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
+      };
+      qr_scan_daily_v: {
+        Row: {
+          bounced: number | null;
+          browsed: number | null;
+          cart: number | null;
+          categories: string[] | null;
+          city_id: string | null;
+          code: string | null;
+          day: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          hour_histogram: Json | null;
+          landed: number | null;
+          median_seconds_to_order: number | null;
+          merchants: string[] | null;
+          ordered: number | null;
+          orders: number | null;
+          owner_id: string | null;
+          owner_type: Database['public']['Enums']['qr_owner_type'] | null;
+          placement: Database['public']['Enums']['qr_placement'] | null;
+          qr_id: string | null;
+          scanned_after_void: number | null;
+          scans: number | null;
+          sessions: number | null;
+        };
+        Relationships: [];
+      };
+      qr_unmet_demand_v: {
+        Row: {
+          category: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          dow: number | null;
+          last_wanted_at: string | null;
+          local_hour: number | null;
+          properties: number | null;
+          scans_that_wanted_it: number | null;
+          sessions: number | null;
+          zone_id: string | null;
+        };
+        Relationships: [];
       };
       review_public: {
         Row: {
@@ -17529,6 +18862,9 @@ export type Database = {
     Functions: {
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_qr_refresh_reports: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_qr_scan_partitions: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_qr_scan_rollup: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_retention: { Args: Record<PropertyKey, never>; Returns: number };
       distance_to_nearest_zone: {
         Args: { p_lat: number; p_lng: number };
@@ -17832,6 +19168,12 @@ export type Database = {
       };
       fn_plan_view: { Args: { p_plan_id: string }; Returns: Json };
       fn_plate_matches: { Args: { p_plate: string; p_read: string }; Returns: boolean };
+      fn_qr_attribute_order: {
+        Args: { p_order_reference: string; p_scan_token: string; p_session_id?: string };
+        Returns: Json;
+      };
+      fn_qr_new_code: { Args: Record<PropertyKey, never>; Returns: string };
+      fn_qr_scan_partition: { Args: { p_month: string }; Returns: string };
       fn_review_checks: { Args: { p_body: string; p_plan_id: string }; Returns: Json };
       fn_rider_cash_cap: { Args: { p_rider_id: string }; Returns: number };
       fn_rider_condition_matches: {
@@ -21474,54 +22816,112 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_qr_generate: {
-        Args: { p_room_id?: string; p_unit_id?: string };
-        Returns: {
-          code: string;
-          first_scanned_at: string | null;
-          generated_at: string;
-          id: string;
-          placed_confirmed_at: string | null;
-          replaced_by: string | null;
-          room_id: string | null;
-          scans: number;
-          sent_at: string | null;
-          state: Database['public']['Enums']['qr_state'];
-          token_hash: string | null;
-          unit_id: string | null;
-          voided_at: string | null;
+      rpc_qr_card: { Args: { p_code: string }; Returns: Json };
+      rpc_qr_generate:
+        | {
+            Args: {
+              p_owner_id: string;
+              p_owner_type: Database['public']['Enums']['qr_owner_type'];
+              p_placement?: Database['public']['Enums']['qr_placement'];
+            };
+            Returns: Json;
+          }
+        | {
+            Args: { p_room_id?: string; p_unit_id?: string };
+            Returns: {
+              batch_id: string | null;
+              city_id: string | null;
+              code: string;
+              first_scanned_at: string | null;
+              generated_at: string;
+              generated_by: string | null;
+              host_id: string | null;
+              hotel_id: string | null;
+              id: string;
+              label: string | null;
+              last_scanned_at: string | null;
+              orders: number;
+              owner_id: string;
+              owner_type: Database['public']['Enums']['qr_owner_type'];
+              placed_confirmed_at: string | null;
+              placement: Database['public']['Enums']['qr_placement'];
+              placement_photo_path: string | null;
+              replaced_by: string | null;
+              scans: number;
+              secret_hash: string;
+              sent_at: string | null;
+              sent_channel: string | null;
+              state: Database['public']['Enums']['qr_state'];
+              void_reason: string | null;
+              voided_at: string | null;
+            };
+            SetofOptions: {
+              from: '*';
+              to: 'property_qr';
+              isOneToOne: true;
+              isSetofReturn: false;
+            };
+          };
+      rpc_qr_mark_placed:
+        | {
+            Args: { p_qr_id: string };
+            Returns: {
+              batch_id: string | null;
+              city_id: string | null;
+              code: string;
+              first_scanned_at: string | null;
+              generated_at: string;
+              generated_by: string | null;
+              host_id: string | null;
+              hotel_id: string | null;
+              id: string;
+              label: string | null;
+              last_scanned_at: string | null;
+              orders: number;
+              owner_id: string;
+              owner_type: Database['public']['Enums']['qr_owner_type'];
+              placed_confirmed_at: string | null;
+              placement: Database['public']['Enums']['qr_placement'];
+              placement_photo_path: string | null;
+              replaced_by: string | null;
+              scans: number;
+              secret_hash: string;
+              sent_at: string | null;
+              sent_channel: string | null;
+              state: Database['public']['Enums']['qr_state'];
+              void_reason: string | null;
+              voided_at: string | null;
+            };
+            SetofOptions: {
+              from: '*';
+              to: 'property_qr';
+              isOneToOne: true;
+              isSetofReturn: false;
+            };
+          }
+        | { Args: { p_photo_path?: string; p_qr_id: string }; Returns: Json };
+      rpc_qr_pack_build: {
+        Args: {
+          p_format?: string;
+          p_host_id?: string;
+          p_hotel_id?: string;
+          p_placements?: Database['public']['Enums']['qr_placement'][];
         };
-        SetofOptions: {
-          from: '*';
-          to: 'unit_qr';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
+        Returns: Json;
       };
-      rpc_qr_mark_placed: {
-        Args: { p_qr_id: string };
-        Returns: {
-          code: string;
-          first_scanned_at: string | null;
-          generated_at: string;
-          id: string;
-          placed_confirmed_at: string | null;
-          replaced_by: string | null;
-          room_id: string | null;
-          scans: number;
-          sent_at: string | null;
-          state: Database['public']['Enums']['qr_state'];
-          token_hash: string | null;
-          unit_id: string | null;
-          voided_at: string | null;
+      rpc_qr_replace: { Args: { p_qr_id: string; p_reason: string }; Returns: Json };
+      rpc_qr_scan_progress: {
+        Args: {
+          p_category?: string;
+          p_merchant_id?: string;
+          p_scan_token: string;
+          p_stage: string;
         };
-        SetofOptions: {
-          from: '*';
-          to: 'unit_qr';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
+        Returns: Json;
       };
+      rpc_qr_test_scan: { Args: { p_qr_id: string }; Returns: Json };
+      rpc_qr_void: { Args: { p_qr_id: string; p_reason: string }; Returns: Json };
+      rpc_qr_void_batch: { Args: { p_batch_id: string; p_reason: string }; Returns: Json };
       rpc_quote_plan: {
         Args: { p_plan_id: string };
         Returns: {
@@ -21760,7 +23160,16 @@ export type Database = {
         };
       };
       rpc_request_review: { Args: { p_plan_id: string }; Returns: string };
-      rpc_resolve_qr: { Args: { p_code: string }; Returns: Json };
+      rpc_resolve_qr: {
+        Args: {
+          p_code: string;
+          p_device?: Json;
+          p_ip_country?: string;
+          p_referrer?: Database['public']['Enums']['qr_referrer_kind'];
+          p_session_id?: string;
+        };
+        Returns: Json;
+      };
       rpc_rider_apply: {
         Args: {
           p_city_id: string;
@@ -23256,6 +24665,27 @@ export type Database = {
         | 'cottage'
         | 'penthouse'
         | 'studio';
+      qr_owner_type: 'unit' | 'hotel_room' | 'hotel_area';
+      qr_placement:
+        | 'counter'
+        | 'fridge'
+        | 'door'
+        | 'welcome_book'
+        | 'bedside'
+        | 'lobby'
+        | 'pool'
+        | 'other';
+      qr_referrer_kind: 'camera' | 'in_app_browser' | 'copied_link' | 'unknown';
+      qr_scan_outcome:
+        | 'landed'
+        | 'browsed'
+        | 'cart'
+        | 'ordered'
+        | 'bounced'
+        | 'voided'
+        | 'paused_unit'
+        | 'not_found'
+        | 'blocked';
       qr_state: 'generated' | 'sent' | 'placed' | 'scanned' | 'replaced';
       rate_change_status: 'draft' | 'awaiting_approval' | 'scheduled' | 'current' | 'archived';
       recon_status: 'open' | 'matched' | 'missing_reference' | 'disputed' | 'reconciled';
@@ -23796,6 +25226,29 @@ export const Constants = {
         'cottage',
         'penthouse',
         'studio',
+      ],
+      qr_owner_type: ['unit', 'hotel_room', 'hotel_area'],
+      qr_placement: [
+        'counter',
+        'fridge',
+        'door',
+        'welcome_book',
+        'bedside',
+        'lobby',
+        'pool',
+        'other',
+      ],
+      qr_referrer_kind: ['camera', 'in_app_browser', 'copied_link', 'unknown'],
+      qr_scan_outcome: [
+        'landed',
+        'browsed',
+        'cart',
+        'ordered',
+        'bounced',
+        'voided',
+        'paused_unit',
+        'not_found',
+        'blocked',
       ],
       qr_state: ['generated', 'sent', 'placed', 'scanned', 'replaced'],
       rate_change_status: ['draft', 'awaiting_approval', 'scheduled', 'current', 'archived'],

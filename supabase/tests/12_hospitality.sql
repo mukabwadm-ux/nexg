@@ -119,17 +119,23 @@ select is(
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a1111111-1111-1111-1111-111111111111","role":"authenticated"}';
 
+/* A card is now generated for an owner of a given kind, at a named
+   spot — a unit can hold a counter card and a fridge card at once. */
 select lives_ok(
-  $$ select public.rpc_qr_generate(
+  $$ select public.rpc_qr_generate('unit',
        (select id from public.unit
-        where host_id = (select id from public.host where phone = '+254700000900'))) $$,
+        where host_id = (select id from public.host where phone = '+254700000900')),
+       'counter') $$,
   'a QR is generated for the unit'
 );
 
 reset role;
 
 select is(
-  ((select public.rpc_resolve_qr((select code from public.unit_qr limit 1))) ->> 'ok')::boolean,
+  ((select public.rpc_resolve_qr((select q.code from public.property_qr q
+          join public.unit u on u.id = q.owner_id and q.owner_type = 'unit'
+         where u.host_id = (select id from public.host where phone = '+254700000900')
+         limit 1))) ->> 'ok')::boolean,
   true,
   'and it resolves to an orderable context'
 );
@@ -142,7 +148,10 @@ update public.unit set status = 'paused'
 where host_id = (select id from public.host where phone = '+254700000900');
 
 select is(
-  ((select public.rpc_resolve_qr((select code from public.unit_qr limit 1))) ->> 'reason'),
+  ((select public.rpc_resolve_qr((select q.code from public.property_qr q
+          join public.unit u on u.id = q.owner_id and q.owner_type = 'unit'
+         where u.host_id = (select id from public.host where phone = '+254700000900')
+         limit 1))) ->> 'reason'),
   'paused',
   'a paused unit resolves to a friendly redirect, not an order'
 );
@@ -155,7 +164,7 @@ select public.rpc_qr_generate((select id from public.unit
 reset role;
 
 select is(
-  (select count(*)::int from public.unit_qr where voided_at is not null),
+  (select count(*)::int from public.property_qr where voided_at is not null),
   1,
   'reprinting a QR voids the one that was on the counter'
 );

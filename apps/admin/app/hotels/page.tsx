@@ -2,6 +2,13 @@ import type { Metadata } from 'next';
 
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
+import {
+  QrTab,
+  type QrCardRow,
+  type QrHealthRow,
+  type QrScanRow,
+  type QrSummary,
+} from '@/components/hotels/qr-tab';
 import { HOTEL_TABS, HotelTabs, TAB_TITLE } from '@/components/hotels/shell';
 import {
   num,
@@ -60,7 +67,8 @@ export default async function HotelsPage({
   const tab = HOTEL_TABS.some((t) => t.key === searchParams?.tab)
     ? searchParams!.tab!
     : 'hosts';
-  const filter = searchParams?.filter ?? (tab === 'charge' ? 'live' : 'all');
+  const filter =
+    searchParams?.filter ?? (tab === 'charge' || tab === 'qr' ? 'live' : 'all');
   const selected = searchParams?.selected ?? null;
 
   /* Matches authz.handles_guest_data(). */
@@ -93,6 +101,7 @@ export default async function HotelsPage({
         {tab === 'hotels' && (await loadHotels(supabase, badges, filter, selected))}
         {tab === 'charge' && (await loadCharge(supabase, badges, filter))}
         {tab === 'desk' && (await loadDesk(supabase))}
+        {tab === 'qr' && (await loadQr(supabase, filter))}
         {/*
          * Guest records and KDPA requests are the DPO's and support's,
          * and RLS enforces that regardless of what renders here. But a
@@ -387,5 +396,59 @@ function NoGuestAccess() {
         There may well be open requests. You are not being shown zero because there are none.
       </p>
     </Card>
+  );
+}
+
+/**
+ * QR & attribution.
+ *
+ * Four reads, all scoped by RLS: the cards, the recent scans, the
+ * health findings, and the live properties a new card could go on.
+ * Nothing here filters by permission itself — `property_qr` and
+ * `qr_scan` carry policies, and `property_attribution_v` scopes
+ * itself because it reads a materialised view that cannot.
+ */
+async function loadQr(supabase: Supabase, filter: string) {
+  const [{ data: summary }, { data: cards }, { data: scans }, { data: health }, { data: units }] =
+    await Promise.all([
+      supabase.from('console_qr_summary_v').select('*').maybeSingle(),
+      supabase
+        .from('property_attribution_v')
+        .select('*')
+        .order('label')
+        .order('placement')
+        .limit(200),
+      supabase
+        .from('console_qr_scan_v')
+        .select('*')
+        .order('scanned_at', { ascending: false })
+        .limit(100),
+      supabase.from('qr_health_v').select('*').not('finding', 'is', null).limit(20),
+      /* Only live units can take a card: a guest scanning a card on a
+         unit that is not live reaches a friendly dead end, and
+         offering to make one would be setting that up. */
+      supabase
+        .from('unit')
+        .select('id, label_public, name')
+        .eq('status', 'live')
+        .is('archived_at', null)
+        .order('name')
+        .limit(200),
+    ]);
+
+  const properties = ((units as { id: string; label_public: string | null; name: string }[] | null) ?? []).map(
+    (u) => ({ id: u.id, label: u.label_public ?? u.name, kind: 'unit' as const }),
+  );
+
+  return (
+    <QrTab
+      summary={(summary as QrSummary | null) ?? null}
+      cards={(cards as QrCardRow[] | null) ?? []}
+      scans={(scans as QrScanRow[] | null) ?? []}
+      health={(health as QrHealthRow[] | null) ?? []}
+      properties={properties}
+      webOrigin={process.env.NEXT_PUBLIC_WEB_ORIGIN ?? 'http://localhost:3006'}
+      filter={filter}
+    />
   );
 }
