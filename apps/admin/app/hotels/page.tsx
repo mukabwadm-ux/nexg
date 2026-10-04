@@ -447,8 +447,26 @@ async function loadQr(supabase: Supabase, filter: string) {
       scans={(scans as QrScanRow[] | null) ?? []}
       health={(health as QrHealthRow[] | null) ?? []}
       properties={properties}
-      webOrigin={process.env.NEXT_PUBLIC_WEB_ORIGIN ?? 'http://localhost:3006'}
+      webOrigin={webOrigin()}
       filter={filter}
     />
   );
+}
+
+/*
+ * Where the "Print the card" and "Download PNG" links point.
+ *
+ * The console and the guest site are separate deployments, so the
+ * admin app has to be told. Set NEXT_PUBLIC_WEB_ORIGIN in Vercel; in
+ * development it falls back to the local web server, and if it is
+ * missing in production it falls back to the live site rather than
+ * to localhost — a print link that silently pointed at a developer's
+ * laptop would produce a page that works for one person and 404s for
+ * everybody else.
+ */
+function webOrigin(): string {
+  if (process.env.NEXT_PUBLIC_WEB_ORIGIN) return process.env.NEXT_PUBLIC_WEB_ORIGIN;
+  return process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3006'
+    : 'https://nexg-sepia.vercel.app';
 }
