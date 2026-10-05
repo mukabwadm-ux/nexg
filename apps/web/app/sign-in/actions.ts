@@ -14,18 +14,38 @@ export interface AuthResult {
 export type AccountRole = 'guest' | 'rider' | 'merchant';
 
 /*
- * Where each role lands.
+ * Where each role lands when we have nothing better.
  *
- * Riders and merchants go to their application, which resumes and shows what
- * is already on file — that is the only thing either of them can do today, and
- * it is genuinely what they came for. Guests go home; there is nothing a guest
- * account unlocks yet beyond not retyping their details.
+ * The role buttons are a hint, not an answer: somebody who picks
+ * "Merchant" may have no application, and somebody who picks
+ * "Guest" may be a rider who forgot which button they pressed. So
+ * the real destination comes from `fn_partner_home`, which reads
+ * what this account actually *is*, and these are only the fallback
+ * for an account that is nothing yet.
  */
-const HOME: Record<AccountRole, string> = {
+const START: Record<AccountRole, string> = {
   guest: '/',
   rider: '/riders/apply',
   merchant: '/merchants/apply',
 };
+
+/**
+ * Where this account belongs, asked of the database.
+ *
+ * One answer, shared with every partner page. A merchant who is
+ * live lands on their dashboard; one who is half-registered lands
+ * back in the form; a rider waiting on a document lands on their
+ * dashboard, because that is where the upload is.
+ */
+async function landingFor(
+  supabase: ReturnType<typeof createClient>,
+  role: AccountRole,
+): Promise<string> {
+  const { data } = await supabase.rpc('fn_partner_home');
+  const home = (data as { kind?: string; home?: string } | null) ?? null;
+  if (home?.home && home.kind !== 'guest' && home.kind !== 'anonymous') return home.home;
+  return START[role];
+}
 
 const credentials = z.object({
   email: z.string().trim().email('Enter a valid email address.'),
@@ -68,7 +88,11 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
     return { ok: false, message: 'That email and password do not match.' };
   }
 
-  return { ok: true, message: 'Signed in.', redirectTo: HOME[roleOf(formData.get('role'))] };
+  return {
+    ok: true,
+    message: 'Signed in.',
+    redirectTo: await landingFor(supabase, roleOf(formData.get('role'))),
+  };
 }
 
 /**
@@ -129,7 +153,7 @@ export async function createAccount(formData: FormData): Promise<AuthResult> {
     return {
       ok: true,
       message: 'Account created. Anything you had already started is still here.',
-      redirectTo: HOME[roleOf(formData.get('role'))],
+      redirectTo: await landingFor(supabase, roleOf(formData.get('role'))),
     };
   }
 
@@ -148,7 +172,11 @@ export async function createAccount(formData: FormData): Promise<AuthResult> {
     };
   }
 
-  return { ok: true, message: 'Account created.', redirectTo: HOME[roleOf(formData.get('role'))] };
+  return {
+    ok: true,
+    message: 'Account created.',
+    redirectTo: await landingFor(supabase, roleOf(formData.get('role'))),
+  };
 }
 
 export async function signOut(): Promise<void> {

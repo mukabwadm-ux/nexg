@@ -1,4 +1,4 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { createClient as createSupabaseClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@nexg/db';
 
 /**
@@ -14,7 +14,9 @@ import type { Database } from '@nexg/db';
  * keep using the cookie client, because this one has no session and row-level
  * security will correctly show it nothing.
  */
-export function createPublicClient() {
+/* Annotated for the same reason as the other two: the generated
+   `Database` type is past what TypeScript will serialise. */
+export function createPublicClient(): SupabaseClient<Database> {
   return createSupabaseClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

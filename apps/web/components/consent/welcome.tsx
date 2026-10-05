@@ -2,7 +2,7 @@
 
 import { Button, useToast } from '@nexg/ui';
 import { Globe, MapPin } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { markAsked, setLocale, setLocationFromCoords } from '@/app/consent-actions';
@@ -36,8 +36,22 @@ export function WelcomeConsent({
   canTranslate: boolean;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
   const [visible, setVisible] = React.useState(false);
+
+  /*
+   * Not inside a partner's own account.
+   *
+   * This card exists to open the shop on somebody's city. A
+   * merchant looking at their orders mid-service, or a rider
+   * checking their cash before going back out, is not shopping —
+   * and a card over the top of either buys them nothing while
+   * costing them the thing they came for. The decision lives here
+   * rather than in the layout so there is one place that knows
+   * where this belongs.
+   */
+  const atWork = pathname.startsWith('/merchant') || pathname.startsWith('/rider');
   const [busy, setBusy] = React.useState<string | null>(null);
 
   /* What the browser says they read, and whether we have it. */
@@ -75,7 +89,7 @@ export function WelcomeConsent({
     setVisible(true);
   }, [canTranslate]);
 
-  if (!visible) return null;
+  if (!visible || atWork) return null;
 
   const dismiss = async () => {
     setBusy('dismiss');

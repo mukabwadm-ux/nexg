@@ -1,5 +1,6 @@
 import type { Database } from '@nexg/db';
 import { createServerClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 /**
@@ -10,7 +11,17 @@ import { cookies } from 'next/headers';
  * role key is never used here — it bypasses RLS and has no business in a
  * request handler.
  */
-export function createClient() {
+/*
+ * The return type is written out rather than inferred.
+ *
+ * The generated `Database` type is large enough that TypeScript
+ * refuses to serialise the inferred client type ("exceeds the
+ * maximum length the compiler will serialize"), and the error
+ * lands here rather than anywhere near the schema that grew. An
+ * explicit annotation costs nothing and keeps it from coming back
+ * every time a table is added.
+ */
+export function createClient(): SupabaseClient<Database> {
   const cookieStore = cookies();
 
   return createServerClient<Database>(
