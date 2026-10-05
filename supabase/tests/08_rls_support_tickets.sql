@@ -5,6 +5,14 @@
 -- rider ops, HR and the DPO cannot reach the module; before migration
 -- 20260101005600 the policies said any staff member could read every row.
 -- These tests exist so that cannot come back.
+--
+-- The module is `messaging` now. Support & tickets folded into it
+-- (20260101016900), and these rows are legacy and read-only — but the
+-- rule travels with them, and it caught a regression on the way: the
+-- new module had been seeded granting finance, merchant ops, rider ops
+-- and partnerships access to the whole inbox. Those teams reach a
+-- conversation by being escalated into it, which is per-conversation
+-- and recorded, not by holding a module grant.
 
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -27,7 +35,7 @@ insert into public.staff_user (id, user_id, email, display_name) values
   ('bbbbbbbb-0000-0000-0000-000000000001', 'b1111111-1111-1111-1111-111111111111', 'desk.ops@nexgapp.com', 'Desk ops'),
   ('bbbbbbbb-0000-0000-0000-000000000002', 'b2222222-2222-2222-2222-222222222222', 'desk.finance@nexgapp.com', 'Desk finance');
 
-/* ops_manager reaches the support module at `full`; finance is `none`. */
+/* ops_manager reaches the messaging module at `full`; finance is `none`. */
 insert into public.role_grant (staff_user_id, role_id, city_id, granted_by) values
   ('bbbbbbbb-0000-0000-0000-000000000001',
    (select id from public.role where key = 'ops_manager'), null,
@@ -67,7 +75,7 @@ reset request.jwt.claims;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"b1111111-1111-1111-1111-111111111111","role":"authenticated"}';
 
-select ok(authz.reaches_module('support'), 'ops_manager reaches the support module');
+select ok(authz.reaches_module('messaging'), 'ops_manager reaches the messaging module');
 
 select is(
   (select count(*)::int from public.support_ticket),
@@ -75,16 +83,26 @@ select is(
   'and sees the ticket'
 );
 
-select lives_ok(
+/*
+ * Replying here used to work and now must not.
+ *
+ * Tickets became conversations (20260101016900) and this table
+ * is read-only history. Left writable it would be a second
+ * place a reply can land, and a reply on a ticket whose
+ * transcript now lives in a conversation is a divergence
+ * nobody notices until somebody quotes the wrong one.
+ */
+select throws_matching(
   $$select public.rpc_support_ticket_reply(
       (select id from public.support_ticket limit 1), 'We are calling the rider now.')$$,
-  'and can reply to it'
+  'conversations now',
+  'the old reply path is closed, and says where to go instead'
 );
 
 select is(
   (select status::text from public.support_ticket limit 1),
-  'answered',
-  'which moves the ticket on'
+  'open',
+  'and the ticket is untouched by the attempt'
 );
 
 reset role;
@@ -95,7 +113,8 @@ reset request.jwt.claims;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"b2222222-2222-2222-2222-222222222222","role":"authenticated"}';
 
-select ok(not authz.reaches_module('support'), 'finance does not reach the support module');
+select ok(not authz.reaches_module('messaging'),
+  'finance does not reach the messaging module — they are escalated into a conversation, not given the inbox');
 
 select is(
   (select count(*)::int from public.support_ticket),

@@ -30841,6 +30841,7 @@ export type Database = {
           title: string;
         }[];
       };
+      fn_msg_absorb_legacy: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_msg_route: {
         Args: {
           p_city: string;
@@ -34548,6 +34549,17 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_withdraw_featured: { Args: { p_booking_id: string }; Returns: Json };
+      rpc_msg_contact: {
+        Args: {
+          p_body: string;
+          p_city_slug?: string;
+          p_consent?: boolean;
+          p_contact: string;
+          p_name: string;
+          p_topic: Database['public']['Enums']['msg_topic'];
+        };
+        Returns: Json;
+      };
       rpc_msg_escalate: {
         Args: {
           p_conversation: string;

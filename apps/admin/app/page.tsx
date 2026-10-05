@@ -37,7 +37,7 @@ export default async function OverviewPage({
   const staff = await requireStaff();
   const supabase = createClient();
 
-  const reachesSupport = staff.modules.some((m) => m.key === 'support');
+  const reachesSupport = staff.modules.some((m) => m.key === 'messaging');
 
   const staleBefore = new Date(Date.now() - STALE_DAYS * 86_400_000).toISOString();
   const pendingStatuses = ['applied', 'documents_pending', 'under_review'];
@@ -89,11 +89,16 @@ export default async function OverviewPage({
    * open the desk — a row telling somebody about work they are not allowed
    * to see is a leak with a link on it.
    */
+  /* Conversations, not tickets. Tickets folded into Messaging
+     (20260101016900) and the old table no longer receives
+     anything — counting it would have shown a permanent zero,
+     which reads as a quiet desk rather than a stale query. */
   const openTickets = reachesSupport
     ? await supabase
-        .from('support_ticket')
+        .from('msg_conversation')
         .select('created_at', { count: 'exact' })
-        .eq('status', 'open')
+        .eq('kind', 'external')
+        .in('status', ['open', 'waiting_on_us', 'escalated'])
         .order('created_at', { ascending: true })
         .limit(1)
     : { count: 0, data: [] as { created_at: string }[] };
@@ -164,12 +169,12 @@ export default async function OverviewPage({
     const hours = oldest ? Math.floor((Date.now() - new Date(oldest).getTime()) / 3_600_000) : null;
     queue.push({
       icon: <MessageSquare className="h-4 w-4" />,
-      title: `${openTickets.count} support ticket${openTickets.count === 1 ? '' : 's'} nobody has picked up`,
+      title: `${openTickets.count} conversation${openTickets.count === 1 ? '' : 's'} nobody has picked up`,
       detail:
         hours === null
-          ? 'Logged from the Help page'
-          : `Logged from the Help page · oldest waiting ${hours < 1 ? 'under an hour' : hours < 24 ? `${hours} h` : `${Math.floor(hours / 24)} d`}`,
-      href: '/support',
+          ? 'From the website, the apps and WhatsApp'
+          : `From the website, the apps and WhatsApp · oldest waiting ${hours < 1 ? 'under an hour' : hours < 24 ? `${hours} h` : `${Math.floor(hours / 24)} d`}`,
+      href: '/messaging?tab=inbox&chip=unassigned',
       cta: 'Open the desk',
     });
   }
