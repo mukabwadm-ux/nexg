@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { activateRider, rejectDocument, verifyDocument } from '@/app/riders/actions';
-import { remindToUpload } from '@/app/documents/actions';
+import { fileDocumentFor, remindToUpload } from '@/app/documents/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
@@ -161,6 +161,11 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
                     'use server';
                     return remindToUpload('rider', params.id, kind);
                   }}
+                  onFiled={async (input) => {
+                    'use server';
+                    return fileDocumentFor('rider', params.id, input);
+                  }}
+                  storagePrefix={`rider/${params.id}`}
                 />
               </div>
             </div>

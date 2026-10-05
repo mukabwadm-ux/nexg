@@ -12,7 +12,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(33);
+select plan(38);
 
 create temp table t_ids (k text primary key, v bigint);
 
@@ -438,6 +438,45 @@ select is(
 select ok(
   pg_get_viewdef('public.featured_live_v'::regclass) not like '%cr.id IS NOT NULL%',
   'An approved creative is no longer required — charging somebody and then not showing them is a bug, not a policy.');
+
+
+-- ═══════════════════════════════ the pitch, honestly
+
+/*
+ * The upsell email. What it must never do is quote a number nobody
+ * agreed — so an unpriced placement is absent from the pitch rather
+ * than rendered as a dash, and a city with no published rate card
+ * cannot be pitched at all.
+ */
+select is(
+  (select count(*)::int from public.featured_pitch_v where price_per_week is null),
+  0,
+  'Nothing unpriced reaches the pitch — a dash is not a price and an invented one gets invoiced.');
+
+select ok(
+  (select count(*) from public.featured_pitch_v) > 0,
+  'And there is something to pitch where a rate card is published.');
+
+select throws_ok(
+  format($$ select public.rpc_featured_send_pitch(%L) $$,
+    (select id from public.merchant where status <> 'live' limit 1)),
+  null,
+  'Somebody who is not trading yet is not pitched — it is a promise we cannot keep.');
+
+select is(
+  (public.fn_render_featured_pitch(
+     jsonb_build_object('name','A','city','B','category','restaurant',
+       'slots', jsonb_build_array(jsonb_build_object(
+         'what_it_is','First in restaurant','price_per_week', 9500,
+         'weeks_open', 8, 'earliest_week', '2026-10-05')))) ->> 'body')
+    like '%KES 9,500 a week%',
+  true,
+  'The rendered email carries the real price, formatted for a person.');
+
+select is(
+  (public.fn_render_featured_pitch('{}'::jsonb) ->> 'body') like '%null%',
+  false,
+  'And an empty payload never prints the word null at a merchant.');
 
 select * from finish();
 rollback;

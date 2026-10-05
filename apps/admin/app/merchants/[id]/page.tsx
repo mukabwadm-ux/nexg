@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { goLive, rejectDocument, verifyDocument } from '@/app/merchants/actions';
-import { remindToUpload } from '@/app/documents/actions';
-import { unfeatureMerchant } from '@/app/featured/actions';
+import { fileDocumentFor, remindToUpload } from '@/app/documents/actions';
+import { sendFeaturedPitch, unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { DocumentReview, type ReviewDocument } from '@/components/document-review';
 import { FeaturedNow } from '@/components/featured/place-merchant';
+import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
@@ -37,6 +38,14 @@ export default async function MerchantApplicationPage({ params }: { params: { id
     .maybeSingle();
 
   if (!merchant) notFound();
+
+  /* After the null check, so `merchant` is actually narrowed. Only
+     worth pitching to somebody who is trading and not already in a
+     slot. */
+  const { data: pitch } =
+    merchant.status === 'live' && !featuredPlacement
+      ? await supabase.rpc('rpc_featured_pitch_preview', { p_merchant_id: params.id })
+      : { data: null };
 
   const [
     { data: requirements },
@@ -197,6 +206,11 @@ export default async function MerchantApplicationPage({ params }: { params: { id
                     'use server';
                     return remindToUpload('merchant', params.id, kind);
                   }}
+                  onFiled={async (input) => {
+                    'use server';
+                    return fileDocumentFor('merchant', params.id, input);
+                  }}
+                  storagePrefix={`merchant/${params.id}`}
                 />
               </div>
             </div>
@@ -271,6 +285,18 @@ export default async function MerchantApplicationPage({ params }: { params: { id
               one and until when — and selling a new one happens where
               those three things can be chosen.
             */}
+            {merchant.status === 'live' && !featuredPlacement && (
+              <PitchPanel
+                merchantName={merchant.trading_name ?? merchant.legal_name ?? 'them'}
+                preview={(pitch as Preview | null) ?? null}
+                onSend={async (note) => {
+                  'use server';
+                  const r = await sendFeaturedPitch(params.id, note);
+                  return { ok: r.ok, message: r.message ?? '' };
+                }}
+              />
+            )}
+
             <FeaturedNow
               merchantName={merchant.trading_name ?? merchant.legal_name ?? 'this merchant'}
               placement={

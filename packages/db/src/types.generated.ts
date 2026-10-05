@@ -5667,6 +5667,7 @@ export type Database = {
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
           quality: Json | null;
+          received_via: string | null;
           rejection_reason: string | null;
           requirement_id: string;
           reviewed_at: string | null;
@@ -5677,6 +5678,7 @@ export type Database = {
           storage_path: string;
           superseded_at: string | null;
           updated_at: string;
+          uploaded_by_staff_id: string | null;
           version: number;
         };
         Insert: {
@@ -5689,6 +5691,7 @@ export type Database = {
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
           quality?: Json | null;
+          received_via?: string | null;
           rejection_reason?: string | null;
           requirement_id: string;
           reviewed_at?: string | null;
@@ -5699,6 +5702,7 @@ export type Database = {
           storage_path: string;
           superseded_at?: string | null;
           updated_at?: string;
+          uploaded_by_staff_id?: string | null;
           version?: number;
         };
         Update: {
@@ -5711,6 +5715,7 @@ export type Database = {
           owner_id?: string;
           owner_type?: Database['public']['Enums']['document_owner_type'];
           quality?: Json | null;
+          received_via?: string | null;
           rejection_reason?: string | null;
           requirement_id?: string;
           reviewed_at?: string | null;
@@ -5721,6 +5726,7 @@ export type Database = {
           storage_path?: string;
           superseded_at?: string | null;
           updated_at?: string;
+          uploaded_by_staff_id?: string | null;
           version?: number;
         };
         Relationships: [
@@ -5734,6 +5740,13 @@ export type Database = {
           {
             foreignKeyName: 'document_reviewed_by_fkey';
             columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'document_uploaded_by_staff_id_fkey';
+            columns: ['uploaded_by_staff_id'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
@@ -20995,6 +21008,69 @@ export type Database = {
           },
         ];
       };
+      featured_pitch_v: {
+        Row: {
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          city_name: string | null;
+          earliest_week: string | null;
+          kind: Database['public']['Enums']['placement_kind'] | null;
+          price_per_week: number | null;
+          weeks_open: number | null;
+          what_it_is: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
       fees_display_v: {
         Row: {
           cash_handling: number | null;
@@ -23563,6 +23639,7 @@ export type Database = {
       };
       fn_qr_new_code: { Args: Record<PropertyKey, never>; Returns: string };
       fn_qr_scan_partition: { Args: { p_month: string }; Returns: string };
+      fn_render_featured_pitch: { Args: { p_payload: Json }; Returns: Json };
       fn_review_checks: { Args: { p_body: string; p_plan_id: string }; Returns: Json };
       fn_rider_cash_cap: { Args: { p_rider_id: string }; Returns: number };
       fn_rider_condition_matches: {
@@ -24849,6 +24926,7 @@ export type Database = {
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
           quality: Json | null;
+          received_via: string | null;
           rejection_reason: string | null;
           requirement_id: string;
           reviewed_at: string | null;
@@ -24859,6 +24937,7 @@ export type Database = {
           storage_path: string;
           superseded_at: string | null;
           updated_at: string;
+          uploaded_by_staff_id: string | null;
           version: number;
         };
         SetofOptions: {
@@ -24901,6 +24980,19 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_document_upload_for: {
+        Args: {
+          p_expires_at?: string;
+          p_mime: string;
+          p_owner_id: string;
+          p_owner_type: Database['public']['Enums']['document_owner_type'];
+          p_received_via?: string;
+          p_requirement_kind: string;
+          p_size_bytes: number;
+          p_storage_path: string;
+        };
+        Returns: Json;
+      };
       rpc_document_verify: {
         Args: { p_document_id: string };
         Returns: {
@@ -24913,6 +25005,7 @@ export type Database = {
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
           quality: Json | null;
+          received_via: string | null;
           rejection_reason: string | null;
           requirement_id: string;
           reviewed_at: string | null;
@@ -24923,6 +25016,7 @@ export type Database = {
           storage_path: string;
           superseded_at: string | null;
           updated_at: string;
+          uploaded_by_staff_id: string | null;
           version: number;
         };
         SetofOptions: {
@@ -25360,6 +25454,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_featured_pitch_preview: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_featured_place_merchant: {
         Args: {
           p_merchant_id: string;
@@ -25562,6 +25657,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_featured_send_pitch: { Args: { p_merchant_id: string; p_note?: string }; Returns: Json };
       rpc_folio_desk_action: {
         Args: { p_action: string; p_folio_ref?: string; p_note?: string; p_posting_id: string };
         Returns: {

@@ -82,3 +82,20 @@ export async function unfeatureMerchant(
   revalidatePath('/featured');
   return { ok: true, message: (data as { message?: string } | null)?.message };
 }
+
+/** Send the merchant the featured-slot pitch, with the real prices. */
+export async function sendFeaturedPitch(
+  merchantId: string,
+  note: string,
+): Promise<PlaceOutcome> {
+  const { data, error } = await createClient().rpc('rpc_featured_send_pitch', {
+    p_merchant_id: merchantId,
+    p_note: note || undefined,
+  });
+
+  const bad = fail(error);
+  if (bad) return bad;
+
+  revalidatePath('/merchants');
+  return { ok: true, message: (data as { message?: string } | null)?.message };
+}

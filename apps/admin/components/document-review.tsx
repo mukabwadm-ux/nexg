@@ -5,6 +5,8 @@ import { ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
+import { createClient } from '@/lib/supabase/client';
+
 export interface ReviewDocument {
   id: string | null;
   kind: string;
@@ -55,12 +57,24 @@ export function DocumentReview({
   onVerify,
   onReject,
   onRemind,
+  onFiled,
+  storagePrefix,
 }: {
   documents: ReviewDocument[];
   onVerify: (documentId: string) => Promise<{ ok: boolean; message: string }>;
   onReject: (documentId: string, reason: string) => Promise<{ ok: boolean; message: string }>;
   /** Chase a document that has not arrived. */
   onRemind: (kind: string) => Promise<{ ok: boolean; message: string }>;
+  /** Record a file a reviewer uploaded on somebody's behalf. */
+  onFiled: (input: {
+    kind: string;
+    storagePath: string;
+    mime: string;
+    sizeBytes: number;
+    receivedVia: string;
+  }) => Promise<{ ok: boolean; message: string }>;
+  /** Where files for this applicant live: `{ownerType}/{ownerId}`. */
+  storagePrefix: string;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -219,6 +233,15 @@ export function DocumentReview({
                     {chase?.last_sent_at ? 'Remind again' : 'Remind them to upload'}
                   </Button>
 
+                  <FileOnTheirBehalf
+                    kind={document.kind}
+                    label={document.label}
+                    storagePrefix={storagePrefix}
+                    disabled={isBusy}
+                    onFiled={onFiled}
+                    onDone={() => router.refresh()}
+                  />
+
                   {chase?.last_sent_at && (
                     <span className="text-muted-light text-[0.6875rem] font-semibold">
                       {chase.by_applicant
@@ -307,4 +330,131 @@ function shortTime(iso: string): string {
     minute: '2-digit',
     timeZone: 'Africa/Nairobi',
   });
+}
+
+/**
+ * Putting a file on record that arrived some other way.
+ *
+ * Plenty of merchants email their permit rather than using the
+ * upload step, and until now the only answer was to ask somebody
+ * who had already sent it to send it again.
+ *
+ * The file goes to storage from the browser rather than through a
+ * server action: a scan of a permit is routinely several megabytes
+ * and a server action body is not the place for it. The row is then
+ * recorded by an RPC, which is what checks the path and attributes
+ * the upload — the storage write alone would be a file nobody knows
+ * about.
+ */
+function FileOnTheirBehalf({
+  kind,
+  label,
+  storagePrefix,
+  disabled,
+  onFiled,
+  onDone,
+}: {
+  kind: string;
+  label: string;
+  storagePrefix: string;
+  disabled: boolean;
+  onFiled: (input: {
+    kind: string;
+    storagePath: string;
+    mime: string;
+    sizeBytes: number;
+    receivedVia: string;
+  }) => Promise<{ ok: boolean; message: string }>;
+  onDone: () => void;
+}) {
+  const { toast } = useToast();
+  const [busy, setBusy] = React.useState(false);
+  const [via, setVia] = React.useState('email');
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const id = React.useId();
+
+  const upload = async (file: File) => {
+    /* Twenty megabytes. A photograph of a permit is under five; a
+       file larger than this is somebody's whole scanner output and
+       will not open on a phone anyway. */
+    if (file.size > 20 * 1024 * 1024) {
+      toast({
+        title: 'Too big',
+        description: 'That file is over 20 MB. A photo of the document is usually under five.',
+        tone: 'danger',
+      });
+      return;
+    }
+
+    setBusy(true);
+    const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+    /* Timestamped, so filing a replacement never overwrites the file
+       the old row still points at. */
+    const path = `${storagePrefix}/${kind}-${Date.now()}.${extension}`;
+
+    const { error } = await createClient()
+      .storage.from('partner-documents')
+      .upload(path, file, { contentType: file.type || 'application/octet-stream' });
+
+    if (error) {
+      setBusy(false);
+      toast({ title: 'Could not upload', description: error.message, tone: 'danger' });
+      return;
+    }
+
+    const result = await onFiled({
+      kind,
+      storagePath: path,
+      mime: file.type || 'application/octet-stream',
+      sizeBytes: file.size,
+      receivedVia: via,
+    });
+
+    setBusy(false);
+    if (inputRef.current) inputRef.current.value = '';
+    toast({
+      title: result.ok ? 'On file' : 'Not recorded',
+      description: result.message,
+      tone: result.ok ? 'success' : 'danger',
+    });
+    if (result.ok) onDone();
+  };
+
+  return (
+    <span className="inline-flex items-center gap-2">
+      <input
+        ref={inputRef}
+        id={id}
+        type="file"
+        accept="image/*,application/pdf"
+        className="sr-only"
+        aria-label={`Upload ${label} on their behalf`}
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) void upload(file);
+        }}
+      />
+      <Button
+        variant="outline"
+        size="sm"
+        loading={busy}
+        disabled={disabled || busy}
+        onClick={() => inputRef.current?.click()}
+      >
+        Upload for them
+      </Button>
+      <select
+        aria-label="How it reached us"
+        value={via}
+        disabled={busy}
+        onChange={(event) => setVia(event.target.value)}
+        className="border-border text-muted rounded-lg border bg-white px-2 py-1 text-[0.6875rem] font-semibold"
+      >
+        <option value="email">by email</option>
+        <option value="whatsapp">on WhatsApp</option>
+        <option value="in_person">in person</option>
+        <option value="post">by post</option>
+      </select>
+    </span>
+  );
 }

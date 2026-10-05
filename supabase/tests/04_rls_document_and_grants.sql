@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(14);
+select plan(17);
 
 -- The seed places demo partners in Nairobi. Clear partner data so the counts
 -- below describe this test's own fixtures. The file rolls back at the end, so
@@ -181,6 +181,34 @@ select is(
      and policyname not like '%own%'),
   0,
   'Nothing but the applicant may insert a chase directly; a reviewer goes through the RPC.');
+
+
+-- ════════════ a document that arrived some other way
+
+/*
+ * Staff filing a document on somebody's behalf. The thing that
+ * matters is that it stays a different fact from one the applicant
+ * uploaded — otherwise nobody can later tell who put a licence on
+ * file.
+ */
+select ok(
+  (select count(*) from information_schema.columns
+   where table_schema = 'public' and table_name = 'document'
+     and column_name in ('uploaded_by_staff_id', 'received_via')) = 2,
+  'A filed document records who filed it and how it reached us.');
+
+select ok(
+  exists (select 1 from pg_policies
+          where schemaname = 'storage' and tablename = 'objects'
+            and policyname = 'partner_documents_staff_insert'),
+  'Staff can write to the bucket they could already read from.');
+
+select throws_ok(
+  format($$ select public.rpc_document_upload_for('merchant', %L, 'business_permit',
+            'somewhere/else/permit.pdf', 'application/pdf', 1000) $$,
+    (select id from public.merchant limit 1)),
+  null,
+  'A file outside the owner''s own folder is refused — nobody would be able to open it later.');
 
 select * from finish();
 rollback;
