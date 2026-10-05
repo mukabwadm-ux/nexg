@@ -3304,6 +3304,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'approval_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'approval_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'approval_request_decided_by_fkey';
             columns: ['decided_by'];
             isOneToOne: false;
@@ -3348,6 +3362,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'auto_message_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'auto_message_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -3912,6 +3940,20 @@ export type Database = {
             isOneToOne: true;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'cash_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: true;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'cash_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: true;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'cash_rule_updated_by_fkey';
@@ -4557,44 +4599,86 @@ export type Database = {
       city: {
         Row: {
           centre: unknown;
+          city_manager_id: string | null;
           country: string;
           created_at: string;
           currency: string;
+          hours: Json | null;
           id: string;
+          late_night_from: string | null;
+          launched_at: string | null;
+          max_radius_km: number | null;
           name: string;
           slug: string;
           sort: number;
           status: Database['public']['Enums']['city_status'];
+          status_changed_at: string | null;
+          status_changed_by: string | null;
+          status_reason: string | null;
+          template_id: string | null;
           timezone: string;
           updated_at: string;
         };
         Insert: {
           centre?: unknown;
+          city_manager_id?: string | null;
           country: string;
           created_at?: string;
           currency: string;
+          hours?: Json | null;
           id?: string;
+          late_night_from?: string | null;
+          launched_at?: string | null;
+          max_radius_km?: number | null;
           name: string;
           slug: string;
           sort?: number;
           status?: Database['public']['Enums']['city_status'];
+          status_changed_at?: string | null;
+          status_changed_by?: string | null;
+          status_reason?: string | null;
+          template_id?: string | null;
           timezone: string;
           updated_at?: string;
         };
         Update: {
           centre?: unknown;
+          city_manager_id?: string | null;
           country?: string;
           created_at?: string;
           currency?: string;
+          hours?: Json | null;
           id?: string;
+          late_night_from?: string | null;
+          launched_at?: string | null;
+          max_radius_km?: number | null;
           name?: string;
           slug?: string;
           sort?: number;
           status?: Database['public']['Enums']['city_status'];
+          status_changed_at?: string | null;
+          status_changed_by?: string | null;
+          status_reason?: string | null;
+          template_id?: string | null;
           timezone?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'city_city_manager_id_fkey';
+            columns: ['city_manager_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'city_status_changed_by_fkey';
+            columns: ['status_changed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       city_hours_exception: {
         Row: {
@@ -4634,6 +4718,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'city_hours_exception_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'city_hours_exception_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -4745,6 +4843,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'concierge_shift_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'concierge_shift_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'concierge_shift_staff_user_id_fkey';
             columns: ['staff_user_id'];
             isOneToOne: false;
@@ -4839,6 +4951,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'coverage_gap_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'coverage_gap_zone_id_fkey';
             columns: ['zone_id'];
             isOneToOne: false;
@@ -4913,6 +5039,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -5627,6 +5767,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'event_published_by_fkey';
             columns: ['published_by'];
             isOneToOne: false;
@@ -5703,6 +5857,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_feed_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_feed_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -5815,6 +5983,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'experience_component_partner_id_fkey';
             columns: ['partner_id'];
             isOneToOne: false;
@@ -5905,6 +6087,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'experience_partner_merchant_id_fkey';
@@ -6096,6 +6292,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'featured_booking_discount_approved_by_fkey';
@@ -6911,6 +7121,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'featured_placement_created_by_fkey';
             columns: ['created_by'];
             isOneToOne: false;
@@ -6988,6 +7212,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'featured_rate_card_second_approver_id_fkey';
@@ -7716,6 +7954,71 @@ export type Database = {
           },
         ];
       };
+      holiday_calendar: {
+        Row: {
+          city_id: string | null;
+          country: string | null;
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          id: string;
+          label: string;
+          prompt_merchants_days_before: number;
+          source: string;
+        };
+        Insert: {
+          city_id?: string | null;
+          country?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          date: string;
+          id?: string;
+          label: string;
+          prompt_merchants_days_before?: number;
+          source?: string;
+        };
+        Update: {
+          city_id?: string | null;
+          country?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          id?: string;
+          label?: string;
+          prompt_merchants_days_before?: number;
+          source?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'holiday_calendar_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'holiday_calendar_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'holiday_calendar_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'holiday_calendar_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       host: {
         Row: {
           areas: string[];
@@ -7823,6 +8126,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'host_verified_by_fkey';
@@ -8147,6 +8464,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'hotel_owner_staff_id_fkey';
@@ -8942,6 +9273,61 @@ export type Database = {
           },
         ];
       };
+      integration: {
+        Row: {
+          blocks: string[];
+          config: NonNullable<Json>;
+          enabled: boolean;
+          health: NonNullable<Json>;
+          key: string;
+          key_rotated_at: string | null;
+          label: string;
+          last_checked_at: string | null;
+          notes: string | null;
+          provider: string | null;
+          rotation_days: number;
+          secret_refs: string[];
+          sort: number;
+          status: string;
+          updated_at: string;
+          fn_integration_rotation_due: boolean | null;
+        };
+        Insert: {
+          blocks?: string[];
+          config?: NonNullable<Json>;
+          enabled?: boolean;
+          health?: NonNullable<Json>;
+          key: string;
+          key_rotated_at?: string | null;
+          label: string;
+          last_checked_at?: string | null;
+          notes?: string | null;
+          provider?: string | null;
+          rotation_days?: number;
+          secret_refs?: string[];
+          sort?: number;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          blocks?: string[];
+          config?: NonNullable<Json>;
+          enabled?: boolean;
+          health?: NonNullable<Json>;
+          key?: string;
+          key_rotated_at?: string | null;
+          label?: string;
+          last_checked_at?: string | null;
+          notes?: string | null;
+          provider?: string | null;
+          rotation_days?: number;
+          secret_refs?: string[];
+          sort?: number;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       job_application: {
         Row: {
           city_id: string | null;
@@ -8986,6 +9372,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'job_application_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'job_application_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -9119,6 +9519,79 @@ export type Database = {
             columns: ['rider_id'];
             isOneToOne: false;
             referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      legal_document: {
+        Row: {
+          approved_at: string | null;
+          approved_by: string | null;
+          changelog: string | null;
+          created_at: string;
+          created_by: string | null;
+          effective_from: string | null;
+          id: string;
+          key: string;
+          markdown: string | null;
+          pdf_path: string | null;
+          requires_reacceptance_by: string | null;
+          second_approver_id: string | null;
+          status: string;
+          version: number;
+        };
+        Insert: {
+          approved_at?: string | null;
+          approved_by?: string | null;
+          changelog?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          effective_from?: string | null;
+          id?: string;
+          key: string;
+          markdown?: string | null;
+          pdf_path?: string | null;
+          requires_reacceptance_by?: string | null;
+          second_approver_id?: string | null;
+          status?: string;
+          version: number;
+        };
+        Update: {
+          approved_at?: string | null;
+          approved_by?: string | null;
+          changelog?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          effective_from?: string | null;
+          id?: string;
+          key?: string;
+          markdown?: string | null;
+          pdf_path?: string | null;
+          requires_reacceptance_by?: string | null;
+          second_approver_id?: string | null;
+          status?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'legal_document_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_document_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_document_second_approver_id_fkey';
+            columns: ['second_approver_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
         ];
@@ -9398,6 +9871,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
@@ -11108,6 +11595,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'onboarding_slot_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'onboarding_slot_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       package_order: {
@@ -11273,6 +11774,103 @@ export type Database = {
           },
         ];
       };
+      payment_method: {
+        Row: {
+          checkout_order: number;
+          config_ref: string | null;
+          disabled_at: string | null;
+          disabled_by: string | null;
+          disabled_reason: string | null;
+          enabled: boolean;
+          health: NonNullable<Json>;
+          key: string;
+          label: string;
+          limits: NonNullable<Json>;
+          note: string | null;
+          provider: string | null;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          checkout_order?: number;
+          config_ref?: string | null;
+          disabled_at?: string | null;
+          disabled_by?: string | null;
+          disabled_reason?: string | null;
+          enabled?: boolean;
+          health?: NonNullable<Json>;
+          key: string;
+          label: string;
+          limits?: NonNullable<Json>;
+          note?: string | null;
+          provider?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          checkout_order?: number;
+          config_ref?: string | null;
+          disabled_at?: string | null;
+          disabled_by?: string | null;
+          disabled_reason?: string | null;
+          enabled?: boolean;
+          health?: NonNullable<Json>;
+          key?: string;
+          label?: string;
+          limits?: NonNullable<Json>;
+          note?: string | null;
+          provider?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payment_method_disabled_by_fkey';
+            columns: ['disabled_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      payout_rail: {
+        Row: {
+          config_ref: string | null;
+          float_alert_amount: number | null;
+          note: string | null;
+          party: string;
+          rail: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          config_ref?: string | null;
+          float_alert_amount?: number | null;
+          note?: string | null;
+          party: string;
+          rail: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          config_ref?: string | null;
+          float_alert_amount?: number | null;
+          note?: string | null;
+          party?: string;
+          rail?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payout_rail_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       plan: {
         Row: {
           answers: NonNullable<Json>;
@@ -11413,6 +12011,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'plan_concierge_id_fkey';
@@ -11839,6 +12451,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'property_host_id_fkey';
             columns: ['host_id'];
             isOneToOne: false;
@@ -11950,6 +12576,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'property_qr_generated_by_fkey';
@@ -13366,6 +14006,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
@@ -13679,6 +14333,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_bonus_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_bonus_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'rider_bonus_rule_created_by_fkey';
@@ -14256,6 +14924,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'rider_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'rider_rate_card_second_approver_id_fkey';
             columns: ['second_approver_id'];
             isOneToOne: false;
@@ -14675,6 +15357,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'rider_settlement_run_second_approver_id_fkey';
@@ -15137,6 +15833,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'role_grant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'role_grant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'role_grant_granted_by_fkey';
             columns: ['granted_by'];
             isOneToOne: false;
@@ -15185,57 +15895,6 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'role';
             referencedColumns: ['key'];
-          },
-        ];
-      };
-      setting: {
-        Row: {
-          approved_by: string | null;
-          city_id: string | null;
-          created_at: string;
-          effective_from: string;
-          id: string;
-          key: string;
-          scope: Database['public']['Enums']['setting_scope'];
-          updated_at: string;
-          value: Json | null;
-        };
-        Insert: {
-          approved_by?: string | null;
-          city_id?: string | null;
-          created_at?: string;
-          effective_from?: string;
-          id?: string;
-          key: string;
-          scope?: Database['public']['Enums']['setting_scope'];
-          updated_at?: string;
-          value?: Json | null;
-        };
-        Update: {
-          approved_by?: string | null;
-          city_id?: string | null;
-          created_at?: string;
-          effective_from?: string;
-          id?: string;
-          key?: string;
-          scope?: Database['public']['Enums']['setting_scope'];
-          updated_at?: string;
-          value?: Json | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'setting_approved_by_fkey';
-            columns: ['approved_by'];
-            isOneToOne: false;
-            referencedRelation: 'staff_user';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'setting_city_id_fkey';
-            columns: ['city_id'];
-            isOneToOne: false;
-            referencedRelation: 'city';
-            referencedColumns: ['id'];
           },
         ];
       };
@@ -15459,6 +16118,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -15728,6 +16401,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'support_ticket_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'support_ticket_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       translation: {
@@ -15934,6 +16621,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'unit_host_id_fkey';
             columns: ['host_id'];
             isOneToOne: false;
@@ -16023,6 +16724,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'waitlist_signup_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'waitlist_signup_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       welcome_package: {
@@ -16077,6 +16792,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'welcome_package_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
@@ -16126,12 +16855,15 @@ export type Database = {
           city_id: string;
           cod_allowed: boolean;
           created_at: string;
+          delivery_band: number | null;
           eta_max: number;
           eta_min: number;
           id: string;
           name: string;
           polygon: unknown;
           tier: Database['public']['Enums']['zone_tier'];
+          trial_reviewed_at: string | null;
+          trial_started_at: string | null;
           updated_at: string;
         };
         Insert: {
@@ -16139,12 +16871,15 @@ export type Database = {
           city_id: string;
           cod_allowed?: boolean;
           created_at?: string;
+          delivery_band?: number | null;
           eta_max: number;
           eta_min: number;
           id?: string;
           name: string;
           polygon: unknown;
           tier: Database['public']['Enums']['zone_tier'];
+          trial_reviewed_at?: string | null;
+          trial_started_at?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -16152,12 +16887,15 @@ export type Database = {
           city_id?: string;
           cod_allowed?: boolean;
           created_at?: string;
+          delivery_band?: number | null;
           eta_max?: number;
           eta_min?: number;
           id?: string;
           name?: string;
           polygon?: unknown;
           tier?: Database['public']['Enums']['zone_tier'];
+          trial_reviewed_at?: string | null;
+          trial_started_at?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -16167,6 +16905,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -16254,6 +17006,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       careers_jobs_v: {
@@ -16282,6 +17048,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -16327,6 +17107,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -16410,6 +17204,45 @@ export type Database = {
         };
         Relationships: [];
       };
+      city_public_v: {
+        Row: {
+          country: string | null;
+          currency: string | null;
+          hours: Json | null;
+          id: string | null;
+          name: string | null;
+          slug: string | null;
+          sort: number | null;
+          status: Database['public']['Enums']['city_status'] | null;
+          timezone: string | null;
+          zones: number | null;
+        };
+        Insert: {
+          country?: string | null;
+          currency?: string | null;
+          hours?: Json | null;
+          id?: string | null;
+          name?: string | null;
+          slug?: string | null;
+          sort?: number | null;
+          status?: Database['public']['Enums']['city_status'] | null;
+          timezone?: string | null;
+          zones?: never;
+        };
+        Update: {
+          country?: string | null;
+          currency?: string | null;
+          hours?: Json | null;
+          id?: string | null;
+          name?: string | null;
+          slug?: string | null;
+          sort?: number | null;
+          status?: Database['public']['Enums']['city_status'] | null;
+          timezone?: string | null;
+          zones?: never;
+        };
+        Relationships: [];
+      };
       component_public: {
         Row: {
           booking_lead_hours: number | null;
@@ -16445,6 +17278,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'experience_component_zone_id_fkey';
@@ -16592,6 +17439,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       console_featured_performance_v: {
@@ -16625,6 +17486,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
@@ -16715,6 +17590,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
@@ -16779,6 +17668,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'featured_slot_week_booking_id_fkey';
@@ -17019,6 +17922,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       console_hotel_directory_v: {
@@ -17052,6 +17969,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -17154,6 +18085,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'property_host_id_fkey';
@@ -17330,6 +18275,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
@@ -17409,6 +18368,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       curated_day_public: {
@@ -17433,6 +18406,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -17517,6 +18504,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
@@ -17589,6 +18590,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -17669,7 +18684,69 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
+      };
+      fees_display_v: {
+        Row: {
+          cash_handling: number | null;
+          city_id: string | null;
+          city_slug: string | null;
+          concierge_flat: number | null;
+          currency: string | null;
+          delivery_band_1: number | null;
+          delivery_band_2: number | null;
+          delivery_band_3: number | null;
+          late_night_from: string | null;
+          night_surcharge: number | null;
+          service_pct: number | null;
+          small_basket_fee: number | null;
+          small_basket_threshold: number | null;
+        };
+        Insert: {
+          cash_handling?: never;
+          city_id?: string | null;
+          city_slug?: string | null;
+          concierge_flat?: never;
+          currency?: string | null;
+          delivery_band_1?: never;
+          delivery_band_2?: never;
+          delivery_band_3?: never;
+          late_night_from?: string | null;
+          night_surcharge?: never;
+          service_pct?: never;
+          small_basket_fee?: never;
+          small_basket_threshold?: never;
+        };
+        Update: {
+          cash_handling?: never;
+          city_id?: string | null;
+          city_slug?: string | null;
+          concierge_flat?: never;
+          currency?: string | null;
+          delivery_band_1?: never;
+          delivery_band_2?: never;
+          delivery_band_3?: never;
+          late_night_from?: string | null;
+          night_surcharge?: never;
+          service_pct?: never;
+          small_basket_fee?: never;
+          small_basket_threshold?: never;
+        };
+        Relationships: [];
       };
       finance_merchant_v: {
         Row: {
@@ -17694,6 +18771,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
@@ -17792,6 +18883,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
@@ -18007,6 +19112,90 @@ export type Database = {
         };
         Relationships: [];
       };
+      integration_v: {
+        Row: {
+          blocks: string[] | null;
+          config: Json | null;
+          enabled: boolean | null;
+          health: Json | null;
+          key: string | null;
+          key_rotated_at: string | null;
+          label: string | null;
+          last_checked_at: string | null;
+          notes: string | null;
+          provider: string | null;
+          rotation_days: number | null;
+          rotation_due: boolean | null;
+          rotation_due_on: string | null;
+          secrets: number | null;
+          sort: number | null;
+          status: string | null;
+        };
+        Insert: {
+          blocks?: string[] | null;
+          config?: Json | null;
+          enabled?: boolean | null;
+          health?: Json | null;
+          key?: string | null;
+          key_rotated_at?: string | null;
+          label?: string | null;
+          last_checked_at?: string | null;
+          notes?: string | null;
+          provider?: string | null;
+          rotation_days?: number | null;
+          rotation_due?: never;
+          rotation_due_on?: never;
+          secrets?: never;
+          sort?: number | null;
+          status?: string | null;
+        };
+        Update: {
+          blocks?: string[] | null;
+          config?: Json | null;
+          enabled?: boolean | null;
+          health?: Json | null;
+          key?: string | null;
+          key_rotated_at?: string | null;
+          label?: string | null;
+          last_checked_at?: string | null;
+          notes?: string | null;
+          provider?: string | null;
+          rotation_days?: number | null;
+          rotation_due?: never;
+          rotation_due_on?: never;
+          secrets?: never;
+          sort?: number | null;
+          status?: string | null;
+        };
+        Relationships: [];
+      };
+      legal_public_v: {
+        Row: {
+          effective_from: string | null;
+          key: string | null;
+          markdown: string | null;
+          pdf_path: string | null;
+          requires_reacceptance_by: string | null;
+          version: number | null;
+        };
+        Insert: {
+          effective_from?: string | null;
+          key?: string | null;
+          markdown?: string | null;
+          pdf_path?: string | null;
+          requires_reacceptance_by?: string | null;
+          version?: number | null;
+        };
+        Update: {
+          effective_from?: string | null;
+          key?: string | null;
+          markdown?: string | null;
+          pdf_path?: string | null;
+          requires_reacceptance_by?: string | null;
+          version?: number | null;
+        };
+        Relationships: [];
+      };
       merchant_dashboard_v: {
         Row: {
           accepting_orders: boolean | null;
@@ -18117,6 +19306,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
@@ -18357,6 +19560,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'property_qr_host_id_fkey';
             columns: ['host_id'];
             isOneToOne: false;
@@ -18452,6 +19669,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       property_unit_public: {
@@ -18522,6 +19753,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
           {
             foreignKeyName: 'property_qr_host_id_fkey';
@@ -18679,6 +19924,20 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       rider_handoff_v: {
@@ -18777,6 +20036,85 @@ export type Database = {
             referencedRelation: 'city';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      setting: {
+        Row: {
+          approved_by: string | null;
+          city_id: string | null;
+          created_at: string | null;
+          effective_from: string | null;
+          id: string | null;
+          key: string | null;
+          scope: Database['public']['Enums']['setting_scope'] | null;
+          updated_at: string | null;
+          value: Json | null;
+        };
+        Insert: {
+          approved_by?: string | null;
+          city_id?: string | null;
+          created_at?: string | null;
+          effective_from?: string | null;
+          id?: string | null;
+          key?: string | null;
+          scope?: never;
+          updated_at?: never;
+          value?: Json | null;
+        };
+        Update: {
+          approved_by?: string | null;
+          city_id?: string | null;
+          created_at?: string | null;
+          effective_from?: string | null;
+          id?: string | null;
+          key?: string | null;
+          scope?: never;
+          updated_at?: never;
+          value?: Json | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'version_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       unit_context_v: {
@@ -18805,6 +20143,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -18855,6 +20207,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'city';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
           },
         ];
       };
@@ -18988,6 +20354,10 @@ export type Database = {
       fn_folio_escalation_sweep: { Args: Record<PropertyKey, never>; Returns: number };
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
+      fn_integration_rotation_due: {
+        Args: { i: Database['public']['Tables']['integration']['Row'] };
+        Returns: boolean;
+      };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
       fn_match_deposit: {
@@ -22817,89 +24187,15 @@ export type Database = {
         };
       };
       rpc_qr_card: { Args: { p_code: string }; Returns: Json };
-      rpc_qr_generate:
-        | {
-            Args: {
-              p_owner_id: string;
-              p_owner_type: Database['public']['Enums']['qr_owner_type'];
-              p_placement?: Database['public']['Enums']['qr_placement'];
-            };
-            Returns: Json;
-          }
-        | {
-            Args: { p_room_id?: string; p_unit_id?: string };
-            Returns: {
-              batch_id: string | null;
-              city_id: string | null;
-              code: string;
-              first_scanned_at: string | null;
-              generated_at: string;
-              generated_by: string | null;
-              host_id: string | null;
-              hotel_id: string | null;
-              id: string;
-              label: string | null;
-              last_scanned_at: string | null;
-              orders: number;
-              owner_id: string;
-              owner_type: Database['public']['Enums']['qr_owner_type'];
-              placed_confirmed_at: string | null;
-              placement: Database['public']['Enums']['qr_placement'];
-              placement_photo_path: string | null;
-              replaced_by: string | null;
-              scans: number;
-              secret_hash: string;
-              sent_at: string | null;
-              sent_channel: string | null;
-              state: Database['public']['Enums']['qr_state'];
-              void_reason: string | null;
-              voided_at: string | null;
-            };
-            SetofOptions: {
-              from: '*';
-              to: 'property_qr';
-              isOneToOne: true;
-              isSetofReturn: false;
-            };
-          };
-      rpc_qr_mark_placed:
-        | {
-            Args: { p_qr_id: string };
-            Returns: {
-              batch_id: string | null;
-              city_id: string | null;
-              code: string;
-              first_scanned_at: string | null;
-              generated_at: string;
-              generated_by: string | null;
-              host_id: string | null;
-              hotel_id: string | null;
-              id: string;
-              label: string | null;
-              last_scanned_at: string | null;
-              orders: number;
-              owner_id: string;
-              owner_type: Database['public']['Enums']['qr_owner_type'];
-              placed_confirmed_at: string | null;
-              placement: Database['public']['Enums']['qr_placement'];
-              placement_photo_path: string | null;
-              replaced_by: string | null;
-              scans: number;
-              secret_hash: string;
-              sent_at: string | null;
-              sent_channel: string | null;
-              state: Database['public']['Enums']['qr_state'];
-              void_reason: string | null;
-              voided_at: string | null;
-            };
-            SetofOptions: {
-              from: '*';
-              to: 'property_qr';
-              isOneToOne: true;
-              isSetofReturn: false;
-            };
-          }
-        | { Args: { p_photo_path?: string; p_qr_id: string }; Returns: Json };
+      rpc_qr_generate: {
+        Args: {
+          p_owner_id: string;
+          p_owner_type: Database['public']['Enums']['qr_owner_type'];
+          p_placement?: Database['public']['Enums']['qr_placement'];
+        };
+        Returns: Json;
+      };
+      rpc_qr_mark_placed: { Args: { p_photo_path?: string; p_qr_id: string }; Returns: Json };
       rpc_qr_pack_build: {
         Args: {
           p_format?: string;
@@ -24370,7 +25666,8 @@ export type Database = {
         | 'guest_block'
         | 'featured_rate_card'
         | 'featured_refund'
-        | 'featured_eligibility_override';
+        | 'featured_eligibility_override'
+        | 'settings_change';
       approval_status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
       audit_severity: 'info' | 'notice' | 'high';
       block_kind: 'activity' | 'meal' | 'venue' | 'transport' | 'stay' | 'event' | 'free';
@@ -24395,7 +25692,7 @@ export type Database = {
         | 'write_off'
         | 'manual_adjustment'
         | 'recovery_payment';
-      city_status: 'live' | 'soft_launch' | 'waitlist';
+      city_status: 'live' | 'soft_launch' | 'waitlist' | 'paused';
       commission_tier_code: 'T1' | 'T2' | 'T3';
       creative_status: 'draft' | 'pending_review' | 'approved' | 'rejected' | 'archived';
       data_request_kind: 'access' | 'erasure' | 'rectification' | 'restriction';
@@ -24736,6 +26033,1061 @@ export type Database = {
       [_ in never]: never;
     };
   };
+  settings: {
+    Tables: {
+      approval_policy: {
+        Row: {
+          group: string | null;
+          id: string;
+          key: string | null;
+          notify_roles: string[];
+          pair: string;
+          threshold: NonNullable<Json>;
+        };
+        Insert: {
+          group?: string | null;
+          id?: string;
+          key?: string | null;
+          notify_roles?: string[];
+          pair: string;
+          threshold?: NonNullable<Json>;
+        };
+        Update: {
+          group?: string | null;
+          id?: string;
+          key?: string | null;
+          notify_roles?: string[];
+          pair?: string;
+          threshold?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'approval_policy_key_fkey';
+            columns: ['key'];
+            isOneToOne: false;
+            referencedRelation: 'console_definition_v';
+            referencedColumns: ['key'];
+          },
+          {
+            foreignKeyName: 'approval_policy_key_fkey';
+            columns: ['key'];
+            isOneToOne: false;
+            referencedRelation: 'definition';
+            referencedColumns: ['key'];
+          },
+        ];
+      };
+      change_set: {
+        Row: {
+          applied_at: string | null;
+          approval_request_id: string | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          cancelled_at: string | null;
+          city_id: string | null;
+          created_at: string;
+          diff: NonNullable<Json>;
+          effective_from: string | null;
+          group: string;
+          id: string;
+          immediate: boolean;
+          impact: NonNullable<Json>;
+          reason: string | null;
+          rejected_reason: string | null;
+          requested_at: string | null;
+          requested_by: string | null;
+          status: Database['settings']['Enums']['change_status'];
+          title: string;
+        };
+        Insert: {
+          applied_at?: string | null;
+          approval_request_id?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          cancelled_at?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          diff?: NonNullable<Json>;
+          effective_from?: string | null;
+          group: string;
+          id?: string;
+          immediate?: boolean;
+          impact?: NonNullable<Json>;
+          reason?: string | null;
+          rejected_reason?: string | null;
+          requested_at?: string | null;
+          requested_by?: string | null;
+          status?: Database['settings']['Enums']['change_status'];
+          title: string;
+        };
+        Update: {
+          applied_at?: string | null;
+          approval_request_id?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          cancelled_at?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          diff?: NonNullable<Json>;
+          effective_from?: string | null;
+          group?: string;
+          id?: string;
+          immediate?: boolean;
+          impact?: NonNullable<Json>;
+          reason?: string | null;
+          rejected_reason?: string | null;
+          requested_at?: string | null;
+          requested_by?: string | null;
+          status?: Database['settings']['Enums']['change_status'];
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settlement_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      city_template: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          name: string;
+          snapshot: NonNullable<Json>;
+          source_city_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name: string;
+          snapshot?: NonNullable<Json>;
+          source_city_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name?: string;
+          snapshot?: NonNullable<Json>;
+          source_city_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'city_template_source_city_id_fkey';
+            columns: ['source_city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'city_template_source_city_id_fkey';
+            columns: ['source_city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'city_template_source_city_id_fkey';
+            columns: ['source_city_id'];
+            isOneToOne: false;
+            referencedRelation: 'pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'city_template_source_city_id_fkey';
+            columns: ['source_city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settlement_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      consent_text: {
+        Row: {
+          approved_at: string | null;
+          approved_by: string | null;
+          body: string;
+          created_at: string;
+          id: string;
+          kind: string;
+          lang: string;
+          status: string;
+          surface: string;
+          version: number;
+        };
+        Insert: {
+          approved_at?: string | null;
+          approved_by?: string | null;
+          body: string;
+          created_at?: string;
+          id?: string;
+          kind: string;
+          lang?: string;
+          status?: string;
+          surface: string;
+          version?: number;
+        };
+        Update: {
+          approved_at?: string | null;
+          approved_by?: string | null;
+          body?: string;
+          created_at?: string;
+          id?: string;
+          kind?: string;
+          lang?: string;
+          status?: string;
+          surface?: string;
+          version?: number;
+        };
+        Relationships: [];
+      };
+      definition: {
+        Row: {
+          approval_pair: string;
+          can_be_immediate: boolean;
+          constraints: NonNullable<Json>;
+          default_value: Json | null;
+          deprecated_at: string | null;
+          group: string;
+          help: string | null;
+          key: string;
+          label: string;
+          reader_modules: string[];
+          scope_kind: Database['settings']['Enums']['scope_kind'];
+          sensitive: boolean;
+          sort: number;
+          unit: string | null;
+          value_type: Database['settings']['Enums']['value_type'];
+        };
+        Insert: {
+          approval_pair?: string;
+          can_be_immediate?: boolean;
+          constraints?: NonNullable<Json>;
+          default_value?: Json | null;
+          deprecated_at?: string | null;
+          group: string;
+          help?: string | null;
+          key: string;
+          label: string;
+          reader_modules?: string[];
+          scope_kind: Database['settings']['Enums']['scope_kind'];
+          sensitive?: boolean;
+          sort?: number;
+          unit?: string | null;
+          value_type: Database['settings']['Enums']['value_type'];
+        };
+        Update: {
+          approval_pair?: string;
+          can_be_immediate?: boolean;
+          constraints?: NonNullable<Json>;
+          default_value?: Json | null;
+          deprecated_at?: string | null;
+          group?: string;
+          help?: string | null;
+          key?: string;
+          label?: string;
+          reader_modules?: string[];
+          scope_kind?: Database['settings']['Enums']['scope_kind'];
+          sensitive?: boolean;
+          sort?: number;
+          unit?: string | null;
+          value_type?: Database['settings']['Enums']['value_type'];
+        };
+        Relationships: [];
+      };
+      notification_rule: {
+        Row: {
+          active: boolean;
+          audience: string;
+          bypass_quiet_hours: boolean;
+          channels: string[];
+          event: string;
+          language_fallback: string;
+          notify_roles: string[];
+          quiet_hours: NonNullable<Json>;
+          retry: NonNullable<Json>;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          active?: boolean;
+          audience: string;
+          bypass_quiet_hours?: boolean;
+          channels?: string[];
+          event: string;
+          language_fallback?: string;
+          notify_roles?: string[];
+          quiet_hours?: NonNullable<Json>;
+          retry?: NonNullable<Json>;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          active?: boolean;
+          audience?: string;
+          bypass_quiet_hours?: boolean;
+          channels?: string[];
+          event?: string;
+          language_fallback?: string;
+          notify_roles?: string[];
+          quiet_hours?: NonNullable<Json>;
+          retry?: NonNullable<Json>;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [];
+      };
+      snapshot_daily: {
+        Row: {
+          city_id: string;
+          day: string;
+          resolved: NonNullable<Json>;
+          written_at: string;
+        };
+        Insert: {
+          city_id: string;
+          day: string;
+          resolved: NonNullable<Json>;
+          written_at?: string;
+        };
+        Update: {
+          city_id?: string;
+          day?: string;
+          resolved?: NonNullable<Json>;
+          written_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'snapshot_daily_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'snapshot_daily_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'snapshot_daily_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'snapshot_daily_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settlement_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      version: {
+        Row: {
+          activated_at: string | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          change_set_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          effective_from: string;
+          id: string;
+          immediate: boolean;
+          key: string;
+          reason: string | null;
+          rolled_back_from: string | null;
+          scope_category: string | null;
+          scope_city_id: string | null;
+          scope_kind: Database['settings']['Enums']['scope_kind'];
+          scope_zone_id: string | null;
+          status: Database['settings']['Enums']['version_status'];
+          superseded_at: string | null;
+          superseded_by: string | null;
+          value: Json | null;
+        };
+        Insert: {
+          activated_at?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          change_set_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          effective_from?: string;
+          id?: string;
+          immediate?: boolean;
+          key: string;
+          reason?: string | null;
+          rolled_back_from?: string | null;
+          scope_category?: string | null;
+          scope_city_id?: string | null;
+          scope_kind: Database['settings']['Enums']['scope_kind'];
+          scope_zone_id?: string | null;
+          status?: Database['settings']['Enums']['version_status'];
+          superseded_at?: string | null;
+          superseded_by?: string | null;
+          value?: Json | null;
+        };
+        Update: {
+          activated_at?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          change_set_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          effective_from?: string;
+          id?: string;
+          immediate?: boolean;
+          key?: string;
+          reason?: string | null;
+          rolled_back_from?: string | null;
+          scope_category?: string | null;
+          scope_city_id?: string | null;
+          scope_kind?: Database['settings']['Enums']['scope_kind'];
+          scope_zone_id?: string | null;
+          status?: Database['settings']['Enums']['version_status'];
+          superseded_at?: string | null;
+          superseded_by?: string | null;
+          value?: Json | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'version_change_set_fk';
+            columns: ['change_set_id'];
+            isOneToOne: false;
+            referencedRelation: 'change_set';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'version_change_set_fk';
+            columns: ['change_set_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_scheduled_v';
+            referencedColumns: ['change_set_id'];
+          },
+          {
+            foreignKeyName: 'version_key_fkey';
+            columns: ['key'];
+            isOneToOne: false;
+            referencedRelation: 'console_definition_v';
+            referencedColumns: ['key'];
+          },
+          {
+            foreignKeyName: 'version_key_fkey';
+            columns: ['key'];
+            isOneToOne: false;
+            referencedRelation: 'definition';
+            referencedColumns: ['key'];
+          },
+          {
+            foreignKeyName: 'version_rolled_back_from_fkey';
+            columns: ['rolled_back_from'];
+            isOneToOne: false;
+            referencedRelation: 'version';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['scope_city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['scope_city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['scope_city_id'];
+            isOneToOne: false;
+            referencedRelation: 'pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['scope_city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_zone_id_fkey';
+            columns: ['scope_zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone_v';
+            referencedColumns: ['zone_id'];
+          },
+          {
+            foreignKeyName: 'version_superseded_by_fkey';
+            columns: ['superseded_by'];
+            isOneToOne: false;
+            referencedRelation: 'version';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+    };
+    Views: {
+      city_v: {
+        Row: {
+          city_id: string | null;
+          city_manager_id: string | null;
+          currency: string | null;
+          holiday_calendar: string | null;
+          hours: Json | null;
+          languages: Json | null;
+          late_night_from: string | null;
+          launched_at: string | null;
+          max_radius_km: number | null;
+          name: string | null;
+          order_cutoff_min: number | null;
+          outside_zone_behaviour: string | null;
+          slug: string | null;
+          status: Database['public']['Enums']['city_status'] | null;
+          template_id: string | null;
+          timezone: string | null;
+          zones: number | null;
+          zones_active: number | null;
+          zones_trial: number | null;
+        };
+        Insert: {
+          city_id?: string | null;
+          city_manager_id?: string | null;
+          currency?: string | null;
+          holiday_calendar?: never;
+          hours?: Json | null;
+          languages?: never;
+          late_night_from?: string | null;
+          launched_at?: string | null;
+          max_radius_km?: number | null;
+          name?: string | null;
+          order_cutoff_min?: never;
+          outside_zone_behaviour?: never;
+          slug?: string | null;
+          status?: Database['public']['Enums']['city_status'] | null;
+          template_id?: string | null;
+          timezone?: string | null;
+          zones?: never;
+          zones_active?: never;
+          zones_trial?: never;
+        };
+        Update: {
+          city_id?: string | null;
+          city_manager_id?: string | null;
+          currency?: string | null;
+          holiday_calendar?: never;
+          hours?: Json | null;
+          languages?: never;
+          late_night_from?: string | null;
+          launched_at?: string | null;
+          max_radius_km?: number | null;
+          name?: string | null;
+          order_cutoff_min?: never;
+          outside_zone_behaviour?: never;
+          slug?: string | null;
+          status?: Database['public']['Enums']['city_status'] | null;
+          template_id?: string | null;
+          timezone?: string | null;
+          zones?: never;
+          zones_active?: never;
+          zones_trial?: never;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'city_template_id_fkey';
+            columns: ['template_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_template';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      console_definition_v: {
+        Row: {
+          approval_pair: string | null;
+          can_be_immediate: boolean | null;
+          constraints: Json | null;
+          default_value: Json | null;
+          deprecated_at: string | null;
+          effective_pair: string | null;
+          group: string | null;
+          help: string | null;
+          key: string | null;
+          label: string | null;
+          reader_modules: string[] | null;
+          scope_kind: Database['settings']['Enums']['scope_kind'] | null;
+          sensitive: boolean | null;
+          sort: number | null;
+          unit: string | null;
+          value_type: Database['settings']['Enums']['value_type'] | null;
+        };
+        Relationships: [];
+      };
+      console_scheduled_v: {
+        Row: {
+          approved_at: string | null;
+          approved_by: string | null;
+          approved_by_name: string | null;
+          change_set_id: string | null;
+          changes: number | null;
+          city_id: string | null;
+          city_name: string | null;
+          diff: Json | null;
+          effective_from: string | null;
+          group: string | null;
+          immediate: boolean | null;
+          impact: Json | null;
+          reason: string | null;
+          requested_at: string | null;
+          requested_by: string | null;
+          requested_by_name: string | null;
+          status: Database['settings']['Enums']['change_status'] | null;
+          title: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settlement_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      dispatch_v: {
+        Row: {
+          accept_window_s: number | null;
+          boost_fee: number | null;
+          city_id: string | null;
+          escalate_min: number | null;
+          max_radius_km: number | null;
+          radius_increment_km: number | null;
+          rider_cash_cap: number | null;
+          rounds_before_boost: number | null;
+          search_radius_km: number | null;
+          selection: string | null;
+          stacking: boolean | null;
+        };
+        Insert: {
+          accept_window_s?: never;
+          boost_fee?: never;
+          city_id?: string | null;
+          escalate_min?: never;
+          max_radius_km?: number | null;
+          radius_increment_km?: never;
+          rider_cash_cap?: never;
+          rounds_before_boost?: never;
+          search_radius_km?: never;
+          selection?: never;
+          stacking?: never;
+        };
+        Update: {
+          accept_window_s?: never;
+          boost_fee?: never;
+          city_id?: string | null;
+          escalate_min?: never;
+          max_radius_km?: number | null;
+          radius_increment_km?: never;
+          rider_cash_cap?: never;
+          rounds_before_boost?: never;
+          search_radius_km?: never;
+          selection?: never;
+          stacking?: never;
+        };
+        Relationships: [];
+      };
+      integrations_v: {
+        Row: {
+          blocks: string[] | null;
+          config: Json | null;
+          enabled: boolean | null;
+          health: Json | null;
+          key: string | null;
+          key_rotated_at: string | null;
+          label: string | null;
+          last_checked_at: string | null;
+          notes: string | null;
+          provider: string | null;
+          rotation_days: number | null;
+          rotation_due: boolean | null;
+          rotation_due_on: string | null;
+          secrets: number | null;
+          sort: number | null;
+          status: string | null;
+        };
+        Insert: {
+          blocks?: string[] | null;
+          config?: Json | null;
+          enabled?: boolean | null;
+          health?: Json | null;
+          key?: string | null;
+          key_rotated_at?: string | null;
+          label?: string | null;
+          last_checked_at?: string | null;
+          notes?: string | null;
+          provider?: string | null;
+          rotation_days?: number | null;
+          rotation_due?: never;
+          rotation_due_on?: never;
+          secrets?: never;
+          sort?: number | null;
+          status?: string | null;
+        };
+        Update: {
+          blocks?: string[] | null;
+          config?: Json | null;
+          enabled?: boolean | null;
+          health?: Json | null;
+          key?: string | null;
+          key_rotated_at?: string | null;
+          label?: string | null;
+          last_checked_at?: string | null;
+          notes?: string | null;
+          provider?: string | null;
+          rotation_days?: number | null;
+          rotation_due?: never;
+          rotation_due_on?: never;
+          secrets?: never;
+          sort?: number | null;
+          status?: string | null;
+        };
+        Relationships: [];
+      };
+      legal_v: {
+        Row: {
+          approved_at: string | null;
+          approved_by_name: string | null;
+          changelog: string | null;
+          effective_from: string | null;
+          key: string | null;
+          pdf_path: string | null;
+          requires_reacceptance_by: string | null;
+          second_approver_name: string | null;
+          status: string | null;
+          version: number | null;
+        };
+        Relationships: [];
+      };
+      payments_v: {
+        Row: {
+          callbacks_failed: number | null;
+          checkout_order: number | null;
+          disabled_reason: string | null;
+          enabled: boolean | null;
+          health: Json | null;
+          key: string | null;
+          label: string | null;
+          limits: Json | null;
+          note: string | null;
+          provider: string | null;
+          status: string | null;
+          success_24h_pct: number | null;
+        };
+        Insert: {
+          callbacks_failed?: never;
+          checkout_order?: number | null;
+          disabled_reason?: string | null;
+          enabled?: boolean | null;
+          health?: Json | null;
+          key?: string | null;
+          label?: string | null;
+          limits?: Json | null;
+          note?: string | null;
+          provider?: string | null;
+          status?: string | null;
+          success_24h_pct?: never;
+        };
+        Update: {
+          callbacks_failed?: never;
+          checkout_order?: number | null;
+          disabled_reason?: string | null;
+          enabled?: boolean | null;
+          health?: Json | null;
+          key?: string | null;
+          label?: string | null;
+          limits?: Json | null;
+          note?: string | null;
+          provider?: string | null;
+          status?: string | null;
+          success_24h_pct?: never;
+        };
+        Relationships: [];
+      };
+      pricing_v: {
+        Row: {
+          cash_handling: number | null;
+          category: string | null;
+          city_id: string | null;
+          commission_pct: number | null;
+          concierge_flat: number | null;
+          delivery_band_1: number | null;
+          delivery_band_2: number | null;
+          delivery_band_3: number | null;
+          featured_eligible: boolean | null;
+          host_credit_rule: string | null;
+          min_order: number | null;
+          night_surcharge: number | null;
+          note: string | null;
+          service_pct: number | null;
+          small_basket_fee: number | null;
+          small_basket_threshold: number | null;
+        };
+        Relationships: [];
+      };
+      settlement_v: {
+        Row: {
+          approvals: string | null;
+          city_id: string | null;
+          cutoff: string | null;
+          cycle: string | null;
+          instant_cashout: boolean | null;
+        };
+        Insert: {
+          approvals?: never;
+          city_id?: string | null;
+          cutoff?: never;
+          cycle?: never;
+          instant_cashout?: never;
+        };
+        Update: {
+          approvals?: never;
+          city_id?: string | null;
+          cutoff?: never;
+          cycle?: never;
+          instant_cashout?: never;
+        };
+        Relationships: [];
+      };
+      zone_v: {
+        Row: {
+          city_id: string | null;
+          cod_allowed: boolean | null;
+          delivery_band: number | null;
+          enabled: boolean | null;
+          eta_max: number | null;
+          eta_min: number | null;
+          name: string | null;
+          polygon: unknown;
+          tier: Database['public']['Enums']['zone_tier'] | null;
+          trial_review_due: boolean | null;
+          trial_reviewed_at: string | null;
+          trial_started_at: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          city_id?: string | null;
+          cod_allowed?: boolean | null;
+          delivery_band?: number | null;
+          enabled?: boolean | null;
+          eta_max?: number | null;
+          eta_min?: number | null;
+          name?: string | null;
+          polygon?: unknown;
+          tier?: Database['public']['Enums']['zone_tier'] | null;
+          trial_review_due?: never;
+          trial_reviewed_at?: string | null;
+          trial_started_at?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          city_id?: string | null;
+          cod_allowed?: boolean | null;
+          delivery_band?: number | null;
+          enabled?: boolean | null;
+          eta_max?: number | null;
+          eta_min?: number | null;
+          name?: string | null;
+          polygon?: unknown;
+          tier?: Database['public']['Enums']['zone_tier'] | null;
+          trial_review_due?: never;
+          trial_reviewed_at?: string | null;
+          trial_started_at?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settlement_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+    };
+    Functions: {
+      cron_activate: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_snapshot: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_bool: {
+        Args: { p_category?: string; p_city_id?: string; p_key: string };
+        Returns: boolean;
+      };
+      fn_get: {
+        Args: {
+          p_at?: string;
+          p_category?: string;
+          p_city_id?: string;
+          p_key: string;
+          p_scope_kind?: Database['settings']['Enums']['scope_kind'];
+          p_zone_id?: string;
+        };
+        Returns: Json;
+      };
+      fn_impact: { Args: { p_category: string; p_city_id: string; p_key: string }; Returns: Json };
+      fn_int: { Args: { p_category?: string; p_city_id?: string; p_key: string }; Returns: number };
+      fn_may_edit: { Args: { p_group: string }; Returns: boolean };
+      fn_num: { Args: { p_category?: string; p_city_id?: string; p_key: string }; Returns: number };
+      fn_pair_roles: { Args: { p_pair: string }; Returns: string[] };
+      fn_required_pair: { Args: { p_change_set: string }; Returns: string };
+      fn_resolve_all: { Args: { p_at?: string; p_city_id: string }; Returns: Json };
+      fn_text: {
+        Args: { p_category?: string; p_city_id?: string; p_key: string };
+        Returns: string;
+      };
+      fn_value: {
+        Args: { p_at?: string; p_category?: string; p_city_id?: string; p_key: string };
+        Returns: Json;
+      };
+      rpc_change_set_approve: { Args: { p_change_set: string }; Returns: Json };
+      rpc_change_set_discard: { Args: { p_change_set: string }; Returns: Json };
+      rpc_change_set_open: { Args: { p_city_id?: string; p_group: string }; Returns: Json };
+      rpc_change_set_put: {
+        Args: {
+          p_category?: string;
+          p_change_set: string;
+          p_city_id?: string;
+          p_key: string;
+          p_value: Json;
+          p_zone_id?: string;
+        };
+        Returns: Json;
+      };
+      rpc_change_set_reject: { Args: { p_change_set: string; p_reason: string }; Returns: Json };
+      rpc_change_set_submit: {
+        Args: {
+          p_change_set: string;
+          p_effective_from?: string;
+          p_immediate?: boolean;
+          p_reason?: string;
+        };
+        Returns: Json;
+      };
+      rpc_compare: {
+        Args: { p_city_a: string; p_city_b: string; p_group?: string };
+        Returns: Json;
+      };
+      rpc_rollback: { Args: { p_reason: string; p_version_id: string }; Returns: Json };
+    };
+    Enums: {
+      change_status:
+        | 'draft'
+        | 'awaiting_approval'
+        | 'approved'
+        | 'scheduled'
+        | 'applied'
+        | 'rejected'
+        | 'cancelled';
+      scope_kind: 'global' | 'city' | 'zone' | 'category' | 'city_category';
+      value_type:
+        | 'int'
+        | 'money'
+        | 'pct'
+        | 'bool'
+        | 'text'
+        | 'enum'
+        | 'json'
+        | 'time'
+        | 'duration'
+        | 'geojson';
+      version_status:
+        | 'draft'
+        | 'awaiting_approval'
+        | 'scheduled'
+        | 'active'
+        | 'superseded'
+        | 'rejected'
+        | 'rolled_back';
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
 };
 
 type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
@@ -24929,6 +27281,7 @@ export const Constants = {
         'featured_rate_card',
         'featured_refund',
         'featured_eligibility_override',
+        'settings_change',
       ],
       approval_status: ['pending', 'approved', 'rejected', 'withdrawn'],
       audit_severity: ['info', 'notice', 'high'],
@@ -24956,7 +27309,7 @@ export const Constants = {
         'manual_adjustment',
         'recovery_payment',
       ],
-      city_status: ['live', 'soft_launch', 'waitlist'],
+      city_status: ['live', 'soft_launch', 'waitlist', 'paused'],
       commission_tier_code: ['T1', 'T2', 'T3'],
       creative_status: ['draft', 'pending_review', 'approved', 'rejected', 'archived'],
       data_request_kind: ['access', 'erasure', 'rectification', 'restriction'],
@@ -25291,6 +27644,41 @@ export const Constants = {
       vehicle_ownership: ['own', 'rented', 'family'],
       vehicle_type: ['motorbike', 'bicycle', 'car', 'tuktuk'],
       zone_tier: ['core', 'extended', 'trial'],
+    },
+  },
+  settings: {
+    Enums: {
+      change_status: [
+        'draft',
+        'awaiting_approval',
+        'approved',
+        'scheduled',
+        'applied',
+        'rejected',
+        'cancelled',
+      ],
+      scope_kind: ['global', 'city', 'zone', 'category', 'city_category'],
+      value_type: [
+        'int',
+        'money',
+        'pct',
+        'bool',
+        'text',
+        'enum',
+        'json',
+        'time',
+        'duration',
+        'geojson',
+      ],
+      version_status: [
+        'draft',
+        'awaiting_approval',
+        'scheduled',
+        'active',
+        'superseded',
+        'rejected',
+        'rolled_back',
+      ],
     },
   },
 } as const;

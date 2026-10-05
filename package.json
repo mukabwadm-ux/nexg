@@ -21,7 +21,7 @@
     "db:status": "supabase status",
     "db:reset": "supabase db reset --local",
     "db:test": "supabase test db",
-    "db:types": "supabase gen types typescript --local --schema public,hr,audit > packages/db/src/types.generated.ts && prettier --write packages/db/src/types.generated.ts",
+    "db:types": "supabase gen types typescript --local --schema public,hr,audit,settings > packages/db/src/types.generated.ts && prettier --write packages/db/src/types.generated.ts",
     "db:lint": "supabase db lint --local --level warning"
   },
   "devDependencies": {
