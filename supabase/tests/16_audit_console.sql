@@ -162,11 +162,20 @@ select is(
   0,
   'Every action the earlier modules emit is in the registry.');
 
+/*
+ * Read from console_module rather than a list written here.
+ *
+ * The hardcoded version still named `support`, which folded
+ * into Messaging, and did not know `messaging` — so it failed
+ * on correct data and would have kept failing every time a
+ * module was added or renamed. A test that has to be edited
+ * whenever the thing it checks changes is a test that gets
+ * edited until it passes.
+ */
 select is(
-  (select count(*)::int from audit.action_registry
-   where module not in ('audit','careers','experiences','featured','finance',
-                        'hotels','live_ops','merchants','orders','overview',
-                        'riders','settings','staff','support')),
+  (select count(*)::int from audit.action_registry r
+    where not exists (
+      select 1 from public.console_module m where m.key = r.module)),
   0,
   'Every registered action maps to a module the console knows.');
 
