@@ -14,7 +14,28 @@ import QRCode from 'qrcode';
  * fridge.
  */
 
-export const QR_ORIGIN = 'https://nexgapp.com';
+/**
+ * Where a scanned card lands.
+ *
+ * This is the single most expensive constant in the codebase to get
+ * wrong, because a printed card cannot be changed. The first version
+ * hardcoded `nexgapp.com` — the canonical brand domain — and that
+ * domain is served by something else entirely, so every card
+ * generated pointed at a site that records nothing and the scans
+ * vanished with no error anywhere.
+ *
+ * It now comes from the environment, and the fallback is the origin
+ * this app is actually deployed at rather than the one it would like
+ * to own. Set NEXT_PUBLIC_QR_ORIGIN to the branded domain once
+ * `/q/*` on that domain reaches this application — and before any
+ * quantity of cards is printed, because after that it is a reprint
+ * rather than a config change.
+ */
+export const QR_ORIGIN = (
+  process.env.NEXT_PUBLIC_QR_ORIGIN ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  'https://nexg-sepia.vercel.app'
+).replace(/\/+$/, '');
 
 export function qrUrl(code: string): string {
   return `${QR_ORIGIN}/q/${code.toUpperCase()}`;

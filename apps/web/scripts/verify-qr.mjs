@@ -26,7 +26,13 @@ import { PNG } from 'pngjs';
 import QRCode from 'qrcode';
 
 const CODES = ['NXG-4B7K2Q', 'NXG-TMZ5KN', 'NXG-ZZZZZZ', 'NXG-23456789'.slice(0, 10)];
-const ORIGIN = 'https://nexgapp.com';
+/* The same origin the cards encode, so this verifies the real
+   string rather than one that was true when it was written. */
+const ORIGIN = (
+  process.env.NEXT_PUBLIC_QR_ORIGIN ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  'https://nexg-sepia.vercel.app'
+).replace(/\/+$/, '');
 
 function read(buffer) {
   const png = PNG.sync.read(buffer);

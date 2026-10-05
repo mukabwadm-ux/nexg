@@ -176,6 +176,23 @@ export function QrTab({
 
   return (
     <>
+      {/*
+        Where cards point. Worth saying out loud on this screen,
+        because a card encoding a domain that does not reach this
+        app fails in the one way nothing catches: the phone opens
+        something, no scan is recorded, no error is raised anywhere,
+        and the console is indistinguishable from a card nobody
+        picked up.
+      */}
+      <div className="bg-bg mt-5 rounded-xl p-3">
+        <p className="text-muted text-[0.75rem] font-semibold leading-[1.7]">
+          Cards generated now encode{' '}
+          <span className="font-mono font-extrabold">{webOrigin}/q/&#123;code&#125;</span>. Scan one
+          and check it lands here before printing any quantity — a printed card cannot be
+          repointed.
+        </p>
+      </div>
+
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Tile label="Scans · 7 days" value={n(s?.scans_7d)} hint={`${n(s?.sessions_7d)} different phones`} />
         <Tile
@@ -314,11 +331,32 @@ export function QrTab({
                   </div>
 
                   <p className="mt-1.5 text-[0.9375rem] font-extrabold">{c.label ?? DASH}</p>
+                  {/*
+                    The URL the card actually encodes. Shown because
+                    a card pointing at the wrong origin fails
+                    silently — the phone opens something, nothing is
+                    recorded, and the console looks identical to a
+                    card nobody scanned.
+                  */}
+                  <p className="text-muted-light mt-0.5 break-all font-mono text-[0.625rem] font-semibold">
+                    {webOrigin}/q/{c.code}
+                  </p>
 
                   <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <Stat label="Scans · 30 d" value={n(c.scans_30d)} />
-                    <Stat label="Phones" value={n(c.sessions_30d)} />
-                    <Stat label="Orders" value={n(c.orders_30d)} />
+                    {/*
+                      Lifetime first, and from the card's own counter
+                      rather than the daily roll-up: the roll-up
+                      rebuilds hourly, so a scan from two minutes ago
+                      reads as zero there — which is exactly what
+                      somebody checking a card they just scanned sees.
+                    */}
+                    <Stat
+                      label="Scans"
+                      value={n(c.scans_lifetime)}
+                      hint={`${n(c.scans_30d)} in the last 30 days`}
+                    />
+                    <Stat label="Phones · 30 d" value={n(c.sessions_30d)} />
+                    <Stat label="Orders" value={n(c.orders_lifetime)} />
                     <Stat
                       label="Converts at"
                       value={c.conversion_30d === null ? DASH : pct(c.conversion_30d)}
