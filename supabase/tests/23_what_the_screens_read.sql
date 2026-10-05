@@ -16,7 +16,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(25);
 
 create temp table t (k text primary key, v text);
 do $grant$
@@ -150,8 +150,9 @@ select set_config('request.jwt.claims',
   json_build_object('sub', (select v from t where k='staff'), 'role', 'authenticated')::text, true);
 
 select ok(
-  (public.rpc_fin_verify((select v::date from t where k='today'), null) ->> 'matches')::boolean,
-  'Verify agrees with a freshly built row.');
+  (public.rpc_fin_verify((select v::date from t where k='today'),
+                         (select v::date from t where k='today')) ->> 'matches')::boolean,
+  'Verify agrees with freshly built figures.');
 
 reset role;
 select lives_ok(
@@ -166,13 +167,22 @@ select set_config('request.jwt.claims',
   json_build_object('sub', (select v from t where k='staff'), 'role', 'authenticated')::text, true);
 
 select ok(
-  not (public.rpc_fin_verify((select v::date from t where k='today'), null) ->> 'matches')::boolean,
+  not (public.rpc_fin_verify((select v::date from t where k='today'),
+                             (select v::date from t where k='today')) ->> 'matches')::boolean,
   'And Verify stops agreeing — the screen is now behind and says so.');
 
 select matches(
-  public.rpc_fin_verify((select v::date from t where k='today'), null) ->> 'message',
+  public.rpc_fin_verify((select v::date from t where k='today'),
+                        (select v::date from t where k='today')) ->> 'message',
   'behind by',
   'It distinguishes being behind from being wrong, because those need different responses.');
+
+/* The range is capped so that the one request-time computation
+   in Finance cannot be turned into a slow one. */
+select throws_matching(
+  $$select public.rpc_fin_verify(current_date - 400, current_date)$$,
+  'at most 92 days',
+  'And it refuses a range large enough to be used as a denial of service.');
 
 -- ══════════════════════════════ 6. who may see any of this
 
