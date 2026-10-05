@@ -105,6 +105,9 @@ importers:
       '@nexg/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@nexg/location':
+        specifier: workspace:*
+        version: link:../../packages/location
       '@nexg/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -236,6 +239,37 @@ importers:
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@20.17.10)(jsdom@25.0.1)
+
+  packages/location:
+    dependencies:
+      lucide-react:
+        specifier: 0.469.0
+        version: 0.469.0(react@18.3.1)
+    devDependencies:
+      '@nexg/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: 18.3.17
+        version: 18.3.17
+      '@types/react-dom':
+        specifier: 18.3.5
+        version: 18.3.5(@types/react@18.3.17)
+      eslint:
+        specifier: 8.57.1
+        version: 8.57.1
+      react:
+        specifier: 18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: 18.3.1
+        version: 18.3.1(react@18.3.1)
+      rimraf:
+        specifier: 6.0.1
+        version: 6.0.1
+      typescript:
+        specifier: 5.7.2
+        version: 5.7.2
 
   packages/ui:
     dependencies:

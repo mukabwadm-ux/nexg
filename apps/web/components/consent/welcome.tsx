@@ -1,11 +1,11 @@
 'use client';
 
-import { Button, useToast } from '@nexg/ui';
-import { Globe, MapPin } from 'lucide-react';
+import { Button } from '@nexg/ui';
+import { Globe } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { markAsked, setLocale, setLocationFromCoords } from '@/app/consent-actions';
+import { markAsked, setLocale } from '@/app/consent-actions';
 import {
   isAuthored,
   localeName,
@@ -15,23 +15,20 @@ import {
 } from '@/lib/i18n/dictionaries';
 
 /**
- * The welcome card.
+ * The welcome card — language only.
  *
- * It asks for two things on the first visit, and it asks in our own
- * words before the browser asks in its.
+ * It used to ask for two things, location and language. Location
+ * has moved to the site-wide layer in `@nexg/location`, which
+ * owns the "Deliver to" chip in the header, the sheet and the
+ * confirmed pin. Two components asking the same question was one
+ * too many: they kept separate state, and a visitor could end up
+ * with a city cookie saying one thing and a delivery pin saying
+ * another.
  *
- * That ordering is the whole design. Firing navigator.geolocation on
- * page load shows a permission dialog with no explanation attached, and
- * browsers treat that as abuse: Chrome degrades or auto-blocks prompts
- * that arrive without a user gesture, and a denial is permanent — the
- * site cannot ask twice. So the browser's dialog only opens after
- * somebody has read what it is for and pressed Allow. Asking well is
- * what protects the ability to ask at all.
- *
- * The language half needs no browser permission: navigator.languages is
- * readable by any page. We ask anyway, because silently rewriting the
- * site into another language is startling, and because the answer is
- * the visitor's to give.
+ * What is left needs no browser permission at all —
+ * navigator.languages is readable by any page. We ask anyway,
+ * because silently rewriting the site into another language is
+ * startling, and because the answer is the visitor's to give.
  */
 export function WelcomeConsent({
   locale,
@@ -43,7 +40,6 @@ export function WelcomeConsent({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { toast } = useToast();
   const [visible, setVisible] = React.useState(false);
 
   /*
@@ -66,15 +62,7 @@ export function WelcomeConsent({
     locale: null,
   });
 
-  /*
-   * The language may change during this card's own lifetime — "Allow
-   * both" applies it and then reports where we placed them. Built from
-   * the applied locale rather than the prop, so the confirmation is not
-   * in English on a page that has just become Swahili.
-   */
-  const effective = preferred.locale ?? locale;
   const t = translator(locale);
-  const tAfter = translator(effective);
 
   React.useEffect(() => {
     const languages = navigator.languages?.length ? [...navigator.languages] : [navigator.language];
@@ -110,62 +98,14 @@ export function WelcomeConsent({
     return false;
   };
 
-  const allowBoth = async () => {
+  const accept = async () => {
     setBusy('both');
-    const changedLanguage = await applyLanguage();
-
-    if (!navigator.geolocation) {
-      await markAsked();
-      setBusy(null);
-      setVisible(false);
-      router.refresh();
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const result = await setLocationFromCoords(
-          position.coords.latitude,
-          position.coords.longitude,
-        );
-        setBusy(null);
-
-        /*
-         * A toast, not a line inside this card.
-         *
-         * Writing the cookie is what makes the result true, and it also
-         * re-renders the layout — which decides this card has had its
-         * answer and unmounts it. The confirmation was being destroyed by
-         * the very thing it was confirming. The toast lives above this
-         * component and survives that.
-         */
-        const live = result.city?.status === 'live' || result.city?.status === 'soft_launch';
-        toast({
-          title: tAfter('consent.title'),
-          description: result.city
-            ? live
-              ? tAfter('consent.located', { city: result.city.name })
-              : tAfter('consent.locatedWaitlist', { city: result.city.name })
-            : tAfter('consent.locatedFar'),
-          tone: result.city && live ? 'success' : undefined,
-        });
-
-        setVisible(false);
-        router.refresh();
-      },
-      async () => {
-        /* Denied, dismissed, or timed out — all the same to us, and none
-           of them is an error worth showing as one. */
-        await markAsked();
-        setBusy(null);
-        toast({ title: tAfter('consent.title'), description: tAfter('consent.denied') });
-        setVisible(false);
-        router.refresh();
-      },
-      { timeout: 12000, maximumAge: 600000 },
-    );
-
-    if (changedLanguage) router.refresh();
+    const changed = await applyLanguage();
+    await markAsked();
+    setBusy(null);
+    setVisible(false);
+    router.refresh();
+    if (changed) router.refresh();
   };
 
   const languageOnly = async () => {
@@ -196,23 +136,6 @@ export function WelcomeConsent({
               aria-hidden="true"
               className="bg-bg text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
             >
-              <MapPin className="h-4 w-4" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[0.875rem] font-extrabold">
-                {t('consent.location.title')}
-              </span>
-              <span className="text-muted-light block text-[0.8125rem] font-semibold leading-[1.7]">
-                {t('consent.location.body')}
-              </span>
-            </span>
-          </li>
-
-          <li className="flex items-start gap-3">
-            <span
-              aria-hidden="true"
-              className="bg-bg text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-            >
               <Globe className="h-4 w-4" />
             </span>
             <span className="min-w-0">
@@ -234,7 +157,7 @@ export function WelcomeConsent({
         </ul>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button loading={busy === 'both'} onClick={() => void allowBoth()}>
+          <Button loading={busy === 'both'} onClick={() => void accept()}>
             {t('consent.allow')}
           </Button>
           {preferred.locale && preferred.locale !== locale && (

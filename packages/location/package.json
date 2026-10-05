@@ -1,0 +1,33 @@
+{
+  "name": "@nexg/location",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./geolocation": "./src/geolocation.ts",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "echo \"@nexg/location is consumed as source via transpilePackages\"",
+    "lint": "eslint src --ext .ts,.tsx --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf .turbo node_modules"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "dependencies": {
+    "lucide-react": "0.469.0"
+  },
+  "devDependencies": {
+    "@nexg/config": "workspace:*",
+    "@types/react": "18.3.17",
+    "@types/react-dom": "18.3.5",
+    "eslint": "8.57.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "rimraf": "6.0.1",
+    "typescript": "5.7.2"
+  }
+}

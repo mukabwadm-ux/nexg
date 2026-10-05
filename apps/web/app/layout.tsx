@@ -1,10 +1,14 @@
 import '@nexg/ui/globals.css';
 
+import { LocationBanner, LocationSheet, type Place, type ResolutionStep } from '@nexg/location';
 import { ToastProvider } from '@nexg/ui';
 import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 
+import { cityFromConnection } from '@/app/location-actions';
 import { WelcomeConsent } from '@/components/consent/welcome';
+import { AfterLocationSettled } from '@/components/location/after-location';
+import { SiteLocationProvider } from '@/components/location/provider';
 import { canMachineTranslate, getLocale, hasBeenAsked } from '@/lib/i18n';
 
 /**
@@ -34,7 +38,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   /*
    * Read on the server, so the page arrives in the right language rather
    * than flashing English and then swapping. `lang` follows it, which is
@@ -43,15 +47,49 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const locale = getLocale();
   const asked = hasBeenAsked();
 
+  /*
+   * The last rung of the resolution ladder, walked on the server
+   * so the page arrives already pointed at a plausible city
+   * instead of resolving one after hydration and shifting under
+   * the reader.
+   *
+   * This is the only location work that happens without being
+   * asked for, and it is deliberately the weakest kind: an edge
+   * header, a city, labelled "from your connection" everywhere
+   * it appears, and never enough to lock a price. The browser's
+   * own location is not touched here or anywhere else on load —
+   * that happens inside a click, in one file, and a test fails
+   * the build if it ever happens anywhere else.
+   */
+  const fromConnection = await cityFromConnection();
+  const initial = fromConnection
+    ? { place: fromConnection.place as unknown as Place, step: 'ip_city' as ResolutionStep }
+    : null;
+
   return (
     <html lang={locale} className={manrope.variable}>
       <body className="bg-bg text-ink min-h-dvh font-sans">
         <ToastProvider>
-          {children}
-          {/* Rendered only when they have not answered, so a returning
-              visitor never sees it and nothing flickers on their screen
-              while the client works out whether to hide it. */}
-          {!asked && <WelcomeConsent locale={locale} canTranslate={canMachineTranslate()} />}
+          <SiteLocationProvider initial={initial}>
+            {/* Under the nav on every page, and only when there is
+                something honest to say about precision. */}
+            <LocationBanner />
+            {children}
+            {/* Once per visit, over a rendered page, on the first
+                page that needs a place. */}
+            <LocationSheet />
+
+            {/* Rendered only when they have not answered, so a returning
+                visitor never sees it and nothing flickers on their screen
+                while the client works out whether to hide it — and only
+                once the location question is settled, so the two first-visit
+                asks queue rather than stack. */}
+            {!asked && (
+              <AfterLocationSettled>
+                <WelcomeConsent locale={locale} canTranslate={canMachineTranslate()} />
+              </AfterLocationSettled>
+            )}
+          </SiteLocationProvider>
         </ToastProvider>
       </body>
     </html>

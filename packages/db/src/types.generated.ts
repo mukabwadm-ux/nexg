@@ -9341,6 +9341,33 @@ export type Database = {
           },
         ];
       };
+      geocode_cache: {
+        Row: {
+          address_line: string | null;
+          cell: string;
+          confidence: string | null;
+          hits: number;
+          looked_up_at: string;
+          plus_code: string | null;
+        };
+        Insert: {
+          address_line?: string | null;
+          cell: string;
+          confidence?: string | null;
+          hits?: number;
+          looked_up_at?: string;
+          plus_code?: string | null;
+        };
+        Update: {
+          address_line?: string | null;
+          cell?: string;
+          confidence?: string | null;
+          hits?: number;
+          looked_up_at?: string;
+          plus_code?: string | null;
+        };
+        Relationships: [];
+      };
       guest: {
         Row: {
           anonymised_at: string | null;
@@ -9507,6 +9534,128 @@ export type Database = {
             columns: ['guest_id'];
             isOneToOne: false;
             referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      guest_place: {
+        Row: {
+          accuracy_m: number | null;
+          address_line: string | null;
+          consent_state_at_capture: string | null;
+          coverage: string;
+          created_at: string;
+          device_id: string | null;
+          floor: string | null;
+          gate_no: string | null;
+          geocode_confidence: string | null;
+          guest_id: string;
+          id: string;
+          label: string;
+          landmark: string | null;
+          last_used_at: string | null;
+          plus_code: string | null;
+          point: unknown;
+          rider_phone: string | null;
+          source: string;
+          unit_no: string | null;
+          updated_at: string;
+          zone_id: string | null;
+        };
+        Insert: {
+          accuracy_m?: number | null;
+          address_line?: string | null;
+          consent_state_at_capture?: string | null;
+          coverage?: string;
+          created_at?: string;
+          device_id?: string | null;
+          floor?: string | null;
+          gate_no?: string | null;
+          geocode_confidence?: string | null;
+          guest_id: string;
+          id?: string;
+          label: string;
+          landmark?: string | null;
+          last_used_at?: string | null;
+          plus_code?: string | null;
+          point: unknown;
+          rider_phone?: string | null;
+          source: string;
+          unit_no?: string | null;
+          updated_at?: string;
+          zone_id?: string | null;
+        };
+        Update: {
+          accuracy_m?: number | null;
+          address_line?: string | null;
+          consent_state_at_capture?: string | null;
+          coverage?: string;
+          created_at?: string;
+          device_id?: string | null;
+          floor?: string | null;
+          gate_no?: string | null;
+          geocode_confidence?: string | null;
+          guest_id?: string;
+          id?: string;
+          label?: string;
+          landmark?: string | null;
+          last_used_at?: string | null;
+          plus_code?: string | null;
+          point?: unknown;
+          rider_phone?: string | null;
+          source?: string;
+          unit_no?: string | null;
+          updated_at?: string;
+          zone_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'guest_place_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'guest_place_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'guest_place_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_zone_health_v';
+            referencedColumns: ['zone_id'];
+          },
+          {
+            foreignKeyName: 'guest_place_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_zone_shape_v';
+            referencedColumns: ['zone_id'];
+          },
+          {
+            foreignKeyName: 'guest_place_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
+          },
+          {
+            foreignKeyName: 'guest_place_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'guest_place_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'zone_bounds';
             referencedColumns: ['id'];
           },
         ];
@@ -11492,6 +11641,54 @@ export type Database = {
           requests?: number;
         };
         Relationships: [];
+      };
+      location_consent_event: {
+        Row: {
+          accuracy_band: string | null;
+          action: string;
+          at: string;
+          guest_id: string | null;
+          id: number;
+          session_id: string;
+          step: string | null;
+          surface: string;
+        };
+        Insert: {
+          accuracy_band?: string | null;
+          action: string;
+          at?: string;
+          guest_id?: string | null;
+          id?: never;
+          session_id: string;
+          step?: string | null;
+          surface: string;
+        };
+        Update: {
+          accuracy_band?: string | null;
+          action?: string;
+          at?: string;
+          guest_id?: string | null;
+          id?: never;
+          session_id?: string;
+          step?: string | null;
+          surface?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'location_consent_event_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'location_consent_event_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       merchant: {
         Row: {
@@ -29345,6 +29542,7 @@ export type Database = {
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_expire: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_featured_reconcile: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_refresh_reports: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -29476,6 +29674,7 @@ export type Database = {
         };
         Returns: number;
       };
+      fn_featured_reconcile: { Args: { p_merchant_id?: string }; Returns: number };
       fn_featured_rollup: { Args: { p_day?: string }; Returns: number };
       fn_fin_build_calendar: { Args: Record<PropertyKey, never>; Returns: number };
       fn_fin_build_decisions: { Args: Record<PropertyKey, never>; Returns: number };
@@ -29502,6 +29701,10 @@ export type Database = {
       fn_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_fit_budget: { Args: { p_plan_id: string }; Returns: undefined };
       fn_folio_escalation_sweep: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_geo_cell: {
+        Args: { p_lat: number; p_lng: number; p_precision?: number };
+        Returns: string;
+      };
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
       fn_integration_rotation_due: {
@@ -29689,6 +29892,7 @@ export type Database = {
         Returns: string;
       };
       fn_payment_reference: { Args: Record<PropertyKey, never>; Returns: string };
+      fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
       fn_plan_flags: { Args: { p_plan_id: string }; Returns: Json };
       fn_plan_totals: {
@@ -30660,6 +30864,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_coverage_lookup: { Args: { p_lat: number; p_lng: number }; Returns: Json };
       rpc_data_request_anonymise: {
         Args: { p_request_id: string };
         Returns: {
@@ -32422,6 +32627,16 @@ export type Database = {
           urgency: string;
         }[];
       };
+      rpc_location_event: {
+        Args: {
+          p_accuracy_band?: string;
+          p_action: string;
+          p_session: string;
+          p_step?: string;
+          p_surface: string;
+        };
+        Returns: undefined;
+      };
       rpc_mark_paid: {
         Args: { p_plan_id: string; p_reference: string };
         Returns: {
@@ -33448,6 +33663,9 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_place_confirm: { Args: { p_payload: Json }; Returns: Json };
+      rpc_place_delete: { Args: { p_id: string }; Returns: Json };
+      rpc_place_list: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_plan_message: {
         Args: { p_body: string; p_plan_id: string };
         Returns: {
@@ -33878,6 +34096,7 @@ export type Database = {
         };
       };
       rpc_request_review: { Args: { p_plan_id: string }; Returns: string };
+      rpc_resolve_location: { Args: { p_context?: Json }; Returns: Json };
       rpc_resolve_qr: {
         Args: {
           p_code: string;
