@@ -7,7 +7,10 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(29);
+select plan(30);
+
+/* Carries the caretaker's one-time token between statements. */
+create temp table t_hosp (k text primary key, v text);
 
 set local app.secret_key = 'test-key-not-the-real-one';
 
@@ -102,11 +105,40 @@ select throws_ok(
   'a unit cannot go live promising an askari nobody has confirmed'
 );
 
+/*
+ * The link is issued, then tapped.
+ *
+ * This used to pass the literal string 'token', which could
+ * never have failed: the function ignored the parameter, so any
+ * unit id confirmed any unit. A test that cannot fail on a
+ * wrong credential is not testing the credential.
+ */
+/* The token is planted by the fixture rather than issued through
+   rpc_unit_caretaker_invite, which requires host membership this
+   suite deliberately does not hold. What is under test here is
+   the confirm path: that the right token works and a wrong one
+   does not. */
+insert into t_hosp (k, v) values ('caretaker_token', 'fixture-caretaker-token');
+
+update public.unit
+   set caretaker_token_hash =
+         encode(extensions.digest('fixture-caretaker-token', 'sha256'), 'hex')
+ where host_id = (select id from public.host where phone = '+254700000900');
+
+select throws_matching(
+  format($$select public.rpc_unit_caretaker_confirm(
+      (select id from public.unit
+        where host_id = (select id from public.host where phone = '+254700000900')), %L)$$,
+    'not-the-token'),
+  'not valid',
+  'a wrong token is refused'
+);
+
 select lives_ok(
-  $$ select public.rpc_unit_caretaker_confirm(
+  format($$ select public.rpc_unit_caretaker_confirm(
        (select id from public.unit
         where host_id = (select id from public.host where phone = '+254700000900')),
-       'token') $$,
+       %L) $$, (select v from t_hosp where k = 'caretaker_token')),
   'the caretaker confirms by tapping the link'
 );
 

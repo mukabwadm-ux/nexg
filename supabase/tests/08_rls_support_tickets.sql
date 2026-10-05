@@ -48,23 +48,35 @@ insert into public.role_grant (staff_user_id, role_id, city_id, granted_by, appr
    'bbbbbbbb-0000-0000-0000-000000000001', 'bbbbbbbb-0000-0000-0000-000000000002');
 
 -- ------------------------------------------------- the Help page writes one
+--
+-- The Help page writes a conversation now, not a ticket
+-- (20260101017200), so the public write path under test is
+-- `rpc_msg_contact`. The ticket below is planted directly: it is
+-- legacy history, and what the rest of this file checks is who
+-- may read it.
+
+insert into public.support_ticket
+  (reference, channel, from_role, topic, full_name, email, phone, body, city_id, status)
+values
+  ('TKT-TEST-1', 'web_form', 'guest', 'order_problem', 'Wanjiru Kamau',
+   'wanjiru@example.com', '+254700111222',
+   'The rider never arrived and nobody is answering.',
+   (select id from public.city where slug = 'nairobi'), 'open');
 
 set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
-select isnt(
-  public.rpc_support_ticket_create(
-    'The rider never arrived and nobody is answering.',
-    'guest', 'order_problem', 'Wanjiru Kamau', 'wanjiru@example.com', '+254700111222'
-  ),
-  null,
-  'the Help page can raise a ticket with no session at all'
+select is(
+  (public.rpc_msg_contact('Wanjiru', 'wanjiru@example.com', 'my_order',
+     'The rider never arrived and nobody is answering.', 'nairobi', true) ->> 'ok')::boolean,
+  true,
+  'the Help page can reach the desk with no session at all'
 );
 
 select is(
   (select count(*)::int from public.support_ticket),
   0,
-  'and cannot read back a single row of what it just wrote'
+  'and an anonymous caller reads back not one row of what is in there'
 );
 
 reset role;
