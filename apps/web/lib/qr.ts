@@ -1,5 +1,7 @@
 import QRCode from 'qrcode';
 
+import { QR_MARK_PNG } from './qr-mark';
+
 /**
  * Drawing the card.
  *
@@ -63,7 +65,7 @@ export async function qrSvg(code: string, opts?: { size?: number }): Promise<str
   });
 
   /*
-   * The centre mark, drawn in the SVG's own units.
+   * The NexG mark, drawn in the SVG's own units.
    *
    * This matters and is easy to get wrong: the generated SVG has a
    * pixel width but a viewBox measured in QR *modules* — 37 units
@@ -73,8 +75,13 @@ export async function qrSvg(code: string, opts?: { size?: number }): Promise<str
    *
    * Level H tolerates about 30% loss; this plate covers roughly 5%
    * of the area, dead centre, away from the three finder patterns.
-   * It is drawn opaque rather than as an overlay, because a
-   * half-covered module reads worse to a scanner than a missing one.
+   * The white plate is drawn first and the mark sits on it, because
+   * the logo has transparent gaps and a half-covered module reads
+   * worse to a scanner than a cleanly missing one.
+   *
+   * `apps/web/scripts/verify-qr.mjs` proves a code still decodes
+   * with this exact square blanked out. Make the plate bigger and
+   * that check has to be re-run, not assumed.
    */
   const viewBox = /viewBox="0 0 (\d+(?:\.\d+)?) /.exec(svg);
   if (!viewBox) return svg;
@@ -83,29 +90,136 @@ export async function qrSvg(code: string, opts?: { size?: number }): Promise<str
   const plate = Math.max(5, Math.round(units * 0.22));
   const x = (units - plate) / 2;
   const r = plate * 0.2;
+  /* The mark sits inside the plate with a little air, so the white
+     reads as a deliberate roundel rather than a printing fault. */
+  const inset = plate * 0.12;
 
   const mark =
     `<g>` +
     `<rect x="${x}" y="${x}" width="${plate}" height="${plate}" rx="${r}" fill="${PAPER}"/>` +
-    `<rect x="${x + 0.6}" y="${x + 0.6}" width="${plate - 1.2}" height="${plate - 1.2}" ` +
-    `rx="${r * 0.85}" fill="${INK}"/>` +
-    `<text x="${units / 2}" y="${units / 2}" text-anchor="middle" dominant-baseline="central" ` +
-    `font-family="Manrope, Arial, sans-serif" font-weight="800" ` +
-    `font-size="${plate * 0.46}" fill="#D4A72C">NX</text>` +
+    `<image href="${QR_MARK_PNG}" x="${x + inset}" y="${x + inset}" ` +
+    `width="${plate - inset * 2}" height="${plate - inset * 2}" ` +
+    `preserveAspectRatio="xMidYMid meet"/>` +
     `</g>`;
 
   return svg.replace('</svg>', `${mark}</svg>`);
 }
 
-/** The same square as PNG bytes, for anything that cannot take SVG. */
+/**
+ * The same square as PNG bytes, with the same mark on it.
+ *
+ * The SVG gets its logo from an `<image>` tag; a bitmap has no such
+ * luxury, so the plate and the mark are composited pixel by pixel.
+ * It would be easy to skip — the printable card uses the SVG — and
+ * that is exactly how you end up with a downloaded PNG that is
+ * subtly not the card, which somebody then prints.
+ */
 export async function qrPng(code: string, size = 1200): Promise<Buffer> {
-  return QRCode.toBuffer(qrUrl(code), {
+  const base = await QRCode.toBuffer(qrUrl(code), {
     errorCorrectionLevel: 'H',
     margin: 2,
     width: size,
     type: 'png',
     color: { dark: INK, light: PAPER },
   });
+
+  return stampMark(base);
+}
+
+/* Both measured as a fraction of the width, and kept in step with
+   the SVG above: the two outputs have to be the same card. */
+const PLATE_RATIO = 0.22;
+const INSET_RATIO = 0.12;
+
+/**
+ * Draw the white roundel and the mark into the middle of a QR
+ * bitmap.
+ *
+ * Hand-rolled because the alternative is an image-processing
+ * dependency for one composite — and `pngjs` is already here for
+ * the scan verifier, so the only thing missing was the resample and
+ * the alpha blend.
+ */
+async function stampMark(qr: Buffer): Promise<Buffer> {
+  const { PNG } = await import('pngjs');
+
+  const target = PNG.sync.read(qr);
+  const mark = PNG.sync.read(
+    Buffer.from(QR_MARK_PNG.slice(QR_MARK_PNG.indexOf(',') + 1), 'base64'),
+  );
+
+  const plate = Math.round(target.width * PLATE_RATIO);
+  const inset = Math.round(plate * INSET_RATIO);
+  const x0 = Math.round((target.width - plate) / 2);
+  const y0 = Math.round((target.height - plate) / 2);
+  const radius = plate * 0.2;
+
+  /* The roundel. Corners are tested against the arc centre so the
+     QR modules show through them, which is what makes it read as a
+     deliberate badge rather than a white square somebody dropped. */
+  for (let y = 0; y < plate; y++) {
+    for (let x = 0; x < plate; x++) {
+      const dx = x < radius ? radius - x : x > plate - radius ? x - (plate - radius) : 0;
+      const dy = y < radius ? radius - y : y > plate - radius ? y - (plate - radius) : 0;
+      if (dx * dx + dy * dy > radius * radius) continue;
+
+      const i = ((y0 + y) * target.width + (x0 + x)) << 2;
+      target.data[i] = 255;
+      target.data[i + 1] = 255;
+      target.data[i + 2] = 255;
+      target.data[i + 3] = 255;
+    }
+  }
+
+  /* The mark, box-filtered down. Nearest-neighbour at this scale
+     turns the thin speed lines into a dotted mess. */
+  const box = plate - inset * 2;
+  const scale = mark.width / box;
+
+  for (let y = 0; y < box; y++) {
+    for (let x = 0; x < box; x++) {
+      const sx0 = Math.floor(x * scale);
+      const sy0 = Math.floor(y * scale);
+      const sx1 = Math.max(sx0 + 1, Math.floor((x + 1) * scale));
+      const sy1 = Math.max(sy0 + 1, Math.floor((y + 1) * scale));
+
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      let a = 0;
+      let n = 0;
+
+      for (let sy = sy0; sy < sy1 && sy < mark.height; sy++) {
+        for (let sx = sx0; sx < sx1 && sx < mark.width; sx++) {
+          const j = (sy * mark.width + sx) << 2;
+          const alpha = mark.data[j + 3]! / 255;
+          /* Premultiplied, so a transparent black pixel does not
+             drag the average towards black. */
+          r += mark.data[j]! * alpha;
+          g += mark.data[j + 1]! * alpha;
+          b += mark.data[j + 2]! * alpha;
+          a += alpha;
+          n += 1;
+        }
+      }
+      if (n === 0) continue;
+
+      const alpha = a / n;
+      if (alpha <= 0.004) continue;
+
+      const i = ((y0 + inset + y) * target.width + (x0 + inset + x)) << 2;
+      const sr = r / a;
+      const sg = g / a;
+      const sb = b / a;
+
+      target.data[i] = Math.round(sr * alpha + target.data[i]! * (1 - alpha));
+      target.data[i + 1] = Math.round(sg * alpha + target.data[i + 1]! * (1 - alpha));
+      target.data[i + 2] = Math.round(sb * alpha + target.data[i + 2]! * (1 - alpha));
+      target.data[i + 3] = 255;
+    }
+  }
+
+  return PNG.sync.write(target);
 }
 
 /**

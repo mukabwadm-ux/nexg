@@ -21,9 +21,25 @@
  * reads, and these are the assertions that prove the choice was
  * right rather than merely intended.
  */
+import { readFileSync } from 'node:fs';
+
 import jsQR from 'jsqr';
 import { PNG } from 'pngjs';
 import QRCode from 'qrcode';
+
+/*
+ * The mark is read out of the generated TypeScript rather than
+ * imported from it: importing a .ts file needs an experimental node
+ * flag, and a verification script that only runs with the right
+ * flag is one that stops being run.
+ */
+const QR_MARK_PNG = /'(data:image\/png;base64,[^']+)'/.exec(
+  readFileSync(new URL('../lib/qr-mark.ts', import.meta.url), 'utf8'),
+)?.[1];
+
+if (!QR_MARK_PNG) {
+  throw new Error('No mark in lib/qr-mark.ts — run scripts/build-brand-assets.py');
+}
 
 const CODES = ['NXG-4B7K2Q', 'NXG-TMZ5KN', 'NXG-ZZZZZZ', 'NXG-23456789'.slice(0, 10)];
 /* The same origin the cards encode, so this verifies the real
@@ -150,6 +166,99 @@ for (const code of CODES.slice(0, 2)) {
     'damage over a finder pattern makes the card unreadable — level H does not cover the corners',
     noFinder,
     null,
+  );
+}
+
+
+/*
+ * And the real thing.
+ *
+ * Everything above models the mark as a blanked square, which is a
+ * fair stand-in and is not the actual output. This composites the
+ * NexG mark exactly as `qrPng` does — white roundel, box-filtered
+ * logo, alpha blend — and decodes that. If the branding ever stops
+ * scanning, this is the assertion that goes red.
+ */
+function stamp(qrBuffer) {
+  const target = PNG.sync.read(qrBuffer);
+  const mark = PNG.sync.read(
+    Buffer.from(QR_MARK_PNG.slice(QR_MARK_PNG.indexOf(',') + 1), 'base64'),
+  );
+
+  const plate = Math.round(target.width * 0.22);
+  const inset = Math.round(plate * 0.12);
+  const x0 = Math.round((target.width - plate) / 2);
+  const y0 = Math.round((target.height - plate) / 2);
+  const radius = plate * 0.2;
+
+  for (let y = 0; y < plate; y++) {
+    for (let x = 0; x < plate; x++) {
+      const dx = x < radius ? radius - x : x > plate - radius ? x - (plate - radius) : 0;
+      const dy = y < radius ? radius - y : y > plate - radius ? y - (plate - radius) : 0;
+      if (dx * dx + dy * dy > radius * radius) continue;
+      const i = ((y0 + y) * target.width + (x0 + x)) << 2;
+      target.data[i] = 255; target.data[i + 1] = 255;
+      target.data[i + 2] = 255; target.data[i + 3] = 255;
+    }
+  }
+
+  const box = plate - inset * 2;
+  const scale = mark.width / box;
+  for (let y = 0; y < box; y++) {
+    for (let x = 0; x < box; x++) {
+      const sx0 = Math.floor(x * scale), sy0 = Math.floor(y * scale);
+      const sx1 = Math.max(sx0 + 1, Math.floor((x + 1) * scale));
+      const sy1 = Math.max(sy0 + 1, Math.floor((y + 1) * scale));
+      let r = 0, g = 0, b = 0, a = 0, n = 0;
+      for (let sy = sy0; sy < sy1 && sy < mark.height; sy++) {
+        for (let sx = sx0; sx < sx1 && sx < mark.width; sx++) {
+          const j = (sy * mark.width + sx) << 2;
+          const al = mark.data[j + 3] / 255;
+          r += mark.data[j] * al; g += mark.data[j + 1] * al; b += mark.data[j + 2] * al;
+          a += al; n += 1;
+        }
+      }
+      if (n === 0) continue;
+      const alpha = a / n;
+      if (alpha <= 0.004) continue;
+      const i = ((y0 + inset + y) * target.width + (x0 + inset + x)) << 2;
+      target.data[i] = Math.round((r / a) * alpha + target.data[i] * (1 - alpha));
+      target.data[i + 1] = Math.round((g / a) * alpha + target.data[i + 1] * (1 - alpha));
+      target.data[i + 2] = Math.round((b / a) * alpha + target.data[i + 2] * (1 - alpha));
+      target.data[i + 3] = 255;
+    }
+  }
+  return PNG.sync.write(target);
+}
+
+for (const code of CODES.slice(0, 2)) {
+  const want = `${ORIGIN}/q/${code}`;
+  const branded = stamp(await render(code));
+
+  check(`${code} · with the real NexG mark composited`, read(branded), want);
+
+  /* Branded AND scuffed, which is the card after a year. */
+  check(
+    `${code} · branded, plus a 10% scuff across the data`,
+    read(occlude(branded, { fraction: 0.1, at: 'data' })),
+    want,
+  );
+}
+
+/* The mark must actually be there. A silently-missing logo would
+   pass every scan test above, because a plain QR scans best. */
+{
+  const plain = PNG.sync.read(await render('NXG-4B7K2Q'));
+  const branded = PNG.sync.read(stamp(await render('NXG-4B7K2Q')));
+  let differing = 0;
+  for (let i = 0; i < plain.data.length; i += 4) {
+    if (plain.data[i] !== branded.data[i]) differing += 1;
+  }
+  const pctChanged = (differing / (plain.width * plain.height)) * 100;
+  check(
+    `the mark is actually drawn (${pctChanged.toFixed(1)}% of pixels changed)`,
+    pctChanged > 1 && pctChanged < 10,
+    true,
   );
 }
 
