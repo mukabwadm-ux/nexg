@@ -12,6 +12,7 @@ import {
 } from '@/components/explore/merchant-card';
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
 import { SiteFooter } from '@/components/site-footer';
+import { ExploreFollowsLocation } from '@/components/location/explore-sync';
 import { SiteHeader } from '@/components/site-header';
 import { unstable_cache } from 'next/cache';
 
@@ -143,11 +144,27 @@ export default async function ExplorePage({
       <SiteHeader />
 
       <main className="mx-auto max-w-[96rem] px-4 pb-16 pt-6 sm:px-8 lg:px-16">
-        {/* Where we are delivering. A real city switch, not decoration. */}
+        {/* Keeps ?city= in step with the chip, so changing the
+            delivery address re-queries this listing without a
+            reload. */}
+        <ExploreFollowsLocation />
+
+        {/*
+          * Which city is being browsed — not where the order is
+          * going. Those are different questions and this used to
+          * answer both, under the same words the header chip
+          * uses.
+          *
+          * Two controls labelled "Deliver to", each with its own
+          * state, is how a guest ends up browsing Mombasa with a
+          * Nairobi pin in the header and no way to tell which one
+          * the prices belong to. The chip owns the delivery
+          * address everywhere; this switches the listing.
+          */}
         <div className="border-border bg-surface flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border px-4 py-3">
           <MapPin aria-hidden="true" className="text-gold h-4 w-4 shrink-0" />
           <span className="text-muted-light text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
-            Deliver to
+            Browsing
           </span>
           <span className="text-[0.875rem] font-extrabold">{cityName}</span>
           <span className="ml-auto flex flex-wrap gap-1.5">
