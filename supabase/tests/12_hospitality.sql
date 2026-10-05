@@ -11,9 +11,30 @@ select plan(29);
 
 set local app.secret_key = 'test-key-not-the-real-one';
 
+/*
+ * Foreign keys and triggers are suspended for the cleanup below,
+ * and switched back on immediately after.
+ *
+ * These ordered deletes worked until orders, dispatch and the
+ * ledger arrived. Now sixty-odd tables reference a merchant or a
+ * rider, and one of them — `ledger.entry` — refuses deletion
+ * outright, by design: the ledger is append-only, and an order it
+ * has posted against cannot be removed. There is no ordering of
+ * deletes that satisfies both that rule and this fixture.
+ *
+ * `session_replication_role = replica` is the standard way out.
+ * It is scoped to this transaction, the transaction rolls back,
+ * and it is restored before the first assertion so that nothing
+ * being tested runs with enforcement off.
+ */
+set local session_replication_role = replica;
+
 delete from public.approval_request;
 delete from public.role_grant;
 delete from public.staff_user;
+
+set local session_replication_role = origin;
+
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password,
                         email_confirmed_at, created_at, updated_at)
@@ -159,7 +180,7 @@ select is(
 /* Replacing voids the old card, so a sticker left on a counter stops working. */
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a1111111-1111-1111-1111-111111111111","role":"authenticated"}';
-select public.rpc_qr_generate((select id from public.unit
+select public.rpc_qr_generate('unit', (select id from public.unit
   where host_id = (select id from public.host where phone = '+254700000900')));
 reset role;
 

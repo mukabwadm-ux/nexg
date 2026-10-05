@@ -8,6 +8,24 @@ select plan(11);
 -- The seed places demo partners in Nairobi. Clear partner data so the counts
 -- below describe this test's own fixtures. The file rolls back at the end, so
 -- nothing here escapes the transaction.
+/*
+ * Foreign keys and triggers are suspended for the cleanup below,
+ * and switched back on immediately after.
+ *
+ * These ordered deletes worked until orders, dispatch and the
+ * ledger arrived. Now sixty-odd tables reference a merchant or a
+ * rider, and one of them — `ledger.entry` — refuses deletion
+ * outright, by design: the ledger is append-only, and an order it
+ * has posted against cannot be removed. There is no ordering of
+ * deletes that satisfies both that rule and this fixture.
+ *
+ * `session_replication_role = replica` is the standard way out.
+ * It is scoped to this transaction, the transaction rolls back,
+ * and it is restored before the first assertion so that nothing
+ * being tested runs with enforcement off.
+ */
+set local session_replication_role = replica;
+
 delete from public.document;
 delete from public.rider;
 delete from public.merchant_user;
@@ -15,6 +33,9 @@ delete from public.merchant_branch;
 delete from public.merchant;
 delete from public.role_grant;
 delete from public.staff_user;
+
+set local session_replication_role = origin;
+
 
 -- ------------------------------------------------------------------- fixtures
 

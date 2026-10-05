@@ -16,9 +16,43 @@ select plan(38);
 
 create temp table t_ids (k text primary key, v bigint);
 
+/* The temp schema is per-session and named unpredictably, so the
+   grant has to be looked up rather than written down. Without it
+   the first write to this table after `set role authenticated`
+   is refused and the rest of the suite reports as "ran 0". */
+do $grant$
+begin
+  execute format('grant usage on schema %I to authenticated',
+                 (select nspname from pg_namespace n join pg_class c on c.relnamespace = n.oid
+                   where c.relname = 't_ids' and n.nspname like 'pg_temp%'));
+end
+$grant$;
+grant all on t_ids to authenticated;
+
+/*
+ * Foreign keys and triggers are suspended for the cleanup below,
+ * and switched back on immediately after.
+ *
+ * These ordered deletes worked until orders, dispatch and the
+ * ledger arrived. Now sixty-odd tables reference a merchant or a
+ * rider, and one of them — `ledger.entry` — refuses deletion
+ * outright, by design: the ledger is append-only, and an order it
+ * has posted against cannot be removed. There is no ordering of
+ * deletes that satisfies both that rule and this fixture.
+ *
+ * `session_replication_role = replica` is the standard way out.
+ * It is scoped to this transaction, the transaction rolls back,
+ * and it is restored before the first assertion so that nothing
+ * being tested runs with enforcement off.
+ */
+set local session_replication_role = replica;
+
 delete from public.approval_request;
 delete from public.role_grant;
 delete from public.staff_user;
+
+set local session_replication_role = origin;
+
 
 /* The local seed prices Nairobi so the console has something to draw.
    This suite is about the unpriced case, so it starts from one. */
@@ -390,6 +424,11 @@ select throws_ok(
  */
 insert into t_ids (k, v) select 'expire_before',
   (select count(*) from public.featured_live_v);
+
+/* Back to the owner: winding a week into the past is the
+   fixture setting up the clock, not something a signed-in user
+   is ever allowed to do. */
+reset role;
 
 update public.featured_slot_week
    set week_start = week_start - 28
