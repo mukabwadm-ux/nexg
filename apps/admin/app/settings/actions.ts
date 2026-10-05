@@ -28,7 +28,17 @@ function fail(error: { message: string } | null): Outcome | null {
   return { ok: false, message: error.message.replace(/^.*?:\s*/, '') };
 }
 
-const s = () => createClient().schema('settings');
+/*
+ * Through the `public` wrappers, not `settings` directly.
+ *
+ * PostgREST only serves schemas in the project's exposed list, which
+ * is a dashboard field no migration can set — and an unexposed
+ * schema fails by returning nothing rather than erroring, so the
+ * page rendered with every control locked and no explanation. The
+ * wrappers put the surface somewhere always served; the rules stay
+ * in the settings functions behind them.
+ */
+const s = () => createClient();
 
 function done(message: string, extra: Partial<Outcome> = {}): Outcome {
   revalidatePath('/settings');
@@ -47,7 +57,7 @@ export async function stageChange(input: {
 }): Promise<Outcome> {
   const db = s();
 
-  const { data: opened, error: openError } = await db.rpc('rpc_change_set_open', {
+  const { data: opened, error: openError } = await db.rpc('rpc_settings_open', {
     p_group: input.group,
     p_city_id: input.cityId ?? undefined,
   });
@@ -57,7 +67,7 @@ export async function stageChange(input: {
   const changeSetId = (opened as { id?: string } | null)?.id;
   if (!changeSetId) return { ok: false, message: 'Could not open a draft.' };
 
-  const { data, error } = await db.rpc('rpc_change_set_put', {
+  const { data, error } = await db.rpc('rpc_settings_put', {
     p_change_set: changeSetId,
     p_key: input.key,
     p_value: input.value as never,
@@ -78,7 +88,7 @@ export async function stageChange(input: {
 }
 
 export async function discardDraft(changeSetId: string): Promise<Outcome> {
-  const { error } = await s().rpc('rpc_change_set_discard', { p_change_set: changeSetId });
+  const { error } = await s().rpc('rpc_settings_discard', { p_change_set: changeSetId });
   return fail(error) ?? done('Draft discarded.');
 }
 
@@ -88,7 +98,7 @@ export async function submitChangeSet(
   reason: string | null,
   effectiveFrom: string | null,
 ): Promise<Outcome> {
-  const { data, error } = await s().rpc('rpc_change_set_submit', {
+  const { data, error } = await s().rpc('rpc_settings_submit', {
     p_change_set: changeSetId,
     p_effective_from: effectiveFrom ?? undefined,
     p_immediate: immediate,
@@ -107,7 +117,7 @@ export async function submitChangeSet(
 }
 
 export async function approveChangeSet(changeSetId: string): Promise<Outcome> {
-  const { data, error } = await s().rpc('rpc_change_set_approve', { p_change_set: changeSetId });
+  const { data, error } = await s().rpc('rpc_settings_approve', { p_change_set: changeSetId });
   const bad = fail(error);
   if (bad) return bad;
 
@@ -130,7 +140,7 @@ export async function approveChangeSet(changeSetId: string): Promise<Outcome> {
 }
 
 export async function rejectChangeSet(changeSetId: string, reason: string): Promise<Outcome> {
-  const { error } = await s().rpc('rpc_change_set_reject', {
+  const { error } = await s().rpc('rpc_settings_reject', {
     p_change_set: changeSetId,
     p_reason: reason,
   });
@@ -138,7 +148,7 @@ export async function rejectChangeSet(changeSetId: string, reason: string): Prom
 }
 
 export async function rollbackVersion(versionId: string, reason: string): Promise<Outcome> {
-  const { data, error } = await s().rpc('rpc_rollback', {
+  const { data, error } = await s().rpc('rpc_settings_rollback', {
     p_version_id: versionId,
     p_reason: reason,
   });
@@ -153,11 +163,38 @@ export async function rollbackVersion(versionId: string, reason: string): Promis
 }
 
 export async function activateDue(): Promise<Outcome> {
-  const { data, error } = await s().rpc('cron_activate', {});
+  const { data, error } = await s().rpc('rpc_settings_activate', {});
   const bad = fail(error);
   if (bad) return bad;
   const n = (data as { activated?: number } | null)?.activated ?? 0;
   return done(
     n === 0 ? 'Nothing was due.' : `${n} change${n === 1 ? '' : 's'} are now live.`,
   );
+}
+
+// ────────────────────────────────────────── the incident switch
+
+/**
+ * Turning a guest payment method on or off.
+ *
+ * Deliberately not a change set. A provider going down at 19:00 on a
+ * Friday should not wait for midnight and a second approver — but it
+ * still needs a reason, it still names who did it, and it still
+ * writes a high-severity event. Switching one back ON is refused
+ * when there is no provider connected behind it.
+ */
+export async function togglePaymentMethod(
+  key: string,
+  enabled: boolean,
+  reason: string,
+): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_payment_method_toggle', {
+    p_key: key,
+    p_enabled: enabled,
+    p_reason: reason,
+  });
+  const bad = fail(error);
+  if (bad) return bad;
+  const r = data as { message?: string; unchanged?: boolean } | null;
+  return done(r?.unchanged ? 'Already in that state.' : (r?.message ?? 'Done.'));
 }

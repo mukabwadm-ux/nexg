@@ -10,7 +10,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(36);
+select plan(47);
 
 create temp table t (k text primary key, v text);
 
@@ -291,6 +291,90 @@ select is(
   (select count(*)::int from public.setting where key = 'doc_grace_days'),
   1,
   'The nine migrations that read public.setting by name still resolve through the view.');
+
+
+-- ════════════════════════ the payment incident switch
+
+/*
+ * The one control that may change what a guest sees without waiting
+ * for midnight. Everything that makes that acceptable is tested
+ * here, because the alternative to these checks is a database
+ * console at 19:00 on a Friday.
+ */
+select set_config('request.jwt.claims',
+  json_build_object('sub', 'e0000000-0000-4000-8000-00000000005a', 'role', 'authenticated')::text, true);
+
+/* Independent of whatever state somebody left the console in. */
+update public.payment_method
+   set enabled = true, status = 'connected', disabled_reason = null
+ where key = 'mpesa_stk';
+
+select throws_ok(
+  $$ select public.rpc_payment_method_toggle('mpesa_stk', false, '') $$,
+  null,
+  'A payment method cannot be switched off without a reason.');
+
+select is(
+  (public.rpc_payment_method_toggle('mpesa_stk', false,
+     'Daraja callbacks failing — provider reports an incident.') ->> 'ok')::boolean,
+  true,
+  'With one, Finance can switch it off at once — a provider outage does not wait for midnight.');
+
+select is(
+  (select enabled from public.payment_method where key = 'mpesa_stk'),
+  false,
+  'And it is off.');
+
+select is(
+  (select disabled_reason from public.payment_method where key = 'mpesa_stk'),
+  'Daraja callbacks failing — provider reports an incident.',
+  'The reason is on the row, where the next person looks.');
+
+select ok(
+  exists (select 1 from audit.audit_event
+          where action = 'payment_method.toggled' and severity = 'high'),
+  'And it is a high-severity audit event, not a quiet update.');
+
+select throws_ok(
+  $$ select public.rpc_payment_method_toggle('airtel_money', true, 'worth a try') $$,
+  null,
+  'A method with no provider behind it cannot be switched on — a guest would find out after choosing.');
+
+select set_config('request.jwt.claims',
+  json_build_object('sub', 'e0000000-0000-4000-8000-00000000005b', 'role', 'authenticated')::text, true);
+
+select throws_ok(
+  $$ select public.rpc_payment_method_toggle('mpesa_stk', true, 'looks fine now') $$,
+  null,
+  'And an ops manager cannot touch payment methods at all.');
+
+-- ═════════════════ the console reaches all of this from public
+
+/*
+ * PostgREST serves `public` and whatever a dashboard field lists.
+ * Both consoles now live entirely in `public`, so neither depends
+ * on somebody remembering that step — and the schemas stay closed.
+ */
+select is(
+  (select count(*)::int from information_schema.views
+   where table_schema = 'public' and table_name like 'settings\_%\_v'),
+  8,
+  'Every settings view the console reads is reachable from public.');
+
+select ok(
+  (select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.proname like 'rpc_settings%') >= 10,
+  'And every settings write.');
+
+select ok(
+  (select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.proname like 'rpc_audit%') >= 15,
+  'The audit console too, which had the same dependency.');
+
+select is(
+  has_schema_privilege('anon', 'settings', 'usage'),
+  false,
+  'And anon still cannot reach the settings schema itself.');
 
 select * from finish();
 rollback;

@@ -30,7 +30,14 @@ function done(message: string): Outcome {
   return { ok: true, message };
 }
 
-const audit = () => createClient().schema('audit');
+/*
+ * Through the `public` wrappers. PostgREST only serves schemas in
+ * the project's exposed list — a dashboard field, not something a
+ * migration can set — and an unexposed schema returns nothing
+ * rather than erroring, which on an audit console reads as "no
+ * events" instead of "we could not look".
+ */
+const audit = () => createClient();
 
 // ───────────────────────────────────────────────────────── reviewing
 
@@ -39,7 +46,7 @@ export async function reviewEvent(
   state: 'reviewed' | 'escalated' | 'needs_review',
   note: string | null,
 ): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_review_event', {
+  const { error } = await audit().rpc('rpc_audit_review_event', {
     p_event_id: eventId,
     p_state: state,
     p_note: note ?? undefined,
@@ -61,7 +68,7 @@ export async function actOnAlert(
   action: 'acknowledge' | 'resolve' | 'false_positive',
   note: string | null,
 ): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_alert_act', {
+  const { error } = await audit().rpc('rpc_audit_alert_act', {
     p_alert_id: alertId,
     p_action: action,
     p_note: note ?? undefined,
@@ -79,7 +86,7 @@ export async function actOnAlert(
 // ───────────────────────────────────────────────── sessions and access
 
 export async function revokeSessions(staffUserId: string, reason: string): Promise<Outcome> {
-  const { data, error } = await audit().rpc('rpc_revoke_sessions', {
+  const { data, error } = await audit().rpc('rpc_audit_revoke_sessions', {
     p_staff_user_id: staffUserId,
     p_reason: reason,
   });
@@ -100,7 +107,7 @@ export async function openBreakGlass(
   moduleKey: string | null,
   cityId: string | null,
 ): Promise<Outcome> {
-  const { data, error } = await audit().rpc('rpc_break_glass_open', {
+  const { data, error } = await audit().rpc('rpc_audit_break_glass_open', {
     p_reason: reason,
     p_scope: scope,
     p_minutes: minutes,
@@ -124,7 +131,7 @@ export async function openBreakGlass(
 }
 
 export async function closeBreakGlass(id: string): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_break_glass_close', { p_id: id });
+  const { error } = await audit().rpc('rpc_audit_break_glass_close', { p_id: id });
   return fail(error) ?? done('Closed.');
 }
 
@@ -133,7 +140,7 @@ export async function reviewBreakGlass(
   outcome: 'justified' | 'unjustified' | 'inconclusive',
   note: string,
 ): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_break_glass_review', {
+  const { error } = await audit().rpc('rpc_audit_break_glass_review', {
     p_id: id,
     p_outcome: outcome,
     p_note: note ?? undefined,
@@ -151,7 +158,7 @@ export async function placeLegalHold(input: {
   instructedBy: string;
   subjectId: string | null;
 }): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_legal_hold_place', {
+  const { error } = await audit().rpc('rpc_audit_legal_hold_place', {
     p_reference: input.reference,
     p_title: input.title,
     p_reason: input.reason,
@@ -163,7 +170,7 @@ export async function placeLegalHold(input: {
 }
 
 export async function releaseLegalHold(id: string, reason: string): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_legal_hold_release', { p_id: id, p_reason: reason });
+  const { error } = await audit().rpc('rpc_audit_legal_hold_release', { p_id: id, p_reason: reason });
   return fail(error) ?? done('Released. Retention resumes on the next run.');
 }
 
@@ -177,7 +184,7 @@ export async function createPack(input: {
   from: string | null;
   to: string | null;
 }): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_pack_create', {
+  const { error } = await audit().rpc('rpc_audit_pack_create', {
     p_reference: input.reference,
     p_title: input.title,
     p_purpose: input.purpose,
@@ -191,7 +198,7 @@ export async function createPack(input: {
 }
 
 export async function freezePack(id: string): Promise<Outcome> {
-  const { data, error } = await audit().rpc('rpc_pack_freeze', { p_id: id });
+  const { data, error } = await audit().rpc('rpc_audit_pack_freeze', { p_id: id });
   const bad = fail(error);
   if (bad) return bad;
   const r = data as { events?: number; hash?: string; chain_ok?: boolean } | null;
@@ -203,7 +210,7 @@ export async function freezePack(id: string): Promise<Outcome> {
 }
 
 export async function sharePack(id: string, with_: string, how: string): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_pack_share', {
+  const { error } = await audit().rpc('rpc_audit_pack_share', {
     p_id: id,
     p_shared_with: with_,
     p_how: how,
@@ -212,7 +219,7 @@ export async function sharePack(id: string, with_: string, how: string): Promise
 }
 
 export async function verifyChain(): Promise<Outcome> {
-  const { data, error } = await audit().rpc('rpc_verify_chain', {});
+  const { data, error } = await audit().rpc('rpc_audit_verify_chain', {});
   const bad = fail(error);
   if (bad) return bad;
   const r = data as {
@@ -237,7 +244,7 @@ export async function setRetention(input: {
   module: string | null;
   description: string | null;
 }): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_retention_set', {
+  const { error } = await audit().rpc('rpc_audit_retention_set', {
     p_key: input.key,
     p_retain_for: `${input.months} months`,
     p_basis: input.basis,
@@ -249,7 +256,7 @@ export async function setRetention(input: {
 }
 
 export async function approveRetention(key: string): Promise<Outcome> {
-  const { data, error } = await audit().rpc('rpc_retention_approve', { p_key: key });
+  const { data, error } = await audit().rpc('rpc_audit_retention_approve', { p_key: key });
   const bad = fail(error);
   if (bad) return bad;
   const state = (data as { state?: string } | null)?.state;
@@ -265,7 +272,7 @@ export async function recordExport(input: {
   rowCount: number | null;
   containsPii: boolean;
 }): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_record_export', {
+  const { error } = await audit().rpc('rpc_audit_record_export', {
     p_module: input.module ?? undefined,
     p_what: input.what,
     p_reason: input.reason,

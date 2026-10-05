@@ -557,3 +557,70 @@ export function RollbackButton({
     </div>
   );
 }
+
+// ───────────────────────────────────── the payment incident switch
+
+/**
+ * Turning a guest payment method on or off.
+ *
+ * The reason box is always open rather than appearing after the
+ * click, because the reason is the point: this is the one control
+ * in Settings that changes what a guest sees without waiting for
+ * midnight or a second person, and the thing that keeps it
+ * accountable is somebody having written down why.
+ */
+export function PaymentToggle({
+  methodKey,
+  label,
+  enabled,
+  canEdit,
+  lockedBy,
+  onToggle,
+}: {
+  methodKey: string;
+  label: string;
+  enabled: boolean;
+  canEdit: boolean;
+  lockedBy: string;
+  onToggle: (key: string, enabled: boolean, reason: string) => Promise<Outcome>;
+}) {
+  const { pending, run } = useRun();
+  const [reason, setReason] = React.useState('');
+
+  if (!canEdit) {
+    return (
+      <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold">🔒 {lockedBy}</p>
+    );
+  }
+
+  return (
+    <div className="mt-3 flex flex-wrap items-end gap-2">
+      <div className="min-w-[16rem] flex-1">
+        <Input
+          id={`pm-reason-${methodKey}`}
+          label={enabled ? `Why turn ${label} off?` : `Why turn ${label} back on?`}
+          labelHidden
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder={
+            enabled
+              ? 'Guests stop seeing it immediately — say why.'
+              : 'Say what changed.'
+          }
+        />
+      </div>
+      <Button
+        size="sm"
+        variant={enabled ? 'outline' : 'black'}
+        loading={pending}
+        disabled={pending || reason.trim() === ''}
+        onClick={async () => {
+          const r = await run(() => onToggle(methodKey, !enabled, reason));
+          if (r.ok) setReason('');
+        }}
+      >
+        {enabled ? 'Turn off' : 'Turn on'}
+      </Button>
+    </div>
+  );
+}

@@ -74,14 +74,15 @@ export default async function AuditPage({
   requireModule(staff, 'audit');
 
   const supabase = createClient();
-  const audit = supabase.schema('audit');
+  /* Public wrappers — see the note in actions.ts. */
+  const audit = supabase;
 
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'activity';
   const filter = searchParams?.filter ?? 'all';
   const moduleFilter = searchParams?.module ?? null;
 
   const { data: healthRaw, error: healthError } = await audit
-    .from('console_health_v')
+    .from('audit_health_v')
     .select('*')
     .maybeSingle();
 
@@ -158,9 +159,10 @@ async function loadActivity(
   moduleFilter: string | null,
   eventId: string | undefined,
 ) {
-  const audit = supabase.schema('audit');
+  /* Public wrappers — see the note in actions.ts. */
+  const audit = supabase;
 
-  let q = audit.from('console_activity_v').select('*').order('id', { ascending: false }).limit(PAGE);
+  let q = audit.from('audit_activity_v').select('*').order('id', { ascending: false }).limit(PAGE);
 
   if (filter === 'needs_review') q = q.eq('review_state', 'needs_review');
   if (filter === 'high') q = q.eq('severity', 'high');
@@ -170,7 +172,7 @@ async function loadActivity(
 
   const [{ data: events }, { data: modules }] = await Promise.all([
     q,
-    audit.from('console_module_v').select('*').order('events', { ascending: false }),
+    audit.from('audit_module_v').select('*').order('events', { ascending: false }),
   ]);
 
   const rows = (events as ActivityRow[] | null) ?? [];
@@ -182,7 +184,7 @@ async function loadActivity(
   let selected = inPage ?? null;
   if (eventId && !inPage) {
     const { data } = await audit
-      .from('console_activity_v')
+      .from('audit_activity_v')
       .select('*')
       .eq('id', Number(eventId))
       .maybeSingle();
@@ -202,16 +204,17 @@ async function loadActivity(
 }
 
 async function loadSignIns(supabase: Supabase, health: HealthRow) {
-  const audit = supabase.schema('audit');
+  /* Public wrappers — see the note in actions.ts. */
+  const audit = supabase;
 
   const [{ data: signIns }, { data: alerts }, { data: breakGlass }] = await Promise.all([
-    audit.from('console_sign_in_v').select('*').order('at', { ascending: false }).limit(PAGE),
+    audit.from('audit_sign_in_v').select('*').order('at', { ascending: false }).limit(PAGE),
     audit
-      .from('console_alert_v')
+      .from('audit_alert_v')
       .select('*')
       .in('state', ['open', 'acknowledged'])
       .order('raised_at', { ascending: false }),
-    audit.from('console_break_glass_v').select('*').order('opened_at', { ascending: false }).limit(50),
+    audit.from('audit_break_glass_v').select('*').order('opened_at', { ascending: false }).limit(50),
   ]);
 
   return (
@@ -226,8 +229,7 @@ async function loadSignIns(supabase: Supabase, health: HealthRow) {
 
 async function loadMoney(supabase: Supabase) {
   const { data } = await supabase
-    .schema('audit')
-    .from('console_money_v')
+    .from('audit_money_v')
     .select('*')
     .order('id', { ascending: false })
     .limit(PAGE);
@@ -236,11 +238,12 @@ async function loadMoney(supabase: Supabase) {
 }
 
 async function loadDataAccess(supabase: Supabase) {
-  const audit = supabase.schema('audit');
+  /* Public wrappers — see the note in actions.ts. */
+  const audit = supabase;
 
   const [{ data: rows }, { data: exports }] = await Promise.all([
-    audit.from('console_data_access_v').select('*').order('id', { ascending: false }).limit(PAGE),
-    audit.from('console_export_v').select('*').order('at', { ascending: false }).limit(50),
+    audit.from('audit_data_access_v').select('*').order('id', { ascending: false }).limit(PAGE),
+    audit.from('audit_export_v').select('*').order('at', { ascending: false }).limit(50),
   ]);
 
   return (
@@ -252,12 +255,13 @@ async function loadDataAccess(supabase: Supabase) {
 }
 
 async function loadEvidence(supabase: Supabase, health: HealthRow) {
-  const audit = supabase.schema('audit');
+  /* Public wrappers — see the note in actions.ts. */
+  const audit = supabase;
 
   const [{ data: packs }, { data: holds }, { data: retention }] = await Promise.all([
-    audit.from('console_evidence_v').select('*').order('created_at', { ascending: false }),
-    audit.from('console_legal_hold_v').select('*').order('placed_at', { ascending: false }),
-    audit.from('console_retention_v').select('*').order('subject'),
+    audit.from('audit_evidence_v').select('*').order('created_at', { ascending: false }),
+    audit.from('audit_legal_hold_v').select('*').order('placed_at', { ascending: false }),
+    audit.from('audit_retention_v').select('*').order('subject'),
   ]);
 
   return (

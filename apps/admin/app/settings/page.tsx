@@ -70,7 +70,8 @@ export default async function SettingsPage({
   requireModule(staff, 'settings');
 
   const supabase = createClient();
-  const s = supabase.schema('settings');
+  /* Public wrappers — see the note in actions.ts. */
+  const s = supabase;
 
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'cities';
 
@@ -79,9 +80,9 @@ export default async function SettingsPage({
     { data: definitions },
     { data: changeSets },
   ] = await Promise.all([
-    s.from('city_v').select('*').order('sort').order('name'),
-    s.from('console_definition_v').select('*').order('sort'),
-    s.from('console_scheduled_v').select('*').order('requested_at', { ascending: false }),
+    s.from('settings_city_v').select('*').order('sort').order('name'),
+    s.from('settings_definition_v').select('*').order('sort'),
+    s.from('settings_scheduled_v').select('*').order('requested_at', { ascending: false }),
   ]);
 
   const cityRows = (cities as CityRow[] | null) ?? [];
@@ -106,13 +107,46 @@ export default async function SettingsPage({
   const groups = ['cities', 'fees', 'dispatch', 'settlement', 'payments', 'payouts',
     'integrations', 'notifications', 'branding', 'legal', 'retention'];
   const editable = new Set<string>();
+  let permissionError: string | null = null;
+
   await Promise.all(
     groups.map(async (g) => {
-      const { data } = await s.rpc('fn_may_edit', { p_group: g });
+      const { data, error } = await s.rpc('rpc_settings_may_edit', { p_group: g });
+      /*
+       * An error here is not "you may not edit this". Discarding it
+       * rendered the whole module locked with nothing saying why —
+       * which is what you see when the settings surface cannot be
+       * reached at all, and it reads as a permissions decision
+       * somebody made rather than a thing that is broken.
+       */
+      if (error) permissionError = error.message;
       if (data === true) editable.add(g);
     }),
   );
   const canEdit = (g: string) => editable.has(g);
+
+  if (permissionError) {
+    return (
+      <ConsoleShell staff={staff} current="/settings">
+        <ConsoleHeader title="Settings" breadcrumb="The settings surface could not be reached" />
+        <main className="px-4 py-6 sm:px-8">
+          <div className="bg-danger-bg border-danger mt-2 rounded-xl border-2 p-5">
+            <p className="text-danger text-[0.9375rem] font-extrabold">
+              Settings could not be read.
+            </p>
+            <p className="text-danger mt-2 max-w-[44rem] text-[0.8125rem] font-semibold leading-[1.7]">
+              This page is showing nothing rather than a screen of locked controls, because a
+              locked control reads as a decision somebody made about your permissions when it
+              actually means the page could not look.
+            </p>
+            <p className="text-muted mt-3 font-mono text-[0.75rem] font-semibold">
+              {permissionError}
+            </p>
+          </div>
+        </main>
+      </ConsoleShell>
+    );
+  }
 
   const [
     { data: zones },
@@ -126,22 +160,22 @@ export default async function SettingsPage({
     { data: retention },
   ] = await Promise.all([
     cityId
-      ? s.from('zone_v').select('*').eq('city_id', cityId).order('name')
+      ? s.from('settings_zone_v').select('*').eq('city_id', cityId).order('name')
       : Promise.resolve({ data: [] }),
     cityId
-      ? s.from('pricing_v').select('*').eq('city_id', cityId)
+      ? s.from('settings_pricing_v').select('*').eq('city_id', cityId)
       : Promise.resolve({ data: [] }),
     cityId
-      ? s.from('dispatch_v').select('*').eq('city_id', cityId).maybeSingle()
+      ? s.from('settings_dispatch_v').select('*').eq('city_id', cityId).maybeSingle()
       : Promise.resolve({ data: null }),
     cityId
-      ? s.from('settlement_v').select('*').eq('city_id', cityId).maybeSingle()
+      ? s.from('settings_settlement_v').select('*').eq('city_id', cityId).maybeSingle()
       : Promise.resolve({ data: null }),
     supabase.from('payment_method').select('*').order('checkout_order'),
     supabase.from('integration_v').select('*').order('sort'),
     supabase.from('payout_rail').select('*'),
-    s.from('legal_v').select('*').order('key'),
-    supabase.schema('audit').from('console_retention_v').select('*').order('subject'),
+    s.from('settings_legal_v').select('*').order('key'),
+    supabase.from('audit_retention_v').select('*').order('subject'),
   ]);
 
   const props: TabProps = {

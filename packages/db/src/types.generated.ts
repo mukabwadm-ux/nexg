@@ -3318,6 +3318,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'approval_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'approval_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'approval_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'approval_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'approval_request_decided_by_fkey';
             columns: ['decided_by'];
             isOneToOne: false;
@@ -3375,6 +3403,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'auto_message_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'auto_message_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'auto_message_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'auto_message_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -3953,6 +4009,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: true;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'cash_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: true;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'cash_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: true;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'cash_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: true;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'cash_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: true;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -4733,6 +4817,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'city_hours_exception_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'city_hours_exception_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'city_hours_exception_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'city_hours_exception_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       commission_tier: {
@@ -4857,6 +4969,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'concierge_shift_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'concierge_shift_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'concierge_shift_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'concierge_shift_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'concierge_shift_staff_user_id_fkey';
             columns: ['staff_user_id'];
             isOneToOne: false;
@@ -4965,6 +5105,41 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'coverage_gap_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
+          },
+          {
             foreignKeyName: 'coverage_gap_zone_id_fkey';
             columns: ['zone_id'];
             isOneToOne: false;
@@ -5052,6 +5227,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -5232,6 +5435,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispatch_zone_setting_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: true;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
           },
           {
             foreignKeyName: 'dispatch_zone_setting_zone_id_fkey';
@@ -5781,6 +5991,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'event_published_by_fkey';
             columns: ['published_by'];
             isOneToOne: false;
@@ -5870,6 +6108,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_feed_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_feed_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_feed_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_feed_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -5997,11 +6263,46 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'experience_component_partner_id_fkey';
             columns: ['partner_id'];
             isOneToOne: false;
             referencedRelation: 'experience_partner';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_component_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
           },
           {
             foreignKeyName: 'experience_component_zone_id_fkey';
@@ -6100,6 +6401,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -6305,6 +6634,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -7135,6 +7492,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'featured_placement_created_by_fkey';
             columns: ['created_by'];
             isOneToOne: false;
@@ -7225,6 +7610,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -8011,6 +8424,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'holiday_calendar_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'holiday_calendar_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'holiday_calendar_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'holiday_calendar_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'holiday_calendar_created_by_fkey';
             columns: ['created_by'];
             isOneToOne: false;
@@ -8139,6 +8580,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -8477,6 +8946,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -9387,6 +9884,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'job_application_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_application_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_application_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_application_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       legal_acceptance: {
@@ -9887,6 +10412,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
             columns: ['parent_merchant_id'];
             isOneToOne: false;
@@ -10042,6 +10595,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
           },
           {
             foreignKeyName: 'merchant_branch_zone_id_fkey';
@@ -11609,6 +12169,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'onboarding_slot_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'onboarding_slot_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'onboarding_slot_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'onboarding_slot_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       package_order: {
@@ -12024,6 +12612,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'plan_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'plan_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'plan_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'plan_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -12465,6 +13081,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'property_host_id_fkey';
             columns: ['host_id'];
             isOneToOne: false;
@@ -12589,6 +13233,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -14020,6 +14692,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
@@ -14349,11 +15049,46 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'rider_bonus_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_bonus_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_bonus_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_bonus_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'rider_bonus_rule_created_by_fkey';
             columns: ['created_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_bonus_rule_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
           },
           {
             foreignKeyName: 'rider_bonus_rule_zone_id_fkey';
@@ -14841,6 +15576,13 @@ export type Database = {
             foreignKeyName: 'rider_presence_event_zone_id_fkey';
             columns: ['zone_id'];
             isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
+          },
+          {
+            foreignKeyName: 'rider_presence_event_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
             referencedRelation: 'zone';
             referencedColumns: ['id'];
           },
@@ -14935,6 +15677,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -15370,6 +16140,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -15847,6 +16645,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'role_grant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'role_grant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'role_grant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'role_grant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'role_grant_granted_by_fkey';
             columns: ['granted_by'];
             isOneToOne: false;
@@ -15978,6 +16804,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'shift_commitment_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
           },
           {
             foreignKeyName: 'shift_commitment_zone_id_fkey';
@@ -16133,6 +16966,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       stay_request_match: {
@@ -16269,6 +17130,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'supply_action_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
           },
           {
             foreignKeyName: 'supply_action_zone_id_fkey';
@@ -16413,6 +17281,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'support_ticket_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'support_ticket_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'support_ticket_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'support_ticket_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -16635,6 +17531,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'unit_host_id_fkey';
             columns: ['host_id'];
             isOneToOne: false;
@@ -16668,6 +17592,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'property_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
           },
           {
             foreignKeyName: 'unit_zone_id_fkey';
@@ -16738,6 +17669,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'waitlist_signup_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'waitlist_signup_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'waitlist_signup_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'waitlist_signup_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       welcome_package: {
@@ -16803,6 +17762,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -16920,6 +17907,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       zone_demand_forecast: {
@@ -16952,6 +17967,13 @@ export type Database = {
             foreignKeyName: 'zone_demand_forecast_zone_id_fkey';
             columns: ['zone_id'];
             isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
+          },
+          {
+            foreignKeyName: 'zone_demand_forecast_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
             referencedRelation: 'zone';
             referencedColumns: ['id'];
           },
@@ -16966,6 +17988,605 @@ export type Database = {
       };
     };
     Views: {
+      audit_activity_v: {
+        Row: {
+          action: string | null;
+          action_label: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          actor_role: string | null;
+          actor_type: Database['public']['Enums']['actor_type'] | null;
+          after: Json | null;
+          ago: string | null;
+          approved_by: string | null;
+          approver_label: string | null;
+          at: string | null;
+          before: Json | null;
+          changed_fields: number | null;
+          city_id: string | null;
+          city_name: string | null;
+          context: Json | null;
+          diff: Json | null;
+          hash: string | null;
+          hash_version: number | null;
+          id: number | null;
+          is_money: boolean | null;
+          module: string | null;
+          needs_two_people: boolean | null;
+          on_behalf_of: string | null;
+          prev_hash: string | null;
+          reason: string | null;
+          related: Json | null;
+          review_note: string | null;
+          review_state: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          reviewed_by_name: string | null;
+          sentence: string | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          target_id: string | null;
+          target_label: string | null;
+          target_type: string | null;
+          touches_pii: boolean | null;
+          unregistered: boolean | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_meta_reviewed_by_fkey';
+            columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      audit_alert_v: {
+        Row: {
+          acknowledged_at: string | null;
+          acknowledged_by: string | null;
+          acknowledged_by_name: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          ago: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          event_count: number | null;
+          first_event_id: number | null;
+          id: string | null;
+          last_event_id: number | null;
+          next_step: string | null;
+          raised_at: string | null;
+          resolution_note: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          resolved_by_name: string | null;
+          rule_key: string | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          stale: boolean | null;
+          state: string | null;
+          summary: string | null;
+          target_id: string | null;
+          target_type: string | null;
+          title: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'alert_acknowledged_by_fkey';
+            columns: ['acknowledged_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'alert_actor_id_fkey';
+            columns: ['actor_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'alert_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'alert_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'alert_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'alert_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'alert_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'alert_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'alert_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'alert_resolved_by_fkey';
+            columns: ['resolved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      audit_break_glass_v: {
+        Row: {
+          ago: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          closed_at: string | null;
+          events_during: number | null;
+          expired_unclosed: boolean | null;
+          expires_at: string | null;
+          id: string | null;
+          module_key: string | null;
+          open_now: boolean | null;
+          opened_at: string | null;
+          reason: string | null;
+          review_note: string | null;
+          review_outcome: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          reviewed_by_name: string | null;
+          scope: string | null;
+          staff_user_id: string | null;
+          who: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'break_glass_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'break_glass_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'break_glass_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'break_glass_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'break_glass_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'break_glass_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'break_glass_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'break_glass_reviewed_by_fkey';
+            columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'break_glass_staff_user_id_fkey';
+            columns: ['staff_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      audit_data_access_v: {
+        Row: {
+          action: string | null;
+          action_label: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          actor_role: string | null;
+          ago: string | null;
+          at: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          id: number | null;
+          ip_country: string | null;
+          module: string | null;
+          no_reason_given: boolean | null;
+          on_behalf_of: string | null;
+          pii_fields: string[] | null;
+          reason: string | null;
+          reveals_in_the_hour: number | null;
+          review_state: string | null;
+          reviewed_at: string | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          subject_label: string | null;
+          surface: string | null;
+          target_id: string | null;
+          target_type: string | null;
+        };
+        Relationships: [];
+      };
+      audit_evidence_v: {
+        Row: {
+          chain_checked_at: string | null;
+          chain_ok: boolean | null;
+          content_hash_hex: string | null;
+          content_hash_short: string | null;
+          created_at: string | null;
+          created_by: string | null;
+          created_by_name: string | null;
+          event_count: number | null;
+          filter: Json | null;
+          first_event_id: number | null;
+          from_at: string | null;
+          frozen_at: string | null;
+          id: string | null;
+          last_event_id: number | null;
+          legal_hold_id: string | null;
+          legal_hold_reference: string | null;
+          purpose: string | null;
+          reason: string | null;
+          reference: string | null;
+          requested_by: string | null;
+          shared_at: string | null;
+          shared_how: string | null;
+          shared_with: string | null;
+          state: string | null;
+          still_matches_the_log: boolean | null;
+          title: string | null;
+          to_at: string | null;
+          withdrawn_at: string | null;
+          withdrawn_reason: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'evidence_pack_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'evidence_pack_legal_hold_id_fkey';
+            columns: ['legal_hold_id'];
+            isOneToOne: false;
+            referencedRelation: 'audit_legal_hold_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      audit_export_v: {
+        Row: {
+          ago: string | null;
+          at: string | null;
+          contains_pii: boolean | null;
+          destination: string | null;
+          event_id: number | null;
+          format: string | null;
+          id: string | null;
+          module: string | null;
+          outside_hours: boolean | null;
+          reason: string | null;
+          row_count: number | null;
+          staff_user_id: string | null;
+          what: string | null;
+          who: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'audit_activity_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'audit_data_access_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'audit_money_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'export_log_staff_user_id_fkey';
+            columns: ['staff_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      audit_health_v: {
+        Row: {
+          alerts_open: number | null;
+          break_glass_expired_unclosed: number | null;
+          break_glass_unreviewed: number | null;
+          chain_check_overdue: boolean | null;
+          chain_checked_at: string | null;
+          chain_detail: string | null;
+          chain_events_checked: number | null;
+          chain_first_bad_id: number | null;
+          chain_ok: boolean | null;
+          events_today: number | null;
+          events_total: number | null;
+          holds_active: number | null;
+          needs_review: number | null;
+          newest_event: string | null;
+          oldest_event: string | null;
+          retention_rules_unset: number | null;
+          unregistered_events: number | null;
+        };
+        Relationships: [];
+      };
+      audit_legal_hold_v: {
+        Row: {
+          active: boolean | null;
+          city_id: string | null;
+          city_name: string | null;
+          from_at: string | null;
+          id: string | null;
+          instructed_by: string | null;
+          packs: number | null;
+          placed_at: string | null;
+          placed_by: string | null;
+          placed_by_name: string | null;
+          reason: string | null;
+          reference: string | null;
+          release_reason: string | null;
+          released_at: string | null;
+          released_by: string | null;
+          released_by_name: string | null;
+          subject_id: string | null;
+          subject_type: string | null;
+          title: string | null;
+          to_at: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'legal_hold_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_placed_by_fkey';
+            columns: ['placed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_released_by_fkey';
+            columns: ['released_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      audit_module_v: {
+        Row: {
+          events: number | null;
+          events_7d: number | null;
+          high: number | null;
+          last_event_at: string | null;
+          module: string | null;
+          unregistered: number | null;
+        };
+        Relationships: [];
+      };
+      audit_money_v: {
+        Row: {
+          action: string | null;
+          action_label: string | null;
+          actor_id: string | null;
+          actor_label: string | null;
+          ago: string | null;
+          amount_cents: number | null;
+          amount_not_recorded: boolean | null;
+          approved_by: string | null;
+          approver_label: string | null;
+          at: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          currency: string | null;
+          diff: Json | null;
+          dispute_id: string | null;
+          id: number | null;
+          missing_second_person: boolean | null;
+          module: string | null;
+          needs_two_people: boolean | null;
+          order_reference: string | null;
+          reason: string | null;
+          review_state: string | null;
+          settlement_run_id: string | null;
+          severity: Database['public']['Enums']['audit_severity'] | null;
+          statement_id: string | null;
+          target_id: string | null;
+          target_label: string | null;
+          target_type: string | null;
+        };
+        Relationships: [];
+      };
+      audit_retention_v: {
+        Row: {
+          anonymise: boolean | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          approved_by_name: string | null;
+          basis: string | null;
+          description: string | null;
+          key: string | null;
+          last_run_at: string | null;
+          last_run_held: number | null;
+          last_run_rows: number | null;
+          module: string | null;
+          not_approved: boolean | null;
+          not_running: boolean | null;
+          period_not_set: boolean | null;
+          retain_for: string | null;
+          retain_for_label: string | null;
+          second_approver_id: string | null;
+          second_approver_name: string | null;
+          subject: string | null;
+          updated_at: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'retention_rule_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'retention_rule_second_approver_id_fkey';
+            columns: ['second_approver_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      audit_sign_in_v: {
+        Row: {
+          ago: string | null;
+          at: string | null;
+          auth_method: string | null;
+          device_label: string | null;
+          email_attempted: string | null;
+          ended_at: string | null;
+          ended_reason: string | null;
+          first_from_country: boolean | null;
+          first_from_device: boolean | null;
+          flag: string | null;
+          id: number | null;
+          ip_country: string | null;
+          ip_masked: string | null;
+          mfa_used: boolean | null;
+          outcome: string | null;
+          recent_failures: number | null;
+          session_id: string | null;
+          session_live: boolean | null;
+          staff_status: Database['public']['Enums']['staff_status'] | null;
+          staff_user_id: string | null;
+          succeeded: boolean | null;
+          who: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sign_in_staff_user_id_fkey';
+            columns: ['staff_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       careers_job_v: {
         Row: {
           benefits_md: string | null;
@@ -17020,6 +18641,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       careers_jobs_v: {
@@ -17061,6 +18710,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -17120,6 +18797,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -17294,6 +18999,41 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_zone_id_fkey';
+            columns: ['zone_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_zone_v';
+            referencedColumns: ['zone_id'];
+          },
+          {
             foreignKeyName: 'experience_component_zone_id_fkey';
             columns: ['zone_id'];
             isOneToOne: false;
@@ -17453,6 +19193,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       console_featured_performance_v: {
@@ -17499,6 +19267,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -17604,6 +19400,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
@@ -17681,6 +19505,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -17936,6 +19788,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       console_hotel_directory_v: {
@@ -17982,6 +19862,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -18098,6 +20006,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -18289,6 +20225,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
@@ -18382,6 +20346,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       curated_day_public: {
@@ -18419,6 +20411,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -18518,6 +20538,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
@@ -18603,6 +20651,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -18698,6 +20774,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       fees_display_v: {
@@ -18784,6 +20888,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -18896,6 +21028,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -19322,6 +21482,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
@@ -19574,6 +21762,34 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
           {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
             foreignKeyName: 'property_qr_host_id_fkey';
             columns: ['host_id'];
             isOneToOne: false;
@@ -19683,6 +21899,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       property_unit_public: {
@@ -19766,6 +22010,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -19938,6 +22210,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       rider_handoff_v: {
@@ -20050,6 +22350,34 @@ export type Database = {
             referencedRelation: 'fees_display_v';
             referencedColumns: ['city_id'];
           },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
         ];
       };
       setting: {
@@ -20095,6 +22423,13 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'version_key_fkey';
+            columns: ['key'];
+            isOneToOne: false;
+            referencedRelation: 'settings_definition_v';
+            referencedColumns: ['key'];
+          },
+          {
             foreignKeyName: 'version_scope_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
@@ -20113,6 +22448,419 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      settings_city_v: {
+        Row: {
+          city_id: string | null;
+          city_manager_id: string | null;
+          currency: string | null;
+          holiday_calendar: string | null;
+          hours: Json | null;
+          languages: Json | null;
+          late_night_from: string | null;
+          launched_at: string | null;
+          max_radius_km: number | null;
+          name: string | null;
+          order_cutoff_min: number | null;
+          outside_zone_behaviour: string | null;
+          slug: string | null;
+          sort: number | null;
+          status: Database['public']['Enums']['city_status'] | null;
+          template_id: string | null;
+          timezone: string | null;
+          zones: number | null;
+          zones_active: number | null;
+          zones_trial: number | null;
+        };
+        Insert: {
+          city_id?: string | null;
+          city_manager_id?: string | null;
+          currency?: string | null;
+          holiday_calendar?: never;
+          hours?: Json | null;
+          languages?: never;
+          late_night_from?: string | null;
+          launched_at?: string | null;
+          max_radius_km?: number | null;
+          name?: string | null;
+          order_cutoff_min?: never;
+          outside_zone_behaviour?: never;
+          slug?: string | null;
+          sort?: number | null;
+          status?: Database['public']['Enums']['city_status'] | null;
+          template_id?: string | null;
+          timezone?: string | null;
+          zones?: never;
+          zones_active?: never;
+          zones_trial?: never;
+        };
+        Update: {
+          city_id?: string | null;
+          city_manager_id?: string | null;
+          currency?: string | null;
+          holiday_calendar?: never;
+          hours?: Json | null;
+          languages?: never;
+          late_night_from?: string | null;
+          launched_at?: string | null;
+          max_radius_km?: number | null;
+          name?: string | null;
+          order_cutoff_min?: never;
+          outside_zone_behaviour?: never;
+          slug?: string | null;
+          sort?: number | null;
+          status?: Database['public']['Enums']['city_status'] | null;
+          template_id?: string | null;
+          timezone?: string | null;
+          zones?: never;
+          zones_active?: never;
+          zones_trial?: never;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'city_city_manager_id_fkey';
+            columns: ['city_manager_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      settings_definition_v: {
+        Row: {
+          approval_pair: string | null;
+          can_be_immediate: boolean | null;
+          constraints: Json | null;
+          default_value: Json | null;
+          deprecated_at: string | null;
+          effective_pair: string | null;
+          group: string | null;
+          help: string | null;
+          key: string | null;
+          label: string | null;
+          reader_modules: string[] | null;
+          scope_kind: Database['settings']['Enums']['scope_kind'] | null;
+          sensitive: boolean | null;
+          sort: number | null;
+          unit: string | null;
+          value_type: Database['settings']['Enums']['value_type'] | null;
+        };
+        Relationships: [];
+      };
+      settings_dispatch_v: {
+        Row: {
+          accept_window_s: number | null;
+          boost_fee: number | null;
+          city_id: string | null;
+          escalate_min: number | null;
+          max_radius_km: number | null;
+          radius_increment_km: number | null;
+          rider_cash_cap: number | null;
+          rounds_before_boost: number | null;
+          search_radius_km: number | null;
+          selection: string | null;
+          stacking: boolean | null;
+        };
+        Insert: {
+          accept_window_s?: never;
+          boost_fee?: never;
+          city_id?: string | null;
+          escalate_min?: never;
+          max_radius_km?: number | null;
+          radius_increment_km?: never;
+          rider_cash_cap?: never;
+          rounds_before_boost?: never;
+          search_radius_km?: never;
+          selection?: never;
+          stacking?: never;
+        };
+        Update: {
+          accept_window_s?: never;
+          boost_fee?: never;
+          city_id?: string | null;
+          escalate_min?: never;
+          max_radius_km?: number | null;
+          radius_increment_km?: never;
+          rider_cash_cap?: never;
+          rounds_before_boost?: never;
+          search_radius_km?: never;
+          selection?: never;
+          stacking?: never;
+        };
+        Relationships: [];
+      };
+      settings_legal_v: {
+        Row: {
+          approved_at: string | null;
+          approved_by_name: string | null;
+          changelog: string | null;
+          effective_from: string | null;
+          key: string | null;
+          pdf_path: string | null;
+          requires_reacceptance_by: string | null;
+          second_approver_name: string | null;
+          status: string | null;
+          version: number | null;
+        };
+        Relationships: [];
+      };
+      settings_pricing_v: {
+        Row: {
+          cash_handling: number | null;
+          category: string | null;
+          city_id: string | null;
+          commission_pct: number | null;
+          concierge_flat: number | null;
+          delivery_band_1: number | null;
+          delivery_band_2: number | null;
+          delivery_band_3: number | null;
+          featured_eligible: boolean | null;
+          host_credit_rule: string | null;
+          min_order: number | null;
+          night_surcharge: number | null;
+          note: string | null;
+          service_pct: number | null;
+          small_basket_fee: number | null;
+          small_basket_threshold: number | null;
+        };
+        Relationships: [];
+      };
+      settings_scheduled_v: {
+        Row: {
+          approved_at: string | null;
+          approved_by: string | null;
+          approved_by_name: string | null;
+          change_set_id: string | null;
+          changes: number | null;
+          city_id: string | null;
+          city_name: string | null;
+          diff: Json | null;
+          effective_from: string | null;
+          group: string | null;
+          immediate: boolean | null;
+          impact: Json | null;
+          reason: string | null;
+          requested_at: string | null;
+          requested_by: string | null;
+          requested_by_name: string | null;
+          status: Database['settings']['Enums']['change_status'] | null;
+          title: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'change_set_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      settings_settlement_v: {
+        Row: {
+          approvals: string | null;
+          city_id: string | null;
+          cutoff: string | null;
+          cycle: string | null;
+          instant_cashout: boolean | null;
+        };
+        Insert: {
+          approvals?: never;
+          city_id?: string | null;
+          cutoff?: never;
+          cycle?: never;
+          instant_cashout?: never;
+        };
+        Update: {
+          approvals?: never;
+          city_id?: string | null;
+          cutoff?: never;
+          cycle?: never;
+          instant_cashout?: never;
+        };
+        Relationships: [];
+      };
+      settings_zone_v: {
+        Row: {
+          city_id: string | null;
+          cod_allowed: boolean | null;
+          delivery_band: number | null;
+          enabled: boolean | null;
+          eta_max: number | null;
+          eta_min: number | null;
+          name: string | null;
+          polygon: unknown;
+          tier: Database['public']['Enums']['zone_tier'] | null;
+          trial_review_due: boolean | null;
+          trial_reviewed_at: string | null;
+          trial_started_at: string | null;
+          zone_id: string | null;
+        };
+        Insert: {
+          city_id?: string | null;
+          cod_allowed?: boolean | null;
+          delivery_band?: number | null;
+          enabled?: boolean | null;
+          eta_max?: number | null;
+          eta_min?: number | null;
+          name?: string | null;
+          polygon?: unknown;
+          tier?: Database['public']['Enums']['zone_tier'] | null;
+          trial_review_due?: never;
+          trial_reviewed_at?: string | null;
+          trial_started_at?: string | null;
+          zone_id?: string | null;
+        };
+        Update: {
+          city_id?: string | null;
+          cod_allowed?: boolean | null;
+          delivery_band?: number | null;
+          enabled?: boolean | null;
+          eta_max?: number | null;
+          eta_min?: number | null;
+          name?: string | null;
+          polygon?: unknown;
+          tier?: Database['public']['Enums']['zone_tier'] | null;
+          trial_review_due?: never;
+          trial_reviewed_at?: string | null;
+          trial_started_at?: string | null;
+          zone_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -20156,6 +22904,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -20220,6 +22996,34 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
           },
         ];
@@ -21018,6 +23822,59 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_audit_alert_act: {
+        Args: { p_action: string; p_alert_id: string; p_note?: string };
+        Returns: Json;
+      };
+      rpc_audit_break_glass_close: { Args: { p_id: string }; Returns: Json };
+      rpc_audit_break_glass_open: {
+        Args: {
+          p_city_id?: string;
+          p_minutes?: number;
+          p_module_key?: string;
+          p_reason: string;
+          p_scope: string;
+        };
+        Returns: Json;
+      };
+      rpc_audit_break_glass_review: {
+        Args: { p_id: string; p_note: string; p_outcome: string };
+        Returns: Json;
+      };
+      rpc_audit_legal_hold_place: {
+        Args: {
+          p_city_id?: string;
+          p_from?: string;
+          p_instructed_by: string;
+          p_reason: string;
+          p_reference: string;
+          p_subject_id?: string;
+          p_subject_type: string;
+          p_title: string;
+          p_to?: string;
+        };
+        Returns: Json;
+      };
+      rpc_audit_legal_hold_release: { Args: { p_id: string; p_reason: string }; Returns: Json };
+      rpc_audit_pack_create: {
+        Args: {
+          p_filter: Json;
+          p_from?: string;
+          p_legal_hold_id?: string;
+          p_purpose: string;
+          p_reason: string;
+          p_reference: string;
+          p_requested_by: string;
+          p_title: string;
+          p_to?: string;
+        };
+        Returns: Json;
+      };
+      rpc_audit_pack_freeze: { Args: { p_id: string }; Returns: Json };
+      rpc_audit_pack_share: {
+        Args: { p_how: string; p_id: string; p_shared_with: string };
+        Returns: Json;
+      };
       rpc_audit_recent: {
         Args: { p_limit?: number; p_module?: string };
         Returns: {
@@ -21034,6 +23891,41 @@ export type Database = {
           target_type: string;
         }[];
       };
+      rpc_audit_record_export: {
+        Args: {
+          p_contains_pii?: boolean;
+          p_destination?: string;
+          p_filter?: Json;
+          p_format?: string;
+          p_module: string;
+          p_reason: string;
+          p_row_count?: number;
+          p_what: string;
+        };
+        Returns: Json;
+      };
+      rpc_audit_retention_approve: { Args: { p_key: string }; Returns: Json };
+      rpc_audit_retention_set: {
+        Args: {
+          p_anonymise?: boolean;
+          p_basis: string;
+          p_description?: string;
+          p_key: string;
+          p_module?: string;
+          p_retain_for: string;
+          p_subject?: string;
+        };
+        Returns: Json;
+      };
+      rpc_audit_review_event: {
+        Args: { p_event_id: number; p_note?: string; p_state: string };
+        Returns: Json;
+      };
+      rpc_audit_revoke_sessions: {
+        Args: { p_reason: string; p_staff_user_id: string };
+        Returns: Json;
+      };
+      rpc_audit_verify_chain: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_block_done: {
         Args: { p_block_id: string };
         Returns: {
@@ -24044,6 +26936,10 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_payment_method_toggle: {
+        Args: { p_enabled: boolean; p_key: string; p_reason: string };
+        Returns: Json;
+      };
       rpc_plan_message: {
         Args: { p_body: string; p_plan_id: string };
         Returns: {
@@ -25232,6 +28128,37 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_settings_activate: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_settings_approve: { Args: { p_change_set: string }; Returns: Json };
+      rpc_settings_compare: {
+        Args: { p_city_a: string; p_city_b: string; p_group?: string };
+        Returns: Json;
+      };
+      rpc_settings_discard: { Args: { p_change_set: string }; Returns: Json };
+      rpc_settings_may_edit: { Args: { p_group: string }; Returns: boolean };
+      rpc_settings_open: { Args: { p_city_id?: string; p_group: string }; Returns: Json };
+      rpc_settings_put: {
+        Args: {
+          p_category?: string;
+          p_change_set: string;
+          p_city_id?: string;
+          p_key: string;
+          p_value: Json;
+          p_zone_id?: string;
+        };
+        Returns: Json;
+      };
+      rpc_settings_reject: { Args: { p_change_set: string; p_reason: string }; Returns: Json };
+      rpc_settings_rollback: { Args: { p_reason: string; p_version_id: string }; Returns: Json };
+      rpc_settings_submit: {
+        Args: {
+          p_change_set: string;
+          p_effective_from?: string;
+          p_immediate?: boolean;
+          p_reason?: string;
+        };
+        Returns: Json;
       };
       rpc_settlement_approve: {
         Args: { p_run_id: string };
@@ -26577,6 +29504,7 @@ export type Database = {
           order_cutoff_min: number | null;
           outside_zone_behaviour: string | null;
           slug: string | null;
+          sort: number | null;
           status: Database['public']['Enums']['city_status'] | null;
           template_id: string | null;
           timezone: string | null;
@@ -26598,6 +29526,7 @@ export type Database = {
           order_cutoff_min?: never;
           outside_zone_behaviour?: never;
           slug?: string | null;
+          sort?: number | null;
           status?: Database['public']['Enums']['city_status'] | null;
           template_id?: string | null;
           timezone?: string | null;
@@ -26619,6 +29548,7 @@ export type Database = {
           order_cutoff_min?: never;
           outside_zone_behaviour?: never;
           slug?: string | null;
+          sort?: number | null;
           status?: Database['public']['Enums']['city_status'] | null;
           template_id?: string | null;
           timezone?: string | null;

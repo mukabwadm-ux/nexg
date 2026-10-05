@@ -2,9 +2,9 @@ import { Card } from '@nexg/ui';
 import Link from 'next/link';
 import * as React from 'react';
 
-import { rollbackVersion, stageChange } from '@/app/settings/actions';
+import { rollbackVersion, stageChange, togglePaymentMethod } from '@/app/settings/actions';
 
-import { RollbackButton, SettingField } from './controls';
+import { PaymentToggle, RollbackButton, SettingField } from './controls';
 import {
   CATEGORY_LABEL,
   type ChangeSetRow,
@@ -771,15 +771,23 @@ export function PaymentsTab({ payments, integrations, rails, canEdit }: TabProps
                       Off: {m.disabled_reason}
                     </p>
                   )}
+                  <PaymentToggle
+                    methodKey={m.key}
+                    label={m.label}
+                    enabled={m.enabled}
+                    canEdit={canEdit('payments')}
+                    lockedBy={GROUP_OWNER.payments ?? 'Finance and Tech edit this'}
+                    onToggle={togglePaymentMethod}
+                  />
                 </Card>
               ))}
             </div>
             <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.7]">
               Turning a method off is one of the few changes that may take effect immediately — an
               incident should not wait for midnight. It still needs a reason, and it still writes
-              an event. The toggle itself is not wired here yet, so today this is a reading of the
-              state rather than a control over it.
-              {!canEdit('payments') && ` 🔒 ${GROUP_OWNER.payments}.`}
+              an event. Switching one back on is refused when there is no provider connected
+              behind it — a guest who picks a route with nothing behind it finds out after they
+              have chosen.
             </p>
           </Section>
 
