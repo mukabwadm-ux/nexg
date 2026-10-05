@@ -15,7 +15,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(34);
+select plan(45);
 
 create temp table t (k text primary key, v text);
 /* The suite switches roles, and the fixture ids live in here. */
@@ -56,6 +56,12 @@ on conflict (id) do nothing;
 
 -- ════════════════════════════ 1. opening a checkout
 
+/* Opening a payment is now checked against the caller, not only
+   the order, so this half is asked as somebody entitled to. */
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+
 select is(
   (public.rpc_payment_begin_order('ab000000-0000-4000-8000-000000000001') ->> 'ok')::boolean,
   true,
@@ -90,6 +96,10 @@ select is(
   'So there is exactly one.');
 
 -- ════════════════════ 2. the provider says it was paid
+
+/* The webhook arrives with no session at all, which is the point
+   of its narrow grant. */
+reset role;
 
 select is(
   (public.rpc_payment_webhook(
@@ -137,6 +147,7 @@ select is(
 
 -- ════════════════════════ 4. a forged one changes nothing
 
+reset role;
 insert into public.order
   (id, reference, guest_id, merchant_id, branch_id, city_id, channel,
    dropoff_label, stage, payment_method, payment_status,
@@ -148,7 +159,11 @@ values
    'confirmed','card','pending', 60000, 25000, 3000, 88000, 'KES')
 on conflict (id) do nothing;
 
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 select public.rpc_payment_begin_order('ab000000-0000-4000-8000-000000000002');
+reset role;
 insert into t (k, v) select 'ref2',
   (select reference from public.payment where order_id = 'ab000000-0000-4000-8000-000000000002');
 
@@ -306,6 +321,98 @@ select is(
   (select count(*)::int from public.console_zone_shape_v where shape is not null),
   (select count(*)::int from public.zone where polygon is not null),
   'Every drawn zone has geometry the map can render.');
+
+-- ════════════ 8. the money tables are not anybody's to write
+
+select is(
+  (select count(*)::int from information_schema.role_table_grants
+    where table_schema = 'public' and grantee = 'anon'
+      and table_name in ('payment', 'payment_event', 'live_pulse')),
+  0,
+  'Anonymous holds nothing on the money tables — not even the default insert Supabase grants.');
+
+select is(
+  (select coalesce(string_agg(distinct privilege_type, ','), 'none')
+     from information_schema.role_table_grants
+    where table_schema = 'public' and grantee = 'authenticated'
+      and table_name in ('payment', 'payment_event')),
+  'SELECT',
+  'And a signed-in person can only read them.');
+
+/*
+ * The webhook still works with no session, because it goes
+ * through a security-definer function rather than a table grant.
+ * That is the whole reason the grants could be taken away.
+ */
+select ok(
+  has_function_privilege('anon',
+    'public.rpc_payment_webhook(text,text,text,boolean,jsonb,boolean,text,bigint,text)',
+    'EXECUTE'),
+  'The webhook can still be called by an unauthenticated provider.');
+
+select is(
+  (select count(*)::int from pg_proc p
+     join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname like 'rpc_payment_begin%'
+      and has_function_privilege('anon', p.oid, 'EXECUTE')),
+  0,
+  'But it cannot open one — only settle one we already made.');
+
+/*
+ * The grant was not the only hole. The function is security
+ * definer, so it reads the order past row security — and it
+ * checked the order and never the caller. Anybody with a guessed
+ * id would have been told the exact amount owed.
+ */
+set local role authenticated;
+select set_config('request.jwt.claims', '{"role":"authenticated"}', true);
+
+select throws_matching(
+  $$select public.rpc_payment_begin_order('ab000000-0000-4000-8000-000000000001')$$,
+  'Start a session',
+  'A caller with no session cannot open a payment, grant or no grant.');
+
+reset role;
+
+-- ════════ 9. what an anonymous request can and cannot run
+
+/*
+ * Supabase grants EXECUTE on every new function in `public` to
+ * `anon` by default, so this is not hypothetical — it was true of
+ * `cron_retention` until it was revoked by name.
+ */
+select is(
+  (select count(*)::int from pg_proc p
+     join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname like 'cron\_%'
+      and has_function_privilege('anon', p.oid, 'EXECUTE')),
+  0,
+  'No maintenance job can be run by an anonymous request.');
+
+select ok(
+  not has_function_privilege('anon', 'public.cron_retention()', 'EXECUTE'),
+  'Including the one that deletes data on the retention schedule.');
+
+select ok(
+  not (select has_function_privilege('anon', p.oid, 'EXECUTE')
+         from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname = 'public' and p.proname = 'fn_anonymise_guest'),
+  'Nor the one that anonymises a named guest.');
+
+select ok(
+  not has_function_privilege('anon', 'public.fn_order_reprice(uuid,jsonb)', 'EXECUTE'),
+  'Nor the one that would say what a guessed order costs.');
+
+/* And the things that genuinely have no session keep working. */
+select ok(
+  has_function_privilege('anon', 'public.fn_merchant_is_live(uuid)', 'EXECUTE'),
+  'A logged-out visitor can still see a live merchant''s menu — a row policy calls this one on their behalf.');
+
+select ok(
+  (select has_function_privilege('anon', p.oid, 'EXECUTE')
+     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname = 'rpc_resolve_qr'),
+  'And a stranger can still scan a QR sticker.');
 
 select * from finish();
 rollback;

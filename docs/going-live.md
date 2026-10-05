@@ -140,6 +140,14 @@ The failure to know about: **the socket connecting before the session loads.** I
 4. Approve a small refund and send it. Confirm it reaches `issued` and the order reads `partially_refunded`.
 5. Swap the test keys for live ones. Nothing else changes.
 
+## One thing worth knowing about privileges
+
+Supabase sets `alter default privileges in schema public grant all on functions to anon, authenticated, service_role`. Every function created in `public` since this project started has therefore been executable by an **unauthenticated request**, and writing `grant execute … to authenticated` in a migration adds a second grant without removing the first.
+
+Most functions guard themselves and raise. The ones that did not were the maintenance jobs and sweeps, written to be called by pg_cron — including `cron_retention`, which deletes on the retention schedule, and `fn_anonymise_guest`. Those are now revoked by name, and the default no longer grants to `anon`.
+
+A function that genuinely needs an anonymous caller — a QR scan, a careers applicant with a one-time token, a Paystack webhook — grants it explicitly. If you add one, grant it on purpose so a reviewer sees the line. `supabase/tests/21_money_and_live.sql` asserts both halves: that no `cron_*` is reachable, and that a logged-out visitor can still read a menu and scan a sticker.
+
 ## What is still missing after all of this
 
 - **A notifications worker.** Everything queues in `notification_log` and nothing sends. Every screen says "queued", never "sent". This is the biggest remaining gap: delay notices, document reminders, featured pitches and tracking SMS all sit there.
