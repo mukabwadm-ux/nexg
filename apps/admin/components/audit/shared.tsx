@@ -296,6 +296,7 @@ export interface SignInRow {
   ago: string;
   staff_user_id: string | null;
   who: string;
+  who_name: string | null;
   email_attempted: string | null;
   outcome: string;
   succeeded: boolean;
@@ -337,6 +338,7 @@ export interface AlertRow {
 export interface BreakGlassRow {
   id: string;
   who: string | null;
+  who_name: string | null;
   opened_at: string;
   ago: string;
   reason: string;

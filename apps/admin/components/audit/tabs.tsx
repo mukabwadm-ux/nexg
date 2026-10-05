@@ -446,7 +446,16 @@ export function SignInsTab({
                       <span className="text-muted-light text-[0.6875rem] font-bold">{s.ago}</span>
                     </Td>
                     <Td>
+                      {/* Email first: unique by constraint, and what
+                          the invitation went to. The name underneath
+                          because the two together read better than
+                          either alone. */}
                       <span className="font-bold">{s.who}</span>
+                      {s.who_name && (
+                        <span className="text-muted-light block text-[0.6875rem] font-semibold">
+                          {s.who_name}
+                        </span>
+                      )}
                     </Td>
                     <Td>
                       <div className="flex flex-wrap items-center gap-1.5">
@@ -536,6 +545,9 @@ export function SignInsTab({
                     </span>
                   </div>
                   <p className="mt-2 text-[0.875rem] font-extrabold">{b.who ?? DASH}</p>
+                  {b.who_name && (
+                    <p className="text-muted-light text-[0.6875rem] font-semibold">{b.who_name}</p>
+                  )}
                   <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.7]">
                     {b.reason}
                   </p>

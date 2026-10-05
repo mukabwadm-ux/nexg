@@ -9,7 +9,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(44);
+select plan(51);
 
 /* psql meta-commands do not survive the test runner, so the ids the
    assertions need are parked in a temp table instead. */
@@ -389,6 +389,84 @@ select is(
    where module_key = 'audit' and level is null),
   0,
   'Every role has a stated level for the audit module, including none.');
+
+
+-- ══════════════════════════ an audit log names people
+
+/*
+ * "[Unknown] did something" is not an audit trail. Three separate
+ * reasons it used to say that, and these are the three that stop it
+ * coming back.
+ */
+
+/* 1. A staff event written before the label column existed. The id
+      was always there; nothing looked at it. */
+insert into audit.audit_event (actor_type, actor_id, module, action, hash_version)
+values ('staff', 'a0000000-0000-4000-8000-000000000001', 'staff', 'staff.invited', 1);
+
+select is(
+  (select audit.fn_actor_name(e) from audit.audit_event e
+    where e.action = 'staff.invited' order by e.id desc limit 1),
+  'audit.one@test.local',
+  'A staff event with no label resolves to the email on the actor id.');
+
+/* 2. `audit.log` no longer lets a caller forget who. */
+select set_config('request.jwt.claims',
+  json_build_object('sub', '00000000-0000-4000-8000-0000000000a1',
+                    'role', 'authenticated')::text, true);
+
+insert into t_ids (k, v) select 'noactor',
+  audit.log('staff'::public.actor_type, 'audit', 'audit.event_reviewed');
+
+select is(
+  (select actor_id from audit.audit_event where id = (select v from t_ids where k = 'noactor')),
+  'a0000000-0000-4000-8000-000000000001'::uuid,
+  'A staff call that passes no actor id is attributed to whoever is signed in.');
+
+select set_config('request.jwt.claims', '', true);
+
+/* 3. A merchant or rider is not staff and has no actor id at all —
+      `actor_id` references staff_user — but the row names what they
+      acted on, so it can name them. Written here rather than found,
+      because this suite clears the board it runs on. */
+insert into audit.audit_event (actor_type, module, action, target_type, target_id, hash_version)
+values ('merchant_user', 'merchants', 'merchant.applied', 'merchant', gen_random_uuid(), 1);
+
+select is(
+  (select audit.fn_actor_name(e) from audit.audit_event e
+    where e.actor_type = 'merchant_user' order by e.id desc limit 1) like '[Merchant]%',
+  true,
+  'A merchant acting on their own application is named as a merchant, not shrugged at.');
+
+select is(
+  (select count(*)::int from audit.audit_event e
+   where audit.fn_actor_name(e) = '[Unknown]'
+     and (e.actor_id is not null
+          or e.actor_type in ('merchant_user', 'rider', 'system', 'guest'))),
+  0,
+  'Nothing that could be identified reads as Unknown.');
+
+/* And the identifier is the email, not the display name: two people
+   can share a name, an address on this project cannot. */
+select ok(
+  (select who from audit.console_sign_in_v limit 1) is null
+  or (select who from audit.console_sign_in_v limit 1) like '%@%',
+  'Sign-ins are identified by email address.');
+
+-- ════════════════════ a refused sign-in has no session
+
+/*
+ * The attempts worth seeing are the ones that failed, and those are
+ * exactly the ones with nobody signed in. If this is not reachable
+ * anonymously the log quietly only ever contains successes.
+ */
+select ok(
+  has_function_privilege('anon', 'public.rpc_record_sign_in(text,text,text,boolean,text,text,text,text,text)', 'execute'),
+  'A failed sign-in can be recorded with no session — otherwise the log only ever holds successes.');
+
+select ok(
+  not has_table_privilege('anon', 'audit.sign_in', 'select'),
+  'And the caller cannot read back what it wrote.');
 
 select * from finish();
 rollback;

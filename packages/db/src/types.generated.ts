@@ -282,6 +282,8 @@ export type Database = {
           target_type: string | null;
           user_agent: string | null;
           canonical: string | null;
+          fn_actor_name: string | null;
+          fn_approver_name: string | null;
           fn_sentence: string | null;
         };
         Insert: {
@@ -1125,6 +1127,7 @@ export type Database = {
           scope: string | null;
           staff_user_id: string | null;
           who: string | null;
+          who_name: string | null;
         };
         Relationships: [];
       };
@@ -1394,6 +1397,7 @@ export type Database = {
           staff_user_id: string | null;
           succeeded: boolean | null;
           who: string | null;
+          who_name: string | null;
         };
         Relationships: [];
       };
@@ -1405,7 +1409,15 @@ export type Database = {
       };
       cron_chain_check: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_run_alerts: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_actor_name: {
+        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Returns: string;
+      };
       fn_ago: { Args: { p_at: string }; Returns: string };
+      fn_approver_name: {
+        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Returns: string;
+      };
       fn_diff: { Args: { p_after: Json; p_before: Json }; Returns: Json };
       fn_mask_email: { Args: { p_email: string }; Returns: string };
       fn_mask_payload: { Args: { p_fields: string[]; p_payload: Json }; Returns: Json };
@@ -18379,6 +18391,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      audit_known_device_v: {
+        Row: {
+          countries: string[] | null;
+          device_fingerprint: string | null;
+          device_label: string | null;
+          first_seen: string | null;
+          last_seen: string | null;
+          staff_email: string | null;
+          staff_user_id: string | null;
+          trusted: boolean | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'known_device_staff_user_id_fkey';
+            columns: ['staff_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       audit_legal_hold_v: {
         Row: {
           active: boolean | null;
@@ -27197,6 +27230,20 @@ export type Database = {
       rpc_reconciliation_import: {
         Args: { p_lines: Json; p_statement_id: string };
         Returns: number;
+      };
+      rpc_record_sign_in: {
+        Args: {
+          p_auth_method?: string;
+          p_device_fingerprint?: string;
+          p_device_label?: string;
+          p_email: string;
+          p_ip_country?: string;
+          p_mfa_used?: boolean;
+          p_outcome: string;
+          p_session_id?: string;
+          p_user_agent?: string;
+        };
+        Returns: Json;
       };
       rpc_reject_event_submission: {
         Args: { p_event_id: string; p_reason: string };
