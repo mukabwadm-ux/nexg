@@ -12,7 +12,9 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(23);
+select plan(33);
+
+create temp table t_ids (k text primary key, v bigint);
 
 delete from public.approval_request;
 delete from public.role_grant;
@@ -340,6 +342,102 @@ select throws_like(
   '%Finance has to approve it%',
   'one person cannot both request and approve a refund'
 );
+
+
+-- ════════════════ selling a slot on the phone, and the end
+
+/*
+ * The flow that actually sells most slots: somebody agrees a price
+ * while you are talking to them. Everything that makes that money
+ * real is tested here, because the ceremony that protects it in the
+ * request-and-quote path has been deliberately skipped.
+ */
+select set_config('request.jwt.claims',
+  json_build_object('sub', (select user_id from public.staff_user order by created_at limit 1),
+                    'role', 'authenticated')::text, true);
+
+select throws_ok(
+  format($$ select public.rpc_featured_place_merchant(%L, %L, %L, null) $$,
+    (select id from public.featured_placement where enabled limit 1),
+    (select id from public.merchant where status = 'live' limit 1),
+    date_trunc('week', now())::date),
+  null,
+  'A placement with no price is refused — nobody could invoice it.');
+
+select throws_ok(
+  format($$ select public.rpc_featured_place_merchant(%L, %L, %L, 50000) $$,
+    (select id from public.featured_placement where enabled limit 1),
+    (select id from public.merchant where status = 'live' limit 1),
+    (date_trunc('week', now()) + interval '3 days')::date),
+  null,
+  'A slot week starts on a Monday, and a Thursday is refused by name.');
+
+select throws_ok(
+  format($$ select public.rpc_featured_place_merchant(%L, %L, %L, 50000) $$,
+    (select id from public.featured_placement where enabled limit 1),
+    (select id from public.merchant where status <> 'live' limit 1),
+    date_trunc('week', now())::date),
+  null,
+  'A merchant who is not live cannot be sold a slot — a sponsored card that is shut is worse than none.');
+
+-- ══════════════════════════ a week ends by itself
+
+/*
+ * The counterpart that never existed. Without it a booking stays
+ * live forever and every console shows the merchant as featured;
+ * the homepage was only ever right because its view re-checks the
+ * dates on each read.
+ */
+insert into t_ids (k, v) select 'expire_before',
+  (select count(*) from public.featured_live_v);
+
+update public.featured_slot_week
+   set week_start = week_start - 28
+ where status = 'live'
+   and booking_id = (select booking_id from public.featured_live_v limit 1);
+
+select ok(
+  (public.cron_featured_expire() ->> 'slots_ended')::int > 0,
+  'The expiry cron ends a week that has passed.');
+
+select ok(
+  (select count(*) from public.featured_live_v)
+    < (select v from t_ids where k = 'expire_before'),
+  'And the merchant comes off the homepage without anybody remembering.');
+
+select is(
+  (select count(*)::int from public.featured_booking b
+   where b.status = 'live'
+     and not exists (select 1 from public.featured_slot_week sw
+                     where sw.booking_id = b.id and sw.status <> 'ended')),
+  0,
+  'A booking with no running weeks left is closed out, not left live.');
+
+-- ════════════════ one answer to "is this merchant featured"
+
+select is(
+  (select count(*)::int from public.merchant m
+   where m.featured is distinct from public.fn_merchant_is_featured(m.id)),
+  0,
+  'The flag on the merchant row and the live slots agree — they used to be able to disagree.');
+
+/* And the toggle can no longer set it by hand. */
+select throws_ok(
+  format($$ select public.rpc_merchant_set_featured(%L, true) $$,
+    (select id from public.merchant where status = 'live' and not featured limit 1)),
+  null,
+  'Featuring somebody from a toggle is refused: it cannot say which slot, which week or what price.');
+
+-- ═══════════════ a paid merchant shows without artwork
+
+select is(
+  (select count(*)::int from pg_matviews where matviewname = 'featured_live_v'),
+  0,
+  'featured_live_v is a view, so the homepage never shows a stale band.');
+
+select ok(
+  pg_get_viewdef('public.featured_live_v'::regclass) not like '%cr.id IS NOT NULL%',
+  'An approved creative is no longer required — charging somebody and then not showing them is a bug, not a policy.');
 
 select * from finish();
 rollback;

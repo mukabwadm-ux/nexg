@@ -1,4 +1,12 @@
 import { Card } from '@nexg/ui';
+
+import { placeMerchantInSlot } from '@/app/featured/actions';
+
+import {
+  type MerchantOption,
+  type OpenSlot,
+  PlaceMerchant,
+} from './place-merchant';
 import Link from 'next/link';
 
 import {
@@ -55,6 +63,8 @@ const GROUPS = [
 
 export function InventoryTab({
   rows,
+  openSlots,
+  merchants,
   badges,
   week,
   selected,
@@ -62,6 +72,8 @@ export function InventoryTab({
   requests,
 }: {
   rows: InventoryRow[];
+  openSlots: OpenSlot[];
+  merchants: MerchantOption[];
   badges: Badges;
   week: string;
   selected: string | null;
@@ -154,13 +166,21 @@ export function InventoryTab({
           })}
         </div>
 
-        {chosen ? (
-          <SlotPanel slot={chosen} requests={requests} />
-        ) : (
-          <Card className="p-5">
-            <p className="text-muted text-sm font-semibold">Pick a slot to open it.</p>
-          </Card>
-        )}
+        <div className="space-y-5">
+          <PlaceMerchant
+            slots={openSlots}
+            merchants={merchants}
+            onPlace={placeMerchantInSlot}
+          />
+
+          {chosen ? (
+            <SlotPanel slot={chosen} requests={requests} />
+          ) : (
+            <Card className="p-5">
+              <p className="text-muted text-sm font-semibold">Pick a slot to open it.</p>
+            </Card>
+          )}
+        </div>
       </div>
     </>
   );

@@ -22,6 +22,7 @@ import {
   type RateCardRow,
   type RuleRow,
 } from '@/components/featured/tabs';
+import { type OpenSlot } from '@/components/featured/place-merchant';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -172,17 +173,56 @@ async function loadInventory(
   badges: Badges,
   requests: RequestRow[],
 ) {
-  const { data } = await supabase
-    .from('console_featured_inventory_v')
-    .select('*')
-    .eq('city_id', city.id)
-    .eq('week_start', week)
-    .order('kind')
-    .order('position');
+  const [{ data }, { data: slots }, { data: merchants }] = await Promise.all([
+    supabase
+      .from('console_featured_inventory_v')
+      .select('*')
+      .eq('city_id', city.id)
+      .eq('week_start', week)
+      .order('kind')
+      .order('position'),
+    /* Eight weeks ahead, so a slot can be sold forward on the call
+       rather than only for the week somebody happens to be looking
+       at. */
+    supabase
+      .from('featured_open_slot_v')
+      .select('*')
+      .eq('city_id', city.id)
+      .order('week_start')
+      .order('kind')
+      .order('position'),
+    supabase
+      .from('merchant')
+      .select('id, trading_name, legal_name, category, featured, city_id')
+      .eq('status', 'live')
+      .eq('city_id', city.id)
+      .order('trading_name')
+      .limit(300),
+  ]);
+
+  const merchantOptions = (
+    (merchants as
+      | {
+          id: string;
+          trading_name: string | null;
+          legal_name: string | null;
+          category: string | null;
+          featured: boolean;
+        }[]
+      | null) ?? []
+  ).map((m) => ({
+    id: m.id,
+    name: m.trading_name ?? m.legal_name ?? '[—]',
+    category: m.category,
+    city_name: city.name,
+    featured_now: m.featured,
+  }));
 
   return (
     <InventoryTab
       rows={(data as InventoryRow[] | null) ?? []}
+      openSlots={(slots as OpenSlot[] | null) ?? []}
+      merchants={merchantOptions}
       badges={badges}
       week={week}
       selected={selected}

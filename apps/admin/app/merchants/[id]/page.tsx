@@ -3,12 +3,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { goLive, rejectDocument, setFeatured, verifyDocument } from '@/app/merchants/actions';
+import { goLive, rejectDocument, verifyDocument } from '@/app/merchants/actions';
+import { unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { DocumentReview, type ReviewDocument } from '@/components/document-review';
-import { FeatureToggle } from '@/components/feature-toggle';
+import { FeaturedNow } from '@/components/featured/place-merchant';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
@@ -24,6 +25,14 @@ export default async function MerchantApplicationPage({ params }: { params: { id
     .from('merchant')
     .select('*, city(name)')
     .eq('id', params.id)
+    .maybeSingle();
+
+  /* What their placement actually is, if they have one. The boolean
+     on the merchant row only says yes or no. */
+  const { data: featuredPlacement } = await supabase
+    .from('merchant_featured_v')
+    .select('*')
+    .eq('merchant_id', params.id)
     .maybeSingle();
 
   if (!merchant) notFound();
@@ -231,12 +240,29 @@ export default async function MerchantApplicationPage({ params }: { params: { id
               </div>
             </Card>
 
-            <FeatureToggle
-              featured={merchant.featured}
-              live={merchant.status === 'live'}
-              onToggle={async (next) => {
+            {/*
+              The old control was a boolean. Being featured is a slot
+              held for a week at an agreed price, so this shows which
+              one and until when — and selling a new one happens where
+              those three things can be chosen.
+            */}
+            <FeaturedNow
+              merchantName={merchant.trading_name ?? merchant.legal_name ?? 'this merchant'}
+              placement={
+                featuredPlacement?.placement_kind && featuredPlacement.until
+                  ? {
+                      placement_kind: featuredPlacement.placement_kind,
+                      placement_category: featuredPlacement.placement_category,
+                      until: featuredPlacement.until,
+                      price_per_week: featuredPlacement.price_per_week,
+                      has_creative: featuredPlacement.has_creative ?? false,
+                      booked_by_email: featuredPlacement.booked_by_email,
+                    }
+                  : null
+              }
+              onEnd={async (reason) => {
                 'use server';
-                return setFeatured(params.id, next);
+                return unfeatureMerchant(params.id, reason);
               }}
             />
 

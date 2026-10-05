@@ -6736,6 +6736,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_placement_id_fkey';
             columns: ['placement_id'];
             isOneToOne: false;
+            referencedRelation: 'featured_open_slot_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_placement';
             referencedColumns: ['id'];
           },
@@ -7132,6 +7139,13 @@ export type Database = {
             foreignKeyName: 'featured_event_placement_id_fkey';
             columns: ['placement_id'];
             isOneToOne: false;
+            referencedRelation: 'featured_open_slot_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_placement';
             referencedColumns: ['id'];
           },
@@ -7433,6 +7447,13 @@ export type Database = {
             columns: ['placement_id'];
             isOneToOne: false;
             referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_open_slot_v';
             referencedColumns: ['placement_id'];
           },
           {
@@ -7830,6 +7851,13 @@ export type Database = {
             columns: ['placement_id'];
             isOneToOne: false;
             referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_open_slot_v';
             referencedColumns: ['placement_id'];
           },
           {
@@ -19621,6 +19649,13 @@ export type Database = {
             foreignKeyName: 'featured_slot_week_placement_id_fkey';
             columns: ['placement_id'];
             isOneToOne: false;
+            referencedRelation: 'featured_open_slot_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_placement';
             referencedColumns: ['id'];
           },
@@ -20731,6 +20766,7 @@ export type Database = {
           closed_today: boolean | null;
           closes_today: string | null;
           cover_photo_path: string | null;
+          has_creative: boolean | null;
           kind: Database['public']['Enums']['placement_kind'] | null;
           merchant_category: Database['public']['Enums']['merchant_category'] | null;
           merchant_id: string | null;
@@ -20834,6 +20870,115 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'settings_settlement_v';
             referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      featured_open_slot_v: {
+        Row: {
+          booking_id: string | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          city_name: string | null;
+          kind: Database['public']['Enums']['placement_kind'] | null;
+          list_price: number | null;
+          placement_id: string | null;
+          position: number | null;
+          sold_to: string | null;
+          status: string | null;
+          week_end: string | null;
+          week_start: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_performance_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_requests_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['booking_id'];
+          },
+          {
+            foreignKeyName: 'featured_slot_week_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_featured_v';
+            referencedColumns: ['booking_id'];
           },
         ];
       };
@@ -21466,30 +21611,24 @@ export type Database = {
       };
       merchant_featured_v: {
         Row: {
-          auto_renew: boolean | null;
-          blurb: string | null;
+          booked_by_email: string | null;
           booking_id: string | null;
-          category: Database['public']['Enums']['merchant_category'] | null;
+          booking_status: Database['public']['Enums']['booking_status'] | null;
           city_id: string | null;
-          creative_status: Database['public']['Enums']['creative_status'] | null;
-          declined_reason: string | null;
-          eligibility: Json | null;
+          city_name: string | null;
           end_date: string | null;
+          has_creative: boolean | null;
           merchant_id: string | null;
-          orders_this_week: number | null;
-          pause_reason: string | null;
+          notes: string | null;
+          placement_category: Database['public']['Enums']['merchant_category'] | null;
+          placement_id: string | null;
           placement_kind: Database['public']['Enums']['placement_kind'] | null;
-          placement_label: string | null;
-          quote_expires_at: string | null;
-          quoted_price: number | null;
-          rejection_reason: string | null;
-          renews_at: string | null;
+          position: number | null;
+          price_per_week: number | null;
+          requested_via: string | null;
           start_date: string | null;
-          status: Database['public']['Enums']['booking_status'] | null;
-          taps_this_week: number | null;
-          views_this_week: number | null;
-          waitlist_rank: number | null;
-          wanted_start: string | null;
+          until: string | null;
+          week_start: string | null;
           weeks: number | null;
         };
         Relationships: [
@@ -21582,6 +21721,27 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_featured_inventory_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_open_slot_v';
+            referencedColumns: ['placement_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_placement_id_fkey';
+            columns: ['placement_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_placement';
             referencedColumns: ['id'];
           },
         ];
@@ -23065,6 +23225,7 @@ export type Database = {
     Functions: {
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_featured_expire: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_refresh_reports: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_scan_partitions: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_scan_rollup: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -23318,6 +23479,7 @@ export type Database = {
           source: string;
         }[];
       };
+      fn_merchant_is_featured: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_readiness: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_required_docs: {
@@ -25087,6 +25249,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_featured_end_now: { Args: { p_booking_id: string; p_reason: string }; Returns: Json };
       rpc_featured_fee_resolve: {
         Args: { p_final_days: number; p_line_id: string; p_note?: string };
         Returns: {
@@ -25167,6 +25330,17 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_featured_place_merchant: {
+        Args: {
+          p_merchant_id: string;
+          p_note?: string;
+          p_placement_id: string;
+          p_price: number;
+          p_week_start: string;
+          p_weeks?: number;
+        };
+        Returns: Json;
       };
       rpc_featured_rate_card_approve: {
         Args: { p_card_id: string };
@@ -26517,93 +26691,7 @@ export type Database = {
       };
       rpc_merchant_set_featured: {
         Args: { p_featured: boolean; p_merchant_id: string; p_reason?: string };
-        Returns: {
-          accepting_orders: boolean;
-          accepting_orders_changed_at: string | null;
-          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
-          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
-          acquisition_source: string | null;
-          answers: NonNullable<Json>;
-          branch_count_band: string | null;
-          busy_mode_until: string | null;
-          capacity_per_15min: number | null;
-          category: Database['public']['Enums']['merchant_category'] | null;
-          category_other: string | null;
-          city_id: string | null;
-          closed_early_at: string | null;
-          commission_pct: number | null;
-          commission_tier: Database['public']['Enums']['commission_tier_code'];
-          concierge_pick: boolean;
-          contact_email: string | null;
-          contact_name: string;
-          contact_phone: string;
-          cover_photo_path: string | null;
-          created_at: string;
-          credentials_sent_at: string | null;
-          delisted_at: string | null;
-          explore_visible: boolean;
-          featured: boolean;
-          fleet_delivery_pay_to_merchant: boolean;
-          fleet_dispatch_preference: string;
-          has_own_riders: boolean;
-          health_band: Database['public']['Enums']['health_band'] | null;
-          health_score: number | null;
-          hours: Json | null;
-          hours_pattern: string | null;
-          id: string;
-          landmark: string | null;
-          late_night_until: string | null;
-          legal_name: string | null;
-          onboarding_call_at: string | null;
-          onboarding_source: string | null;
-          onboarding_step: number;
-          order_channels: string[];
-          packaging: string | null;
-          parent_merchant_id: string | null;
-          password_set_at: string | null;
-          pay_on_delivery: boolean;
-          pay_on_delivery_cap_kes: number | null;
-          payout_account: Json | null;
-          payout_hold: boolean;
-          payout_hold_reason: string | null;
-          payout_name_lookup: Json | null;
-          payout_rail: string | null;
-          phone_code_attempts: number;
-          phone_code_expires_at: string | null;
-          phone_code_hash: string | null;
-          phone_verified_at: string | null;
-          pickup_instructions: string | null;
-          prep_minutes: number;
-          price_band: string | null;
-          referred_by_id: string | null;
-          referred_by_type: string | null;
-          requires_ops_mapping: boolean;
-          resume_token_expires_at: string | null;
-          resume_token_hash: string | null;
-          rider_parking: string | null;
-          settlement_account: Json | null;
-          source_url: string | null;
-          status: Database['public']['Enums']['partner_status'];
-          status_reason: string | null;
-          strike_count: number;
-          submitted_at: string | null;
-          suspended_at: string | null;
-          suspended_by: string | null;
-          suspension_reason: string | null;
-          suspension_second_approver: string | null;
-          trading_name: string;
-          updated_at: string;
-          waitlisted_at: string | null;
-          went_live_at: string | null;
-          went_live_by: string | null;
-          when_busy: string;
-        };
-        SetofOptions: {
-          from: '*';
-          to: 'merchant';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
+        Returns: Json;
       };
       rpc_merchant_set_pause: {
         Args: { p_merchant_id: string; p_paused: boolean; p_reason?: string };
