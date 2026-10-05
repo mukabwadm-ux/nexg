@@ -13611,6 +13611,782 @@ export type Database = {
         };
         Relationships: [];
       };
+      msg_canned_reply: {
+        Row: {
+          action_key: string | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          audience: string;
+          body_by_lang: NonNullable<Json>;
+          key: string;
+          last_used_at: string | null;
+          needs_approval: boolean;
+          owner_team: string | null;
+          title: string;
+          topic: Database['public']['Enums']['msg_topic'] | null;
+          usage_count: number;
+        };
+        Insert: {
+          action_key?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          audience: string;
+          body_by_lang: NonNullable<Json>;
+          key: string;
+          last_used_at?: string | null;
+          needs_approval?: boolean;
+          owner_team?: string | null;
+          title: string;
+          topic?: Database['public']['Enums']['msg_topic'] | null;
+          usage_count?: number;
+        };
+        Update: {
+          action_key?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          audience?: string;
+          body_by_lang?: NonNullable<Json>;
+          key?: string;
+          last_used_at?: string | null;
+          needs_approval?: boolean;
+          owner_team?: string | null;
+          title?: string;
+          topic?: Database['public']['Enums']['msg_topic'] | null;
+          usage_count?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_canned_reply_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_conversation: {
+        Row: {
+          assignee_id: string | null;
+          city_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          current_channel: Database['public']['Enums']['msg_channel'];
+          escalated_to: string[];
+          first_responded_at: string | null;
+          first_response_due_at: string | null;
+          id: string;
+          kind: Database['public']['Enums']['msg_conversation_kind'];
+          language: string;
+          last_external_message_at: string | null;
+          last_message_at: string | null;
+          last_staff_message_at: string | null;
+          legal_hold: boolean;
+          origin_channel: Database['public']['Enums']['msg_channel'];
+          owner_team: string;
+          parent_conversation_id: string | null;
+          priority: Database['public']['Enums']['msg_priority'];
+          rating: number | null;
+          rating_comment: string | null;
+          reopened_count: number;
+          resolution_due_at: string | null;
+          resolution_note: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          resolved_in_one: boolean | null;
+          retention_until: string | null;
+          status: Database['public']['Enums']['msg_conv_status'];
+          subject: string;
+          topic: Database['public']['Enums']['msg_topic'] | null;
+        };
+        Insert: {
+          assignee_id?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          current_channel: Database['public']['Enums']['msg_channel'];
+          escalated_to?: string[];
+          first_responded_at?: string | null;
+          first_response_due_at?: string | null;
+          id?: string;
+          kind: Database['public']['Enums']['msg_conversation_kind'];
+          language?: string;
+          last_external_message_at?: string | null;
+          last_message_at?: string | null;
+          last_staff_message_at?: string | null;
+          legal_hold?: boolean;
+          origin_channel: Database['public']['Enums']['msg_channel'];
+          owner_team?: string;
+          parent_conversation_id?: string | null;
+          priority?: Database['public']['Enums']['msg_priority'];
+          rating?: number | null;
+          rating_comment?: string | null;
+          reopened_count?: number;
+          resolution_due_at?: string | null;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          resolved_in_one?: boolean | null;
+          retention_until?: string | null;
+          status?: Database['public']['Enums']['msg_conv_status'];
+          subject: string;
+          topic?: Database['public']['Enums']['msg_topic'] | null;
+        };
+        Update: {
+          assignee_id?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          current_channel?: Database['public']['Enums']['msg_channel'];
+          escalated_to?: string[];
+          first_responded_at?: string | null;
+          first_response_due_at?: string | null;
+          id?: string;
+          kind?: Database['public']['Enums']['msg_conversation_kind'];
+          language?: string;
+          last_external_message_at?: string | null;
+          last_message_at?: string | null;
+          last_staff_message_at?: string | null;
+          legal_hold?: boolean;
+          origin_channel?: Database['public']['Enums']['msg_channel'];
+          owner_team?: string;
+          parent_conversation_id?: string | null;
+          priority?: Database['public']['Enums']['msg_priority'];
+          rating?: number | null;
+          rating_comment?: string | null;
+          reopened_count?: number;
+          resolution_due_at?: string | null;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          resolved_in_one?: boolean | null;
+          retention_until?: string | null;
+          status?: Database['public']['Enums']['msg_conv_status'];
+          subject?: string;
+          topic?: Database['public']['Enums']['msg_topic'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_conversation_assignee_id_fkey';
+            columns: ['assignee_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_parent_conversation_id_fkey';
+            columns: ['parent_conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_parent_conversation_id_fkey';
+            columns: ['parent_conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_parent_conversation_id_fkey';
+            columns: ['parent_conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_resolved_by_fkey';
+            columns: ['resolved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_message: {
+        Row: {
+          action: Json | null;
+          attachments: NonNullable<Json>;
+          author_participant_id: string | null;
+          body: string | null;
+          body_lang: string | null;
+          channel_out: Database['public']['Enums']['msg_channel'] | null;
+          conversation_id: string;
+          created_at: string;
+          delivered_at: string | null;
+          delivery: Database['public']['Enums']['msg_delivery_status'];
+          edited_at: string | null;
+          failure_reason: string | null;
+          id: string;
+          idempotency_key: string | null;
+          kind: Database['public']['Enums']['msg_message_kind'];
+          object_links: NonNullable<Json>;
+          provider_ref: string | null;
+          read_at: string | null;
+          redacted_at: string | null;
+          redacted_by: string | null;
+          redaction_reason: string | null;
+          seq: number;
+          trace_id: string | null;
+          visibility: Database['public']['Enums']['msg_visibility'];
+        };
+        Insert: {
+          action?: Json | null;
+          attachments?: NonNullable<Json>;
+          author_participant_id?: string | null;
+          body?: string | null;
+          body_lang?: string | null;
+          channel_out?: Database['public']['Enums']['msg_channel'] | null;
+          conversation_id: string;
+          created_at?: string;
+          delivered_at?: string | null;
+          delivery?: Database['public']['Enums']['msg_delivery_status'];
+          edited_at?: string | null;
+          failure_reason?: string | null;
+          id?: string;
+          idempotency_key?: string | null;
+          kind?: Database['public']['Enums']['msg_message_kind'];
+          object_links?: NonNullable<Json>;
+          provider_ref?: string | null;
+          read_at?: string | null;
+          redacted_at?: string | null;
+          redacted_by?: string | null;
+          redaction_reason?: string | null;
+          seq: number;
+          trace_id?: string | null;
+          visibility: Database['public']['Enums']['msg_visibility'];
+        };
+        Update: {
+          action?: Json | null;
+          attachments?: NonNullable<Json>;
+          author_participant_id?: string | null;
+          body?: string | null;
+          body_lang?: string | null;
+          channel_out?: Database['public']['Enums']['msg_channel'] | null;
+          conversation_id?: string;
+          created_at?: string;
+          delivered_at?: string | null;
+          delivery?: Database['public']['Enums']['msg_delivery_status'];
+          edited_at?: string | null;
+          failure_reason?: string | null;
+          id?: string;
+          idempotency_key?: string | null;
+          kind?: Database['public']['Enums']['msg_message_kind'];
+          object_links?: NonNullable<Json>;
+          provider_ref?: string | null;
+          read_at?: string | null;
+          redacted_at?: string | null;
+          redacted_by?: string | null;
+          redaction_reason?: string | null;
+          seq?: number;
+          trace_id?: string | null;
+          visibility?: Database['public']['Enums']['msg_visibility'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_message_author_participant_id_fkey';
+            columns: ['author_participant_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_participant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_message_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_message_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_message_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+          {
+            foreignKeyName: 'msg_message_redacted_by_fkey';
+            columns: ['redacted_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_object_link: {
+        Row: {
+          conversation_id: string;
+          id: string;
+          is_primary: boolean;
+          label: string;
+          linked_at: string;
+          linked_by: string | null;
+          object_id: string;
+          object_type: string;
+        };
+        Insert: {
+          conversation_id: string;
+          id?: string;
+          is_primary?: boolean;
+          label: string;
+          linked_at?: string;
+          linked_by?: string | null;
+          object_id: string;
+          object_type: string;
+        };
+        Update: {
+          conversation_id?: string;
+          id?: string;
+          is_primary?: boolean;
+          label?: string;
+          linked_at?: string;
+          linked_by?: string | null;
+          object_id?: string;
+          object_type?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_object_link_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_object_link_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_object_link_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+          {
+            foreignKeyName: 'msg_object_link_linked_by_fkey';
+            columns: ['linked_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_participant: {
+        Row: {
+          can_reply_external: boolean;
+          can_see_internal: boolean;
+          conversation_id: string;
+          display_name: string;
+          guest_id: string | null;
+          id: string;
+          joined_at: string;
+          kind: Database['public']['Enums']['msg_participant_kind'];
+          last_read_seq: number;
+          left_at: string | null;
+          muted: boolean;
+          role_label: string | null;
+          staff_user_id: string | null;
+          team_key: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          can_reply_external?: boolean;
+          can_see_internal?: boolean;
+          conversation_id: string;
+          display_name: string;
+          guest_id?: string | null;
+          id?: string;
+          joined_at?: string;
+          kind: Database['public']['Enums']['msg_participant_kind'];
+          last_read_seq?: number;
+          left_at?: string | null;
+          muted?: boolean;
+          role_label?: string | null;
+          staff_user_id?: string | null;
+          team_key?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          can_reply_external?: boolean;
+          can_see_internal?: boolean;
+          conversation_id?: string;
+          display_name?: string;
+          guest_id?: string | null;
+          id?: string;
+          joined_at?: string;
+          kind?: Database['public']['Enums']['msg_participant_kind'];
+          last_read_seq?: number;
+          left_at?: string | null;
+          muted?: boolean;
+          role_label?: string | null;
+          staff_user_id?: string | null;
+          team_key?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_participant_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_participant_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_participant_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+          {
+            foreignKeyName: 'msg_participant_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_participant_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_participant_staff_user_id_fkey';
+            columns: ['staff_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_presence: {
+        Row: {
+          active_count: number;
+          capacity: number;
+          device: string | null;
+          last_seen_at: string;
+          on_shift_until: string | null;
+          staff_user_id: string;
+          state: string;
+        };
+        Insert: {
+          active_count?: number;
+          capacity?: number;
+          device?: string | null;
+          last_seen_at?: string;
+          on_shift_until?: string | null;
+          staff_user_id: string;
+          state?: string;
+        };
+        Update: {
+          active_count?: number;
+          capacity?: number;
+          device?: string | null;
+          last_seen_at?: string;
+          on_shift_until?: string | null;
+          staff_user_id?: string;
+          state?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_presence_staff_user_id_fkey';
+            columns: ['staff_user_id'];
+            isOneToOne: true;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_routing_rule: {
+        Row: {
+          auto_link: string | null;
+          conditions: NonNullable<Json>;
+          enabled: boolean;
+          first_response_sla_s: number;
+          id: string;
+          label: string;
+          owner_team: string;
+          priority: number;
+          priority_out: Database['public']['Enums']['msg_priority'];
+          resolution_sla_min: number | null;
+        };
+        Insert: {
+          auto_link?: string | null;
+          conditions?: NonNullable<Json>;
+          enabled?: boolean;
+          first_response_sla_s?: number;
+          id?: string;
+          label: string;
+          owner_team: string;
+          priority: number;
+          priority_out?: Database['public']['Enums']['msg_priority'];
+          resolution_sla_min?: number | null;
+        };
+        Update: {
+          auto_link?: string | null;
+          conditions?: NonNullable<Json>;
+          enabled?: boolean;
+          first_response_sla_s?: number;
+          id?: string;
+          label?: string;
+          owner_team?: string;
+          priority?: number;
+          priority_out?: Database['public']['Enums']['msg_priority'];
+          resolution_sla_min?: number | null;
+        };
+        Relationships: [];
+      };
+      msg_topic_tag: {
+        Row: {
+          at: string;
+          auto: boolean;
+          conversation_id: string;
+          subtopic: string | null;
+          tagged_by: string | null;
+          topic: Database['public']['Enums']['msg_topic'];
+        };
+        Insert: {
+          at?: string;
+          auto?: boolean;
+          conversation_id: string;
+          subtopic?: string | null;
+          tagged_by?: string | null;
+          topic: Database['public']['Enums']['msg_topic'];
+        };
+        Update: {
+          at?: string;
+          auto?: boolean;
+          conversation_id?: string;
+          subtopic?: string | null;
+          tagged_by?: string | null;
+          topic?: Database['public']['Enums']['msg_topic'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_topic_tag_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_topic_tag_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_topic_tag_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+          {
+            foreignKeyName: 'msg_topic_tag_tagged_by_fkey';
+            columns: ['tagged_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_visitor: {
+        Row: {
+          consent_at: string | null;
+          contact: string | null;
+          contact_kind: string | null;
+          created_at: string;
+          display_name: string | null;
+          id: string;
+          ip_country: string | null;
+          linked_guest_id: string | null;
+          session_hash: string;
+        };
+        Insert: {
+          consent_at?: string | null;
+          contact?: string | null;
+          contact_kind?: string | null;
+          created_at?: string;
+          display_name?: string | null;
+          id?: string;
+          ip_country?: string | null;
+          linked_guest_id?: string | null;
+          session_hash: string;
+        };
+        Update: {
+          consent_at?: string | null;
+          contact?: string | null;
+          contact_kind?: string | null;
+          created_at?: string;
+          display_name?: string | null;
+          id?: string;
+          ip_country?: string | null;
+          linked_guest_id?: string | null;
+          session_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_visitor_linked_guest_id_fkey';
+            columns: ['linked_guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_visitor_linked_guest_id_fkey';
+            columns: ['linked_guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_whatsapp_session: {
+        Row: {
+          conversation_id: string;
+          last_inbound_at: string | null;
+          last_outbound_at: string | null;
+          msisdn_hash: string;
+          msisdn_masked: string;
+          opt_in_at: string;
+          provider_conversation_id: string | null;
+          window_expires_at: string;
+        };
+        Insert: {
+          conversation_id: string;
+          last_inbound_at?: string | null;
+          last_outbound_at?: string | null;
+          msisdn_hash: string;
+          msisdn_masked: string;
+          opt_in_at?: string;
+          provider_conversation_id?: string | null;
+          window_expires_at: string;
+        };
+        Update: {
+          conversation_id?: string;
+          last_inbound_at?: string | null;
+          last_outbound_at?: string | null;
+          msisdn_hash?: string;
+          msisdn_masked?: string;
+          opt_in_at?: string;
+          provider_conversation_id?: string | null;
+          window_expires_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_whatsapp_session_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_whatsapp_session_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_whatsapp_session_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+        ];
+      };
       notification: {
         Row: {
           attempts: number;
@@ -27667,6 +28443,195 @@ export type Database = {
           },
         ];
       };
+      msg_badges_v: {
+        Row: {
+          open_now: number | null;
+          overdue: number | null;
+          unassigned: number | null;
+        };
+        Relationships: [];
+      };
+      msg_desk_status_v: {
+        Row: {
+          busy: number | null;
+          capacity_left: number | null;
+          median_first_reply_s: number | null;
+          on_roster: number | null;
+          online: number | null;
+        };
+        Relationships: [];
+      };
+      msg_inbox_v: {
+        Row: {
+          assignee: string | null;
+          assignee_id: string | null;
+          city: string | null;
+          city_id: string | null;
+          created_at: string | null;
+          current_channel: Database['public']['Enums']['msg_channel'] | null;
+          escalated_to: string[] | null;
+          first_responded_at: string | null;
+          first_response_due_at: string | null;
+          id: string | null;
+          internal_notes: number | null;
+          kind: Database['public']['Enums']['msg_conversation_kind'] | null;
+          last_external_message_at: string | null;
+          last_message_at: string | null;
+          message_count: number | null;
+          object_id: string | null;
+          object_label: string | null;
+          object_type: string | null;
+          origin_channel: Database['public']['Enums']['msg_channel'] | null;
+          overdue_s: number | null;
+          owner_team: string | null;
+          priority: Database['public']['Enums']['msg_priority'] | null;
+          rating: number | null;
+          resolved_at: string | null;
+          snippet: string | null;
+          status: Database['public']['Enums']['msg_conv_status'] | null;
+          subject: string | null;
+          topic: Database['public']['Enums']['msg_topic'] | null;
+          unassigned: boolean | null;
+          with_whom: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_conversation_assignee_id_fkey';
+            columns: ['assignee_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      msg_message_v: {
+        Row: {
+          action: Json | null;
+          attachments: Json | null;
+          author: string | null;
+          author_kind: Database['public']['Enums']['msg_participant_kind'] | null;
+          author_role: string | null;
+          author_staff_id: string | null;
+          body: string | null;
+          channel_out: Database['public']['Enums']['msg_channel'] | null;
+          conversation_id: string | null;
+          created_at: string | null;
+          delivery: Database['public']['Enums']['msg_delivery_status'] | null;
+          id: string | null;
+          kind: Database['public']['Enums']['msg_message_kind'] | null;
+          object_links: Json | null;
+          redacted_at: string | null;
+          redaction_reason: string | null;
+          seq: number | null;
+          visibility: Database['public']['Enums']['msg_visibility'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_message_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_message_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_message_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+          {
+            foreignKeyName: 'msg_participant_staff_user_id_fkey';
+            columns: ['author_staff_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_object_conversations_v: {
+        Row: {
+          conversation_id: string | null;
+          kind: Database['public']['Enums']['msg_conversation_kind'] | null;
+          label: string | null;
+          last_message_at: string | null;
+          object_id: string | null;
+          object_type: string | null;
+          status: Database['public']['Enums']['msg_conv_status'] | null;
+          subject: string | null;
+        };
+        Relationships: [];
+      };
       order_money_v: {
         Row: {
           city_id: string | null;
@@ -29875,6 +30840,31 @@ export type Database = {
           tier: number;
           title: string;
         }[];
+      };
+      fn_msg_route: {
+        Args: {
+          p_city: string;
+          p_has_live_order: boolean;
+          p_topic: Database['public']['Enums']['msg_topic'];
+        };
+        Returns: {
+          auto_link: string | null;
+          conditions: NonNullable<Json>;
+          enabled: boolean;
+          first_response_sla_s: number;
+          id: string;
+          label: string;
+          owner_team: string;
+          priority: number;
+          priority_out: Database['public']['Enums']['msg_priority'];
+          resolution_sla_min: number | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'msg_routing_rule';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       fn_needs_action_reads_as: { Args: { p_reasons: string[] }; Returns: string };
       fn_order_lateness: { Args: { p_delivered: string; p_promised: string }; Returns: number };
@@ -33558,6 +34548,66 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_withdraw_featured: { Args: { p_booking_id: string }; Returns: Json };
+      rpc_msg_escalate: {
+        Args: {
+          p_conversation: string;
+          p_hand_over?: boolean;
+          p_note?: string;
+          p_to_staff?: string;
+          p_to_team?: string;
+        };
+        Returns: Json;
+      };
+      rpc_msg_link_object: {
+        Args: {
+          p_conversation: string;
+          p_label: string;
+          p_object_id: string;
+          p_object_type: string;
+        };
+        Returns: Json;
+      };
+      rpc_msg_pin_decision: {
+        Args: { p_conversation: string; p_reason: string; p_summary: string };
+        Returns: Json;
+      };
+      rpc_msg_presence: { Args: { p_on_shift_until?: string; p_state: string }; Returns: Json };
+      rpc_msg_resolve: {
+        Args: {
+          p_conversation: string;
+          p_note?: string;
+          p_subtopic?: string;
+          p_topic: Database['public']['Enums']['msg_topic'];
+        };
+        Returns: Json;
+      };
+      rpc_msg_send: {
+        Args: {
+          p_body: string;
+          p_conversation: string;
+          p_idempotency_key?: string;
+          p_kind?: Database['public']['Enums']['msg_message_kind'];
+          p_visibility?: Database['public']['Enums']['msg_visibility'];
+        };
+        Returns: Json;
+      };
+      rpc_msg_start: {
+        Args: {
+          p_channel?: Database['public']['Enums']['msg_channel'];
+          p_city_id?: string;
+          p_guest_id?: string;
+          p_kind: Database['public']['Enums']['msg_conversation_kind'];
+          p_object_id?: string;
+          p_object_label?: string;
+          p_object_type?: string;
+          p_staff_participants?: string[];
+          p_subject: string;
+          p_team_participants?: string[];
+          p_topic?: Database['public']['Enums']['msg_topic'];
+        };
+        Returns: Json;
+      };
+      rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -35528,6 +36578,64 @@ export type Database = {
       merchant_control_source: 'merchant' | 'staff' | 'system';
       merchant_user_role: 'owner' | 'manager';
       mood: 'wild' | 'taste' | 'night' | 'slow' | 'stay' | 'events';
+      msg_channel:
+        | 'web'
+        | 'guest_app'
+        | 'merchant_dashboard'
+        | 'rider_app'
+        | 'host_view'
+        | 'hotel_desk'
+        | 'whatsapp'
+        | 'sms'
+        | 'email'
+        | 'internal';
+      msg_conv_status:
+        | 'open'
+        | 'waiting_on_us'
+        | 'waiting_on_them'
+        | 'escalated'
+        | 'resolved'
+        | 'closed'
+        | 'archived';
+      msg_conversation_kind: 'external' | 'internal_thread' | 'team_channel' | 'direct' | 'group';
+      msg_delivery_status: 'stored' | 'broadcast' | 'sent' | 'delivered' | 'read' | 'failed';
+      msg_message_kind:
+        | 'text'
+        | 'attachment'
+        | 'system'
+        | 'internal_note'
+        | 'action_card'
+        | 'suggested_reply'
+        | 'decision'
+        | 'link'
+        | 'redacted';
+      msg_participant_kind:
+        | 'staff'
+        | 'guest'
+        | 'merchant_user'
+        | 'rider'
+        | 'host_user'
+        | 'hotel_user'
+        | 'visitor'
+        | 'team';
+      msg_priority: 'urgent' | 'high' | 'normal' | 'low';
+      msg_topic:
+        | 'my_order'
+        | 'payment'
+        | 'refund_status'
+        | 'change_order'
+        | 'merchant_application'
+        | 'merchant_documents'
+        | 'merchant_payout'
+        | 'rider_application'
+        | 'rider_cash'
+        | 'rider_documents'
+        | 'hotel_or_airbnb'
+        | 'partnership'
+        | 'outside_coverage'
+        | 'careers'
+        | 'something_else';
+      msg_visibility: 'external' | 'internal';
       notification_kind:
         | 'ticket_received'
         | 'ticket_resolved'
@@ -37202,6 +38310,69 @@ export const Constants = {
       merchant_control_source: ['merchant', 'staff', 'system'],
       merchant_user_role: ['owner', 'manager'],
       mood: ['wild', 'taste', 'night', 'slow', 'stay', 'events'],
+      msg_channel: [
+        'web',
+        'guest_app',
+        'merchant_dashboard',
+        'rider_app',
+        'host_view',
+        'hotel_desk',
+        'whatsapp',
+        'sms',
+        'email',
+        'internal',
+      ],
+      msg_conv_status: [
+        'open',
+        'waiting_on_us',
+        'waiting_on_them',
+        'escalated',
+        'resolved',
+        'closed',
+        'archived',
+      ],
+      msg_conversation_kind: ['external', 'internal_thread', 'team_channel', 'direct', 'group'],
+      msg_delivery_status: ['stored', 'broadcast', 'sent', 'delivered', 'read', 'failed'],
+      msg_message_kind: [
+        'text',
+        'attachment',
+        'system',
+        'internal_note',
+        'action_card',
+        'suggested_reply',
+        'decision',
+        'link',
+        'redacted',
+      ],
+      msg_participant_kind: [
+        'staff',
+        'guest',
+        'merchant_user',
+        'rider',
+        'host_user',
+        'hotel_user',
+        'visitor',
+        'team',
+      ],
+      msg_priority: ['urgent', 'high', 'normal', 'low'],
+      msg_topic: [
+        'my_order',
+        'payment',
+        'refund_status',
+        'change_order',
+        'merchant_application',
+        'merchant_documents',
+        'merchant_payout',
+        'rider_application',
+        'rider_cash',
+        'rider_documents',
+        'hotel_or_airbnb',
+        'partnership',
+        'outside_coverage',
+        'careers',
+        'something_else',
+      ],
+      msg_visibility: ['external', 'internal'],
       notification_kind: [
         'ticket_received',
         'ticket_resolved',
