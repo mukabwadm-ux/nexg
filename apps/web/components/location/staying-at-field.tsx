@@ -37,7 +37,7 @@ interface Candidate {
 }
 
 export function StayingAtField() {
-  const { place, ready, consent, openSheet, setPlace, actions } = useLocation();
+  const { place, step, ready, consent, openSheet, setPlace, actions } = useLocation();
 
   const [value, setValue] = React.useState('');
   const [touched, setTouched] = React.useState(false);
@@ -59,15 +59,31 @@ export function StayingAtField() {
    */
   React.useEffect(() => {
     if (!ready || touched || !place) return;
-    /* A city guessed from the connection is not an address, and
-       putting "Nairobi · from your connection" in a field asking
-       where somebody is staying would be a worse answer than an
-       empty box. */
+
+    /*
+     * A city guessed from the connection is not an address.
+     * Putting "Nairobi · from your connection" in a field asking
+     * where somebody is staying is a worse answer than an empty
+     * box, and it is pre-filled, so most people would send it.
+     *
+     * This tested `coverage` first, which looked right and was
+     * not: Nairobi's own IP coordinate lands inside a live zone,
+     * so an IP guess comes back `covered` and sailed through. It
+     * only showed up in production, because there are no edge
+     * headers locally and the step never occurs in development.
+     *
+     * The discriminator is how the place was arrived at, not
+     * whether its coordinate happens to fall somewhere we
+     * deliver. `rpc_resolve_location` makes the same distinction
+     * for the chip and there is a test on it; this is the same
+     * rule, applied where it was missing.
+     */
+    if (step === 'ip_city' || place.source === 'ip_city') return;
     if (place.coverage !== 'covered') return;
 
     setValue(describePlace(place));
     setPicked(place);
-  }, [ready, touched, place]);
+  }, [ready, touched, place, step]);
 
   /* Debounced search, same endpoint as the header panel. */
   React.useEffect(() => {

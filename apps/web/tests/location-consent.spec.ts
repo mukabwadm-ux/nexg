@@ -141,6 +141,73 @@ test.describe('location is never read without a gesture', () => {
   });
 });
 
+test.describe('a guessed city is never presented as an address', () => {
+  /*
+   * This shipped broken and only production found it. The hero
+   * field guarded on `coverage`, which looked right — and
+   * Nairobi's own IP coordinate falls inside a live zone, so an
+   * IP guess comes back `covered` and filled the box with
+   * "Nairobi · from your connection". Pre-filled, so most people
+   * would have sent it.
+   *
+   * It cannot reproduce in development, because the edge headers
+   * that produce an ip_city step do not exist locally. So the
+   * state is seeded directly.
+   */
+  test('"Where are you staying?" stays empty on an IP-guessed city', async ({ page }) => {
+    await page.addInitScript(() => {
+      sessionStorage.setItem('nexg.loc.asked', '1');
+      localStorage.setItem(
+        'nexg.loc.current',
+        JSON.stringify({
+          step: 'ip_city',
+          place: {
+            label: 'Nairobi · from your connection',
+            city: 'Nairobi',
+            lat: -1.2921,
+            lng: 36.8219,
+            /* Covered on purpose — that is the trap. */
+            coverage: 'covered',
+            zone: 'CBD',
+            source: 'ip_city',
+          },
+        }),
+      );
+    });
+    await page.goto('/');
+    await page.waitForTimeout(2500);
+
+    await expect(
+      page.locator('#staying_at'),
+      'A city worked out from the connection is not an address, and a pre-filled field is one most people will send.',
+    ).toHaveValue('');
+  });
+
+  test('a confirmed pin does fill it', async ({ page }) => {
+    await page.addInitScript(() => {
+      sessionStorage.setItem('nexg.loc.asked', '1');
+      localStorage.setItem(
+        'nexg.loc.current',
+        JSON.stringify({
+          step: 'device',
+          place: {
+            label: 'Home',
+            address_line: 'Riverside Drive',
+            lat: -1.285,
+            lng: 36.7825,
+            coverage: 'covered',
+            zone: 'Kilimani',
+            source: 'gps',
+          },
+        }),
+      );
+    });
+    await page.goto('/');
+    await page.waitForTimeout(2500);
+    await expect(page.locator('#staying_at')).not.toHaveValue('');
+  });
+});
+
 test.describe('the chip is on every public page', () => {
   for (const route of PUBLIC_ROUTES.filter((r) => r !== '/sign-in')) {
     test(`${route} renders the Deliver to chip`, async ({ page }) => {
