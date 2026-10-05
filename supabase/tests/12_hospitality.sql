@@ -180,8 +180,23 @@ select is(
 /* Replacing voids the old card, so a sticker left on a counter stops working. */
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a1111111-1111-1111-1111-111111111111","role":"authenticated"}';
-select public.rpc_qr_generate('unit', (select id from public.unit
-  where host_id = (select id from public.host where phone = '+254700000900')));
+/*
+ * Replacing, not generating.
+ *
+ * Generating a second card for a spot is refused on purpose and
+ * the refusal says so: two live cards in one place and neither
+ * number means anything. `rpc_qr_replace` is the way through —
+ * it voids the old card, issues a new one, and links them, in
+ * that order so a failure leaves the old card working rather
+ * than the counter with none.
+ */
+select public.rpc_qr_replace(
+  (select q.id from public.property_qr q
+     join public.unit u on u.id = q.owner_id and q.owner_type = 'unit'
+    where u.host_id = (select id from public.host where phone = '+254700000900')
+      and q.voided_at is null
+    limit 1),
+  'reprinted — the counter card was damaged');
 reset role;
 
 select is(

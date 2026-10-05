@@ -474,8 +474,24 @@ select is(
   0,
   'featured_live_v is a view, so the homepage never shows a stale band.');
 
-select ok(
-  pg_get_viewdef('public.featured_live_v'::regclass) not like '%cr.id IS NOT NULL%',
+/*
+ * Asserted as behaviour rather than by reading the view's SQL.
+ *
+ * The old version grepped the definition for `cr.id IS NOT
+ * NULL` and failed on the `has_creative` column — which is the
+ * view reporting whether artwork exists, not requiring it. A
+ * test that reads SQL text fails on a rename and passes on a
+ * rewrite that breaks the behaviour, which is the wrong way
+ * round in both directions.
+ */
+insert into t_ids (k, v) select 'showing_before', (select count(*) from public.featured_live_v);
+
+update public.featured_creative set status = 'draft'
+ where booking_id in (select booking_id from public.featured_live_v);
+
+select is(
+  (select count(*) from public.featured_live_v)::bigint,
+  (select v from t_ids where k = 'showing_before'),
   'An approved creative is no longer required — charging somebody and then not showing them is a bug, not a policy.');
 
 
