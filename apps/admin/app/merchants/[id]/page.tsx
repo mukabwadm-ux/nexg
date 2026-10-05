@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { goLive, rejectDocument, verifyDocument } from '@/app/merchants/actions';
+import { remindToUpload } from '@/app/documents/actions';
 import { unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
@@ -101,6 +102,25 @@ export default async function MerchantApplicationPage({ params }: { params: { id
     ((chases as { requirement_id: string }[] | null) ?? []).map((c) => c.requirement_id),
   );
 
+  /* When each document was last chased, so the button can say
+     something true rather than offering to send a fourth message. */
+  const { data: chaseState } = await supabase.rpc('fn_document_chase_state', {
+    p_owner_type: 'merchant',
+    p_owner_id: params.id,
+  });
+  const chases_ = (chaseState ?? {}) as Record<
+    string,
+    {
+      last_sent_at: string | null;
+      last_channel: string | null;
+      by: string | null;
+      by_applicant: boolean;
+      times: number | null;
+      can_send_again: boolean;
+      next_allowed_at: string | null;
+    }
+  >;
+
   const review: ReviewDocument[] = await Promise.all(
     applicable.map(async (requirement) => {
       const document = byRequirement.get(requirement.id);
@@ -127,6 +147,7 @@ export default async function MerchantApplicationPage({ params }: { params: { id
         rejectionReason: document?.rejection_reason ?? null,
         url,
         mime: document?.mime ?? null,
+        chase: chases_[requirement.kind] ?? null,
       };
     }),
   );
@@ -171,6 +192,10 @@ export default async function MerchantApplicationPage({ params }: { params: { id
                   onReject={async (documentId, reason) => {
                     'use server';
                     return rejectDocument(documentId, params.id, reason);
+                  }}
+                  onRemind={async (kind) => {
+                    'use server';
+                    return remindToUpload('merchant', params.id, kind);
                   }}
                 />
               </div>

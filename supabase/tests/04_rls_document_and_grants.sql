@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(14);
 
 -- The seed places demo partners in Nairobi. Clear partner data so the counts
 -- below describe this test's own fixtures. The file rolls back at the end, so
@@ -147,6 +147,40 @@ select throws_ok(
   null,
   'a super_admin grant cannot be self-approved'
 );
+
+
+-- ══════════════════════ chasing a document that has not come
+
+/*
+ * The reviewer's version of the chase. The applicant's version
+ * already existed and authorises with `is_merchant_member`, so a
+ * reviewer could not call it at all — and the one thing a reviewer
+ * with a button can do that an applicant cannot is send the same
+ * person four messages in a minute.
+ */
+select throws_ok(
+  $$ select public.rpc_document_remind('merchant',
+       (select id from public.merchant limit 1), 'not_a_real_document') $$,
+  null,
+  'A document we do not ask for cannot be chased.');
+
+select ok(
+  (select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.proname = 'rpc_document_remind') = 1,
+  'There is one reminder function, not an overload pair waiting to go ambiguous.');
+
+select ok(
+  (select count(*) from information_schema.columns
+   where table_schema = 'public' and table_name = 'document_request'
+     and column_name = 'requested_by') = 1,
+  'A chase records who sent it — null still means the applicant asked us to.');
+
+select is(
+  (select count(*)::int from pg_policies
+   where schemaname = 'public' and tablename = 'document_request' and cmd = 'INSERT'
+     and policyname not like '%own%'),
+  0,
+  'Nothing but the applicant may insert a chase directly; a reviewer goes through the RPC.');
 
 select * from finish();
 rollback;

@@ -5781,8 +5781,10 @@ export type Database = {
           created_at: string;
           fulfilled_document_id: string | null;
           id: string;
+          note: string | null;
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
+          requested_by: string | null;
           requirement_id: string;
           sent_at: string;
           updated_at: string;
@@ -5792,8 +5794,10 @@ export type Database = {
           created_at?: string;
           fulfilled_document_id?: string | null;
           id?: string;
+          note?: string | null;
           owner_id: string;
           owner_type: Database['public']['Enums']['document_owner_type'];
+          requested_by?: string | null;
           requirement_id: string;
           sent_at?: string;
           updated_at?: string;
@@ -5803,8 +5807,10 @@ export type Database = {
           created_at?: string;
           fulfilled_document_id?: string | null;
           id?: string;
+          note?: string | null;
           owner_id?: string;
           owner_type?: Database['public']['Enums']['document_owner_type'];
+          requested_by?: string | null;
           requirement_id?: string;
           sent_at?: string;
           updated_at?: string;
@@ -5815,6 +5821,13 @@ export type Database = {
             columns: ['fulfilled_document_id'];
             isOneToOne: false;
             referencedRelation: 'document';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'document_request_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
           {
@@ -23298,6 +23311,13 @@ export type Database = {
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
       fn_data_request_blockers: { Args: { p_request_id: string }; Returns: Json };
       fn_decrypt_secret: { Args: { p_cipher: string }; Returns: string };
+      fn_document_chase_state: {
+        Args: {
+          p_owner_id: string;
+          p_owner_type: Database['public']['Enums']['document_owner_type'];
+        };
+        Returns: Json;
+      };
       fn_encrypt_secret: { Args: { p_plain: string }; Returns: string };
       fn_event_anchor_effects: { Args: { p_plan_id: string }; Returns: undefined };
       fn_expire_documents: { Args: Record<PropertyKey, never>; Returns: number };
@@ -24847,6 +24867,15 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_document_remind: {
+        Args: {
+          p_channel?: string;
+          p_owner_id: string;
+          p_owner_type: Database['public']['Enums']['document_owner_type'];
+          p_requirement_kind: string;
+        };
+        Returns: Json;
       };
       rpc_document_request_via_whatsapp:
         | { Args: { p_merchant_id: string; p_requirement_kind: string }; Returns: Json }

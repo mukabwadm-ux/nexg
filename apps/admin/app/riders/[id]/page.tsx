@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { activateRider, rejectDocument, verifyDocument } from '@/app/riders/actions';
+import { remindToUpload } from '@/app/documents/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
@@ -69,6 +70,25 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
    * 3.4). They are never stored: a URL in the page source that still worked
    * tomorrow would be a copy of the document nobody could revoke.
    */
+  /* When each document was last chased, so the button can say
+     something true rather than offering to send a fourth message. */
+  const { data: chaseState } = await supabase.rpc('fn_document_chase_state', {
+    p_owner_type: 'rider',
+    p_owner_id: params.id,
+  });
+  const chases_ = (chaseState ?? {}) as Record<
+    string,
+    {
+      last_sent_at: string | null;
+      last_channel: string | null;
+      by: string | null;
+      by_applicant: boolean;
+      times: number | null;
+      can_send_again: boolean;
+      next_allowed_at: string | null;
+    }
+  >;
+
   const review: ReviewDocument[] = await Promise.all(
     applicable.map(async (requirement) => {
       const document = byRequirement.get(requirement.id);
@@ -92,6 +112,7 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
         rejectionReason: document?.rejection_reason ?? null,
         url,
         mime: document?.mime ?? null,
+        chase: chases_[requirement.kind] ?? null,
       };
     }),
   );
@@ -135,6 +156,10 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
                   onReject={async (documentId, reason) => {
                     'use server';
                     return rejectDocument(documentId, params.id, reason);
+                  }}
+                  onRemind={async (kind) => {
+                    'use server';
+                    return remindToUpload('rider', params.id, kind);
                   }}
                 />
               </div>

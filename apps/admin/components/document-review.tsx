@@ -17,6 +17,16 @@ export interface ReviewDocument {
   /** Five-minute signed URL, minted server-side. Null when nothing is on file. */
   url: string | null;
   mime: string | null;
+  /** When this document was last chased, and whether it can be again. */
+  chase: {
+    last_sent_at: string | null;
+    last_channel: string | null;
+    by: string | null;
+    by_applicant: boolean;
+    times: number | null;
+    can_send_again: boolean;
+    next_allowed_at: string | null;
+  } | null;
 }
 
 /* "missing" is not a document status in the database — nothing has been
@@ -44,10 +54,13 @@ export function DocumentReview({
   documents,
   onVerify,
   onReject,
+  onRemind,
 }: {
   documents: ReviewDocument[];
   onVerify: (documentId: string) => Promise<{ ok: boolean; message: string }>;
   onReject: (documentId: string, reason: string) => Promise<{ ok: boolean; message: string }>;
+  /** Chase a document that has not arrived. */
+  onRemind: (kind: string) => Promise<{ ok: boolean; message: string }>;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -110,6 +123,12 @@ export function DocumentReview({
         const isBusy = busyKind === document.kind;
         const reason = reasons[document.kind] ?? '';
         const reviewable = document.id !== null && document.status !== 'verified';
+        /* Nothing to chase once it is in. A reviewer reminding
+           somebody to send a thing they already sent is how a
+           reviewer loses their trust. */
+        const chaseable =
+          document.status === MISSING || document.status === 'rejected' || document.status === 'expired';
+        const chase = document.chase;
 
         return (
           <li key={document.kind}>
@@ -188,6 +207,34 @@ export function DocumentReview({
                 </div>
               )}
 
+              {chaseable && (
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    loading={isBusy}
+                    disabled={isBusy || chase?.can_send_again === false}
+                    onClick={() => run(document.kind, () => onRemind(document.kind), 'Reminder recorded')}
+                  >
+                    {chase?.last_sent_at ? 'Remind again' : 'Remind them to upload'}
+                  </Button>
+
+                  {chase?.last_sent_at && (
+                    <span className="text-muted-light text-[0.6875rem] font-semibold">
+                      {chase.by_applicant
+                        ? 'They asked us to send a link'
+                        : `Chased by ${chase.by ?? 'somebody'}`}
+                      {' · '}
+                      {relative(chase.last_sent_at)}
+                      {chase.times && chase.times > 1 ? ` · ${chase.times} times` : ''}
+                      {chase.can_send_again === false && chase.next_allowed_at
+                        ? ` · again after ${shortTime(chase.next_allowed_at)}`
+                        : ''}
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/*
                * Guarded on `reviewable`, not only on the open set. A
                * document with no row behind it cannot be rejected,
@@ -240,4 +287,24 @@ export function DocumentReview({
       })}
     </ul>
   );
+}
+
+/* "2 hours ago", for a line that sits beside a button. */
+function relative(iso: string): string {
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (mins < 2) return 'a moment ago';
+  if (mins < 60) return `${mins} minutes ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+  const days = Math.round(hours / 24);
+  return `${days} day${days === 1 ? '' : 's'} ago`;
+}
+
+function shortTime(iso: string): string {
+  return new Date(iso).toLocaleString('en-GB', {
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Africa/Nairobi',
+  });
 }
