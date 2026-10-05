@@ -237,12 +237,43 @@ export function LocationProvider({
     if (!deviceId) return;
     let cancelled = false;
 
+    /*
+     * What this browser already knows, read synchronously.
+     *
+     * This used to sit behind `await consentState()` and `await
+     * actions.listSaved()`, so a visitor whose pin was sitting in
+     * their own localStorage still watched an empty header and an
+     * empty "Where are you staying?" field until a server round
+     * trip came back. On a cold start that was seconds, and on a
+     * slow connection it is however long the connection takes to
+     * tell us something we already had.
+     *
+     * Nothing here touches the network or the browser's location.
+     */
+    const device = loadDevicePlaces();
+    setSavedPlaces(device);
+
+    if (!place) {
+      const remembered = readJSON<{ place: Place; step: ResolutionStep } | null>(
+        safeStorage('local'),
+        CURRENT_KEY,
+        null,
+      );
+      const local = remembered?.place ?? device[0];
+      if (local) {
+        setPlaceState(local);
+        setStep(remembered?.step ?? 'device');
+      }
+    }
+
+    /* Enough to render honestly. The rest refines it. */
+    setReady(true);
+
     void (async () => {
       const state = await consentState();
       if (cancelled) return;
       setConsent(state);
 
-      const device = loadDevicePlaces();
       let account: SavedPlace[] = [];
       try {
         account = await actions.listSaved();
@@ -250,33 +281,25 @@ export function LocationProvider({
         /* Signed out, or the call failed. Neither is worth a
            message: the device's own list still works. */
       }
-      if (cancelled) return;
+      if (cancelled || account.length === 0) return;
 
-      const all = [...account, ...device.filter((d) => !account.some((a) => metresBetween(a, d) < 30))];
-      setSavedPlaces(all);
+      setSavedPlaces([
+        ...account,
+        ...device.filter((d) => !account.some((a) => metresBetween(a, d) < 30)),
+      ]);
 
-      if (!place) {
-        const remembered = readJSON<{ place: Place; step: ResolutionStep } | null>(
-          safeStorage('local'),
-          CURRENT_KEY,
-          null,
-        );
-        const fromAccount = account[0];
-        const chosen = fromAccount
-          ? { place: fromAccount as Place, step: 'account' as ResolutionStep }
-          : remembered?.place
-            ? { place: remembered.place, step: 'device' as ResolutionStep }
-            : device[0]
-              ? { place: device[0] as Place, step: 'device' as ResolutionStep }
-              : null;
-
-        if (chosen) {
-          setPlaceState(chosen.place);
-          setStep(chosen.step);
-        }
-      }
-
-      setReady(true);
+      /*
+       * The account wins over the device only when the device had
+       * nothing. Somebody who set an address on this machine a
+       * minute ago should not have it replaced by where they
+       * ordered from last week because a signed-in list arrived
+       * late.
+       */
+      setPlaceState((current) => {
+        if (current) return current;
+        setStep('account');
+        return account[0] as Place;
+      });
     })();
 
     return () => {

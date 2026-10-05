@@ -96,27 +96,56 @@ export async function GET(request: Request) {
 }
 
 /**
- * Places NexG already knows about: hotels, units and merchant
- * branches. These beat a geocoder for the thing guests actually
- * type, and they come with a zone already attached.
+ * Places NexG already knows about.
+ *
+ * Read from `merchant_public` rather than the branch table,
+ * because guests type the name over the door — "Westlands
+ * Trattoria", not whatever the branch row is called internally.
+ * Searching the internal name returned nothing for the most
+ * obvious query on the site.
+ *
+ * These beat a geocoder for what people actually type, they
+ * cost nothing, and they come with coordinates already in a
+ * zone.
  */
 async function knownPlaces(query: string) {
+  /*
+   * `.or()` takes a PostgREST filter *string*, so the search
+   * term is being interpolated into a small query language —
+   * commas separate filters, parentheses group them, and a dot
+   * separates column from operator. A term containing any of
+   * them does not fail; it changes which rows come back, which
+   * is the quiet half of an injection.
+   *
+   * Stripped rather than escaped, because PostgREST has no
+   * escape for these inside a filter value, and nobody searching
+   * for a hotel needs a comma.
+   */
+  const safe = query.replace(/[,().*"'%\\]/g, ' ').trim().slice(0, 60);
+  if (safe.length < 3) return [];
+
   const supabase = createPublicClient();
   const { data } = await supabase
-    .from('merchant_branch')
-    .select('name, latitude, longitude')
-    .ilike('name', `%${query}%`)
-    .not('latitude', 'is', null)
-    .limit(4);
+    .from('merchant_public')
+    .select('trading_name, branch_name, city_name, branch_latitude, branch_longitude')
+    .or(`trading_name.ilike.%${safe}%,branch_name.ilike.%${safe}%`)
+    .not('branch_latitude', 'is', null)
+    .limit(5);
 
   return (
-    (data as { name: string; latitude: number; longitude: number }[] | null) ?? []
-  ).map((b) => ({
-    label: b.name,
-    address_line: null,
+    (data as {
+      trading_name: string;
+      branch_name: string | null;
+      city_name: string | null;
+      branch_latitude: number;
+      branch_longitude: number;
+    }[] | null) ?? []
+  ).map((m) => ({
+    label: m.trading_name,
+    address_line: [m.branch_name, m.city_name].filter(Boolean).join(', ') || null,
     plus_code: null,
-    lat: b.latitude,
-    lng: b.longitude,
+    lat: m.branch_latitude,
+    lng: m.branch_longitude,
     coverage: 'unknown' as const,
     source: 'search',
   }));

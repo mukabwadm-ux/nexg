@@ -21,6 +21,18 @@ const leadSchema = z.object({
   need: z.string().trim().min(1, 'Choose what you need.').max(100),
   when: z.enum(['asap', 'later']),
   when_detail: z.string().trim().max(200).optional(),
+
+  /*
+   * The pin, present only when the guest picked a place rather
+   * than typing one. Coerced and bounded here rather than
+   * trusted: these arrive as hidden form fields, which anybody
+   * can edit, and a lead carrying a coordinate off the planet
+   * would be a map pin nobody can place.
+   */
+  staying_lat: z.coerce.number().min(-90).max(90).optional(),
+  staying_lng: z.coerce.number().min(-180).max(180).optional(),
+  staying_zone: z.string().trim().max(120).optional(),
+  staying_source: z.string().trim().max(32).optional(),
 });
 
 export async function submitLead(_prev: ActionResult | null, formData: FormData) {
@@ -29,6 +41,20 @@ export async function submitLead(_prev: ActionResult | null, formData: FormData)
     need: formData.get('need'),
     when: formData.get('when'),
     when_detail: formData.get('when_detail') ?? undefined,
+    /*
+     * The pin, when the guest picked one rather than typing.
+     *
+     * An address string is where the guesswork starts — a
+     * concierge reads "Westlands Trattoria" and still has to
+     * work out which gate. Carrying the coordinates through
+     * means the lead arrives with the spot already settled, and
+     * the zone means we know before replying whether we can
+     * even deliver there.
+     */
+    staying_lat: formData.get('staying_lat') ?? undefined,
+    staying_lng: formData.get('staying_lng') ?? undefined,
+    staying_zone: formData.get('staying_zone') ?? undefined,
+    staying_source: formData.get('staying_source') ?? undefined,
   });
 
   if (!parsed.success) {

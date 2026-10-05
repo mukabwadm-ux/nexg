@@ -1,12 +1,13 @@
 'use client';
 
 import { Button, cn, Input, useToast } from '@nexg/ui';
-import { ArrowRight, MapPin } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 
 import { type ActionResult, submitLead } from '@/app/actions';
+import { StayingAtField } from '@/components/location/staying-at-field';
 
 /**
  * The "Start your order" card from the `BookingFirst` artboard.
@@ -70,14 +71,9 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
       </p>
 
       <div className="mt-4">
-        <Input
-          id="staying_at"
-          name="staying_at"
-          label="Where are you staying?"
-          placeholder="Hotel, apartment or address"
-          leadingIcon={<MapPin className="h-4 w-4" />}
-          required
-        />
+        {/* Fills itself from the resolved delivery location, and
+            is the picker when there is not one yet. */}
+        <StayingAtField />
       </div>
 
       <fieldset className="mt-4">
