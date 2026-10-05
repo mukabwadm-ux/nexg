@@ -131,6 +131,7 @@ export function StayingAtField() {
 
   const confirmed = picked && picked.coverage === 'covered' && !touched;
   const showResults = open && touched && value.trim().length >= 3;
+  const guessed = step === 'ip_city' || place?.source === 'ip_city';
 
   return (
     <div ref={wrap} className="relative">
@@ -214,11 +215,19 @@ export function StayingAtField() {
           </>
         ) : (
           <>
-            {place && place.coverage !== 'covered' ? (
+            {/* Same discriminator as the fill guard above: how
+                the place was arrived at, not whether its
+                coordinate lands somewhere we deliver. Testing
+                coverage here left an IP-placed visitor reading
+                the generic hint, when the useful sentence is the
+                one saying their city was guessed. */}
+            {place && (guessed || place.coverage !== 'covered') ? (
               <span className="text-muted-light text-[0.6875rem] font-semibold">
                 {place.coverage === 'unlaunched'
                   ? `We are not live in ${place.city ?? 'that city'} yet — tell us where anyway and we will be in touch.`
-                  : 'We worked out your city from your connection. Type the exact place for a real price.'}
+                  : guessed
+                    ? `We worked out ${place.city ?? 'your city'} from your connection. Type the exact place for a real price.`
+                    : 'That spot is outside the areas we deliver to. Type another, or tell us anyway.'}
               </span>
             ) : (
               <span className="text-muted-light text-[0.6875rem] font-semibold">
