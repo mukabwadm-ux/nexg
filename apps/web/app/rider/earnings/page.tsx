@@ -95,9 +95,7 @@ export default async function RiderEarnings() {
                     {kesWhole(e.total_kes)}
                   </p>
                 </div>
-                <p className="text-muted-light text-[0.75rem] font-semibold">
-                  {day(e.earned_at)}
-                </p>
+                <p className="text-muted-light text-[0.75rem] font-semibold">{day(e.earned_at)}</p>
                 <p className="text-muted mt-1 text-[0.75rem] font-semibold">
                   {[
                     `base ${kesWhole(e.base_kes)}`,
@@ -126,8 +124,7 @@ export default async function RiderEarnings() {
       <Panel title="Settlements" note={settled.length > 0 ? 'Weekly' : undefined}>
         {settled.length === 0 ? (
           <p className="text-muted text-[0.8125rem] font-semibold">
-            Nothing settled yet. Earnings are paid out weekly to{' '}
-            {r?.payout_msisdn ?? DASH}.
+            Nothing settled yet. Earnings are paid out weekly to {r?.payout_msisdn ?? DASH}.
           </p>
         ) : (
           <ul className="divide-border divide-y">
@@ -135,12 +132,9 @@ export default async function RiderEarnings() {
               <li key={s.id} className="py-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <p className="text-[0.875rem] font-extrabold">
-                    {s.paid_at ? day(s.paid_at) : 'Not paid yet'} ·{' '}
-                    {plural(s.trips ?? 0, 'trip')}
+                    {s.paid_at ? day(s.paid_at) : 'Not paid yet'} · {plural(s.trips ?? 0, 'trip')}
                   </p>
-                  <Pill tone={TONE[s.status] ?? 'bg-bg text-muted'}>
-                    {s.status.toUpperCase()}
-                  </Pill>
+                  <Pill tone={TONE[s.status] ?? 'bg-bg text-muted'}>{s.status.toUpperCase()}</Pill>
                 </div>
                 <dl className="mt-1 space-y-0.5">
                   <Line label="Earned" value={kesWhole(s.earnings_kes)} />

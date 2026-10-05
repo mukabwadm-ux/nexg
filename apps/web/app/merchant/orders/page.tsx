@@ -1,4 +1,5 @@
 import { Empty, Panel, Pill, clock, day, kes, plural } from '@/components/partner/bits';
+import { LiveOrders } from '@/components/partner/live-orders';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -66,9 +67,7 @@ export default async function MerchantOrders({
             key={v}
             href={`/merchant/orders?show=${v}`}
             className={`rounded-full px-4 py-2 text-[0.8125rem] font-extrabold ${
-              show === v
-                ? 'bg-ink text-white'
-                : 'border-border-strong bg-surface border'
+              show === v ? 'bg-ink text-white' : 'border-border-strong bg-surface border'
             }`}
           >
             {v === 'live' ? 'On now' : 'Everything'}
@@ -85,11 +84,13 @@ export default async function MerchantOrders({
       <Panel
         title={show === 'live' ? 'On now' : 'Every order'}
         note={
-          rows.length > 0
-            ? show === 'all'
-              ? `${plural(rows.length, 'order')} · you kept ${kes(kept)} of the delivered ones`
-              : plural(rows.length, 'order')
-            : undefined
+          <span className="flex items-center gap-2">
+            {rows.length > 0 &&
+              (show === 'all'
+                ? `${plural(rows.length, 'order')} · you kept ${kes(kept)} of the delivered ones`
+                : plural(rows.length, 'order'))}
+            <LiveOrders merchantId={me.id} />
+          </span>
         }
       >
         {rows.length === 0 ? (

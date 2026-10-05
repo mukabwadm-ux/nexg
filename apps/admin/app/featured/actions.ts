@@ -65,10 +65,7 @@ export async function endFeaturedNow(bookingId: string, reason: string): Promise
 }
 
 /** From a merchant's own page: take them off, by merchant rather than booking. */
-export async function unfeatureMerchant(
-  merchantId: string,
-  reason: string,
-): Promise<PlaceOutcome> {
+export async function unfeatureMerchant(merchantId: string, reason: string): Promise<PlaceOutcome> {
   const { data, error } = await createClient().rpc('rpc_merchant_set_featured', {
     p_merchant_id: merchantId,
     p_featured: false,
@@ -84,10 +81,7 @@ export async function unfeatureMerchant(
 }
 
 /** Send the merchant the featured-slot pitch, with the real prices. */
-export async function sendFeaturedPitch(
-  merchantId: string,
-  note: string,
-): Promise<PlaceOutcome> {
+export async function sendFeaturedPitch(merchantId: string, note: string): Promise<PlaceOutcome> {
   const { data, error } = await createClient().rpc('rpc_featured_send_pitch', {
     p_merchant_id: merchantId,
     p_note: note || undefined,

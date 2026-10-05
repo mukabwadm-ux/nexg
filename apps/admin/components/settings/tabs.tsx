@@ -106,11 +106,7 @@ export function CitiesTab({
           value={num(allZones)}
           hint={`${activeZones} active · ${trialZones} trial`}
         />
-        <Tile
-          label="Outside-zone requests · 7d"
-          value={DASH}
-          hint="tells you where to draw next"
-        />
+        <Tile label="Outside-zone requests · 7d" value={DASH} hint="tells you where to draw next" />
         <Tile
           label={waitlist[0] ? `${waitlist[0].name} waitlist` : 'Waitlist'}
           value={DASH}
@@ -133,7 +129,10 @@ export function CitiesTab({
               </thead>
               <tbody className="divide-border divide-y">
                 {cities.map((c) => (
-                  <tr key={c.city_id} className={city?.city_id === c.city_id ? 'bg-gold-soft/40' : ''}>
+                  <tr
+                    key={c.city_id}
+                    className={city?.city_id === c.city_id ? 'bg-gold-soft/40' : ''}
+                  >
                     <Td>
                       <Link href={`/settings?tab=cities&city=${c.city_id}`} className="block">
                         <span className="font-extrabold">{c.name}</span>
@@ -174,8 +173,8 @@ export function CitiesTab({
                 cityId={null}
                 settingKey="city.languages"
                 value={JSON.stringify(
-                  (definitions.find((d) => d.key === 'city.languages')?.default_value as string[]) ??
-                    ['en', 'sw'],
+                  (definitions.find((d) => d.key === 'city.languages')
+                    ?.default_value as string[]) ?? ['en', 'sw'],
                 )}
                 valueType="text"
                 canEdit={canEdit('cities')}
@@ -250,8 +249,8 @@ export function CitiesTab({
               </Pill>
             </div>
             <p className="text-muted mt-1.5 text-[0.75rem] font-semibold leading-[1.7]">
-              Opened {day(city.launched_at)} · city manager {city.city_manager_id ? '[Staff]' : DASH}{' '}
-              · {num(city.zones)} zones
+              Opened {day(city.launched_at)} · city manager{' '}
+              {city.city_manager_id ? '[Staff]' : DASH} · {num(city.zones)} zones
             </p>
 
             <div className="border-border mt-4 grid gap-3 border-t pt-4 sm:grid-cols-2">
@@ -292,7 +291,9 @@ export function CitiesTab({
                       {z.trial_review_due && (
                         <Pill tone="bg-warning-bg text-warning">REVIEW DUE</Pill>
                       )}
-                      <Pill tone={z.enabled ? 'bg-success-bg text-success' : 'bg-bg text-muted-light'}>
+                      <Pill
+                        tone={z.enabled ? 'bg-success-bg text-success' : 'bg-bg text-muted-light'}
+                      >
                         {z.enabled ? 'ON' : 'OFF'}
                       </Pill>
                     </li>
@@ -333,7 +334,10 @@ export function CitiesTab({
  */
 function Readiness({ city, zones }: { city: CityRow; zones: ZoneRow[] }) {
   const items = [
-    { ok: zones.some((z) => z.tier === 'core' && z.enabled), label: 'At least one Core zone, enabled' },
+    {
+      ok: zones.some((z) => z.tier === 'core' && z.enabled),
+      label: 'At least one Core zone, enabled',
+    },
     { ok: !!city.hours, label: 'Operating hours set' },
     { ok: !!city.currency, label: 'Currency set' },
     { ok: !!city.max_radius_km, label: 'Max radius set' },
@@ -387,18 +391,18 @@ export function FeesTab({
         {cities
           .filter((c) => c.status === 'live' || c.status === 'soft_launch')
           .map((c) => (
-          <Link
-            key={c.city_id}
-            href={`/settings?tab=fees&city=${c.city_id}`}
-            className={`rounded-lg px-3 py-1.5 text-[0.8125rem] font-extrabold transition-colors ${
-              city?.city_id === c.city_id
-                ? 'bg-ink text-white'
-                : 'border-border hover:bg-bg border bg-white'
-            }`}
-          >
-            {c.name}
-          </Link>
-        ))}
+            <Link
+              key={c.city_id}
+              href={`/settings?tab=fees&city=${c.city_id}`}
+              className={`rounded-lg px-3 py-1.5 text-[0.8125rem] font-extrabold transition-colors ${
+                city?.city_id === c.city_id
+                  ? 'bg-ink text-white'
+                  : 'border-border hover:bg-bg border bg-white'
+              }`}
+            >
+              {c.name}
+            </Link>
+          ))}
         <span className="text-muted-light ml-2 text-[0.75rem] font-semibold">
           {cities.filter((c) => c.status === 'waitlist').length > 0
             ? `${cities
@@ -498,9 +502,17 @@ export function FeesTab({
                 </p>
                 <div className="divide-border mt-2 divide-y">
                   <FeeRow label="Band 1 · Core" meta="≤ 3 km" value={kes(first?.delivery_band_1)} />
-                  <FeeRow label="Band 2 · Extended" meta="3–6 km" value={kes(first?.delivery_band_2)} />
+                  <FeeRow
+                    label="Band 2 · Extended"
+                    meta="3–6 km"
+                    value={kes(first?.delivery_band_2)}
+                  />
                   <FeeRow label="Band 3 · edge" meta="6–8 km" value={kes(first?.delivery_band_3)} />
-                  <FeeRow label="Night · 22:00+" meta="+ flat" value={kes(first?.night_surcharge)} />
+                  <FeeRow
+                    label="Night · 22:00+"
+                    meta="+ flat"
+                    value={kes(first?.night_surcharge)}
+                  />
                 </div>
               </Card>
 
@@ -513,7 +525,10 @@ export function FeesTab({
                     label={`Small-basket fee below ${kes(first?.small_basket_threshold)}`}
                     value={kes(first?.small_basket_fee)}
                   />
-                  <FeeRow label="Cash-on-delivery handling" value={kes(first?.cash_handling ?? 0)} />
+                  <FeeRow
+                    label="Cash-on-delivery handling"
+                    value={kes(first?.cash_handling ?? 0)}
+                  />
                   <FeeRow
                     label="Airbnb host credit · welcome pack"
                     value={first?.host_credit_rule === 'host_billed' ? 'host-billed' : DASH}
@@ -535,7 +550,11 @@ export function FeesTab({
                     ['fees.delivery.band_3', 'Band 3 · edge', first?.delivery_band_3],
                     ['fees.night_surcharge', 'Night surcharge', first?.night_surcharge],
                     ['fees.concierge_flat', 'Concierge request', first?.concierge_flat],
-                    ['fees.small_basket_threshold', 'Small-basket threshold', first?.small_basket_threshold],
+                    [
+                      'fees.small_basket_threshold',
+                      'Small-basket threshold',
+                      first?.small_basket_threshold,
+                    ],
                     ['fees.small_basket_fee', 'Small-basket fee', first?.small_basket_fee],
                   ].map(([key, label, value]) => (
                     <SettingField
@@ -693,17 +712,25 @@ export function FeesTab({
               <Row
                 label="Cycle"
                 help="Merchants, riders and host credits settle in one run"
-                value={settlement?.cycle === 'weekly_friday' ? 'Weekly · Friday' : (settlement?.cycle ?? DASH)}
+                value={
+                  settlement?.cycle === 'weekly_friday'
+                    ? 'Weekly · Friday'
+                    : (settlement?.cycle ?? DASH)
+                }
               />
               <Row
                 label="Cut-off"
                 help="Orders and cash up to this point are in the run"
-                value={settlement?.cutoff === 'thu_2359' ? 'Thu 23:59' : (settlement?.cutoff ?? DASH)}
+                value={
+                  settlement?.cutoff === 'thu_2359' ? 'Thu 23:59' : (settlement?.cutoff ?? DASH)
+                }
               />
               <Row
                 label="Approvals"
                 help="Two people before money moves"
-                value={(settlement?.approvals ?? 'finance+ops_manager').replace('+', ' + ').replace(/_/g, ' ')}
+                value={(settlement?.approvals ?? 'finance+ops_manager')
+                  .replace('+', ' + ')
+                  .replace(/_/g, ' ')}
               />
               <Row
                 label="Instant cash-out"
@@ -759,7 +786,9 @@ export function PaymentsTab({ payments, integrations, rails, canEdit }: TabProps
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[0.875rem] font-extrabold">{m.label}</span>
                     <Pill tone={STATUS_TONE[m.status]}>{STATUS_LABEL[m.status] ?? m.status}</Pill>
-                    <Pill tone={m.enabled ? 'bg-success-bg text-success' : 'bg-bg text-muted-light'}>
+                    <Pill
+                      tone={m.enabled ? 'bg-success-bg text-success' : 'bg-bg text-muted-light'}
+                    >
                       {m.enabled ? 'ON' : 'OFF'}
                     </Pill>
                   </div>
@@ -784,10 +813,9 @@ export function PaymentsTab({ payments, integrations, rails, canEdit }: TabProps
             </div>
             <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.7]">
               Turning a method off is one of the few changes that may take effect immediately — an
-              incident should not wait for midnight. It still needs a reason, and it still writes
-              an event. Switching one back on is refused when there is no provider connected
-              behind it — a guest who picks a route with nothing behind it finds out after they
-              have chosen.
+              incident should not wait for midnight. It still needs a reason, and it still writes an
+              event. Switching one back on is refused when there is no provider connected behind it
+              — a guest who picks a route with nothing behind it finds out after they have chosen.
             </p>
           </Section>
 
@@ -854,8 +882,8 @@ export function PaymentsTab({ payments, integrations, rails, canEdit }: TabProps
               ))}
             </div>
             <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.7]">
-              Secrets live in the vault and this console holds only their names. There is no
-              control here that could show you a key, which is the point.
+              Secrets live in the vault and this console holds only their names. There is no control
+              here that could show you a key, which is the point.
             </p>
           </Section>
 
@@ -886,14 +914,11 @@ export function NotificationsTab() {
         <Empty>
           The templates themselves live in `message_template` from the onboarding builds and the
           editor is not wired here yet. What exists today: the rules below, and the fact that
-          nothing is sent without a template somebody wrote — there is no code path that composes
-          a message inline.
+          nothing is sent without a template somebody wrote — there is no code path that composes a
+          message inline.
         </Empty>
       </Section>
-      <Section
-        title="Rules"
-        sub="Which channels, in which order, and who is never interrupted."
-      >
+      <Section title="Rules" sub="Which channels, in which order, and who is never interrupted.">
         <Empty>
           No notification rules are defined. Until they are, each module uses its own quiet-hours
           handling — which works, and is exactly the duplication this tab exists to collapse.
@@ -913,8 +938,8 @@ export function BrandingTab({ legal, canEdit }: TabProps) {
       >
         <Empty>
           The tokens are still defined in `packages/ui` and generating them from settings is not
-          done. Changing a colour today is a code change and a deploy — honest, and slower than
-          this tab promises.
+          done. Changing a colour today is a code change and a deploy — honest, and slower than this
+          tab promises.
         </Empty>
       </Section>
 
@@ -1043,8 +1068,8 @@ export function RetentionTab({ retention }: Pick<TabProps, 'retention'>) {
           </Card>
         )}
         <p className="text-muted-light mt-3 text-[0.75rem] font-semibold leading-[1.7]">
-          Editing a period is the same two-person action as in the Audit log, because it is the
-          same row. A second editing surface for the same rule is how two teams end up believing
+          Editing a period is the same two-person action as in the Audit log, because it is the same
+          row. A second editing surface for the same rule is how two teams end up believing
           different things about how long a phone number is kept.
         </p>
       </Section>

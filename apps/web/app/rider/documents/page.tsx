@@ -1,4 +1,9 @@
-import { Documents, type Asked, type OnFile, type Requirement } from '@/components/partner/documents';
+import {
+  Documents,
+  type Asked,
+  type OnFile,
+  type Requirement,
+} from '@/components/partner/documents';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 

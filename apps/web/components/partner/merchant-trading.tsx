@@ -60,8 +60,8 @@ export function Trading({
     return (
       <Panel title="Taking orders" note={`Your account is ${status}`}>
         <p className="text-muted text-[0.8125rem] font-semibold">
-          These switches appear once you are live. Nothing is lost in the meantime — what you
-          have set up is on file.
+          These switches appear once you are live. Nothing is lost in the meantime — what you have
+          set up is on file.
         </p>
       </Panel>
     );
@@ -133,8 +133,8 @@ export function Trading({
       {open === 'close' && (
         <div className="bg-bg mt-3 space-y-2 rounded-xl p-3">
           <p className="text-[0.8125rem] font-semibold">
-            Guests will still see you, but they will not be able to order. If it is only that
-            the kitchen is backed up, busy mode keeps the trade and tells them to expect longer.
+            Guests will still see you, but they will not be able to order. If it is only that the
+            kitchen is backed up, busy mode keeps the trade and tells them to expect longer.
           </p>
           <input
             value={reason}
@@ -164,7 +164,9 @@ export function Trading({
                 key={m}
                 type="button"
                 disabled={busy}
-                onClick={() => run(() => setBusyMode(merchantId, m, reason || 'kitchen is backed up'))}
+                onClick={() =>
+                  run(() => setBusyMode(merchantId, m, reason || 'kitchen is backed up'))
+                }
                 className="border-border-strong hover:border-ink rounded-lg border px-3 py-1.5 text-[0.75rem] font-extrabold disabled:opacity-40"
               >
                 +{m} min
@@ -187,8 +189,8 @@ export function Trading({
       {open === 'prep' && (
         <div className="bg-bg mt-3 space-y-2 rounded-xl p-3">
           <p className="text-[0.8125rem] font-semibold">
-            This is what the guest is quoted, so it has to be one you can keep. Too low and
-            every order is late; too high and fewer people order.
+            This is what the guest is quoted, so it has to be one you can keep. Too low and every
+            order is late; too high and fewer people order.
           </p>
           <div className="flex items-center gap-2">
             <input

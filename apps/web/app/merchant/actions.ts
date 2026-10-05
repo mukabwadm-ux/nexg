@@ -18,11 +18,7 @@ export interface Outcome {
   data?: Record<string, unknown>;
 }
 
-function unwrap(
-  data: unknown,
-  error: { message: string } | null,
-  paths: string[] = [],
-): Outcome {
+function unwrap(data: unknown, error: { message: string } | null, paths: string[] = []): Outcome {
   if (error) return { ok: false, message: error.message.replace(/^.*?:\s*/, '') };
   for (const p of paths) revalidatePath(p);
   const r = (data ?? {}) as Record<string, unknown>;

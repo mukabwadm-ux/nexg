@@ -5,6 +5,8 @@ import * as React from 'react';
 
 import { addStore, closeStore, renameStore, type Outcome } from '@/app/merchant/actions';
 
+import { StoreMap } from './store-map';
+
 import { Panel, Pill } from './bits';
 
 export interface StoreRow {
@@ -34,9 +36,13 @@ export interface StoreRow {
 export function Stores({
   merchantId,
   stores,
+  maps,
+  cityCentre,
 }: {
   merchantId: string;
   stores: StoreRow[];
+  maps: { live: boolean; key: string; mapId: string };
+  cityCentre: { lat: number; lng: number };
 }) {
   const router = useRouter();
   const [busy, setBusy] = React.useState(false);
@@ -113,8 +119,8 @@ export function Stores({
         <div className="bg-bg mb-4 space-y-2 rounded-xl p-4">
           <p className="text-[0.875rem] font-extrabold">A new store</p>
           <p className="text-muted text-[0.8125rem] font-semibold">
-            We check it against the delivery map before it starts taking orders — usually the
-            same day. It will not appear to guests until then.
+            We check it against the delivery map before it starts taking orders — usually the same
+            day. It will not appear to guests until then.
           </p>
 
           <input
@@ -129,28 +135,38 @@ export function Stores({
             placeholder="Street address — a rider has to find the door"
             className="border-border-strong w-full rounded-lg border px-3 py-2 text-[0.875rem] font-semibold"
           />
-          <div>
-            <input
-              value={coords}
-              onChange={(e) => setCoords(e.target.value)}
-              placeholder="-1.2650, 36.8030"
-              className="border-border-strong w-full rounded-lg border px-3 py-2 text-[0.875rem] font-semibold tabular-nums"
+          {maps.live ? (
+            <StoreMap
+              apiKey={maps.key}
+              mapId={maps.mapId}
+              value={parsed}
+              centre={cityCentre}
+              onChange={(at) => setCoords(`${at.lat}, ${at.lng}`)}
             />
-            <p className="text-muted-light mt-1 text-[0.75rem] font-semibold">
-              Open your phone&apos;s map app, hold a finger on the exact spot, and copy the two
-              numbers it shows.{' '}
-              {coords.trim() && !parsed && (
-                <span className="text-danger font-bold">
-                  That is not a pair of coordinates yet.
-                </span>
-              )}
-              {parsed && (
-                <span className="text-success font-bold">
-                  Got it — {parsed.lat}, {parsed.lng}.
-                </span>
-              )}
-            </p>
-          </div>
+          ) : (
+            <div>
+              <input
+                value={coords}
+                onChange={(e) => setCoords(e.target.value)}
+                placeholder="-1.2650, 36.8030"
+                className="border-border-strong w-full rounded-lg border px-3 py-2 text-[0.875rem] font-semibold tabular-nums"
+              />
+              <p className="text-muted-light mt-1 text-[0.75rem] font-semibold">
+                Open your phone&apos;s map app, hold a finger on the exact spot, and copy the two
+                numbers it shows.{' '}
+                {coords.trim() && !parsed && (
+                  <span className="text-danger font-bold">
+                    That is not a pair of coordinates yet.
+                  </span>
+                )}
+                {parsed && (
+                  <span className="text-success font-bold">
+                    Got it — {parsed.lat}, {parsed.lng}.
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
 
           <label className="flex items-center gap-2 text-[0.8125rem] font-semibold">
             <input
@@ -233,7 +249,12 @@ export function Stores({
               <EditStore
                 store={s}
                 busy={busy}
-                onSave={(n, a) => run(() => renameStore(s.id, n, a), () => setEditing(null))}
+                onSave={(n, a) =>
+                  run(
+                    () => renameStore(s.id, n, a),
+                    () => setEditing(null),
+                  )
+                }
               />
             )}
 
@@ -253,10 +274,13 @@ export function Stores({
                   type="button"
                   disabled={busy || !reason.trim()}
                   onClick={() =>
-                    run(() => closeStore(s.id, reason), () => {
-                      setClosing(null);
-                      setReason('');
-                    })
+                    run(
+                      () => closeStore(s.id, reason),
+                      () => {
+                        setClosing(null);
+                        setReason('');
+                      },
+                    )
                   }
                   className="bg-danger rounded-lg px-3 py-2 text-[0.8125rem] font-extrabold text-white disabled:opacity-40"
                 >
@@ -296,8 +320,8 @@ function EditStore({
         className="border-border-strong w-full rounded-lg border px-3 py-2 text-[0.8125rem] font-semibold"
       />
       <p className="text-muted-light text-[0.75rem] font-semibold">
-        Moving a store to a different place is a new one rather than an edit — the delivery
-        area, and the riders who cover it, both change.
+        Moving a store to a different place is a new one rather than an edit — the delivery area,
+        and the riders who cover it, both change.
       </p>
       <button
         type="button"

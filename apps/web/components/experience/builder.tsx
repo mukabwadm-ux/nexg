@@ -32,11 +32,31 @@ import type { Json } from '@nexg/db';
  * bracketed because no SLA has been agreed with a real desk.
  */
 
-const MOODS: { key: Mood; label: string; blurb: string; icon: React.ComponentType<{ className?: string }> }[] = [
+const MOODS: {
+  key: Mood;
+  label: string;
+  blurb: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
   { key: 'wild', label: 'Wild', blurb: 'Game park, giraffes, elephants, Karura', icon: Sparkles },
-  { key: 'taste', label: 'Taste', blurb: 'Nyama choma, coastal, street food, fine dining', icon: UtensilsCrossed },
-  { key: 'night', label: 'Night', blurb: 'Rooftops, live bands, clubs, a safe ride home', icon: Music },
-  { key: 'slow', label: 'Slow', blurb: 'Spa, pool day, coffee farm, a long breakfast', icon: PartyPopper },
+  {
+    key: 'taste',
+    label: 'Taste',
+    blurb: 'Nyama choma, coastal, street food, fine dining',
+    icon: UtensilsCrossed,
+  },
+  {
+    key: 'night',
+    label: 'Night',
+    blurb: 'Rooftops, live bands, clubs, a safe ride home',
+    icon: Music,
+  },
+  {
+    key: 'slow',
+    label: 'Slow',
+    blurb: 'Spa, pool day, coffee farm, a long breakfast',
+    icon: PartyPopper,
+  },
   { key: 'stay', label: 'Stay', blurb: 'Airbnb or boutique hotel for the night', icon: Bed },
   { key: 'events', label: 'Events', blurb: 'Marathon, RnB House, rugby, festivals', icon: Ticket },
 ];
@@ -253,8 +273,7 @@ export function Builder({
       toast({ title: 'Could not swap', description: result.message, tone: 'danger' });
   }
 
-  const partyLabel =
-    party === 'solo' ? 'for one' : party === 'couple' ? 'for two' : `for ${size}`;
+  const partyLabel = party === 'solo' ? 'for one' : party === 'couple' ? 'for two' : `for ${size}`;
 
   const byMood = React.useMemo(() => {
     const map = new Map<Mood, MoodChip[]>();
@@ -316,7 +335,8 @@ export function Builder({
                     key={p.key}
                     on={party === p.key}
                     onClick={() => {
-                      const nextSize = p.key === 'solo' ? 1 : p.key === 'couple' ? 2 : Math.max(size, 3);
+                      const nextSize =
+                        p.key === 'solo' ? 1 : p.key === 'couple' ? 2 : Math.max(size, 3);
                       setParty(p.key);
                       setSize(nextSize);
                       queue({ party_type: p.key, party_size: nextSize });
@@ -541,12 +561,7 @@ export function Builder({
 
           <div className="mt-3">
             {view && (
-              <DayTimeline
-                view={view}
-                partyLabel={partyLabel}
-                onSwap={onSwap}
-                busy={busyBlock}
-              />
+              <DayTimeline view={view} partyLabel={partyLabel} onSwap={onSwap} busy={busyBlock} />
             )}
           </div>
 
@@ -571,9 +586,9 @@ export function Builder({
           </Button>
 
           <p className="text-muted-light mt-3 text-center text-[0.6875rem] font-semibold leading-[1.7]">
-            A concierge confirms every booking and the final price within{' '}
-            {replyMinutes ?? '[—]'} minutes. You pay once, after you approve. Park fees and
-            anything paid on the day are listed separately.
+            A concierge confirms every booking and the final price within {replyMinutes ?? '[—]'}{' '}
+            minutes. You pay once, after you approve. Park fees and anything paid on the day are
+            listed separately.
           </p>
         </div>
       </div>
@@ -648,9 +663,7 @@ function Chip({
       aria-pressed={on}
       onClick={onClick}
       className={`rounded-full px-3.5 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-        on
-          ? 'bg-ink text-gold'
-          : 'border-border-strong bg-surface text-ink hover:border-ink border'
+        on ? 'bg-ink text-gold' : 'border-border-strong bg-surface text-ink hover:border-ink border'
       }`}
     >
       {children}

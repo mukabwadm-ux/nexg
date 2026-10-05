@@ -106,7 +106,16 @@ export default async function JobPage({ params }: { params: { slug: string } }) 
             application and we will keep it for six months.
           </p>
           <ul className="border-border mt-7 max-w-[44rem] divide-y rounded-2xl border bg-white">
-            {((others as { slug: string; title: string; team_name: string | null; location_label: string | null }[] | null) ?? []).map((o) => (
+            {(
+              (others as
+                | {
+                    slug: string;
+                    title: string;
+                    team_name: string | null;
+                    location_label: string | null;
+                  }[]
+                | null) ?? []
+            ).map((o) => (
               <li key={o.slug}>
                 <Link
                   href={`/careers/${o.slug}`}
@@ -200,12 +209,9 @@ export default async function JobPage({ params }: { params: { slug: string } }) 
             )}
 
             {/* The promise, computed from this job's own targets. */}
-            <h2 className="mt-9 text-[1.25rem] font-extrabold tracking-[-0.01em]">
-              How we hire
-            </h2>
+            <h2 className="mt-9 text-[1.25rem] font-extrabold tracking-[-0.01em]">How we hire</h2>
             <p className="text-muted-light mt-1.5 text-[0.8125rem] font-semibold">
-              Five steps, about {j.weeks_to_hire ?? 2}{' '}
-              {j.weeks_to_hire === 1 ? 'week' : 'weeks'}.
+              Five steps, about {j.weeks_to_hire ?? 2} {j.weeks_to_hire === 1 ? 'week' : 'weeks'}.
             </p>
             <ol className="mt-4 grid max-w-[42rem] gap-2 sm:grid-cols-2">
               {[
@@ -233,8 +239,8 @@ export default async function JobPage({ params }: { params: { slug: string } }) 
             </ol>
 
             <p className="text-muted mt-5 max-w-[42rem] text-[0.8125rem] font-semibold leading-[1.8]">
-              We tell you where you stand after every step. If it&rsquo;s a no, you&rsquo;ll hear
-              it from a person, with a reason.
+              We tell you where you stand after every step. If it&rsquo;s a no, you&rsquo;ll hear it
+              from a person, with a reason.
             </p>
 
             <Section title="What you get" body={j.benefits_md} />
@@ -255,8 +261,8 @@ export default async function JobPage({ params }: { params: { slug: string } }) 
                 <div className="border-border mt-5 border-t pt-4">
                   <p className="text-[0.8125rem] font-extrabold">Who you would work with</p>
                   <p className="text-muted mt-1.5 text-[0.75rem] font-semibold leading-relaxed">
-                    {j.hiring_manager_name.split(' ')[0]} leads{' '}
-                    {j.team_name ?? 'this team'} and reads every application for this role.
+                    {j.hiring_manager_name.split(' ')[0]} leads {j.team_name ?? 'this team'} and
+                    reads every application for this role.
                   </p>
                 </div>
               )}

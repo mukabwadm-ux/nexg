@@ -9,12 +9,7 @@ import {
   type JobRow,
   type MetricsRow,
 } from '@/components/careers/shared';
-import {
-  ApplicantsTab,
-  JobsTab,
-  PipelineTab,
-  SettingsTab,
-} from '@/components/careers/tabs';
+import { ApplicantsTab, JobsTab, PipelineTab, SettingsTab } from '@/components/careers/tabs';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -66,13 +61,15 @@ export default async function CareersPage({
 
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'jobs';
   const filter =
-    searchParams?.filter ??
-    (tab === 'jobs' ? 'open' : tab === 'applicants' ? 'active' : 'all');
+    searchParams?.filter ?? (tab === 'jobs' ? 'open' : tab === 'applicants' ? 'active' : 'all');
   const selected = searchParams?.selected ?? null;
 
   const [{ data: badgesRaw }, { data: jobs }] = await Promise.all([
     hr.rpc('rpc_careers_counts', {}),
-    hr.from('console_jobs_v').select('*').order('posted_at', { ascending: false, nullsFirst: false }),
+    hr
+      .from('console_jobs_v')
+      .select('*')
+      .order('posted_at', { ascending: false, nullsFirst: false }),
   ]);
 
   const badges = (badgesRaw as Badges | null) ?? ({} as Badges);
@@ -82,7 +79,9 @@ export default async function CareersPage({
   return (
     <ConsoleShell staff={staff} current="/careers">
       <ConsoleHeader
-        title={tab === 'pipeline' ? 'Pipeline' : tab === 'applicants' ? 'Applicants' : 'Careers ATS'}
+        title={
+          tab === 'pipeline' ? 'Pipeline' : tab === 'applicants' ? 'Applicants' : 'Careers ATS'
+        }
         breadcrumb={SUBTITLE[tab]!}
       />
 
@@ -107,7 +106,8 @@ export default async function CareersPage({
         </nav>
 
         {tab === 'jobs' && (await loadJobs(supabase, jobRows, badges, filter, selected))}
-        {tab === 'applicants' && (await loadApplicants(supabase, badges, filter, selected, searchParams?.job))}
+        {tab === 'applicants' &&
+          (await loadApplicants(supabase, badges, filter, selected, searchParams?.job))}
         {tab === 'pipeline' && (await loadPipeline(supabase, jobRows, jobId, filter))}
         {tab === 'settings' && (await loadSettings(supabase))}
       </main>
@@ -146,15 +146,17 @@ async function loadJobs(
       filter={filter}
       selected={selected}
       questions={
-        (questions as {
-          id: string;
-          job_id: string;
-          prompt: string;
-          kind: string;
-          points: number | null;
-          threshold: Record<string, number> | null;
-          must_value: string | null;
-        }[] | null) ?? []
+        (questions as
+          | {
+              id: string;
+              job_id: string;
+              prompt: string;
+              kind: string;
+              points: number | null;
+              threshold: Record<string, number> | null;
+              must_value: string | null;
+            }[]
+          | null) ?? []
       }
     />
   );
@@ -173,7 +175,11 @@ async function loadApplicants(
 
   const [{ data: applicants }, { data: reasons }] = await Promise.all([
     query,
-    hr.from('rejection_reason').select('code, label, candidate_text').eq('active', true).order('sort'),
+    hr
+      .from('rejection_reason')
+      .select('code, label, candidate_text')
+      .eq('active', true)
+      .order('sort'),
   ]);
 
   /* The selected candidate's history only. Fetching every note for
@@ -205,9 +211,7 @@ async function loadApplicants(
       badges={badges}
       filter={filter}
       selected={selected}
-      reasons={
-        (reasons as { code: string; label: string; candidate_text: string }[] | null) ?? []
-      }
+      reasons={(reasons as { code: string; label: string; candidate_text: string }[] | null) ?? []}
       notes={(
         (notes as
           | {
@@ -220,8 +224,9 @@ async function loadApplicants(
           | null) ?? []
       ).map((n) => ({ ...n, author: n.author?.display_name ?? null }))}
       events={
-        (events as { id: number; from_stage: string | null; to_stage: string; at: string }[] | null) ??
-        []
+        (events as
+          | { id: number; from_stage: string | null; to_stage: string; at: string }[]
+          | null) ?? []
       }
       emails={
         (emails as { id: string; subject: string; status: string; created_at: string }[] | null) ??
@@ -231,7 +236,12 @@ async function loadApplicants(
   );
 }
 
-async function loadPipeline(supabase: Supabase, jobs: JobRow[], jobId: string | null, filter: string) {
+async function loadPipeline(
+  supabase: Supabase,
+  jobs: JobRow[],
+  jobId: string | null,
+  filter: string,
+) {
   const hr = supabase.schema('hr');
   if (!jobId) {
     return <PipelineTab applicants={[]} jobs={jobs} jobId={null} metrics={null} filter={filter} />;
@@ -267,14 +277,16 @@ async function loadSettings(supabase: Supabase) {
   return (
     <SettingsTab
       templates={
-        (templates as {
-          id: string;
-          key: string;
-          subject: string;
-          requires_reason: boolean;
-          version: number;
-          updated_at: string;
-        }[] | null) ?? []
+        (templates as
+          | {
+              id: string;
+              key: string;
+              subject: string;
+              requires_reason: boolean;
+              version: number;
+              updated_at: string;
+            }[]
+          | null) ?? []
       }
       reasons={
         (reasons as

@@ -30,13 +30,7 @@ import {
  * background clear, training passed, kit issued — so there is no way
  * for the board and the record to disagree.
  */
-export type Stage =
-  | 'applied'
-  | 'documents'
-  | 'background'
-  | 'training'
-  | 'kit'
-  | 'active';
+export type Stage = 'applied' | 'documents' | 'background' | 'training' | 'kit' | 'active';
 
 const STAGES: { key: Stage; label: string; tone: string }[] = [
   { key: 'applied', label: 'Applied', tone: 'bg-muted-light' },
@@ -74,9 +68,10 @@ export function PipelineTab({ riders }: { riders: PipelineRider[] }) {
   return (
     <>
       <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <Tile label="Applications · 30d" value={num(
-          riders.filter((r) => (daysSince(r.created_at) ?? 999) <= 30).length,
-        )}>
+        <Tile
+          label="Applications · 30d"
+          value={num(riders.filter((r) => (daysSince(r.created_at) ?? 999) <= 30).length)}
+        >
           {DASH}/week · target {DASH}
         </Tile>
         <Tile label="In onboarding" value={num(waiting.length)}>
@@ -219,10 +214,7 @@ export function HealthTab({
         </Tile>
         <Tile label="Incidents · 30d" value={num(incidents.length)}>
           {plural(incidents.filter((i) => i.kind === 'accident').length, 'accident')} ·{' '}
-          {plural(
-            incidents.filter((i) => i.kind === 'guest_complaint').length,
-            'guest complaint',
-          )}
+          {plural(incidents.filter((i) => i.kind === 'guest_complaint').length, 'guest complaint')}
         </Tile>
         <Tile
           label="Fraud flags"
@@ -629,12 +621,8 @@ export function CashTab({
                   Deposits via Paybill {DASH} with rider code as reference · auto-matched within 5
                   min
                 </li>
-                <li>
-                  Anything still held on {rule.netting_cutoff} is netted from Friday payout
-                </li>
-                <li>
-                  M-Pesa-to-NexG at the door is preferred and never counts as cash held
-                </li>
+                <li>Anything still held on {rule.netting_cutoff} is netted from Friday payout</li>
+                <li>M-Pesa-to-NexG at the door is preferred and never counts as cash held</li>
               </ul>
             ) : (
               <p className="text-muted mt-2 text-[0.75rem] font-semibold">No city rules loaded.</p>
@@ -826,7 +814,9 @@ export function SettlementTab({
                       {l.rider ? riderName(l.rider) : DASH}
                     </Link>
                     <span className="text-muted-light block text-[0.625rem] font-semibold">
-                      {l.payout_msisdn ? `M-Pesa •${l.payout_msisdn.slice(-2)}` : 'no M-Pesa number'}
+                      {l.payout_msisdn
+                        ? `M-Pesa •${l.payout_msisdn.slice(-2)}`
+                        : 'no M-Pesa number'}
                       {l.rider?.status === 'suspended' && ' · suspended'}
                       {l.paid_to_merchant_id && ' · paid to employer'}
                     </span>
@@ -984,7 +974,10 @@ export function SupplyTab({
   return (
     <>
       <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <Tile label="Online now" value={`${num(badges.online_now)} of ${num(badges.active)} active`}>
+        <Tile
+          label="Online now"
+          value={`${num(badges.online_now)} of ${num(badges.active)} active`}
+        >
           {num(badges.on_trip)} on trip
         </Tile>
         <Tile label="Demand vs supply · next hour" value={`${DASH}×`}>
@@ -1051,9 +1044,8 @@ export function SupplyTab({
           </table>
           <p className="text-muted-light border-border border-t px-4 py-3 text-[0.6875rem] font-semibold leading-snug">
             Orders per hour vs riders online. Red = fewer than 1 free rider per 3 orders · offers
-            cascade further and later. The needed column is {DASH} until a demand forecast is
-            loaded — a gap computed against a number nobody set would send riders to the wrong
-            zone.
+            cascade further and later. The needed column is {DASH} until a demand forecast is loaded
+            — a gap computed against a number nobody set would send riders to the wrong zone.
           </p>
         </Card>
 
@@ -1180,9 +1172,7 @@ export function DocumentsTab({
                         {d.rider ? riderName(d.rider) : DASH}
                       </Link>
                     </td>
-                    <td className="text-muted px-4 py-3 text-[0.75rem] font-semibold">
-                      {d.label}
-                    </td>
+                    <td className="text-muted px-4 py-3 text-[0.75rem] font-semibold">{d.label}</td>
                     <td className="text-muted px-4 py-3 text-[0.75rem] font-semibold">
                       {d.expires_at
                         ? new Date(d.expires_at).toLocaleDateString('en-GB', {
@@ -1244,9 +1234,8 @@ export function DocumentsTab({
           <Card className="p-5">
             <p className="text-[0.9375rem] font-extrabold">Privacy note</p>
             <p className="text-muted mt-2 text-[0.75rem] font-semibold leading-[1.7]">
-              ID and licence images are stored encrypted, visible only to Rider ops and Super
-              admin, watermarked on view, and deleted 12 months after a rider leaves. Access is
-              logged.
+              ID and licence images are stored encrypted, visible only to Rider ops and Super admin,
+              watermarked on view, and deleted 12 months after a rider leaves. Access is logged.
             </p>
             <p className="text-warning mt-2 text-[0.6875rem] font-bold leading-snug">
               The 12-month retention period has not been confirmed against the Kenyan Data

@@ -58,9 +58,13 @@ export async function applyToJob(input: ApplyInput): Promise<ApplyResult> {
 
   if (error) return { ok: false, message: error.message };
 
-  const result = data as
-    | { ok: boolean; token?: string; first_name?: string; reopened?: boolean; message?: string }
-    | null;
+  const result = data as {
+    ok: boolean;
+    token?: string;
+    first_name?: string;
+    reopened?: boolean;
+    message?: string;
+  } | null;
 
   if (!result?.ok) {
     return { ok: false, message: result?.message ?? 'That role is no longer open.' };

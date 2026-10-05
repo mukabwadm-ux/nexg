@@ -36,10 +36,7 @@ export async function markAsked(): Promise<void> {
  * survives is a slug like `nairobi`, which is the only part we have any
  * use for and the part that tells nobody where somebody lives.
  */
-export async function setLocationFromCoords(
-  lat: number,
-  lng: number,
-): Promise<ConsentResult> {
+export async function setLocationFromCoords(lat: number, lng: number): Promise<ConsentResult> {
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
     return { ok: false, message: 'That does not look like a location.' };
   }
@@ -52,7 +49,11 @@ export async function setLocationFromCoords(
 
   if (error) return { ok: false, message: error.message };
 
-  const row = (data as { slug: string; name: string; status: string; distance_m: number; inside_a_zone: boolean }[] | null)?.[0];
+  const row = (
+    data as
+      | { slug: string; name: string; status: string; distance_m: number; inside_a_zone: boolean }[]
+      | null
+  )?.[0];
   if (!row) return { ok: false, message: 'We could not place that.' };
 
   const km = Math.round(row.distance_m / 1000);

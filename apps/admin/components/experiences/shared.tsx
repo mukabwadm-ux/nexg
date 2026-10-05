@@ -39,7 +39,10 @@ export function countdown(seconds: number | null): { text: string; tone: string 
   if (seconds < 0) {
     const over = Math.abs(seconds);
     return {
-      text: over < 3600 ? `overdue by ${Math.floor(over / 60)} min` : `overdue by ${Math.floor(over / 3600)} h`,
+      text:
+        over < 3600
+          ? `overdue by ${Math.floor(over / 60)} min`
+          : `overdue by ${Math.floor(over / 3600)} h`,
       tone: 'text-danger',
     };
   }
@@ -147,7 +150,9 @@ export function Chip({
       aria-pressed={on}
       onClick={onClick}
       className={`rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-        on ? 'bg-ink text-white' : 'border-border-strong bg-surface text-ink hover:border-ink border'
+        on
+          ? 'bg-ink text-white'
+          : 'border-border-strong bg-surface text-ink hover:border-ink border'
       }`}
     >
       {children}

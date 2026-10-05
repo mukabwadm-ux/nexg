@@ -16,10 +16,7 @@ import { normaliseCode, qrPng, qrSvg } from '@/lib/qr';
  */
 export const runtime = 'nodejs';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { code: string } },
-) {
+export async function GET(request: Request, { params }: { params: { code: string } }) {
   const code = normaliseCode(params.code);
 
   if (!code) {
@@ -33,9 +30,7 @@ export async function GET(
      small to scan from across a room — the bug this comment exists
      to stop coming back. */
   const asked = Number(url.searchParams.get('size'));
-  const size = Number.isFinite(asked) && asked > 0
-    ? Math.min(Math.max(asked, 128), 2048)
-    : null;
+  const size = Number.isFinite(asked) && asked > 0 ? Math.min(Math.max(asked, 128), 2048) : null;
 
   /* Immutable: a given code always draws the same square, so this can
      sit in a CDN until the heat death of the print run. */

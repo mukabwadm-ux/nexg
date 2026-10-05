@@ -68,8 +68,8 @@ export default async function RiderProfilePage() {
           </Pill>
         </div>
         <p className="text-muted mt-2 text-[0.8125rem] font-semibold">
-          These decide which jobs reach you at all. They are ours to set, not yours — an alcohol
-          run is a licensing matter and a large-item run is a question of what fits on the bike.
+          These decide which jobs reach you at all. They are ours to set, not yours — an alcohol run
+          is a licensing matter and a large-item run is a question of what fits on the bike.
         </p>
       </Panel>
 

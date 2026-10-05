@@ -62,13 +62,12 @@ export default async function ApplyPage({
               {job.location_label ? ` · ${job.location_label}` : ''}
             </p>
             <p className="text-muted mt-4 max-w-[26rem] text-[0.875rem] font-semibold leading-[1.8]">
-              About two minutes. No cover letter — the questions below tell us more than one
-              would, and a person reads every answer.
+              About two minutes. No cover letter — the questions below tell us more than one would,
+              and a person reads every answer.
             </p>
             <p className="text-muted-light mt-4 max-w-[26rem] text-[0.75rem] font-semibold leading-[1.8]">
-              Questions marked &ldquo;this role needs this&rdquo; are the ones that decide
-              whether the job is possible for you. We say which they are rather than leaving you
-              to guess.
+              Questions marked &ldquo;this role needs this&rdquo; are the ones that decide whether
+              the job is possible for you. We say which they are rather than leaving you to guess.
             </p>
           </div>
 

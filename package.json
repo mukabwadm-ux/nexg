@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.49.1",
+    "@types/google.maps": "^3.66.5",
     "prettier": "3.4.2",
     "prettier-plugin-tailwindcss": "0.6.9",
     "rimraf": "6.0.1",

@@ -26,11 +26,7 @@ const WORD: Record<string, string> = {
  * was earned. On a cash order those are two different numbers and
  * confusing them is how a rider's float goes wrong.
  */
-export default async function RiderJobs({
-  searchParams,
-}: {
-  searchParams?: { show?: string };
-}) {
+export default async function RiderJobs({ searchParams }: { searchParams?: { show?: string } }) {
   const me = await requireRider();
   const show = searchParams?.show === 'all' ? 'all' : 'live';
   const supabase = createClient();

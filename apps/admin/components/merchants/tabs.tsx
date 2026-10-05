@@ -43,9 +43,7 @@ const STAGES = [
 export function PipelineTab({ rows, counts }: { rows: DirectoryRow[]; counts: Counts }) {
   const blocked = rows.filter((r) => {
     const age = daysSince(r.submitted_at ?? r.created_at);
-    return (
-      ['applied', 'documents_pending', 'under_review'].includes(r.status) && (age ?? 0) > 5
-    );
+    return ['applied', 'documents_pending', 'under_review'].includes(r.status) && (age ?? 0) > 5;
   });
 
   return (
@@ -79,7 +77,9 @@ export function PipelineTab({ rows, counts }: { rows: DirectoryRow[]; counts: Co
        */}
       <div className="mt-5 grid gap-4 md:grid-cols-4">
         {STAGES.map((stage) => {
-          const inStage = rows.filter((r) => (stage.statuses as readonly string[]).includes(r.status));
+          const inStage = rows.filter((r) =>
+            (stage.statuses as readonly string[]).includes(r.status),
+          );
           return (
             <Card key={stage.key} className="p-0">
               <div className="border-border flex items-center justify-between border-b px-3 py-2.5">
@@ -165,7 +165,10 @@ export function HealthTab({
         <Tile label="Red" value={num(red.length)} tone={red.length > 0 ? 'danger' : undefined}>
           hidden from Explore while red
         </Tile>
-        <Tile label="Not enough data" value={num(rows.filter((r) => r.health_score === null).length)}>
+        <Tile
+          label="Not enough data"
+          value={num(rows.filter((r) => r.health_score === null).length)}
+        >
           under the minimum order count
         </Tile>
       </div>
@@ -221,8 +224,7 @@ export function HealthTab({
           {scored.length === 0 && (
             <p className="text-muted border-border border-t px-4 py-4 text-[0.75rem] font-semibold leading-[1.7]">
               No scores yet. Health is computed nightly from orders, and there is no orders domain
-              to compute it from — every merchant shows {DASH} rather than a number nobody
-              measured.
+              to compute it from — every merchant shows {DASH} rather than a number nobody measured.
             </p>
           )}
         </Card>
@@ -263,7 +265,11 @@ export function HealthTab({
             <ol className="mt-3 space-y-2.5">
               {[
                 { level: 1, title: 'Warning', body: 'Auto email and a call task.' },
-                { level: 2, title: 'Temporary delist', body: 'Hidden from Explore, 7 days to fix.' },
+                {
+                  level: 2,
+                  title: 'Temporary delist',
+                  body: 'Hidden from Explore, 7 days to fix.',
+                },
                 { level: 3, title: 'Suspension', body: 'Payout held · needs a second approver.' },
               ].map((s) => (
                 <li key={s.level} className="flex items-start gap-2.5">
@@ -418,8 +424,8 @@ export function DisputesTab({ rows }: { rows: DisputeRow[] }) {
             ))}
             {rows.length === 0 && (
               <EmptyRow colSpan={6}>
-                No disputes. Guests open them from an order page, which needs the orders domain —
-                so this stays empty until that lands.
+                No disputes. Guests open them from an order page, which needs the orders domain — so
+                this stays empty until that lands.
               </EmptyRow>
             )}
           </tbody>
@@ -455,7 +461,13 @@ export function HoursTab({
   autoRules,
 }: {
   rows: HoursRow[];
-  exceptions: { id: string; label: string; date: string; default_close: string | null; enabled: boolean }[];
+  exceptions: {
+    id: string;
+    label: string;
+    date: string;
+    default_close: string | null;
+    enabled: boolean;
+  }[];
   autoRules: { id: string; key: string; enabled: boolean }[];
 }) {
   const now = new Date();
@@ -478,9 +490,7 @@ export function HoursTab({
   };
 
   const shouldBeOpen = rows.filter((r) => state(r).text === 'Not switched on');
-  const busy = rows.filter(
-    (r) => r.busy_mode_until && new Date(r.busy_mode_until) > now,
-  );
+  const busy = rows.filter((r) => r.busy_mode_until && new Date(r.busy_mode_until) > now);
 
   const AUTO_LABEL: Record<string, string> = {
     kitchen_running_long: 'Kitchen running long → +ETA notice',
@@ -762,9 +772,7 @@ export function DocumentsTab({
                 );
               })}
               {expired.length + expiring.length + awaiting.length === 0 && (
-                <EmptyRow colSpan={4}>
-                  Nothing expiring, expired or waiting to be checked.
-                </EmptyRow>
+                <EmptyRow colSpan={4}>Nothing expiring, expired or waiting to be checked.</EmptyRow>
               )}
             </tbody>
           </table>
@@ -869,10 +877,17 @@ export function FinanceTab({
         <Tile label="Commission · 30d" value={`KES ${DASH}`}>
           blended {DASH}%
         </Tile>
-        <Tile label="Payouts held" value={num(heldCount)} tone={heldCount > 0 ? 'danger' : undefined}>
+        <Tile
+          label="Payouts held"
+          value={num(heldCount)}
+          tone={heldCount > 0 ? 'danger' : undefined}
+        >
           suspension, KYC or an open chargeback
         </Tile>
-        <Tile label="Statements sent" value={num(statements.filter((s) => s.status !== 'draft').length)}>
+        <Tile
+          label="Statements sent"
+          value={num(statements.filter((s) => s.status !== 'draft').length)}
+        >
           {num(statements.length)} on file
         </Tile>
       </div>
@@ -980,9 +995,7 @@ export function BranchesTab({
         <Tile
           label="Largest chain"
           value={
-            chains.length === 0
-              ? DASH
-              : String(Math.max(...chains.map((c) => c.branches.length)))
+            chains.length === 0 ? DASH : String(Math.max(...chains.map((c) => c.branches.length)))
           }
         >
           branches under one parent
@@ -1005,9 +1018,9 @@ export function BranchesTab({
         <Card className="mt-5 p-6">
           <p className="text-muted text-[0.875rem] leading-[1.8]">
             No chains yet. A merchant becomes a parent when another merchant points at it with{' '}
-            <code className="text-[0.75rem]">parent_merchant_id</code> — set when a second branch
-            is added, which runs the standard onboarding prefilled from the parent and only asks
-            for location, manager, hours and any branch-specific permit.
+            <code className="text-[0.75rem]">parent_merchant_id</code> — set when a second branch is
+            added, which runs the standard onboarding prefilled from the parent and only asks for
+            location, manager, hours and any branch-specific permit.
           </p>
         </Card>
       ) : (
@@ -1106,8 +1119,21 @@ export function CatalogueTab({
   imports,
   itemsLive,
 }: {
-  flags: { id: string; merchant_name: string | null; app_price_kes: number | null; observed_price_kes: number | null; drift_pct: number | null; status: string }[];
-  edits: { id: string; merchant_name: string | null; kind: string; status: string; created_at: string }[];
+  flags: {
+    id: string;
+    merchant_name: string | null;
+    app_price_kes: number | null;
+    observed_price_kes: number | null;
+    drift_pct: number | null;
+    status: string;
+  }[];
+  edits: {
+    id: string;
+    merchant_name: string | null;
+    kind: string;
+    status: string;
+    created_at: string;
+  }[];
   photoTasks: { id: string; merchant_name: string | null; status: string }[];
   imports: { id: string; merchant_name: string | null; source: string; status: string }[];
   itemsLive: number;
@@ -1132,7 +1158,10 @@ export function CatalogueTab({
         >
           price changes awaiting review
         </Tile>
-        <Tile label="Imports in queue" value={num(imports.filter((i) => i.status !== 'applied').length)}>
+        <Tile
+          label="Imports in queue"
+          value={num(imports.filter((i) => i.status !== 'applied').length)}
+        >
           PDF or sheet, loaded by NexG
         </Tile>
       </div>
@@ -1175,7 +1204,9 @@ export function CatalogueTab({
               .filter((f) => f.status === 'open')
               .map((f) => (
                 <li key={f.id} className="flex items-baseline justify-between gap-2">
-                  <span className="text-[0.75rem] font-bold">{f.merchant_name ?? '[Merchant]'}</span>
+                  <span className="text-[0.75rem] font-bold">
+                    {f.merchant_name ?? '[Merchant]'}
+                  </span>
                   <span className="text-warning text-[0.75rem] font-extrabold">
                     {f.drift_pct === null ? DASH : `+${Math.round(Number(f.drift_pct))}%`}
                   </span>

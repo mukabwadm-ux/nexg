@@ -107,7 +107,12 @@ export async function submitChangeSet(
   const bad = fail(error);
   if (bad) return bad;
 
-  const r = data as { pair?: string; effective_from?: string; single_person?: boolean; changes?: number } | null;
+  const r = data as {
+    pair?: string;
+    effective_from?: string;
+    single_person?: boolean;
+    changes?: number;
+  } | null;
   return done(
     r?.single_person
       ? `${r?.changes ?? 0} change${r?.changes === 1 ? '' : 's'} submitted — you can approve this yourself.`
@@ -167,9 +172,7 @@ export async function activateDue(): Promise<Outcome> {
   const bad = fail(error);
   if (bad) return bad;
   const n = (data as { activated?: number } | null)?.activated ?? 0;
-  return done(
-    n === 0 ? 'Nothing was due.' : `${n} change${n === 1 ? '' : 's'} are now live.`,
-  );
+  return done(n === 0 ? 'Nothing was due.' : `${n} change${n === 1 ? '' : 's'} are now live.`);
 }
 
 // ────────────────────────────────────────── the incident switch

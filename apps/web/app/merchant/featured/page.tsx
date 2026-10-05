@@ -45,7 +45,9 @@ export default async function MerchantFeatured() {
       .order('position'),
     supabase
       .from('featured_booking')
-      .select('id, placement_kind, status, wanted_start, weeks, quoted_price, requested_at, start_date, end_date')
+      .select(
+        'id, placement_kind, status, wanted_start, weeks, quoted_price, requested_at, start_date, end_date',
+      )
       .eq('merchant_id', me.id)
       .order('requested_at', { ascending: false })
       .limit(10),

@@ -105,7 +105,8 @@ const en: Dictionary = {
   'home.step1.title': 'Ask in a sentence',
   'home.step1.body': 'Type or voice-note what you need. No forms, no menus to dig through.',
   'home.step2.title': 'A concierge takes it',
-  'home.step2.body': 'A vetted local concierge confirms the plan, the price and the timing with you.',
+  'home.step2.body':
+    'A vetted local concierge confirms the plan, the price and the timing with you.',
   'home.step3.title': 'Track and pay',
   'home.step3.body': 'Follow it live in the app and settle by card or M-Pesa when it’s done.',
   'home.popular.heading': 'Popular requests right now',
@@ -240,15 +241,15 @@ const sw: Dictionary = {
   'home.atYourDoorstep': 'Mlangoni Pako',
   'home.youWantIt': 'Unakitaka!',
   'home.weGotYou': 'Tunakupata!',
-  'home.lede':
-    'Tuambie unapokaa — hoteli au Airbnb — na unachohitaji. Tutakuletea.',
+  'home.lede': 'Tuambie unapokaa — hoteli au Airbnb — na unachohitaji. Tutakuletea.',
   'home.stat.cities': 'miji',
   'home.stat.categories': 'aina za huduma',
   'home.stat.tracking': 'Ufuatiliaji',
   'home.step1.title': 'Uliza kwa sentensi moja',
   'home.step1.body': 'Andika au tuma ujumbe wa sauti. Hakuna fomu, hakuna menyu za kupekua.',
   'home.step2.title': 'Msaidizi anachukua',
-  'home.step2.body': 'Msaidizi wa hapa aliyehakikiwa atathibitisha mpango, bei na muda pamoja nawe.',
+  'home.step2.body':
+    'Msaidizi wa hapa aliyehakikiwa atathibitisha mpango, bei na muda pamoja nawe.',
   'home.step3.title': 'Fuatilia na ulipe',
   'home.step3.body': 'Fuatilia moja kwa moja kwenye programu na ulipe kwa kadi au M-Pesa ikiisha.',
   'home.popular.heading': 'Maombi maarufu sasa hivi',

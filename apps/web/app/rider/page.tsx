@@ -1,6 +1,17 @@
 import Link from 'next/link';
 
-import { DASH, Empty, Panel, Pill, Progress, Stat, clock, kesWhole, num } from '@/components/partner/bits';
+import {
+  DASH,
+  Empty,
+  Panel,
+  Pill,
+  Progress,
+  Stat,
+  clock,
+  kesWhole,
+  num,
+} from '@/components/partner/bits';
+import { LiveTrips } from '@/components/partner/live-orders';
 import { Shift } from '@/components/partner/rider-shift';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
@@ -80,21 +91,25 @@ export default async function RiderToday() {
         <Stat label="This week" value={kesWhole(r.earned_week_kes)} hint="Since Monday" />
         <Stat
           label="Cash on you"
-          value={
-            r.cash_cap === null
-              ? kesWhole(r.cash_on_hand)
-              : `${kesWhole(r.cash_on_hand)}`
-          }
+          value={r.cash_cap === null ? kesWhole(r.cash_on_hand) : `${kesWhole(r.cash_on_hand)}`}
           hint={
             r.cash_cap === null
               ? 'No cap set for your city'
               : `of ${kesWhole(r.cash_cap)}${capPct !== null ? ` · ${capPct}%` : ''}`
           }
-          tone={capPct !== null && capPct >= 90 ? 'danger' : capPct !== null && capPct >= 70 ? 'gold' : undefined}
+          tone={
+            capPct !== null && capPct >= 90
+              ? 'danger'
+              : capPct !== null && capPct >= 70
+                ? 'gold'
+                : undefined
+          }
         />
         <Stat
           label="Health"
-          value={r.health_band ? r.health_band.charAt(0).toUpperCase() + r.health_band.slice(1) : DASH}
+          value={
+            r.health_band ? r.health_band.charAt(0).toUpperCase() + r.health_band.slice(1) : DASH
+          }
           hint={
             r.strike_count > 0
               ? `${r.strike_count} active ${r.strike_count === 1 ? 'strike' : 'strikes'}`
@@ -116,7 +131,12 @@ export default async function RiderToday() {
 
       <Panel
         title="What you are carrying"
-        note={live.length > 0 ? `${live.length} on` : undefined}
+        note={
+          <span className="flex items-center gap-2">
+            {live.length > 0 && `${live.length} on`}
+            <LiveTrips riderId={r.rider_id} />
+          </span>
+        }
         action={
           <Link
             href="/rider/jobs"

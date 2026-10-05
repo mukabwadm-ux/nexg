@@ -38,12 +38,13 @@ export default async function CardPage({
    * with nothing to say what went wrong.
    */
   const { data } = await supabase.rpc('rpc_qr_card', { p_code: code });
-  const row = (data as {
-    ok: boolean;
-    label: string | null;
-    placement: string | null;
-    voided: boolean;
-  } | null) ?? null;
+  const row =
+    (data as {
+      ok: boolean;
+      label: string | null;
+      placement: string | null;
+      voided: boolean;
+    } | null) ?? null;
 
   if (!row?.ok) notFound();
   const svg = await qrSvg(code, { size: 640 });
@@ -70,8 +71,8 @@ export default async function CardPage({
         <h1 className="text-[1.25rem] font-extrabold tracking-tight">Print this card</h1>
         <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
           Print at A6 — that is a quarter of a sheet, and the square still scans from across a
-          kitchen. Keep the white border: printers trim, and a QR with nothing around it reads on
-          a screen and fails on card.
+          kitchen. Keep the white border: printers trim, and a QR with nothing around it reads on a
+          screen and fails on card.
         </p>
         {row.voided && (
           <p className="bg-danger-bg text-danger mt-3 rounded-lg p-3 text-[0.8125rem] font-bold">
@@ -80,8 +81,7 @@ export default async function CardPage({
           </p>
         )}
         <p className="text-muted-light mt-3 text-[0.75rem] font-semibold">
-          Add <code className="font-mono">?n=4</code> to the address for four copies on four
-          pages.
+          Add <code className="font-mono">?n=4</code> to the address for four copies on four pages.
         </p>
       </div>
 

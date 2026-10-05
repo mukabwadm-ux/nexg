@@ -89,13 +89,7 @@ export const FOLIO_LABEL: Record<string, string> = {
   void: 'VOID',
 };
 
-export function Pill({
-  children,
-  tone,
-}: {
-  children: React.ReactNode;
-  tone?: string;
-}) {
+export function Pill({ children, tone }: { children: React.ReactNode; tone?: string }) {
   return (
     <span
       className={`inline-block whitespace-nowrap rounded-full px-2.5 py-1 text-[0.625rem] font-extrabold ${
@@ -176,7 +170,9 @@ export function Chip({
     <Link
       href={href}
       className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-        on ? 'bg-ink text-white' : 'border-border-strong bg-surface text-ink hover:border-ink border'
+        on
+          ? 'bg-ink text-white'
+          : 'border-border-strong bg-surface text-ink hover:border-ink border'
       }`}
     >
       {children}

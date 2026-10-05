@@ -71,9 +71,9 @@ export default async function MerchantMessages() {
 
       <Panel title="Reaching a person">
         <p className="text-muted text-[0.8125rem] font-semibold">
-          There is no reply box here yet, and one that queued your message without sending it
-          would be worse than none. Call or WhatsApp the number on your onboarding email and
-          you will get somebody.
+          There is no reply box here yet, and one that queued your message without sending it would
+          be worse than none. Call or WhatsApp the number on your onboarding email and you will get
+          somebody.
         </p>
       </Panel>
     </div>

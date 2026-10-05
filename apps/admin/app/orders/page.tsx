@@ -142,12 +142,24 @@ export default async function OrdersPage({
   let candidates: Candidate[] = [];
 
   if (selectedId) {
-    const [d, t, i] = await Promise.all([
+    const [d, t, i, waiting] = await Promise.all([
       supabase.from('console_order_detail_v').select('*').eq('id', selectedId).maybeSingle(),
       supabase.from('console_order_timeline_v').select('*').eq('order_id', selectedId).order('at'),
       supabase.from('console_order_items_v').select('*').eq('order_id', selectedId),
+      /* Approved and not yet out. Shown on the order rather than
+         in a queue somewhere else, because the person asking
+         "where is my refund" is looking at this order. */
+      supabase
+        .from('refunds_to_issue_v')
+        .select('refund_id, amount_cents')
+        .eq('order_id', selectedId),
     ]);
     detail = (d.data as OrderDetail | null) ?? null;
+    if (detail) {
+      detail.refund_waiting_to_send = (
+        (waiting.data as { refund_id: string; amount_cents: number }[] | null) ?? []
+      ).map((r) => ({ id: r.refund_id, amount_cents: r.amount_cents }));
+    }
     timeline = (t.data as TimelineRow[] | null) ?? [];
     items = (i.data as ItemRow[] | null) ?? [];
     for (const e of [d.error, t.error, i.error]) if (e) problems.push(e.message);

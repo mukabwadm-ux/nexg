@@ -213,9 +213,7 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                     <div className="p-4 pt-0 sm:py-4 sm:pl-0 sm:pr-5">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-[1rem] font-extrabold">
-                            {u.label_public ?? u.name}
-                          </p>
+                          <p className="text-[1rem] font-extrabold">{u.label_public ?? u.name}</p>
                           {u.unit_summary && (
                             <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.6]">
                               {u.unit_summary}
@@ -318,8 +316,8 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                 <p className="text-[0.8125rem] font-extrabold">Concierge included</p>
                 <p className="text-muted mt-1.5 text-[0.75rem] font-semibold leading-[1.7]">
                   Food, drinks, laundry, pharmacy and airport transfers, delivered to the door by
-                  the host&rsquo;s own rule — so nobody rings your bell at 1am unless you asked
-                  them to.
+                  the host&rsquo;s own rule — so nobody rings your bell at 1am unless you asked them
+                  to.
                 </p>
               </div>
             </Card>

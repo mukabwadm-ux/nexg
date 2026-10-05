@@ -69,9 +69,7 @@ export default async function StatusPage({ params }: { params: { token: string }
       <>
         <SiteHeader action={{ label: 'See open roles', href: '/careers#roles' }} />
         <main className="mx-auto max-w-[96rem] px-4 py-16 sm:px-8 lg:px-16">
-          <h1 className="text-[1.875rem] font-extrabold tracking-tight">
-            That link has expired.
-          </h1>
+          <h1 className="text-[1.875rem] font-extrabold tracking-tight">That link has expired.</h1>
           <p className="text-muted mt-3 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8]">
             Status links last 90 days and are extended each time your application moves. Reply to
             any email from us and we will send a new one.
@@ -145,8 +143,7 @@ export default async function StatusPage({ params }: { params: { token: string }
                 {s.rejected_reason}
               </p>
               <p className="text-muted-light mt-3 text-[0.8125rem] font-semibold leading-[1.8]">
-                We know that is not the answer you wanted. Thank you for the time you put into
-                it.
+                We know that is not the answer you wanted. Thank you for the time you put into it.
               </p>
             </>
           ) : withdrawn ? (
@@ -155,8 +152,8 @@ export default async function StatusPage({ params }: { params: { token: string }
             </p>
           ) : s.stage === 'new' || s.stage === 'screening' ? (
             <p className="text-muted mt-3 text-[0.9375rem] font-semibold leading-[1.8]">
-              We read every application by hand. You will hear from a person either way — the
-              whole process is five steps and about {s.weeks_to_hire ?? 2} weeks.
+              We read every application by hand. You will hear from a person either way — the whole
+              process is five steps and about {s.weeks_to_hire ?? 2} weeks.
             </p>
           ) : s.stage === 'offer' && s.offer ? (
             <div className="mt-3">
@@ -174,10 +171,7 @@ export default async function StatusPage({ params }: { params: { token: string }
                 />
                 <Row label="Start" value={s.offer.start_date ?? '[—]'} />
                 <Row label="Contract" value={s.offer.contract?.replace(/_/g, ' ') ?? '[—]'} />
-                <Row
-                  label="Conditions"
-                  value={s.offer.conditions?.join(', ') || 'None'}
-                />
+                <Row label="Conditions" value={s.offer.conditions?.join(', ') || 'None'} />
               </dl>
             </div>
           ) : (

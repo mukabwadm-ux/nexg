@@ -141,7 +141,9 @@ export function DocumentReview({
            somebody to send a thing they already sent is how a
            reviewer loses their trust. */
         const chaseable =
-          document.status === MISSING || document.status === 'rejected' || document.status === 'expired';
+          document.status === MISSING ||
+          document.status === 'rejected' ||
+          document.status === 'expired';
         const chase = document.chase;
 
         return (
@@ -202,9 +204,7 @@ export function DocumentReview({
                         size="sm"
                         loading={isBusy}
                         disabled={isBusy}
-                        onClick={() =>
-                          run(document.kind, () => onVerify(document.id!), 'Verified')
-                        }
+                        onClick={() => run(document.kind, () => onVerify(document.id!), 'Verified')}
                       >
                         Verify
                       </Button>
@@ -228,7 +228,9 @@ export function DocumentReview({
                     size="sm"
                     loading={isBusy}
                     disabled={isBusy || chase?.can_send_again === false}
-                    onClick={() => run(document.kind, () => onRemind(document.kind), 'Reminder recorded')}
+                    onClick={() =>
+                      run(document.kind, () => onRemind(document.kind), 'Reminder recorded')
+                    }
                   >
                     {chase?.last_sent_at ? 'Remind again' : 'Remind them to upload'}
                   </Button>
@@ -387,7 +389,12 @@ function FileOnTheirBehalf({
     }
 
     setBusy(true);
-    const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+    const extension =
+      file.name
+        .split('.')
+        .pop()
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]/g, '') || 'bin';
     /* Timestamped, so filing a replacement never overwrites the file
        the old row still points at. */
     const path = `${storagePrefix}/${kind}-${Date.now()}.${extension}`;

@@ -235,8 +235,8 @@ export function Workbench({
 
         {cascade.length === 0 ? (
           <p className="text-muted mt-3 text-[0.8125rem] font-semibold">
-            No offers have been made. If this order is live, the cascade has not run yet —
-            which is itself worth knowing.
+            No offers have been made. If this order is live, the cascade has not run yet — which is
+            itself worth knowing.
           </p>
         ) : (
           <div className="mt-3 space-y-3">
@@ -763,8 +763,8 @@ function ReassignAction({
   return (
     <Disclosure label="Reassign rider" open={open} onToggle={onToggle}>
       <p className="text-muted text-[0.75rem] font-semibold">
-        The order has no rider until the new one accepts, so the guest is not told about
-        somebody who then declines.
+        The order has no rider until the new one accepts, so the guest is not told about somebody
+        who then declines.
       </p>
       <input
         value={reason}
@@ -866,8 +866,8 @@ function CancelAction({
           />
           {(what.needs_second_person as boolean) && (
             <p className="text-gold-text text-[0.75rem] font-extrabold">
-              Over {kes(what.threshold_cents as number)} — this goes to the approvals queue
-              rather than happening now.
+              Over {kes(what.threshold_cents as number)} — this goes to the approvals queue rather
+              than happening now.
             </p>
           )}
         </div>
@@ -905,15 +905,7 @@ function CancelAction({
   );
 }
 
-function Consequence({
-  label,
-  value,
-  warn,
-}: {
-  label: string;
-  value: string;
-  warn?: boolean;
-}) {
+function Consequence({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
     <p className="flex items-baseline justify-between gap-2 text-[0.75rem]">
       <span className="text-muted font-semibold">{label}</span>

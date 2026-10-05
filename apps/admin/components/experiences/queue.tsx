@@ -218,7 +218,10 @@ export function Queue({
               })}
               {visible.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-muted px-4 py-10 text-center text-sm font-semibold">
+                  <td
+                    colSpan={6}
+                    className="text-muted px-4 py-10 text-center text-sm font-semibold"
+                  >
                     Nothing here.
                   </td>
                 </tr>

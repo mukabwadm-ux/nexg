@@ -292,8 +292,8 @@ export function SaveBar({
               <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.7]">
                 {merchants > 0 && `${merchants} live merchant${merchants === 1 ? '' : 's'}. `}
                 {riders > 0 && `${riders} active rider${riders === 1 ? '' : 's'}. `}
-                Orders a day at the old value: [—] — the orders domain is not built, so that
-                number is genuinely unknown rather than zero.
+                Orders a day at the old value: [—] — the orders domain is not built, so that number
+                is genuinely unknown rather than zero.
               </p>
             </div>
 
@@ -419,8 +419,7 @@ export function ScheduledBanner({
     <div className="mt-4 space-y-2">
       {live.map((s) => {
         const waiting = s.status === 'awaiting_approval';
-        const due =
-          s.effective_from !== null && new Date(s.effective_from).getTime() <= Date.now();
+        const due = s.effective_from !== null && new Date(s.effective_from).getTime() <= Date.now();
         return (
           <div
             key={s.change_set_id}
@@ -588,9 +587,7 @@ export function PaymentToggle({
   const [reason, setReason] = React.useState('');
 
   if (!canEdit) {
-    return (
-      <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold">🔒 {lockedBy}</p>
-    );
+    return <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold">🔒 {lockedBy}</p>;
   }
 
   return (
@@ -603,9 +600,7 @@ export function PaymentToggle({
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder={
-            enabled
-              ? 'Guests stop seeing it immediately — say why.'
-              : 'Say what changed.'
+            enabled ? 'Guests stop seeing it immediately — say why.' : 'Say what changed.'
           }
         />
       </div>

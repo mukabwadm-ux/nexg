@@ -1,6 +1,18 @@
 import Link from 'next/link';
 
-import { DASH, Empty, Panel, Pill, Progress, Stat, clock, kes, num, plural } from '@/components/partner/bits';
+import {
+  DASH,
+  Empty,
+  Panel,
+  Pill,
+  Progress,
+  Stat,
+  clock,
+  kes,
+  num,
+  plural,
+} from '@/components/partner/bits';
+import { LiveOrders } from '@/components/partner/live-orders';
 import { Trading } from '@/components/partner/merchant-trading';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
@@ -75,7 +87,9 @@ export default async function MerchantToday() {
         />
         <Stat
           label="Health"
-          value={m.health_band ? m.health_band.charAt(0).toUpperCase() + m.health_band.slice(1) : DASH}
+          value={
+            m.health_band ? m.health_band.charAt(0).toUpperCase() + m.health_band.slice(1) : DASH
+          }
           hint={m.health_band ? 'Your rating with us' : 'No score yet'}
           tone={
             m.health_band === 'green'
@@ -99,7 +113,12 @@ export default async function MerchantToday() {
 
       <Panel
         title="What is on"
-        note={live.length > 0 ? `${plural(live.length, 'order')} · oldest first` : undefined}
+        note={
+          <span className="flex items-center gap-2">
+            {live.length > 0 && `${plural(live.length, 'order')} · oldest first`}
+            <LiveOrders merchantId={m.merchant_id} />
+          </span>
+        }
         action={
           <Link
             href="/merchant/orders"
@@ -140,10 +159,7 @@ export default async function MerchantToday() {
                     {o.promised_ready_at && ` · promised ready ${clock(o.promised_ready_at)}`}
                     {o.rider && ` · ${o.rider}`}
                     {o.needs_your_ack && (
-                      <span className="text-danger font-bold">
-                        {' '}
-                        · a change needs your nod
-                      </span>
+                      <span className="text-danger font-bold"> · a change needs your nod</span>
                     )}
                   </p>
                 </div>
@@ -180,8 +196,8 @@ export default async function MerchantToday() {
             ))}
           </ul>
           <p className="text-muted-light mt-3 text-[0.75rem] font-semibold">
-            These are the six things we check. The ring is floored, so it never claims one that
-            is not ticked.
+            These are the six things we check. The ring is floored, so it never claims one that is
+            not ticked.
           </p>
         </Panel>
       )}

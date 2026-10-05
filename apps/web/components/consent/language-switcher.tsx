@@ -22,13 +22,7 @@ import { localeName } from '@/lib/i18n/dictionaries';
  * their own language is scanning for their own word for it, not for the
  * English name of it in a language they are trying to leave.
  */
-export function LanguageSwitcher({
-  locale,
-  locales,
-}: {
-  locale: string;
-  locales: string[];
-}) {
+export function LanguageSwitcher({ locale, locales }: { locale: string; locales: string[] }) {
   const router = useRouter();
   const [busy, setBusy] = React.useState<string | null>(null);
 

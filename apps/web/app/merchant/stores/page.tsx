@@ -1,3 +1,5 @@
+import { maps as mapsCapability } from '@nexg/ui/capabilities';
+
 import { Empty, Panel } from '@/components/partner/bits';
 import { Stores, type StoreRow } from '@/components/partner/merchant-stores';
 import { requireMerchant } from '@/lib/partner';
@@ -19,7 +21,9 @@ export default async function StoresPage() {
   const me = await requireMerchant();
   const supabase = createClient();
 
-  const [{ data, error }, { data: zones }] = await Promise.all([
+  const maps = mapsCapability();
+
+  const [{ data, error }, { data: zones }, { data: home }] = await Promise.all([
     supabase
       .from('merchant_branch')
       .select(
@@ -28,9 +32,30 @@ export default async function StoresPage() {
       .eq('merchant_id', me.id)
       .order('sort'),
     supabase.from('zone').select('id, name').eq('active', true),
+    supabase.from('merchant_home_v').select('city_id').eq('merchant_id', me.id).maybeSingle(),
   ]);
 
   const rows = (data as StoreRow[] | null) ?? [];
+
+  /*
+   * Where a new pin starts: their existing main store if they have
+   * one, otherwise the middle of their city. A map that opens over
+   * the Atlantic makes somebody pan across a continent before they
+   * can do anything.
+   */
+  const main = rows.find((r) => r.is_primary && r.latitude !== null);
+  const cityId = (home as { city_id: string } | null)?.city_id ?? null;
+  const { data: bounds } = cityId
+    ? await supabase.from('city_bounds_v').select('*').eq('city_id', cityId).maybeSingle()
+    : { data: null };
+  const box = bounds as { north: number; south: number; east: number; west: number } | null;
+
+  const centre =
+    main?.latitude !== undefined && main?.latitude !== null && main.longitude !== null
+      ? { lat: main.latitude, lng: main.longitude }
+      : box
+        ? { lat: (box.north + box.south) / 2, lng: (box.east + box.west) / 2 }
+        : { lat: -1.2864, lng: 36.8172 };
   const open = rows.filter((r) => !r.closed_at);
   const closed = rows.filter((r) => r.closed_at);
   const zoneNames = new Map(
@@ -51,6 +76,8 @@ export default async function StoresPage() {
           ...s,
           zone_name: s.zone_id ? (zoneNames.get(s.zone_id) ?? null) : null,
         }))}
+        maps={maps}
+        cityCentre={centre}
       />
 
       {closed.length > 0 && (

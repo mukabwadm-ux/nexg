@@ -124,7 +124,12 @@ export default async function IncidentPage({ params }: { params: { id: string } 
                 )}
                 {(
                   (notes as
-                    | { id: number; body: string; created_at: string; author: { display_name: string } | null }[]
+                    | {
+                        id: number;
+                        body: string;
+                        created_at: string;
+                        author: { display_name: string } | null;
+                      }[]
                     | null) ?? []
                 ).map((n) => (
                   <li key={n.id} className="px-4 py-3">

@@ -31,9 +31,16 @@ export function PlanPage({ initial }: { initial: PlanView }) {
 
   const plan = view.plan;
   const partyLabel =
-    plan.party_type === 'solo' ? 'for one' : plan.party_type === 'couple' ? 'for two' : `for ${plan.party_size}`;
+    plan.party_type === 'solo'
+      ? 'for one'
+      : plan.party_type === 'couple'
+        ? 'for two'
+        : `for ${plan.party_size}`;
 
-  const run = async (key: string, fn: () => Promise<{ ok: boolean; message?: string; view?: PlanView }>) => {
+  const run = async (
+    key: string,
+    fn: () => Promise<{ ok: boolean; message?: string; view?: PlanView }>,
+  ) => {
     setBusy(key);
     const r = await fn();
     setBusy(null);
@@ -92,17 +99,14 @@ export function PlanPage({ initial }: { initial: PlanView }) {
             <ul className="mt-3 space-y-2.5">
               {view.messages.length === 0 ? (
                 <li className="text-xs font-semibold text-white/45">
-                  Nothing yet. Ask anything here — it goes straight to the person handling your
-                  day.
+                  Nothing yet. Ask anything here — it goes straight to the person handling your day.
                 </li>
               ) : (
                 view.messages.map((m) => (
                   <li
                     key={m.id}
                     className={`max-w-[85%] rounded-xl p-3 text-[0.8125rem] leading-[1.7] ${
-                      m.author_type === 'guest'
-                        ? 'ml-auto bg-white/12'
-                        : 'bg-gold text-ink'
+                      m.author_type === 'guest' ? 'bg-white/12 ml-auto' : 'bg-gold text-ink'
                     }`}
                   >
                     <span className="block text-[0.5625rem] font-extrabold uppercase tracking-wide opacity-60">
@@ -145,7 +149,10 @@ export function PlanPage({ initial }: { initial: PlanView }) {
               <h2 className="text-sm font-extrabold uppercase tracking-wide">Your quote</h2>
               <dl className="mt-3 space-y-1.5 text-[0.8125rem]">
                 {view.blocks
-                  .filter((b) => b.included_by === null && b.kind !== 'free' && b.status !== 'unavailable')
+                  .filter(
+                    (b) =>
+                      b.included_by === null && b.kind !== 'free' && b.status !== 'unavailable',
+                  )
                   .map((b) => (
                     <div key={b.id} className="flex justify-between gap-3">
                       <dt className="text-muted-light min-w-0 truncate font-semibold">

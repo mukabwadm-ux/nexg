@@ -105,8 +105,8 @@ export function Featured({
       {status !== 'live' ? (
         <Panel title="Not yet">
           <p className="text-muted text-[0.8125rem] font-semibold">
-            Featured slots are for businesses that are live and trading. Yours is {status}.
-            Finish that first and this opens by itself.
+            Featured slots are for businesses that are live and trading. Yours is {status}. Finish
+            that first and this opens by itself.
           </p>
         </Panel>
       ) : !eligible ? (
@@ -116,8 +116,8 @@ export function Featured({
               'Your account does not meet the bar for a paid placement at the moment. A green health band for a run of weeks is the usual way in.'}
           </p>
           <p className="text-muted-light mt-2 text-[0.75rem] font-semibold">
-            This is deliberately not something money gets you past. A guest has to be able to
-            trust a sponsored card.
+            This is deliberately not something money gets you past. A guest has to be able to trust
+            a sponsored card.
           </p>
         </Panel>
       ) : openBooking ? (
@@ -136,8 +136,8 @@ export function Featured({
               : `${kesWhole(openBooking.quoted_price)} a week`}
           </p>
           <p className="text-muted-light mt-1 text-[0.75rem] font-semibold">
-            Nothing is charged until somebody has spoken to you and you have paid. We do not
-            take card details on this page.
+            Nothing is charged until somebody has spoken to you and you have paid. We do not take
+            card details on this page.
           </p>
           {['requested', 'quoted', 'waitlisted'].includes(openBooking.status) && (
             <button
@@ -166,15 +166,13 @@ export function Featured({
                         {p.label || KIND[p.kind] || p.kind}
                       </p>
                       {p.description && (
-                        <p className="text-muted text-[0.8125rem] font-semibold">
-                          {p.description}
-                        </p>
+                        <p className="text-muted text-[0.8125rem] font-semibold">{p.description}</p>
                       )}
                       <p className="text-muted-light mt-0.5 text-[0.8125rem] font-semibold">
                         {p.price_kes === null || p.price_kes === undefined ? (
                           <>
-                            <strong className="text-ink">{DASH}</strong> a week · no rate
-                            published for your city yet, so somebody will quote you
+                            <strong className="text-ink">{DASH}</strong> a week · no rate published
+                            for your city yet, so somebody will quote you
                           </>
                         ) : (
                           <>
@@ -230,10 +228,8 @@ export function Featured({
                           <>
                             {' '}
                             That would be{' '}
-                            <strong className="text-ink">
-                              {kesWhole(p.price_kes * weeks)}
-                            </strong>{' '}
-                            in all.
+                            <strong className="text-ink">{kesWhole(p.price_kes * weeks)}</strong> in
+                            all.
                           </>
                         )}
                       </p>

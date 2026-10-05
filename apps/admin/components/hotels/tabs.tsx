@@ -109,8 +109,11 @@ export function HostsTab({
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Tile label="Airbnb hosts" value={num(badges.hosts_live)}>
-          {plural(hosts.reduce((s, h) => s + h.units, 0), 'unit')} ·{' '}
-          {plural(new Set(hosts.map((h) => h.city_id).filter(Boolean)).size, 'city', 'cities')}
+          {plural(
+            hosts.reduce((s, h) => s + h.units, 0),
+            'unit',
+          )}{' '}
+          · {plural(new Set(hosts.map((h) => h.city_id).filter(Boolean)).size, 'city', 'cities')}
         </Tile>
         <Tile label="Orders from Airbnb units · 30d" value={DASH}>
           {DASH}% of all orders · avg {kes(null)}
@@ -157,7 +160,11 @@ export function HostsTab({
                         </span>
                         <span className="text-muted-light block text-[0.6875rem] font-semibold">
                           {HOST_KIND_LABEL[h.kind] ?? h.kind}
-                          {h.areas?.length ? ` · ${h.areas[0]}` : h.city_name ? ` · ${h.city_name}` : ''}
+                          {h.areas?.length
+                            ? ` · ${h.areas[0]}`
+                            : h.city_name
+                              ? ` · ${h.city_name}`
+                              : ''}
                         </span>
                       </span>
                     </Link>
@@ -185,9 +192,7 @@ export function HostsTab({
                   </td>
                 </tr>
               ))}
-              {visible.length === 0 && (
-                <EmptyRow colSpan={6}>Nobody matches that filter.</EmptyRow>
-              )}
+              {visible.length === 0 && <EmptyRow colSpan={6}>Nobody matches that filter.</EmptyRow>}
             </tbody>
           </table>
         </Card>
@@ -233,10 +238,7 @@ function HostPanel({ host, units }: { host: HostRow; units: UnitRow[] }) {
       <div className="grid grid-cols-2 gap-3">
         <Tile label="Orders · 30d" value={num(host.orders_30d)} />
         <Tile label="Guests ordering" value={pct(null)} />
-        <Tile
-          label="QR scans"
-          value={DASH}
-        />
+        <Tile label="QR scans" value={DASH} />
         <Tile label="Packages · month" value={num(host.packages_month)} />
       </div>
 
@@ -539,9 +541,8 @@ function HotelPanel({
             <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold leading-relaxed">
               {[hotel.area, hotel.city_name].filter(Boolean).join(', ') || DASH} ·{' '}
               {hotel.rooms ? plural(hotel.rooms, 'room') : `${DASH} rooms`}
-              {hotel.star_rating ? ` · ${hotel.star_rating}★` : ''} · GM{' '}
-              {hotel.gm_name ?? '[Name]'} · agreement {hotel.agreement_version ?? DASH} signed{' '}
-              {when(hotel.agreement_signed_at)}
+              {hotel.star_rating ? ` · ${hotel.star_rating}★` : ''} · GM {hotel.gm_name ?? '[Name]'}{' '}
+              · agreement {hotel.agreement_version ?? DASH} signed {when(hotel.agreement_signed_at)}
             </p>
           </div>
         </div>
@@ -579,9 +580,7 @@ function HotelPanel({
               </li>
             ))}
             {activity.length === 0 && (
-              <li className="text-muted-light text-[0.75rem] font-semibold">
-                Nothing logged yet.
-              </li>
+              <li className="text-muted-light text-[0.75rem] font-semibold">Nothing logged yet.</li>
             )}
           </ul>
           <p className="text-muted-light mt-4 text-[0.6875rem] font-semibold leading-snug">
@@ -610,9 +609,7 @@ function HotelPanel({
               <SettingRow
                 label="In-room QR & cards"
                 on={!!setting?.['in_room_qr']}
-                sub={`Room-level links · ${num(
-                  setting?.['room_cards_printed'] as number,
-                )} printed`}
+                sub={`Room-level links · ${num(setting?.['room_cards_printed'] as number)} printed`}
               />
               <SettingRow
                 label="Front-desk ordering"
@@ -645,8 +642,8 @@ function HotelPanel({
               </p>
             ) : (
               <p className="text-warning mt-2 text-[0.75rem] font-bold leading-relaxed">
-                No access rule has been written. A rider arriving at this hotel would not know
-                which entrance to use — activation is blocked until there is one.
+                No access rule has been written. A rider arriving at this hotel would not know which
+                entrance to use — activation is blocked until there is one.
               </p>
             )}
             <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold leading-snug">
@@ -741,8 +738,7 @@ export function ChargeTab({
     .filter((f) => f.status === 'awaiting_desk')
     .reduce((m, f) => Math.max(m, f.age_minutes), 0);
 
-  const href = (f: string) =>
-    `/hotels?tab=charge${f === 'live' ? '' : `&filter=${f}`}`;
+  const href = (f: string) => `/hotels?tab=charge${f === 'live' ? '' : `&filter=${f}`}`;
 
   return (
     <>
@@ -1007,9 +1003,7 @@ export function DeskTab({
                   <td className="px-4 py-3 text-[0.8125rem] font-bold">{p.rejected}</td>
                 </tr>
               ))}
-              {perHotel.length === 0 && (
-                <EmptyRow colSpan={4}>No partner hotels yet.</EmptyRow>
-              )}
+              {perHotel.length === 0 && <EmptyRow colSpan={4}>No partner hotels yet.</EmptyRow>}
             </tbody>
           </table>
         </Card>
@@ -1201,9 +1195,7 @@ export function GuestsTab({
                   </td>
                 </tr>
               ))}
-              {visible.length === 0 && (
-                <EmptyRow colSpan={5}>No guests match that.</EmptyRow>
-              )}
+              {visible.length === 0 && <EmptyRow colSpan={5}>No guests match that.</EmptyRow>}
             </tbody>
           </table>
         </Card>
@@ -1348,9 +1340,7 @@ export function DataRequestsTab({
   badges: Badges;
   filter: string;
 }) {
-  const open = requests.filter(
-    (r) => !['fulfilled', 'refused', 'withdrawn'].includes(r.status),
-  );
+  const open = requests.filter((r) => !['fulfilled', 'refused', 'withdrawn'].includes(r.status));
   const visible = requests.filter((r) => {
     switch (filter) {
       case 'open':
@@ -1393,7 +1383,10 @@ export function DataRequestsTab({
           value={num(badges.data_requests_due_soon)}
           tone={badges.data_requests_due_soon > 0 ? 'danger' : undefined}
         />
-        <Tile label="Median days to fulfil" value={medianDays === null ? DASH : `${medianDays} d`} />
+        <Tile
+          label="Median days to fulfil"
+          value={medianDays === null ? DASH : `${medianDays} d`}
+        />
         <Tile label="Fulfilled · 12m" value={num(fulfilled.length)} />
       </div>
 
@@ -1461,9 +1454,7 @@ export function DataRequestsTab({
                 </td>
               </tr>
             ))}
-            {visible.length === 0 && (
-              <EmptyRow colSpan={7}>Nothing matches that filter.</EmptyRow>
-            )}
+            {visible.length === 0 && <EmptyRow colSpan={7}>Nothing matches that filter.</EmptyRow>}
           </tbody>
         </table>
       </Card>
@@ -1472,11 +1463,13 @@ export function DataRequestsTab({
         <p className="text-[0.9375rem] font-extrabold">The rules this queue works to</p>
         <ul className="text-muted mt-3 space-y-2 text-[0.75rem] font-semibold leading-relaxed">
           <li>• Nothing is fulfilled before identity is verified.</li>
-          <li>• An erasure is refused while a blocking reason is open — an unresolved dispute,
-            for one.</li>
           <li>
-            • Finance records inside their retention period are never deleted. They are
-            anonymised, and the bundle says so.
+            • An erasure is refused while a blocking reason is open — an unresolved dispute, for
+            one.
+          </li>
+          <li>
+            • Finance records inside their retention period are never deleted. They are anonymised,
+            and the bundle says so.
           </li>
           <li>• Every request, reveal and decision is in the audit log against a named person.</li>
         </ul>

@@ -34,9 +34,7 @@ export function when(iso: string | null | undefined): string {
 }
 
 export function shortDate(iso: string | null | undefined): string {
-  return iso
-    ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-    : DASH;
+  return iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : DASH;
 }
 
 /** "today" when it just moved, otherwise the count. */
@@ -225,7 +223,9 @@ export function Chip({
     <Link
       href={href}
       className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-        on ? 'bg-ink text-white' : 'border-border-strong bg-surface text-ink hover:border-ink border'
+        on
+          ? 'bg-ink text-white'
+          : 'border-border-strong bg-surface text-ink hover:border-ink border'
       }`}
     >
       {children}

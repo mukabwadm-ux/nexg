@@ -183,7 +183,10 @@ export function AllExperiences({
               })}
               {visible.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-muted px-4 py-10 text-center text-sm font-semibold">
+                  <td
+                    colSpan={6}
+                    className="text-muted px-4 py-10 text-center text-sm font-semibold"
+                  >
                     Nobody matches that.
                   </td>
                 </tr>
@@ -464,9 +467,7 @@ function GuestPanel({
                 loading={busy === 'approve'}
                 disabled={!review.consent_publish}
                 onClick={() =>
-                  void run('approve', () =>
-                    decideReview(review.id, 'approved', null, display),
-                  )
+                  void run('approve', () => decideReview(review.id, 'approved', null, display))
                 }
               >
                 Approve &amp; publish
@@ -478,9 +479,7 @@ function GuestPanel({
                 onClick={() => {
                   const reason = window.prompt('Why keep it private? This is logged.');
                   if (!reason) return;
-                  void run('private', () =>
-                    decideReview(review.id, 'kept_private', reason, null),
-                  );
+                  void run('private', () => decideReview(review.id, 'kept_private', reason, null));
                 }}
               >
                 Keep private

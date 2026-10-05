@@ -70,18 +70,11 @@ export function StatusPill({ status }: { status: string }) {
 }
 
 /** Green, amber or red — and the score beside it, because colour alone is not a signal. */
-export function HealthDot({
-  band,
-  score,
-}: {
-  band: string | null;
-  score: number | null;
-}) {
+export function HealthDot({ band, score }: { band: string | null; score: number | null }) {
   if (!band && score === null) {
     return <span className="text-muted-light text-xs font-semibold">{DASH}</span>;
   }
-  const colour =
-    band === 'green' ? 'bg-success' : band === 'amber' ? 'bg-warning' : 'bg-danger';
+  const colour = band === 'green' ? 'bg-success' : band === 'amber' ? 'bg-warning' : 'bg-danger';
   return (
     <span className="flex items-center gap-1.5">
       <span aria-hidden="true" className={`h-2 w-2 shrink-0 rounded-full ${colour}`} />
@@ -141,7 +134,9 @@ export function Chip({
     <a
       href={href}
       className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-        on ? 'bg-ink text-white' : 'border-border-strong bg-surface text-ink hover:border-ink border'
+        on
+          ? 'bg-ink text-white'
+          : 'border-border-strong bg-surface text-ink hover:border-ink border'
       }`}
     >
       {children}

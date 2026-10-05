@@ -137,8 +137,7 @@ export function Directory({
             <tbody>
               {visible.map((r) => {
                 const over =
-                  r.cash_cap_effective !== null &&
-                  (r.cash_on_hand ?? 0) >= r.cash_cap_effective;
+                  r.cash_cap_effective !== null && (r.cash_on_hand ?? 0) >= r.cash_cap_effective;
                 return (
                   <tr
                     key={r.id}
@@ -151,13 +150,8 @@ export function Directory({
                         <Avatar name={riderName(r)} />
                         <span className="min-w-0">
                           <span className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-[0.8125rem] font-extrabold">
-                              {riderName(r)}
-                            </span>
-                            <PresencePill
-                              presence={r.presence}
-                              cooldownUntil={r.cooldown_until}
-                            />
+                            <span className="text-[0.8125rem] font-extrabold">{riderName(r)}</span>
+                            <PresencePill presence={r.presence} cooldownUntil={r.cooldown_until} />
                             {r.top_decile && (
                               <span className="border-gold text-gold-text rounded-full border px-1.5 py-0.5 text-[0.5625rem] font-extrabold">
                                 TOP 10%
@@ -287,9 +281,7 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
 
       {/* ───────────────────────────────────────── the controls */}
       <Card className="p-0">
-        <p className="border-border border-b px-4 py-3 text-[0.9375rem] font-extrabold">
-          Controls
-        </p>
+        <p className="border-border border-b px-4 py-3 text-[0.9375rem] font-extrabold">Controls</p>
         <div className="divide-border divide-y">
           <ControlRow
             riderId={rider.id}
@@ -344,9 +336,7 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
       {/* ───────────────────────────────────────── cash on hand */}
       <Card className="p-5">
         <p className="text-[0.9375rem] font-extrabold">Cash on hand</p>
-        <p className="mt-2 text-[1.5rem] font-extrabold leading-tight">
-          {kes(rider.cash_on_hand)}
-        </p>
+        <p className="mt-2 text-[1.5rem] font-extrabold leading-tight">{kes(rider.cash_on_hand)}</p>
         <p className="text-muted-light mt-1 text-[0.6875rem] font-semibold">
           {rider.oldest_undeposited_at
             ? `oldest collection ${when(rider.oldest_undeposited_at)}`
@@ -397,8 +387,7 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
           Suspend…
         </Link>
         <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold leading-snug">
-          Suspension needs a reason and a second approver · pending earnings are held, not
-          forfeited
+          Suspension needs a reason and a second approver · pending earnings are held, not forfeited
         </p>
       </Card>
     </div>

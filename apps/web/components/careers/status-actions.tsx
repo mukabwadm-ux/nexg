@@ -41,9 +41,7 @@ export function StatusActions({
   const [pending, startTransition] = React.useTransition();
   const [pool, setPool] = React.useState(talentPool);
   const [gone, setGone] = React.useState(false);
-  const [confirmed, setConfirmed] = React.useState<string | null>(
-    interview?.scheduled_at ?? null,
-  );
+  const [confirmed, setConfirmed] = React.useState<string | null>(interview?.scheduled_at ?? null);
 
   const run = (fn: () => Promise<{ ok: boolean; message: string }>, after?: () => void) =>
     startTransition(async () => {
@@ -118,10 +116,7 @@ export function StatusActions({
         <Card className="mt-4 p-5 sm:p-7">
           <p className="text-[0.9375rem] font-extrabold">Your answer</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button
-              disabled={pending}
-              onClick={() => run(() => respondToOffer(token, true, null))}
-            >
+            <Button disabled={pending} onClick={() => run(() => respondToOffer(token, true, null))}>
               Accept
             </Button>
             <Button
@@ -165,7 +160,10 @@ export function StatusActions({
               type="button"
               disabled={pending}
               onClick={() =>
-                run(() => withdrawApplication(token, null), () => setGone(true))
+                run(
+                  () => withdrawApplication(token, null),
+                  () => setGone(true),
+                )
               }
               className="border-border-strong hover:border-ink rounded-lg border bg-white px-3 py-2 text-[0.75rem] font-bold transition-colors disabled:opacity-50"
             >

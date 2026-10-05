@@ -1,12 +1,20 @@
 import { Card } from '@nexg/ui';
+import { maps as mapsCapability } from '@nexg/ui/capabilities';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { MapArea, type RiderPin } from '@/components/live/map-area';
+import type { Bounds, OrderPoint, ZoneShape } from '@/components/live/map';
 import { Chip, DASH, num } from '@/components/live/shared';
-import { Workbench, type CascadeRow, type Candidate, type LiveOrder, type Rules } from '@/components/live/workbench';
+import {
+  Workbench,
+  type CascadeRow,
+  type Candidate,
+  type LiveOrder,
+  type Rules,
+} from '@/components/live/workbench';
 import { Zones, type ZoneRow } from '@/components/live/zones';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
@@ -50,14 +58,18 @@ export default async function LivePage({
     .from('city')
     .select('id, name, slug, status')
     .order('sort');
-  const cityRows = (cities as { id: string; name: string; slug: string; status: string }[] | null) ?? [];
+  const cityRows =
+    (cities as { id: string; name: string; slug: string; status: string }[] | null) ?? [];
   const live = cityRows.filter((c) => c.status === 'live');
   const city = live.find((c) => c.slug === searchParams?.city) ?? live[0];
 
   if (!city) {
     return (
       <ConsoleShell staff={staff} current="/live">
-        <ConsoleHeader title="Live operations" breadcrumb="Dispatch, the cascade, and the city now" />
+        <ConsoleHeader
+          title="Live operations"
+          breadcrumb="Dispatch, the cascade, and the city now"
+        />
         <main className="px-4 py-6 sm:px-8">
           <Card className="p-6">
             <p className="text-[0.9375rem] font-extrabold">No city is live yet.</p>
@@ -76,7 +88,9 @@ export default async function LivePage({
    * one where that lie costs the most — three separate bugs in this
    * project have had exactly that shape.
    */
-  const [ordersQ, zonesQ, rulesQ, ridersQ] = await Promise.all([
+  const maps = mapsCapability();
+
+  const [ordersQ, zonesQ, rulesQ, ridersQ, pointsQ, shapesQ, boundsQ] = await Promise.all([
     supabase
       .from('console_live_orders_needs_v')
       .select('*')
@@ -85,16 +99,26 @@ export default async function LivePage({
     supabase.from('console_zone_health_v').select('*').eq('city_id', city.id).order('zone'),
     supabase.from('dispatch_rules_v').select('*').eq('city_id', city.id).maybeSingle(),
     supabase.rpc('rpc_riders_live', { p_city_id: city.id }),
+    /* Only fetched when there is a map to draw them on. A guest's
+       dropped pin is their home address, and a page that has no
+       map has no reason to hold one. */
+    maps.live
+      ? supabase.rpc('rpc_live_order_points', { p_city_id: city.id })
+      : Promise.resolve({ data: [], error: null }),
+    maps.live
+      ? supabase.from('console_zone_shape_v').select('*').eq('city_id', city.id)
+      : Promise.resolve({ data: [], error: null }),
+    maps.live
+      ? supabase.from('city_bounds_v').select('*').eq('city_id', city.id).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
   ]);
 
-  const problems = [ordersQ, zonesQ, rulesQ, ridersQ]
+  const problems = [ordersQ, zonesQ, rulesQ, ridersQ, pointsQ, shapesQ, boundsQ]
     .map((q) => q.error?.message)
     .filter(Boolean) as string[];
 
   const all = (ordersQ.data as LiveOrder[] | null) ?? [];
-  const openOrders = all.filter(
-    (o) => !['delivered', 'cancelled', 'refunded'].includes(o.stage),
-  );
+  const openOrders = all.filter((o) => !['delivered', 'cancelled', 'refunded'].includes(o.stage));
   const zones = (zonesQ.data as ZoneRow[] | null) ?? [];
   const rules = (rulesQ.data as Rules | null) ?? null;
   const riders = (ridersQ.data as RiderPin[] | null) ?? [];
@@ -147,11 +171,7 @@ export default async function LivePage({
   /* The same three the RPC checks, so the button is not offered to
      somebody the database will then refuse. */
   const canPause =
-    staff.isSuperAdmin ||
-    staff.roles.includes('ops_manager') ||
-    staff.roles.includes('city_lead');
-  const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? null;
-
+    staff.isSuperAdmin || staff.roles.includes('ops_manager') || staff.roles.includes('city_lead');
   return (
     <ConsoleShell staff={staff} current="/live">
       <ConsoleHeader
@@ -212,8 +232,12 @@ export default async function LivePage({
               riders={riders}
               selected={selected?.id ?? null}
               city={city.slug}
+              cityId={city.id}
               chip={chip}
-              mapsKey={mapsKey}
+              maps={maps}
+              points={(pointsQ.data as OrderPoint[] | null) ?? []}
+              zones={(shapesQ.data as ZoneShape[] | null) ?? []}
+              bounds={(boundsQ.data as Bounds | null) ?? null}
             />
             <Zones zones={zones} canPause={canPause} />
           </div>
@@ -241,8 +265,8 @@ export default async function LivePage({
         </div>
 
         <p className="text-muted-light mt-5 text-[0.6875rem] font-semibold">
-          Keyboard: B boost · A assign · W widen · T tell guest · Esc close. The cascade is
-          written by the dispatch service; nothing on this screen edits an offer.
+          Keyboard: B boost · A assign · W widen · T tell guest · Esc close. The cascade is written
+          by the dispatch service; nothing on this screen edits an offer.
         </p>
       </main>
     </ConsoleShell>

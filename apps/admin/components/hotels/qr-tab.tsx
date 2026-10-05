@@ -188,13 +188,16 @@ export function QrTab({
         <p className="text-muted text-[0.75rem] font-semibold leading-[1.7]">
           Cards generated now encode{' '}
           <span className="font-mono font-extrabold">{webOrigin}/q/&#123;code&#125;</span>. Scan one
-          and check it lands here before printing any quantity — a printed card cannot be
-          repointed.
+          and check it lands here before printing any quantity — a printed card cannot be repointed.
         </p>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile label="Scans · 7 days" value={n(s?.scans_7d)} hint={`${n(s?.sessions_7d)} different phones`} />
+        <Tile
+          label="Scans · 7 days"
+          value={n(s?.scans_7d)}
+          hint={`${n(s?.sessions_7d)} different phones`}
+        />
         <Tile
           label="Scan → order · 30 days"
           value={pct(s?.conversion_30d)}
@@ -202,7 +205,11 @@ export function QrTab({
         />
         <Tile
           label="Share of all orders"
-          value={s?.share_of_all_orders === null || s?.share_of_all_orders === undefined ? DASH : pct(s.share_of_all_orders)}
+          value={
+            s?.share_of_all_orders === null || s?.share_of_all_orders === undefined
+              ? DASH
+              : pct(s.share_of_all_orders)
+          }
           hint="Needs the orders domain, which is not built"
         />
         <Tile
@@ -232,8 +239,8 @@ export function QrTab({
           <div>
             <h2 className="text-[1.0625rem] font-extrabold tracking-tight">Where the card goes</h2>
             <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.7]">
-              The same flat with a card on the counter and a card on the fridge will not convert
-              the same. This is the number to quote a host.
+              The same flat with a card on the counter and a card on the fridge will not convert the
+              same. This is the number to quote a host.
             </p>
           </div>
           <RefreshReports onRefresh={refreshReports} />
@@ -241,8 +248,8 @@ export function QrTab({
 
         {placements.length === 0 ? (
           <Empty>
-            No cards have been made yet. Generate one on the right — the code is created here, and
-            a host never types it.
+            No cards have been made yet. Generate one on the right — the code is created here, and a
+            host never types it.
           </Empty>
         ) : (
           <Card className="mt-3 overflow-x-auto p-0">
@@ -488,7 +495,10 @@ export function QrTab({
             ) : (
               <ul className="mt-3 space-y-3">
                 {health.map((h) => (
-                  <li key={h.qr_id} className="border-border border-t pt-3 first:border-0 first:pt-0">
+                  <li
+                    key={h.qr_id}
+                    className="border-border border-t pt-3 first:border-0 first:pt-0"
+                  >
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-[0.75rem] font-extrabold">{h.code}</span>
                       <Pill tone="bg-warning-bg text-warning">
@@ -521,8 +531,8 @@ export function QrTab({
             </p>
             {(s?.misses_7d ?? 0) > 0 && (
               <p className="text-muted-light mt-3 text-[0.75rem] font-semibold">
-                {n(s?.misses_7d)} attempts on codes that do not exist in the last week. Worth a
-                look only if it climbs.
+                {n(s?.misses_7d)} attempts on codes that do not exist in the last week. Worth a look
+                only if it climbs.
               </p>
             )}
           </Card>

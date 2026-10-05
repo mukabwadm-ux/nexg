@@ -170,7 +170,10 @@ export async function placeLegalHold(input: {
 }
 
 export async function releaseLegalHold(id: string, reason: string): Promise<Outcome> {
-  const { error } = await audit().rpc('rpc_audit_legal_hold_release', { p_id: id, p_reason: reason });
+  const { error } = await audit().rpc('rpc_audit_legal_hold_release', {
+    p_id: id,
+    p_reason: reason,
+  });
   return fail(error) ?? done('Released. Retention resumes on the next run.');
 }
 

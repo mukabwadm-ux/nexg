@@ -70,14 +70,12 @@ export default async function PlanWorkbenchPage({ params }: { params: { id: stri
     notes: plan.notes,
     moods: (plan.moods as string[] | null) ?? [],
     answers: (plan.answers as Record<string, unknown> | null) ?? {},
-    concierge_name:
-      (plan.staff_user as { display_name: string } | null)?.display_name ?? null,
+    concierge_name: (plan.staff_user as { display_name: string } | null)?.display_name ?? null,
     claimed_at: plan.claimed_at,
     quote_due_in_s: plan.sla_quote_due_at
       ? Math.round((new Date(plan.sla_quote_due_at).getTime() - Date.now()) / 1000)
       : null,
-    flags:
-      (plan.flags as { severity: string; kind: string; text: string }[] | null) ?? [],
+    flags: (plan.flags as { severity: string; kind: string; text: string }[] | null) ?? [],
   };
 
   const workBlocks: WorkBlock[] = ((blocks ?? []) as Record<string, unknown>[]).map((b) => ({

@@ -253,7 +253,9 @@ export function Locked({ group, who }: { group: string; who: string }) {
   return (
     <span className="text-muted-light inline-flex items-center gap-1 text-[0.6875rem] font-semibold">
       <span aria-hidden="true">🔒</span>
-      <span>{who} edits {group}</span>
+      <span>
+        {who} edits {group}
+      </span>
     </span>
   );
 }
@@ -323,7 +325,9 @@ export function SettingsTabs({ current }: { current: string }) {
           key={t.key}
           href={`/settings?tab=${t.key}`}
           className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
-            current === t.key ? 'border-gold text-ink' : 'text-muted hover:text-ink border-transparent'
+            current === t.key
+              ? 'border-gold text-ink'
+              : 'text-muted hover:text-ink border-transparent'
           }`}
         >
           {t.label}
@@ -484,7 +488,10 @@ export interface ChangeSetRow {
   effective_from: string | null;
   immediate: boolean;
   reason: string | null;
-  diff: Record<string, { label: string; from: unknown; to: unknown; unit: string | null; sensitive: boolean }>;
+  diff: Record<
+    string,
+    { label: string; from: unknown; to: unknown; unit: string | null; sensitive: boolean }
+  >;
   impact: Record<string, Record<string, unknown>>;
   requested_by: string | null;
   requested_by_name: string | null;

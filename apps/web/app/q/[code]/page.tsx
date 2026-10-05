@@ -59,9 +59,7 @@ export default function ScanPage() {
     const copy: Record<string, { title: string; body: string }> = {
       paused: {
         title: 'This place isn’t taking orders right now.',
-        body:
-          r.message ??
-          'Your host has paused it. You can still order to any other address.',
+        body: r.message ?? 'Your host has paused it. You can still order to any other address.',
       },
       replaced: {
         title: 'This card has been replaced.',
@@ -110,9 +108,7 @@ export default function ScanPage() {
           <Row
             label="Delivery window"
             value={
-              hours?.from && hours?.to
-                ? `${hours.from}–${hours.to}`
-                : 'Any time we have someone on'
+              hours?.from && hours?.to ? `${hours.from}–${hours.to}` : 'Any time we have someone on'
             }
           />
           {handoff && <Row label="Your host’s hand-off" value={handoff} />}

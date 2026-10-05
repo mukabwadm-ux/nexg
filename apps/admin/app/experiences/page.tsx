@@ -4,12 +4,7 @@ import Link from 'next/link';
 
 import { AllExperiences } from '@/components/experiences/all-experiences';
 import { Queue } from '@/components/experiences/queue';
-import type {
-  GuestRow,
-  QueueRow,
-  ReviewRow,
-  Stats,
-} from '@/components/experiences/shared';
+import type { GuestRow, QueueRow, ReviewRow, Stats } from '@/components/experiences/shared';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { requireModule, requireStaff } from '@/lib/staff';
@@ -48,25 +43,22 @@ export default async function ExperiencesPage({
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'all';
   const filter = searchParams?.filter ?? (tab === 'queue' ? 'needs_me' : 'all');
 
-  const [{ data: stats }, { data: guests }, { data: queue }, { data: reviews }] =
-    await Promise.all([
+  const [{ data: stats }, { data: guests }, { data: queue }, { data: reviews }] = await Promise.all(
+    [
       supabase.rpc('rpc_experience_stats', {}),
       tab === 'all'
         ? supabase.rpc('rpc_experience_guests', { p_filter: filter })
         : Promise.resolve({ data: [] }),
-      tab === 'queue'
-        ? supabase.rpc('rpc_experience_queue', {})
-        : Promise.resolve({ data: [] }),
+      tab === 'queue' ? supabase.rpc('rpc_experience_queue', {}) : Promise.resolve({ data: [] }),
       supabase
         .from('review')
         .select(
           'id, plan_id, rating, body, word_count, received_at, channel, consent_publish, consent_display, status, checks, decision_reason, reply_body',
         ),
-    ]);
-
-  const reviewsById = Object.fromEntries(
-    ((reviews ?? []) as ReviewRow[]).map((r) => [r.id, r]),
+    ],
   );
+
+  const reviewsById = Object.fromEntries(((reviews ?? []) as ReviewRow[]).map((r) => [r.id, r]));
 
   const s = (stats as Stats | null) ?? ({} as Stats);
 
@@ -272,7 +264,10 @@ async function CatalogueTab({
                   {c.swap_group}
                 </td>
                 <td className="px-4 py-3">
-                  <span aria-label={`tier ${c.tier} of 5`} className="text-[0.625rem] tracking-wider">
+                  <span
+                    aria-label={`tier ${c.tier} of 5`}
+                    className="text-[0.625rem] tracking-wider"
+                  >
                     {'●'.repeat(c.tier ?? 0)}
                     <span className="text-border-strong">{'○'.repeat(5 - (c.tier ?? 0))}</span>
                   </span>

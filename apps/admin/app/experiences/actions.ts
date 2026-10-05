@@ -36,11 +36,7 @@ export async function claimPlan(planId: string): Promise<Outcome> {
   return { ok: true, message: 'It is yours.' };
 }
 
-export async function handoverPlan(
-  planId: string,
-  to: string,
-  reason: string,
-): Promise<Outcome> {
+export async function handoverPlan(planId: string, to: string, reason: string): Promise<Outcome> {
   const supabase = createClient();
   const { error } = await supabase.rpc('rpc_handover_plan', {
     p_plan_id: planId,
@@ -117,11 +113,7 @@ export async function blockUnavailable(
   return { ok: true, message: 'Marked unavailable, with the alternatives.' };
 }
 
-export async function removeBlock(
-  planId: string,
-  blockId: string,
-  note: string,
-): Promise<Outcome> {
+export async function removeBlock(planId: string, blockId: string, note: string): Promise<Outcome> {
   const supabase = createClient();
   const { error } = await supabase.rpc('rpc_remove_block', {
     p_block_id: blockId,

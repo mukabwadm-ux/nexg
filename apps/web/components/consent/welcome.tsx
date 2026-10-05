@@ -6,7 +6,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { markAsked, setLocale, setLocationFromCoords } from '@/app/consent-actions';
-import { isAuthored, localeName, pickLocale, translator, type Locale } from '@/lib/i18n/dictionaries';
+import {
+  isAuthored,
+  localeName,
+  pickLocale,
+  translator,
+  type Locale,
+} from '@/lib/i18n/dictionaries';
 
 /**
  * The welcome card.
@@ -71,9 +77,7 @@ export function WelcomeConsent({
   const tAfter = translator(effective);
 
   React.useEffect(() => {
-    const languages = navigator.languages?.length
-      ? [...navigator.languages]
-      : [navigator.language];
+    const languages = navigator.languages?.length ? [...navigator.languages] : [navigator.language];
     const match = pickLocale(languages);
 
     /*
@@ -105,7 +109,6 @@ export function WelcomeConsent({
     }
     return false;
   };
-
 
   const allowBoth = async () => {
     setBusy('both');
@@ -231,18 +234,18 @@ export function WelcomeConsent({
         </ul>
 
         <div className="mt-5 flex flex-wrap gap-2">
-            <Button loading={busy === 'both'} onClick={() => void allowBoth()}>
-              {t('consent.allow')}
+          <Button loading={busy === 'both'} onClick={() => void allowBoth()}>
+            {t('consent.allow')}
+          </Button>
+          {preferred.locale && preferred.locale !== locale && (
+            <Button
+              variant="outline"
+              loading={busy === 'language'}
+              onClick={() => void languageOnly()}
+            >
+              {t('consent.allowLanguageOnly')}
             </Button>
-            {preferred.locale && preferred.locale !== locale && (
-              <Button
-                variant="outline"
-                loading={busy === 'language'}
-                onClick={() => void languageOnly()}
-              >
-                {t('consent.allowLanguageOnly')}
-              </Button>
-            )}
+          )}
           <Button variant="outline" loading={busy === 'dismiss'} onClick={() => void dismiss()}>
             {t('consent.decline')}
           </Button>

@@ -134,13 +134,10 @@ export function Documents({
 
   return (
     <div className="space-y-4">
-      <Panel
-        title="Your documents"
-        note={`${requirements.length} asked for`}
-      >
+      <Panel title="Your documents" note={`${requirements.length} asked for`}>
         <p className="text-muted text-[0.8125rem] font-semibold">
-          Send a clear photo of the whole thing — all four corners in frame, flat, in daylight.
-          Most of what comes back comes back because a corner is missing.
+          Send a clear photo of the whole thing — all four corners in frame, flat, in daylight. Most
+          of what comes back comes back because a corner is missing.
         </p>
       </Panel>
 
@@ -150,18 +147,13 @@ export function Documents({
           const wanted = askedFor.has(req.id);
 
           return (
-            <li
-              key={req.id}
-              className="border-border bg-surface rounded-2xl border p-4"
-            >
+            <li key={req.id} className="border-border bg-surface rounded-2xl border p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="flex flex-wrap items-center gap-2 text-[0.9375rem] font-extrabold">
                     {req.label}
                     {!req.essential && (
-                      <span className="text-muted-light text-[0.6875rem] font-bold">
-                        optional
-                      </span>
+                      <span className="text-muted-light text-[0.6875rem] font-bold">optional</span>
                     )}
                     {wanted && <Pill tone="bg-gold-soft text-gold-text">WE ASKED FOR THIS</Pill>}
                   </p>
@@ -181,14 +173,10 @@ export function Documents({
                   <input
                     type="date"
                     value={
-                      dates[req.kind] ??
-                      latest.get(`${req.id}:-`)?.expires_at?.slice(0, 10) ??
-                      ''
+                      dates[req.kind] ?? latest.get(`${req.id}:-`)?.expires_at?.slice(0, 10) ?? ''
                     }
                     min={new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)}
-                    onChange={(e) =>
-                      setDates((d) => ({ ...d, [req.kind]: e.target.value }))
-                    }
+                    onChange={(e) => setDates((d) => ({ ...d, [req.kind]: e.target.value }))}
                     className="border-border-strong mt-1 w-full max-w-xs rounded-lg border px-3 py-2 text-[0.875rem] font-semibold"
                   />
                 </label>
@@ -226,8 +214,7 @@ export function Documents({
                       {have?.status === 'verified' && have.expires_at && (
                         <p className="text-muted mt-1 text-[0.75rem] font-semibold">
                           Good until {day(have.expires_at)}
-                          {new Date(have.expires_at).getTime() - Date.now() <
-                            30 * 86_400_000 && (
+                          {new Date(have.expires_at).getTime() - Date.now() < 30 * 86_400_000 && (
                             <span className="text-gold-text font-bold">
                               {' '}
                               · that is inside the month
@@ -254,19 +241,15 @@ export function Documents({
                       </label>
 
                       {uploading && (
-                        <p className="text-muted mt-1 text-[0.75rem] font-semibold">
-                          Sending…
-                        </p>
+                        <p className="text-muted mt-1 text-[0.75rem] font-semibold">Sending…</p>
                       )}
                       {errors[key] && (
-                        <p className="text-danger mt-1 text-[0.75rem] font-bold">
-                          {errors[key]}
-                        </p>
+                        <p className="text-danger mt-1 text-[0.75rem] font-bold">{errors[key]}</p>
                       )}
                       {have && !justDone && (
                         <p className="text-muted-light mt-1 text-[0.75rem] font-semibold">
-                          Sending another replaces this one. The old one stays on file — nothing
-                          a reviewer has looked at is overwritten.
+                          Sending another replaces this one. The old one stays on file — nothing a
+                          reviewer has looked at is overwritten.
                         </p>
                       )}
                     </div>

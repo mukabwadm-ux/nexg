@@ -22,7 +22,8 @@ export type HotelTab = (typeof HOTEL_TABS)[number]['key'];
 export const TAB_TITLE: Record<string, { title: string; subtitle: string }> = {
   hosts: {
     title: 'Airbnb hosts & units',
-    subtitle: 'Hosts, property managers and every unit with its hand-off rule · QR packs · welcome packages',
+    subtitle:
+      'Hosts, property managers and every unit with its hand-off rule · QR packs · welcome packages',
   },
   listings: {
     title: 'Listings & stay requests',
@@ -39,8 +40,7 @@ export const TAB_TITLE: Record<string, { title: string; subtitle: string }> = {
   },
   qr: {
     title: 'QR & attribution',
-    subtitle:
-      'Every card NexG has printed, where it sits, and what guests did after scanning it',
+    subtitle: 'Every card NexG has printed, where it sits, and what guests did after scanning it',
   },
   guests: {
     title: 'Guests & data requests',

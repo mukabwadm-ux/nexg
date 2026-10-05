@@ -47,7 +47,10 @@ export function PartnerShell({
     <div className="bg-bg min-h-dvh">
       <header className="bg-ink text-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
-          <Link href={kind === 'merchant' ? '/merchant' : '/rider'} className="flex items-center gap-3">
+          <Link
+            href={kind === 'merchant' ? '/merchant' : '/rider'}
+            className="flex items-center gap-3"
+          >
             <Logo className="h-8 w-auto" onDark />
             <span className="text-gold/90 text-[0.6875rem] font-extrabold uppercase tracking-[0.18em]">
               {kind === 'merchant' ? 'Merchant' : 'Rider'}
@@ -74,16 +77,16 @@ export function PartnerShell({
                 href={item.href}
                 aria-current={on ? 'page' : undefined}
                 className={`-mb-px shrink-0 border-b-2 pb-3 text-[0.8125rem] font-extrabold transition-colors ${
-                  on ? 'border-gold text-white' : 'border-transparent text-white/55 hover:text-white'
+                  on
+                    ? 'border-gold text-white'
+                    : 'border-transparent text-white/55 hover:text-white'
                 }`}
               >
                 {item.label}
                 {item.badge ? (
                   <span
                     className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[0.625rem] ${
-                      item.tone === 'danger'
-                        ? 'bg-danger text-white'
-                        : 'bg-gold text-ink'
+                      item.tone === 'danger' ? 'bg-danger text-white' : 'bg-gold text-ink'
                     }`}
                   >
                     {item.badge}

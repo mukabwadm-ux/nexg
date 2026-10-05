@@ -135,23 +135,31 @@ async function loadPipeline(supabase: Supabase, rows: RiderRow[]): Promise<Pipel
   if (onboarding.length === 0) return [];
   const ids = onboarding.map((r) => r.id);
 
-  const [{ data: riders }, { data: training }, { data: trips }, { data: documents }, { data: reqs }] =
-    await Promise.all([
-      supabase.from('rider').select('id, background_check, kit_issued_at, kit_deposit_status, vehicle').in('id', ids),
-      supabase.from('rider_training').select('rider_id, module, passed').in('rider_id', ids),
-      supabase.from('rider_test_trip').select('rider_id, outcome').in('rider_id', ids),
-      supabase
-        .from('document')
-        .select('owner_id, status')
-        .eq('owner_type', 'rider')
-        .in('owner_id', ids)
-        .is('superseded_at', null),
-      supabase
-        .from('document_requirement')
-        .select('kind, applies_when')
-        .eq('owner_type', 'rider')
-        .eq('required', true),
-    ]);
+  const [
+    { data: riders },
+    { data: training },
+    { data: trips },
+    { data: documents },
+    { data: reqs },
+  ] = await Promise.all([
+    supabase
+      .from('rider')
+      .select('id, background_check, kit_issued_at, kit_deposit_status, vehicle')
+      .in('id', ids),
+    supabase.from('rider_training').select('rider_id, module, passed').in('rider_id', ids),
+    supabase.from('rider_test_trip').select('rider_id, outcome').in('rider_id', ids),
+    supabase
+      .from('document')
+      .select('owner_id, status')
+      .eq('owner_type', 'rider')
+      .in('owner_id', ids)
+      .is('superseded_at', null),
+    supabase
+      .from('document_requirement')
+      .select('kind, applies_when')
+      .eq('owner_type', 'rider')
+      .eq('required', true),
+  ]);
 
   const extra = new Map(
     (riders ?? []).map((r) => [
@@ -246,9 +254,9 @@ async function loadCash(
     supabase.from('cash_rule').select('*, city:city_id(name)'),
   ]);
 
-  const cashRules = ((rules as (CashRuleRow & { city: { name: string } | null })[] | null) ?? []).map(
-    (r) => ({ ...r, city_name: r.city?.name ?? null }),
-  );
+  const cashRules = (
+    (rules as (CashRuleRow & { city: { name: string } | null })[] | null) ?? []
+  ).map((r) => ({ ...r, city_name: r.city?.name ?? null }));
 
   return (
     <CashTab
@@ -316,8 +324,14 @@ async function loadSupply(supabase: Supabase, badges: Badges) {
   const gaps = await Promise.all(
     (zones ?? []).map(async (z) => {
       const { data } = await supabase.rpc('fn_zone_supply_gap', { p_zone_id: z.id });
-      const g = ((data as { online_now: number; on_trip: number; riders_needed: number | null; gap: number | null }[] | null) ??
-        [])[0];
+      const g = ((data as
+        | {
+            online_now: number;
+            on_trip: number;
+            riders_needed: number | null;
+            gap: number | null;
+          }[]
+        | null) ?? [])[0];
       return {
         id: z.id,
         name: z.name,
@@ -393,8 +407,7 @@ async function loadDocuments(supabase: Supabase, rows: RiderRow[]) {
         signed === null || activeCount === 0
           ? null
           : Math.round(
-              (rows.filter((r) => r.status === 'active' && signed.has(r.id)).length /
-                activeCount) *
+              (rows.filter((r) => r.status === 'active' && signed.has(r.id)).length / activeCount) *
                 100,
             )
       }

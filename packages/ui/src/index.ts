@@ -7,6 +7,12 @@
 
 // Utilities
 export { cn } from './lib/cn';
+export { MAP_COLOURS, loadGoogleMaps, type MapsLoad } from './lib/google-maps';
+/* Capabilities are imported from '@nexg/ui/capabilities', not from
+   here. They read environment rather than rendering anything, and a
+   barrel of components is the wrong door for that — `maps` is also
+   exactly the kind of generic name `optimizePackageImports` mangles
+   when it rewrites a re-export into a deep import. */
 export {
   ACCEPTED_MIME_TYPES,
   compressImage,

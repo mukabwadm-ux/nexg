@@ -133,7 +133,11 @@ export function ActivityTab({
   return (
     <>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile label="Events recorded" value={num(health.events_total)} hint="Since the log opened" />
+        <Tile
+          label="Events recorded"
+          value={num(health.events_total)}
+          hint="Since the log opened"
+        />
         <Tile label="In the last day" value={num(health.events_today)} />
         <Tile
           label="Waiting on a person"
@@ -397,7 +401,9 @@ export function SignInsTab({
                   <Pill tone={SEVERITY_TONE[a.severity]}>{SEVERITY_LABEL[a.severity]}</Pill>
                   {a.stale && <Pill tone="bg-danger-bg text-danger">UNTOUCHED 24H</Pill>}
                   {a.state === 'acknowledged' && <Pill tone="bg-info-bg text-info">ON IT</Pill>}
-                  <span className="text-muted-light ml-auto text-[0.6875rem] font-bold">{a.ago}</span>
+                  <span className="text-muted-light ml-auto text-[0.6875rem] font-bold">
+                    {a.ago}
+                  </span>
                 </div>
                 <p className="mt-2 text-[0.875rem] font-extrabold">{a.title}</p>
                 <p className="text-muted mt-1 text-[0.8125rem] font-semibold">{a.summary}</p>
@@ -594,7 +600,11 @@ export function MoneyTab({ rows }: { rows: MoneyRow[] }) {
           value={num(unrecorded)}
           hint="The event happened; the figure was not captured"
         />
-        <Tile label="Reconciled against orders" value={DASH} hint="The orders domain is not built" />
+        <Tile
+          label="Reconciled against orders"
+          value={DASH}
+          hint="The orders domain is not built"
+        />
       </div>
 
       <div className="bg-info-bg mt-4 rounded-xl p-4">
@@ -786,9 +796,9 @@ export function DataAccessTab({
       <Section title="Exports" sub="Everything that left the system, with the reason given.">
         {exportRows.length === 0 ? (
           <Empty>
-            Nothing has been exported. Any surface that produces a file calls
-            `rpc_record_export` first, which refuses without a stated reason — so an empty list
-            here means no files, not unrecorded ones.
+            Nothing has been exported. Any surface that produces a file calls `rpc_record_export`
+            first, which refuses without a stated reason — so an empty list here means no files, not
+            unrecorded ones.
           </Empty>
         ) : (
           <div className="space-y-2">
@@ -797,9 +807,7 @@ export function DataAccessTab({
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[0.875rem] font-extrabold">{x.what}</span>
                   {x.contains_pii && <Pill tone="bg-info-bg text-info">PERSONAL DATA</Pill>}
-                  {x.outside_hours && (
-                    <Pill tone="bg-warning-bg text-warning">OUTSIDE HOURS</Pill>
-                  )}
+                  {x.outside_hours && <Pill tone="bg-warning-bg text-warning">OUTSIDE HOURS</Pill>}
                   <span className="text-muted-light ml-auto text-[0.6875rem] font-bold">
                     {x.ago}
                   </span>
@@ -956,9 +964,7 @@ export function EvidenceTab({
                 <Card key={h.id} className="p-4">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-[0.75rem] font-extrabold">{h.reference}</span>
-                    <Pill
-                      tone={h.active ? 'bg-warning-bg text-warning' : 'bg-bg text-muted-light'}
-                    >
+                    <Pill tone={h.active ? 'bg-warning-bg text-warning' : 'bg-bg text-muted-light'}>
                       {h.active ? 'ACTIVE' : 'RELEASED'}
                     </Pill>
                     {h.packs > 0 && <Pill tone="bg-info-bg text-info">{h.packs} PACKS</Pill>}
@@ -1041,7 +1047,12 @@ export function EvidenceTab({
                   </p>
                 )}
                 <div className="mt-3">
-                  <PackActions id={p.id} state={p.state} onFreeze={freezePack} onShare={sharePack} />
+                  <PackActions
+                    id={p.id}
+                    state={p.state}
+                    onFreeze={freezePack}
+                    onShare={sharePack}
+                  />
                 </div>
               </Card>
             ))}
@@ -1129,7 +1140,10 @@ function ModuleChip({
 
 function Th({ children }: { children: React.ReactNode }) {
   return (
-    <th scope="col" className="px-4 py-2.5 text-[0.625rem] font-extrabold uppercase tracking-[0.1em]">
+    <th
+      scope="col"
+      className="px-4 py-2.5 text-[0.625rem] font-extrabold uppercase tracking-[0.1em]"
+    >
       {children}
     </th>
   );

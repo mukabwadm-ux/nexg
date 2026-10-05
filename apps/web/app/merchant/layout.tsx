@@ -86,7 +86,7 @@ export default async function MerchantLayout({ children }: { children: React.Rea
   return (
     <PartnerShell
       kind="merchant"
-      name={m?.name ?? (me.name ?? 'Your business')}
+      name={m?.name ?? me.name ?? 'Your business'}
       subtitle={`${statusLine(m?.status, m?.readiness_pct)}${m?.city ? ` · ${m.city}` : ''}`}
       nav={nav}
       current={''}

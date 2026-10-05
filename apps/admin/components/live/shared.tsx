@@ -163,7 +163,9 @@ export function Chip({
     <Link
       href={href}
       className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-        on ? 'bg-ink text-white' : 'border-border-strong bg-surface text-ink hover:border-ink border'
+        on
+          ? 'bg-ink text-white'
+          : 'border-border-strong bg-surface text-ink hover:border-ink border'
       }`}
     >
       {children}
@@ -218,8 +220,7 @@ export function SectionTitle({
 
 /** Green / amber / red, with the state word beside it. */
 export function StateDot({ state }: { state: string }) {
-  const colour =
-    state === 'short' ? 'bg-danger' : state === 'tight' ? 'bg-warning' : 'bg-success';
+  const colour = state === 'short' ? 'bg-danger' : state === 'tight' ? 'bg-warning' : 'bg-success';
   return (
     <span className="flex items-center gap-1.5">
       <span aria-hidden="true" className={`h-2 w-2 shrink-0 rounded-full ${colour}`} />

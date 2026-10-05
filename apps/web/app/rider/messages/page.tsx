@@ -60,9 +60,9 @@ export default async function RiderMessages() {
 
       <Panel title="Reaching a person">
         <p className="text-muted text-[0.8125rem] font-semibold">
-          There is no reply box here yet, and one that queued your message without sending it
-          would be worse than none. For anything urgent — an accident, a guest who will not
-          answer, a bike down — call the rider line on your kit card.
+          There is no reply box here yet, and one that queued your message without sending it would
+          be worse than none. For anything urgent — an accident, a guest who will not answer, a bike
+          down — call the rider line on your kit card.
         </p>
       </Panel>
     </div>

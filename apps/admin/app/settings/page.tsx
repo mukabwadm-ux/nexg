@@ -75,11 +75,7 @@ export default async function SettingsPage({
 
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'cities';
 
-  const [
-    { data: cities },
-    { data: definitions },
-    { data: changeSets },
-  ] = await Promise.all([
+  const [{ data: cities }, { data: definitions }, { data: changeSets }] = await Promise.all([
     s.from('settings_city_v').select('*').order('sort').order('name'),
     s.from('settings_definition_v').select('*').order('sort'),
     s.from('settings_scheduled_v').select('*').order('requested_at', { ascending: false }),
@@ -104,8 +100,19 @@ export default async function SettingsPage({
    * than inferred from the role list here, so the lock icons and the
    * refusals cannot disagree.
    */
-  const groups = ['cities', 'fees', 'dispatch', 'settlement', 'payments', 'payouts',
-    'integrations', 'notifications', 'branding', 'legal', 'retention'];
+  const groups = [
+    'cities',
+    'fees',
+    'dispatch',
+    'settlement',
+    'payments',
+    'payouts',
+    'integrations',
+    'notifications',
+    'branding',
+    'legal',
+    'retention',
+  ];
   const editable = new Set<string>();
   let permissionError: string | null = null;
 
@@ -135,9 +142,9 @@ export default async function SettingsPage({
               Settings could not be read.
             </p>
             <p className="text-danger mt-2 max-w-[44rem] text-[0.8125rem] font-semibold leading-[1.7]">
-              This page is showing nothing rather than a screen of locked controls, because a
-              locked control reads as a decision somebody made about your permissions when it
-              actually means the page could not look.
+              This page is showing nothing rather than a screen of locked controls, because a locked
+              control reads as a decision somebody made about your permissions when it actually
+              means the page could not look.
             </p>
             <p className="text-muted mt-3 font-mono text-[0.75rem] font-semibold">
               {permissionError}
@@ -212,9 +219,12 @@ export default async function SettingsPage({
      database computes it, so the dialog does not promise a lighter
      approval than the RPC will demand. */
   const pair = draftSet
-    ? Object.keys(draftSet.diff)
-        .map((k) => defs.find((d) => d.key === k.split(':')[0])?.effective_pair ?? 'single:ops_manager')
-        .sort((a, b) => rank(b) - rank(a))[0] ?? 'single:ops_manager'
+    ? (Object.keys(draftSet.diff)
+        .map(
+          (k) =>
+            defs.find((d) => d.key === k.split(':')[0])?.effective_pair ?? 'single:ops_manager',
+        )
+        .sort((a, b) => rank(b) - rank(a))[0] ?? 'single:ops_manager')
     : 'single:ops_manager';
 
   return (

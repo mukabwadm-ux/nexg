@@ -33,9 +33,9 @@ export default async function CareersPage() {
 
   const openRoles = (roles as OpenRole[] | null) ?? [];
   const liveRoles = openRoles.filter((r) => !r.is_general);
-  const teamRows = (teams as
-    | { id: string; name: string; blurb: string | null; open_roles: number }[]
-    | null) ?? [];
+  const teamRows =
+    (teams as { id: string; name: string; blurb: string | null; open_roles: number }[] | null) ??
+    [];
 
   /*
    * "Five steps, about N weeks." Taken from the roles actually open,

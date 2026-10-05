@@ -106,11 +106,7 @@ export function Directory({
             <h2 className="text-[0.9375rem] font-extrabold">Applications to review</h2>
             <p className="text-gold-text text-[0.6875rem] font-extrabold uppercase tracking-wide">
               {applications.length} · oldest{' '}
-              {Math.max(
-                ...applications.map(
-                  (a) => daysSince(a.submitted_at ?? a.created_at) ?? 0,
-                ),
-              )}{' '}
+              {Math.max(...applications.map((a) => daysSince(a.submitted_at ?? a.created_at) ?? 0))}{' '}
               days
             </p>
           </div>
@@ -246,9 +242,7 @@ export function Directory({
                   </td>
                 </tr>
               ))}
-              {visible.length === 0 && (
-                <EmptyRow colSpan={6}>Nobody matches that filter.</EmptyRow>
-              )}
+              {visible.length === 0 && <EmptyRow colSpan={6}>Nobody matches that filter.</EmptyRow>}
             </tbody>
           </table>
           <p className="text-muted-light border-border border-t px-4 py-3 text-[0.6875rem] font-semibold">

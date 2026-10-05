@@ -50,8 +50,8 @@ export default async function MerchantMenu() {
       <Panel title="Prices and new items">
         <p className="text-muted text-[0.8125rem] font-semibold">
           Changing a price or adding something new goes through your registration, where the
-          category questions and the price band are set together.{' '}
-          {plural(items.length, 'item')} on file, {on.length} of them orderable right now —{' '}
+          category questions and the price band are set together. {plural(items.length, 'item')} on
+          file, {on.length} of them orderable right now —{' '}
           {kesWhole(Math.min(...items.map((i) => i.price_kes)))} to{' '}
           {kesWhole(Math.max(...items.map((i) => i.price_kes)))}.
         </p>

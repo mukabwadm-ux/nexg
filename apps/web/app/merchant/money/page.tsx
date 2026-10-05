@@ -58,8 +58,8 @@ export default async function MerchantMoney() {
           </p>
         )}
         <p className="text-muted-light mt-1 text-[0.75rem] font-semibold">
-          Changing where money goes is a conversation rather than a form — message us and we
-          will verify it properly.
+          Changing where money goes is a conversation rather than a form — message us and we will
+          verify it properly.
         </p>
       </Panel>
 
@@ -119,8 +119,8 @@ export default async function MerchantMoney() {
       <Panel title="Today">
         <p className="text-2xl font-extrabold tracking-tight">{kes(m?.earned_today_cents ?? 0)}</p>
         <p className="text-muted mt-0.5 text-[0.8125rem] font-semibold">
-          Kept on delivered orders so far today, after commission. It lands in a statement at
-          the end of the week.
+          Kept on delivered orders so far today, after commission. It lands in a statement at the
+          end of the week.
         </p>
       </Panel>
     </div>

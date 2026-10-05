@@ -205,7 +205,9 @@ export function Chip({
     <a
       href={href}
       className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-        on ? 'bg-ink text-white' : 'border-border-strong bg-surface text-ink hover:border-ink border'
+        on
+          ? 'bg-ink text-white'
+          : 'border-border-strong bg-surface text-ink hover:border-ink border'
       }`}
     >
       {children}
@@ -233,9 +235,7 @@ export function EmptyRow({ colSpan, children }: { colSpan: number; children: Rea
  */
 export function CashBar({ held, cap }: { held: number | null; cap: number | null }) {
   if (cap === null || cap === undefined || cap === 0) {
-    return (
-      <span className="text-muted-light text-[0.6875rem] font-semibold">no cap set</span>
-    );
+    return <span className="text-muted-light text-[0.6875rem] font-semibold">no cap set</span>;
   }
   const ratio = Math.min((held ?? 0) / cap, 1);
   const tone = ratio >= 1 ? 'bg-danger' : ratio >= 0.8 ? 'bg-warning' : 'bg-success';
@@ -326,9 +326,6 @@ export interface Badges {
   riders_holding_cash: number;
 }
 
-export function riderName(r: {
-  first_name: string | null;
-  last_name: string | null;
-}): string {
+export function riderName(r: { first_name: string | null; last_name: string | null }): string {
   return `${r.first_name ?? '[First]'} ${r.last_name ?? ''}`.trim();
 }

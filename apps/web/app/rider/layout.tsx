@@ -207,11 +207,7 @@ function RiderBanner({ r }: { r: RiderHome | null }) {
 
   /* Cash at the cap is the one that quietly stops the evening, so
      it gets a banner rather than only a number on the page. */
-  if (
-    r.cash_cap !== null &&
-    r.cash_on_hand !== null &&
-    r.cash_on_hand >= r.cash_cap * 0.9
-  ) {
+  if (r.cash_cap !== null && r.cash_on_hand !== null && r.cash_on_hand >= r.cash_cap * 0.9) {
     return (
       <Blocker
         tone={r.cash_on_hand >= r.cash_cap ? 'danger' : 'gold'}

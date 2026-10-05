@@ -1,18 +1,7 @@
 import { Card } from '@nexg/ui';
 import Link from 'next/link';
 
-import {
-  Avatar,
-  Chip,
-  DASH,
-  EmptyRow,
-  kes,
-  num,
-  Pill,
-  plural,
-  Tile,
-  when,
-} from './shared';
+import { Avatar, Chip, DASH, EmptyRow, kes, num, Pill, plural, Tile, when } from './shared';
 
 /**
  * Listings & stay requests.
@@ -149,7 +138,11 @@ export function ListingsTab({
     <>
       <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Tile label="Live on the website" value={num(live.length)}>
-          {plural(live.reduce((s, p) => s + p.units_listed, 0), 'unit')} bookable
+          {plural(
+            live.reduce((s, p) => s + p.units_listed, 0),
+            'unit',
+          )}{' '}
+          bookable
         </Tile>
         <Tile
           label="Ready but not showing"
@@ -343,13 +336,7 @@ export function ListingsTab({
   );
 }
 
-function RequestPanel({
-  request,
-  matches,
-}: {
-  request: StayRequestRow;
-  matches: MatchRow[];
-}) {
+function RequestPanel({ request, matches }: { request: StayRequestRow; matches: MatchRow[] }) {
   return (
     <div className="space-y-4">
       <Card className="p-5">
@@ -358,8 +345,9 @@ function RequestPanel({
           <Pill tone={STATUS_TONE[request.status]}>{request.status.toUpperCase()}</Pill>
         </p>
         <p className="text-muted-light mt-1 text-[0.6875rem] font-semibold">
-          {request.requester_name ?? '[Requester]'} · {request.phone_masked ?? request.requester_email ?? DASH}{' '}
-          · asked {when(request.created_at)}
+          {request.requester_name ?? '[Requester]'} ·{' '}
+          {request.phone_masked ?? request.requester_email ?? DASH} · asked{' '}
+          {when(request.created_at)}
           {request.assigned_to_name && ` · ${request.assigned_to_name}`}
         </p>
 
@@ -477,9 +465,7 @@ function RequestPanel({
 }
 
 function fmt(iso: string | null): string {
-  return iso
-    ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-    : DASH;
+  return iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : DASH;
 }
 
 function Row({ label, value }: { label: string; value: string }) {

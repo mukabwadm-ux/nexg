@@ -41,9 +41,7 @@ export function when(iso: string | null | undefined): string {
 }
 
 export function shortDate(iso: string | null | undefined): string {
-  return iso
-    ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-    : DASH;
+  return iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : DASH;
 }
 
 /** Monday of the week a date falls in, as an ISO date string. */
@@ -220,7 +218,9 @@ export function Chip({
     <Link
       href={href}
       className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-        on ? 'bg-ink text-white' : 'border-border-strong bg-surface text-ink hover:border-ink border'
+        on
+          ? 'bg-ink text-white'
+          : 'border-border-strong bg-surface text-ink hover:border-ink border'
       }`}
     >
       {children}
@@ -387,11 +387,7 @@ export const CHECK_LABEL: Record<string, string> = {
  * Rendered from the stored result rather than recomputed, so what a
  * staff member reads here is exactly what the merchant was told.
  */
-export function EligibilityList({
-  eligibility,
-}: {
-  eligibility: RequestRow['eligibility'];
-}) {
+export function EligibilityList({ eligibility }: { eligibility: RequestRow['eligibility'] }) {
   const checks = eligibility?.checks ?? {};
   const keys = Object.keys(CHECK_LABEL);
 

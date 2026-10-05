@@ -93,8 +93,8 @@ export function RiderProfile({
           </span>
         </legend>
         <p className="text-muted mt-0.5 text-[0.75rem] font-semibold">
-          Jobs are matched by how far you are from the merchant, not by this list. What it buys
-          you is an easier first week, in streets you already know.
+          Jobs are matched by how far you are from the merchant, not by this list. What it buys you
+          is an easier first week, in streets you already know.
         </p>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {areaOptions.map((a) => {
@@ -143,9 +143,9 @@ export function RiderProfile({
       <fieldset className="mt-5">
         <legend className="text-[0.8125rem] font-extrabold">The furthest you will ride</legend>
         <p className="text-muted mt-0.5 text-[0.75rem] font-semibold">
-          This one really does decide what you are offered — pickup and drop-off added together.
-          Set it short and you get fewer, closer jobs; set it long and you get runs that take
-          the evening.
+          This one really does decide what you are offered — pickup and drop-off added together. Set
+          it short and you get fewer, closer jobs; set it long and you get runs that take the
+          evening.
         </p>
         <div className="mt-2 flex items-center gap-3">
           <input

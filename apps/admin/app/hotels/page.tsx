@@ -64,11 +64,8 @@ export default async function HotelsPage({
   requireModule(staff, 'hotels');
   const supabase = createClient();
 
-  const tab = HOTEL_TABS.some((t) => t.key === searchParams?.tab)
-    ? searchParams!.tab!
-    : 'hosts';
-  const filter =
-    searchParams?.filter ?? (tab === 'charge' || tab === 'qr' ? 'live' : 'all');
+  const tab = HOTEL_TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'hosts';
+  const filter = searchParams?.filter ?? (tab === 'charge' || tab === 'qr' ? 'live' : 'all');
   const selected = searchParams?.selected ?? null;
 
   /* Matches authz.handles_guest_data(). */
@@ -109,13 +106,13 @@ export default async function HotelsPage({
          * cannot see the rows, so this says which it is.
          */}
         {tab === 'guests' &&
-          (handlesGuestData
-            ? await loadGuests(supabase, badges, filter, selected)
-            : <NoGuestAccess />)}
+          (handlesGuestData ? (
+            await loadGuests(supabase, badges, filter, selected)
+          ) : (
+            <NoGuestAccess />
+          ))}
         {tab === 'data' &&
-          (handlesGuestData
-            ? await loadDataRequests(supabase, badges, filter)
-            : <NoGuestAccess />)}
+          (handlesGuestData ? await loadDataRequests(supabase, badges, filter) : <NoGuestAccess />)}
       </main>
     </ConsoleShell>
   );
@@ -130,10 +127,7 @@ async function loadHosts(
   selected: string | null,
 ) {
   const [{ data: hosts }, { data: units }] = await Promise.all([
-    supabase
-      .from('console_host_directory_v')
-      .select('*')
-      .order('created_at', { ascending: false }),
+    supabase.from('console_host_directory_v').select('*').order('created_at', { ascending: false }),
     /* Only the selected host's units: the panel is the only thing that
        renders them, and a hundred hosts is a lot of rows to fetch for
        a table that shows a count. */
@@ -153,17 +147,10 @@ async function loadHosts(
   );
 }
 
-async function loadListings(
-  supabase: Supabase,
-  filter: string,
-  selected: string | null,
-) {
+async function loadListings(supabase: Supabase, filter: string, selected: string | null) {
   const [{ data: properties }, { data: requests }, { data: matches }] = await Promise.all([
     supabase.from('console_property_v').select('*').order('name'),
-    supabase
-      .from('console_stay_request_v')
-      .select('*')
-      .order('created_at', { ascending: false }),
+    supabase.from('console_stay_request_v').select('*').order('created_at', { ascending: false }),
     /* Only the selected request's options: the table shows a count. */
     selected
       ? supabase
@@ -191,35 +178,40 @@ async function loadHotels(
   filter: string,
   selected: string | null,
 ) {
-  const [{ data: hotels }, { data: setting }, { data: rule }, { data: contacts }, { data: activity }] =
-    await Promise.all([
-      supabase.from('console_hotel_directory_v').select('*').order('name'),
-      selected
-        ? supabase.from('hotel_program_setting').select('*').eq('hotel_id', selected).maybeSingle()
-        : Promise.resolve({ data: null }),
-      selected
-        ? supabase
-            .from('hotel_access_rule')
-            .select('version, text, after_hours_handoff')
-            .eq('hotel_id', selected)
-            .is('superseded_at', null)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-      selected
-        ? supabase
-            .from('hotel_contact')
-            .select('id, name, role, phone_last2, email, ext')
-            .eq('hotel_id', selected)
-        : Promise.resolve({ data: [] as unknown[] }),
-      selected
-        ? supabase
-            .from('hotel_prospect_activity')
-            .select('id, kind, at, notes')
-            .eq('hotel_id', selected)
-            .order('at', { ascending: false })
-            .limit(8)
-        : Promise.resolve({ data: [] as unknown[] }),
-    ]);
+  const [
+    { data: hotels },
+    { data: setting },
+    { data: rule },
+    { data: contacts },
+    { data: activity },
+  ] = await Promise.all([
+    supabase.from('console_hotel_directory_v').select('*').order('name'),
+    selected
+      ? supabase.from('hotel_program_setting').select('*').eq('hotel_id', selected).maybeSingle()
+      : Promise.resolve({ data: null }),
+    selected
+      ? supabase
+          .from('hotel_access_rule')
+          .select('version, text, after_hours_handoff')
+          .eq('hotel_id', selected)
+          .is('superseded_at', null)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    selected
+      ? supabase
+          .from('hotel_contact')
+          .select('id, name, role, phone_last2, email, ext')
+          .eq('hotel_id', selected)
+      : Promise.resolve({ data: [] as unknown[] }),
+    selected
+      ? supabase
+          .from('hotel_prospect_activity')
+          .select('id, kind, at, notes')
+          .eq('hotel_id', selected)
+          .order('at', { ascending: false })
+          .limit(8)
+      : Promise.resolve({ data: [] as unknown[] }),
+  ]);
 
   return (
     <HotelsTab
@@ -233,14 +225,16 @@ async function loadHotels(
         null
       }
       contacts={
-        (contacts as {
-          id: string;
-          name: string;
-          role: string | null;
-          phone_last2: string | null;
-          email: string | null;
-          ext: string | null;
-        }[] | null) ?? []
+        (contacts as
+          | {
+              id: string;
+              name: string;
+              role: string | null;
+              phone_last2: string | null;
+              email: string | null;
+              ext: string | null;
+            }[]
+          | null) ?? []
       }
       activity={
         (activity as { id: number; kind: string; at: string; notes: string | null }[] | null) ?? []
@@ -388,9 +382,8 @@ function NoGuestAccess() {
       <p className="text-[0.9375rem] font-extrabold">This one is not yours to see.</p>
       <p className="text-muted mt-2 max-w-[38rem] text-[0.8125rem] font-semibold leading-[1.8]">
         Guest records and KDPA access and erasure requests are handled by the data protection
-        officer and the support desk. Partnerships and finance reach every other tab in this
-        module but not these — signing up a hotel is not a reason to read a guest&rsquo;s order
-        history.
+        officer and the support desk. Partnerships and finance reach every other tab in this module
+        but not these — signing up a hotel is not a reason to read a guest&rsquo;s order history.
       </p>
       <p className="text-muted-light mt-3 text-[0.75rem] font-semibold">
         There may well be open requests. You are not being shown zero because there are none.
@@ -436,9 +429,9 @@ async function loadQr(supabase: Supabase, filter: string) {
         .limit(200),
     ]);
 
-  const properties = ((units as { id: string; label_public: string | null; name: string }[] | null) ?? []).map(
-    (u) => ({ id: u.id, label: u.label_public ?? u.name, kind: 'unit' as const }),
-  );
+  const properties = (
+    (units as { id: string; label_public: string | null; name: string }[] | null) ?? []
+  ).map((u) => ({ id: u.id, label: u.label_public ?? u.name, kind: 'unit' as const }));
 
   return (
     <QrTab

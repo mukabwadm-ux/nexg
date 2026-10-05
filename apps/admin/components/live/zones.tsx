@@ -100,8 +100,7 @@ export function Zones({ zones, canPause }: { zones: ZoneRow[]; canPause: boolean
           {zones.length === 0 && (
             <tr>
               <td colSpan={6} className="text-muted py-3 text-[0.75rem] font-semibold">
-                No zones are drawn for this city yet. They come from Settings → Cities &amp;
-                zones.
+                No zones are drawn for this city yet. They come from Settings → Cities &amp; zones.
               </td>
             </tr>
           )}
@@ -128,9 +127,7 @@ export function Zones({ zones, canPause }: { zones: ZoneRow[]; canPause: boolean
                 <td className="py-2 text-right text-[0.8125rem] font-bold tabular-nums">
                   {z.live_orders}
                   {z.escalated > 0 && (
-                    <span className="text-danger ml-1 text-[0.625rem]">
-                      {z.escalated} stuck
-                    </span>
+                    <span className="text-danger ml-1 text-[0.625rem]">{z.escalated} stuck</span>
                   )}
                 </td>
                 <td className="py-2 text-right text-[0.8125rem] font-bold tabular-nums">

@@ -161,9 +161,7 @@ export default async function OverviewPage({
 
   if ((openTickets.count ?? 0) > 0) {
     const oldest = openTickets.data?.[0]?.created_at;
-    const hours = oldest
-      ? Math.floor((Date.now() - new Date(oldest).getTime()) / 3_600_000)
-      : null;
+    const hours = oldest ? Math.floor((Date.now() - new Date(oldest).getTime()) / 3_600_000) : null;
     queue.push({
       icon: <MessageSquare className="h-4 w-4" />,
       title: `${openTickets.count} support ticket${openTickets.count === 1 ? '' : 's'} nobody has picked up`,

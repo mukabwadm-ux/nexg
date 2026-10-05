@@ -239,9 +239,7 @@ export default async function HomePage() {
               </span>
               {t('home.popular.heading')}
             </h2>
-            <p className="text-muted-light text-xs font-semibold">
-              {t('home.popular.sub')}
-            </p>
+            <p className="text-muted-light text-xs font-semibold">{t('home.popular.sub')}</p>
           </div>
 
           <ul className="mt-4 flex flex-wrap gap-2">
@@ -268,7 +266,9 @@ export default async function HomePage() {
               <Link
                 href="/#start"
                 className="bg-ink hover:bg-ink/90 focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center rounded-full px-4 py-2 text-sm font-bold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              >{t('home.popular.other')}</Link>
+              >
+                {t('home.popular.other')}
+              </Link>
             </li>
           </ul>
         </section>
@@ -304,7 +304,9 @@ export default async function HomePage() {
             <FeaturedMerchants merchants={featured ?? []} t={t} />
 
             <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs font-semibold text-white/40">{t('home.featured.ownBusiness')}</p>
+              <p className="text-xs font-semibold text-white/40">
+                {t('home.featured.ownBusiness')}
+              </p>
               <Link
                 href="/merchants#featured"
                 className="text-gold text-xs font-bold hover:underline"
@@ -368,7 +370,9 @@ export default async function HomePage() {
           >
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight">{t('home.join.heading')}</h2>
-              <p className="mt-2 max-w-md text-[0.9375rem] font-semibold leading-[1.7] text-white/60">{t('home.join.body')}</p>
+              <p className="mt-2 max-w-md text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
+                {t('home.join.body')}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="gold" size="sm" asChild>
@@ -396,7 +400,9 @@ export default async function HomePage() {
                 {t('home.app.eyebrow')}
               </span>
 
-              <h2 className="mt-5 text-4xl/[1.06] font-extrabold tracking-tight sm:text-[3.125rem]/[1.06]">{t('home.app.heading')}<br />
+              <h2 className="mt-5 text-4xl/[1.06] font-extrabold tracking-tight sm:text-[3.125rem]/[1.06]">
+                {t('home.app.heading')}
+                <br />
                 your pocket.
               </h2>
 

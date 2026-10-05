@@ -80,9 +80,7 @@ export function BudgetCard({ view }: { view: PlanView }) {
       <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
         <p className="text-2xl font-extrabold tracking-tight">
           {keslabel(plan.estimate_total_kes)}
-          <span className="ml-1.5 text-sm font-bold text-white/55">
-            of {keslabel(budget)}
-          </span>
+          <span className="ml-1.5 text-sm font-bold text-white/55">of {keslabel(budget)}</span>
         </p>
         <span
           className={`rounded-full px-3 py-1 text-xs font-extrabold ${
@@ -94,7 +92,7 @@ export function BudgetCard({ view }: { view: PlanView }) {
       </div>
 
       {/* The bar, coloured by mood, in the artboard's legend order. */}
-      <div className="mt-3 flex h-2.5 w-full overflow-hidden rounded-full bg-white/12">
+      <div className="bg-white/12 mt-3 flex h-2.5 w-full overflow-hidden rounded-full">
         {segments.map(([mood, amount]) => (
           <span
             key={mood}
@@ -131,7 +129,6 @@ export function BudgetCard({ view }: { view: PlanView }) {
           {keslabel(suggestion.saves)} less.
         </p>
       )}
-
     </div>
   );
 }
@@ -266,9 +263,7 @@ function TimelineBlock({
                 </>
               ) : (
                 <>
-                  <p className="text-success text-[0.8125rem] font-extrabold">
-                    KES {kes(price)}
-                  </p>
+                  <p className="text-success text-[0.8125rem] font-extrabold">KES {kes(price)}</p>
                   <p className="text-muted-light text-[0.5625rem] font-semibold">{partyLabel}</p>
                 </>
               )}

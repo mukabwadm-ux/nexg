@@ -41,7 +41,14 @@ const SECTIONS = [
     note: null,
     live: false,
   },
-  { number: '03', key: 'nav.howItWorks', href: '/#how-it-works', noteKey: null, note: null, live: false },
+  {
+    number: '03',
+    key: 'nav.howItWorks',
+    href: '/#how-it-works',
+    noteKey: null,
+    note: null,
+    live: false,
+  },
   {
     number: '04',
     key: 'nav.cities',
@@ -50,7 +57,14 @@ const SECTIONS = [
     note: '11 across East Africa',
     live: false,
   },
-  { number: '05', key: 'nav.askConcierge', href: '/#start', noteKey: null, note: 'Online now', live: true },
+  {
+    number: '05',
+    key: 'nav.askConcierge',
+    href: '/#start',
+    noteKey: null,
+    note: 'Online now',
+    live: true,
+  },
 ] as const;
 
 const PARTNER_LINKS = [

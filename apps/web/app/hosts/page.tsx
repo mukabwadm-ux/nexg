@@ -141,7 +141,10 @@ export default async function HostsPage() {
 
   const packages = Object.values(
     (packageRows ?? []).reduce<
-      Record<string, { id: string; name: string; description: string | null; price: number | null; sort: number }>
+      Record<
+        string,
+        { id: string; name: string; description: string | null; price: number | null; sort: number }
+      >
     >((acc, row) => {
       const seen = acc[row.name];
       if (!seen) {
@@ -178,8 +181,8 @@ export default async function HostsPage() {
 
             <p className="mt-5 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8] text-[#5B5B5B]">
               Your guests land at midnight needing food, a charger, laundry or a ride to the
-              airport. NexG handles it — delivered to your door with your access rules — and you
-              get the 5-star review.
+              airport. NexG handles it — delivered to your door with your access rules — and you get
+              the 5-star review.
             </p>
 
             <div className="mt-7 flex flex-wrap gap-3">
@@ -306,10 +309,7 @@ export default async function HostsPage() {
               <div className="grid grid-cols-2 gap-3">
                 {packages.map((pkg) => (
                   <div key={pkg.id} className="rounded-xl bg-white p-3">
-                    <div
-                      aria-hidden="true"
-                      className="h-16 w-full rounded-lg bg-[#F6F3EC]"
-                    />
+                    <div aria-hidden="true" className="h-16 w-full rounded-lg bg-[#F6F3EC]" />
                     <p className="mt-2.5 text-[0.8125rem] font-extrabold">{pkg.name}</p>
                     <p className="mt-0.5 text-[0.6875rem] font-semibold leading-snug text-[#8A8A8A]">
                       {pkg.description}
@@ -321,9 +321,7 @@ export default async function HostsPage() {
                      */}
                     <p className="mt-1.5 text-[0.75rem] font-extrabold text-[#B8901F]">
                       from KES{' '}
-                      {pkg.price === null
-                        ? '[—]'
-                        : Number(pkg.price).toLocaleString('en-KE')}
+                      {pkg.price === null ? '[—]' : Number(pkg.price).toLocaleString('en-KE')}
                     </p>
                   </div>
                 ))}
@@ -356,9 +354,9 @@ export default async function HostsPage() {
             </h2>
 
             <p className="mt-4 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8] text-[#5B5B5B]">
-              Every place on NexG comes with a concierge already set up: food, laundry, a charger
-              at midnight, an airport run at five. Describe the stay and a person comes back with
-              two or three that actually fit.
+              Every place on NexG comes with a concierge already set up: food, laundry, a charger at
+              midnight, an airport run at five. Describe the stay and a person comes back with two
+              or three that actually fit.
             </p>
 
             <dl className="mt-7 grid gap-4 sm:grid-cols-3">
@@ -572,8 +570,8 @@ function PhoneMock() {
           What guests say
         </p>
         <p className="mt-1.5 text-[0.6875rem] font-bold leading-relaxed text-[#141414]">
-          &ldquo;Host had a concierge service set up — ordered breakfast at 7 and it was at the
-          gate by 7:30.&rdquo; — [Review placeholder]
+          &ldquo;Host had a concierge service set up — ordered breakfast at 7 and it was at the gate
+          by 7:30.&rdquo; — [Review placeholder]
         </p>
       </div>
     </div>
@@ -582,10 +580,7 @@ function PhoneMock() {
 
 function HostViewMock() {
   return (
-    <div
-      aria-hidden="true"
-      className="rounded-2xl border border-[#2A2A2A] bg-[#141414] p-5"
-    >
+    <div aria-hidden="true" className="rounded-2xl border border-[#2A2A2A] bg-[#141414] p-5">
       <p className="text-[0.5625rem] font-extrabold uppercase tracking-[0.12em] text-[#D4A72C]">
         Your host view
       </p>
@@ -593,8 +588,16 @@ function HostViewMock() {
 
       <div className="mt-4 space-y-2">
         {[
-          ['Apartment 4B · Kilimani', 'Gate code · call before arriving · leave with askari', 'LIVE'],
-          ['Studio 2 · Westlands', 'Lockbox · rider photo on drop · no deliveries 23:00–06:00', 'LIVE'],
+          [
+            'Apartment 4B · Kilimani',
+            'Gate code · call before arriving · leave with askari',
+            'LIVE',
+          ],
+          [
+            'Studio 2 · Westlands',
+            'Lockbox · rider photo on drop · no deliveries 23:00–06:00',
+            'LIVE',
+          ],
           ['Cottage · Karen', 'Caretaker [Name] · dogs on site · park outside gate', 'SETTING UP'],
         ].map(([label, rule, state]) => (
           <div key={label} className="rounded-lg bg-[#1E1E1E] p-2.5">

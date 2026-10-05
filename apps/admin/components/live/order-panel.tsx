@@ -9,6 +9,7 @@ import {
   addNote,
   adjustItems,
   contact,
+  issueRefund,
   markOrder,
   previewReprice,
   refundOrder,
@@ -75,6 +76,7 @@ export interface OrderDetail {
   guest_contact_attempts: number;
   refunded_cents: number;
   refund_in_flight_cents: number;
+  refund_waiting_to_send?: { id: string; amount_cents: number }[] | null;
   awaiting_merchant_ack: boolean;
   needs_action_reads_as: string | null;
   job_id: string | null;
@@ -368,6 +370,27 @@ export function OrderPanel({
               }
             />
           </Panel>
+        )}
+
+        {(order.refund_waiting_to_send ?? []).length > 0 && (
+          <div className="bg-gold-soft rounded-lg p-3">
+            <p className="text-gold-text text-[0.75rem] font-extrabold">
+              {(order.refund_waiting_to_send ?? []).length === 1
+                ? 'A refund is approved and has not left the account.'
+                : `${(order.refund_waiting_to_send ?? []).length} refunds are approved and have not left the account.`}
+            </p>
+            {(order.refund_waiting_to_send ?? []).map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                disabled={busy}
+                onClick={() => run(() => issueRefund(r.id))}
+                className="bg-ink mt-2 rounded-lg px-3 py-2 text-[0.75rem] font-extrabold text-white disabled:opacity-40"
+              >
+                {busy ? 'Sending…' : `Send ${kes(r.amount_cents)} now`}
+              </button>
+            ))}
+          </div>
         )}
 
         <Panel

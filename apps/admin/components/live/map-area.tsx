@@ -1,6 +1,11 @@
+'use client';
+
 import { Card } from '@nexg/ui';
 import Link from 'next/link';
 import * as React from 'react';
+
+import { LiveMap, type Bounds, type OrderPoint, type ZoneShape } from './map';
+import { useLive } from './use-live';
 
 import {
   DASH,
@@ -56,16 +61,43 @@ export function MapArea({
   riders,
   selected,
   city,
+  cityId,
   chip,
-  mapsKey,
+  maps,
+  points,
+  zones,
+  bounds,
 }: {
   orders: LiveOrder[];
   riders: RiderPin[];
   selected: string | null;
   city: string;
+  cityId: string;
   chip: string;
-  mapsKey: string | null;
+  maps: { live: boolean; key: string; mapId: string; why: string | null };
+  points: OrderPoint[];
+  zones: ZoneShape[];
+  bounds: Bounds | null;
 }) {
+  /*
+   * The screen keeps itself current. Orders, jobs and offers all
+   * change the picture, so all three are watched — and the city
+   * filter means a dispatcher is only woken by their own traffic.
+   */
+  const { connected } = useLive([
+    { schema: 'public', table: 'order', filter: `city_id=eq.${cityId}` },
+    /* Jobs, offers and zone health all live in `dispatch`, which
+       Realtime does not serve — they ring this bell instead. */
+    { schema: 'public', table: 'live_pulse', filter: `city_id=eq.${cityId}` },
+  ]);
+
+  const select = React.useCallback(
+    (orderId: string) => {
+      window.location.href = `/live?city=${encodeURIComponent(city)}&chip=${chip}&selected=${orderId}`;
+    },
+    [city, chip],
+  );
+
   const free = riders.filter((r) => r.presence === 'online' && !r.offers_paused);
   const onTrip = riders.filter((r) => r.presence === 'on_trip');
   const idle = free.filter(
@@ -77,16 +109,24 @@ export function MapArea({
 
   return (
     <div className="space-y-4">
-      {!mapsKey && (
+      {maps.live ? (
+        <LiveMap
+          apiKey={maps.key}
+          mapId={maps.mapId}
+          riders={riders}
+          orders={points}
+          zones={zones}
+          bounds={bounds}
+          selectedId={selected}
+          onSelect={select}
+        />
+      ) : (
         <Card className="p-4">
           <p className="text-[0.8125rem] font-extrabold">No map is drawn here, deliberately.</p>
           <p className="text-muted mt-1.5 text-[0.8125rem] font-semibold">
-            The map needs a Google Maps key and a Map ID, and neither is configured. Drawing an
-            illustrative one — placeholder streets, invented rider positions — would be read as the
-            city, which is worse than no map. Set{' '}
-            <code className="text-[0.75rem]">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> and{' '}
-            <code className="text-[0.75rem]">NEXT_PUBLIC_GOOGLE_MAPS_ID</code> and it appears above
-            this list.
+            {maps.why ?? 'The map needs a Google Maps key and a Map ID, and neither is configured.'}{' '}
+            Drawing an illustrative one — placeholder streets, invented rider positions — would be
+            read as the city, which is worse than no map.
           </p>
           <p className="text-muted-light mt-1.5 text-[0.8125rem] font-semibold">
             Everything the map was specified to show is below, from the same queries, and reachable
@@ -109,8 +149,12 @@ export function MapArea({
           tone={unassigned.length > 0 ? 'danger' : undefined}
         />
         {idle.length > 0 && <Count label="idle 30+ min" value={idle.length} tone="gold" />}
-        <span className="ml-auto text-[0.625rem] font-semibold text-white/40">
-          {city} · positions from the rider record
+        <span className="ml-auto flex items-center gap-1.5 text-[0.625rem] font-semibold text-white/40">
+          <span
+            aria-hidden="true"
+            className={`h-1.5 w-1.5 rounded-full ${connected ? 'bg-success' : 'bg-muted'}`}
+          />
+          {connected ? 'live' : 'reconnecting'} · positions from the rider record
         </span>
       </div>
 

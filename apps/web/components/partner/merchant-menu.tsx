@@ -46,7 +46,9 @@ export function Menu({ items, available }: { items: ItemRow[]; available: number
         {items.map((i) => (
           <li key={i.id} className="flex items-center justify-between gap-3 py-3">
             <div className="min-w-0">
-              <p className={`truncate text-[0.875rem] font-extrabold ${i.available ? '' : 'opacity-50'}`}>
+              <p
+                className={`truncate text-[0.875rem] font-extrabold ${i.available ? '' : 'opacity-50'}`}
+              >
                 {i.name}
                 {i.age_restricted && (
                   <Pill tone="bg-danger-bg text-danger">
@@ -55,9 +57,7 @@ export function Menu({ items, available }: { items: ItemRow[]; available: number
                 )}
               </p>
               {i.description && (
-                <p className="text-muted truncate text-[0.75rem] font-semibold">
-                  {i.description}
-                </p>
+                <p className="text-muted truncate text-[0.75rem] font-semibold">{i.description}</p>
               )}
             </div>
             <div className="flex shrink-0 items-center gap-3">

@@ -73,7 +73,8 @@ export default async function FeaturedPage({
     supabase.rpc('rpc_featured_counts', {}),
   ]);
 
-  const cityRows = (cities as { id: string; name: string; slug: string; status: string }[] | null) ?? [];
+  const cityRows =
+    (cities as { id: string; name: string; slug: string; status: string }[] | null) ?? [];
   const live = cityRows.filter((c) => c.status === 'live');
   const city = live.find((c) => c.slug === searchParams?.city) ?? live[0];
   const badges = (badgesRaw as Badges | null) ?? ({} as Badges);
@@ -136,8 +137,8 @@ export default async function FeaturedPage({
           <Card className="mt-6 p-6">
             <p className="text-[0.9375rem] font-extrabold">No city is live yet.</p>
             <p className="text-muted mt-2 text-[0.8125rem] font-semibold">
-              Featured slots exist per city. A slot in a city NexG does not deliver to is
-              something a merchant could be sold.
+              Featured slots exist per city. A slot in a city NexG does not deliver to is something
+              a merchant could be sold.
             </p>
           </Card>
         ) : (

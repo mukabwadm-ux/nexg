@@ -201,9 +201,7 @@ export default async function ExperienceHome({
 
           {upcoming.length === 0 ? (
             <Card tone="muted" className="mt-5 p-6">
-              <p className="text-muted text-[0.9375rem] leading-[1.8]">
-                {t('xp.events.empty')}
-              </p>
+              <p className="text-muted text-[0.9375rem] leading-[1.8]">{t('xp.events.empty')}</p>
             </Card>
           ) : (
             <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

@@ -185,11 +185,7 @@ export async function swapBlock(planId: string, blockId: string, componentId: st
   return { ok: true, planId, view: await read(planId) };
 }
 
-export async function sendPlan(
-  planId: string,
-  name: string,
-  phone: string,
-): Promise<PlanResult> {
+export async function sendPlan(planId: string, name: string, phone: string): Promise<PlanResult> {
   const supabase = createClient();
 
   const { error } = await supabase.rpc('rpc_send_plan', {
@@ -243,7 +239,9 @@ export async function applyCuratedDay(planId: string, slug: string): Promise<Pla
 
   const { data: components } = await supabase
     .from('component_public')
-    .select('id, mood, title, subtitle, kind, price_kes, price_basis, pay_on_day, swap_group, default_slot, duration_min')
+    .select(
+      'id, mood, title, subtitle, kind, price_kes, price_basis, pay_on_day, swap_group, default_slot, duration_min',
+    )
     .in('id', ids);
 
   const size = plan.party_size ?? 1;

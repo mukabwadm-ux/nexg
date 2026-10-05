@@ -131,7 +131,9 @@ export default async function AuditPage({
               key={t.key}
               href={`/audit?tab=${t.key}`}
               className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
-                tab === t.key ? 'border-gold text-ink' : 'text-muted hover:text-ink border-transparent'
+                tab === t.key
+                  ? 'border-gold text-ink'
+                  : 'text-muted hover:text-ink border-transparent'
               }`}
             >
               {t.label}
@@ -214,7 +216,11 @@ async function loadSignIns(supabase: Supabase, health: HealthRow) {
       .select('*')
       .in('state', ['open', 'acknowledged'])
       .order('raised_at', { ascending: false }),
-    audit.from('audit_break_glass_v').select('*').order('opened_at', { ascending: false }).limit(50),
+    audit
+      .from('audit_break_glass_v')
+      .select('*')
+      .order('opened_at', { ascending: false })
+      .limit(50),
   ]);
 
   return (

@@ -85,17 +85,17 @@ export default async function MerchantsPage({
 
         {tab === 'pipeline' && <PipelineTab rows={rows} counts={counts} />}
 
-        {tab === 'health' && <HealthTab {...(await loadHealth(supabase, rows))} />}
+        {tab === 'health' && <HealthTab {...await loadHealth(supabase, rows)} />}
 
         {tab === 'disputes' && <DisputesTab rows={await loadDisputes(supabase, byId)} />}
 
-        {tab === 'hours' && <HoursTab {...(await loadHours(supabase, rows))} />}
+        {tab === 'hours' && <HoursTab {...await loadHours(supabase, rows)} />}
 
-        {tab === 'catalogue' && <CatalogueTab {...(await loadCatalogue(supabase, byId))} />}
+        {tab === 'catalogue' && <CatalogueTab {...await loadCatalogue(supabase, byId)} />}
 
-        {tab === 'finance' && <FinanceTab {...(await loadFinance(supabase, byId, rows))} />}
+        {tab === 'finance' && <FinanceTab {...await loadFinance(supabase, byId, rows)} />}
 
-        {tab === 'documents' && <DocumentsTab {...(await loadDocuments(supabase, byId))} />}
+        {tab === 'documents' && <DocumentsTab {...await loadDocuments(supabase, byId)} />}
 
         {tab === 'branches' && <BranchesTab chains={await loadChains(supabase, rows)} />}
       </main>
@@ -132,9 +132,11 @@ async function loadApplications(supabase: Db, rows: DirectoryRow[]): Promise<App
 
   const docsByMerchant = new Map<string, Application['docs']>();
   for (const d of (docs ?? []) as Record<string, unknown>[]) {
-    const req = d.document_requirement as
-      | { kind: string; label: string; essential: boolean }
-      | null;
+    const req = d.document_requirement as {
+      kind: string;
+      label: string;
+      essential: boolean;
+    } | null;
     if (!req) continue;
     const list = docsByMerchant.get(d.owner_id as string) ?? [];
     list.push({
@@ -243,7 +245,11 @@ async function loadHours(supabase: Db, rows: DirectoryRow[]) {
       const { data: h } = await supabase.rpc('fn_merchant_effective_hours', {
         p_merchant_id: m.id as string,
       });
-      const first = (h as { opens: string | null; closes: string | null; closed: boolean; source: string }[] | null)?.[0];
+      const first = (
+        h as
+          | { opens: string | null; closes: string | null; closed: boolean; source: string }[]
+          | null
+      )?.[0];
       return {
         id: m.id as string,
         trading_name: m.trading_name as string | null,
@@ -265,26 +271,36 @@ async function loadHours(supabase: Db, rows: DirectoryRow[]) {
   );
 
   return {
-    rows: hours.length > 0 ? hours : live.map((l) => ({
-      id: l.id,
-      trading_name: l.trading_name,
-      category: l.category,
-      city_name: l.city_name,
-      status: l.status,
-      accepting_orders: l.accepting_orders,
-      accepting_orders_source: null,
-      busy_mode_until: null,
-      closed_early_at: null,
-      capacity_per_15min: null,
-      prep_minutes: null,
-      opens: null,
-      closes: null,
-      closed: null,
-      hours_source: null,
-    })),
+    rows:
+      hours.length > 0
+        ? hours
+        : live.map((l) => ({
+            id: l.id,
+            trading_name: l.trading_name,
+            category: l.category,
+            city_name: l.city_name,
+            status: l.status,
+            accepting_orders: l.accepting_orders,
+            accepting_orders_source: null,
+            busy_mode_until: null,
+            closed_early_at: null,
+            capacity_per_15min: null,
+            prep_minutes: null,
+            opens: null,
+            closes: null,
+            closed: null,
+            hours_source: null,
+          })),
     exceptions:
-      (exceptions as { id: string; label: string; date: string; default_close: string | null; enabled: boolean }[] | null) ??
-      [],
+      (exceptions as
+        | {
+            id: string;
+            label: string;
+            date: string;
+            default_close: string | null;
+            enabled: boolean;
+          }[]
+        | null) ?? [],
     autoRules: (autoRules as { id: string; key: string; enabled: boolean }[] | null) ?? [],
   };
 }
@@ -304,9 +320,7 @@ async function loadCatalogue(supabase: Db, byId: Map<string, DirectoryRow>) {
         .limit(20),
       supabase.from('catalogue_photo_task').select('id, merchant_id, status').limit(20),
       supabase.from('catalogue_import').select('id, merchant_id, source, status').limit(20),
-      supabase
-        .from('catalogue_public')
-        .select('id', { count: 'exact', head: true }),
+      supabase.from('catalogue_public').select('id', { count: 'exact', head: true }),
     ]);
 
   const name = (id: unknown) => byId.get(id as string)?.trading_name ?? null;
@@ -360,8 +374,9 @@ async function loadFinance(supabase: Db, byId: Map<string, DirectoryRow>, rows: 
       merchant_name: byId.get(s.merchant_id as string)?.trading_name ?? null,
     })),
     tiers:
-      (tiers as { code: string; label: string; default_pct: number | null; criteria: string | null }[] | null) ??
-      [],
+      (tiers as
+        | { code: string; label: string; default_pct: number | null; criteria: string | null }[]
+        | null) ?? [],
     heldCount: rows.filter((r) => r.payout_hold).length,
   };
 }
@@ -397,8 +412,7 @@ async function loadDocuments(supabase: Db, byId: Map<string, DirectoryRow>) {
     terms:
       (terms as { id: string; version: string; status: string; effective_from: string }[] | null) ??
       [],
-    automation:
-      (automation as { key: string; label: string; enabled: boolean }[] | null) ?? [],
+    automation: (automation as { key: string; label: string; enabled: boolean }[] | null) ?? [],
   };
 }
 

@@ -31,7 +31,6 @@ function useRun() {
   };
 }
 
-
 /**
  * Making a card.
  *
@@ -151,7 +150,12 @@ export function CardActions({
           Download PNG
         </a>
         {!voided && (
-          <Button size="sm" variant="ghost" loading={pending} onClick={() => run(() => onTest(qrId))}>
+          <Button
+            size="sm"
+            variant="ghost"
+            loading={pending}
+            onClick={() => run(() => onTest(qrId))}
+          >
             Test it
           </Button>
         )}

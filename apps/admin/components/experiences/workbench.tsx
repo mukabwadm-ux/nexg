@@ -183,7 +183,9 @@ export function Workbench({
                 const left = chargeable.filter((b) => b.status !== 'done').length;
                 const note =
                   left > 0
-                    ? window.prompt(`${left} block(s) are not marked done. Say why you are closing it.`)
+                    ? window.prompt(
+                        `${left} block(s) are not marked done. Say why you are closing it.`,
+                      )
                     : null;
                 if (left > 0 && !note) return;
                 void run('complete', () => completePlan(plan.id, note));
@@ -240,9 +242,7 @@ export function Workbench({
               <Row label="Budget">{keslabel(plan.budget_kes)}</Row>
               <Row label="Staying">{plan.stay_label ?? '[stay]'}</Row>
               <Row label="Reach them">{plan.guest_phone ?? DASH}</Row>
-              <Row label="Getting around">
-                {(plan.answers.transport as string) ?? 'not said'}
-              </Row>
+              <Row label="Getting around">{(plan.answers.transport as string) ?? 'not said'}</Row>
             </dl>
             {plan.notes && (
               <p className="border-gold/40 bg-gold-soft mt-3 rounded-lg border p-2.5 text-[0.75rem] font-semibold leading-[1.7]">
@@ -279,7 +279,9 @@ export function Workbench({
             <dl className="mt-3 space-y-1.5 text-[0.8125rem]">
               <Row label={`Confirmed · ${settled.length}`}>{keslabel(subtotal)}</Row>
               <Row label={`Still open · ${open.length}`}>
-                {open.length === 0 ? '—' : keslabel(open.reduce((s, b) => s + (b.price_estimate_kes ?? 0), 0))}
+                {open.length === 0
+                  ? '—'
+                  : keslabel(open.reduce((s, b) => s + (b.price_estimate_kes ?? 0), 0))}
               </Row>
               <Row label="Paid on the day">
                 {plan.pay_on_day_total_kes ? keslabel(plan.pay_on_day_total_kes) : '—'}
@@ -359,7 +361,9 @@ export function Workbench({
                     }`}
                   >
                     <span className="block text-[0.5625rem] font-extrabold uppercase tracking-wide opacity-60">
-                      {m.author_type === 'guest' ? (plan.guest_name ?? 'Guest') : (m.author_name ?? 'NexG')}{' '}
+                      {m.author_type === 'guest'
+                        ? (plan.guest_name ?? 'Guest')
+                        : (m.author_name ?? 'NexG')}{' '}
                       · {when(m.created_at)}
                     </span>
                     {m.body}

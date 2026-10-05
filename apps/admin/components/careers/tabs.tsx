@@ -116,10 +116,7 @@ export function JobsTab({
         >
           target 14 d · measured, not typed
         </Tile>
-        <Tile
-          label="Offer acceptance"
-          value={pct(badges.offer_acceptance_pct)}
-        >
+        <Tile label="Offer acceptance" value={pct(badges.offer_acceptance_pct)}>
           {plural(badges.offers_total ?? 0, 'offer')} · {num(badges.offers_declined)} declined
         </Tile>
       </div>
@@ -279,8 +276,8 @@ function JobPanel({
       <Card className="p-5">
         <p className="text-[0.9375rem] font-extrabold">What the candidate is promised</p>
         <p className="text-muted mt-2 text-[0.75rem] font-semibold leading-[1.7]">
-          Five steps, about <strong>{weeks} weeks</strong> — summed from this job&rsquo;s own
-          stage targets, so the page cannot promise a fortnight while the pipeline runs longer.
+          Five steps, about <strong>{weeks} weeks</strong> — summed from this job&rsquo;s own stage
+          targets, so the page cannot promise a fortnight while the pipeline runs longer.
         </p>
         <ul className="mt-3 flex flex-wrap gap-1.5">
           {Object.entries(job.stage_targets ?? {}).map(([stage, days]) => (
@@ -354,11 +351,7 @@ export function PipelineTab({
           .filter((j) => j.status === 'open' || j.status === 'always_open')
           .slice(0, 6)
           .map((j) => (
-            <Chip
-              key={j.id}
-              on={jobId === j.id}
-              href={`/careers?tab=pipeline&job=${j.id}`}
-            >
+            <Chip key={j.id} on={jobId === j.id} href={`/careers?tab=pipeline&job=${j.id}`}>
               {j.title}
             </Chip>
           ))}
@@ -472,8 +465,7 @@ export function PipelineTab({
                         </p>
                         <p
                           className={`mt-1.5 text-[0.625rem] font-extrabold ${
-                            a.stage_target_days !== null &&
-                            a.days_in_stage > a.stage_target_days
+                            a.stage_target_days !== null && a.days_in_stage > a.stage_target_days
                               ? 'text-danger'
                               : 'text-gold-text'
                           }`}
@@ -560,7 +552,8 @@ export function ApplicantsTab({
     <>
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <Chip on={filter === 'active'} href={href('active')}>
-          All active {applicants.filter((a) => !['rejected', 'withdrawn', 'hired'].includes(a.stage)).length}
+          All active{' '}
+          {applicants.filter((a) => !['rejected', 'withdrawn', 'hired'].includes(a.stage)).length}
         </Chip>
         <Chip on={filter === 'new'} href={href('new')}>
           New {badges.new_applications}
@@ -609,9 +602,7 @@ export function ApplicantsTab({
                         </span>
                         <span className="text-muted-light block text-[0.6875rem] font-semibold">
                           {a.city ?? DASH}
-                          {a.needs_action && (
-                            <span className="text-danger"> · needs action</span>
-                          )}
+                          {a.needs_action && <span className="text-danger"> · needs action</span>}
                         </span>
                       </span>
                     </Link>
@@ -633,9 +624,7 @@ export function ApplicantsTab({
                   </td>
                 </tr>
               ))}
-              {visible.length === 0 && (
-                <EmptyRow colSpan={6}>Nobody here.</EmptyRow>
-              )}
+              {visible.length === 0 && <EmptyRow colSpan={6}>Nobody here.</EmptyRow>}
             </tbody>
           </table>
         </Card>
@@ -711,11 +700,7 @@ function CandidatePanel({
         />
         <Fact
           label="Work sample"
-          value={
-            applicant.work_sample_score === null
-              ? DASH
-              : `${applicant.work_sample_score}/20`
-          }
+          value={applicant.work_sample_score === null ? DASH : `${applicant.work_sample_score}/20`}
           sub={
             applicant.work_sample_hours
               ? `${applicant.work_sample_payment === 'paid' ? 'paid' : 'due'} · ${applicant.work_sample_hours} h`
@@ -795,9 +780,7 @@ function CandidatePanel({
       </Card>
 
       <Card className="p-0">
-        <p className="border-border border-b px-4 py-3 text-[0.9375rem] font-extrabold">
-          Timeline
-        </p>
+        <p className="border-border border-b px-4 py-3 text-[0.9375rem] font-extrabold">Timeline</p>
         <ul className="divide-border divide-y">
           {events.map((e) => (
             <li key={e.id} className="px-4 py-2.5">
@@ -844,8 +827,8 @@ function CandidatePanel({
             </span>
           </div>
           <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.7]">
-            The candidate sees stage changes by email · a rejection always carries a reason they
-            can read · data is kept {6} months, then anonymised.
+            The candidate sees stage changes by email · a rejection always carries a reason they can
+            read · data is kept {6} months, then anonymised.
           </p>
           <p className="text-muted-light mt-2 text-[0.625rem] font-semibold">
             {plural(reasons.length, 'rejection reason')} on the list, each with the sentence the
@@ -907,9 +890,7 @@ export function SettingsTab({
               {templates.map((t) => (
                 <tr key={t.id} className="border-border border-b last:border-b-0">
                   <td className="px-4 py-3 text-[0.75rem] font-extrabold">{t.key}</td>
-                  <td className="text-muted px-4 py-3 text-[0.75rem] font-semibold">
-                    {t.subject}
-                  </td>
+                  <td className="text-muted px-4 py-3 text-[0.75rem] font-semibold">{t.subject}</td>
                   <td className="text-muted-light px-4 py-3 text-[0.75rem] font-semibold">
                     v{t.version}
                   </td>

@@ -52,12 +52,7 @@ export default async function BuildPage({
 
   const [{ data: chips }, { data: events }, { data: settings }] = await Promise.all([
     supabase.rpc('fn_mood_chips', { p_city_id: city.id }),
-    supabase
-      .from('event_public')
-      .select('*')
-      .eq('city_id', city.id)
-      .order('starts_at')
-      .limit(8),
+    supabase.from('event_public').select('*').eq('city_id', city.id).order('starts_at').limit(8),
     supabase
       .from('setting')
       .select('key, value')

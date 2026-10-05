@@ -2,11 +2,7 @@ import { Card } from '@nexg/ui';
 
 import { placeMerchantInSlot } from '@/app/featured/actions';
 
-import {
-  type MerchantOption,
-  type OpenSlot,
-  PlaceMerchant,
-} from './place-merchant';
+import { type MerchantOption, type OpenSlot, PlaceMerchant } from './place-merchant';
 import Link from 'next/link';
 
 import {
@@ -101,13 +97,13 @@ export function InventoryTab({
         >
           target ≥ 80 %
         </Tile>
-        <Tile
-          label="Featured revenue · wk"
-          value={revenue > 0 ? kes(revenue) : kes(null)}
-        >
+        <Tile label="Featured revenue · wk" value={revenue > 0 ? kes(revenue) : kes(null)}>
           billed via weekly settlement
         </Tile>
-        <Tile label="Waitlist" value={num(requests.filter((r) => r.status === 'waitlisted').length)}>
+        <Tile
+          label="Waitlist"
+          value={num(requests.filter((r) => r.status === 'waitlisted').length)}
+        >
           eligible merchants waiting
         </Tile>
         <Tile
@@ -167,11 +163,7 @@ export function InventoryTab({
         </div>
 
         <div className="space-y-5">
-          <PlaceMerchant
-            slots={openSlots}
-            merchants={merchants}
-            onPlace={placeMerchantInSlot}
-          />
+          <PlaceMerchant slots={openSlots} merchants={merchants} onPlace={placeMerchantInSlot} />
 
           {chosen ? (
             <SlotPanel slot={chosen} requests={requests} />
@@ -186,15 +178,7 @@ export function InventoryTab({
   );
 }
 
-function SlotCard({
-  slot,
-  href,
-  on,
-}: {
-  slot: InventoryRow;
-  href: string;
-  on: boolean;
-}) {
+function SlotCard({ slot, href, on }: { slot: InventoryRow; href: string; on: boolean }) {
   const status = slot.slot_status ?? 'open';
   const open = status === 'open';
 
@@ -220,9 +204,7 @@ function SlotCard({
         </Pill>
       </p>
 
-      <p className="mt-2 text-[0.8125rem] font-extrabold">
-        {slot.trading_name ?? 'Unsold'}
-      </p>
+      <p className="mt-2 text-[0.8125rem] font-extrabold">{slot.trading_name ?? 'Unsold'}</p>
 
       <p className="text-muted-light mt-0.5 text-[0.6875rem] font-semibold leading-snug">
         {slot.trading_name
@@ -241,7 +223,7 @@ function SlotCard({
       <p className="mt-2.5 flex items-center justify-between gap-2">
         {slot.trading_name ? <SponsoredChip /> : <span />}
         <span className="text-[0.6875rem] font-extrabold">
-          {slot.price ?? slot.rate_card_price
+          {(slot.price ?? slot.rate_card_price)
             ? `${kes(slot.price ?? slot.rate_card_price)} / wk`
             : `KES ${DASH} / wk`}
         </span>
@@ -282,7 +264,7 @@ function SlotPanel({ slot, requests }: { slot: InventoryRow; requests: RequestRo
           <Fact
             label="Price / week"
             value={
-              slot.price ?? slot.rate_card_price
+              (slot.price ?? slot.rate_card_price)
                 ? kes(slot.price ?? slot.rate_card_price)
                 : kes(null)
             }
@@ -309,9 +291,9 @@ function SlotPanel({ slot, requests }: { slot: InventoryRow; requests: RequestRo
             pro-rata and the merchant has been told.
           </p>
           <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.7]">
-            It does not come back on its own. A merchant who flips green and amber day to day
-            would otherwise appear and vanish from the homepage inside a week — somebody looks
-            first, and Restore only works while they pass.
+            It does not come back on its own. A merchant who flips green and amber day to day would
+            otherwise appear and vanish from the homepage inside a week — somebody looks first, and
+            Restore only works while they pass.
           </p>
         </Card>
       )}
@@ -538,11 +520,9 @@ export function RequestsTab({
                               : r.stage}
                     </Pill>
                   </td>
-                  <td className="px-4 py-3 text-[0.8125rem] font-bold">
-                    {r.waiting_days} d
-                  </td>
+                  <td className="px-4 py-3 text-[0.8125rem] font-bold">{r.waiting_days} d</td>
                   <td className="px-4 py-3 text-[0.8125rem] font-extrabold">
-                    {r.quoted_price ?? r.rate_card_price
+                    {(r.quoted_price ?? r.rate_card_price)
                       ? kes(r.quoted_price ?? r.rate_card_price)
                       : '—'}
                   </td>
@@ -571,18 +551,12 @@ export function RequestsTab({
             <ol className="mt-3 space-y-3">
               {[
                 ['Requested', 'From the merchant dashboard, or booked on their behalf here.'],
-                [
-                  'Eligibility · automatic',
-                  'Five checks, re-run nightly while the slot is live.',
-                ],
+                ['Eligibility · automatic', 'Five checks, re-run nightly while the slot is live.'],
                 [
                   'Quoted · held 48 h',
                   'Rate-card price. Nobody types one — a placement with no price cannot be quoted.',
                 ],
-                [
-                  'Booked',
-                  'Merchant accepts in their dashboard · creative approved by Growth.',
-                ],
+                ['Booked', 'Merchant accepts in their dashboard · creative approved by Growth.'],
                 [
                   'Live → Ended',
                   'Mon 00:00 to Fri 23:59 weeks · auto-renew unless cancelled by Friday 23:59.',
@@ -631,15 +605,12 @@ function RequestPanel({ request }: { request: RequestRow }) {
         <Fact
           label="Price / week"
           value={
-            request.quoted_price ?? request.rate_card_price
+            (request.quoted_price ?? request.rate_card_price)
               ? `${kes(request.quoted_price ?? request.rate_card_price)}`
               : 'not set'
           }
         />
-        <Fact
-          label="Start"
-          value={shortDate(request.start_date ?? request.wanted_start)}
-        />
+        <Fact label="Start" value={shortDate(request.start_date ?? request.wanted_start)} />
       </div>
 
       {request.rate_card_price === null && request.quoted_price === null && (
@@ -675,9 +646,7 @@ export function ScheduleTab({ rows, weeks }: { rows: ScheduleRow[]; weeks: strin
     popular_request: 2,
   };
 
-  const placements = [
-    ...new Map(rows.map((r) => [r.placement_id, r])).values(),
-  ].sort((a, b) =>
+  const placements = [...new Map(rows.map((r) => [r.placement_id, r])).values()].sort((a, b) =>
     a.kind === b.kind
       ? a.position - b.position || (a.category ?? '').localeCompare(b.category ?? '')
       : (KIND_ORDER[a.kind] ?? 9) - (KIND_ORDER[b.kind] ?? 9),
@@ -741,10 +710,7 @@ export function ScheduleTab({ rows, weeks }: { rows: ScheduleRow[]; weeks: strin
           <tbody>
             {placements.map((p) => (
               <tr key={p.placement_id} className="border-border border-b last:border-b-0">
-                <th
-                  scope="row"
-                  className="px-4 py-2 text-left text-[0.75rem] font-extrabold"
-                >
+                <th scope="row" className="px-4 py-2 text-left text-[0.75rem] font-extrabold">
                   {KIND_LABEL[p.kind] ?? p.kind}
                   <span className="text-muted-light font-semibold">
                     {' · '}
@@ -772,9 +738,7 @@ export function ScheduleTab({ rows, weeks }: { rows: ScheduleRow[]; weeks: strin
               </tr>
             ))}
             {placements.length === 0 && (
-              <EmptyRow colSpan={weeks.length + 1}>
-                No placements in this city.
-              </EmptyRow>
+              <EmptyRow colSpan={weeks.length + 1}>No placements in this city.</EmptyRow>
             )}
           </tbody>
         </table>
@@ -790,13 +754,7 @@ export function ScheduleTab({ rows, weeks }: { rows: ScheduleRow[]; weeks: strin
 
 // ══════════════════════════ G3 · Performance & billing
 
-export function PerformanceTab({
-  rows,
-  badges,
-}: {
-  rows: PerformanceRow[];
-  badges: Badges;
-}) {
+export function PerformanceTab({ rows, badges }: { rows: PerformanceRow[]; badges: Badges }) {
   const totals = rows.reduce(
     (a, r) => ({
       views: a.views + r.views,
@@ -928,10 +886,7 @@ export function PerformanceTab({
                 'Auto-pause',
                 'Health drops below green → the slot pauses at the next 00:00 · unused days are credited pro-rata.',
               ],
-              [
-                'Refunds',
-                'Only for NexG-side outages · two different people approve · logged.',
-              ],
+              ['Refunds', 'Only for NexG-side outages · two different people approve · logged.'],
               [
                 'Reporting',
                 'Monday email to the merchant: views, taps, orders, cost per order · identical to this table.',
@@ -1014,10 +969,13 @@ export function RulesTab({
               Quotes are blocked where a price is missing
             </p>
             <p className="text-muted mt-2 text-[0.75rem] font-semibold leading-[1.7]">
-              {missing.map((c) => c.city_name).filter(Boolean).join(', ')} —{' '}
-              {plural(missing.length, 'rate card')} with at least one placement unpriced. The quote
-              RPC refuses rather than letting anybody type a number, so nothing can be sold there
-              until finance publishes one.
+              {missing
+                .map((c) => c.city_name)
+                .filter(Boolean)
+                .join(', ')}{' '}
+              — {plural(missing.length, 'rate card')} with at least one placement unpriced. The
+              quote RPC refuses rather than letting anybody type a number, so nothing can be sold
+              there until finance publishes one.
             </p>
           </Card>
         )}
@@ -1124,9 +1082,7 @@ export function RulesTab({
 
       <div className="space-y-4">
         <Card className="p-0">
-          <p className="border-border border-b px-4 py-3 text-[0.9375rem] font-extrabold">
-            Rules
-          </p>
+          <p className="border-border border-b px-4 py-3 text-[0.9375rem] font-extrabold">Rules</p>
           <ul className="divide-border divide-y">
             {rules.map((r) => (
               <li key={r.key} className="flex items-start justify-between gap-3 px-4 py-2.5">

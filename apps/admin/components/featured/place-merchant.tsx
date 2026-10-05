@@ -97,7 +97,10 @@ export function PlaceMerchant({
   );
 
   React.useEffect(() => {
-    if (weeksForPlacement.length > 0 && !weeksForPlacement.some((s) => s.week_start === weekStart)) {
+    if (
+      weeksForPlacement.length > 0 &&
+      !weeksForPlacement.some((s) => s.week_start === weekStart)
+    ) {
       setWeekStart(weeksForPlacement[0]!.week_start);
     }
   }, [weeksForPlacement, weekStart]);
@@ -117,8 +120,8 @@ export function PlaceMerchant({
       <Card className="p-5">
         <h3 className="text-[0.875rem] font-extrabold">Sell a slot</h3>
         <p className="text-muted mt-2 text-[0.8125rem] font-semibold leading-[1.7]">
-          Every slot in the next eight weeks is taken. That is a good problem — but it means
-          there is nothing to sell on a call today.
+          Every slot in the next eight weeks is taken. That is a good problem — but it means there
+          is nothing to sell on a call today.
         </p>
       </Card>
     );
@@ -128,8 +131,8 @@ export function PlaceMerchant({
     <Card className="p-5">
       <h3 className="text-[0.875rem] font-extrabold">Sell a slot</h3>
       <p className="text-muted mt-1.5 text-[0.8125rem] font-semibold leading-[1.7]">
-        For the merchant who agreed a price on the phone. They go on the homepage straight away
-        if the week has already started, and on Monday if it has not.
+        For the merchant who agreed a price on the phone. They go on the homepage straight away if
+        the week has already started, and on Monday if it has not.
       </p>
 
       <div className="mt-4 space-y-3">
@@ -150,9 +153,7 @@ export function PlaceMerchant({
             value: s.week_start,
             label: weekLabel(s.week_start),
           }))}
-          hint={
-            weeksForPlacement.length === 0 ? 'No free weeks on that placement.' : undefined
-          }
+          hint={weeksForPlacement.length === 0 ? 'No free weeks on that placement.' : undefined}
         />
 
         <Select
@@ -285,8 +286,8 @@ export function FeaturedNow({
       <Card className="p-5">
         <h2 className="text-sm font-extrabold uppercase tracking-wide">Featured placement</h2>
         <p className="text-muted mt-2 text-sm font-semibold leading-[1.7]">
-          Not featured. Selling a slot happens in Featured slots, where there is a placement, a
-          week and a price to agree — none of which a switch here could say.
+          Not featured. Selling a slot happens in Featured slots, where there is a placement, a week
+          and a price to agree — none of which a switch here could say.
         </p>
       </Card>
     );
@@ -314,7 +315,11 @@ export function FeaturedNow({
           month: 'long',
           timeZone: 'UTC',
         })}
-        , at {placement.price_per_week ? `KES ${placement.price_per_week.toLocaleString('en-KE')}` : `KES ${DASH}`} a week.
+        , at{' '}
+        {placement.price_per_week
+          ? `KES ${placement.price_per_week.toLocaleString('en-KE')}`
+          : `KES ${DASH}`}{' '}
+        a week.
       </p>
 
       <p className="text-muted-light mt-1.5 text-[0.75rem] font-semibold leading-[1.7]">

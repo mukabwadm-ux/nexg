@@ -53,13 +53,14 @@ export default async function StaysPage() {
             </p>
 
             <h1 className="mt-5 text-[2.5rem] font-extrabold leading-[1.08] tracking-[-0.02em] sm:text-[3.25rem]">
-              Tell us what you need. We&rsquo;ll find the <span className="text-gold-text">place</span>.
+              Tell us what you need. We&rsquo;ll find the{' '}
+              <span className="text-gold-text">place</span>.
             </h1>
 
             <p className="text-muted mt-5 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8]">
-              Every place here comes with a NexG concierge: food, laundry, a charger at midnight,
-              an airport run at five. Browse what&rsquo;s listed, or describe the stay and a
-              person comes back with two or three that actually fit.
+              Every place here comes with a NexG concierge: food, laundry, a charger at midnight, an
+              airport run at five. Browse what&rsquo;s listed, or describe the stay and a person
+              comes back with two or three that actually fit.
             </p>
 
             <ul className="mt-7 grid gap-3 sm:grid-cols-3">
@@ -109,8 +110,8 @@ export default async function StaysPage() {
               <p className="text-[0.9375rem] font-extrabold">No places are listed yet.</p>
               <p className="text-muted mx-auto mt-2 max-w-[32rem] text-[0.8125rem] font-semibold leading-[1.8]">
                 We only list a property once the host is verified and the hand-off rule is set, so
-                this page stays empty rather than showing you somewhere nobody can actually let
-                you in. Leave a request above and we will go and find you one.
+                this page stays empty rather than showing you somewhere nobody can actually let you
+                in. Leave a request above and we will go and find you one.
               </p>
             </Card>
           ) : (
@@ -143,7 +144,7 @@ export default async function StaysPage() {
                   'Once you pick, the concierge is already arranged — the hand-off rule, the delivery hours, the lot.',
                 ],
               ].map(([title, body], i) => (
-                <li key={title} className="border-white/15 border-t pt-4">
+                <li key={title} className="border-t border-white/15 pt-4">
                   <span
                     aria-hidden="true"
                     className="bg-gold text-ink flex h-7 w-7 items-center justify-center rounded-full text-[0.75rem] font-extrabold"

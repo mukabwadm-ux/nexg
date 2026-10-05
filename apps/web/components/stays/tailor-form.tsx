@@ -154,8 +154,8 @@ export function TailorForm({
         </h3>
         <p className="text-muted mt-3 text-sm font-semibold leading-[1.8]">
           Somebody on the desk reads this — it is not a search. They will come back with two or
-          three places that actually fit what you said, with what each one costs and why they
-          picked it.
+          three places that actually fit what you said, with what each one costs and why they picked
+          it.
         </p>
         <p className="text-muted-light mt-3 text-[0.75rem] font-semibold leading-relaxed">
           Quote the reference if you call. Nothing is booked and nothing is charged yet.
@@ -387,9 +387,7 @@ function Toggle({
       aria-pressed={on}
       onClick={onClick}
       className={`rounded-full px-3 py-1.5 text-[0.75rem] font-bold transition-colors ${
-        on
-          ? 'bg-ink text-white'
-          : 'border-border-strong text-ink hover:border-ink border bg-white'
+        on ? 'bg-ink text-white' : 'border-border-strong text-ink hover:border-ink border bg-white'
       }`}
     >
       {children}

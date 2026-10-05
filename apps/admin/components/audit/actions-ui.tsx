@@ -246,7 +246,12 @@ export function BreakGlassActions({
   return (
     <div className="mt-3">
       {openNow && (
-        <Button size="sm" variant="outline" loading={pending} onClick={() => run(() => onClose(id))}>
+        <Button
+          size="sm"
+          variant="outline"
+          loading={pending}
+          onClick={() => run(() => onClose(id))}
+        >
           Close it now
         </Button>
       )}
