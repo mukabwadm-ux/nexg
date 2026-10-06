@@ -37,6 +37,11 @@ import {
   RetentionTab,
   type TabProps,
 } from '@/components/settings/tabs';
+import {
+  WaitlistTab,
+  type WaitlistCityRow,
+  type WaitlistSignupRow,
+} from '@/components/settings/waitlist';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -74,6 +79,19 @@ export default async function SettingsPage({
   const s = supabase;
 
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'cities';
+
+  /* Read only on the tab that shows it. Every other tab pays
+     nothing for a list it does not render. */
+  let waitlistCities: WaitlistCityRow[] = [];
+  let waitlistSignups: WaitlistSignupRow[] = [];
+  if (tab === 'waitlist') {
+    const [cityRes, signupRes] = await Promise.all([
+      s.from('waitlist_city_v').select('*'),
+      s.from('waitlist_signup_v').select('*').limit(500),
+    ]);
+    waitlistCities = (cityRes.data as WaitlistCityRow[] | null) ?? [];
+    waitlistSignups = (signupRes.data as WaitlistSignupRow[] | null) ?? [];
+  }
 
   const [{ data: cities }, { data: definitions }, { data: changeSets }] = await Promise.all([
     s.from('settings_city_v').select('*').order('sort').order('name'),
@@ -281,6 +299,7 @@ export default async function SettingsPage({
         {tab === 'notifications' && <NotificationsTab />}
         {tab === 'branding' && <BrandingTab {...props} />}
         {tab === 'retention' && <RetentionTab {...props} />}
+        {tab === 'waitlist' && <WaitlistTab cities={waitlistCities} signups={waitlistSignups} />}
       </main>
     </ConsoleShell>
   );

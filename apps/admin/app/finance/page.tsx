@@ -12,8 +12,18 @@ import {
   type OwedRow,
   type RevenueRow,
 } from '@/components/finance/overview';
+import { Exports, type ExportLogRow } from '@/components/finance/exports';
+import { Fees, type FeeLineRow, type TakeRow } from '@/components/finance/fees';
+import { Invoices, type InvoiceRow } from '@/components/finance/invoices';
+import {
+  Reconciliation,
+  type ClearingRow,
+  type ReconRow,
+  type WebhookRow,
+} from '@/components/finance/reconciliation';
 import { Settlement, type LineRow, type RunRow } from '@/components/finance/settlement';
 import { Freshness } from '@/components/finance/shared';
+import { Tax, type TaxRow } from '@/components/finance/tax';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -21,22 +31,21 @@ export const metadata: Metadata = { title: 'Finance' };
 export const dynamic = 'force-dynamic';
 
 /*
- * The seven tabs the module is specified with. Four of them are
- * not built, and they are shown greyed rather than linked or
- * hidden.
+ * The seven tabs the module is specified with, all built.
  *
- * Hiding them would make the module look finished. Linking them
- * would 404 — which this console has already done once, when a
- * migration naming a route was pushed before the route existed.
+ * `built` stays as a field rather than being deleted. It is how
+ * a tab gets added to the rail before its screen exists without
+ * linking to a 404 — which this console has already done once,
+ * when a migration naming a route was pushed ahead of the route.
  */
 const TABS = [
   { key: 'overview', label: 'Overview', built: true },
   { key: 'settlement', label: 'Weekly settlement', built: true },
-  { key: 'reconciliation', label: 'Reconciliation', built: false },
-  { key: 'fees', label: 'Fees & commissions', built: false },
-  { key: 'invoices', label: 'Invoices', built: false },
-  { key: 'tax', label: 'Tax', built: false },
-  { key: 'exports', label: 'Exports', built: false },
+  { key: 'reconciliation', label: 'Reconciliation', built: true },
+  { key: 'fees', label: 'Fees & commissions', built: true },
+  { key: 'invoices', label: 'Invoices', built: true },
+  { key: 'tax', label: 'Tax', built: true },
+  { key: 'exports', label: 'Exports', built: true },
 ] as const;
 
 /**
@@ -194,6 +203,73 @@ export default async function FinancePage({
     }
 
     body = <Settlement runs={runs} run={run} lines={lines} />;
+  }
+
+  if (tab === 'reconciliation') {
+    const [clearing, recon, webhooks] = await Promise.all([
+      supabase.from('fin_clearing_aging_v').select('*'),
+      supabase.from('fin_provider_recon_v').select('*').limit(60),
+      supabase.from('fin_webhook_gap_v').select('*').limit(100),
+    ]);
+
+    body = (
+      <Reconciliation
+        clearing={(clearing.data as ClearingRow[] | null) ?? []}
+        recon={(recon.data as ReconRow[] | null) ?? []}
+        webhooks={(webhooks.data as WebhookRow[] | null) ?? []}
+      />
+    );
+  }
+
+  if (tab === 'fees') {
+    const [lines, take] = await Promise.all([
+      supabase
+        .from('fin_fee_line_v')
+        .select('*')
+        .gte('day', monthStart)
+        .lte('day', today),
+      supabase.from('fin_merchant_take_v').select('*').limit(100),
+    ]);
+
+    body = (
+      <Fees
+        lines={(lines.data as FeeLineRow[] | null) ?? []}
+        take={(take.data as TakeRow[] | null) ?? []}
+        from={monthStart}
+        to={today}
+      />
+    );
+  }
+
+  if (tab === 'invoices') {
+    const { data } = await supabase
+      .from('fin_invoice_aging_v')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    body = <Invoices rows={(data as InvoiceRow[] | null) ?? []} />;
+  }
+
+  if (tab === 'tax') {
+    const { data } = await supabase.from('fin_tax_position_v').select('*').order('sort');
+    body = <Tax rows={(data as TaxRow[] | null) ?? []} />;
+  }
+
+  if (tab === 'exports') {
+    const { data } = await supabase
+      .from('fin_export_log_v')
+      .select('id, kind, from_date, to_date, row_count, taken_at, taken_by_email')
+      .order('taken_at', { ascending: false })
+      .limit(50);
+
+    body = (
+      <Exports
+        log={(data as ExportLogRow[] | null) ?? []}
+        defaultFrom={monthStart}
+        defaultTo={today}
+      />
+    );
   }
 
   return (

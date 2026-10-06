@@ -13,6 +13,7 @@ export const TABS = [
   { key: 'notifications', label: 'Notifications & templates' },
   { key: 'branding', label: 'Branding & legal' },
   { key: 'retention', label: 'Data & retention' },
+  { key: 'waitlist', label: 'Waitlist' },
 ] as const;
 
 export type SettingsTab = (typeof TABS)[number]['key'];
@@ -35,6 +36,11 @@ export const TAB_COPY: Record<string, { title: string; subtitle: string }> = {
   notifications: {
     title: 'Notifications & templates',
     subtitle: 'Every message NexG sends, in both languages, with who gets what and when',
+  },
+  waitlist: {
+    title: 'Waitlist',
+    subtitle:
+      'Everyone who asked to be told when we open, and the state of the city they asked about',
   },
   branding: {
     title: 'Branding & legal',
