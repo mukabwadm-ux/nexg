@@ -92,11 +92,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             <RegisterServiceWorker />
 
-            {/* Above the footer, below the location sheet. Real
-                support: what somebody types here becomes a
-                conversation on the concierge desk with a person
-                routed to it. */}
-            <FloatingChat />
+            {/* Real support: what somebody types here becomes a
+                conversation on the concierge desk, routed to a
+                person.
+
+                Held back until the consent bar has been answered.
+                That bar is a full-width strip at the bottom of the
+                screen and sits above this button, so showing them
+                together puts a button on screen that cannot be
+                pressed — which reads as broken rather than as
+                "answer this first". */}
+            {asked && <FloatingChat />}
 
           {/* Rendered only when they have not answered, so a returning
                 visitor never sees it and nothing flickers on their screen

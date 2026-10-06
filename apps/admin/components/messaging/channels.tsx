@@ -44,13 +44,25 @@ export interface WhatsAppWindowRow {
   subject: string | null;
 }
 
+/*
+ * The labels, keyed on the real `msg_channel` values.
+ *
+ * An unknown key falls through to the raw enum value rather
+ * than to a blank or to "Other" — a channel quietly labelled
+ * "Other" is a channel nobody investigates, and this map was
+ * already wrong once by guessing at the spelling.
+ */
 const CHANNEL_LABEL: Record<string, string> = {
-  web_chat: 'Website chat',
-  app: 'In the app',
+  web: 'Website chat',
+  guest_app: 'Guest app',
+  merchant_dashboard: 'Merchant dashboard',
+  rider_app: 'Rider app',
+  host_view: 'Host view',
+  hotel_desk: 'Hotel desk',
   whatsapp: 'WhatsApp',
-  email: 'Email',
-  phone: 'Phone',
   sms: 'SMS',
+  email: 'Email',
+  internal: 'Internal',
 };
 
 /**
