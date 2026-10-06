@@ -81,7 +81,7 @@ const en: Dictionary = {
     'Your browser says you read {language}. We will use it where we have it.',
   'consent.language.body.unsupported':
     'Your browser says you read {language}. We do not have that yet, so this stays in English.',
-  'consent.allow': 'Allow both',
+  'consent.allow': 'Yes, use it',
   'consent.allowLanguageOnly': 'Use my language',
   'consent.decline': 'Not now',
   'consent.footnote':
@@ -225,7 +225,7 @@ const sw: Dictionary = {
     'Kivinjari chako kinasema unasoma {language}. Tutaitumia pale tuliyo nayo.',
   'consent.language.body.unsupported':
     'Kivinjari chako kinasema unasoma {language}. Bado hatuna lugha hiyo, kwa hivyo hii itabaki Kiingereza.',
-  'consent.allow': 'Ruhusu yote mawili',
+  'consent.allow': 'Ndiyo, itumie',
   'consent.allowLanguageOnly': 'Tumia lugha yangu',
   'consent.decline': 'Si sasa',
   'consent.footnote':

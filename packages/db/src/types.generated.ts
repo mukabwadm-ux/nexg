@@ -16970,6 +16970,45 @@ export type Database = {
           },
         ];
       };
+      push_subscription: {
+        Row: {
+          auth_key: string;
+          created_at: string;
+          endpoint: string;
+          failed_at: string | null;
+          failure_reason: string | null;
+          id: string;
+          last_seen_at: string;
+          p256dh: string;
+          surface: string | null;
+          user_id: string;
+        };
+        Insert: {
+          auth_key: string;
+          created_at?: string;
+          endpoint: string;
+          failed_at?: string | null;
+          failure_reason?: string | null;
+          id?: string;
+          last_seen_at?: string;
+          p256dh: string;
+          surface?: string | null;
+          user_id: string;
+        };
+        Update: {
+          auth_key?: string;
+          created_at?: string;
+          endpoint?: string;
+          failed_at?: string | null;
+          failure_reason?: string | null;
+          id?: string;
+          last_seen_at?: string;
+          p256dh?: string;
+          surface?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       qr_miss: {
         Row: {
           at: string;
@@ -21682,6 +21721,54 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      user_notification: {
+        Row: {
+          body: string | null;
+          created_at: string;
+          href: string | null;
+          id: string;
+          kind: string;
+          object_id: string | null;
+          object_type: string | null;
+          read_at: string | null;
+          tag: string | null;
+          title: string;
+          tone: Database['public']['Enums']['notification_tone'];
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          body?: string | null;
+          created_at?: string;
+          href?: string | null;
+          id?: string;
+          kind: string;
+          object_id?: string | null;
+          object_type?: string | null;
+          read_at?: string | null;
+          tag?: string | null;
+          title: string;
+          tone?: Database['public']['Enums']['notification_tone'];
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          body?: string | null;
+          created_at?: string;
+          href?: string | null;
+          id?: string;
+          kind?: string;
+          object_id?: string | null;
+          object_type?: string | null;
+          read_at?: string | null;
+          tag?: string | null;
+          title?: string;
+          tone?: Database['public']['Enums']['notification_tone'];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
       };
       waitlist_signup: {
         Row: {
@@ -30450,6 +30537,51 @@ export type Database = {
           },
         ];
       };
+      user_notification_v: {
+        Row: {
+          body: string | null;
+          created_at: string | null;
+          href: string | null;
+          id: string | null;
+          kind: string | null;
+          object_id: string | null;
+          object_type: string | null;
+          read_at: string | null;
+          title: string | null;
+          tone: Database['public']['Enums']['notification_tone'] | null;
+          unread: boolean | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          body?: string | null;
+          created_at?: string | null;
+          href?: string | null;
+          id?: string | null;
+          kind?: string | null;
+          object_id?: string | null;
+          object_type?: string | null;
+          read_at?: string | null;
+          title?: string | null;
+          tone?: Database['public']['Enums']['notification_tone'] | null;
+          unread?: never;
+          updated_at?: string | null;
+        };
+        Update: {
+          body?: string | null;
+          created_at?: string | null;
+          href?: string | null;
+          id?: string | null;
+          kind?: string | null;
+          object_id?: string | null;
+          object_type?: string | null;
+          read_at?: string | null;
+          title?: string | null;
+          tone?: Database['public']['Enums']['notification_tone'] | null;
+          unread?: never;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       wiring_health_v: {
         Row: {
           findings: number | null;
@@ -30931,6 +31063,20 @@ export type Database = {
         };
       };
       fn_needs_action_reads_as: { Args: { p_reasons: string[] }; Returns: string };
+      fn_notify_user: {
+        Args: {
+          p_body?: string;
+          p_href?: string;
+          p_kind: string;
+          p_object_id?: string;
+          p_object_type?: string;
+          p_tag?: string;
+          p_title: string;
+          p_tone?: Database['public']['Enums']['notification_tone'];
+          p_user_id: string;
+        };
+        Returns: string;
+      };
       fn_order_lateness: { Args: { p_delivered: string; p_promised: string }; Returns: number };
       fn_order_needs_action: { Args: { p_order_id: string }; Returns: string[] };
       fn_order_reference: { Args: Record<PropertyKey, never>; Returns: string };
@@ -34717,6 +34863,7 @@ export type Database = {
         };
         Returns: undefined;
       };
+      rpc_notifications_read: { Args: { p_id?: string }; Returns: Json };
       rpc_order_add_note: {
         Args: { p_body: string; p_order_id: string; p_visible_to?: string };
         Returns: Json;
@@ -34942,6 +35089,11 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_push_subscribe: {
+        Args: { p_auth: string; p_endpoint: string; p_p256dh: string; p_surface?: string };
+        Returns: Json;
+      };
+      rpc_push_unsubscribe: { Args: { p_endpoint: string }; Returns: Json };
       rpc_qr_card: { Args: { p_code: string }; Returns: Json };
       rpc_qr_generate: {
         Args: {
@@ -36844,6 +36996,7 @@ export type Database = {
         | 'featured_refund_issued'
         | 'featured_rate_card_changing';
       notification_status: 'pending' | 'sent' | 'failed' | 'no_address';
+      notification_tone: 'info' | 'good' | 'warning' | 'urgent';
       order_channel: 'web' | 'qr' | 'qr_return' | 'desk' | 'concierge' | 'api' | 'manual';
       order_payment_method:
         | 'mpesa_stk'
@@ -38582,6 +38735,7 @@ export const Constants = {
         'featured_rate_card_changing',
       ],
       notification_status: ['pending', 'sent', 'failed', 'no_address'],
+      notification_tone: ['info', 'good', 'warning', 'urgent'],
       order_channel: ['web', 'qr', 'qr_return', 'desk', 'concierge', 'api', 'manual'],
       order_payment_method: [
         'mpesa_stk',

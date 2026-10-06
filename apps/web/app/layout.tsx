@@ -9,6 +9,7 @@ import { cityFromConnection } from '@/app/location-actions';
 import { WelcomeConsent } from '@/components/consent/welcome';
 import { AfterLocationSettled } from '@/components/location/after-location';
 import { SiteLocationProvider } from '@/components/location/provider';
+import { RegisterServiceWorker } from '@/components/notifications/register-sw';
 import { canMachineTranslate, getLocale, hasBeenAsked } from '@/lib/i18n';
 
 /**
@@ -30,8 +31,17 @@ export const metadata: Metadata = {
   },
   description:
     'Tell us where you are staying and what you need. A vetted local concierge delivers it to your door.',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'NexG', statusBarStyle: 'default' },
+  applicationName: 'NexG',
 };
 
+/*
+ * What makes it installable. `appleWebApp` is what lets an
+ * iPhone add it to the home screen as an app — and on iOS that
+ * is also the only way web push works at all, so the two are
+ * the same switch.
+ */
 export const viewport: Viewport = {
   themeColor: '#F6F3EC',
   width: 'device-width',
@@ -79,7 +89,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 page that needs a place. */}
             <LocationSheet />
 
-            {/* Rendered only when they have not answered, so a returning
+            <RegisterServiceWorker />
+
+          {/* Rendered only when they have not answered, so a returning
                 visitor never sees it and nothing flickers on their screen
                 while the client works out whether to hide it — and only
                 once the location question is settled, so the two first-visit

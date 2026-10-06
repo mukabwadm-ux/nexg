@@ -1,4 +1,6 @@
 import { DeliverToChip } from '@nexg/location';
+
+import { NotificationBell } from './notifications/bell';
 import { Button } from '@nexg/ui';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
@@ -61,6 +63,10 @@ export async function SiteHeader({ action, signIn, tone = 'light' }: SiteHeaderP
               {signIn.label}
             </Link>
           )}
+
+          {/* Renders nothing for a signed-out visitor: a bell
+              over an empty drawer is a promise we have not made. */}
+          <NotificationBell tone={tone} />
 
           <Button variant="gold" size="sm" asChild>
             <Link href={cta.href}>{cta.label}</Link>

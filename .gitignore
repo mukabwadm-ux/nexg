@@ -72,3 +72,4 @@ nexgcr.txt
 # Claude Code personal settings. Local to one machine, and this repo is
 # public — a permission rule is nobody else's business.
 .claude/settings.local.json
+vapid-keys.txt
