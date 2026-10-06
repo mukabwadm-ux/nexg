@@ -1,6 +1,7 @@
 'use client';
 
 import * as Dialog from '@radix-ui/react-dialog';
+import { describe as describePlace, useLocation } from '@nexg/location';
 import { cn } from '@nexg/ui';
 import {
   Briefcase,
@@ -102,6 +103,18 @@ export function SiteMenu({
   const [open, setOpen] = React.useState(false);
   const close = () => setOpen(false);
 
+  /*
+   * The same store the header chip reads.
+   *
+   * This card was drawn from the artboard and left inert, with
+   * "[Your hotel], Westlands · Nairobi" hard-coded and a Change
+   * that did nothing. On a phone the menu is where most people
+   * will look for the address, so it was the one place showing a
+   * delivery location that could not be true.
+   */
+  const { place, chip, openSheet } = useLocation();
+  const deliverTo = describePlace(chip, place);
+
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
@@ -131,19 +144,51 @@ export function SiteMenu({
           </header>
 
           <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-9">
-            {/* Delivery address is a Phase 1 feature; drawn as designed, inert. */}
-            <div className="bg-surface flex items-center gap-3 rounded-xl px-4 py-3">
-              <MapPin className="text-muted-light h-4 w-4 shrink-0" aria-hidden="true" />
+            {/*
+              * Tapping anywhere on this opens the same sheet the
+              * header chip opens — and closes the menu first,
+              * because the sheet would otherwise open behind it.
+              */}
+            <button
+              type="button"
+              onClick={() => {
+                close();
+                /* After the menu's close animation, so the sheet
+                   does not fight it for focus. */
+                setTimeout(() => openSheet('menu'), 120);
+              }}
+              className="bg-surface focus-visible:ring-gold flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2"
+            >
+              <span className="relative shrink-0">
+                <MapPin className="text-muted-light h-4 w-4" aria-hidden="true" />
+                {/* Precision, not coverage: gold until a pin is
+                    confirmed, which is the same rule the header
+                    chip follows. */}
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'ring-surface absolute -right-1 -top-1 h-2 w-2 rounded-full ring-2',
+                    chip === 'empty' || chip === 'city' || chip === 'unlaunched'
+                      ? 'bg-gold'
+                      : 'bg-success',
+                  )}
+                />
+              </span>
               <span className="min-w-0 flex-1">
                 <span className="text-micro text-muted-light block font-bold uppercase">
                   Deliver to
                 </span>
                 <span className="text-ink block truncate text-sm font-bold">
-                  [Your hotel], Westlands · Nairobi
+                  {deliverTo.title}
+                </span>
+                <span className="text-muted-light block truncate text-xs font-semibold">
+                  {deliverTo.hint}
                 </span>
               </span>
-              <span className="text-ink shrink-0 text-sm font-bold">Change</span>
-            </div>
+              <span className="text-ink shrink-0 text-sm font-bold">
+                {chip === 'empty' ? 'Set' : 'Change'}
+              </span>
+            </button>
 
             {/* --------------------------------------------------------- nav */}
             <nav aria-label="Main" className="mt-5">
