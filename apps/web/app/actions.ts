@@ -7,20 +7,40 @@ import { createClient } from '@/lib/supabase/server';
 export interface ActionResult {
   ok: boolean;
   message: string;
+  /** The ticket the desk will work. Shown back so they can quote it. */
+  reference?: string;
 }
 
 /**
  * The homepage "Start your order" card.
  *
- * Section 4.1: in this slice the form captures a concierge lead rather than
- * placing an order. It is stored on waitlist_signup with
- * source = 'homepage_request' and a concierge follows up on WhatsApp.
+ * It raises a **ticket**. It used to write a row to
+ * `waitlist_signup` with source = 'homepage_request', which is
+ * a table nobody works through — so somebody asking for dinner
+ * at eight landed in a list beside people who wanted to be told
+ * when we launch in Kisumu, with no queue, no clock and no
+ * status.
+ *
+ * It also took no contact detail at all. A concierge request
+ * with no way to reply is not a request; it is a note to
+ * ourselves. The phone number is now required, because every
+ * other field only matters if somebody can answer.
  */
 const leadSchema = z.object({
   staying_at: z.string().trim().min(3, 'Tell us where you are staying.').max(300),
   need: z.string().trim().min(1, 'Choose what you need.').max(100),
   when: z.enum(['asap', 'later']),
   when_detail: z.string().trim().max(200).optional(),
+
+  /* The two that make it answerable. */
+  phone: z
+    .string()
+    .trim()
+    .min(7, 'We need a number to reach you on.')
+    .max(20)
+    .regex(/^[+0-9][0-9 ()-]{6,}$/, 'That does not look like a phone number.'),
+  full_name: z.string().trim().max(120).optional(),
+  notes: z.string().trim().max(600).optional(),
 
   /*
    * The pin, present only when the guest picked a place rather
@@ -41,16 +61,9 @@ export async function submitLead(_prev: ActionResult | null, formData: FormData)
     need: formData.get('need'),
     when: formData.get('when'),
     when_detail: formData.get('when_detail') ?? undefined,
-    /*
-     * The pin, when the guest picked one rather than typing.
-     *
-     * An address string is where the guesswork starts — a
-     * concierge reads "Westlands Trattoria" and still has to
-     * work out which gate. Carrying the coordinates through
-     * means the lead arrives with the spot already settled, and
-     * the zone means we know before replying whether we can
-     * even deliver there.
-     */
+    phone: formData.get('phone'),
+    full_name: formData.get('full_name') ?? undefined,
+    notes: formData.get('notes') ?? undefined,
     staying_lat: formData.get('staying_lat') ?? undefined,
     staying_lng: formData.get('staying_lng') ?? undefined,
     staying_zone: formData.get('staying_zone') ?? undefined,
@@ -64,19 +77,61 @@ export async function submitLead(_prev: ActionResult | null, formData: FormData)
     };
   }
 
+  const d = parsed.data;
   const supabase = createClient();
-  const { error } = await supabase.from('waitlist_signup').insert({
-    source: 'homepage_request',
-    payload: parsed.data,
+
+  /*
+   * The body is what a desk agent reads first, so it is written
+   * as a sentence rather than as a dump of field names. The
+   * structured copy goes in `details`, where the console can
+   * show each answer under its own label.
+   */
+  const body = [
+    `${d.need} — ${d.when === 'asap' ? 'as soon as possible' : (d.when_detail || 'at a time to arrange')}.`,
+    `Staying at: ${d.staying_at}.`,
+    d.notes ? `They added: ${d.notes}` : null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const { data, error } = await supabase.rpc('rpc_support_ticket_create', {
+    p_body: body,
+    p_from_role: 'guest',
+    /* The hero form is always somebody asking for something to
+       be arranged, whatever they picked from the chips. */
+    p_topic: 'concierge_request' as never,
+    p_phone: d.phone,
+    ...(d.full_name ? { p_full_name: d.full_name } : {}),
+    p_source_form: 'homepage_order',
+    p_details: {
+      need: d.need,
+      when: d.when,
+      when_detail: d.when_detail ?? null,
+      staying_at: d.staying_at,
+      /* The pin, when they picked a place rather than typing
+         one. A concierge reading an address still has to work
+         out which gate; coordinates settle it before anyone
+         replies. */
+      lat: d.staying_lat ?? null,
+      lng: d.staying_lng ?? null,
+      zone: d.staying_zone ?? null,
+      location_source: d.staying_source ?? null,
+      notes: d.notes ?? null,
+    } as never,
   });
 
   if (error) {
-    return { ok: false, message: 'We could not send that. Check your connection and try again.' };
+    /* The rate limit is a real answer, not a failure — it is
+       worded for the person and should reach them as written. */
+    return { ok: false, message: error.message };
   }
+
+  const created = data as unknown as { reference: string };
 
   return {
     ok: true,
-    message: 'Got it. A concierge will reply on WhatsApp shortly to confirm the price and timing.',
+    reference: created.reference,
+    message: 'Got it. A concierge is reading this now.',
   };
 }
 

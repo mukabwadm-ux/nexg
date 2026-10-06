@@ -21216,6 +21216,7 @@ export type Database = {
           channel: Database['public']['Enums']['ticket_channel'];
           city_id: string | null;
           created_at: string;
+          details: NonNullable<Json>;
           email: string | null;
           first_reply_at: string | null;
           from_role: Database['public']['Enums']['ticket_from'];
@@ -21225,6 +21226,7 @@ export type Database = {
           phone: string | null;
           reference: string;
           resolved_at: string | null;
+          source_form: string | null;
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
@@ -21235,6 +21237,7 @@ export type Database = {
           channel?: Database['public']['Enums']['ticket_channel'];
           city_id?: string | null;
           created_at?: string;
+          details?: NonNullable<Json>;
           email?: string | null;
           first_reply_at?: string | null;
           from_role?: Database['public']['Enums']['ticket_from'];
@@ -21244,6 +21247,7 @@ export type Database = {
           phone?: string | null;
           reference: string;
           resolved_at?: string | null;
+          source_form?: string | null;
           status?: Database['public']['Enums']['ticket_status'];
           topic?: Database['public']['Enums']['ticket_topic'];
           updated_at?: string;
@@ -21254,6 +21258,7 @@ export type Database = {
           channel?: Database['public']['Enums']['ticket_channel'];
           city_id?: string | null;
           created_at?: string;
+          details?: NonNullable<Json>;
           email?: string | null;
           first_reply_at?: string | null;
           from_role?: Database['public']['Enums']['ticket_from'];
@@ -21263,6 +21268,7 @@ export type Database = {
           phone?: string | null;
           reference?: string;
           resolved_at?: string | null;
+          source_form?: string | null;
           status?: Database['public']['Enums']['ticket_status'];
           topic?: Database['public']['Enums']['ticket_topic'];
           updated_at?: string;
@@ -21401,6 +21407,8 @@ export type Database = {
           caretaker_confirmed_at: string | null;
           caretaker_name: string | null;
           caretaker_phone_encrypted: string | null;
+          caretaker_token_hash: string | null;
+          caretaker_token_sent_at: string | null;
           checkin_time: string | null;
           checkout_time: string | null;
           city_id: string | null;
@@ -21450,6 +21458,8 @@ export type Database = {
           caretaker_confirmed_at?: string | null;
           caretaker_name?: string | null;
           caretaker_phone_encrypted?: string | null;
+          caretaker_token_hash?: string | null;
+          caretaker_token_sent_at?: string | null;
           checkin_time?: string | null;
           checkout_time?: string | null;
           city_id?: string | null;
@@ -21499,6 +21509,8 @@ export type Database = {
           caretaker_confirmed_at?: string | null;
           caretaker_name?: string | null;
           caretaker_phone_encrypted?: string | null;
+          caretaker_token_hash?: string | null;
+          caretaker_token_sent_at?: string | null;
           checkin_time?: string | null;
           checkout_time?: string | null;
           city_id?: string | null;
@@ -21925,6 +21937,48 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      wiring_anon_allow: {
+        Row: {
+          added_at: string;
+          function_name: string;
+          guarded_by: string;
+          reason: string;
+        };
+        Insert: {
+          added_at?: string;
+          function_name: string;
+          guarded_by: string;
+          reason: string;
+        };
+        Update: {
+          added_at?: string;
+          function_name?: string;
+          guarded_by?: string;
+          reason?: string;
+        };
+        Relationships: [];
+      };
+      wiring_audit_exempt: {
+        Row: {
+          added_at: string;
+          function_name: string;
+          reason: string;
+          recorded_in: string;
+        };
+        Insert: {
+          added_at?: string;
+          function_name: string;
+          reason: string;
+          recorded_in: string;
+        };
+        Update: {
+          added_at?: string;
+          function_name?: string;
+          reason?: string;
+          recorded_in?: string;
+        };
+        Relationships: [];
       };
       zone: {
         Row: {
@@ -30396,6 +30450,14 @@ export type Database = {
           },
         ];
       };
+      wiring_health_v: {
+        Row: {
+          findings: number | null;
+          rule: string | null;
+          severity: string | null;
+        };
+        Relationships: [];
+      };
       zone_bounds: {
         Row: {
           city_id: string | null;
@@ -30665,6 +30727,7 @@ export type Database = {
       };
       fn_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_fit_budget: { Args: { p_plan_id: string }; Returns: undefined };
+      fn_folio_caller_may_charge: { Args: { p_hotel_id: string }; Returns: boolean };
       fn_folio_escalation_sweep: { Args: Record<PropertyKey, never>; Returns: number };
       fn_geo_cell: {
         Args: { p_lat: number; p_lng: number; p_precision?: number };
@@ -31084,6 +31147,15 @@ export type Database = {
       };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
+      fn_wiring_check: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          detail: string;
+          finding: string;
+          rule: string;
+          severity: string;
+        }[];
+      };
       fn_zone_serviceable: { Args: { p_point: unknown }; Returns: Json };
       fn_zone_supply_gap: {
         Args: { p_at?: string; p_zone_id: string };
@@ -36262,11 +36334,13 @@ export type Database = {
       rpc_support_ticket_create: {
         Args: {
           p_body: string;
+          p_details?: Json;
           p_email?: string;
           p_from_role?: Database['public']['Enums']['ticket_from'];
           p_full_name?: string;
           p_order_reference?: string;
           p_phone?: string;
+          p_source_form?: string;
           p_topic?: Database['public']['Enums']['ticket_topic'];
         };
         Returns: Json;
@@ -36279,6 +36353,7 @@ export type Database = {
           channel: Database['public']['Enums']['ticket_channel'];
           city_id: string | null;
           created_at: string;
+          details: NonNullable<Json>;
           email: string | null;
           first_reply_at: string | null;
           from_role: Database['public']['Enums']['ticket_from'];
@@ -36288,6 +36363,7 @@ export type Database = {
           phone: string | null;
           reference: string;
           resolved_at: string | null;
+          source_form: string | null;
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
@@ -36311,6 +36387,7 @@ export type Database = {
           channel: Database['public']['Enums']['ticket_channel'];
           city_id: string | null;
           created_at: string;
+          details: NonNullable<Json>;
           email: string | null;
           first_reply_at: string | null;
           from_role: Database['public']['Enums']['ticket_from'];
@@ -36320,6 +36397,7 @@ export type Database = {
           phone: string | null;
           reference: string;
           resolved_at: string | null;
+          source_form: string | null;
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
@@ -36332,7 +36410,8 @@ export type Database = {
         };
       };
       rpc_translations_put: { Args: { p_locale: string; p_rows: Json }; Returns: number };
-      rpc_unit_caretaker_confirm: { Args: { p_token: string; p_unit_id: string }; Returns: Json };
+      rpc_unit_caretaker_confirm: { Args: { p_token?: string; p_unit_id: string }; Returns: Json };
+      rpc_unit_caretaker_invite: { Args: { p_unit_id: string }; Returns: Json };
       rpc_unit_secret_reveal: {
         Args: { p_reason: string; p_unit_id: string; p_which: string };
         Returns: Json;
@@ -36352,6 +36431,8 @@ export type Database = {
           caretaker_confirmed_at: string | null;
           caretaker_name: string | null;
           caretaker_phone_encrypted: string | null;
+          caretaker_token_hash: string | null;
+          caretaker_token_sent_at: string | null;
           checkin_time: string | null;
           checkout_time: string | null;
           city_id: string | null;

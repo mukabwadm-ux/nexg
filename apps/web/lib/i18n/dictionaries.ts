@@ -72,7 +72,7 @@ const en: Dictionary = {
   // ── the welcome card
   'consent.title': 'Make this yours',
   'consent.body':
-    'Two things would make NexG fit you better. Both are your choice, and you can change either at any time.',
+    'One thing would make NexG fit you better. It is your choice, and you can change it at any time.',
   'consent.location.title': 'Where you are',
   'consent.location.body':
     'So we open on your city and show what actually reaches you. Your browser will ask you next.',

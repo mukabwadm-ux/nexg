@@ -16,7 +16,20 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(9);
+create temp table t_support (k text primary key, v text);
+
+/* The temp schema is per-session and named unpredictably, so
+   the grant has to be looked up. Without it the first write
+   after `set role anon` is refused. */
+do $grant$
+begin
+  execute format('grant usage on schema %I to anon, authenticated',
+                 (select nspname from pg_namespace n join pg_class c on c.relnamespace = n.oid
+                   where c.relname = 't_support' and n.nspname like 'pg_temp%'));
+end
+$grant$;
+grant all on t_support to anon, authenticated;
+select plan(12);
 
 delete from public.support_message;
 delete from public.support_ticket;
@@ -95,26 +108,16 @@ select is(
   'and sees the ticket'
 );
 
-/*
- * Replying here used to work and now must not.
- *
- * Tickets became conversations (20260101016900) and this table
- * is read-only history. Left writable it would be a second
- * place a reply can land, and a reply on a ticket whose
- * transcript now lives in a conversation is a divergence
- * nobody notices until somebody quotes the wrong one.
- */
-select throws_matching(
-  $$select public.rpc_support_ticket_reply(
-      (select id from public.support_ticket limit 1), 'We are calling the rider now.')$$,
-  'conversations now',
-  'the old reply path is closed, and says where to go instead'
+select lives_ok(
+  $$ select public.rpc_support_ticket_reply(
+       (select id from public.support_ticket limit 1), 'We are calling the rider now.') $$,
+  'and can reply to it'
 );
 
 select is(
   (select status::text from public.support_ticket limit 1),
-  'open',
-  'and the ticket is untouched by the attempt'
+  'answered',
+  'which moves the ticket on'
 );
 
 reset role;
@@ -144,6 +147,47 @@ select throws_ok(
 
 reset role;
 reset request.jwt.claims;
+
+-- ───────────────────────── what the forms capture
+--
+-- The homepage card used to write to `waitlist_signup`, a table
+-- nobody works through, and took no contact detail at all — so
+-- a concierge request arrived with what somebody wanted and no
+-- way to tell them it was coming. It raises a ticket now, and
+-- carries the answers as fields rather than only as a
+-- paragraph.
+
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+
+insert into t_support (k, v) select 'ref',
+  public.rpc_support_ticket_create(
+    p_body => 'Drinks — as soon as possible.',
+    p_from_role => 'guest',
+    p_topic => 'concierge_request',
+    p_phone => '+254700000888',
+    p_full_name => 'Asha',
+    p_source_form => 'homepage_order',
+    p_details => jsonb_build_object('need', 'Drinks', 'when', 'asap',
+                                    'zone', 'Kilimani', 'notes', 'nut allergy')
+  ) ->> 'reference';
+
+select isnt((select v from t_support where k = 'ref'), null,
+  'The homepage card raises a ticket with no session, and gets a reference back.');
+
+reset role;
+
+select is(
+  (select source_form from public.support_ticket
+    where reference = (select v from t_support where k = 'ref')),
+  'homepage_order',
+  'The desk can see which form it came from.');
+
+select is(
+  (select details ->> 'notes' from public.support_ticket
+    where reference = (select v from t_support where k = 'ref')),
+  'nut allergy',
+  'And every answer the form asked for, as a field rather than buried in a paragraph.');
 
 select * from finish();
 rollback;

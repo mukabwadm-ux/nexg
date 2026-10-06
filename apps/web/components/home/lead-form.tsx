@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, cn, Input, useToast } from '@nexg/ui';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check, MessageCircle } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
@@ -48,16 +48,30 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
     if (seeded) setNeed(seeded);
   }, [seeded]);
 
+  /*
+   * A failure gets a toast. A success replaces the card.
+   *
+   * A toast saying "request received" over a form still holding
+   * everything they typed reads as though nothing happened —
+   * people re-submit. Taking the form away and saying what
+   * happens next is the part that feels like somebody picked up.
+   */
   React.useEffect(() => {
     if (state && state !== announced.current) {
       announced.current = state;
-      toast({
-        title: state.ok ? 'Request received' : 'Something went wrong',
-        description: state.message,
-        tone: state.ok ? 'success' : 'danger',
-      });
+      if (!state.ok) {
+        toast({
+          title: 'That did not send',
+          description: state.message,
+          tone: 'danger',
+        });
+      }
     }
   }, [state, toast]);
+
+  if (state?.ok) {
+    return <ThankYou reference={state.reference} need={need} when={when} />;
+  }
 
   return (
     <form
@@ -74,6 +88,34 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
         {/* Fills itself from the resolved delivery location, and
             is the picker when there is not one yet. */}
         <StayingAtField />
+      </div>
+
+      {/*
+        * The field that makes the rest of it answerable.
+        *
+        * This card took no contact detail at all, so a request
+        * arrived with what somebody wanted and no way to tell
+        * them it was on the way. WhatsApp because that is where
+        * the reply goes.
+        */}
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <Input
+          id="phone"
+          name="phone"
+          type="tel"
+          label="WhatsApp number"
+          placeholder="07.. or +254.."
+          inputMode="tel"
+          autoComplete="tel"
+          required
+        />
+        <Input
+          id="full_name"
+          name="full_name"
+          label="Your name"
+          placeholder="So we know who we are helping"
+          autoComplete="given-name"
+        />
       </div>
 
       <fieldset className="mt-4">
@@ -140,6 +182,15 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
         </div>
       )}
 
+      <div className="mt-3">
+        <Input
+          id="notes"
+          name="notes"
+          label="Anything else we should know?"
+          placeholder="Room number, allergies, a budget, a brand you like…"
+        />
+      </div>
+
       <div className="mt-4">
         <SubmitButton />
       </div>
@@ -164,5 +215,88 @@ function SubmitButton() {
     >
       Place your Order
     </Button>
+  );
+}
+
+/**
+ * What replaces the card once it is sent.
+ *
+ * Three things, in the order somebody wants them: that a person
+ * has it, what they asked for read back so they can see we
+ * understood, and the reference to quote. Then a way to keep
+ * talking, because the next thought after "sent" is usually
+ * "actually, one more thing".
+ *
+ * No form underneath. Leaving it there invites a second
+ * submission of the same request, and the desk then has two
+ * tickets and has to work out whether they are one person.
+ */
+function ThankYou({
+  reference,
+  need,
+  when,
+}: {
+  reference?: string;
+  need: string;
+  when: 'asap' | 'later';
+}) {
+  return (
+    <div
+      className="border-border bg-surface shadow-raised rounded-2xl border p-5 sm:p-6"
+      role="status"
+      aria-live="polite"
+    >
+      <span className="bg-gold flex h-11 w-11 items-center justify-center rounded-full">
+        <Check className="text-ink h-5 w-5" aria-hidden="true" />
+      </span>
+
+      <h2 className="mt-3 text-lg font-extrabold tracking-tight">
+        Thank you — a concierge has your request.
+      </h2>
+      <p className="text-muted mt-1.5 text-[0.875rem] leading-[1.7]">
+        Somebody is reading it now, not a bot. You will hear from us on WhatsApp shortly to confirm
+        the price and the timing before anything is ordered.
+      </p>
+
+      <dl className="border-border bg-bg mt-4 space-y-1.5 rounded-xl border p-3.5">
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted-light text-xs font-bold uppercase">You asked for</dt>
+          <dd className="text-right text-[0.8125rem] font-extrabold">{need}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted-light text-xs font-bold uppercase">When</dt>
+          <dd className="text-right text-[0.8125rem] font-extrabold">
+            {when === 'asap' ? 'As soon as possible' : 'At a time to arrange'}
+          </dd>
+        </div>
+        {reference ? (
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted-light text-xs font-bold uppercase">Your reference</dt>
+            <dd className="text-right font-mono text-[0.8125rem] font-extrabold">{reference}</dd>
+          </div>
+        ) : null}
+      </dl>
+
+      <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.6]">
+        Quote that reference if you call or message us and whoever answers will already know what
+        this is about.
+      </p>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" asChild>
+          <a href="/explore">
+            Browse while you wait
+          </a>
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => window.location.reload()}
+          trailingIcon={<MessageCircle className="h-4 w-4" />}
+        >
+          Ask for something else
+        </Button>
+      </div>
+    </div>
   );
 }
