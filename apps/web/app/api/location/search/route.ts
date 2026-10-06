@@ -8,10 +8,15 @@ export const dynamic = 'force-dynamic';
 /**
  * Address search.
  *
- * Proxied rather than called from the browser so the Maps key
- * stays on the server, and restricted to Kenya and the launch
- * cities so a search for "Westlands" does not offer the one in
- * Ontario.
+ * Proxied rather than called from the browser so the request
+ * can be shaped — a field mask that keeps the bill down, and a
+ * bias to Kenya and the launch cities so a search for
+ * "Westlands" does not offer the one in Ontario.
+ *
+ * It used to claim the proxy kept the key off the client. It
+ * did not: the key it used was a NEXT_PUBLIC_ one, which is in
+ * the bundle by definition. The secrecy now comes from using a
+ * separate server key, below.
  *
  * When no key is configured this returns an empty list and says
  * why in `reason`. It does **not** fall back to a plausible
@@ -28,6 +33,26 @@ export async function GET(request: Request) {
      they type "Yaya" than anything a geocoder returns. */
   const local = await knownPlaces(query);
 
+  /*
+   * The server's own key, not the browser's.
+   *
+   * These cannot be the same key. The browser key must be
+   * locked to our domains by HTTP referrer, or anyone can lift
+   * it out of the bundle and spend our quota. This request is
+   * made from a Vercel function, which sends no Referer header
+   * at all — so a referrer-restricted key is refused here with
+   * "Requests from referer <empty> are blocked", which is
+   * exactly what happened the first time the key went live.
+   *
+   * So: GOOGLE_MAPS_API_KEY, restricted by API rather than by
+   * referrer, is what this route wants. It falls back to the
+   * public key so a deployment with only one key still works —
+   * that only succeeds if the public key has no referrer
+   * restriction, which is a trade worth making knowingly
+   * rather than a silent failure.
+   */
+  const serverKey = process.env['GOOGLE_MAPS_API_KEY'] ?? '';
+
   const capability = maps();
   if (!capability.live) {
     return NextResponse.json({
@@ -43,7 +68,7 @@ export async function GET(request: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Goog-Api-Key': capability.key,
+          'X-Goog-Api-Key': serverKey || capability.key,
           'X-Goog-FieldMask':
             'places.displayName,places.formattedAddress,places.location,places.plusCode',
         },
@@ -95,7 +120,12 @@ export async function GET(request: Request) {
           `Address search is configured but Google refused the request (HTTP ${response.status}).` +
           (why ? ` ${why}` : '') +
           ' Check the key’s API restrictions include Places API (New), that its referrer' +
-          ' restrictions allow this domain, and that billing is enabled on the Cloud project.',
+          (serverKey
+            ? ' GOOGLE_MAPS_API_KEY is set, so check its own API restrictions and billing.'
+            : ' This request used the browser key because GOOGLE_MAPS_API_KEY is not set.' +
+              ' A referrer-restricted key cannot work here: this call comes from a server and' +
+              ' sends no referer. Set GOOGLE_MAPS_API_KEY to a second key restricted by API' +
+              ' rather than by referrer.'),
       });
     }
 
