@@ -119,11 +119,11 @@ export async function GET(request: Request) {
         reason:
           `Address search is configured but Google refused the request (HTTP ${response.status}).` +
           (why ? ` ${why}` : '') +
-          ' Check the key’s API restrictions include Places API (New), that its referrer' +
           (serverKey
-            ? ' GOOGLE_MAPS_API_KEY is set, so check its own API restrictions and billing.'
-            : ' This request used the browser key because GOOGLE_MAPS_API_KEY is not set.' +
-              ' A referrer-restricted key cannot work here: this call comes from a server and' +
+            ? ' This used GOOGLE_MAPS_API_KEY, so check that key’s own API restrictions' +
+              ' include Places API (New) and that billing is enabled on the Cloud project.'
+            : ' This used the browser key, because GOOGLE_MAPS_API_KEY is not set. A' +
+              ' referrer-restricted key cannot work here: the call comes from a server and' +
               ' sends no referer. Set GOOGLE_MAPS_API_KEY to a second key restricted by API' +
               ' rather than by referrer.'),
       });
