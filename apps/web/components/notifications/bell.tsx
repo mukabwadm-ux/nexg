@@ -244,15 +244,19 @@ export function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }
  * not offer a second chance.
  */
 function PushToggle() {
-  const [state, setState] = React.useState<'unknown' | 'unsupported' | 'off' | 'on' | 'blocked'>(
-    'unknown',
-  );
+  const [state, setState] = React.useState<
+    'unknown' | 'unsupported' | 'off' | 'on' | 'blocked' | 'unconfigured'
+  >('unknown');
   const [busy, setBusy] = React.useState(false);
 
   React.useEffect(() => {
     void (async () => {
       if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
         setState('unsupported');
+        return;
+      }
+      if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
+        setState('unconfigured');
         return;
       }
       if (Notification.permission === 'denied') {
@@ -278,12 +282,17 @@ function PushToggle() {
       const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
       if (!key) {
         /*
-         * Said plainly rather than failing quietly. Without a
-         * VAPID key the browser cannot subscribe at all, and a
-         * toggle that flips and does nothing is worse than one
-         * that explains itself.
+         * Its own state, not 'off'.
+         *
+         * Without a VAPID key the browser cannot subscribe at
+         * all — but reporting that as 'off' made a deployment
+         * problem look identical to somebody declining, and
+         * there was no way to tell them apart from outside.
+         * This is the one that says which variable is missing,
+         * the same way every other capability in this system
+         * does.
          */
-        setState('off');
+        setState('unconfigured');
         return;
       }
 
@@ -306,6 +315,16 @@ function PushToggle() {
     } finally {
       setBusy(false);
     }
+  }
+
+  if (state === 'unconfigured') {
+    return (
+      <p className="text-muted-light text-[0.6875rem] font-semibold">
+        On-screen notifications are not switched on for this deployment yet. You will still see
+        everything here. <span className="font-mono">NEXT_PUBLIC_VAPID_PUBLIC_KEY</span> turns them
+        on — and it is read at build time, so it needs a fresh build rather than a redeploy.
+      </p>
+    );
   }
 
   if (state === 'unsupported') {
