@@ -66,7 +66,38 @@ export async function GET(request: Request) {
       },
     );
 
-    if (!response.ok) return NextResponse.json({ results: local });
+    if (!response.ok) {
+      /*
+       * Say that Google refused, and why.
+       *
+       * This returned a bare empty list, which is the same
+       * thing it returns when Google simply found nothing. A
+       * key restricted to the wrong referrer, an unenabled
+       * Places API and a genuine no-match were three different
+       * problems wearing one face — and the one person who
+       * needs to tell them apart is whoever has just added the
+       * key and is wondering whether it worked.
+       *
+       * The status alone is most of the answer: 403 is
+       * restriction or an unenabled API, 429 is quota.
+       */
+      const detail = await response.text().catch(() => '');
+      const why = (() => {
+        try {
+          return (JSON.parse(detail) as { error?: { message?: string } }).error?.message;
+        } catch {
+          return undefined;
+        }
+      })();
+      return NextResponse.json({
+        results: local,
+        reason:
+          `Address search is configured but Google refused the request (HTTP ${response.status}).` +
+          (why ? ` ${why}` : '') +
+          ' Check the key’s API restrictions include Places API (New), that its referrer' +
+          ' restrictions allow this domain, and that billing is enabled on the Cloud project.',
+      });
+    }
 
     const body = (await response.json()) as {
       places?: {
@@ -90,8 +121,20 @@ export async function GET(request: Request) {
       }));
 
     return NextResponse.json({ results: [...local, ...remote].slice(0, 8) });
-  } catch {
-    return NextResponse.json({ results: local });
+  } catch (error) {
+    /*
+     * Almost always the 3s timeout above. Named rather than
+     * swallowed for the same reason as the branch above: a slow
+     * geocoder and an absent one are different problems, and an
+     * empty list says neither.
+     */
+    const timedOut = error instanceof Error && error.name === 'TimeoutError';
+    return NextResponse.json({
+      results: local,
+      reason: timedOut
+        ? 'Google did not answer within 3 seconds, so only places NexG already knows are shown.'
+        : 'Address search could not reach Google, so only places NexG already knows are shown.',
+    });
   }
 }
 
