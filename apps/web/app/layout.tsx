@@ -9,6 +9,7 @@ import { cityFromConnection } from '@/app/location-actions';
 import { WelcomeConsent } from '@/components/consent/welcome';
 import { AfterLocationSettled } from '@/components/location/after-location';
 import { SiteLocationProvider } from '@/components/location/provider';
+import { FloatingChat } from '@/components/chat/floating-chat';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
 import { canMachineTranslate, getLocale, hasBeenAsked } from '@/lib/i18n';
 
@@ -90,6 +91,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <LocationSheet />
 
             <RegisterServiceWorker />
+
+            {/* Above the footer, below the location sheet. Real
+                support: what somebody types here becomes a
+                conversation on the concierge desk with a person
+                routed to it. */}
+            <FloatingChat />
 
           {/* Rendered only when they have not answered, so a returning
                 visitor never sees it and nothing flickers on their screen

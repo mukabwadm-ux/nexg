@@ -15020,6 +15020,77 @@ export type Database = {
         };
         Relationships: [];
       };
+      notification_outbox: {
+        Row: {
+          attempts: number;
+          body: string | null;
+          channel: string;
+          created_at: string;
+          expires_at: string | null;
+          id: string;
+          last_error: string | null;
+          next_attempt_at: string;
+          notification_log_id: string | null;
+          payload: NonNullable<Json>;
+          provider: string | null;
+          provider_ref: string | null;
+          recipient: string;
+          sensitive: boolean;
+          sent_at: string | null;
+          status: string;
+          subject: string | null;
+          template: string;
+        };
+        Insert: {
+          attempts?: number;
+          body?: string | null;
+          channel: string;
+          created_at?: string;
+          expires_at?: string | null;
+          id?: string;
+          last_error?: string | null;
+          next_attempt_at?: string;
+          notification_log_id?: string | null;
+          payload?: NonNullable<Json>;
+          provider?: string | null;
+          provider_ref?: string | null;
+          recipient: string;
+          sensitive?: boolean;
+          sent_at?: string | null;
+          status?: string;
+          subject?: string | null;
+          template: string;
+        };
+        Update: {
+          attempts?: number;
+          body?: string | null;
+          channel?: string;
+          created_at?: string;
+          expires_at?: string | null;
+          id?: string;
+          last_error?: string | null;
+          next_attempt_at?: string;
+          notification_log_id?: string | null;
+          payload?: NonNullable<Json>;
+          provider?: string | null;
+          provider_ref?: string | null;
+          recipient?: string;
+          sensitive?: boolean;
+          sent_at?: string | null;
+          status?: string;
+          subject?: string | null;
+          template?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'notification_outbox_notification_log_id_fkey';
+            columns: ['notification_log_id'];
+            isOneToOne: false;
+            referencedRelation: 'notification_log';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       onboarding_slot: {
         Row: {
           booked: number;
@@ -29698,6 +29769,75 @@ export type Database = {
         };
         Relationships: [];
       };
+      msg_canned_reply_v: {
+        Row: {
+          action_key: string | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          approved_by_email: string | null;
+          audience: string | null;
+          blocked: boolean | null;
+          body_by_lang: Json | null;
+          key: string | null;
+          languages: string[] | null;
+          last_used_at: string | null;
+          needs_approval: boolean | null;
+          owner_team: string | null;
+          title: string | null;
+          topic: string | null;
+          usage_count: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_canned_reply_approved_by_fkey';
+            columns: ['approved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      msg_channel_v: {
+        Row: {
+          answered: number | null;
+          breaching_now: number | null;
+          channel: string | null;
+          last_24h: number | null;
+          last_7d: number | null;
+          latest_activity: string | null;
+          median_first_response_s: number | null;
+          median_resolution_min: number | null;
+          open_now: number | null;
+          resolved: number | null;
+          total: number | null;
+          unassigned: number | null;
+        };
+        Relationships: [];
+      };
+      msg_desk_roster_v: {
+        Row: {
+          active_count: number | null;
+          capacity: number | null;
+          device: string | null;
+          display_name: string | null;
+          email: string | null;
+          headroom: number | null;
+          last_seen_at: string | null;
+          on_shift_until: string | null;
+          presence_stale: boolean | null;
+          staff_user_id: string | null;
+          state: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_presence_staff_user_id_fkey';
+            columns: ['staff_user_id'];
+            isOneToOne: true;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       msg_desk_status_v: {
         Row: {
           busy: number | null;
@@ -29821,6 +29961,41 @@ export type Database = {
           },
         ];
       };
+      msg_insight_daily_v: {
+        Row: {
+          answered: number | null;
+          avg_rating: number | null;
+          day: string | null;
+          median_first_response_s: number | null;
+          opened: number | null;
+          rated: number | null;
+          reopened: number | null;
+          resolved: number | null;
+          resolved_first_touch: number | null;
+        };
+        Relationships: [];
+      };
+      msg_insight_hour_v: {
+        Row: {
+          hour: number | null;
+          median_first_response_s: number | null;
+          opened: number | null;
+          opened_28d: number | null;
+        };
+        Relationships: [];
+      };
+      msg_insight_topic_v: {
+        Row: {
+          avg_rating: number | null;
+          median_resolution_min: number | null;
+          rated: number | null;
+          resolved_first_touch: number | null;
+          still_open: number | null;
+          topic: string | null;
+          total: number | null;
+        };
+        Relationships: [];
+      };
       msg_message_v: {
         Row: {
           action: Json | null;
@@ -29883,6 +30058,104 @@ export type Database = {
           object_type: string | null;
           status: Database['public']['Enums']['msg_conv_status'] | null;
           subject: string | null;
+        };
+        Relationships: [];
+      };
+      msg_routing_rule_v: {
+        Row: {
+          auto_link: string | null;
+          conditions: Json | null;
+          enabled: boolean | null;
+          first_response_sla_s: number | null;
+          id: string | null;
+          label: string | null;
+          owner_team: string | null;
+          priority: number | null;
+          priority_out: string | null;
+          resolution_sla_min: number | null;
+          team_volume_30d: number | null;
+        };
+        Insert: {
+          auto_link?: string | null;
+          conditions?: Json | null;
+          enabled?: boolean | null;
+          first_response_sla_s?: number | null;
+          id?: string | null;
+          label?: string | null;
+          owner_team?: string | null;
+          priority?: number | null;
+          priority_out?: never;
+          resolution_sla_min?: number | null;
+          team_volume_30d?: never;
+        };
+        Update: {
+          auto_link?: string | null;
+          conditions?: Json | null;
+          enabled?: boolean | null;
+          first_response_sla_s?: number | null;
+          id?: string | null;
+          label?: string | null;
+          owner_team?: string | null;
+          priority?: number | null;
+          priority_out?: never;
+          resolution_sla_min?: number | null;
+          team_volume_30d?: never;
+        };
+        Relationships: [];
+      };
+      msg_whatsapp_window_v: {
+        Row: {
+          conversation_id: string | null;
+          hours_left: number | null;
+          last_inbound_at: string | null;
+          last_outbound_at: string | null;
+          msisdn_masked: string | null;
+          opt_in_at: string | null;
+          status: string | null;
+          subject: string | null;
+          window_expires_at: string | null;
+          window_open: boolean | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'msg_whatsapp_session_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_whatsapp_session_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'msg_whatsapp_session_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+        ];
+      };
+      notification_outbox_v: {
+        Row: {
+          attempts: number | null;
+          body_or_reason: string | null;
+          channel: string | null;
+          created_at: string | null;
+          expires_at: string | null;
+          id: string | null;
+          last_error: string | null;
+          next_attempt_at: string | null;
+          provider: string | null;
+          recipient_masked: string | null;
+          sensitive: boolean | null;
+          sent_at: string | null;
+          status: string | null;
+          template: string | null;
         };
         Relationships: [];
       };
@@ -32000,12 +32273,14 @@ export type Database = {
       };
     };
     Functions: {
+      authz_outbox_readable: { Args: Record<PropertyKey, never>; Returns: boolean };
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_expire: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_featured_reconcile: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_push_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_refresh_reports: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_scan_partitions: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -32366,6 +32641,19 @@ export type Database = {
         };
       };
       fn_needs_action_reads_as: { Args: { p_reasons: string[] }; Returns: string };
+      fn_notify_enqueue: {
+        Args: {
+          p_body: string;
+          p_channel: string;
+          p_expires_at?: string;
+          p_payload?: Json;
+          p_recipient: string;
+          p_sensitive?: boolean;
+          p_subject?: string;
+          p_template: string;
+        };
+        Returns: string;
+      };
       fn_notify_user: {
         Args: {
           p_body?: string;
@@ -36194,6 +36482,27 @@ export type Database = {
           p_reason_text?: string;
         };
         Returns: Json;
+      };
+      rpc_outbox_due: {
+        Args: { p_limit?: number };
+        Returns: {
+          attempts: number;
+          body: string;
+          channel: string;
+          id: string;
+          payload: Json;
+          recipient: string;
+          subject: string;
+          template: string;
+        }[];
+      };
+      rpc_outbox_failed: {
+        Args: { p_error: string; p_id: string; p_retryable?: boolean };
+        Returns: undefined;
+      };
+      rpc_outbox_sent: {
+        Args: { p_id: string; p_provider: string; p_provider_ref?: string };
+        Returns: undefined;
       };
       rpc_partner_go_live: {
         Args: { p_partner_id: string };

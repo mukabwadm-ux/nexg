@@ -18,6 +18,24 @@ import {
   fmtSeconds,
   sla,
 } from '@/components/messaging/shared';
+import {
+  Channels,
+  type ChannelRow,
+  type WhatsAppWindowRow,
+} from '@/components/messaging/channels';
+import {
+  CannedReplies,
+  DeskSettings,
+  type CannedRow,
+  type RosterRow,
+  type RoutingRow,
+} from '@/components/messaging/desk-settings';
+import {
+  Insights,
+  type DailyRow,
+  type HourRow,
+  type TopicRow,
+} from '@/components/messaging/insights';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -27,10 +45,10 @@ export const dynamic = 'force-dynamic';
 const TABS = [
   { key: 'inbox', label: 'Inbox', built: true },
   { key: 'internal', label: 'Internal', built: true },
-  { key: 'channels', label: 'Channels', built: false },
-  { key: 'insights', label: 'Insights', built: false },
-  { key: 'canned', label: 'Canned replies', built: false },
-  { key: 'settings', label: 'Settings', built: false },
+  { key: 'channels', label: 'Channels', built: true },
+  { key: 'insights', label: 'Insights', built: true },
+  { key: 'canned', label: 'Canned replies', built: true },
+  { key: 'settings', label: 'Settings', built: true },
 ] as const;
 
 const CHIPS = [
@@ -74,10 +92,10 @@ interface InboxRow {
  * internal and external side by side for staff while the
  * database guarantees the guest's copy has neither.
  *
- * Four of the six tabs are not built. They are greyed rather
- * than linked, for the reason this console learned the hard
- * way: a rail entry pointing at a route that does not exist is
- * a 404 somebody finds before you do.
+ * All six tabs are built. `built` stays as a field because it
+ * is how a tab joins the rail before its screen exists without
+ * linking to a 404 — something this console learned the hard
+ * way once already.
  */
 export default async function MessagingPage({
   searchParams,
@@ -103,6 +121,8 @@ export default async function MessagingPage({
    * with different people in it, so it would be odd if the two
    * tabs disagreed about what a conversation is.
    */
+  const isQueue = tab === 'inbox' || tab === 'internal';
+
   let query = supabase
     .from('msg_inbox_v')
     .select('*')
@@ -118,7 +138,7 @@ export default async function MessagingPage({
     if (chip === 'waiting') query = query.in('status', ['open', 'waiting_on_us', 'escalated']);
   }
 
-  const { data: rows } = await query;
+  const { data: rows } = isQueue ? await query : { data: null };
   const list = (rows as InboxRow[] | null) ?? [];
   const selected = list.find((r) => r.id === searchParams?.id) ?? list[0];
 
@@ -127,7 +147,7 @@ export default async function MessagingPage({
   let canReplyExternal = false;
   let isParticipant = false;
 
-  if (selected) {
+  if (selected && isQueue) {
     const [convRes, msgRes, partRes] = await Promise.all([
       supabase.from('msg_inbox_v').select('*').eq('id', selected.id).maybeSingle(),
       supabase
@@ -148,6 +168,50 @@ export default async function MessagingPage({
     const me = partRes.data as { can_reply_external: boolean } | null;
     isParticipant = me !== null;
     canReplyExternal = me?.can_reply_external ?? false;
+  }
+
+  /* Each tab reads only what it draws. */
+  let channels: ChannelRow[] = [];
+  let whatsapp: WhatsAppWindowRow[] = [];
+  let daily: DailyRow[] = [];
+  let topics: TopicRow[] = [];
+  let hours: HourRow[] = [];
+  let canned: CannedRow[] = [];
+  let rules: RoutingRow[] = [];
+  let roster: RosterRow[] = [];
+
+  if (tab === 'channels') {
+    const [ch, wa] = await Promise.all([
+      supabase.from('msg_channel_v').select('*'),
+      supabase.from('msg_whatsapp_window_v').select('*').limit(100),
+    ]);
+    channels = (ch.data as ChannelRow[] | null) ?? [];
+    whatsapp = (wa.data as WhatsAppWindowRow[] | null) ?? [];
+  }
+
+  if (tab === 'insights') {
+    const [d, t, h] = await Promise.all([
+      supabase.from('msg_insight_daily_v').select('*').limit(60),
+      supabase.from('msg_insight_topic_v').select('*'),
+      supabase.from('msg_insight_hour_v').select('*'),
+    ]);
+    daily = (d.data as DailyRow[] | null) ?? [];
+    topics = (t.data as TopicRow[] | null) ?? [];
+    hours = (h.data as HourRow[] | null) ?? [];
+  }
+
+  if (tab === 'canned') {
+    const { data } = await supabase.from('msg_canned_reply_v').select('*');
+    canned = (data as CannedRow[] | null) ?? [];
+  }
+
+  if (tab === 'settings') {
+    const [r, p] = await Promise.all([
+      supabase.from('msg_routing_rule_v').select('*').order('priority'),
+      supabase.from('msg_desk_roster_v').select('*'),
+    ]);
+    rules = (r.data as RoutingRow[] | null) ?? [];
+    roster = (p.data as RosterRow[] | null) ?? [];
   }
 
   const base = `/messaging?tab=${tab}`;
@@ -235,6 +299,7 @@ export default async function MessagingPage({
           </div>
         ) : null}
 
+        {isQueue ? (
         <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
           {/* ───────────────────────────────────── the queue */}
           <div className="border-border bg-surface overflow-hidden rounded-xl border">
@@ -333,6 +398,14 @@ export default async function MessagingPage({
             </div>
           )}
         </div>
+        ) : null}
+
+        {tab === 'channels' ? <Channels channels={channels} whatsapp={whatsapp} /> : null}
+        {tab === 'insights' ? (
+          <Insights daily={daily} topics={topics} hours={hours} />
+        ) : null}
+        {tab === 'canned' ? <CannedReplies rows={canned} /> : null}
+        {tab === 'settings' ? <DeskSettings rules={rules} roster={roster} /> : null}
 
         {tab === 'internal' ? (
           <p className="text-muted-light text-[0.6875rem] font-semibold">
