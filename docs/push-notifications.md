@@ -42,7 +42,7 @@ Or simply open the bell. If the key is missing it says so by name, in place of t
 
 ```bash
 npx supabase login          # once, opens a browser
-bash scripts/enable-push.sh
+bash scripts/enable-messaging.sh
 ```
 
 That is the whole of it. The script reads the key pair out of the gitignored

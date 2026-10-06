@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 #
-# Turns web push on, end to end.
+# Turns the senders on, end to end.
 #
-#   bash scripts/enable-push.sh
+#   bash scripts/enable-messaging.sh
+#
+# Two edge functions: push-dispatch, which puts notifications on
+# a lock screen, and notify-dispatch, which sends the SMS, email
+# and WhatsApp sitting in the outbox. They are one script because
+# they are one job — messages reaching people — and a second
+# script is a second thing to forget.
 #
 # Run it from anywhere, in Git Bash. It needs you to have run
 # `supabase login` once first — deploying a function and setting
@@ -16,6 +22,11 @@
 #   3. stores the function URL and that same secret in Vault, so
 #      the minute-by-minute cron can call it
 #   4. calls the cron function once and reports what came back
+#   5. does the same for notify-dispatch
+#
+# Both secrets are generated here rather than typed, so the two
+# halves of each pair are written from one variable and cannot
+# drift apart.
 #
 # The private key is read from vapid-keys.txt and passed
 # straight to Supabase. It is never printed, never echoed, and
@@ -61,11 +72,11 @@ fi
 # the same value into Vault, so the two stay in step.
 DISPATCH_SECRET=$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')
 
-echo "1/4  Deploying push-dispatch…"
+echo "1/5  Deploying push-dispatch…"
 npx supabase functions deploy push-dispatch --project-ref "$PROJECT_REF" --no-verify-jwt
 
 echo
-echo "2/4  Setting its secrets…"
+echo "2/5  Setting its secrets…"
 npx supabase secrets set --project-ref "$PROJECT_REF" \
   "VAPID_PUBLIC_KEY=$PUBLIC_KEY" \
   "VAPID_PRIVATE_KEY=$PRIVATE_KEY" \
@@ -74,7 +85,7 @@ npx supabase secrets set --project-ref "$PROJECT_REF" \
 echo "     done (values not printed)"
 
 echo
-echo "3/4  Telling the cron where to call…"
+echo "3/5  Telling the cron where to call…"
 FUNCTION_URL="https://${PROJECT_REF}.supabase.co/functions/v1/push-dispatch"
 
 # Vault rather than a settings row: a row is readable by anything
@@ -88,16 +99,42 @@ SQL
 echo "     stored push_dispatch_url and push_dispatch_secret"
 
 echo
-echo "4/4  Calling it once…"
+echo "4/5  Calling it once…"
 bash scripts/query-production.sh <<'SQL'
 \pset pager off
 select jsonb_pretty(public.cron_push_dispatch()) as dispatch;
 select count(*) as waiting_to_push from public.user_notification where pushed_at is null;
 SQL
 
+echo
+echo "5/5  Deploying notify-dispatch (email and SMS)…"
+
+# The same shape as push: one function, one shared secret, two
+# Vault rows. It is deployed here rather than in its own script
+# because the two are one job — "messages reach people" — and a
+# second script is a second thing to forget.
+npx supabase functions deploy notify-dispatch --project-ref "$PROJECT_REF" --no-verify-jwt
+
+NOTIFY_SECRET=$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | od -An -tx1 | tr -d ' 
+')
+NOTIFY_URL="https://${PROJECT_REF}.supabase.co/functions/v1/notify-dispatch"
+
+npx supabase secrets set --project-ref "$PROJECT_REF"   "NOTIFY_DISPATCH_SECRET=$NOTIFY_SECRET" >/dev/null
+
+bash scripts/query-production.sh <<SQL >/dev/null
+delete from vault.secrets where name in ('notify_dispatch_url', 'notify_dispatch_secret');
+select vault.create_secret('${NOTIFY_URL}', 'notify_dispatch_url');
+select vault.create_secret('${NOTIFY_SECRET}', 'notify_dispatch_secret');
+SQL
+
+bash scripts/query-production.sh <<'SQL'
+\pset pager off
+select jsonb_pretty(public.cron_notify_dispatch()) as notify_dispatch;
+SQL
+
 cat <<'MSG'
 
-Done. The cron calls it every minute from here on.
+Done. Both crons run every minute from here on.
 
 What is left before a phone actually buzzes:
 
@@ -110,4 +147,29 @@ What is left before a phone actually buzzes:
     screen". Nothing subscribes on their behalf.
 
   * On iPhone, only after the site is added to the home screen.
+
+And before an SMS or an email actually goes out, notify-dispatch
+needs a provider. It reports which one is missing rather than
+guessing, and holds the backlog until a key appears:
+
+  * SMS — AT_API_KEY and AT_USERNAME (Africa's Talking), plus
+    AT_SENDER_ID once the sender ID is approved. Or
+    TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_FROM.
+
+  * Email — RESEND_API_KEY and EMAIL_FROM.
+
+  * WhatsApp — WHATSAPP_TOKEN and WHATSAPP_PHONE_NUMBER_ID, and
+    for the inbound webhook WHATSAPP_VERIFY_TOKEN and
+    WHATSAPP_APP_SECRET.
+
+Set them the same way:
+
+    npx supabase secrets set --project-ref bmrrifvtfvgagkhrmitv       RESEND_API_KEY=... EMAIL_FROM=...
+
+One thing not to skip: until a provider exists, both OTP
+functions put the code on screen instead of sending it. The
+moment you set one, they stop doing that and send for real. If
+the provider key is wrong, nobody can verify a phone number and
+the screen no longer shows the code — so test one signup right
+after setting it.
 MSG
