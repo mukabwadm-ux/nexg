@@ -28,12 +28,14 @@ export interface WaitlistCityRow {
 
 export interface WaitlistSignupRow {
   id: string;
-  email: string;
+  email: string | null;
+  reachable: boolean;
   city_id: string | null;
   city_name: string | null;
   city_status: string | null;
   source: string | null;
   consent_marketing: boolean;
+  asked_for: string | null;
   created_at: string;
 }
 
@@ -66,6 +68,7 @@ export function WaitlistTab({
   const stranded = withPeople.filter((c) => c.waiting_for_an_open_city);
   const total = cities.reduce((a, c) => a + Number(c.waiting), 0);
   const noCity = signups.filter((s) => s.city_id === null);
+  const unreachable = signups.filter((s) => !s.reachable);
   const contactable = cities.reduce((a, c) => a + Number(c.contactable), 0);
 
   return (
@@ -87,11 +90,33 @@ export function WaitlistTab({
           note="Recent demand"
         />
         <Stat
-          label="No city given"
-          value={noCity.length}
-          note="Counted separately, not folded into a city"
+          label="No way to reach them"
+          value={unreachable.length}
+          note="No contact detail was captured at all"
         />
       </div>
+
+      {unreachable.length > 0 ? (
+        <div className="border-danger/40 bg-danger/5 rounded-xl border p-4">
+          <p className="text-danger text-[0.8125rem] font-extrabold">
+            {unreachable.length} of these people left no contact detail.
+          </p>
+          <p className="text-muted mt-1 text-[0.75rem] font-semibold">
+            They came through the old homepage card, which asked what somebody needed and never
+            asked how to reply. What they wanted is in the table below and is all that survives.
+            The card now takes a phone number and raises a support ticket instead, so this cannot
+            happen again — but these {unreachable.length} cannot be answered.
+          </p>
+        </div>
+      ) : null}
+
+      {noCity.length > 0 && noCity.length !== unreachable.length ? (
+        <p className="border-border bg-bg text-muted rounded-lg border px-3 py-2 text-[0.75rem] font-semibold">
+          {noCity.length} signup{noCity.length === 1 ? '' : 's'} named no city. They are counted
+          separately rather than folded into one, which would put them somewhere they never asked
+          for.
+        </p>
+      ) : null}
 
       {stranded.length > 0 ? (
         <div className="border-warn/40 bg-warn/5 rounded-xl border p-4">
@@ -183,7 +208,8 @@ export function WaitlistTab({
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
               <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
-                <th className="px-4 py-2">Email</th>
+                <th className="px-4 py-2">Contact</th>
+                <th className="px-4 py-2">What they asked for</th>
                 <th className="px-4 py-2">City</th>
                 <th className="px-4 py-2">Came from</th>
                 <th className="px-4 py-2">May we write?</th>
@@ -193,7 +219,7 @@ export function WaitlistTab({
             <tbody>
               {signups.length === 0 ? (
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={6}>
                     <p className="text-muted-light px-4 py-8 text-center text-[0.8125rem] font-semibold">
                       Nothing here yet.
                     </p>
@@ -203,9 +229,20 @@ export function WaitlistTab({
                 signups.map((s) => (
                   <tr
                     key={s.id}
-                    className="border-border border-b text-[0.8125rem] font-semibold last:border-0"
+                    className={`border-border border-b text-[0.8125rem] font-semibold last:border-0 ${
+                      s.reachable ? '' : 'bg-danger/5'
+                    }`}
                   >
-                    <td className="px-4 py-2.5 font-extrabold">{s.email}</td>
+                    <td className="px-4 py-2.5 font-extrabold">
+                      {s.reachable ? (
+                        s.email
+                      ) : (
+                        <span className="text-danger">no contact captured</span>
+                      )}
+                    </td>
+                    <td className="text-muted px-4 py-2.5 text-[0.75rem]">
+                      {s.asked_for ?? <span className="text-muted-light">nothing recorded</span>}
+                    </td>
                     <td className="text-muted px-4 py-2.5">
                       {s.city_name ?? <span className="text-muted-light">not given</span>}
                     </td>

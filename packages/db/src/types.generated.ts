@@ -32068,6 +32068,7 @@ export type Database = {
       };
       waitlist_signup_v: {
         Row: {
+          asked_for: string | null;
           city_id: string | null;
           city_name: string | null;
           city_status: string | null;
@@ -32075,6 +32076,8 @@ export type Database = {
           created_at: string | null;
           email: string | null;
           id: string | null;
+          payload: Json | null;
+          reachable: boolean | null;
           source: string | null;
         };
         Relationships: [
@@ -32884,6 +32887,7 @@ export type Database = {
       };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
+      fn_wa_window: { Args: { p_conversation: string }; Returns: Json };
       fn_wiring_check: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -38253,6 +38257,20 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_wa_inbound: {
+        Args: {
+          p_body: string;
+          p_display_name?: string;
+          p_msisdn: string;
+          p_provider_conversation_id?: string;
+          p_provider_message_id: string;
+        };
+        Returns: Json;
+      };
+      rpc_wa_reply: {
+        Args: { p_body: string; p_conversation: string; p_idempotency_key?: string };
+        Returns: Json;
       };
       rpc_zone_pause: {
         Args: { p_reason: string; p_until?: string; p_zone_id: string };
