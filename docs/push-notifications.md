@@ -18,7 +18,25 @@ To check it took, open the site and run in the console:
 await (await navigator.serviceWorker.getRegistration())?.pushManager.getSubscription()
 ```
 
-or simply open the bell. If the key is missing it says so by name, in place of the "Also show these on my screen" button — a missing variable and somebody declining the browser prompt used to look identical from outside, and now they do not.
+### Telling "not set" apart from "set to the wrong thing"
+
+Next.js inlines these by literal text substitution: a build that saw the
+variable has the *value* in the chunk and no longer has the *name*, because the
+name was replaced. So if you search the loaded JavaScript and find the string
+`VAPID_PUBLIC_KEY` still there, the substitution never happened — the variable
+was absent at build time, and no amount of rebuilding the same project will
+change that. Finding the name is the diagnosis, not the absence of the value.
+
+From the console on the live site:
+
+```js
+for (const s of document.querySelectorAll('script[src]')) {
+  const t = await (await fetch(s.src)).text();
+  if (t.includes('VAPID_PUBLIC_KEY')) console.log('not substituted:', s.src);
+}
+```
+
+Or simply open the bell. If the key is missing it says so by name, in place of the "Also show these on my screen" button — a missing variable and somebody declining the browser prompt used to look identical from outside, and now they do not.
 
 ## 2 and 3. The function and the clock — one script
 
