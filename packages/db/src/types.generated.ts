@@ -3810,6 +3810,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'broadcast_rider_recipient_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'broadcast_rider_recipient_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       campaign_spend: {
@@ -3951,6 +3965,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'cash_deposit_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'cash_deposit_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       cash_event: {
@@ -4053,6 +4081,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'cash_event_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'cash_event_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -6094,6 +6136,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'dispute_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -9804,6 +9860,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'fraud_signal_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'fraud_signal_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       geocode_cache: {
@@ -11719,6 +11789,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'incident_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'incident_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       incident_note: {
@@ -12094,6 +12178,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -13203,6 +13301,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -15555,6 +15667,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'notification_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'notification_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
             foreignKeyName: 'notification_ticket_id_fkey';
             columns: ['ticket_id'];
             isOneToOne: false;
@@ -16218,6 +16344,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
           {
             foreignKeyName: 'order_zone_id_fkey';
@@ -17711,6 +17851,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_block_assigned_rider_id_fkey';
+            columns: ['assigned_rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_assigned_rider_id_fkey';
+            columns: ['assigned_rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
           {
             foreignKeyName: 'plan_block_component_id_fkey';
@@ -20105,6 +20259,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'rider_adjustment_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_adjustment_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       rider_agreement_acceptance: {
@@ -20192,6 +20360,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_agreement_acceptance_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_agreement_acceptance_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -20525,6 +20707,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       rider_health_snapshot: {
@@ -20635,6 +20831,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_health_snapshot_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_health_snapshot_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -20781,6 +20991,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'rider_message_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_message_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       rider_presence_event: {
@@ -20867,6 +21091,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_presence_event_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_presence_event_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
           {
             foreignKeyName: 'rider_presence_event_zone_id_fkey';
@@ -21148,6 +21386,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'rider_reference_check_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_reference_check_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       rider_review: {
@@ -21244,6 +21496,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_review_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_review_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -21437,6 +21703,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_line_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_line_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
           {
             foreignKeyName: 'rider_settlement_line_run_id_fkey';
@@ -21676,6 +21956,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'rider_status_change_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_status_change_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
             foreignKeyName: 'rider_status_change_second_approver_id_fkey';
             columns: ['second_approver_id'];
             isOneToOne: false;
@@ -21789,6 +22083,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'rider_strike_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_strike_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       rider_test_trip: {
@@ -21883,6 +22191,20 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'rider_test_trip_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_test_trip_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       rider_training: {
@@ -21966,6 +22288,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_training_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_training_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -22261,6 +22597,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'shift_commitment_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'shift_commitment_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
           {
             foreignKeyName: 'shift_commitment_zone_id_fkey';
@@ -26513,6 +26863,20 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
             foreignKeyName: 'order_zone_id_fkey';
             columns: ['zone_id'];
             isOneToOne: false;
@@ -26795,6 +27159,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
           {
             foreignKeyName: 'order_zone_id_fkey';
@@ -27228,6 +27606,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
           {
             foreignKeyName: 'order_zone_id_fkey';
@@ -32591,6 +32983,19 @@ export type Database = {
           },
         ];
       };
+      rider_attention_v: {
+        Row: {
+          action: string | null;
+          body: string | null;
+          href: string | null;
+          kind: string | null;
+          rider_id: string | null;
+          sort: number | null;
+          title: string | null;
+          tone: string | null;
+        };
+        Relationships: [];
+      };
       rider_handoff_v: {
         Row: {
           address_line: string | null;
@@ -32852,6 +33257,145 @@ export type Database = {
             referencedRelation: 'rider_public';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+        ];
+      };
+      rider_pay_line_v: {
+        Row: {
+          base_kes: number | null;
+          cash_collected_kes: number | null;
+          distance_kes: number | null;
+          earned_at: string | null;
+          earning_id: string | null;
+          is_test: boolean | null;
+          lines: string | null;
+          order_reference: string | null;
+          peak_bonus_kes: number | null;
+          penalty_kes: number | null;
+          pickup_bonus_kes: number | null;
+          rider_id: string | null;
+          tip_kes: number | null;
+          total_kes: number | null;
+          waiting_kes: number | null;
+        };
+        Insert: {
+          base_kes?: number | null;
+          cash_collected_kes?: number | null;
+          distance_kes?: number | null;
+          earned_at?: string | null;
+          earning_id?: string | null;
+          is_test?: boolean | null;
+          lines?: never;
+          order_reference?: string | null;
+          peak_bonus_kes?: number | null;
+          penalty_kes?: number | null;
+          pickup_bonus_kes?: number | null;
+          rider_id?: string | null;
+          tip_kes?: number | null;
+          total_kes?: number | null;
+          waiting_kes?: number | null;
+        };
+        Update: {
+          base_kes?: number | null;
+          cash_collected_kes?: number | null;
+          distance_kes?: number | null;
+          earned_at?: string | null;
+          earning_id?: string | null;
+          is_test?: boolean | null;
+          lines?: never;
+          order_reference?: string | null;
+          peak_bonus_kes?: number | null;
+          penalty_kes?: number | null;
+          pickup_bonus_kes?: number | null;
+          rider_id?: string | null;
+          tip_kes?: number | null;
+          total_kes?: number | null;
+          waiting_kes?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_rider_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_fleet_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_app_me_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_home_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
         ];
       };
       rider_public: {
@@ -32951,6 +33495,128 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
         ];
+      };
+      rider_setup_progress_v: {
+        Row: {
+          activated_at: string | null;
+          can_train: boolean | null;
+          done_count: number | null;
+          first_name: string | null;
+          is_active: boolean | null;
+          last_name: string | null;
+          modules_passed: number | null;
+          next_step: number | null;
+          of_count: number | null;
+          readiness: Json | null;
+          rider_id: string | null;
+          status: string | null;
+          step_app: boolean | null;
+          step_documents: boolean | null;
+          step_payout: boolean | null;
+          step_profile: boolean | null;
+          step_session: boolean | null;
+          step_training: boolean | null;
+          step_vehicle: boolean | null;
+          submitted_at: string | null;
+          vehicle: string | null;
+        };
+        Relationships: [];
+      };
+      rider_week_bars_v: {
+        Row: {
+          base_kes: number | null;
+          bonus_kes: number | null;
+          day: string | null;
+          dow: string | null;
+          rider_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_rider_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_fleet_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_app_me_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_home_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_earning_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+        ];
+      };
+      rider_week_earnings_v: {
+        Row: {
+          base_kes: number | null;
+          bonus_kes: number | null;
+          cash_collected_kes: number | null;
+          deliveries: number | null;
+          distance_kes: number | null;
+          penalty_kes: number | null;
+          rider_id: string | null;
+          tip_kes: number | null;
+          total_kes: number | null;
+          week_start: string | null;
+        };
+        Relationships: [];
       };
       setting: {
         Row: {
