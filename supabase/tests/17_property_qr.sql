@@ -69,7 +69,14 @@ select is(
 
 -- ═════════════════════════════════════ generating a card
 
-insert into t (k, v) select 'unit', (select id::text from public.unit where status = 'live' order by name limit 1);
+/* A live unit *with a public label*. The card carries that
+   label, so a unit without one cannot have a card — picking
+   "whichever sorts first" meant this suite broke the first time
+   anybody seeded a unit named earlier in the alphabet. */
+insert into t (k, v) select 'unit',
+  (select id::text from public.unit
+    where status = 'live' and label_public is not null
+    order by name limit 1);
 
 insert into t (k, v) select 'counter',
   (public.rpc_qr_generate('unit', (select v::uuid from t where k = 'unit'), 'counter') ->> 'code');

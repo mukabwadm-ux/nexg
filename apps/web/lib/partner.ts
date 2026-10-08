@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
 export interface PartnerHome {
-  kind: 'merchant' | 'rider' | 'guest' | 'staff' | 'anonymous';
+  kind: 'merchant' | 'rider' | 'host' | 'guest' | 'staff' | 'anonymous';
   id?: string;
   name?: string | null;
   status?: string;
@@ -37,6 +37,25 @@ export async function requireMerchant(): Promise<PartnerHome & { id: string }> {
   /* Under the line, the application is still the honest answer:
      there is nothing to run yet. */
   if (!me.ready) redirect('/merchants/apply');
+  return me as PartnerHome & { id: string };
+}
+
+/**
+ * A host, unlike the other two, is never turned away for being
+ * unfinished.
+ *
+ * The merchant and rider portals bounce an incomplete account
+ * back to an application form, because until a merchant has a
+ * menu there is genuinely nothing to run. A host is different:
+ * the onboarding lives inside the portal, and somebody with one
+ * half-built unit still has properties, a team, a verification
+ * code and a QR pack on the way to look at. Sending them out to
+ * a form to finish one step is how a half-finished setup stays
+ * half-finished.
+ */
+export async function requireHost(): Promise<PartnerHome & { id: string }> {
+  const me = await partnerHome();
+  if (me.kind !== 'host' || !me.id) redirect(me.home);
   return me as PartnerHome & { id: string };
 }
 
