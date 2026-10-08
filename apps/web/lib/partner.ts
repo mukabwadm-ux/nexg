@@ -31,12 +31,24 @@ export async function partnerHome(): Promise<PartnerHome> {
   return (data as unknown as PartnerHome) ?? { kind: 'anonymous', home: '/sign-in' };
 }
 
+/**
+ * A merchant is no longer turned away for being unfinished.
+ *
+ * This used to bounce anybody under the readiness line back to
+ * the application form, on the reasoning that a merchant with
+ * no menu has nothing to run. That was true when the dashboard
+ * had one state. It now has two, and the second one is built
+ * for exactly this person: the setup strip, what going live
+ * unlocks, and every section open with sample data.
+ *
+ * Sending them to a form instead means they never see what
+ * finishing buys them — and it was the reason signing in
+ * "did not work" for every real merchant on the system, all of
+ * whom sit under the line.
+ */
 export async function requireMerchant(): Promise<PartnerHome & { id: string }> {
   const me = await partnerHome();
   if (me.kind !== 'merchant' || !me.id) redirect(me.home);
-  /* Under the line, the application is still the honest answer:
-     there is nothing to run yet. */
-  if (!me.ready) redirect('/merchants/apply');
   return me as PartnerHome & { id: string };
 }
 
@@ -59,10 +71,10 @@ export async function requireHost(): Promise<PartnerHome & { id: string }> {
   return me as PartnerHome & { id: string };
 }
 
+/** The same, for the same reason: R1 is built for this rider. */
 export async function requireRider(): Promise<PartnerHome & { id: string }> {
   const me = await partnerHome();
   if (me.kind !== 'rider' || !me.id) redirect(me.home);
-  if (!me.ready) redirect('/riders/apply');
   return me as PartnerHome & { id: string };
 }
 

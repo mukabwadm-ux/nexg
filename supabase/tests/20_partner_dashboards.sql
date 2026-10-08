@@ -242,11 +242,26 @@ select cmp_ok(
 
 select is(
   (public.fn_partner_home() ->> 'ready')::boolean, false,
-  'So the dashboard does not open — there is nothing to run yet.');
+  'They are under the line, and the payload still says so.');
 
+/*
+ * This used to assert '/riders/apply'.
+ *
+ * It was right when the rider dashboard had one state and that
+ * state assumed an activated rider: with nothing to run, the
+ * application was the honest destination. The dashboard now has
+ * a second state built for exactly this person — the activation
+ * strip, what going live unlocks, every section open with
+ * sample data — so sending them to a form instead means they
+ * never see what finishing buys them.
+ *
+ * It also locked every real rider out of their own portal, all
+ * of whom sit under the line. The assertion is reversed rather
+ * than deleted, so the decision stays written down.
+ */
 select is(
-  public.fn_partner_home() ->> 'home', '/riders/apply',
-  'And they are sent back to finish the application.');
+  public.fn_partner_home() ->> 'home', '/rider',
+  'And they land on their dashboard, in its activation state.');
 
 -- ════════════════════ 5. what the write RPCs refuse
 
