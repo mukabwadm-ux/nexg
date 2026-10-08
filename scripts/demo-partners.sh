@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Partner logins on production, so the merchant and rider portals
-# can be opened and walked through.
+# Partner logins on production, so the merchant, rider and host
+# portals can be opened and walked through.
 #
 #   bash scripts/demo-partners.sh            # create them
 #   bash scripts/demo-partners.sh --remove   # take them away again
@@ -24,6 +24,10 @@ if [ "${1:-}" = "--remove" ]; then
   bash scripts/query-production.sh <<'SQL'
 \set ON_ERROR_STOP on
 begin;
+delete from unit            where id::text like 'dddddddd-8888-%';
+delete from property        where id::text like 'dddddddd-7777-%';
+delete from host_user       where user_id::text like 'dddddddd-0000-%';
+delete from host            where id::text like 'dddddddd-6666-%';
 delete from merchant_branch where id::text like 'dddddddd-2222-%';
 delete from merchant_user   where user_id::text like 'dddddddd-0000-%';
 delete from merchant        where id::text like 'dddddddd-1111-%';
@@ -71,6 +75,7 @@ Two logins now work on https://nexg-sepia.vercel.app/sign-in :
 
   demo.merchant@nexgapp.com   ->  /merchant
   demo.rider@nexgapp.com      ->  /rider
+  demo.host@nexgapp.com       ->  /host
 
 Both use the password you just typed.
 

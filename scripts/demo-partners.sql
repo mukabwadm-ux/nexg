@@ -1,5 +1,12 @@
 -- Partner logins for production, so the portals can be opened.
 --
+-- Three accounts: merchant, rider and host. The host gets two
+-- units deliberately — one ready and one still waiting on its
+-- caretaker — because the portal's attention card and readiness
+-- ring only mean anything when there is something unfinished to
+-- point at, and a demo of a product where nothing needs doing
+-- shows none of the work.
+--
 -- The portals were never broken. They are gated: `fn_partner_home`
 -- sends you to a dashboard only once an application is submitted
 -- or 80% complete, and every real account on production sits below
@@ -55,6 +62,13 @@ values
    crypt(:'pw', gen_salt('bf')), now(), now(), now(),
    '{"provider":"email","providers":["email"]}'::jsonb,
    '{"full_name":"Demo Rider"}'::jsonb,
+   '', '', '', '', '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000',
+   'dddddddd-0000-4000-8000-000000000003',
+   'authenticated', 'authenticated', 'demo.host@nexgapp.com',
+   crypt(:'pw', gen_salt('bf')), now(), now(), now(),
+   '{"provider":"email","providers":["email"]}'::jsonb,
+   '{"full_name":"Demo Host"}'::jsonb,
    '', '', '', '', '', '', '', '')
 on conflict (id) do update
   set encrypted_password = excluded.encrypted_password,
@@ -79,7 +93,8 @@ select
   'email', now(), now(), now()
 from auth.users u
 where u.id in ('dddddddd-0000-4000-8000-000000000001',
-               'dddddddd-0000-4000-8000-000000000002')
+               'dddddddd-0000-4000-8000-000000000002',
+               'dddddddd-0000-4000-8000-000000000003')
 on conflict (provider, provider_id) do nothing;
 
 -- ═════════════════════════════════════════════════════ merchant
@@ -154,20 +169,109 @@ from city c where c.slug = 'nairobi'
 on conflict (id) do update
   set status = 'active', submitted_at = now(), activated_at = now();
 
+-- ═════════════════════════════════════════════════════════ host
+
+/*
+ * Live, so the portal opens on its live home rather than the
+ * setup one. `went_live_at` is required by a check constraint
+ * for that status — the database insisting a live host has a
+ * date it went live.
+ */
+insert into host (
+  id, kind, display_name, contact_name, phone, email, city_id,
+  status, submitted_at, went_live_at, verified_at,
+  verification_method, verification_submitted_at, default_handoff)
+select
+  'dddddddd-6666-4000-8000-000000000001',
+  'multi_unit', 'Demo Stays', 'Demo Host', '+254700000103',
+  'demo.host@nexgapp.com', c.id,
+  'live', now(), now(), now(), 'listing_code', now(), 'leave_with_askari'
+from city c where c.slug = 'nairobi'
+on conflict (id) do update
+  set status = 'live', went_live_at = now(), verified_at = now();
+
+insert into host_user (host_id, user_id, role, accepted_at)
+values ('dddddddd-6666-4000-8000-000000000001',
+        'dddddddd-0000-4000-8000-000000000003', 'owner', now())
+on conflict (host_id, user_id) do nothing;
+
+insert into property (id, host_id, slug, name, kind, area, city_id,
+                      check_in_from, check_out_by)
+select
+  'dddddddd-7777-4000-8000-000000000001',
+  'dddddddd-6666-4000-8000-000000000001',
+  'demo-stays-kilimani', 'Demo Stays Kilimani', 'apartment_block',
+  'Kilimani', c.id, '14:00', '11:00'
+from city c where c.slug = 'nairobi'
+on conflict (id) do nothing;
+
+/*
+ * `label_public` is the name a guest sees on the QR card. A unit
+ * without one cannot have a card generated — the RPC says so by
+ * name now, but it is easier to set it here than to find out
+ * later.
+ */
+insert into unit (
+  id, host_id, property_id, name, label_public, address_line,
+  building, unit_no, city_id, zone_id, status, handoff,
+  caretaker_name, caretaker_confirmed_at, delivery_hours, readiness)
+select
+  'dddddddd-8888-4000-8000-000000000001',
+  'dddddddd-6666-4000-8000-000000000001',
+  'dddddddd-7777-4000-8000-000000000001',
+  'A1204', 'Apartment A1204', 'Demo address, Kilimani, Nairobi',
+  'Demo Stays Kilimani', 'A1204', c.id, z.id, 'live', 'leave_with_askari',
+  'Demo Caretaker', now(), '{"from":"06:00","to":"22:00"}'::jsonb,
+  '{"address":true,"handoff":true,"contact_confirmed":true,"hours":true,"qr_placed":true}'::jsonb
+from city c
+join zone z on z.city_id = c.id and z.active
+where c.slug = 'nairobi'
+order by z.created_at
+limit 1
+on conflict (id) do nothing;
+
+/*
+ * A second unit that is not finished. This is what makes the
+ * readiness ring and the attention card show anything — and
+ * those are half of what the portal is for.
+ */
+insert into unit (
+  id, host_id, property_id, name, label_public, address_line,
+  building, unit_no, city_id, zone_id, status, handoff,
+  caretaker_name, caretaker_token_sent_at, caretaker_confirmed_at, readiness)
+select
+  'dddddddd-8888-4000-8000-000000000002',
+  'dddddddd-6666-4000-8000-000000000001',
+  'dddddddd-7777-4000-8000-000000000001',
+  'B0710', 'Apartment B0710', 'Demo address, Kilimani, Nairobi',
+  'Demo Stays Kilimani', 'B0710', c.id, z.id, 'setting_up', 'leave_with_askari',
+  'Demo Caretaker', now() - interval '2 days', null,
+  '{"address":true,"handoff":true,"contact_confirmed":false,"hours":false,"qr_placed":false}'::jsonb
+from city c
+join zone z on z.city_id = c.id and z.active
+where c.slug = 'nairobi'
+order by z.created_at
+limit 1
+on conflict (id) do nothing;
+
 commit;
 
 -- ═══════════════════════════════════════════════ what you now have
 
 \echo ''
 select u.email,
-       coalesce(m.trading_name, r.first_name || ' ' || r.last_name) as partner,
-       coalesce(m.status::text, r.status::text) as status,
-       case when m.id is not null then '/merchant' else '/rider' end as lands_on
+       coalesce(m.trading_name, r.first_name || ' ' || r.last_name, h.display_name) as partner,
+       coalesce(m.status::text, r.status::text, h.status::text) as status,
+       case when m.id is not null then '/merchant'
+            when r.id is not null then '/rider'
+            when h.id is not null then '/host' end as lands_on
   from auth.users u
   left join merchant_user mu on mu.user_id = u.id
   left join merchant m on m.id = mu.merchant_id
   left join rider r on r.user_id = u.id
- where u.email in ('demo.merchant@nexgapp.com', 'demo.rider@nexgapp.com')
+  left join host_user hu on hu.user_id = u.id
+  left join host h on h.id = hu.host_id
+ where u.email like 'demo.%@nexgapp.com'
  order by u.email;
 
 -- ════════════════════════════════════════════════ to remove them
@@ -175,6 +279,10 @@ select u.email,
 -- These are real logins on a live system. When the testing is
 -- done, this takes them away again:
 --
+--   delete from unit            where id::text like 'dddddddd-8888-%';
+--   delete from property        where id::text like 'dddddddd-7777-%';
+--   delete from host_user       where user_id::text like 'dddddddd-0000-%';
+--   delete from host            where id::text like 'dddddddd-6666-%';
 --   delete from merchant_branch where id::text like 'dddddddd-2222-%';
 --   delete from merchant_user   where user_id::text like 'dddddddd-0000-%';
 --   delete from merchant        where id::text like 'dddddddd-1111-%';

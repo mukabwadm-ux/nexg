@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Card, Input, PhoneInput, useToast } from '@nexg/ui';
-import { ArrowRight, Bike, Store, UserRound } from 'lucide-react';
+import { ArrowRight, Bike, Building2, Store, UserRound } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -26,6 +26,12 @@ const ROLES: { value: AccountRole; label: string; hint: string; icon: React.Reac
     label: 'Merchant',
     hint: 'Orders & catalogue',
     icon: <Store className="h-4 w-4" />,
+  },
+  {
+    value: 'host',
+    label: 'Host',
+    hint: 'Units & guests',
+    icon: <Building2 className="h-4 w-4" />,
   },
 ];
 
@@ -113,7 +119,7 @@ export function AuthPanel({ initialTab = 'signin' }: { initialTab?: 'signin' | '
           {tab === 'signin' && (
             <fieldset className="mb-5">
               <legend className="text-ink mb-2 text-sm font-bold">I am a…</legend>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {ROLES.map((option) => (
                   <button
                     key={option.value}
@@ -270,7 +276,7 @@ export function AuthPanel({ initialTab = 'signin' }: { initialTab?: 'signin' | '
               >
                 Create an account
               </button>{' '}
-              — it takes a minute. Riders and merchants: your application login works here too.
+              — it takes a minute. Riders, merchants and hosts: your application login works here too.
             </>
           ) : (
             <>
@@ -290,7 +296,7 @@ export function AuthPanel({ initialTab = 'signin' }: { initialTab?: 'signin' | '
       <div className="bg-ink mt-4 rounded-2xl p-5 text-white">
         <p className="text-[0.9375rem] font-extrabold">Want to earn with NexG?</p>
         <p className="mt-1 text-xs font-semibold leading-[1.7] text-white/60">
-          Riders and merchants apply separately — your login is set up once you’re approved.
+          Riders, merchants and hosts apply separately — your login is set up once you’re approved.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button variant="gold" size="sm" asChild>
@@ -303,6 +309,14 @@ export function AuthPanel({ initialTab = 'signin' }: { initialTab?: 'signin' | '
             className="border-gold/50 text-gold hover:bg-gold/10"
           >
             <Link href="/merchants/apply">Register Your Business</Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="border-gold/50 text-gold hover:bg-gold/10"
+          >
+            <Link href="/hosts">List Your Airbnb</Link>
           </Button>
         </div>
       </div>

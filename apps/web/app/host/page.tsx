@@ -106,7 +106,10 @@ export default async function HostHomePage() {
 
   const chips = live
     ? [
-        { label: `${home.units_live} units live`, tone: 'plain' as const },
+        {
+          label: `${home.units_live} unit${home.units_live === 1 ? '' : 's'} live`,
+          tone: 'plain' as const,
+        },
         {
           label: `${home.qr_placed} of ${home.units_total} QR cards placed`,
           tone: 'plain' as const,
@@ -114,7 +117,12 @@ export default async function HostHomePage() {
         { label: 'Guest operations active', tone: 'good' as const },
       ]
     : [
-        { label: `${home.units_setting_up} unit in setup`, tone: 'plain' as const },
+        {
+          label: `${home.units_setting_up} unit${
+            home.units_setting_up === 1 ? '' : 's'
+          } in setup`,
+          tone: 'plain' as const,
+        },
         { label: 'QR card not generated yet', tone: 'plain' as const },
         {
           label: progress.step_verify

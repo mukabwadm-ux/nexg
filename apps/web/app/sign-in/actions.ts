@@ -11,7 +11,7 @@ export interface AuthResult {
   redirectTo?: string;
 }
 
-export type AccountRole = 'guest' | 'rider' | 'merchant';
+export type AccountRole = 'guest' | 'rider' | 'merchant' | 'host';
 
 /*
  * Where each role lands when we have nothing better.
@@ -27,6 +27,13 @@ const START: Record<AccountRole, string> = {
   guest: '/',
   rider: '/riders/apply',
   merchant: '/merchants/apply',
+  /*
+   * Hosts land on the public page, not an application form.
+   * Their onboarding lives inside the portal once an account
+   * exists, so the thing a host without one needs is the page
+   * that explains what listing involves.
+   */
+  host: '/hosts',
 };
 
 /**
@@ -63,7 +70,7 @@ const signUpSchema = credentials.extend({
 });
 
 function roleOf(value: FormDataEntryValue | null): AccountRole {
-  return value === 'rider' || value === 'merchant' ? value : 'guest';
+  return value === 'rider' || value === 'merchant' || value === 'host' ? value : 'guest';
 }
 
 export async function signIn(formData: FormData): Promise<AuthResult> {
