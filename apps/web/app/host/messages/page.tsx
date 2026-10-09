@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { DASH, when } from '@/components/host/bits';
 import {
   Fact,
@@ -12,6 +14,7 @@ import {
   TwoColumn,
 } from '@/components/host/module';
 import { HostSection, hostContext } from '@/components/host/section';
+import { WriteToUs } from '@/components/host/write-client';
 
 export const metadata = { title: 'Messages' };
 export const dynamic = 'force-dynamic';
@@ -52,7 +55,7 @@ export default async function HostMessagesPage({
 }: {
   searchParams?: { tab?: string };
 }) {
-  const { home, live, nav, supabase, photoUrl } = await hostContext();
+  const { home, live, nav, supabase, photoUrl, me } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -139,12 +142,7 @@ export default async function HostMessagesPage({
                 >
                   WhatsApp host ops
                 </a>
-                <a
-                  href="/help/contact?from=host"
-                  className="border-border-strong block rounded-lg border px-4 py-2.5 text-center text-[0.8125rem] font-extrabold"
-                >
-                  Write to us
-                </a>
+                <WriteToUs hostId={me.id} />
               </div>
               <p className="text-muted-light border-border border-t px-4 py-2.5 text-[0.6875rem] font-semibold leading-[1.6]">
                 Replying from inside this page is the next piece. Both routes above land in the
@@ -181,7 +179,9 @@ export default async function HostMessagesPage({
           {rows.map((c) => (
             <Tr key={c.id} tone={c.unread > 0 ? 'warn' : 'plain'}>
               <Td strong note={c.topic ? c.topic.replace(/_/g, ' ') : undefined}>
-                {c.subject ?? 'No subject'}
+                <Link href={`/host/messages/${c.id}`} className="hover:underline">
+                  {c.subject ?? 'No subject'}
+                </Link>
                 {c.unread > 0 ? (
                   <span className="ml-1.5">
                     <Pill tone="gold">{c.unread} new</Pill>

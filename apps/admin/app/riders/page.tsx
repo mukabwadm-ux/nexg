@@ -354,14 +354,20 @@ async function loadSupply(supabase: Supabase, badges: Badges) {
   );
 }
 
+const DOCUMENT_SELECT: string =
+  'id, owner_id, status, expires_at, requirement:requirement_id(label, essential), rider:owner_id(first_name, last_name)';
+
 async function loadDocuments(supabase: Supabase, rows: RiderRow[]) {
   const [{ data: documents }, { data: automation }, { data: current }, { data: accepted }] =
     await Promise.all([
       supabase
+        /* Held as `string` so Supabase does not parse the two
+           embeds at the type level. That parse is what pushed
+           this file past TypeScript's instantiation budget and
+           failed the admin build; the rows are cast below
+           either way. */
         .from('document')
-        .select(
-          'id, owner_id, status, expires_at, requirement:requirement_id(label, essential), rider:owner_id(first_name, last_name)',
-        )
+        .select(DOCUMENT_SELECT)
         .eq('owner_type', 'rider')
         .is('superseded_at', null)
         .order('expires_at', { ascending: true, nullsFirst: false }),

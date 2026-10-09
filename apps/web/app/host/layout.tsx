@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { HostThemeFrame, type Theme } from '@/components/host/theme';
 import { requireHost } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -70,6 +71,16 @@ export default async function HostLayout({ children }: { children: React.ReactNo
   await requireHost();
   /* Touch the client here so an expired session is refreshed
      once per navigation rather than per query below. */
-  createClient();
-  return <>{children}</>;
+  const supabase = createClient();
+
+  /*
+   * Read once, in the layout, for every page under it.
+   *
+   * Settings saved a theme and nothing changed, because nothing
+   * ever read it back. Reading it per page would be eighteen
+   * queries and eighteen chances for one page to miss it.
+   */
+  const { data } = await supabase.from('user_theme_v').select('*').maybeSingle();
+
+  return <HostThemeFrame theme={data as Theme | null}>{children}</HostThemeFrame>;
 }

@@ -53,6 +53,15 @@
   --danger-bg: #fdecea;
   --danger-bg-rgb: 253 236 234;
 
+  /* Status: information.
+     Neither good nor bad — "Occupied", "Booked", "In-stay".
+     The artboards use a blue for these and there was no token
+     for it, so every pill asking for one rendered colourless. */
+  --info: #1f4e79;
+  --info-rgb: 31 78 121;
+  --info-bg: #eaf1f8;
+  --info-bg-rgb: 234 241 248;
+
   /* Status: warning */
   --warning: #8a6a10;
   --warning-rgb: 138 106 16;

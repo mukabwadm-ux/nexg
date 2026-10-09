@@ -11,6 +11,7 @@ import {
   TwoColumn,
 } from '@/components/host/module';
 import { HostSection, hostContext } from '@/components/host/section';
+import { WriteToUs } from '@/components/host/write-client';
 
 export const metadata = { title: 'Support' };
 export const dynamic = 'force-dynamic';
@@ -48,7 +49,7 @@ const TOPIC: Record<string, string> = {
  * promise at all.
  */
 export default async function HostSupportPage() {
-  const { home, live, nav, supabase, photoUrl } = await hostContext();
+  const { home, live, nav, supabase, photoUrl, me } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -122,12 +123,7 @@ export default async function HostSupportPage() {
           >
             Call the desk
           </a>
-          <a
-            href="/help/contact?from=host"
-            className="rounded-lg bg-white/10 px-4 py-3 text-center text-[0.8125rem] font-extrabold text-white"
-          >
-            Write to us
-          </a>
+          <WriteToUs hostId={me.id} variant="light" />
         </div>
       </section>
 

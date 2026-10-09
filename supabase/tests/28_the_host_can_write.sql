@@ -18,7 +18,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(28);
+select plan(34);
 
 create temp table t (k text primary key, v text);
 do $grant$
@@ -269,6 +269,83 @@ select is(
       and code !~ '^NXG-[23456789ABCDEFGHJKMNPQRSTVWXYZ]{6}$'),
   'The unprintable-card view finds exactly the live ones, so the bad codes already minted can '
   'be replaced deliberately rather than rewritten underneath a card on somebody''s counter.');
+
+-- ══════════════════ 8. writing to us, and being answered
+
+/*
+ * "Write to us" pointed at a path that does not exist, so the
+ * one button somebody presses when something is wrong gave
+ * them a 404. The conversation model was already here; a host
+ * simply could not use it — `rpc_msg_send` matches a
+ * participant by staff or guest id, and a host joins by
+ * `user_id`.
+ */
+set local role authenticated;
+select set_config('request.jwt.claims',
+  json_build_object('sub', (select v from t where k = 'user_a'),
+                    'role', 'authenticated')::text, true);
+
+insert into t (k, v) select 'conv',
+  (public.rpc_host_message_start(
+     (select v::uuid from t where k = 'host_a'),
+     'hotel_or_airbnb', 'Lift out of service',
+     'Engineer booked Thursday.') ->> 'conversation_id');
+
+select isnt((select v from t where k = 'conv'), null,
+  'A host can open a thread with NexG. The button for this led to a 404 for a week.');
+
+select is(
+  (select count(*)::int from public.host_conversation_v
+    where id = (select v::uuid from t where k = 'conv')),
+  1,
+  'And they can see it in their own Messages.');
+
+select is(
+  (select count(*)::int from public.host_message_v
+    where conversation_id = (select v::uuid from t where k = 'conv')),
+  1,
+  'With the message they wrote in it, rather than an empty thread.');
+
+select ok(
+  (public.rpc_host_message_reply((select v::uuid from t where k = 'conv'),
+    'Engineer now says Friday.') ->> 'ok')::boolean,
+  'They can reply to it, which is the whole difference between a thread and a contact form.');
+
+/* A conversation id they are provably not in. Picking "some
+   other row" first picked one the seed had already put them
+   in, and the test passed the wrong thing. */
+select throws_ok(
+  $$ select public.rpc_host_message_reply(
+       '00000000-0000-4000-8000-0000000000ff'::uuid, 'Not mine') $$,
+  '42501', null,
+  'And not to a thread they are not in. The participant row is the check, not the page.');
+
+/*
+ * The one that matters. An agent writing "check whether this
+ * host has paid" to a colleague is working, not hiding — and
+ * the host must never see it. This is enforced at the policy,
+ * so there is no query the portal could run that would show
+ * them one.
+ */
+reset role;
+insert into public.msg_message (
+  conversation_id, kind, body, visibility, delivery)
+values (
+  (select v::uuid from t where k = 'conv'), 'text',
+  'Internal: check whether this host is on the old agreement.', 'internal', 'stored');
+
+set local role authenticated;
+select set_config('request.jwt.claims',
+  json_build_object('sub', (select v from t where k = 'user_a'),
+                    'role', 'authenticated')::text, true);
+
+select is(
+  (select count(*)::int from public.host_message_v
+    where conversation_id = (select v::uuid from t where k = 'conv')
+      and body like 'Internal:%'),
+  0,
+  'An internal note is invisible to the host — not filtered by a page, refused by the policy, '
+  'so no future query or export can leak one.');
 
 select * from finish();
 rollback;

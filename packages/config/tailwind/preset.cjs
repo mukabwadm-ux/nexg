@@ -51,6 +51,19 @@ module.exports = {
           DEFAULT: channel('--warning-rgb'),
           bg: channel('--warning-bg-rgb'),
         },
+        /* `warn` is the spelling that kept getting written, and
+           an unknown Tailwind colour is dropped silently — so
+           half the amber pills in the host portal rendered with
+           no colour at all and nothing anywhere said so. Both
+           names now resolve to the same token. */
+        warn: {
+          DEFAULT: channel('--warning-rgb'),
+          bg: channel('--warning-bg-rgb'),
+        },
+        info: {
+          DEFAULT: channel('--info-rgb'),
+          bg: channel('--info-bg-rgb'),
+        },
         // Console shell (dark sidebar in the admin artboards).
         shell: {
           DEFAULT: channel('--shell-rgb'),

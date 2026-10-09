@@ -435,3 +435,50 @@ export async function saveTheme(theme: {
   });
   return unwrap(data, error, ALL, 'Your theme is saved. It applies to your login only.');
 }
+
+// ───────────────────────────────────────────────── messaging
+
+/**
+ * Open a thread with NexG.
+ *
+ * `topic` decides which desk it lands on, through the same
+ * routing rules the public contact form uses — so a host's
+ * message queues with everybody else's rather than in a
+ * separate inbox somebody forgets to watch.
+ */
+export async function startConversation(input: {
+  hostId: string;
+  topic: string;
+  subject: string;
+  body: string;
+}): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_host_message_start', {
+    p_host_id: input.hostId,
+    p_topic: input.topic as never,
+    p_subject: input.subject,
+    p_body: input.body,
+  });
+  return unwrap(
+    data,
+    error,
+    ['/host', '/host/messages', '/host/support'],
+    'Sent. You will see the reply here and we will notify you.',
+  );
+}
+
+export async function replyToConversation(
+  conversationId: string,
+  body: string,
+): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_host_message_reply', {
+    p_conversation: conversationId,
+    p_body: body,
+  });
+  return unwrap(data, error, ['/host', '/host/messages', '/host/support'], 'Sent.');
+}
+
+export async function markConversationRead(conversationId: string): Promise<void> {
+  await createClient().rpc('rpc_host_message_read', { p_conversation: conversationId });
+  revalidatePath('/host/messages');
+  revalidatePath('/host');
+}

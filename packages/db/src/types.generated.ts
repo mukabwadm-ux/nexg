@@ -41106,6 +41106,23 @@ export type Database = {
       };
       rpc_hospitality_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_apply: { Args: { p_payload: Json }; Returns: Json };
+      rpc_host_message_read: { Args: { p_conversation: string }; Returns: Json };
+      rpc_host_message_reply: {
+        Args: { p_body: string; p_conversation: string; p_idempotency_key?: string };
+        Returns: Json;
+      };
+      rpc_host_message_start: {
+        Args: {
+          p_body: string;
+          p_host_id: string;
+          p_object_id?: string;
+          p_object_label?: string;
+          p_object_type?: string;
+          p_subject: string;
+          p_topic: Database['public']['Enums']['msg_topic'];
+        };
+        Returns: Json;
+      };
       rpc_host_package_archive: { Args: { p_package_id: string }; Returns: Json };
       rpc_host_package_upsert: {
         Args: { p_host_id: string; p_package: Json; p_package_id?: string };

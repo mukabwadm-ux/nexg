@@ -20,33 +20,85 @@ export default async function PlanWorkbenchPage({ params }: { params: { id: stri
   requireModule(staff, 'experiences');
   const supabase = createClient();
 
-  const [{ data: plan }, { data: blocks }, { data: messages }, { data: fee }] = await Promise.all([
-    supabase
-      .from('plan')
-      .select(
-        'id, reference, status, guest_name, guest_phone, stay_label, party_type, party_size, date, budget_kes, estimate_total_kes, quote_total_kes, pay_on_day_total_kes, concierge_fee_kes, notes, moods, answers, claimed_at, sla_quote_due_at, flags, staff_user!plan_concierge_id_fkey(display_name)',
-      )
-      .eq('id', params.id)
-      .maybeSingle(),
-    supabase
-      .from('plan_block')
-      .select(
-        'id, slot, start_time, kind, title_snapshot, subtitle_snapshot, price_estimate_kes, price_quoted_kes, status, change_note, changed_from, hold_status, included_by, anchored, swap_group, done_at, experience_component(experience_partner(name))',
-      )
-      .eq('plan_id', params.id)
-      .order('sort'),
-    supabase
-      .from('plan_message')
-      .select('id, author_type, body, created_at, staff_user(display_name)')
-      .eq('plan_id', params.id)
-      .order('created_at'),
-    supabase
-      .from('setting')
-      .select('value')
-      .eq('key', 'experience_fee_rule')
-      .eq('scope', 'global')
-      .maybeSingle(),
-  ]);
+  /*
+   * Each query built first, then awaited together.
+   *
+   * Inlining four chained Supabase calls into one `Promise.all`
+   * made TypeScript give up — "Type instantiation is
+   * excessively deep" — and that failed the whole admin build,
+   * not just this page. It is the limit
+   * `lib/supabase/client.ts` already works around by
+   * annotating the client: the generated `Database` type is
+   * very large, and a tuple of chained builders multiplies it.
+   *
+   * Naming each builder lets TypeScript finish one before it
+   * starts the next, and they still all run in parallel.
+   */
+  const planQuery = supabase
+    .from('plan')
+    .select(
+      'id, reference, status, guest_name, guest_phone, stay_label, party_type, party_size, date, budget_kes, estimate_total_kes, quote_total_kes, pay_on_day_total_kes, concierge_fee_kes, notes, moods, answers, claimed_at, sla_quote_due_at, flags, staff_user!plan_concierge_id_fkey(display_name)',
+    )
+    .eq('id', params.id)
+    .maybeSingle();
+
+  const blocksQuery = supabase
+    .from('plan_block')
+    .select(
+      'id, slot, start_time, kind, title_snapshot, subtitle_snapshot, price_estimate_kes, price_quoted_kes, status, change_note, changed_from, hold_status, included_by, anchored, swap_group, done_at, experience_component(experience_partner(name))',
+    )
+    .eq('plan_id', params.id)
+    .order('sort')
+    .returns<Record<string, unknown>[]>();
+
+  /*
+   * Every query here says what it returns.
+   *
+   * Four selects with embedded relations exhausted TypeScript's
+   * instantiation budget — "Type instantiation is excessively
+   * deep" — and that failed the whole admin build, not just
+   * this page. Annotating them one at a time simply moved the
+   * error to the next one, because the cost is cumulative
+   * across the file.
+   *
+   * Nothing is lost: every row below is already read as
+   * `Record<string, unknown>` and narrowed field by field, so
+   * these annotations describe what the code actually relies
+   * on rather than a stricter shape nobody checks.
+   */
+  /*
+   * The select is held as `string`, not as a literal.
+   *
+   * Supabase infers a row shape by parsing the select at the
+   * type level, and `staff_user(display_name)` is the embed
+   * that finally exhausted the budget — `.returns<>()` does not
+   * help, because the parse happens before it. Widening the
+   * argument to `string` skips the parse entirely, which costs
+   * nothing here: the rows are read as
+   * `Record<string, unknown>` and narrowed field by field a few
+   * lines down either way.
+   */
+  const MESSAGE_SELECT: string =
+    'id, author_type, body, created_at, staff_user(display_name)';
+
+  const messagesQuery = supabase
+    .from('plan_message')
+    .select(MESSAGE_SELECT)
+    .eq('plan_id', params.id)
+    .order('created_at')
+    .returns<Record<string, unknown>[]>();
+
+  const feeQuery = supabase
+    .from('setting')
+    .select('value')
+    .eq('key', 'experience_fee_rule')
+    .eq('scope', 'global')
+    .maybeSingle<{ value: unknown }>();
+
+  const { data: plan } = await planQuery;
+  const { data: blocks } = await blocksQuery;
+  const { data: messages } = await messagesQuery;
+  const { data: fee } = await feeQuery;
 
   /* RLS already refused if this is not theirs to see; a missing row here
      is a missing row, and a 404 says so without hinting it exists. */

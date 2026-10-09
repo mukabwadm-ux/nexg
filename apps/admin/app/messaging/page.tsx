@@ -338,6 +338,26 @@ export default async function MessagingPage({
                           </span>
                         </div>
 
+                        {/*
+                          The subject, when the row is named by
+                          somebody else.
+
+                          A guest chat has no subject and is
+                          rightly named by who it is with. A
+                          partner writes one deliberately — the
+                          RPC that takes it tells them it is
+                          "the line the desk sees in the queue"
+                          — and that was not true: the queue
+                          showed their name and their subject
+                          appeared nowhere until the thread was
+                          opened.
+                        */}
+                        {r.kind === 'external' && r.subject && r.subject !== r.with_whom ? (
+                          <p className="text-ink mt-0.5 truncate text-[0.75rem] font-bold">
+                            {r.subject}
+                          </p>
+                        ) : null}
+
                         <div className="mt-1 flex flex-wrap items-center gap-1">
                           {r.topic ? (
                             <Pill tone="bg-bg text-muted">{TOPIC_LABEL[r.topic]}</Pill>
