@@ -18,14 +18,32 @@ export interface Outcome {
   data?: Record<string, unknown>;
 }
 
-function unwrap(data: unknown, error: { message: string } | null, paths: string[] = []): Outcome {
+function unwrap(
+  data: unknown,
+  error: { message: string } | null,
+  paths: string[] = [],
+  /* What to say when the RPC returns a row rather than a
+     `{ok, note}` envelope — an upsert hands back the record, so
+     there is no message in it to show. */
+  okMessage?: string,
+): Outcome {
   if (error) return { ok: false, message: error.message.replace(/^.*?:\s*/, '') };
   for (const p of paths) revalidatePath(p);
   const r = (data ?? {}) as Record<string, unknown>;
-  return { ok: r.ok !== false, message: r.message as string | undefined, data: r };
+  return {
+    ok: r.ok !== false,
+    message: (r.note as string | undefined) ?? (r.message as string | undefined) ?? okMessage,
+    data: r,
+  };
 }
 
-const ALL = ['/merchant', '/merchant/orders', '/merchant/stores', '/merchant/documents'];
+const ALL = [
+  '/merchant',
+  '/merchant/orders',
+  '/merchant/stores',
+  '/merchant/documents',
+  '/merchant/team',
+];
 
 /** Open and closed for business, with the reason recorded. */
 export async function setAcceptingOrders(
@@ -180,4 +198,118 @@ export async function setItemAvailable(itemId: string, available: boolean): Prom
     ok: true,
     message: available ? 'Back on the menu.' : 'Off the menu until you turn it back on.',
   };
+}
+
+// ─────────────────────────────────────────────────── branches
+
+/**
+ * Opening, changing and closing a branch.
+ *
+ * Each one re-checks membership in the database. Adding a
+ * branch also raises it for review and rings the console —
+ * a new address appearing on Explore without anybody looking
+ * at it is the thing that check exists for.
+ */
+export async function saveBranch(input: {
+  merchantId: string;
+  branchId?: string | null;
+  name: string;
+  addressText: string;
+  pickupInstructions: string;
+  riderPhone: string;
+  latitude?: string;
+  longitude?: string;
+}): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_branch_upsert', {
+    p_merchant_id: input.merchantId,
+    p_branch_id: input.branchId ?? undefined,
+    p_branch: {
+      name: input.name,
+      address_text: input.addressText,
+      pickup_instructions: input.pickupInstructions,
+      rider_phone: input.riderPhone,
+      latitude: input.latitude,
+      longitude: input.longitude,
+    } as never,
+  });
+  return unwrap(
+    data,
+    error,
+    ALL,
+    input.branchId
+      ? 'Saved.'
+      : 'Branch added. It is with NexG for review before it shows on Explore.',
+  );
+}
+
+export async function pauseBranch(branchId: string, reason: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_branch_pause', {
+    p_branch_id: branchId,
+    p_reason: reason,
+  });
+  return unwrap(data, error, ALL, 'Paused. Guests see it as closed; orders already accepted finish.');
+}
+
+export async function resumeBranch(branchId: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_branch_resume', { p_branch_id: branchId });
+  return unwrap(data, error, ALL, 'Open again.');
+}
+
+export async function deleteBranch(branchId: string, confirmName: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_branch_delete', {
+    p_branch_id: branchId,
+    p_confirm_name: confirmName,
+  });
+  return unwrap(data, error, ALL);
+}
+
+// ───────────────────────────────────────────────────── team
+
+export async function inviteMember(input: {
+  merchantId: string;
+  contact: string;
+  role: string;
+  branches: string[];
+  caps: Record<string, boolean>;
+}): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_merchant_invite_member', {
+    p_merchant_id: input.merchantId,
+    p_contact: input.contact,
+    p_role: input.role,
+    p_branches: input.branches.length > 0 ? input.branches : undefined,
+    p_caps: input.caps as never,
+  });
+  return unwrap(data, error, ALL, 'Invitation sent. They join when they sign in with it.');
+}
+
+export async function updateMember(input: {
+  merchantId: string;
+  userId: string;
+  role: string;
+  branches: string[];
+  caps: Record<string, boolean>;
+}): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_merchant_membership_update', {
+    p_merchant_id: input.merchantId,
+    p_user_id: input.userId,
+    p_role: input.role,
+    p_branches: input.branches.length > 0 ? input.branches : undefined,
+    p_caps: input.caps as never,
+  });
+  return unwrap(data, error, ALL, 'Saved.');
+}
+
+export async function removeMember(merchantId: string, userId: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_merchant_membership_remove', {
+    p_merchant_id: merchantId,
+    p_user_id: userId,
+  });
+  return unwrap(data, error, ALL);
+}
+
+export async function revokeInvite(inviteId: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_merchant_invite_revoke', {
+    p_invite_id: inviteId,
+  });
+  return unwrap(data, error, ALL);
 }

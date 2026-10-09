@@ -1,5 +1,6 @@
 import { maps as mapsCapability } from '@nexg/ui/capabilities';
 
+import { AddBranch, OpenBranch, type BranchRow } from '@/components/merchant/branch-client';
 import { Empty, Panel } from '@/components/partner/bits';
 import { Stores, type StoreRow } from '@/components/partner/merchant-stores';
 import { requireMerchant } from '@/lib/partner';
@@ -38,6 +39,21 @@ export default async function StoresPage() {
   const rows = (data as StoreRow[] | null) ?? [];
 
   /*
+   * The branch list, from the view that knows what each one has
+   * actually been doing. The query above reads `merchant_branch`
+   * directly because the map component wants the raw columns;
+   * this reads the view because a card shows orders and prep
+   * time, which the table does not carry.
+   */
+  const { data: detail } = await supabase
+    .from('merchant_branch_list_v')
+    .select('*')
+    .eq('merchant_id', me.id)
+    .order('is_primary', { ascending: false })
+    .order('name');
+  const branches = (detail as BranchRow[] | null) ?? [];
+
+  /*
    * Where a new pin starts: their existing main store if they have
    * one, otherwise the middle of their city. A map that opens over
    * the Atlantic makes somebody pan across a continent before they
@@ -69,6 +85,83 @@ export default async function StoresPage() {
           Your stores could not be read, so this page is incomplete: {error.message}
         </p>
       )}
+
+      {/*
+        Branch cards, as the board draws them: what each one is
+        doing today, and a way in. The map component below is
+        still how a new pin gets placed — this is the layer that
+        was missing, which is everything about a branch that is
+        not its coordinates.
+      */}
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-[1.0625rem] font-extrabold tracking-tight">Your branches</h2>
+            <p className="text-muted-light text-[0.75rem] font-semibold">
+              {branches.length} branch{branches.length === 1 ? '' : 'es'} ·{' '}
+              {branches.filter((b) => b.state === 'live').length} live
+            </p>
+          </div>
+          <AddBranch merchantId={me.id} />
+        </div>
+
+        {branches.length > 0 ? (
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {branches.map((b) => (
+              <article
+                key={b.id}
+                className="border-border bg-surface overflow-hidden rounded-xl border"
+              >
+                <div className="bg-ink relative flex h-24 items-end p-3">
+                  <span className="absolute inset-0 bg-gradient-to-br from-white/[0.07] to-transparent" />
+                  <span className="absolute right-2.5 top-2.5">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[0.6875rem] font-extrabold ${
+                        b.state === 'live'
+                          ? 'bg-success/10 text-success'
+                          : b.state === 'paused'
+                            ? 'bg-warning-bg text-warning'
+                            : 'bg-white/15 text-white'
+                      }`}
+                    >
+                      {b.state === 'live'
+                        ? 'Open · accepting'
+                        : b.state === 'paused'
+                          ? 'Paused'
+                          : b.state === 'closed'
+                            ? 'Closed'
+                            : 'Setup in progress'}
+                    </span>
+                  </span>
+                  <div className="relative">
+                    <h3 className="text-[1rem] font-extrabold tracking-tight text-white">
+                      {b.name}
+                      {b.is_primary ? (
+                        <span className="text-gold ml-1.5 text-[0.625rem] font-extrabold uppercase">
+                          main
+                        </span>
+                      ) : null}
+                    </h3>
+                    <p className="text-[0.6875rem] font-semibold text-white/60">
+                      {b.address_text ?? 'Address not set'}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-muted-light flex flex-wrap gap-x-3 gap-y-1 px-3 py-2.5 text-[0.6875rem] font-extrabold uppercase tracking-wide">
+                  <span>{b.orders_today} today</span>
+                  <span>
+                    {b.prep_avg_minutes === null ? 'prep —' : `prep ${b.prep_avg_minutes} min`}
+                  </span>
+                  <span>{b.zone_name ?? 'no zone'}</span>
+                </div>
+                <div className="border-border border-t px-3 py-2.5">
+                  <OpenBranch merchantId={me.id} branch={b} />
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </section>
 
       <Stores
         merchantId={me.id}
