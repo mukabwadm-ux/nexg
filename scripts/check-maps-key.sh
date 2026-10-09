@@ -78,6 +78,47 @@ if [ -z "$KEY" ]; then
   exit 1
 fi
 
+# ── does it even look like a key? ───────────────────────────
+#
+# A Google API key is "AIza" and 35 more characters. Selecting
+# one by hand in the console drops a character off an end often
+# enough that it is worth saying so here rather than spending a
+# Google round trip to be told "API key not valid" — which reads
+# like a restriction problem and is not.
+
+LEN=${#KEY}
+SHAPE_OK=yes
+
+case "$KEY" in
+  AIza*) ;;
+  *) echo "That does not start with \"AIza\", which every Google API key does."
+     echo "You may have copied the key's *name*, or a project id."
+     SHAPE_OK=no ;;
+esac
+
+if [ "$LEN" -ne 39 ]; then
+  echo "That is $LEN characters; a Google API key is 39."
+  if [ "$LEN" -lt 39 ]; then
+    echo "It looks truncated — a character is missing from one end."
+  else
+    echo "It looks like something extra came with it (a space, a quote)."
+  fi
+  SHAPE_OK=no
+fi
+
+if [ "$SHAPE_OK" = "no" ]; then
+  echo
+  echo "Copy it again from Credentials → your key → Show key, using"
+  echo "the copy button rather than selecting the text by hand."
+  echo
+  printf 'Send it to Google anyway? [y/N] '
+  read -r GO
+  case "$GO" in
+    y|Y) echo ;;
+    *) echo "Stopped."; exit 1 ;;
+  esac
+fi
+
 # The same call the route makes. A mismatch here is the point of
 # the script, so none of it is "close enough".
 BODY=$(cat <<'JSON'
