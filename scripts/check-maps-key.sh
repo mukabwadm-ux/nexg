@@ -120,12 +120,23 @@ PY
     echo "for the day, or billing is not enabled."
     ;;
   400)
-    echo "BAD REQUEST — which usually means the key is fine but the"
-    echo "project has the legacy Places API enabled rather than"
-    echo "Places API (New)."
-    echo
-    python -c 'import json;print("  "+(json.load(open("/tmp/nexg-maps-check.json")).get("error",{}).get("message","(no message)")))' 2>/dev/null \
-      || cat /tmp/nexg-maps-check.json
+    # A mistyped key and a wrong-API project both land on 400,
+    # and telling somebody to check their API when they actually
+    # pasted half a key wastes the afternoon this script exists
+    # to save. Google distinguishes them; so should we.
+    if grep -q "API key not valid" /tmp/nexg-maps-check.json 2>/dev/null; then
+      echo "THE KEY ITSELF IS NOT VALID."
+      echo
+      echo "Nothing to do with restrictions. Copy it again from"
+      echo "Credentials -> your key -> Show key, and watch for a"
+      echo "missing character at either end."
+    else
+      echo "BAD REQUEST - the key is valid but the project most"
+      echo "likely has the legacy Places API enabled rather than"
+      echo "Places API (New)."
+      echo
+      cat /tmp/nexg-maps-check.json
+    fi
     ;;
   *)
     cat /tmp/nexg-maps-check.json
