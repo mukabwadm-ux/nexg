@@ -172,6 +172,13 @@ fi
 CODE=$(field reason)
 MSG=$(field message)
 
+# Always shown, even when the friendly text below covers it.
+# Hiding the code behind a translation is unhelpful at exactly
+# the moment somebody is pasting this output to someone else.
+[ -n "$CODE" ] && echo "Google's reason code: $CODE"
+[ -n "$MSG" ]  && echo "Google's message:     $MSG"
+[ -n "$CODE$MSG" ] && echo
+
 case "$CODE" in
   API_KEY_HTTP_REFERRER_BLOCKED)
     echo "THIS KEY IS RESTRICTED TO WEBSITES."
@@ -227,9 +234,7 @@ case "$CODE" in
         echo "missing character at either end does this."
         ;;
       *)
-        echo "HTTP $HTTP, and Google sent no reason code."
-        echo
-        [ -n "$MSG" ] && echo "Google said: $MSG"
+        echo "HTTP $HTTP, and this is not a reason code I know."
         echo
         echo "The raw response:"
         sed 's/^/  /' "$OUT"
