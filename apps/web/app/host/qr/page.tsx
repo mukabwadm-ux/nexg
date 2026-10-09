@@ -1,6 +1,12 @@
 import { DASH, when } from '@/components/host/bits';
 import { HowItWorks, Kpi, KpiRow, Pill, Table, Td, Tr, TwoColumn } from '@/components/host/module';
-import { CardActions, GenerateCards, type UnitOption } from '@/components/host/qr-client';
+import {
+  CardActions,
+  GenerateCards,
+  ViewCard,
+  type CardDetail,
+  type UnitOption,
+} from '@/components/host/qr-client';
 import { spotLabel } from '@/components/host/vocab';
 import { HostSection, hostContext } from '@/components/host/section';
 
@@ -12,6 +18,7 @@ interface CardRow {
   code: string;
   unit_id: string | null;
   unit_name: string | null;
+  unit_public_name: string | null;
   property_name: string | null;
   spot: string;
   label: string | null;
@@ -19,8 +26,12 @@ interface CardRow {
   placed_confirmed_at: string | null;
   voided_at: string | null;
   scans_30d: number;
+  scans_all: number;
+  test_scans: number;
   orders: number;
   last_scan_at: string | null;
+  typical_hour: number | null;
+  repeat_pct: number | null;
   status: string;
 }
 
@@ -40,7 +51,7 @@ interface UnitRow {
  * list without waiting for JavaScript.
  */
 export default async function HostQrPage() {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const [cardRes, unitRes] = await Promise.all([
@@ -98,6 +109,7 @@ export default async function HostQrPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/qr"
       title="QR Cards"
       lead="One card per spot: bedside, kitchen counter, reception. Each card opens that unit's page, and records where and when it was scanned and what the guest ordered."
@@ -206,7 +218,7 @@ export default async function HostQrPage() {
         }
       >
         <Table
-          head={['Card', 'Unit', 'Spot', 'Generated', '>Scans 30d', '>Orders', 'Status', '>Actions']}
+          head={['Card', 'Unit', 'Spot', 'Generated', '>Scans 30d', '>Orders', 'Status', '>Card']}
           empty={
             units.length === 0
               ? 'No units yet, so nowhere for a card to point. Add a unit first.'
@@ -245,7 +257,12 @@ export default async function HostQrPage() {
                 )}
               </Td>
               <Td right>
-                <CardActions qrId={c.id} status={c.status} code={c.code} />
+                <div className="flex flex-wrap justify-end gap-1.5">
+                  <ViewCard card={c as CardDetail} />
+                </div>
+                <div className="mt-1.5">
+                  <CardActions qrId={c.id} status={c.status} code={c.code} />
+                </div>
               </Td>
             </Tr>
           ))}

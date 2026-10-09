@@ -86,7 +86,7 @@ export default async function HostRequestsPage({
 }: {
   searchParams?: { tab?: string };
 }) {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const [reqRes, ruleRes, unitRes] = await Promise.all([
@@ -129,6 +129,7 @@ export default async function HostRequestsPage({
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/requests"
       title="Requests & Issues"
       lead="What guests are asking for and what has gone wrong, with priority, owner and deadline. The concierge handles most; what needs a host decision comes to you."

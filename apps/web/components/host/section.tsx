@@ -24,6 +24,8 @@ interface HostContext {
   attention: Attention[];
   live: boolean;
   nav: HostNavItem[];
+  /** The cover photograph for the banner, signed, or null. */
+  photoUrl: string | null;
 }
 
 /* Annotated rather than inferred: the Supabase client's type is
@@ -34,11 +36,12 @@ export async function hostContext(): Promise<HostContext> {
   const me = await requireHost();
   const supabase = createClient();
 
-  const [homeRes, progressRes, attentionRes, todayRes] = await Promise.all([
+  const [homeRes, progressRes, attentionRes, todayRes, photoRes] = await Promise.all([
     supabase.from('host_home_v').select('*').eq('host_id', me.id).maybeSingle(),
     supabase.from('host_setup_progress_v').select('*').eq('host_id', me.id).maybeSingle(),
     supabase.from('host_attention_v').select('*').eq('host_id', me.id).order('sort'),
     supabase.from('host_today_v').select('*').eq('host_id', me.id).maybeSingle(),
+    supabase.from('host_banner_photo_v').select('path').eq('host_id', me.id).maybeSingle(),
   ]);
 
   const home = homeRes.data as HostHome | null;
@@ -47,9 +50,28 @@ export async function hostContext(): Promise<HostContext> {
   const today = todayRes.data as { open_requests: number; units_without_qr: number } | null;
   const live = home?.status === 'live';
 
+  /*
+   * Signed here, once, for every page in the portal.
+   *
+   * The bucket is private, so the banner needs a signed URL and
+   * the signature has to come from the server. An hour is long
+   * enough that a tab left open over lunch still shows the
+   * photograph and short enough that a copied URL is not a
+   * permanent one.
+   */
+  const photoPath = (photoRes.data as { path: string | null } | null)?.path ?? null;
+  let photoUrl: string | null = null;
+  if (photoPath) {
+    const { data: signedOne } = await supabase.storage
+      .from('host-photos')
+      .createSignedUrl(photoPath, 60 * 60);
+    photoUrl = signedOne?.signedUrl ?? null;
+  }
+
   return {
     me,
     supabase,
+    photoUrl,
     home,
     progress,
     attention,
@@ -77,6 +99,7 @@ export function HostSection({
   home,
   live,
   nav,
+  photoUrl,
   current,
   title,
   lead,
@@ -87,6 +110,7 @@ export function HostSection({
   home: HostHome;
   live: boolean;
   nav: HostNavItem[];
+  photoUrl?: string | null;
   current: string;
   title: string;
   lead: string;
@@ -109,6 +133,7 @@ export function HostSection({
       ]}
       nav={nav}
       current={current}
+      photoUrl={photoUrl}
       headline={
         <div>
           <p className="text-[2rem] font-extrabold leading-none tracking-tight">{headlineValue}</p>

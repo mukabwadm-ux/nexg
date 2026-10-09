@@ -139,6 +139,7 @@ export function HostShell({
   nav,
   current,
   children,
+  photoUrl,
 }: {
   name: string;
   subtitle: string;
@@ -148,15 +149,34 @@ export function HostShell({
   nav: HostNavItem[];
   current: string;
   children: React.ReactNode;
+  /** The host's cover photograph, already signed. */
+  photoUrl?: string | null;
 }) {
   return (
     <div className="bg-bg min-h-dvh">
       {/* ─────────────────────────────────────────── the hero */}
       <header className="bg-ink relative overflow-hidden text-white">
-        {/* The design has a city photograph here. We have no
-            licensed photography, so this is the branded gradient
-            rather than a stock image of a skyline that is not
-            Nairobi. */}
+        {/*
+          The host's own cover photograph, when they have
+          uploaded one. Without it this stays the branded
+          gradient rather than a stock skyline that is not
+          Nairobi — a generic city photo on somebody's portal
+          reads as a template they have not filled in.
+
+          Darkened hard, because white text sits on it and the
+          photograph is whatever the host took.
+        */}
+        {photoUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="from-ink via-ink/85 to-ink/70 absolute inset-0 bg-gradient-to-r" />
+          </>
+        ) : null}
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-transparent" />
 
         <div className="relative mx-auto max-w-[96rem] px-4 py-5 sm:px-6">
@@ -181,10 +201,15 @@ export function HostShell({
               {/* The property thumbnail slot, labelled rather
                   than filled with a placeholder that looks like
                   a failed image. */}
-              <div className="border-gold/25 from-gold/25 hidden h-[7.5rem] w-[7.5rem] shrink-0 items-end justify-center rounded-xl border bg-gradient-to-br to-transparent pb-2 sm:flex">
-                <span className="text-[0.5rem] font-extrabold uppercase tracking-[0.12em] text-white/40">
-                  Photo · Property
-                </span>
+              <div className="border-gold/25 from-gold/25 relative hidden h-[7.5rem] w-[7.5rem] shrink-0 items-end justify-center overflow-hidden rounded-xl border bg-gradient-to-br to-transparent pb-2 sm:flex">
+                {photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={photoUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                ) : (
+                  <span className="text-[0.5rem] font-extrabold uppercase tracking-[0.12em] text-white/40">
+                    Photo · Property
+                  </span>
+                )}
               </div>
 
               <div className="min-w-0">

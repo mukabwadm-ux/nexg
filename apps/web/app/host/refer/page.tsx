@@ -39,7 +39,7 @@ interface ReferralRow {
  * enough to identify a stranger's.
  */
 export default async function HostReferPage() {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const [refRes, hostRes] = await Promise.all([
@@ -76,6 +76,7 @@ export default async function HostReferPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/refer"
       title="Refer a Host"
       lead="Send another host our way. When their first unit goes live and takes an order, the reward is credited against your account."

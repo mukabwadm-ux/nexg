@@ -18,7 +18,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(25);
+select plan(28);
 
 create temp table t (k text primary key, v text);
 do $grant$
@@ -238,6 +238,37 @@ select is(
   'And no host''s ledger disagrees with the tables it was built from. This is the assertion '
   'the whole exercise exists for: one source, checked, rather than two that drift until '
   'somebody is billed twice and we find out from them.');
+
+-- ══════════════════ 7. a card you can print
+
+/*
+ * `rpc_qr_generate` minted codes from hex, and hex has 0 and 1
+ * in it. The card alphabet leaves those out because somebody
+ * reads the code off a card on a kitchen counter — so about
+ * 55% of every card ever generated could be created, stored
+ * and listed, and never drawn or printed. Nothing failed; the
+ * image was simply blank.
+ */
+select is(
+  (select count(*)::int from (
+     select public.fn_qr_new_code() as c from generate_series(1, 40)) g
+    where g.c !~ '^NXG-[23456789ABCDEFGHJKMNPQRSTVWXYZ]{6}$'),
+  0,
+  'Forty generated codes, none of them outside the card alphabet. Before the fix roughly '
+  'twenty-two of these would have been cards that cannot be printed.');
+
+select ok(
+  (select count(*) from (
+     select public.fn_qr_new_code() as c from generate_series(1, 40)) g) = 40,
+  'And forty distinct attempts all return something, rather than the collision loop giving up.');
+
+select is(
+  (select count(*)::int from public.qr_unprintable_v where not already_voided),
+  (select count(*)::int from public.property_qr
+    where voided_at is null
+      and code !~ '^NXG-[23456789ABCDEFGHJKMNPQRSTVWXYZ]{6}$'),
+  'The unprintable-card view finds exactly the live ones, so the bad codes already minted can '
+  'be replaced deliberately rather than rewritten underneath a card on somebody''s counter.');
 
 select * from finish();
 rollback;

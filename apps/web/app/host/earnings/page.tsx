@@ -55,7 +55,7 @@ interface PackageOrderRow {
  * together — the page shows both and says which is which.
  */
 export default async function HostEarningsPage() {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const [earnRes, pkgRes, stmtRes] = await Promise.all([
@@ -97,6 +97,7 @@ export default async function HostEarningsPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/earnings"
       title="Earnings & Invoices"
       lead="What guests ordered through your cards, what you owe us for welcome packages, and what your referrals have earned."

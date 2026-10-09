@@ -4,7 +4,7 @@ export const metadata = { title: 'Charge to Room' };
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const { home, live, nav } = await hostContext();
+  const { home, live, nav, photoUrl } = await hostContext();
   if (!home) return null;
 
   return (
@@ -12,6 +12,7 @@ export default async function Page() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/charge-to-room"
       title="Charge to Room"
       lead="Hotel folio postings"

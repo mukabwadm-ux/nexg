@@ -62,7 +62,7 @@ export default async function HostUnitsPage({
 }: {
   searchParams?: { view?: string; tab?: string; property?: string };
 }) {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const [unitRes, propRes] = await Promise.all([
@@ -139,6 +139,7 @@ export default async function HostUnitsPage({
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/units"
       title="Units & Rooms"
       lead="All your units across every property: who is in them, how riders hand over, and what each one still needs. Open a unit for its bookings, cards and access details."

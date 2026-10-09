@@ -136,7 +136,11 @@ begin
       id, code, state, generated_at, sent_at, placed_confirmed_at,
       owner_type, owner_id, placement, host_id, city_id, label, secret_hash)
     values (
-      v_qr, 'NXG-SEED0' || i, 'placed',
+      /* The alphabet has no 0 or 1 — they are too easily
+         misread off a printed card — so `NXG-SEED01` is a code
+         the renderer correctly refuses, and every seeded card
+         had an unloadable preview. */
+      v_qr, 'NXG-SEED' || translate(i::text, '1', 'Z') || 'A', 'placed',
       now() - interval '14 days', now() - interval '13 days', now() - interval '12 days',
       'unit',
       case i when 1 then v_unit_a1 when 2 then v_unit_a2 else v_unit_c1 end,
@@ -158,7 +162,7 @@ begin
     values (
       ('c5000000-0000-4000-8000-00000000000' || (1 + (i % 3)))::uuid,
       now() - (i || ' hours')::interval - ((i / 3) || ' days')::interval,
-      'NXG-SEED0' || (1 + (i % 3)),
+      'NXG-SEED' || translate((1 + (i % 3))::text, '1', 'Z') || 'A',
       'unit',
       case (i % 3) when 0 then v_unit_a1 when 1 then v_unit_a2 else v_unit_c1 end,
       v_live_host, v_city, v_zone, 'counter',
@@ -210,7 +214,7 @@ begin
           - ((i / 2) || ' days')::interval)
         + ((17 + (i % 6)) || ' hours')::interval
         + ((i * 7 % 60) || ' minutes')::interval) at time zone 'Africa/Nairobi',
-      'NXG-SEED0' || (1 + (i % 3)),
+      'NXG-SEED' || translate((1 + (i % 3))::text, '1', 'Z') || 'A',
       'unit',
       case (i % 3) when 0 then v_unit_a1 when 1 then v_unit_a2 else v_unit_c1 end,
       v_live_host, v_city, v_zone, 'counter',

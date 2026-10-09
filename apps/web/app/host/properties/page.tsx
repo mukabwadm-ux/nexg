@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { DASH } from '@/components/host/bits';
 import { HowItWorks, Kpi, KpiRow, Pill, Table, Td, Tr, TwoColumn } from '@/components/host/module';
 import { AddProperty, EditProperty, type PropertyForEdit } from '@/components/host/property-client';
-import { kindLabel } from '@/components/host/vocab';
+import { coverOf, kindLabel, photosOf, type Photo } from '@/components/host/vocab';
 import { HostSection, hostContext } from '@/components/host/section';
 
 export const metadata = { title: 'My Properties' };
@@ -43,7 +43,7 @@ export default async function HostPropertiesPage({
 }: {
   searchParams?: { tab?: string };
 }) {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -53,6 +53,26 @@ export default async function HostPropertiesPage({
     .order('created_at');
 
   const all = (data as PropertyRow[] | null) ?? [];
+
+  /*
+   * Signed URLs, resolved here rather than in the browser.
+   *
+   * The bucket is private, so a photograph of somebody's
+   * building cannot be found by guessing a filename. Signing on
+   * the server means the page arrives with the pictures already
+   * loadable instead of flashing empty boxes while the client
+   * asks for each one.
+   */
+  const paths = all.flatMap((p) => photosOf(p.photos).map((x) => x.path));
+  const signed: Record<string, string> = {};
+  if (paths.length > 0) {
+    const { data: urls } = await supabase.storage
+      .from('host-photos')
+      .createSignedUrls(paths, 60 * 60);
+    for (const u of urls ?? []) {
+      if (u.path && u.signedUrl) signed[u.path] = u.signedUrl;
+    }
+  }
   const tab = searchParams?.tab ?? 'all';
   const liveOnes = all.filter((p) => p.units_live > 0);
   const setup = all.filter((p) => p.units_live === 0);
@@ -70,6 +90,7 @@ export default async function HostPropertiesPage({
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/properties"
       title="My Properties"
       lead="Every property on your account, with its units, QR coverage and who is in-house. Add a property to start; units, cards and team access hang off it."
@@ -140,10 +161,24 @@ export default async function HostPropertiesPage({
                   one is uploaded this is the branded block, not
                   a stock image of somebody else's building. */}
               <div className="bg-ink relative flex h-28 items-end p-4">
-                <span className="absolute inset-0 bg-gradient-to-br from-white/[0.07] to-transparent" />
-                <span className="absolute left-4 top-3 text-[0.5625rem] font-extrabold uppercase tracking-[0.12em] text-white/40">
-                  {Array.isArray(p.photos) && p.photos.length > 0 ? 'Photo' : 'No photo yet'}
-                </span>
+                {(() => {
+                  const c = coverOf(p.photos);
+                  const url = c ? signed[c.path] : null;
+                  return url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={url}
+                      alt=""
+                      className="absolute inset-0 h-full w-full object-cover opacity-80"
+                    />
+                  ) : null;
+                })()}
+                <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                {coverOf(p.photos) ? null : (
+                  <span className="absolute left-4 top-3 text-[0.5625rem] font-extrabold uppercase tracking-[0.12em] text-white/40">
+                    No photo yet
+                  </span>
+                )}
                 <span className="absolute right-3 top-3">
                   {p.units_live > 0 ? (
                     <Pill tone="good">
@@ -179,7 +214,12 @@ export default async function HostPropertiesPage({
                 >
                   Units
                 </Link>
-                <EditProperty hostId={me.id} property={p as PropertyForEdit} />
+                <EditProperty
+                  hostId={me.id}
+                  property={p as PropertyForEdit}
+                  photos={photosOf(p.photos) as Photo[]}
+                  signed={signed}
+                />
                 <Link
                   href={`/host/qr`}
                   className="border-border-strong text-muted hover:text-ink rounded-md border px-2.5 py-1 text-[0.6875rem] font-extrabold transition-colors"

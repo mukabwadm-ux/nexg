@@ -69,7 +69,7 @@ export default async function HostBookingsPage({
 }: {
   searchParams?: { tab?: string };
 }) {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const [stayRes, unitRes, calRes, propRes] = await Promise.all([
@@ -129,6 +129,7 @@ export default async function HostBookingsPage({
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/bookings"
       title="Bookings & Guests"
       lead="Stays across your properties, entered by you or synced from a calendar. Linking a stay to a unit is what lets an order be attributed to a guest rather than a room."

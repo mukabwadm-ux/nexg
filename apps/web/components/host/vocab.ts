@@ -69,3 +69,34 @@ export const KINDS: { value: string; label: string }[] = [
 export function kindLabel(k: string): string {
   return KINDS.find((x) => x.value === k)?.label ?? k.replace(/_/g, ' ');
 }
+
+/* ════════════════════════════════════════════════ photos */
+
+export interface Photo {
+  path: string;
+  alt?: string;
+  cover?: boolean;
+}
+
+/**
+ * The photo list off a `jsonb` column, safely.
+ *
+ * Here and not beside the upload form for the reason stated at
+ * the top of this file: the server pages read these, and an
+ * export of a `'use client'` module is not callable on the
+ * server. That mistake was made twice — the second time with
+ * the note about the first one already written.
+ */
+export function photosOf(v: unknown): Photo[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter(
+    (p): p is Photo =>
+      typeof p === 'object' && p !== null && typeof (p as Photo).path === 'string',
+  );
+}
+
+/** The cover, or the first one, or nothing. */
+export function coverOf(v: unknown): Photo | null {
+  const all = photosOf(v);
+  return all.find((p) => p.cover) ?? all[0] ?? null;
+}

@@ -64,7 +64,7 @@ const HANDOFF: Record<string, { label: string; needs: string }> = {
  * silently trusted.
  */
 export default async function HostOperationsPage() {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -88,6 +88,7 @@ export default async function HostOperationsPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/operations"
       title="Guest Operations"
       lead="What a rider does when they reach your door. One rule per unit, plus the hours you accept deliveries and who the rider should ask for."

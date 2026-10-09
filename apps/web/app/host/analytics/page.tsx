@@ -61,7 +61,7 @@ export default async function HostAnalyticsPage({
 }: {
   searchParams?: { range?: string };
 }) {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const range = searchParams?.range ?? '30';
@@ -108,6 +108,7 @@ export default async function HostAnalyticsPage({
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/analytics"
       title="Analytics"
       lead="How often your cards are scanned, how many of those scans become orders, and which units carry it. Everything here counts real people — bots and our own test scans are excluded at the view."

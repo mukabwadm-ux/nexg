@@ -76,7 +76,7 @@ export default async function HostDeliveriesPage({
 }: {
   searchParams?: { tab?: string };
 }) {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -129,6 +129,7 @@ export default async function HostDeliveriesPage({
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/deliveries"
       title="Deliveries"
       lead="Everything that arrived at your units, which hand-off rule was applied, and whether there is a photo proving it was left where you said."

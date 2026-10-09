@@ -20,7 +20,7 @@ interface Member {
  * than discover later.
  */
 export default async function HostTeamPage() {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -37,6 +37,7 @@ export default async function HostTeamPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/team"
       title="Team"
       lead="Managers and front-desk staff who can see this account. Each can be scoped to particular units."

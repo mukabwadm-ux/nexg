@@ -22,8 +22,13 @@ export default async function HostHomePage() {
   const me = await requireHost();
   const supabase = createClient();
 
-  const [homeRes, progressRes, attentionRes, readinessRes] = await Promise.all([
+  const [homeRes, photoRes, progressRes, attentionRes, readinessRes] = await Promise.all([
     supabase.from('host_home_v').select('*').eq('host_id', me.id).maybeSingle(),
+    /* Home builds its own shell rather than going through
+       `HostSection`, so it has to fetch the banner itself —
+       which is exactly why it was the one page with no
+       photograph on it. */
+    supabase.from('host_banner_photo_v').select('path').eq('host_id', me.id).maybeSingle(),
     supabase.from('host_setup_progress_v').select('*').eq('host_id', me.id).maybeSingle(),
     supabase.from('host_attention_v').select('*').eq('host_id', me.id).order('sort'),
     supabase
@@ -35,6 +40,15 @@ export default async function HostHomePage() {
   ]);
 
   const home = homeRes.data as HostHome | null;
+
+  const photoPath = (photoRes.data as { path: string | null } | null)?.path ?? null;
+  let photoUrl: string | null = null;
+  if (photoPath) {
+    const { data: signed } = await supabase.storage
+      .from('host-photos')
+      .createSignedUrl(photoPath, 60 * 60);
+    photoUrl = signed?.signedUrl ?? null;
+  }
   const progress = progressRes.data as SetupProgress | null;
   const attention = (attentionRes.data as Attention[] | null) ?? [];
   const readiness = (readinessRes.data as
@@ -144,6 +158,7 @@ export default async function HostHomePage() {
 
   return (
     <HostShell
+      photoUrl={photoUrl}
       name={home.display_name}
       subtitle={subtitle}
       kicker={live ? 'Host portal · Owner' : 'Host portal · Setting up'}

@@ -48,7 +48,7 @@ const TOPIC: Record<string, string> = {
  * promise at all.
  */
 export default async function HostSupportPage() {
-  const { home, live, nav, supabase } = await hostContext();
+  const { home, live, nav, supabase, photoUrl } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -72,6 +72,7 @@ export default async function HostSupportPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/support"
       title="Support"
       lead="Host ops handles anything this portal cannot do yet — scheduling a package, changing a hand-off rule in a hurry, a guest issue that needs a person."

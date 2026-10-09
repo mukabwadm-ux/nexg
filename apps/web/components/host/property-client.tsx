@@ -17,7 +17,8 @@ import {
   Text,
   useAction,
 } from './form';
-import { KINDS } from './vocab';
+import { PhotoAfterSaving, PropertyPhotos } from './photo-client';
+import { KINDS, type Photo } from './vocab';
 
 /**
  * Adding and editing a property.
@@ -32,6 +33,7 @@ import { KINDS } from './vocab';
 
 export interface PropertyForEdit {
   id: string;
+  photos?: unknown;
   name: string;
   kind: string;
   area: string | null;
@@ -58,14 +60,20 @@ export function AddProperty({ hostId }: { hostId: string }) {
 export function EditProperty({
   hostId,
   property,
+  photos,
+  signed,
 }: {
   hostId: string;
   property: PropertyForEdit;
+  photos: Photo[];
+  signed: Record<string, string>;
 }) {
   return (
     <PropertyDrawer
       hostId={hostId}
       property={property}
+      photos={photos}
+      signed={signed}
       trigger={
         <span className="border-border-strong text-muted hover:text-ink inline-block rounded-md border px-2.5 py-1 text-[0.6875rem] font-extrabold transition-colors">
           Edit
@@ -78,10 +86,14 @@ export function EditProperty({
 function PropertyDrawer({
   hostId,
   property,
+  photos,
+  signed,
   trigger,
 }: {
   hostId: string;
   property?: PropertyForEdit;
+  photos?: Photo[];
+  signed?: Record<string, string>;
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = React.useState(false);
@@ -171,6 +183,19 @@ function PropertyDrawer({
               />
             </Field>
           </Grid>
+
+          <div className="border-border border-t pt-4">
+            {property ? (
+              <PropertyPhotos
+                hostId={hostId}
+                propertyId={property.id}
+                photos={photos ?? []}
+                signed={signed ?? {}}
+              />
+            ) : (
+              <PhotoAfterSaving />
+            )}
+          </div>
 
           <Said outcome={outcome} />
 

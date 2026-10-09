@@ -52,7 +52,7 @@ export default async function HostMessagesPage({
 }: {
   searchParams?: { tab?: string };
 }) {
-  const { home, live, nav, supabase } = await hostContext();
+  const { home, live, nav, supabase, photoUrl } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -86,6 +86,7 @@ export default async function HostMessagesPage({
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/messages"
       title="Messages"
       lead="Threads between you and NexG, whether they started here, on WhatsApp or on a call. One record, so the desk remembers what you asked last week."

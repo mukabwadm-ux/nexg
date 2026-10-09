@@ -34,7 +34,7 @@ function maskPhone(p: string | null): string {
  * conclude something is broken.
  */
 export default async function HostSettingsPage() {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const [setRes, themeRes, teamRes, phoneRes, userRes] = await Promise.all([
@@ -61,6 +61,7 @@ export default async function HostSettingsPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/settings"
       title="Settings"
       lead="Turn things on and off, choose how you are notified, brand what your guests see, and make the portal look the way you like."

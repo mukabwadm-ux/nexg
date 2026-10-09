@@ -57,7 +57,7 @@ interface OrderRow {
  * own lead time.
  */
 export default async function HostPackagesPage() {
-  const { home, live, nav, supabase, me } = await hostContext();
+  const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 
   const [catRes, ordRes, cityRes, unitRes] = await Promise.all([
@@ -107,6 +107,7 @@ export default async function HostPackagesPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/packages"
       title="Packages & Amenities"
       lead="Things we can put in a unit before a guest walks in. You pick it, we place it, and a photo goes on the record so you can see it was done."

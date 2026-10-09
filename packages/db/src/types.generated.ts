@@ -3947,6 +3947,13 @@ export type Database = {
             foreignKeyName: 'calendar_connection_property_id_fkey';
             columns: ['property_id'];
             isOneToOne: false;
+            referencedRelation: 'host_banner_photo_v';
+            referencedColumns: ['property_id'];
+          },
+          {
+            foreignKeyName: 'calendar_connection_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
             referencedRelation: 'host_property_list_v';
             referencedColumns: ['id'];
           },
@@ -11540,6 +11547,13 @@ export type Database = {
             foreignKeyName: 'host_request_property_id_fkey';
             columns: ['property_id'];
             isOneToOne: false;
+            referencedRelation: 'host_banner_photo_v';
+            referencedColumns: ['property_id'];
+          },
+          {
+            foreignKeyName: 'host_request_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
             referencedRelation: 'host_property_list_v';
             referencedColumns: ['id'];
           },
@@ -17224,6 +17238,13 @@ export type Database = {
             referencedColumns: ['qr_id'];
           },
           {
+            foreignKeyName: 'order_property_qr_id_fkey';
+            columns: ['property_qr_id'];
+            isOneToOne: false;
+            referencedRelation: 'qr_unprintable_v';
+            referencedColumns: ['id'];
+          },
+          {
             foreignKeyName: 'order_rider_id_fkey';
             columns: ['rider_id'];
             isOneToOne: false;
@@ -19497,6 +19518,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'qr_health_v';
             referencedColumns: ['qr_id'];
+          },
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'qr_unprintable_v';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -24052,6 +24080,13 @@ export type Database = {
             foreignKeyName: 'stay_property_id_fkey';
             columns: ['property_id'];
             isOneToOne: false;
+            referencedRelation: 'host_banner_photo_v';
+            referencedColumns: ['property_id'];
+          },
+          {
+            foreignKeyName: 'stay_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
             referencedRelation: 'host_property_list_v';
             referencedColumns: ['id'];
           },
@@ -25061,6 +25096,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'console_property_v';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_banner_photo_v';
+            referencedColumns: ['property_id'];
           },
           {
             foreignKeyName: 'unit_property_id_fkey';
@@ -26563,6 +26605,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'console_property_v';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'calendar_connection_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_banner_photo_v';
+            referencedColumns: ['property_id'];
           },
           {
             foreignKeyName: 'calendar_connection_property_id_fkey';
@@ -32337,6 +32386,79 @@ export type Database = {
         };
         Relationships: [];
       };
+      host_banner_photo_v: {
+        Row: {
+          host_id: string | null;
+          path: string | null;
+          property_id: string | null;
+          property_name: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+        ];
+      };
       host_conversation_v: {
         Row: {
           about: string | null;
@@ -32940,20 +33062,28 @@ export type Database = {
       host_qr_list_v: {
         Row: {
           code: string | null;
+          first_scan_at: string | null;
           generated_at: string | null;
           host_id: string | null;
           id: string | null;
           label: string | null;
           last_scan_at: string | null;
+          order_value_cents: number | null;
           orders: number | null;
           placed_confirmed_at: string | null;
           property_name: string | null;
+          repeat_pct: number | null;
           scans_30d: number | null;
+          scans_all: number | null;
+          sent_at: string | null;
           spot: string | null;
           state: string | null;
           status: string | null;
+          test_scans: number | null;
+          typical_hour: number | null;
           unit_id: string | null;
           unit_name: string | null;
+          unit_public_name: string | null;
           voided_at: string | null;
         };
         Relationships: [
@@ -33721,6 +33851,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'console_property_v';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_banner_photo_v';
+            referencedColumns: ['property_id'];
           },
           {
             foreignKeyName: 'unit_property_id_fkey';
@@ -35680,6 +35817,13 @@ export type Database = {
             referencedRelation: 'qr_health_v';
             referencedColumns: ['qr_id'];
           },
+          {
+            foreignKeyName: 'unit_qr_replaced_by_fkey';
+            columns: ['replaced_by'];
+            isOneToOne: false;
+            referencedRelation: 'qr_unprintable_v';
+            referencedColumns: ['id'];
+          },
         ];
       };
       property_public: {
@@ -35805,6 +35949,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'console_property_v';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_banner_photo_v';
+            referencedColumns: ['property_id'];
           },
           {
             foreignKeyName: 'unit_property_id_fkey';
@@ -36051,6 +36202,137 @@ export type Database = {
           zone_id: string | null;
         };
         Relationships: [];
+      };
+      qr_unprintable_v: {
+        Row: {
+          already_voided: boolean | null;
+          code: string | null;
+          generated_at: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: string | null;
+          label: string | null;
+          owner_id: string | null;
+          owner_type: string | null;
+          state: string | null;
+        };
+        Insert: {
+          already_voided?: never;
+          code?: string | null;
+          generated_at?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: string | null;
+          label?: string | null;
+          owner_id?: string | null;
+          owner_type?: never;
+          state?: never;
+        };
+        Update: {
+          already_voided?: never;
+          code?: string | null;
+          generated_at?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: string | null;
+          label?: string | null;
+          owner_id?: string | null;
+          owner_type?: never;
+          state?: never;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_qr_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+        ];
       };
       refunds_to_issue_v: {
         Row: {
@@ -37751,6 +38033,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'console_property_v';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'unit_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_banner_photo_v';
+            referencedColumns: ['property_id'];
           },
           {
             foreignKeyName: 'unit_property_id_fkey';

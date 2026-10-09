@@ -47,7 +47,7 @@ const KIND: Record<string, string> = {
  * overdue row is red rather than amber.
  */
 export default async function HostPrivacyPage() {
-  const { home, live, nav, supabase } = await hostContext();
+  const { home, live, nav, supabase, photoUrl } = await hostContext();
   if (!home) return null;
 
   const { data } = await supabase
@@ -65,6 +65,7 @@ export default async function HostPrivacyPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/privacy"
       title="Data & Privacy"
       lead="What we hold about guests who ordered through your cards, what you can see of it, and the requests a guest can make about their own data."

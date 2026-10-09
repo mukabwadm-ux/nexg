@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
  * not self-service.
  */
 export default async function HostVerifyPage() {
-  const { home, live, nav, progress } = await hostContext();
+  const { home, live, nav, progress, photoUrl } = await hostContext();
   if (!home || !progress) return null;
 
   const submitted = progress.step_verify;
@@ -32,6 +32,7 @@ export default async function HostVerifyPage() {
       home={home}
       live={live}
       nav={nav}
+      photoUrl={photoUrl}
       current="/host/verify"
       title={live ? 'You are verified' : 'Verify & go live'}
       lead={
