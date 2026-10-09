@@ -74,3 +74,4 @@ nexgcr.txt
 .claude/settings.local.json
 vapid-keys.txt
 .maps-check.json
+.maps-status.json
