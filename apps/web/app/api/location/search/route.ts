@@ -107,25 +107,82 @@ export async function GET(request: Request) {
        * restriction or an unenabled API, 429 is quota.
        */
       const detail = await response.text().catch(() => '');
-      const why = (() => {
+      const parsed = (() => {
         try {
-          return (JSON.parse(detail) as { error?: { message?: string } }).error?.message;
+          return JSON.parse(detail) as {
+            error?: {
+              message?: string;
+              status?: string;
+              details?: { reason?: string; metadata?: Record<string, string> }[];
+            };
+          };
         } catch {
           return undefined;
         }
       })();
+
+      const why = parsed?.error?.message;
+
+      /*
+       * Google's reason code, which is the whole answer.
+       *
+       * The human message for all three of these is "The caller
+       * does not have permission" — identical whether the key
+       * is referrer-locked, restricted to the wrong APIs, or
+       * the API is switched off. We threw the code away and
+       * printed the sentence, so the one field that
+       * distinguishes them never reached the person who had
+       * just changed a key and was guessing which it was.
+       */
+      const reasonCode = parsed?.error?.details?.find((d) => d.reason)?.reason;
+
+      const PLAIN: Record<string, string> = {
+        API_KEY_HTTP_REFERRER_BLOCKED:
+          'That key is restricted to websites. A referrer-restricted key can never work here,' +
+          ' because this call comes from a server and sends no referer. Set Application' +
+          ' restrictions to None on the key in GOOGLE_MAPS_API_KEY — and keep the website' +
+          ' restriction on the separate browser key.',
+        API_KEY_IP_ADDRESS_BLOCKED:
+          'That key is restricted to IP addresses. Vercel functions have no fixed egress IP,' +
+          ' so set Application restrictions to None on this key.',
+        API_KEY_ANDROID_APP_BLOCKED:
+          'That key is restricted to an Android app, so it cannot be used from a server.',
+        API_KEY_IOS_APP_BLOCKED:
+          'That key is restricted to an iOS app, so it cannot be used from a server.',
+        API_KEY_SERVICE_BLOCKED:
+          'The key is reaching Google, but its API restrictions do not include Places API' +
+          ' (New). Add it on the key, or set API restrictions to Don’t restrict key.',
+        SERVICE_DISABLED:
+          'Places API (New) is not enabled on this Cloud project. It is a separate entry' +
+          ' from the older Places API — enable it in the API Library.',
+        API_KEY_INVALID:
+          'That key is not valid. Copy it again from Credentials → your key → Show' +
+          ' key, watching for a missing character at either end.',
+        BILLING_DISABLED:
+          'Billing is not enabled on this Cloud project. Places API (New) will not serve a' +
+          ' request without it.',
+        RATE_LIMIT_EXCEEDED: 'The project is over its quota for now.',
+      };
+
+      const plain = reasonCode ? PLAIN[reasonCode] : undefined;
+
       return NextResponse.json({
         results: local,
         reason:
           `Address search is configured but Google refused the request (HTTP ${response.status}).` +
-          (why ? ` ${why}` : '') +
-          (serverKey
-            ? ' This used GOOGLE_MAPS_API_KEY, so check that key’s own API restrictions' +
-              ' include Places API (New) and that billing is enabled on the Cloud project.'
-            : ' This used the browser key, because GOOGLE_MAPS_API_KEY is not set. A' +
-              ' referrer-restricted key cannot work here: the call comes from a server and' +
-              ' sends no referer. Set GOOGLE_MAPS_API_KEY to a second key restricted by API' +
-              ' rather than by referrer.'),
+          (reasonCode ? ` Google's reason: ${reasonCode}.` : '') +
+          (plain
+            ? ` ${plain}`
+            : (why ? ` ${why}` : '') +
+              (serverKey
+                ? ' This used GOOGLE_MAPS_API_KEY, so check that key’s own API' +
+                  ' restrictions include Places API (New) and that billing is enabled on' +
+                  ' the Cloud project.'
+                : ' This used the browser key, because GOOGLE_MAPS_API_KEY is not set. A' +
+                  ' referrer-restricted key cannot work here: the call comes from a server' +
+                  ' and sends no referer. Set GOOGLE_MAPS_API_KEY to a second key restricted' +
+                  ' by API rather than by referrer.')) +
+          (serverKey ? '' : ' (GOOGLE_MAPS_API_KEY is not set.)'),
       });
     }
 

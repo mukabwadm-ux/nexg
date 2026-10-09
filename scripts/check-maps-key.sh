@@ -100,6 +100,45 @@ else:
 PY
     ;;
   403)
+    # Google's reason code, which is the whole answer. The human
+    # message is "The caller does not have permission" for all
+    # three causes, so printing that alone tells nobody anything.
+    CODE=$(python -c 'import json;d=json.load(open("/tmp/nexg-maps-check.json"));print(next((x.get("reason","") for x in d.get("error",{}).get("details",[]) if x.get("reason")),""))' 2>/dev/null || true)
+    case "$CODE" in
+      API_KEY_HTTP_REFERRER_BLOCKED)
+        echo "THIS KEY IS RESTRICTED TO WEBSITES."
+        echo
+        echo "It can never work from a server: the call sends no"
+        echo "referer. Set Application restrictions to None on the"
+        echo "key you are using for GOOGLE_MAPS_API_KEY, and keep"
+        echo "the website restriction on the separate browser key."
+        echo
+        echo "Most likely you pasted the browser key into"
+        echo "GOOGLE_MAPS_API_KEY. They are easy to swap."
+        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
+      API_KEY_SERVICE_BLOCKED)
+        echo "THE KEY'S API RESTRICTIONS EXCLUDE PLACES API (NEW)."
+        echo
+        echo "Add it on the key, or set API restrictions to"
+        echo "\"Don't restrict key\"."
+        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
+      SERVICE_DISABLED)
+        echo "PLACES API (NEW) IS NOT ENABLED ON THIS PROJECT."
+        echo
+        echo "It is a separate entry from the older Places API."
+        echo "Enable it in the API Library."
+        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
+      BILLING_DISABLED)
+        echo "BILLING IS NOT ENABLED ON THIS CLOUD PROJECT."
+        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
+      API_KEY_IP_ADDRESS_BLOCKED)
+        echo "THIS KEY IS RESTRICTED TO IP ADDRESSES."
+        echo
+        echo "Vercel functions have no fixed egress IP. Set"
+        echo "Application restrictions to None."
+        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
+    esac
+
     echo "REFUSED. The three things that cause a 403, in the order"
     echo "they are usually wrong:"
     echo
