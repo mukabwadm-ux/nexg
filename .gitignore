@@ -73,3 +73,4 @@ nexgcr.txt
 # public — a permission rule is nobody else's business.
 .claude/settings.local.json
 vapid-keys.txt
+.maps-check.json

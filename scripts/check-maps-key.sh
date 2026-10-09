@@ -5,6 +5,11 @@
 #   bash scripts/check-maps-key.sh            # asks for the key
 #   bash scripts/check-maps-key.sh --deployed # tests the live site instead
 #
+# From PowerShell, `bash` resolves to the WSL launcher rather than
+# Git Bash. Either use a Git Bash terminal, or:
+#
+#   & "C:\Program Files\Git\bin\bash.exe" scripts/check-maps-key.sh
+#
 # Run it before putting a key into Vercel. A key that fails here
 # will fail there, and finding out at that end means a redeploy
 # per attempt and a 403 that could be any of four things.
@@ -13,6 +18,13 @@
 # makes — same endpoint, same header, same field mask — because a
 # key that works for a different Places call can still be refused
 # for this one.
+#
+# Nothing here uses Python. The first version did, and on Windows
+# the system Python cannot open a Git Bash `/tmp` path — so the
+# one line that read Google's reason code failed silently and the
+# script printed a list of three guesses while holding the exact
+# answer in a file next to it. grep and sed are Git Bash's own and
+# have no such problem.
 #
 # The key is read from the terminal and never written anywhere:
 # not to a file, not to your shell history, not to the process
@@ -23,25 +35,41 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 SITE="${NEXG_SITE:-https://nexg-sepia.vercel.app}"
+OUT="./.maps-check.json"
+
+cleanup() { rm -f "$OUT"; }
+trap cleanup EXIT
+
+# ── reading the response without a JSON parser ──────────────
+#
+# Good enough for these fields and nothing more: each is a flat
+# string in Google's error envelope.
+
+field() { # field <name> → first "name": "value" in the file
+  grep -o "\"$1\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" "$OUT" 2>/dev/null \
+    | head -1 | sed 's/.*:[[:space:]]*"//; s/"$//'
+}
 
 if [ "${1:-}" = "--deployed" ]; then
   echo "Asking the deployed site to search for an address…"
   echo
-  curl -s "$SITE/api/location/search?q=Yaya+Centre" --max-time 30 \
-    | python -c 'import json,sys
-d = json.load(sys.stdin)
-n = len(d.get("results") or [])
-if d.get("reason"):
-    print("NOT WORKING\n")
-    print(d["reason"])
-else:
-    print("WORKING — %d result(s), first: %s" % (
-        n, (d["results"][0].get("label") if n else "none")))
-'
+  curl -s "$SITE/api/location/search?q=Yaya+Centre" --max-time 30 -o "$OUT"
+
+  REASON=$(field reason)
+  if [ -n "$REASON" ]; then
+    echo "NOT WORKING"
+    echo
+    echo "$REASON" | fold -s -w 72
+    exit 1
+  fi
+
+  COUNT=$(grep -o '"label"' "$OUT" 2>/dev/null | wc -l | tr -d ' ')
+  echo "WORKING — $COUNT result(s)"
+  [ "$COUNT" != "0" ] && echo "  first: $(field label)"
   exit 0
 fi
 
-printf 'Paste the server key (it will not be shown): '
+printf 'Paste the key (it will not be shown): '
 read -r -s KEY
 printf '\n\n'
 
@@ -66,7 +94,7 @@ BODY=$(cat <<'JSON'
 JSON
 )
 
-HTTP=$(curl -s -o /tmp/nexg-maps-check.json -w '%{http_code}' \
+HTTP=$(curl -s -o "$OUT" -w '%{http_code}' \
   -X POST 'https://places.googleapis.com/v1/places:searchText' \
   -H 'Content-Type: application/json' \
   -H "X-Goog-Api-Key: $KEY" \
@@ -78,108 +106,95 @@ unset KEY
 echo "HTTP $HTTP"
 echo
 
-case "$HTTP" in
-  200)
-    python - <<'PY'
-import json
-d = json.load(open('/tmp/nexg-maps-check.json'))
-places = d.get('places') or []
-if not places:
-    print('The key works, but Google found nothing for that query.')
-    print('That is unusual for "Yaya Centre Nairobi" — check the')
-    print('project is the one you think it is.')
-else:
-    print('WORKS. %d result(s):' % len(places))
-    for p in places:
-        print('  - %s — %s' % (
-            (p.get('displayName') or {}).get('text', '?'),
-            p.get('formattedAddress', '?')))
-    print()
-    print('Put this key in Vercel as GOOGLE_MAPS_API_KEY')
-    print('(no NEXT_PUBLIC_ prefix — that would publish it).')
-PY
-    ;;
-  403)
-    # Google's reason code, which is the whole answer. The human
-    # message is "The caller does not have permission" for all
-    # three causes, so printing that alone tells nobody anything.
-    CODE=$(python -c 'import json;d=json.load(open("/tmp/nexg-maps-check.json"));print(next((x.get("reason","") for x in d.get("error",{}).get("details",[]) if x.get("reason")),""))' 2>/dev/null || true)
-    case "$CODE" in
-      API_KEY_HTTP_REFERRER_BLOCKED)
-        echo "THIS KEY IS RESTRICTED TO WEBSITES."
-        echo
-        echo "It can never work from a server: the call sends no"
-        echo "referer. Set Application restrictions to None on the"
-        echo "key you are using for GOOGLE_MAPS_API_KEY, and keep"
-        echo "the website restriction on the separate browser key."
-        echo
-        echo "Most likely you pasted the browser key into"
-        echo "GOOGLE_MAPS_API_KEY. They are easy to swap."
-        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
-      API_KEY_SERVICE_BLOCKED)
-        echo "THE KEY'S API RESTRICTIONS EXCLUDE PLACES API (NEW)."
-        echo
-        echo "Add it on the key, or set API restrictions to"
-        echo "\"Don't restrict key\"."
-        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
-      SERVICE_DISABLED)
-        echo "PLACES API (NEW) IS NOT ENABLED ON THIS PROJECT."
-        echo
-        echo "It is a separate entry from the older Places API."
-        echo "Enable it in the API Library."
-        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
-      BILLING_DISABLED)
-        echo "BILLING IS NOT ENABLED ON THIS CLOUD PROJECT."
-        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
-      API_KEY_IP_ADDRESS_BLOCKED)
-        echo "THIS KEY IS RESTRICTED TO IP ADDRESSES."
-        echo
-        echo "Vercel functions have no fixed egress IP. Set"
-        echo "Application restrictions to None."
-        rm -f /tmp/nexg-maps-check.json; exit 1 ;;
-    esac
+if [ "$HTTP" = "200" ]; then
+  COUNT=$(grep -o '"formattedAddress"' "$OUT" | wc -l | tr -d ' ')
+  if [ "$COUNT" = "0" ]; then
+    echo "The key works, but Google found nothing for that query."
+    echo 'That is unusual for "Yaya Centre Nairobi" — check the'
+    echo "project is the one you think it is."
+    exit 0
+  fi
+  echo "WORKS — $COUNT result(s):"
+  grep -o '"formattedAddress"[[:space:]]*:[[:space:]]*"[^"]*"' "$OUT" \
+    | sed 's/.*:[[:space:]]*"//; s/"$//; s/^/  - /'
+  echo
+  echo "This is the key for GOOGLE_MAPS_API_KEY in Vercel"
+  echo "(no NEXT_PUBLIC_ prefix — that would publish it)."
+  exit 0
+fi
 
-    echo "REFUSED. The three things that cause a 403, in the order"
-    echo "they are usually wrong:"
+# ── Google's reason code, which is the whole answer ─────────
+#
+# The human message is "The caller does not have permission" for
+# three different causes, so printing it alone tells nobody which.
+
+CODE=$(field reason)
+MSG=$(field message)
+
+case "$CODE" in
+  API_KEY_HTTP_REFERRER_BLOCKED)
+    echo "THIS KEY IS RESTRICTED TO WEBSITES."
     echo
-    echo "  1. Places API (New) is not enabled on the project."
-    echo "     It is a separate entry from the older Places API."
-    echo "  2. The key has an Application restriction. It must be"
-    echo "     None — this call comes from a server with no"
-    echo "     referer and no fixed IP."
-    echo "  3. The key's API restriction does not include"
-    echo "     Places API (New)."
+    echo "It can never work from a server: the call sends no referer."
+    echo "That is the right setting for your *browser* key, which"
+    echo "belongs in NEXT_PUBLIC_GOOGLE_MAPS_API_KEY."
     echo
-    echo "Google said:"
-    python -c 'import json;print("  "+(json.load(open("/tmp/nexg-maps-check.json")).get("error",{}).get("message","(no message)")))' 2>/dev/null \
-      || cat /tmp/nexg-maps-check.json
+    echo "GOOGLE_MAPS_API_KEY needs the other key — the one with"
+    echo "Application restrictions set to None. The two are easy to"
+    echo "swap when pasting into Vercel."
     ;;
-  429)
-    echo "QUOTA. The key is valid but the project is over its limit"
-    echo "for the day, or billing is not enabled."
+  API_KEY_SERVICE_BLOCKED)
+    echo "THE KEY'S API RESTRICTIONS EXCLUDE PLACES API (NEW)."
+    echo
+    echo "Add it to the key's allowed APIs, or set API restrictions"
+    echo "to \"Don't restrict key\"."
     ;;
-  400)
-    # A mistyped key and a wrong-API project both land on 400,
-    # and telling somebody to check their API when they actually
-    # pasted half a key wastes the afternoon this script exists
-    # to save. Google distinguishes them; so should we.
-    if grep -q "API key not valid" /tmp/nexg-maps-check.json 2>/dev/null; then
-      echo "THE KEY ITSELF IS NOT VALID."
-      echo
-      echo "Nothing to do with restrictions. Copy it again from"
-      echo "Credentials -> your key -> Show key, and watch for a"
-      echo "missing character at either end."
-    else
-      echo "BAD REQUEST - the key is valid but the project most"
-      echo "likely has the legacy Places API enabled rather than"
-      echo "Places API (New)."
-      echo
-      cat /tmp/nexg-maps-check.json
-    fi
+  SERVICE_DISABLED)
+    echo "PLACES API (NEW) IS NOT ENABLED ON THIS PROJECT."
+    echo
+    echo "It is a separate entry from the older Places API."
+    echo "Enable it in the API Library."
+    ;;
+  BILLING_DISABLED)
+    echo "BILLING IS NOT ENABLED ON THIS CLOUD PROJECT."
+    echo "Places API (New) will not serve a request without it."
+    ;;
+  API_KEY_IP_ADDRESS_BLOCKED)
+    echo "THIS KEY IS RESTRICTED TO IP ADDRESSES."
+    echo
+    echo "Vercel functions have no fixed egress IP, so set"
+    echo "Application restrictions to None."
+    ;;
+  API_KEY_INVALID)
+    echo "THE KEY ITSELF IS NOT VALID."
+    echo
+    echo "Nothing to do with restrictions. Copy it again from"
+    echo "Credentials → your key → Show key → the copy button,"
+    echo "rather than selecting the text by hand."
+    ;;
+  RATE_LIMIT_EXCEEDED)
+    echo "OVER QUOTA for now."
     ;;
   *)
-    cat /tmp/nexg-maps-check.json
+    case "$MSG" in
+      *"API key not valid"*)
+        echo "THE KEY ITSELF IS NOT VALID."
+        echo
+        echo "Nothing to do with restrictions. Copy it again from"
+        echo "Credentials → your key → Show key → the copy button,"
+        echo "rather than selecting the text by hand. A single"
+        echo "missing character at either end does this."
+        ;;
+      *)
+        echo "HTTP $HTTP, and Google sent no reason code."
+        echo
+        [ -n "$MSG" ] && echo "Google said: $MSG"
+        echo
+        echo "The raw response:"
+        sed 's/^/  /' "$OUT"
+        ;;
+    esac
     ;;
 esac
 
-rm -f /tmp/nexg-maps-check.json
+exit 1
