@@ -10,6 +10,7 @@ import {
   Tr,
   TwoColumn,
 } from '@/components/host/module';
+import { ReferralLink } from '@/components/host/refer-client';
 import { HostSection, hostContext } from '@/components/host/section';
 
 export const metadata = { title: 'Refer a Host' };
@@ -41,13 +42,24 @@ export default async function HostReferPage() {
   const { home, live, nav, supabase, me } = await hostContext();
   if (!home) return null;
 
-  const { data } = await supabase
-    .from('host_referral_v')
-    .select('*')
-    .eq('referrer_host_id', me.id)
-    .order('created_at', { ascending: false });
+  const [refRes, hostRes] = await Promise.all([
+    supabase
+      .from('host_referral_v')
+      .select('*')
+      .eq('referrer_host_id', me.id)
+      .order('created_at', { ascending: false }),
+    /* The code lives on the host, not on a referral. Reading it
+       from `rows[0]` meant a host with no referrals yet — which
+       is everyone, at the point they want the link — was told
+       they had no code. */
+    supabase.from('host').select('referral_code').eq('id', me.id).maybeSingle(),
+  ]);
 
-  const rows = (data as ReferralRow[] | null) ?? [];
+  const rows = (refRes.data as ReferralRow[] | null) ?? [];
+  const code =
+    (hostRes.data as { referral_code: string | null } | null)?.referral_code ??
+    rows[0]?.code ??
+    null;
   const liveOnes = rows.filter((r) => r.live_at !== null);
   const settingUp = rows.filter((r) => r.stage === 'setting up');
   const applied = rows.filter((r) => r.stage === 'applied');
@@ -58,12 +70,6 @@ export default async function HostReferPage() {
   const pending = rows
     .filter((r) => r.reward_status === 'pending')
     .reduce((a, r) => a + Number(r.reward_amount_kes ?? 0), 0);
-
-  /* A host gets one code, and it is theirs. Shown rather than
-     generated on click: a code that only exists after a button
-     is pressed is one somebody cannot read out over the phone. */
-  const code = rows[0]?.code ?? null;
-  const link = code ? `https://nexgapp.com/hosts?ref=${code}` : null;
 
   return (
     <HostSection
@@ -122,26 +128,7 @@ export default async function HostReferPage() {
           </>
         }
       >
-        <section className="bg-ink rounded-xl p-5 text-white">
-          <h2 className="text-gold text-[0.5625rem] font-extrabold uppercase tracking-[0.12em]">
-            Your link
-          </h2>
-          {link ? (
-            <>
-              <p className="mt-2 break-all font-mono text-[0.875rem] font-extrabold">{link}</p>
-              <p className="mt-2.5 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-                Code <span className="font-extrabold text-white">{code}</span> — readable over the
-                phone, which is how most of these actually get passed on.
-              </p>
-            </>
-          ) : (
-            <p className="mt-2 text-[0.8125rem] font-semibold leading-[1.65] text-white/60">
-              Your code is issued with your first referral. Ask host ops from Get Help and they
-              will set one up against your account — it is the same code for life, so it is worth
-              having one you can say out loud.
-            </p>
-          )}
-        </section>
+        <ReferralLink hostId={me.id} code={code} />
 
         <Table
           head={['Area', '>Units', 'Started', 'Live', '>Reward', 'Stage']}

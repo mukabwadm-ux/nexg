@@ -13,6 +13,7 @@ import {
   Tr,
   TwoColumn,
 } from '@/components/host/module';
+import { RaiseRequest, RequestActions } from '@/components/host/request-client';
 import { HostSection, hostContext } from '@/components/host/section';
 
 export const metadata = { title: 'Requests & Issues' };
@@ -88,17 +89,19 @@ export default async function HostRequestsPage({
   const { home, live, nav, supabase, me } = await hostContext();
   if (!home) return null;
 
-  const [reqRes, ruleRes] = await Promise.all([
+  const [reqRes, ruleRes, unitRes] = await Promise.all([
     supabase
       .from('host_request_v')
       .select('*')
       .eq('host_id', me.id)
       .order('due_at', { nullsFirst: false }),
     supabase.from('host_priority_rule').select('*').eq('host_id', me.id),
+    supabase.from('host_unit_list_v').select('id, name').eq('host_id', me.id).order('name'),
   ]);
 
   const all = (reqRes.data as RequestRow[] | null) ?? [];
   const rules = (ruleRes.data as Rule[] | null) ?? [];
+  const units = (unitRes.data as { id: string; name: string }[] | null) ?? [];
 
   const tab = (searchParams?.tab ?? 'open') as keyof typeof TAB;
   const rows = all.filter(TAB[tab] ?? TAB.open);
@@ -178,6 +181,7 @@ export default async function HostRequestsPage({
             { key: 'resolved', label: 'Resolved', count: all.filter(TAB.resolved).length },
           ]}
         />
+        <RaiseRequest hostId={me.id} units={units} />
       </div>
 
       <TwoColumn
@@ -258,7 +262,7 @@ export default async function HostRequestsPage({
         }
       >
         <Table
-          head={['Priority', 'Guest · unit', 'Type', 'Request', 'Owner', 'Due', 'Status']}
+          head={['Priority', 'Guest · unit', 'Type', 'Request', 'Owner', 'Due', 'Status', '>Action']}
           empty={
             tab === 'open'
               ? 'Nothing open. Not a loading state — every request has been dealt with.'
@@ -308,6 +312,14 @@ export default async function HostRequestsPage({
                 </Td>
                 <Td>
                   <Pill tone={st.tone}>{st.label}</Pill>
+                </Td>
+                <Td right>
+                  <RequestActions
+                    requestId={r.id}
+                    reference={r.reference}
+                    title={r.title}
+                    resolved={r.resolved_in_minutes !== null}
+                  />
                 </Td>
               </Tr>
             );

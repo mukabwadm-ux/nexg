@@ -11,6 +11,12 @@ import {
   Tr,
   TwoColumn,
 } from '@/components/host/module';
+import {
+  AddBooking,
+  Calendars,
+  CancelBooking,
+  type CalendarRow,
+} from '@/components/host/booking-client';
 import { HostSection, hostContext } from '@/components/host/section';
 
 export const metadata = { title: 'Bookings & Guests' };
@@ -66,13 +72,25 @@ export default async function HostBookingsPage({
   const { home, live, nav, supabase, me } = await hostContext();
   if (!home) return null;
 
-  const { data } = await supabase
-    .from('host_stay_v')
-    .select('*')
-    .eq('host_id', me.id)
-    .order('check_in', { ascending: false });
+  const [stayRes, unitRes, calRes, propRes] = await Promise.all([
+    supabase
+      .from('host_stay_v')
+      .select('*')
+      .eq('host_id', me.id)
+      .order('check_in', { ascending: false }),
+    supabase
+      .from('host_unit_list_v')
+      .select('id, name, property_name')
+      .eq('host_id', me.id)
+      .order('name'),
+    supabase.from('calendar_connection_v').select('*').eq('host_id', me.id).order('created_at'),
+    supabase.from('host_property_list_v').select('id, name').eq('host_id', me.id),
+  ]);
 
-  const all = (data as StayRow[] | null) ?? [];
+  const all = (stayRes.data as StayRow[] | null) ?? [];
+  const units = (unitRes.data as { id: string; name: string; property_name: string | null }[] | null) ?? [];
+  const calendars = (calRes.data as CalendarRow[] | null) ?? [];
+  const properties = (propRes.data as { id: string; name: string }[] | null) ?? [];
   const tab = searchParams?.tab ?? 'all';
 
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Nairobi' });
@@ -162,34 +180,25 @@ export default async function HostBookingsPage({
         </div>
       ) : null}
 
-      <Segmented
-        base="/host/bookings"
-        param="tab"
-        current={tab}
-        options={[
-          { key: 'all', label: 'All', count: all.length },
-          { key: 'in_house', label: 'In-house', count: inHouse.length },
-          { key: 'arrivals', label: 'Arrivals today', count: arrivals.length },
-          { key: 'departures', label: 'Departures today', count: departures.length },
-        ]}
-      />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Segmented
+          base="/host/bookings"
+          param="tab"
+          current={tab}
+          options={[
+            { key: 'all', label: 'All', count: all.length },
+            { key: 'in_house', label: 'In-house', count: inHouse.length },
+            { key: 'arrivals', label: 'Arrivals today', count: arrivals.length },
+            { key: 'departures', label: 'Departures today', count: departures.length },
+          ]}
+        />
+        <AddBooking hostId={me.id} units={units} />
+      </div>
 
       <TwoColumn
         rail={
           <>
-            <section className="border-border bg-surface rounded-xl border">
-              <div className="border-border border-b px-4 py-3">
-                <h2 className="text-[0.875rem] font-extrabold tracking-tight">
-                  Connected calendars
-                </h2>
-              </div>
-              <div className="px-4 py-5 text-center">
-                <p className="text-muted-light text-[0.8125rem] font-semibold leading-[1.65]">
-                  None connected. Airbnb and Booking.com iCal sync is the next piece of this
-                  module; bookings entered here work now.
-                </p>
-              </div>
-            </section>
+            <Calendars hostId={me.id} connections={calendars} properties={properties} />
 
             <section className="border-border bg-surface rounded-xl border">
               <div className="border-border border-b px-4 py-3">
@@ -236,7 +245,7 @@ export default async function HostBookingsPage({
         }
       >
         <Table
-          head={['Guest', 'Unit', 'Dates', 'Source', '>Orders', 'Rating', 'Status']}
+          head={['Guest', 'Unit', 'Dates', 'Source', '>Orders', 'Rating', 'Status', '>Action']}
           empty="No bookings yet. Add one, or connect a calendar once that lands."
           caption="Guests are shown by first name. The phone, when there is one, is masked everywhere including exports."
         >
@@ -270,6 +279,15 @@ export default async function HostBookingsPage({
                     <Pill tone="plain">Departed</Pill>
                   ) : (
                     <Pill tone="info">Booked</Pill>
+                  )}
+                </Td>
+                <Td right>
+                  {s.status === 'cancelled' ? (
+                    <span className="text-muted-light text-[0.6875rem] font-semibold">
+                      Cancelled
+                    </span>
+                  ) : (
+                    <CancelBooking stayId={s.id} guest={s.guest_first_name ?? 'this'} />
                   )}
                 </Td>
               </Tr>

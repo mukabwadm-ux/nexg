@@ -10,6 +10,11 @@ import {
   Tr,
   TwoColumn,
 } from '@/components/host/module';
+import {
+  CreatePackage,
+  PackageCardActions,
+  type PackageForEdit,
+} from '@/components/host/package-client';
 import { HostSection, hostContext } from '@/components/host/section';
 
 export const metadata = { title: 'Packages & Amenities' };
@@ -22,10 +27,13 @@ interface CatalogueRow {
   /* jsonb. Seeded empty today, so the guard below is not
      defensive padding — it is the case that actually renders. */
   items: unknown;
-  price_kes: number;
+  /* Nullable. The NexG catalogue is seeded without prices in
+     some cities, and rendering that as KES 0 reads as free. */
+  price: number | null;
   lead_hours: number;
   city_id: string | null;
   sort: number;
+  host_id: string | null;
 }
 
 interface OrderRow {
@@ -52,22 +60,36 @@ export default async function HostPackagesPage() {
   const { home, live, nav, supabase, me } = await hostContext();
   if (!home) return null;
 
-  const [catRes, ordRes, cityRes] = await Promise.all([
-    supabase.from('host_package_catalogue_v').select('*').order('sort'),
+  const [catRes, ordRes, cityRes, unitRes] = await Promise.all([
+    /* The table, not `host_package_catalogue_v`: that view
+       predates host-owned packages and filters to the NexG
+       catalogue, so a host's own would never appear in it. */
+    supabase
+      .from('welcome_package')
+      .select('id, name, description, items, price, lead_hours, city_id, sort, host_id, status')
+      .is('archived_at', null)
+      .eq('status', 'live')
+      .order('sort'),
     supabase
       .from('host_package_order_v')
       .select('*')
       .eq('host_id', me.id)
       .order('for_checkin_at', { ascending: false }),
     supabase.from('host').select('city_id').eq('id', me.id).maybeSingle(),
+    supabase.from('host_unit_list_v').select('id, name').eq('host_id', me.id).order('name'),
   ]);
 
   /* The catalogue is per city, and a host in Nairobi should not
      be offered a Mombasa package they cannot be delivered. A
      package with no city is national and shown to everyone. */
   const cityId = (cityRes.data as { city_id: string | null } | null)?.city_id ?? null;
+  const units = (unitRes.data as { id: string; name: string }[] | null) ?? [];
   const allCat = (catRes.data as CatalogueRow[] | null) ?? [];
-  const catalogue = allCat.filter((c) => c.city_id === null || c.city_id === cityId);
+  /* A host's own packages are theirs wherever they are; NexG
+     ones are shown only where we can actually deliver them. */
+  const catalogue = allCat.filter(
+    (c) => c.host_id === me.id || c.city_id === null || c.city_id === cityId,
+  );
   const orders = (ordRes.data as OrderRow[] | null) ?? [];
 
   const scheduled = orders.filter((o) => o.status === 'scheduled');
@@ -77,7 +99,8 @@ export default async function HostPackagesPage() {
     .filter((o) => o.status !== 'cancelled' && o.status !== 'scheduled')
     .reduce((a, o) => a + Number(o.price_kes ?? 0), 0);
 
-  const cheapest = catalogue.length > 0 ? Math.min(...catalogue.map((c) => Number(c.price_kes))) : null;
+  const priced = catalogue.filter((c) => c.price !== null);
+  const cheapest = priced.length > 0 ? Math.min(...priced.map((c) => Number(c.price))) : null;
 
   return (
     <HostSection
@@ -99,7 +122,7 @@ export default async function HostPackagesPage() {
         <Kpi
           label="From"
           value={cheapest === null ? DASH : `KES ${cheapest.toLocaleString('en-KE')}`}
-          note="cheapest package"
+          note={priced.length === 0 ? 'none priced yet' : 'cheapest package'}
         />
         <Kpi label="Scheduled" value={String(scheduled.length)} note="not yet billed" />
         <Kpi label="Placed" value={String(placed.length)} note="in the unit" />
@@ -136,20 +159,35 @@ export default async function HostPackagesPage() {
               scheduled inside it. We would rather tell you now than tell a guest at check-in.
             </HowItWorks>
 
-            <HowItWorks title="Scheduling one">
-              Placing an order is the next piece of this module. Until it lands, ask host ops
-              from Get Help and they will schedule it against the unit and check-in you name —
-              same catalogue, same price, same photo on the record.
-            </HowItWorks>
+            <section className="bg-ink rounded-xl p-5 text-white">
+              <h2 className="text-gold text-[0.5625rem] font-extrabold uppercase tracking-[0.12em]">
+                Your own packages
+              </h2>
+              <p className="mt-2 text-[1.0625rem] font-extrabold leading-snug tracking-tight">
+                Make one that suits your guests
+              </p>
+              <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
+                Name it, list what goes in, set a price and the lead time you can actually meet.
+                A NexG package cannot be edited — it is shared across every host in the city —
+                but you can copy one and change your copy.
+              </p>
+              <div className="mt-4">
+                <CreatePackage hostId={me.id} />
+              </div>
+            </section>
           </>
         }
       >
         <section className="border-border bg-surface rounded-xl border">
           <div className="border-border flex items-center justify-between border-b px-4 py-3">
-            <h2 className="text-[0.875rem] font-extrabold tracking-tight">The catalogue</h2>
-            <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
-              {catalogue.length} available
-            </span>
+            <div>
+              <h2 className="text-[0.875rem] font-extrabold tracking-tight">The catalogue</h2>
+              <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
+                {catalogue.length} available ·{' '}
+                {catalogue.filter((c) => c.host_id === me.id).length} yours
+              </span>
+            </div>
+            <CreatePackage hostId={me.id} />
           </div>
           {catalogue.length === 0 ? (
             <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
@@ -165,7 +203,11 @@ export default async function HostPackagesPage() {
                       {c.name}
                     </h3>
                     <span className="shrink-0 text-[0.9375rem] font-extrabold tabular-nums">
-                      KES {Number(c.price_kes).toLocaleString('en-KE')}
+                      {c.price === null ? (
+                        <span className="text-muted-light">Price on request</span>
+                      ) : (
+                        `KES ${Number(c.price).toLocaleString('en-KE')}`
+                      )}
                     </span>
                   </div>
                   {c.description ? (
@@ -183,8 +225,23 @@ export default async function HostPackagesPage() {
                     </ul>
                   ) : null}
                   <p className="text-muted-light mt-3 text-[0.6875rem] font-extrabold uppercase tracking-wide">
-                    {c.lead_hours}h lead time
+                    {c.lead_hours}h lead time · {c.host_id === me.id ? 'yours' : 'NexG'}
                   </p>
+                  <div className="mt-3">
+                    <PackageCardActions
+                      hostId={me.id}
+                      units={units}
+                      pkg={{
+                        id: c.id,
+                        name: c.name,
+                        description: c.description,
+                        price_kes: c.price === null ? 0 : Number(c.price),
+                        lead_hours: c.lead_hours,
+                        items: c.items,
+                        mine: c.host_id === me.id,
+                      } satisfies PackageForEdit}
+                    />
+                  </div>
                 </article>
               ))}
             </div>

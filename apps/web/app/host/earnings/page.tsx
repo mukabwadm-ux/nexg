@@ -1,4 +1,4 @@
-import { DASH, kes } from '@/components/host/bits';
+import { DASH, kes, when } from '@/components/host/bits';
 import {
   Fact,
   HowItWorks,
@@ -23,6 +23,14 @@ interface Earnings {
   rewards_credited_kes: number;
   guest_order_value_cents: number;
   guest_order_count: number;
+}
+
+interface StatementLine {
+  id: number;
+  effective_at: string;
+  line_kind: string;
+  memo: string | null;
+  amount_cents: number;
 }
 
 interface PackageOrderRow {
@@ -50,13 +58,23 @@ export default async function HostEarningsPage() {
   const { home, live, nav, supabase, me } = await hostContext();
   if (!home) return null;
 
-  const [earnRes, pkgRes] = await Promise.all([
+  const [earnRes, pkgRes, stmtRes] = await Promise.all([
     supabase.from('host_earnings_v').select('*').eq('host_id', me.id).maybeSingle(),
     supabase
       .from('host_package_order_v')
       .select('*')
       .eq('host_id', me.id)
       .order('for_checkin_at', { ascending: false }),
+    /* The ledger, not the invoice table. Finance reads the same
+       entries through `finance_host_v`, so the two cannot drift
+       — which is the whole reason host money was put on the
+       ledger rather than left in standalone tables. */
+    supabase
+      .from('host_statement_v')
+      .select('*')
+      .eq('host_id', me.id)
+      .order('effective_at', { ascending: false })
+      .limit(50),
   ]);
 
   const e = (earnRes.data as Earnings | null) ?? {
@@ -69,6 +87,8 @@ export default async function HostEarningsPage() {
     guest_order_count: 0,
   };
   const packages = (pkgRes.data as PackageOrderRow[] | null) ?? [];
+  const statement = (stmtRes.data as StatementLine[] | null) ?? [];
+  const balanceCents = statement.reduce((a, l) => a + Number(l.amount_cents), 0);
   const billable = packages.filter((p) => p.status !== 'cancelled');
   const owedKes = billable.reduce((a, p) => a + Number(p.price_kes ?? 0), 0);
 
@@ -209,6 +229,68 @@ export default async function HostEarningsPage() {
             </Tr>
           ))}
         </Table>
+        <section className="border-border bg-surface rounded-xl border">
+          <div className="border-border flex items-center justify-between border-b px-4 py-3">
+            <h2 className="text-[0.875rem] font-extrabold tracking-tight">Your statement</h2>
+            <span
+              className={`text-[0.875rem] font-extrabold tabular-nums ${
+                balanceCents < 0 ? 'text-danger' : 'text-success'
+              }`}
+            >
+              {balanceCents < 0 ? `You owe ${kes(-balanceCents)}` : `Owed to you ${kes(balanceCents)}`}
+            </span>
+          </div>
+          {statement.length === 0 ? (
+            <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold leading-[1.65]">
+              Nothing on your statement yet. Invoices and referral rewards appear here the moment
+              they are raised, from the same ledger entries the finance team reads.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="border-border bg-bg border-b">
+                  <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
+                    <th className="px-4 py-2">Date</th>
+                    <th className="px-4 py-2">Type</th>
+                    <th className="px-4 py-2">Description</th>
+                    <th className="px-4 py-2 text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {statement.map((l) => (
+                    <tr
+                      key={l.id}
+                      className="border-border border-b text-[0.8125rem] font-semibold last:border-0"
+                    >
+                      <td className="text-muted px-4 py-2.5">{when(l.effective_at)}</td>
+                      <td className="px-4 py-2.5">
+                        {l.line_kind === 'reward' ? (
+                          <Pill tone="good">Reward</Pill>
+                        ) : (
+                          <Pill tone="info">Invoice</Pill>
+                        )}
+                      </td>
+                      <td className="text-muted px-4 py-2.5">{l.memo ?? DASH}</td>
+                      <td
+                        className={`px-4 py-2.5 text-right font-extrabold tabular-nums ${
+                          Number(l.amount_cents) < 0 ? 'text-danger' : 'text-success'
+                        }`}
+                      >
+                        {Number(l.amount_cents) < 0 ? '−' : '+'}
+                        {kes(Math.abs(Number(l.amount_cents)))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p className="text-muted-light border-border border-t px-4 py-2.5 text-[0.6875rem] font-semibold leading-[1.6]">
+            These are ledger entries, not a summary of them. The finance team reads the same rows,
+            so what you see here and what they see cannot disagree — and a reconciliation check
+            asserts it on every test run.
+          </p>
+        </section>
       </TwoColumn>
     </HostSection>
   );
