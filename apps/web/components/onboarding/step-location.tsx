@@ -1,5 +1,6 @@
 'use client';
 
+import { readPositionOnce } from '@nexg/location';
 import { Button, Input, useToast } from '@nexg/ui';
 import { LocateFixed, MapPin as MapPinIcon, Plus, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -138,38 +139,48 @@ export function LocationStep() {
     if (row) setOutside({ km: row.km, nearest: row.zone_name, city: row.city_name });
   };
 
-  const useMyLocation = () => {
-    if (!navigator.geolocation) {
+  /*
+   * The read goes through @nexg/location, which owns the only
+   * call to the browser API in the codebase.
+   *
+   * This used to roll its own `getCurrentPosition`, and the
+   * hand-rolled version was worse in three ways: every failure
+   * became one generic sentence, so a merchant who had blocked
+   * the permission was told to "pick an area" with no hint that
+   * the padlock menu was the fix; `enableHighAccuracy` was
+   * forced on, which on a laptop spends battery and seconds to
+   * get the same wifi fix; and a position read moments ago was
+   * re-requested from scratch. The shared helper handles all
+   * three, and it is the call site the lint rule points at.
+   */
+  const pinFromBrowser = async () => {
+    setLocating(true);
+    const result = await readPositionOnce();
+    setLocating(false);
+
+    if (!result.ok) {
       toast({
-        title: 'Your browser will not share a location',
-        description: 'Pick your area below instead.',
+        title:
+          result.reason === 'denied'
+            ? 'Location is blocked in your browser'
+            : 'We could not read your location',
+        /* The helper's message names the padlock when that is
+           what will fix it. Pick-an-area stays as the way
+           forward either way, because it always works. */
+        description: `${result.message} You can also pick your area below and correct the pin later.`,
         tone: 'danger',
       });
       return;
     }
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocating(false);
-        const next = [...branches];
-        next[0] = {
-          ...(next[0] ?? blank()),
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        setLocalBranches(next);
-        void persist(next);
-      },
-      () => {
-        setLocating(false);
-        toast({
-          title: 'We could not read your location',
-          description: 'Pick your area below instead — you can correct the pin later.',
-          tone: 'danger',
-        });
-      },
-      { enableHighAccuracy: true, timeout: 10000 },
-    );
+
+    const next = [...branches];
+    next[0] = {
+      ...(next[0] ?? blank()),
+      lat: result.fix.lat,
+      lng: result.fix.lng,
+    };
+    setLocalBranches(next);
+    void persist(next);
   };
 
   /*
@@ -280,7 +291,7 @@ export function LocationStep() {
           <p className="text-[0.9375rem] font-extrabold">Where is your main branch?</p>
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <Button loading={locating} loadingText="Locating…" onClick={useMyLocation}>
+            <Button loading={locating} loadingText="Locating…" onClick={() => void pinFromBrowser()}>
               <span className="flex items-center gap-2">
                 <LocateFixed className="h-4 w-4" aria-hidden="true" />
                 Use my location
