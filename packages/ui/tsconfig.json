@@ -2,7 +2,11 @@
   "extends": "@nexg/config/tsconfig/react-library.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    /* An explicit `types` array switches off automatic @types
+       discovery, so anything needed has to be named. Leaving
+       google.maps out is why `loadGoogleMaps` could not see the
+       `google` namespace and this package would not typecheck. */
+    "types": ["vitest/globals", "@testing-library/jest-dom", "google.maps"],
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src", "*.cjs", "vitest.config.ts"],
