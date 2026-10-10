@@ -13,6 +13,23 @@ create extension if not exists pgtap with schema extensions;
 select plan(21);
 
 delete from public.document;
+
+/*
+ * Cash events are append-only — `tg_cash_event_immutable` refuses
+ * both UPDATE and DELETE, including the cascade from deleting a
+ * rider. That guard is right: a cash movement is corrected by
+ * writing a correcting row, never by removing the original, and
+ * nothing in production should ever delete one.
+ *
+ * It does mean a test that wipes every rider as setup has to
+ * stand the trigger down first. Scoped to this transaction, which
+ * rolls back, so the guard is untouched everywhere else — and the
+ * suite fails loudly if anybody tries this outside a test.
+ */
+alter table public.cash_event disable trigger user;
+delete from public.cash_event;
+alter table public.cash_event enable trigger user;
+
 delete from public.rider;
 delete from public.role_grant;
 delete from public.staff_user;
