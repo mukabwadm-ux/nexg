@@ -75,3 +75,4 @@ nexgcr.txt
 vapid-keys.txt
 .maps-check.json
 .maps-status.json
+e2e/.auth/

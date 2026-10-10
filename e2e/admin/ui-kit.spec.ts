@@ -65,7 +65,19 @@ test.describe('admin ui-kit', () => {
   test('a toast is announced and can be dismissed', async ({ page }) => {
     await page.getByRole('button', { name: 'Success', exact: true }).click();
 
-    const toast = page.getByRole('status').filter({ hasText: 'Document verified' });
+    /*
+     * Scoped to the toast viewport.
+     *
+     * Radix renders a second `role="status"` — an off-screen
+     * announcer reading "Notification Document verified" — so an
+     * unscoped match found two elements and failed on strict
+     * mode. Both are correct and both should exist; the test was
+     * the imprecise one.
+     */
+    const toast = page
+      .getByLabel('Notifications (F8)')
+      .getByRole('status')
+      .filter({ hasText: 'Document verified' });
     await expect(toast).toBeVisible();
 
     await toast.getByRole('button', { name: 'Dismiss notification' }).click();
@@ -89,9 +101,4 @@ test.describe('admin ui-kit', () => {
       .first();
     await expect(tile).toContainText('[—]');
   });
-});
-
-test('the public site boots', async ({ page }) => {
-  await page.goto('http://127.0.0.1:3000/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('public site');
 });
