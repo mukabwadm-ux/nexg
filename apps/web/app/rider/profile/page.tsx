@@ -1,5 +1,6 @@
 import { DASH, Panel, Pill } from '@/components/partner/bits';
 import { RiderProfile } from '@/components/partner/rider-profile';
+import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -42,7 +43,11 @@ export default async function RiderProfilePage() {
   ].sort();
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <RiderPageHead
+        title="Profile"
+        lead="Your ride, your areas and where you are paid. The parts rider ops change are shown with the reason rather than as a greyed-out field."
+      />
       <Panel title="Your ride">
         <dl className="grid gap-3 sm:grid-cols-2">
           <Fact label="Vehicle" value={r.vehicle ?? DASH} />

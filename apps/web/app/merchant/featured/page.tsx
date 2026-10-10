@@ -1,5 +1,6 @@
 import { Panel } from '@/components/partner/bits';
 import { Featured, type Booking, type Placement } from '@/components/partner/merchant-featured';
+import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -75,7 +76,11 @@ export default async function MerchantFeatured() {
   const nextMonday = mondayOf(new Date(Date.now() + 7 * 86_400_000));
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <PageHead
+        title="Featured"
+        lead="Paid placement at the top of Explore in your zone for a week. Eligibility follows your health band; cancel by Friday 23:59 before the week starts."
+      />
       <Panel title="What a featured slot is">
         <p className="text-muted text-[0.8125rem] font-semibold">
           A week at the top of the homepage, the top of your category, or in Popular Requests.

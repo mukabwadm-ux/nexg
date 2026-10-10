@@ -1,7 +1,6 @@
 import { DashboardActive } from '@/components/rider/dashboard-active';
 import { DashboardPending } from '@/components/rider/dashboard-pending';
 import { riderContext } from '@/components/rider/frame';
-import { PresenceControl, RiderShell } from '@/components/rider/shell';
 import type {
   RiderAttentionRow,
   RiderJob,
@@ -31,7 +30,7 @@ export const dynamic = 'force-dynamic';
  * cannot substitute for somebody having met them.
  */
 export default async function RiderDashboard() {
-  const { h, active, nav, supabase, me } = await riderContext();
+  const { h, active, supabase, me } = await riderContext();
 
   if (!h) {
     return (
@@ -78,23 +77,7 @@ export default async function RiderDashboard() {
     : [{ data: null }, { data: null }, { data: null }];
 
   return (
-    <RiderShell
-      personName={h.name ?? h.first_name ?? 'Rider'}
-      riderCode={h.rider_id.slice(0, 8).toUpperCase()}
-      vehicle={h.vehicle}
-      active={active}
-      zoneLine={h.city ? `${h.city} · your home zone` : 'Zone not set'}
-      unreadCount={h.unread_messages ?? 0}
-      nav={nav}
-      current="/rider"
-      presenceControl={
-        <PresenceControl
-          active={active}
-          online={h.presence === 'online'}
-          reason={h.offers_paused_reason}
-        />
-      }
-    >
+    <>
       {active ? (
         <DashboardActive
           h={h}
@@ -106,6 +89,6 @@ export default async function RiderDashboard() {
       ) : progress ? (
         <DashboardPending h={h} progress={progress} attention={attention} />
       ) : null}
-    </RiderShell>
+    </>
   );
 }

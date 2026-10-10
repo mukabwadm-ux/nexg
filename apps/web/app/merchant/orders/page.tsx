@@ -1,5 +1,6 @@
 import { Empty, Panel, Pill, clock, day, kes, plural } from '@/components/partner/bits';
 import { LiveOrders } from '@/components/partner/live-orders';
+import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -60,7 +61,11 @@ export default async function MerchantOrders({
     .reduce((t, r) => t + (r.merchant_keeps_cents ?? 0), 0);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <PageHead
+        title="Orders"
+        lead="Your live queue in three lanes, then history. Accept within the countdown; every action here tells the guest and the rider at once."
+      />
       <div className="flex gap-2">
         {(['live', 'all'] as const).map((v) => (
           <a

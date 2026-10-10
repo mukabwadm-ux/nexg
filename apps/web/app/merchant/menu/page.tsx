@@ -1,5 +1,6 @@
 import { Empty, Panel, kesWhole, plural } from '@/components/partner/bits';
 import { Menu, type ItemRow } from '@/components/partner/merchant-menu';
+import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -29,7 +30,11 @@ export default async function MerchantMenu() {
   const on = items.filter((i) => i.available);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <PageHead
+        title="Catalogue"
+        lead="Everything guests can order from you, with prices and categories. Edits before go-live need no review; when live, price and name changes are reviewed within 24 h."
+      />
       {error && (
         <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
           Your menu could not be read: {error.message}

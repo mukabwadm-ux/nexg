@@ -1,6 +1,6 @@
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { ReportProblem } from '@/components/merchant/board-client';
-import { MerchantPage, merchantContext } from '@/components/merchant/frame';
+import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Support' };
@@ -43,7 +43,7 @@ function when(iso: string | null): string {
  * thread that waited two days is worse than no promise.
  */
 export default async function SupportPage() {
-  const { m, live, nav } = await merchantContext();
+  const { m } = await merchantContext();
   if (!m) return null;
 
   const { data } = await createClient()
@@ -66,14 +66,11 @@ export default async function SupportPage() {
     replies.length >= 3 ? Math.round(replies[Math.floor(replies.length / 2)] as number) : null;
 
   return (
-    <MerchantPage
-      m={m}
-      live={live}
-      nav={nav}
-      current="/merchant/support"
-      title="Support"
-      lead="Merchant ops for day-to-day help, partnerships for your agreement and fees, and the product team for bugs and ideas. Every message gets a ticket you can follow."
-    >
+    <Board>
+      <PageHead
+        title="Support"
+        lead="Merchant ops for day-to-day help, partnerships for your agreement and fees, and the product team for bugs and ideas. Every message gets a ticket you can follow."
+      />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Tile
           label="Open tickets"
@@ -194,6 +191,6 @@ export default async function SupportPage() {
           </section>
         </aside>
       </div>
-    </MerchantPage>
+    </Board>
   );
 }

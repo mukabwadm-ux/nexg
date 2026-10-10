@@ -3,6 +3,7 @@ import { maps as mapsCapability } from '@nexg/ui/capabilities';
 import { AddBranch, OpenBranch, type BranchRow } from '@/components/merchant/branch-client';
 import { Empty, Panel } from '@/components/partner/bits';
 import { Stores, type StoreRow } from '@/components/partner/merchant-stores';
+import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -79,7 +80,11 @@ export default async function StoresPage() {
   );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <PageHead
+        title="Branches"
+        lead="Each branch has its own hours, catalogue overrides, counter device and readiness, and goes live on its own."
+      />
       {error && (
         <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
           Your stores could not be read, so this page is incomplete: {error.message}

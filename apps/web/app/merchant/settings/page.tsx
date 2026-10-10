@@ -1,6 +1,6 @@
 import { Panel, Row } from '@/components/merchant/bits';
 import { MerchantSettings } from '@/components/merchant/board-client';
-import { MerchantPage, merchantContext } from '@/components/merchant/frame';
+import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Settings' };
@@ -40,7 +40,7 @@ function mask(p: string | null): string {
  * who changes it does not.
  */
 export default async function SettingsPage() {
-  const { m, live, nav } = await merchantContext();
+  const { m } = await merchantContext();
   if (!m) return null;
 
   const { data } = await createClient()
@@ -53,14 +53,11 @@ export default async function SettingsPage() {
   if (!s) return null;
 
   return (
-    <MerchantPage
-      m={m}
-      live={live}
-      nav={nav}
-      current="/merchant/settings"
-      title="Settings"
-      lead="Your business profile, how you are notified, and your data. Your existing profile and payout details are carried over."
-    >
+    <Board>
+      <PageHead
+        title="Settings"
+        lead="Your business profile, how you are notified, and your data. Your existing profile and payout details are carried over."
+      />
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-4">
           <Panel title="Business profile">
@@ -132,6 +129,6 @@ export default async function SettingsPage() {
           </section>
         </aside>
       </div>
-    </MerchantPage>
+    </Board>
   );
 }

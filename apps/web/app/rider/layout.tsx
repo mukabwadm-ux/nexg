@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-import { requireRider } from '@/lib/partner';
+import { riderContext } from '@/components/rider/frame';
+import { PresenceControl, RiderShell } from '@/components/rider/shell';
 
 export const metadata = {
   title: { default: 'Your account', template: '%s · NexG' },
@@ -53,14 +55,39 @@ export interface RiderHome {
 /**
  * The rider side of the account.
  *
- * The layout checks who is asking and nothing else. The shell
- * moved into the pages with the rebuild: the dashboard's hero
- * differs between an applicant and a working rider, and a
- * layout rendering one for both would have to guess which.
+ * The shell is drawn here, once — the same correction made on
+ * the merchant side, for the same reason. Five of the twelve
+ * boards had forgotten to render it: Documents, Earnings, Jobs,
+ * Messages and Profile came up as bare content with no
+ * navigation and no way out, all returning HTTP 200.
  *
- * `RiderHome` stays exported here because every page reads it.
+ * A frame each page must remember is a frame some page forgets.
+ * The dashboard's hero still differs between an applicant and a
+ * working rider; that is page content, not the frame.
  */
 export default async function RiderLayout({ children }: { children: React.ReactNode }) {
-  await requireRider();
-  return <>{children}</>;
+  const { h, active, nav } = await riderContext();
+
+  if (!h) redirect('/riders/apply');
+
+  return (
+    <RiderShell
+      personName={h.name ?? h.first_name ?? 'Rider'}
+      riderCode={h.rider_id.slice(0, 8).toUpperCase()}
+      vehicle={h.vehicle}
+      active={active}
+      zoneLine={h.city ? `${h.city} · your home zone` : 'Zone not set'}
+      unreadCount={h.unread_messages ?? 0}
+      nav={nav}
+      presenceControl={
+        <PresenceControl
+          active={active}
+          online={h.presence === 'online'}
+          reason={h.offers_paused_reason}
+        />
+      }
+    >
+      {children}
+    </RiderShell>
+  );
 }

@@ -1,4 +1,5 @@
 import { DASH, Empty, Panel, Pill, Stat, day, kesWhole, plural } from '@/components/partner/bits';
+import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -53,7 +54,11 @@ export default async function RiderEarnings() {
   const settled = (settlements as Settlement[] | null) ?? [];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <RiderPageHead
+        title="Earnings"
+        lead="What you made, per trip and per week, and when it reaches you. Every figure here comes from the same statement rows Finance pays from."
+      />
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat label="Today" value={kesWhole(r?.earned_today_kes)} hint="Across every trip" />
         <Stat label="This week" value={kesWhole(r?.earned_week_kes)} hint="Since Monday" />

@@ -4,6 +4,7 @@ import {
   type OnFile,
   type Requirement,
 } from '@/components/partner/documents';
+import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -39,12 +40,18 @@ export default async function RiderDocuments() {
   }
 
   return (
-    <Documents
-      ownerType="rider"
-      ownerId={me.id}
-      requirements={(reqs as Requirement[] | null) ?? []}
-      onFile={(docs as OnFile[] | null) ?? []}
-      asked={(asked as Asked[] | null) ?? []}
-    />
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <RiderPageHead
+        title="Documents"
+        lead="What NexG needs before you can take trips, the review state of each, and when any of them expire."
+      />
+      <Documents
+        ownerType="rider"
+        ownerId={me.id}
+        requirements={(reqs as Requirement[] | null) ?? []}
+        onFile={(docs as OnFile[] | null) ?? []}
+        asked={(asked as Asked[] | null) ?? []}
+      />
+    </div>
   );
 }

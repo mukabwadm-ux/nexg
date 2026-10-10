@@ -1,5 +1,5 @@
 import { Panel, Row } from '@/components/merchant/bits';
-import { MerchantPage, merchantContext } from '@/components/merchant/frame';
+import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { InviteMember, MemberActions, type MemberRow } from '@/components/merchant/team-client';
 import { createClient } from '@/lib/supabase/server';
 
@@ -29,7 +29,7 @@ const CAN: Record<string, string> = {
  * manager already has access.
  */
 export default async function TeamPage() {
-  const { m, live, nav } = await merchantContext();
+  const { m } = await merchantContext();
   if (!m) return null;
 
   const supabase = createClient();
@@ -54,14 +54,11 @@ export default async function TeamPage() {
   const owners = active.filter((x) => x.role === 'owner');
 
   return (
-    <MerchantPage
-      m={m}
-      live={live}
-      nav={nav}
-      current="/merchant/team"
-      title="Team"
-      lead="Owners, managers and cashiers with per-branch access. An invitation grants nothing until the person signs in with it."
-    >
+    <Board>
+      <PageHead
+        title="Team"
+        lead="Owners, managers and cashiers with per-branch access. An invitation grants nothing until the person signs in with it."
+      />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-muted text-[0.8125rem] font-semibold">
           {active.length} member{active.length === 1 ? '' : 's'}
@@ -186,6 +183,6 @@ export default async function TeamPage() {
           </section>
         </aside>
       </div>
-    </MerchantPage>
+    </Board>
   );
 }

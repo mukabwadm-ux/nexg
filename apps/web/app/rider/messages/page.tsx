@@ -1,4 +1,5 @@
 import { Empty, Panel, ago } from '@/components/partner/bits';
+import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -24,7 +25,11 @@ export default async function RiderMessages() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <RiderPageHead
+        title="Messages"
+        lead="Threads with rider ops, the concierge desk and the merchants on your active trips. Guests never message you directly."
+      />
       {error && (
         <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
           Your messages could not be read: {error.message}

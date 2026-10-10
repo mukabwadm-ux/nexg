@@ -6,7 +6,6 @@ import {
   Heart,
   HelpCircle,
   LayoutDashboard,
-  Lock,
   MessageSquare,
   Settings,
   TriangleAlert,
@@ -17,7 +16,9 @@ import Link from 'next/link';
 import * as React from 'react';
 
 import { Logo } from '@/components/logo';
-import { SignOut } from '@/components/partner/sign-out';
+
+import { RiderAccountMenu } from './account-menu';
+import { RiderPhoneNav, RiderSideNav } from './nav-links';
 
 /**
  * The rider dashboard frame.
@@ -112,7 +113,6 @@ export function RiderShell({
   presenceControl,
   unreadCount,
   nav,
-  current,
   children,
 }: {
   personName: string;
@@ -123,18 +123,8 @@ export function RiderShell({
   presenceControl: React.ReactNode;
   unreadCount: number;
   nav: RiderNavItem[];
-  current: string;
   children: React.ReactNode;
 }) {
-  const initials =
-    personName
-      .split(' ')
-      .map((p) => p[0])
-      .filter(Boolean)
-      .slice(0, 2)
-      .join('')
-      .toUpperCase() || 'RD';
-
   return (
     <div className="bg-bg min-h-dvh lg:flex">
       {/* ═══════════════════════════════════ the dark sidebar */}
@@ -146,45 +136,7 @@ export function RiderShell({
           </span>
         </Link>
 
-        <nav aria-label="Rider dashboard" className="flex-1 px-3">
-          <ul className="space-y-0.5">
-            {nav.map((item) => {
-              const on = item.href === current;
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    aria-current={on ? 'page' : undefined}
-                    className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[0.8125rem] font-extrabold transition-colors ${
-                      on ? 'bg-gold text-ink' : 'text-white/65 hover:bg-white/[0.07] hover:text-white'
-                    }`}
-                  >
-                    <span className="shrink-0" aria-hidden="true">
-                      {item.icon}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                    {item.badge ? (
-                      <span
-                        className={`h-[1.1rem] min-w-[1.1rem] shrink-0 rounded-full px-1 text-center text-[0.625rem] font-extrabold leading-[1.1rem] ${
-                          item.tone === 'danger'
-                            ? 'bg-danger text-white'
-                            : on
-                              ? 'bg-ink text-white'
-                              : 'bg-gold text-ink'
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
-                    ) : null}
-                    {item.locked ? (
-                      <Lock className="h-3 w-3 shrink-0 opacity-50" aria-label="not yet available" />
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+        <RiderSideNav nav={nav} />
 
         <div className="m-3 rounded-xl bg-gradient-to-b from-white/[0.08] to-transparent p-4">
           <div className="from-gold/25 mb-3 flex h-20 items-end rounded-lg bg-gradient-to-br to-transparent p-2">
@@ -255,44 +207,16 @@ export function RiderShell({
               <HelpCircle className="h-4 w-4" aria-hidden="true" />
             </Link>
 
-            <span className="border-border flex items-center gap-2.5 border-l pl-3">
-              <span className="bg-ink flex h-8 w-8 items-center justify-center rounded-full text-[0.6875rem] font-extrabold text-white">
-                {initials}
-              </span>
-              <span className="hidden sm:block">
-                <span className="block text-[0.8125rem] font-extrabold leading-tight">
-                  {personName}
-                </span>
-                <span className="text-muted-light block text-[0.6875rem] font-semibold leading-tight">
-                  {active ? 'Rider' : 'Applicant'} · {riderCode}
-                  {vehicle ? ` · ${vehicle}` : ''}
-                </span>
-              </span>
-              <SignOut />
-            </span>
+            <RiderAccountMenu
+              personName={personName}
+              riderCode={riderCode}
+              vehicle={vehicle}
+              active={active}
+            />
           </div>
         </header>
 
-        <nav
-          aria-label="Rider dashboard"
-          className="border-border bg-surface fixed bottom-0 left-0 right-0 z-30 flex gap-1 overflow-x-auto border-t px-2 py-2 lg:hidden"
-        >
-          {nav.slice(0, 6).map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`relative flex shrink-0 flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[0.5625rem] font-extrabold ${
-                item.href === current ? 'bg-gold text-ink' : 'text-muted'
-              }`}
-            >
-              <span aria-hidden="true">{item.icon}</span>
-              <span className="whitespace-nowrap">{item.label}</span>
-              {item.badge ? (
-                <span className="bg-danger absolute right-1 top-0.5 h-1.5 w-1.5 rounded-full" />
-              ) : null}
-            </Link>
-          ))}
-        </nav>
+        <RiderPhoneNav nav={nav} />
 
         <main className="pb-24 lg:pb-0">{children}</main>
       </div>

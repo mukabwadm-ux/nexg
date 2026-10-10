@@ -1,5 +1,5 @@
 import { Panel, Row, Tile } from '@/components/merchant/bits';
-import { MerchantPage, merchantContext } from '@/components/merchant/frame';
+import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { CloseEarly, CopyHours, HoursSlot } from '@/components/merchant/hours-client';
 import { DAYS, hhmm, type HoursRow } from '@/components/merchant/hours-vocab';
 import { createClient } from '@/lib/supabase/server';
@@ -33,7 +33,7 @@ export default async function HoursPage({
 }: {
   searchParams?: { branch?: string };
 }) {
-  const { m, live, nav } = await merchantContext();
+  const { m } = await merchantContext();
   if (!m) return null;
 
   const supabase = createClient();
@@ -86,14 +86,11 @@ export default async function HoursPage({
   const nextHoliday = thisWeek.find((o) => o.reason?.toLowerCase().includes('holiday'));
 
   return (
-    <MerchantPage
-      m={m}
-      live={live}
-      nav={nav}
-      current="/merchant/hours"
-      title="Hours"
-      lead="When guests can order from each branch. Carried over from your current listing; Nairobi public holidays follow the city default unless you override them."
-    >
+    <Board>
+      <PageHead
+        title="Hours"
+        lead="When guests can order from each branch. Carried over from your current listing; Nairobi public holidays follow the city default unless you override them."
+      />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <Tile
           label="Open now"
@@ -296,6 +293,6 @@ export default async function HoursPage({
           </section>
         </aside>
       </div>
-    </MerchantPage>
+    </Board>
   );
 }

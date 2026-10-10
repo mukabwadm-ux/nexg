@@ -3,7 +3,7 @@ import * as React from 'react';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
-import { PresenceControl, RiderShell, riderNav, type RiderNavItem } from './shell';
+import { riderNav, type RiderNavItem } from './shell';
 import type { RiderHome } from './types';
 
 /**
@@ -54,54 +54,44 @@ export async function riderContext(): Promise<RiderContext> {
   };
 }
 
-export function RiderPage({
-  h,
-  active,
-  nav,
-  current,
+/**
+ * The heading every rider board but the dashboard carries.
+ *
+ * It was `RiderPage`, and it wrapped its children in the whole
+ * `RiderShell` plus `max-w-5xl`: a page had to render the shell
+ * to get a heading, so the five boards that skipped it lost the
+ * sidebar too, and the ones that used it were capped at 1024px
+ * inside a full-width frame. The shell is in the layout now.
+ */
+export function RiderPageHead({
   title,
   lead,
-  children,
+  actions,
 }: {
-  h: RiderHome;
-  active: boolean;
-  nav: RiderNavItem[];
-  current: string;
   title: string;
-  lead: string;
-  children: React.ReactNode;
+  lead?: string;
+  actions?: React.ReactNode;
 }) {
   return (
-    <RiderShell
-      personName={h.name ?? h.first_name ?? 'Rider'}
-      riderCode={h.rider_id.slice(0, 8).toUpperCase()}
-      vehicle={h.vehicle}
-      active={active}
-      zoneLine={h.city ? `${h.city} · your home zone` : 'Zone not set'}
-      unreadCount={h.unread_messages ?? 0}
-      nav={nav}
-      current={current}
-      presenceControl={
-        <PresenceControl
-          active={active}
-          online={h.presence === 'online'}
-          reason={h.offers_paused_reason}
-        />
-      }
-    >
-      <div className="max-w-5xl space-y-5 px-4 py-7 sm:px-7">
-        <div>
-          <h1 className="font-serif text-[1.875rem] font-extrabold leading-tight tracking-tight">
-            {title}
-          </h1>
-          <p className="text-muted mt-2 max-w-2xl text-[0.9375rem] font-semibold leading-[1.7]">
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="min-w-0">
+        <h1 className="font-serif text-[1.875rem] font-extrabold leading-tight tracking-tight">
+          {title}
+        </h1>
+        {lead ? (
+          <p className="text-muted mt-2 max-w-3xl text-[0.9375rem] font-semibold leading-[1.7]">
             {lead}
           </p>
-        </div>
-        {children}
+        ) : null}
       </div>
-    </RiderShell>
+      {actions ? <div className="flex shrink-0 flex-wrap gap-2">{actions}</div> : null}
+    </div>
   );
+}
+
+/** The padding a rider board sits in. Full width, with a gutter. */
+export function RiderBoard({ children }: { children: React.ReactNode }) {
+  return <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">{children}</div>;
 }
 
 /**

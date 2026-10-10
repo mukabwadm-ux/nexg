@@ -1,6 +1,6 @@
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { ReviewReply } from '@/components/merchant/board-client';
-import { MerchantPage, merchantContext } from '@/components/merchant/frame';
+import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Reviews' };
@@ -49,7 +49,7 @@ export default async function ReviewsPage({
 }: {
   searchParams?: { tab?: string };
 }) {
-  const { m, live, nav } = await merchantContext();
+  const { m } = await merchantContext();
   if (!m) return null;
 
   const supabase = createClient();
@@ -106,14 +106,11 @@ export default async function ReviewsPage({
   for (const r of all) for (const t of r.themes ?? []) mentions.set(t, (mentions.get(t) ?? 0) + 1);
 
   return (
-    <MerchantPage
-      m={m}
-      live={live}
-      nav={nav}
-      current="/merchant/reviews"
-      title="Reviews"
-      lead="Ratings and comments guests leave on delivered orders. Reply publicly — replies are moderated before they appear — or fix the cause."
-    >
+    <Board>
+      <PageHead
+        title="Reviews"
+        lead="Ratings and comments guests leave on delivered orders. Reply publicly — replies are moderated before they appear — or fix the cause."
+      />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <Tile
           label="Rating"
@@ -286,6 +283,6 @@ export default async function ReviewsPage({
           </section>
         </aside>
       </div>
-    </MerchantPage>
+    </Board>
   );
 }

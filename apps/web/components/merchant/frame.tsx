@@ -4,7 +4,7 @@ import type { MerchantHome } from '@/app/merchant/layout';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
-import { MerchantShell, StateControl, merchantNav, type MerchantNavItem } from './shell';
+import { merchantNav, type MerchantNavItem } from './shell';
 
 /**
  * What every merchant page needs before it can draw anything.
@@ -54,61 +54,49 @@ export async function merchantContext(): Promise<MerchantContext> {
 }
 
 /**
- * The frame for a merchant page that is not the dashboard.
+ * The heading every board but the dashboard carries.
  *
- * The dashboard renders its own hero, which differs between the
- * two states; everything else gets this plainer heading, so a
- * section page cannot accidentally imply a status the merchant
- * does not have.
+ * It was `MerchantPage`, and it wrapped its children in the
+ * whole `MerchantShell` plus `max-w-5xl`. Two problems in one
+ * component: a page had to render the shell to get a heading,
+ * so the boards that skipped the heading lost the sidebar too —
+ * and the ones that did use it were capped at 1024px inside a
+ * full-width frame, which is the dead space on the right of
+ * every screenshot. The artboards run edge to edge.
+ *
+ * The shell is in the layout now. This is a heading.
  */
-export function MerchantPage({
-  m,
-  live,
-  nav,
-  current,
+export function PageHead({
   title,
   lead,
-  children,
+  actions,
 }: {
-  m: MerchantHome;
-  live: boolean;
-  nav: MerchantNavItem[];
-  current: string;
   title: string;
-  lead: string;
-  children: React.ReactNode;
+  lead?: string;
+  actions?: React.ReactNode;
 }) {
   return (
-    <MerchantShell
-      businessName={m.name}
-      personName={firstName(m.contact_name, m.name)}
-      role="Owner"
-      live={live}
-      branchName={null}
-      unreadCount={m.unread_messages ?? 0}
-      nav={nav}
-      current={current}
-      stateControl={
-        <StateControl
-          live={live}
-          accepting={m.accepting_orders ?? false}
-          busyUntil={m.busy_mode_until}
-        />
-      }
-    >
-      <div className="max-w-5xl space-y-5 px-4 py-7 sm:px-7">
-        <div>
-          <h1 className="font-serif text-[1.875rem] font-extrabold leading-tight tracking-tight">
-            {title}
-          </h1>
-          <p className="text-muted mt-2 max-w-2xl text-[0.9375rem] font-semibold leading-[1.7]">
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="min-w-0">
+        <h1 className="font-serif text-[1.875rem] font-extrabold leading-tight tracking-tight">
+          {title}
+        </h1>
+        {lead ? (
+          <p className="text-muted mt-2 max-w-3xl text-[0.9375rem] font-semibold leading-[1.7]">
             {lead}
           </p>
-        </div>
-        {children}
+        ) : null}
       </div>
-    </MerchantShell>
+      {actions ? <div className="flex shrink-0 flex-wrap gap-2">{actions}</div> : null}
+    </div>
   );
+}
+
+/**
+ * The padding a board sits in. Full width, with a gutter.
+ */
+export function Board({ children }: { children: React.ReactNode }) {
+  return <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">{children}</div>;
 }
 
 /**

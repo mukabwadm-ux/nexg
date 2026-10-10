@@ -1,4 +1,5 @@
 import { Empty, Panel, Pill, day, kes, kesWhole } from '@/components/partner/bits';
+import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -41,7 +42,11 @@ export default async function MerchantMoney() {
   const rows = (statements as Row[] | null) ?? [];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <PageHead
+        title="Money"
+        lead="Statements, payouts, fees and refunds, all from Finance; nothing here is computed on this page."
+      />
       <Panel title="Where we pay you">
         {m?.payout_rail ? (
           <p className="text-[0.875rem] font-semibold">

@@ -1,4 +1,5 @@
 import { Empty, Panel, ago } from '@/components/partner/bits';
+import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -35,7 +36,11 @@ export default async function MerchantMessages() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <PageHead
+        title="Messages"
+        lead="Threads with merchant ops, the concierge desk, riders on active orders, your branch teams and NexG broadcasts. Guests never message you directly; the concierge desk relays."
+      />
       {error && (
         <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
           Your messages could not be read: {error.message}

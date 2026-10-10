@@ -1,6 +1,6 @@
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { DisputeReply, type DisputeRow } from '@/components/merchant/board-client';
-import { MerchantPage, merchantContext } from '@/components/merchant/frame';
+import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Disputes' };
@@ -29,7 +29,7 @@ export default async function DisputesPage({
 }: {
   searchParams?: { tab?: string };
 }) {
-  const { m, live, nav } = await merchantContext();
+  const { m } = await merchantContext();
   if (!m) return null;
 
   const { data } = await createClient()
@@ -56,14 +56,11 @@ export default async function DisputesPage({
   const topReason = [...reasons.entries()].sort((a, b) => b[1] - a[1])[0];
 
   return (
-    <MerchantPage
-      m={m}
-      live={live}
-      nav={nav}
-      current="/merchant/disputes"
-      title="Disputes"
-      lead="Refunds and claims that touch your money. Reply with evidence before the deadline; NexG decides within one working day and both sides see the reasoning."
-    >
+    <Board>
+      <PageHead
+        title="Disputes"
+        lead="Refunds and claims that touch your money. Reply with evidence before the deadline; NexG decides within one working day and both sides see the reasoning."
+      />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <Tile
           label="Open"
@@ -241,6 +238,6 @@ export default async function DisputesPage({
           </section>
         </aside>
       </div>
-    </MerchantPage>
+    </Board>
   );
 }

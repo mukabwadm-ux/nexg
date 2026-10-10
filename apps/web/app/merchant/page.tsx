@@ -1,7 +1,6 @@
 import { DashboardLive } from '@/components/merchant/dashboard-live';
 import { DashboardSetup } from '@/components/merchant/dashboard-setup';
 import { firstName, merchantContext } from '@/components/merchant/frame';
-import { MerchantShell, StateControl } from '@/components/merchant/shell';
 import type {
   AttentionRow,
   BranchCard,
@@ -25,7 +24,7 @@ export const dynamic = 'force-dynamic';
  * decided for itself would be the one place that disagreed.
  */
 export default async function MerchantDashboard() {
-  const { m, live, nav, supabase, me } = await merchantContext();
+  const { m, live, supabase, me } = await merchantContext();
 
   if (!m) {
     return (
@@ -67,26 +66,8 @@ export default async function MerchantDashboard() {
       ])
     : [{ data: null }, { data: null }, { data: null }];
 
-  const primaryBranch = branches.find((b) => b.is_primary) ?? branches[0];
-
   return (
-    <MerchantShell
-      businessName={m.name}
-      personName={person}
-      role="Owner"
-      live={live}
-      branchName={primaryBranch?.name ?? null}
-      unreadCount={m.unread_messages ?? 0}
-      nav={nav}
-      current="/merchant"
-      stateControl={
-        <StateControl
-          live={live}
-          accepting={m.accepting_orders ?? false}
-          busyUntil={m.busy_mode_until}
-        />
-      }
-    >
+    <>
       {live ? (
         <DashboardLive
           m={m}
@@ -106,6 +87,6 @@ export default async function MerchantDashboard() {
           attention={attention}
         />
       ) : null}
-    </MerchantShell>
+    </>
   );
 }

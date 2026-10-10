@@ -1,5 +1,5 @@
 import { DASH, Panel, Row, kes } from '@/components/merchant/bits';
-import { MerchantPage, merchantContext } from '@/components/merchant/frame';
+import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import type { BranchCard } from '@/components/merchant/types';
 
 export const metadata = { title: 'Analytics' };
@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
  * confident-looking number this product refuses to print.
  */
 export default async function MerchantAnalytics() {
-  const { m, live, nav, supabase, me } = await merchantContext();
+  const { m, supabase, me } = await merchantContext();
   if (!m) return null;
 
   const since = new Date(Date.now() - 30 * 86400000).toISOString();
@@ -89,14 +89,11 @@ export default async function MerchantAnalytics() {
   const ENOUGH = 10;
 
   return (
-    <MerchantPage
-      m={m}
-      live={live}
-      nav={nav}
-      current="/merchant/analytics"
-      title={`Analytics · ${m.name}`}
-      lead="All branches combined, with each one side by side. Every number here comes from the same views as your statements and order history, so it will always match them."
-    >
+    <Board>
+      <PageHead
+        title=""
+        lead="All branches combined, with each one side by side. Every number here comes from the same views as your statements and order history, so it will always match them."
+      />
       {/* ───────────────────────────────────── the KPI row */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="Orders delivered" value={String(delivered.length)} note="Last 30 days" />
@@ -246,7 +243,7 @@ export default async function MerchantAnalytics() {
           figures today — the numbers are the ones on this screen.
         </p>
       </section>
-    </MerchantPage>
+    </Board>
   );
 }
 

@@ -4,6 +4,7 @@ import {
   type OnFile,
   type Requirement,
 } from '@/components/partner/documents';
+import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -30,21 +31,26 @@ export default async function MerchantDocuments() {
       .is('fulfilled_document_id', null),
   ]);
 
-  if (error) {
-    return (
-      <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
-        We could not read what we need from you: {error.message}
-      </p>
-    );
-  }
-
   return (
-    <Documents
-      ownerType="merchant"
-      ownerId={me.id}
-      requirements={(reqs as Requirement[] | null) ?? []}
-      onFile={(docs as OnFile[] | null) ?? []}
-      asked={(asked as Asked[] | null) ?? []}
-    />
+    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+      <PageHead
+        title="Documents"
+        lead="The documents NexG needs for your category, their review state and expiry. Documents you already verified are carried over and never re-requested unless they expire."
+      />
+
+      {error ? (
+        <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
+          We could not read what we need from you: {error.message}
+        </p>
+      ) : (
+        <Documents
+          ownerType="merchant"
+          ownerId={me.id}
+          requirements={(reqs as Requirement[] | null) ?? []}
+          onFile={(docs as OnFile[] | null) ?? []}
+          asked={(asked as Asked[] | null) ?? []}
+        />
+      )}
+    </div>
   );
 }
