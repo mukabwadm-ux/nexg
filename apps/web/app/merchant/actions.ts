@@ -38,6 +38,11 @@ function unwrap(
 }
 
 const ALL = [
+  '/merchant/hours',
+  '/merchant/disputes',
+  '/merchant/reviews',
+  '/merchant/settings',
+  '/merchant/support',
   '/merchant',
   '/merchant/orders',
   '/merchant/stores',
@@ -312,4 +317,127 @@ export async function revokeInvite(inviteId: string): Promise<Outcome> {
     p_invite_id: inviteId,
   });
   return unwrap(data, error, ALL);
+}
+
+// ────────────────────────────────────────────────────── hours
+
+export async function setHours(input: {
+  merchantId: string;
+  day: number;
+  service: string;
+  opens: string;
+  closes: string;
+  closed: boolean;
+  branchId?: string | null;
+}): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_hours_set', {
+    p_merchant_id: input.merchantId,
+    p_day: input.day,
+    p_service: input.service,
+    p_opens: input.closed ? undefined : input.opens,
+    p_closes: input.closed ? undefined : input.closes,
+    p_closed: input.closed,
+    p_branch_id: input.branchId ?? undefined,
+  });
+  return unwrap(data, error, ALL, 'Saved. Guests see the change on their next look.');
+}
+
+export async function copyHours(
+  merchantId: string,
+  fromBranch: string | null,
+  toBranch: string,
+): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_hours_copy', {
+    p_merchant_id: merchantId,
+    p_to_branch: toBranch,
+    p_from_branch: fromBranch ?? undefined,
+  });
+  return unwrap(data, error, ALL);
+}
+
+/** Close early today, or any other one-day override. */
+export async function setOverride(input: {
+  merchantId: string;
+  date: string;
+  closes: string;
+  closed: boolean;
+  reason: string;
+  branchId?: string | null;
+}): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_merchant_hours_override', {
+    p_merchant_id: input.merchantId,
+    p_date: input.date,
+    p_opens: undefined,
+    p_closes: input.closed ? undefined : input.closes,
+    p_closed: input.closed,
+    p_branch_id: input.branchId ?? undefined,
+    p_reason: input.reason,
+    p_source: 'merchant' as never,
+  });
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Applied. Guests see "closes early today" and orders already accepted finish as normal.',
+  );
+}
+
+// ──────────────────────────────────────────────────── reviews
+
+export async function replyToReview(ratingId: string, body: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_review_reply', {
+    p_rating_id: ratingId,
+    p_body: body,
+  });
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Sent for moderation. It appears on your Explore page once approved, usually within minutes.',
+  );
+}
+
+// ─────────────────────────────────────────────────── disputes
+
+export async function replyToDispute(disputeId: string, reply: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_dispute_merchant_reply', {
+    p_dispute_id: disputeId,
+    p_reply: reply,
+  });
+  return unwrap(data, error, ALL, 'Sent. NexG decides within one working day and you see the reasoning.');
+}
+
+export async function acceptDispute(disputeId: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_dispute_accept', {
+    p_dispute_id: disputeId,
+  });
+  return unwrap(data, error, ALL, 'Accepted. It appears on Friday’s statement with the reason.');
+}
+
+// ─────────────────────────────────────────────────── settings
+
+export async function saveMerchantSettings(
+  merchantId: string,
+  patch: Record<string, unknown>,
+): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_merchant_settings_update', {
+    p_merchant_id: merchantId,
+    p_patch: patch as never,
+  });
+  return unwrap(data, error, ALL, 'Saved.');
+}
+
+// ──────────────────────────────────────────────────── support
+
+export async function openTicket(input: {
+  topic: string;
+  body: string;
+  page: string;
+}): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_support_ticket_create', {
+    p_topic: input.topic as never,
+    p_body: `${input.body}\n\n— from ${input.page}`,
+    p_source_form: 'merchant_portal',
+  });
+  return unwrap(data, error, ALL, 'Opened. You will see it in Your tickets below.');
 }

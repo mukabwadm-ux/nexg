@@ -3715,6 +3715,20 @@ export type Database = {
             foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -4591,6 +4605,20 @@ export type Database = {
             foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -4712,6 +4740,20 @@ export type Database = {
             foreignKeyName: 'catalogue_import_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -4826,6 +4868,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'catalogue_item_merchant_id_fkey';
@@ -5082,6 +5138,20 @@ export type Database = {
             foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -5216,6 +5286,20 @@ export type Database = {
             foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -5319,6 +5403,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'catalogue_section_merchant_id_fkey';
@@ -6441,6 +6539,20 @@ export type Database = {
             foreignKeyName: 'dispute_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -7501,6 +7613,20 @@ export type Database = {
             foreignKeyName: 'experience_partner_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -7811,6 +7937,20 @@ export type Database = {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -7998,6 +8138,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'featured_creative_merchant_id_fkey';
@@ -8270,6 +8424,20 @@ export type Database = {
             foreignKeyName: 'featured_event_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -8464,6 +8632,20 @@ export type Database = {
             foreignKeyName: 'featured_fee_line_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -8635,6 +8817,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
@@ -12859,6 +13055,20 @@ export type Database = {
             foreignKeyName: 'incident_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'incident_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'incident_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -13244,6 +13454,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'legal_acceptance_merchant_id_fkey';
@@ -13946,6 +14170,20 @@ export type Database = {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
             columns: ['parent_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -14113,6 +14351,20 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -14238,6 +14490,20 @@ export type Database = {
             isOneToOne: true;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
@@ -14389,6 +14655,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_device_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_device_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_device_merchant_id_fkey';
@@ -14556,6 +14836,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
@@ -14753,6 +15047,20 @@ export type Database = {
             foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -14767,6 +15075,7 @@ export type Database = {
       };
       merchant_hours: {
         Row: {
+          branch_id: string | null;
           closed: boolean;
           closes: string | null;
           created_at: string;
@@ -14774,9 +15083,12 @@ export type Database = {
           id: string;
           merchant_id: string;
           opens: string | null;
+          service: string;
+          sort: number;
           updated_at: string;
         };
         Insert: {
+          branch_id?: string | null;
           closed?: boolean;
           closes?: string | null;
           created_at?: string;
@@ -14784,9 +15096,12 @@ export type Database = {
           id?: string;
           merchant_id: string;
           opens?: string | null;
+          service?: string;
+          sort?: number;
           updated_at?: string;
         };
         Update: {
+          branch_id?: string | null;
           closed?: boolean;
           closes?: string | null;
           created_at?: string;
@@ -14794,9 +15109,46 @@ export type Database = {
           id?: string;
           merchant_id?: string;
           opens?: string | null;
+          service?: string;
+          sort?: number;
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'branch_readiness_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch_live_v';
+            referencedColumns: ['branch_id'];
+          },
           {
             foreignKeyName: 'merchant_hours_merchant_id_fkey';
             columns: ['merchant_id'];
@@ -14852,6 +15204,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_hours_merchant_id_fkey';
@@ -15012,6 +15378,20 @@ export type Database = {
             foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -15123,6 +15503,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_invite_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_invite_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_invite_merchant_id_fkey';
@@ -15245,6 +15639,20 @@ export type Database = {
             foreignKeyName: 'merchant_message_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -15314,6 +15722,13 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'merchant_penalty_dispute_id_fkey';
+            columns: ['dispute_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dispute_v';
+            referencedColumns: ['id'];
+          },
+          {
             foreignKeyName: 'merchant_penalty_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
@@ -15368,6 +15783,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_penalty_merchant_id_fkey';
@@ -15472,6 +15901,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_review_merchant_id_fkey';
@@ -15628,6 +16071,20 @@ export type Database = {
             foreignKeyName: 'merchant_statement_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -15741,6 +16198,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_status_change_merchant_id_fkey';
@@ -15874,6 +16345,20 @@ export type Database = {
             foreignKeyName: 'merchant_strike_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -15964,6 +16449,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
@@ -16110,6 +16609,20 @@ export type Database = {
             foreignKeyName: 'merchant_user_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_user_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_user_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -16251,6 +16764,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'modifier_group_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'modifier_group_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'modifier_group_merchant_id_fkey';
@@ -17241,6 +17768,20 @@ export type Database = {
             foreignKeyName: 'notification_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -17333,6 +17874,13 @@ export type Database = {
             columns: ['ticket_id'];
             isOneToOne: false;
             referencedRelation: 'host_ticket_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'notification_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_ticket_v';
             referencedColumns: ['id'];
           },
           {
@@ -17922,6 +18470,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'order_merchant_id_fkey';
@@ -18656,6 +19218,20 @@ export type Database = {
             foreignKeyName: 'order_rating_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_rating_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_rating_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -19313,6 +19889,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'payment_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'payment_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'payment_merchant_id_fkey';
@@ -20990,6 +21580,20 @@ export type Database = {
             foreignKeyName: 'qr_scan_first_merchant_id_fkey';
             columns: ['first_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -21649,6 +22253,20 @@ export type Database = {
             isOneToOne: true;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'referral_merchant_id_fkey';
@@ -22365,6 +22983,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
@@ -23995,6 +24627,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_line_paid_to_merchant_id_fkey';
+            columns: ['paid_to_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_line_paid_to_merchant_id_fkey';
+            columns: ['paid_to_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'rider_settlement_line_paid_to_merchant_id_fkey';
@@ -25706,6 +26352,13 @@ export type Database = {
             foreignKeyName: 'support_message_ticket_id_fkey';
             columns: ['ticket_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_ticket_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'support_message_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
             referencedRelation: 'support_ticket';
             referencedColumns: ['id'];
           },
@@ -26691,6 +27344,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'welcome_package_merchant_id_fkey';
@@ -27718,6 +28385,20 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -28225,6 +28906,20 @@ export type Database = {
             foreignKeyName: 'catalogue_item_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -28632,6 +29327,20 @@ export type Database = {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -28869,6 +29578,20 @@ export type Database = {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -29043,6 +29766,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
@@ -29821,6 +30558,20 @@ export type Database = {
             foreignKeyName: 'order_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -30119,6 +30870,20 @@ export type Database = {
             foreignKeyName: 'order_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -30317,6 +31082,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
@@ -30561,6 +31340,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'order_merchant_id_fkey';
@@ -31246,6 +32039,20 @@ export type Database = {
             foreignKeyName: 'qr_scan_first_merchant_id_fkey';
             columns: ['first_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -31457,6 +32264,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
@@ -32052,6 +32873,20 @@ export type Database = {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -32303,6 +33138,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
@@ -33326,6 +34175,20 @@ export type Database = {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
             columns: ['parent_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -33510,6 +34373,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
@@ -35467,6 +36344,20 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -35594,6 +36485,20 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -35680,6 +36585,152 @@ export type Database = {
           unread_messages?: never;
         };
         Relationships: [];
+      };
+      merchant_dispute_v: {
+        Row: {
+          amount_claimed_kes: number | null;
+          amount_refunded_kes: number | null;
+          branch_id: string | null;
+          branch_name: string | null;
+          charged_to: string | null;
+          evidence: Json | null;
+          fault: string | null;
+          guest_note: string | null;
+          hours_left: number | null;
+          id: string | null;
+          merchant_id: string | null;
+          merchant_reply: string | null;
+          merchant_reply_due_at: string | null;
+          open: boolean | null;
+          opened_at: string | null;
+          order_reference: string | null;
+          overdue: boolean | null;
+          reason: string | null;
+          resolution: string | null;
+          resolved_at: string | null;
+          status: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dispute_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'branch_readiness_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'dispute_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'dispute_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch_live_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
       };
       merchant_featured_v: {
         Row: {
@@ -35834,6 +36885,20 @@ export type Database = {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -35957,6 +37022,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
@@ -36088,6 +37167,141 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'waitlist_city_v';
             referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      merchant_hours_v: {
+        Row: {
+          branch_id: string | null;
+          branch_name: string | null;
+          closed: boolean | null;
+          closes: string | null;
+          day_of_week: number | null;
+          id: string | null;
+          merchant_id: string | null;
+          opens: string | null;
+          service: string | null;
+          sort: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'branch_readiness_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch_live_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
           },
         ];
       };
@@ -36233,11 +37447,163 @@ export type Database = {
             foreignKeyName: 'order_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_override_v: {
+        Row: {
+          active_today: boolean | null;
+          branch_id: string | null;
+          branch_name: string | null;
+          closed: boolean | null;
+          closes: string | null;
+          created_at: string | null;
+          date: string | null;
+          id: string | null;
+          merchant_id: string | null;
+          opens: string | null;
+          past: boolean | null;
+          reason: string | null;
+          source: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_hours_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'branch_readiness_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_branch_live_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
@@ -36330,6 +37696,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
@@ -36462,6 +37842,20 @@ export type Database = {
             foreignKeyName: 'order_rating_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_rating_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_rating_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
             referencedColumns: ['merchant_id'];
           },
@@ -36544,6 +37938,115 @@ export type Database = {
           },
         ];
       };
+      merchant_review_stats_v: {
+        Row: {
+          average: number | null;
+          five: number | null;
+          five_star: number | null;
+          four: number | null;
+          low_ratings: number | null;
+          merchant_id: string | null;
+          one: number | null;
+          ratings: number | null;
+          replied: number | null;
+          three: number | null;
+          two: number | null;
+          unanswered: number | null;
+        };
+        Relationships: [];
+      };
+      merchant_settings_v: {
+        Row: {
+          accepting_orders: boolean | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          city_id: string | null;
+          city_name: string | null;
+          contact_email: string | null;
+          contact_name: string | null;
+          contact_phone: string | null;
+          health_band: string | null;
+          legal_name: string | null;
+          merchant_id: string | null;
+          notification_rules: Json | null;
+          payout_rail: string | null;
+          phone_verified_at: string | null;
+          quiet_hours: Json | null;
+          status: string | null;
+          trading_name: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
       merchant_setup_progress_v: {
         Row: {
           can_go_live: boolean | null;
@@ -36564,6 +38067,42 @@ export type Database = {
           submitted_at: string | null;
           trading_name: string | null;
           went_live_at: string | null;
+        };
+        Relationships: [];
+      };
+      merchant_ticket_v: {
+        Row: {
+          body: string | null;
+          created_at: string | null;
+          first_reply_at: string | null;
+          id: string | null;
+          reference: string | null;
+          resolved_at: string | null;
+          source_form: string | null;
+          status: string | null;
+          topic: string | null;
+        };
+        Insert: {
+          body?: string | null;
+          created_at?: string | null;
+          first_reply_at?: string | null;
+          id?: string | null;
+          reference?: string | null;
+          resolved_at?: string | null;
+          source_form?: string | null;
+          status?: never;
+          topic?: never;
+        };
+        Update: {
+          body?: string | null;
+          created_at?: string | null;
+          first_reply_at?: string | null;
+          id?: string | null;
+          reference?: string | null;
+          resolved_at?: string | null;
+          source_form?: string | null;
+          status?: never;
+          topic?: never;
         };
         Relationships: [];
       };
@@ -36631,6 +38170,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'order_merchant_id_fkey';
@@ -41813,6 +43366,38 @@ export type Database = {
         Returns: Json;
       };
       rpc_dispatch_widen_radius: { Args: { p_job_id: string; p_radius_km: number }; Returns: Json };
+      rpc_dispute_accept: {
+        Args: { p_dispute_id: string };
+        Returns: {
+          amount_claimed_kes: number | null;
+          amount_refunded_kes: number;
+          branch_id: string | null;
+          charged_to: string | null;
+          evidence: NonNullable<Json>;
+          fault: Database['public']['Enums']['dispute_fault'];
+          guest_note: string | null;
+          guest_user_id: string | null;
+          id: string;
+          merchant_id: string;
+          merchant_reply: string | null;
+          merchant_reply_due_at: string | null;
+          opened_at: string;
+          opened_by: string | null;
+          order_reference: string | null;
+          reason: string;
+          resolution: Database['public']['Enums']['dispute_resolution'] | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          rider_id: string | null;
+          status: Database['public']['Enums']['dispute_status'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'dispute';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_dispute_ask_merchant: {
         Args: { p_dispute_id: string; p_due_hours?: number };
         Returns: {
@@ -43345,6 +44930,40 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_hours_copy: {
+        Args: { p_from_branch?: string; p_merchant_id: string; p_to_branch: string };
+        Returns: Json;
+      };
+      rpc_hours_set: {
+        Args: {
+          p_branch_id?: string;
+          p_closed?: boolean;
+          p_closes?: string;
+          p_day: number;
+          p_merchant_id: string;
+          p_opens?: string;
+          p_service: string;
+        };
+        Returns: {
+          branch_id: string | null;
+          closed: boolean;
+          closes: string | null;
+          created_at: string;
+          day_of_week: number;
+          id: string;
+          merchant_id: string;
+          opens: string | null;
+          service: string;
+          sort: number;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant_hours';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_incident_open: {
         Args: {
           p_description?: string;
@@ -44427,6 +46046,98 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_merchant_settings_update: {
+        Args: { p_merchant_id: string; p_patch: Json };
+        Returns: {
+          accepting_orders: boolean;
+          accepting_orders_changed_at: string | null;
+          accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
+          acquisition_source: string | null;
+          answers: NonNullable<Json>;
+          branch_count_band: string | null;
+          busy_mode_until: string | null;
+          capacity_per_15min: number | null;
+          category: Database['public']['Enums']['merchant_category'] | null;
+          category_other: string | null;
+          city_id: string | null;
+          closed_early_at: string | null;
+          commission_pct: number | null;
+          commission_tier: Database['public']['Enums']['commission_tier_code'];
+          concierge_pick: boolean;
+          contact_email: string | null;
+          contact_name: string;
+          contact_phone: string;
+          cover_photo_path: string | null;
+          created_at: string;
+          credentials_sent_at: string | null;
+          delisted_at: string | null;
+          explore_visible: boolean;
+          featured: boolean;
+          fleet_delivery_pay_to_merchant: boolean;
+          fleet_dispatch_preference: string;
+          has_own_riders: boolean;
+          health_band: Database['public']['Enums']['health_band'] | null;
+          health_score: number | null;
+          hours: Json | null;
+          hours_pattern: string | null;
+          id: string;
+          landmark: string | null;
+          late_night_until: string | null;
+          legal_name: string | null;
+          notification_rules: NonNullable<Json>;
+          onboarding_call_at: string | null;
+          onboarding_source: string | null;
+          onboarding_step: number;
+          order_channels: string[];
+          packaging: string | null;
+          parent_merchant_id: string | null;
+          password_set_at: string | null;
+          pay_on_delivery: boolean;
+          pay_on_delivery_cap_kes: number | null;
+          payout_account: Json | null;
+          payout_hold: boolean;
+          payout_hold_reason: string | null;
+          payout_name_lookup: Json | null;
+          payout_rail: string | null;
+          phone_code_attempts: number;
+          phone_code_expires_at: string | null;
+          phone_code_hash: string | null;
+          phone_verified_at: string | null;
+          pickup_instructions: string | null;
+          prep_minutes: number;
+          price_band: string | null;
+          quiet_hours: Json | null;
+          referred_by_id: string | null;
+          referred_by_type: string | null;
+          requires_ops_mapping: boolean;
+          resume_token_expires_at: string | null;
+          resume_token_hash: string | null;
+          rider_parking: string | null;
+          settlement_account: Json | null;
+          source_url: string | null;
+          status: Database['public']['Enums']['partner_status'];
+          status_reason: string | null;
+          strike_count: number;
+          submitted_at: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_reason: string | null;
+          suspension_second_approver: string | null;
+          trading_name: string;
+          updated_at: string;
+          waitlisted_at: string | null;
+          went_live_at: string | null;
+          went_live_by: string | null;
+          when_busy: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_merchant_start: {
         Args: {
           p_contact_email?: string;
@@ -45327,6 +47038,33 @@ export type Database = {
           p_session_id?: string;
         };
         Returns: Json;
+      };
+      rpc_review_reply: {
+        Args: { p_body: string; p_rating_id: string };
+        Returns: {
+          about: string;
+          branch_id: string | null;
+          comment: string | null;
+          created_at: string;
+          id: string;
+          merchant_id: string;
+          order_id: string;
+          reply_at: string | null;
+          reply_body: string | null;
+          reply_by: string | null;
+          reply_decided_by: string | null;
+          reply_status: string;
+          rider_id: string | null;
+          stars: number;
+          themes: string[];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'order_rating';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       rpc_rider_apply: {
         Args: {
