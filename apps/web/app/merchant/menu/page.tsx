@@ -50,10 +50,24 @@ export default async function MerchantMenu() {
       <Panel title="Prices and new items">
         <p className="text-muted text-[0.8125rem] font-semibold">
           Changing a price or adding something new goes through your registration, where the
-          category questions and the price band are set together. {plural(items.length, 'item')} on
-          file, {on.length} of them orderable right now —{' '}
-          {kesWhole(Math.min(...items.map((i) => i.price_kes)))} to{' '}
-          {kesWhole(Math.max(...items.map((i) => i.price_kes)))}.
+          category questions and the price band are set together.{' '}
+          {/*
+            The range is only printed when there is a range.
+            `Math.min()` over an empty list is Infinity and
+            `Math.max()` is -Infinity, so every merchant who had
+            not added anything yet — which is every merchant on
+            their first day — was told their prices ran from
+            KES ∞ to KES -∞.
+          */}
+          {items.length === 0 ? (
+            'Nothing is priced yet.'
+          ) : (
+            <>
+              {plural(items.length, 'item')} on file, {on.length} of them orderable right now —{' '}
+              {kesWhole(Math.min(...items.map((i) => i.price_kes)))} to{' '}
+              {kesWhole(Math.max(...items.map((i) => i.price_kes)))}.
+            </>
+          )}
         </p>
         <a
           href="/merchants/apply"

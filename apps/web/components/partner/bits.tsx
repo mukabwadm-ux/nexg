@@ -4,21 +4,40 @@ import * as React from 'react';
 
 export const DASH = '[—]';
 
+/*
+ * Non-finite is unknown, not a number.
+ *
+ * The null check alone was not enough. `Math.min()` over an
+ * empty list is `Infinity` and `Math.max()` is `-Infinity`,
+ * both of which are numbers and neither of which is null — so
+ * a merchant with nothing on their menu was shown a price range
+ * of "KES ∞ to KES -∞". NaN arrives the same way, from an
+ * arithmetic step on a column that came back null.
+ *
+ * Ground rule 3 says we never invent a number. Infinity is an
+ * invented number with a straight face, so it formats as the
+ * same [—] everything else unknown does.
+ */
+function known(value: number | null | undefined): number | null {
+  return value === null || value === undefined || !Number.isFinite(Number(value))
+    ? null
+    : Number(value);
+}
+
 export function kes(cents: number | null | undefined): string {
-  return cents === null || cents === undefined
-    ? `KES ${DASH}`
-    : `KES ${Math.round(Number(cents) / 100).toLocaleString('en-KE')}`;
+  const n = known(cents);
+  return n === null ? `KES ${DASH}` : `KES ${Math.round(n / 100).toLocaleString('en-KE')}`;
 }
 
 /** Some of this database keeps whole shillings rather than cents. */
 export function kesWhole(value: number | null | undefined): string {
-  return value === null || value === undefined
-    ? `KES ${DASH}`
-    : `KES ${Math.round(Number(value)).toLocaleString('en-KE')}`;
+  const n = known(value);
+  return n === null ? `KES ${DASH}` : `KES ${Math.round(n).toLocaleString('en-KE')}`;
 }
 
 export function num(value: number | null | undefined): string {
-  return value === null || value === undefined ? DASH : String(value);
+  const n = known(value);
+  return n === null ? DASH : String(n);
 }
 
 export function clock(iso: string | null | undefined): string {
