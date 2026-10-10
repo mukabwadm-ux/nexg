@@ -253,17 +253,30 @@ export function LocationProvider({
     const device = loadDevicePlaces();
     setSavedPlaces(device);
 
-    if (!place) {
-      const remembered = readJSON<{ place: Place; step: ResolutionStep } | null>(
-        safeStorage('local'),
-        CURRENT_KEY,
-        null,
-      );
-      const local = remembered?.place ?? device[0];
-      if (local) {
-        setPlaceState(local);
+    /*
+     * Asked of React rather than read from the closure.
+     *
+     * This used to be `if (!place)`, which made a mount-once
+     * bootstrap depend on a value that changes every time
+     * somebody moves their pin. Declaring that dependency would
+     * have re-run the whole ladder — the saved-places request
+     * included — on every move; leaving it undeclared was the
+     * stale closure the rule exists to catch. The functional
+     * form needs neither, because React hands it the current
+     * value.
+     */
+    const remembered = readJSON<{ place: Place; step: ResolutionStep } | null>(
+      safeStorage('local'),
+      CURRENT_KEY,
+      null,
+    );
+    const fromThisDevice = remembered?.place ?? device[0];
+    if (fromThisDevice) {
+      setPlaceState((current) => {
+        if (current) return current;
         setStep(remembered?.step ?? 'device');
-      }
+        return fromThisDevice;
+      });
     }
 
     /* Enough to render honestly. The rest refines it. */

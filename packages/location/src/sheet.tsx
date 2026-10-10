@@ -49,6 +49,24 @@ export function LocationSheet() {
     return () => clearTimeout(timer);
   }, [ready, asked, sheetOpen, place, step, openSheet]);
 
+  /*
+   * Escape dismisses it.
+   *
+   * Clicking the backdrop always did; pressing Escape did not,
+   * which is the same sheet being dismissible with a mouse and
+   * not with a keyboard. The lint rule that flagged the
+   * click-anywhere handler was pointing at a real gap rather
+   * than being pedantic.
+   */
+  React.useEffect(() => {
+    if (!sheetOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeSheet('dismissed');
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [sheetOpen, closeSheet]);
+
   if (!sheetOpen) return null;
 
   return (
@@ -57,11 +75,21 @@ export function LocationSheet() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="location-sheet-title"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) closeSheet('dismissed');
-      }}
     >
-      <div className="bg-surface max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-t-3xl sm:rounded-3xl">
+      {/*
+        A real button rather than a click handler on the
+        backdrop div. It is what makes "click outside to
+        dismiss" reachable by keyboard and by a screen reader,
+        and it is why the div above no longer needs a handler
+        the rule had to object to.
+      */}
+      <button
+        type="button"
+        aria-label="Close"
+        className="absolute inset-0 cursor-default"
+        onClick={() => closeSheet('dismissed')}
+      />
+      <div className="bg-surface relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-t-3xl sm:rounded-3xl">
         <div className="grid gap-0 lg:grid-cols-[1.4fr_1fr]">
           {/* ───────────────────────────────────────── the ask */}
           <div className="p-5 sm:p-7">
