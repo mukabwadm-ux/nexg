@@ -264,22 +264,45 @@ export function Settings({
 
           <Panel title="Features">
             <div className="divide-border divide-y">
+              {/*
+                A div, not a label.
+                
+                `Toggle` renders a `role="switch"` button, and a
+                `<label>` does nothing for a button — the
+                `cursor-pointer` promised a clickable row and
+                only the 44px switch ever responded. Worse, the
+                switch had no accessible name at all: a screen
+                reader announced "switch, not checked" with no
+                way to tell which feature it belonged to.
+                `aria-labelledby` and `aria-describedby` give it
+                the name and the consequence.
+              */}
               {FEATURES.map((f) => (
-                <label
+                <div
                   key={f.key}
-                  className="flex cursor-pointer items-start justify-between gap-4 px-4 py-3"
+                  className="flex items-start justify-between gap-4 px-4 py-3"
                 >
                   <span className="min-w-0">
-                    <span className="block text-[0.875rem] font-extrabold">{f.label}</span>
-                    <span className="text-muted-light mt-0.5 block text-[0.75rem] font-semibold leading-[1.5]">
+                    <span
+                      id={`feature-${f.key}-label`}
+                      className="block text-[0.875rem] font-extrabold"
+                    >
+                      {f.label}
+                    </span>
+                    <span
+                      id={`feature-${f.key}-note`}
+                      className="text-muted-light mt-0.5 block text-[0.75rem] font-semibold leading-[1.5]"
+                    >
                       {f.consequence}
                     </span>
                   </span>
                   <Toggle
+                    labelledBy={`feature-${f.key}-label`}
+                    describedBy={`feature-${f.key}-note`}
                     on={features[f.key] === true}
                     onChange={(v) => setFeatures({ ...features, [f.key]: v })}
                   />
-                </label>
+                </div>
               ))}
             </div>
           </Panel>
@@ -610,12 +633,24 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+function Toggle({
+  on,
+  onChange,
+  labelledBy,
+  describedBy,
+}: {
+  on: boolean;
+  onChange: (v: boolean) => void;
+  labelledBy?: string;
+  describedBy?: string;
+}) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={on}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
       onClick={() => onChange(!on)}
       className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
         on ? 'bg-success' : 'bg-border-strong'

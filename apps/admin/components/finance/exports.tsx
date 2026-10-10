@@ -124,7 +124,15 @@ export function Exports({ log, defaultFrom, defaultTo }: {
     }
 
     const csv = toCsv(result.rows);
-    const blob = new Blob([`﻿${csv}`], { type: 'text/csv;charset=utf-8' });
+    /* The leading U+FEFF is what makes Excel open this as UTF-8
+       rather than Windows-1252, which is the difference between
+       a merchant whose name reads correctly and one whose name
+       arrives as mojibake in the finance team's spreadsheet.
+       Written as an escape because it was previously the literal
+       character: invisible in every editor, and one stray
+       backspace from being deleted by somebody who could not see
+       it was there. */
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
