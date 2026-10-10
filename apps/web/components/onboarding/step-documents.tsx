@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 import { uploadDocument } from '@/lib/uploads';
 
 import { DocumentsNote } from './controls';
+import { NoDraft } from './no-draft';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
 
@@ -140,6 +141,9 @@ export function DocumentsStep() {
   const pendingOptional = requirements.filter((r) => !r.essential && !existing[r.id]);
   const canContinue = missingEssential.length === 0;
 
+  /* No application at all is a different thing from one still
+     loading, and only the first is permanent. */
+  if (!draftId) return <NoDraft step={5} eyebrow="Verification" startHref="/merchants/apply/start" what="upload documents for" />;
   if (!loaded) return null;
 
   return (

@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Chip } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
+import { NoDraft } from './no-draft';
 
 interface Item {
   id?: string;
@@ -185,6 +186,7 @@ export function PayoutStep() {
     router.push('/merchants/status');
   };
 
+  if (!draftId) return <NoDraft step={6} eyebrow="Getting paid" startHref="/merchants/apply/start" what="set payout details for" />;
   if (!loaded) return null;
 
   return (

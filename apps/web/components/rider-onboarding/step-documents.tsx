@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client';
 import { uploadDocument } from '@/lib/uploads';
 
 import { RiderShell } from './rider-shell';
+import { RiderNoDraft } from './no-draft';
 import { useRiderOnboarding } from './store';
 
 interface Requirement {
@@ -164,6 +165,9 @@ export function RiderDocumentsStep() {
   const pendingOptional = requirements.filter((r) => !r.essential && !isDone(r));
   const canContinue = missingEssential.length === 0;
 
+  /* No application at all is a different thing from one still
+     loading, and only the first is permanent. */
+  if (!draftId) return <RiderNoDraft />;
   if (!loaded) return null;
 
   return (
