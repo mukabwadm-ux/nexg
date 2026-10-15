@@ -112,7 +112,10 @@ test.describe('location is never read without a gesture', () => {
       /* Scoped to the dialog. The homepage hero offers the same
          thing, and an unscoped match picks whichever is first in
          the DOM — which is behind the modal and not clickable. */
-      await sheet.getByRole('button', { name: /use my current location/i }).first().click();
+      await sheet
+        .getByRole('button', { name: /use my current location/i })
+        .first()
+        .click();
       await page.waitForTimeout(500);
 
       const after = await page.evaluate(

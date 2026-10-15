@@ -57,7 +57,10 @@ export const Uuid = z.string().uuid();
  */
 export const Msisdn = z
   .string()
-  .regex(/^\+254[17]\d{8}$/, 'A Kenyan mobile number in full international form, like +254712345678.');
+  .regex(
+    /^\+254[17]\d{8}$/,
+    'A Kenyan mobile number in full international form, like +254712345678.',
+  );
 
 export const Email = z.string().email().max(320);
 

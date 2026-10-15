@@ -53,8 +53,11 @@ Deno.serve(async (request) => {
    * notifications is not much, but the comparison costs nothing.
    */
   const presented = request.headers.get('x-push-secret') ?? '';
-  if (!DISPATCH_SECRET || presented.length !== DISPATCH_SECRET.length ||
-      !timingSafeEqual(presented, DISPATCH_SECRET)) {
+  if (
+    !DISPATCH_SECRET ||
+    presented.length !== DISPATCH_SECRET.length ||
+    !timingSafeEqual(presented, DISPATCH_SECRET)
+  ) {
     return json({ ok: false, error: 'not for you' }, 401);
   }
 
@@ -65,10 +68,13 @@ Deno.serve(async (request) => {
      * deployment that is half-configured and the answer should
      * name the missing half.
      */
-    return json({
-      ok: false,
-      error: 'No VAPID keys on this function. Set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY.',
-    }, 503);
+    return json(
+      {
+        ok: false,
+        error: 'No VAPID keys on this function. Set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY.',
+      },
+      503,
+    );
   }
 
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC, VAPID_PRIVATE);

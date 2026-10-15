@@ -3,13 +3,7 @@ import Link from 'next/link';
 import * as React from 'react';
 
 import { Attention, DASH, Panel, QuickAction, Row, Tile, kesc, kesh, partOfDay } from './bits';
-import type {
-  RiderAttentionRow,
-  RiderHome,
-  RiderJob,
-  WeekBar,
-  WeekEarnings,
-} from './types';
+import type { RiderAttentionRow, RiderHome, RiderJob, WeekBar, WeekEarnings } from './types';
 
 /**
  * The dashboard for a rider who is working.
@@ -54,10 +48,7 @@ export function DashboardActive({
     h.cash_cap && h.cash_cap > 0 ? Math.min(1, (h.cash_on_hand ?? 0) / h.cash_cap) : 0;
   const cashTone = cashPct >= 1 ? 'danger' : cashPct >= 0.8 ? 'gold' : 'plain';
 
-  const peak = bars.reduce(
-    (mx, b) => Math.max(mx, Number(b.base_kes) + Number(b.bonus_kes)),
-    0,
-  );
+  const peak = bars.reduce((mx, b) => Math.max(mx, Number(b.base_kes) + Number(b.bonus_kes)), 0);
 
   return (
     <div className="space-y-6">
@@ -230,8 +221,7 @@ export function DashboardActive({
               </h3>
               <p className="mt-1 text-[0.8125rem] font-semibold leading-[1.6] text-white/55">
                 Shifts give a guaranteed slot and an incentive paid as its own statement line when
-                you complete the window. Releasing early forfeits the incentive and is not a
-                strike.
+                you complete the window. Releasing early forfeits the incentive and is not a strike.
               </p>
               <Link
                 href="/rider/shifts"

@@ -123,8 +123,8 @@ export default async function HostReferPage() {
 
             <HowItWorks title="What you are not told">
               You see the area and how many units, never the name, the phone or the email. They
-              followed a link; they did not agree to be listed to you. If they want you to know
-              it went through, they will tell you.
+              followed a link; they did not agree to be listed to you. If they want you to know it
+              went through, they will tell you.
             </HowItWorks>
           </>
         }

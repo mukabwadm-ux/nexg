@@ -45,19 +45,21 @@ const HANDOFF: Record<string, string> = {
 
 const IN_FLIGHT = ['placed', 'confirmed', 'preparing', 'ready', 'picked_up', 'arriving'];
 
-const STAGE: Record<string, { label: string; tone: 'good' | 'info' | 'warn' | 'danger' | 'plain' }> =
-  {
-    placed: { label: 'Placed', tone: 'info' },
-    confirmed: { label: 'Confirmed', tone: 'info' },
-    preparing: { label: 'Preparing', tone: 'info' },
-    ready: { label: 'Ready', tone: 'warn' },
-    picked_up: { label: 'Picked up', tone: 'warn' },
-    arriving: { label: 'Arriving', tone: 'warn' },
-    delivered: { label: 'Delivered', tone: 'good' },
-    cancelled: { label: 'Cancelled', tone: 'plain' },
-    disputed: { label: 'Disputed', tone: 'danger' },
-    refunded: { label: 'Refunded', tone: 'plain' },
-  };
+const STAGE: Record<
+  string,
+  { label: string; tone: 'good' | 'info' | 'warn' | 'danger' | 'plain' }
+> = {
+  placed: { label: 'Placed', tone: 'info' },
+  confirmed: { label: 'Confirmed', tone: 'info' },
+  preparing: { label: 'Preparing', tone: 'info' },
+  ready: { label: 'Ready', tone: 'warn' },
+  picked_up: { label: 'Picked up', tone: 'warn' },
+  arriving: { label: 'Arriving', tone: 'warn' },
+  delivered: { label: 'Delivered', tone: 'good' },
+  cancelled: { label: 'Cancelled', tone: 'plain' },
+  disputed: { label: 'Disputed', tone: 'danger' },
+  refunded: { label: 'Refunded', tone: 'plain' },
+};
 
 /**
  * Everything that arrived at a unit, and how it was handed over.
@@ -114,7 +116,8 @@ export default async function HostDeliveriesPage({
         (new Date(d.delivered_at as string).getTime() - new Date(d.placed_at).getTime()) / 60000,
     )
     .sort((a, b) => a - b);
-  const median = times.length > 0 ? Math.round(times[Math.floor(times.length / 2)] as number) : null;
+  const median =
+    times.length > 0 ? Math.round(times[Math.floor(times.length / 2)] as number) : null;
 
   const byRule = new Map<string, number>();
   for (const d of delivered) {
@@ -140,12 +143,7 @@ export default async function HostDeliveriesPage({
         <Kpi label="Deliveries" value={String(all.length)} note="last 200" />
         <Kpi label="On the way" value={String(inFlight.length)} note="right now" />
         <Kpi label="Delivered" value={String(delivered.length)} note="completed" />
-        <Kpi
-          label="Order value"
-          value={kes(value)}
-          note="guests paid the merchants"
-          tone="plain"
-        />
+        <Kpi label="Order value" value={kes(value)} note="guests paid the merchants" tone="plain" />
         <Kpi
           label="Median time"
           value={median === null ? DASH : `${median}m`}
@@ -153,7 +151,9 @@ export default async function HostDeliveriesPage({
         />
         <Kpi
           label="Photo proof"
-          value={delivered.length === 0 ? DASH : `${Math.round((withProof / delivered.length) * 100)}%`}
+          value={
+            delivered.length === 0 ? DASH : `${Math.round((withProof / delivered.length) * 100)}%`
+          }
           note={`${withProof} of ${delivered.length}`}
           tone={delivered.length > 0 && withProof < delivered.length ? 'gold' : 'good'}
         />
@@ -201,18 +201,24 @@ export default async function HostDeliveriesPage({
               <div className="border-border border-b px-4 py-3">
                 <h2 className="text-[0.875rem] font-extrabold tracking-tight">Where it went</h2>
               </div>
-              <Fact label="Units receiving" value={String(new Set(all.map((d) => d.unit_id)).size)} />
+              <Fact
+                label="Units receiving"
+                value={String(new Set(all.map((d) => d.unit_id)).size)}
+              />
               <Fact
                 label="Merchants used"
                 value={String(new Set(all.map((d) => d.merchant_name).filter(Boolean)).size)}
               />
-              <Fact label="Disputed" value={String(all.filter((d) => d.stage === 'disputed').length)} />
+              <Fact
+                label="Disputed"
+                value={String(all.filter((d) => d.stage === 'disputed').length)}
+              />
             </section>
 
             <HowItWorks title="The photo">
               A rider takes one photograph at hand-over and it is stored against the order, not
-              against the guest. You can open it from the order; it is not shown inline here and
-              it is not in any export.
+              against the guest. You can open it from the order; it is not shown inline here and it
+              is not in any export.
             </HowItWorks>
           </>
         }

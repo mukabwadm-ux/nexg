@@ -276,7 +276,8 @@ export function AuthPanel({ initialTab = 'signin' }: { initialTab?: 'signin' | '
               >
                 Create an account
               </button>{' '}
-              — it takes a minute. Riders, merchants and hosts: your application login works here too.
+              — it takes a minute. Riders, merchants and hosts: your application login works here
+              too.
             </>
           ) : (
             <>

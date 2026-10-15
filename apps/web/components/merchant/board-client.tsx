@@ -133,8 +133,8 @@ export function DisputeReply({ dispute }: { dispute: DisputeRow }) {
           <div className="border-border border-t pt-4">
             <Said outcome={accept.outcome} />
             <p className="text-muted mt-2 text-[0.75rem] font-semibold leading-[1.6]">
-              If the claim is right, accepting it now costs the same and takes a second. It
-              appears on Friday&apos;s statement with the reason.
+              If the claim is right, accepting it now costs the same and takes a second. It appears
+              on Friday&apos;s statement with the reason.
             </p>
             <div className="mt-3">
               <Submit
@@ -394,11 +394,7 @@ export function ReportProblem({ page = 'Merchant portal' }: { page?: string }) {
       >
         <div className="space-y-4">
           <Field label="Who it is for">
-            <Select
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              options={TOPICS}
-            />
+            <Select value={topic} onChange={(e) => setTopic(e.target.value)} options={TOPICS} />
           </Field>
           <Field label="What happened, or what you would like">
             <Area

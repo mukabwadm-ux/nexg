@@ -24,11 +24,7 @@ const STEPS: [string, string][] = [
  * whoever opens this, and the only thing separating them is how
  * long is left to reply.
  */
-export default async function DisputesPage({
-  searchParams,
-}: {
-  searchParams?: { tab?: string };
-}) {
+export default async function DisputesPage({ searchParams }: { searchParams?: { tab?: string } }) {
   const { m } = await merchantContext();
   if (!m) return null;
 
@@ -165,9 +161,7 @@ export default async function DisputesPage({
                           ) : d.hours_left === null ? (
                             '—'
                           ) : (
-                            <span
-                              className={d.hours_left < 6 ? 'text-danger font-extrabold' : ''}
-                            >
+                            <span className={d.hours_left < 6 ? 'text-danger font-extrabold' : ''}>
                               {d.hours_left} h
                             </span>
                           )}

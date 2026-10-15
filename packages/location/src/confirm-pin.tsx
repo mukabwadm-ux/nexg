@@ -104,11 +104,14 @@ export function ConfirmPin({
           Browser accuracy{' '}
           <span className="text-ink font-extrabold tabular-nums">±{Math.round(accuracy)} m</span>
           <span className="text-muted-light">
-            · {accuracyBand(accuracy) === 'exact' ? 'precise enough' : 'please confirm the exact spot'}
+            ·{' '}
+            {accuracyBand(accuracy) === 'exact'
+              ? 'precise enough'
+              : 'please confirm the exact spot'}
           </span>
         </p>
 
-        <div className="relative mt-3 flex h-36 items-center justify-center overflow-hidden rounded-xl bg-[color:var(--color-border)]/30">
+        <div className="bg-[color:var(--color-border)]/30 relative mt-3 flex h-36 items-center justify-center overflow-hidden rounded-xl">
           {/* The accuracy ring, drawn to scale against the pin so the
               uncertainty is a size rather than a number. */}
           <span
@@ -205,7 +208,9 @@ export function ConfirmPin({
         {place.coverage === 'covered' ? (
           <p className="text-success text-[0.75rem] font-extrabold">
             We deliver here{place.zone ? ` · ${place.zone}` : ''}
-            {place.eta_min && place.eta_max ? ` · ${place.eta_min}–${place.eta_max} min typical` : ''}
+            {place.eta_min && place.eta_max
+              ? ` · ${place.eta_min}–${place.eta_max} min typical`
+              : ''}
           </p>
         ) : place.coverage === 'unknown' ? null : (
           <p className="text-danger text-[0.75rem] font-extrabold">{place.message}</p>

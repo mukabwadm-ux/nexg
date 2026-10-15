@@ -42,10 +42,12 @@ export function Kpi({
       <p className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
         {label}
       </p>
-      <p className="mt-1.5 text-[1.5rem] font-extrabold leading-none tracking-tight tabular-nums">
+      <p className="mt-1.5 text-[1.5rem] font-extrabold tabular-nums leading-none tracking-tight">
         {value}
       </p>
-      {note ? <p className={`mt-1.5 text-[0.6875rem] font-extrabold ${toneClass}`}>{note}</p> : null}
+      {note ? (
+        <p className={`mt-1.5 text-[0.6875rem] font-extrabold ${toneClass}`}>{note}</p>
+      ) : null}
     </>
   );
 
@@ -63,9 +65,7 @@ export function Kpi({
 }
 
 export function KpiRow({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{children}</div>
-  );
+  return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{children}</div>;
 }
 
 /**
@@ -129,10 +129,7 @@ export function Table({
           <thead className="border-border bg-bg border-b">
             <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
               {head.map((h) => (
-                <th
-                  key={h}
-                  className={`px-4 py-2 ${h.startsWith('>') ? 'text-right' : ''}`}
-                >
+                <th key={h} className={`px-4 py-2 ${h.startsWith('>') ? 'text-right' : ''}`}>
                   {h.replace(/^>/, '')}
                 </th>
               ))}
@@ -294,13 +291,7 @@ export function Bar({ label, value, max }: { label: string; value: number; max: 
 }
 
 /** A labelled value in a rail panel. */
-export function Fact({
-  label,
-  value,
-}: {
-  label: React.ReactNode;
-  value: React.ReactNode;
-}) {
+export function Fact({ label, value }: { label: React.ReactNode; value: React.ReactNode }) {
   return (
     <div className="border-border flex items-start justify-between gap-3 border-b px-4 py-2.5 last:border-0">
       <span className="text-muted text-[0.8125rem] font-semibold">{label}</span>

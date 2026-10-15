@@ -116,8 +116,8 @@ export function DashboardLive({
               Get featured in {m.city ?? 'your zone'}
             </p>
             <p className="mt-1.5 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-              Featured slots put you at the top of Explore in your zone for a week. Your health
-              band decides eligibility.
+              Featured slots put you at the top of Explore in your zone for a week. Your health band
+              decides eligibility.
             </p>
             <Link
               href="/merchant/featured"

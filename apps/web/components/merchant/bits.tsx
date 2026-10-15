@@ -83,7 +83,7 @@ export function Tile({
           </span>
         ) : null}
         <div className="min-w-0">
-          <p className="text-[1.5rem] font-extrabold leading-none tracking-tight tabular-nums">
+          <p className="text-[1.5rem] font-extrabold tabular-nums leading-none tracking-tight">
             {value}
           </p>
           <p className="text-muted mt-1 text-[0.75rem] font-semibold">{label}</p>
@@ -100,7 +100,7 @@ export function Tile({
 
 export function PreviewBadge() {
   return (
-    <span className="border-gold/50 bg-gold-soft text-gold-text -rotate-2 inline-block rounded border border-dashed px-2 py-0.5 text-[0.625rem] font-extrabold uppercase tracking-wide">
+    <span className="border-gold/50 bg-gold-soft text-gold-text inline-block -rotate-2 rounded border border-dashed px-2 py-0.5 text-[0.625rem] font-extrabold uppercase tracking-wide">
       Preview · live once you go live
     </span>
   );

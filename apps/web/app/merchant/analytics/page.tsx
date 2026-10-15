@@ -234,9 +234,9 @@ export default async function MerchantAnalytics() {
       <section className="border-border bg-surface rounded-xl border p-5">
         <h2 className="text-[0.9375rem] font-extrabold tracking-tight">Export this view</h2>
         <p className="text-muted mt-1.5 text-[0.8125rem] font-semibold leading-[1.7]">
-          Everything on this page for the selected period, with the order-level detail behind it
-          and guest data masked. Excel, CSV or PDF, and a scheduled weekly or monthly copy to you
-          or your accountant.
+          Everything on this page for the selected period, with the order-level detail behind it and
+          guest data masked. Excel, CSV or PDF, and a scheduled weekly or monthly copy to you or
+          your accountant.
         </p>
         <p className="text-muted-light mt-2 text-[0.75rem] font-semibold leading-[1.7]">
           The export builder is the next piece of this page. Merchant ops can produce the same
@@ -253,7 +253,7 @@ function Kpi({ label, value, note }: { label: string; value: string; note: strin
       <p className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
         {label}
       </p>
-      <p className="mt-1.5 text-[1.5rem] font-extrabold leading-none tracking-tight tabular-nums">
+      <p className="mt-1.5 text-[1.5rem] font-extrabold tabular-nums leading-none tracking-tight">
         {value}
       </p>
       <p className="text-muted-light mt-1.5 text-[0.6875rem] font-semibold">{note}</p>

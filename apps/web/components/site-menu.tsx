@@ -145,10 +145,10 @@ export function SiteMenu({
 
           <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-9">
             {/*
-              * Tapping anywhere on this opens the same sheet the
-              * header chip opens — and closes the menu first,
-              * because the sheet would otherwise open behind it.
-              */}
+             * Tapping anywhere on this opens the same sheet the
+             * header chip opens — and closes the menu first,
+             * because the sheet would otherwise open behind it.
+             */}
             <button
               type="button"
               onClick={() => {
@@ -178,9 +178,7 @@ export function SiteMenu({
                 <span className="text-micro text-muted-light block font-bold uppercase">
                   Deliver to
                 </span>
-                <span className="text-ink block truncate text-sm font-bold">
-                  {deliverTo.title}
-                </span>
+                <span className="text-ink block truncate text-sm font-bold">{deliverTo.title}</span>
                 <span className="text-muted-light block truncate text-xs font-semibold">
                   {deliverTo.hint}
                 </span>

@@ -100,11 +100,11 @@ export function Tile({
 }) {
   return (
     <div className="border-border bg-surface rounded-xl border p-4">
-      <p className="text-muted-light text-[0.6875rem] font-extrabold tracking-wide uppercase">
+      <p className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
         {label}
       </p>
       <p
-        className={`mt-1.5 text-2xl font-extrabold tracking-tight tabular-nums ${
+        className={`mt-1.5 text-2xl font-extrabold tabular-nums tracking-tight ${
           tone === 'warn' ? 'text-danger' : ''
         }`}
       >
@@ -120,7 +120,9 @@ export function Tile({
             {change.text}
           </span>
         ) : null}
-        {note ? <span className="text-muted-light text-[0.6875rem] font-semibold">{note}</span> : null}
+        {note ? (
+          <span className="text-muted-light text-[0.6875rem] font-semibold">{note}</span>
+        ) : null}
       </div>
     </div>
   );

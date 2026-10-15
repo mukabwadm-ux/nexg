@@ -153,8 +153,7 @@ function metresBetween(a: { lat: number; lng: number }, b: { lat: number; lng: n
   const dLng = ((b.lng - a.lng) * Math.PI) / 180;
   const lat1 = (a.lat * Math.PI) / 180;
   const lat2 = (b.lat * Math.PI) / 180;
-  const h =
-    Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  const h = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
@@ -348,10 +347,7 @@ export function LocationProvider({
          whether it also reached an account — a signed-in guest
          who signs out still has their own browser. */
       const saved = saveDevicePlace(next);
-      setSavedPlaces((current) => [
-        saved,
-        ...current.filter((p) => metresBetween(p, next) >= 30),
-      ]);
+      setSavedPlaces((current) => [saved, ...current.filter((p) => metresBetween(p, next) >= 30)]);
 
       void actions.note('confirmed', {
         band: accuracyBand(next.accuracy_m),
@@ -379,7 +375,11 @@ export function LocationProvider({
 
       const storage = safeStorage('local');
       const local = readJSON<StoredDevicePlace[]>(storage, PLACES_KEY, []);
-      writeJSON(storage, PLACES_KEY, local.filter((p) => p.id !== id));
+      writeJSON(
+        storage,
+        PLACES_KEY,
+        local.filter((p) => p.id !== id),
+      );
 
       if (target && !target.deviceOnly) {
         await actions.remove(id);

@@ -28,22 +28,14 @@ interface OverrideRow {
  * question a merchant opens this to answer, which is "are we
  * shown as open right now".
  */
-export default async function HoursPage({
-  searchParams,
-}: {
-  searchParams?: { branch?: string };
-}) {
+export default async function HoursPage({ searchParams }: { searchParams?: { branch?: string } }) {
   const { m } = await merchantContext();
   if (!m) return null;
 
   const supabase = createClient();
   const [hoursRes, overrideRes, branchRes] = await Promise.all([
     supabase.from('merchant_hours_v').select('*').eq('merchant_id', m.merchant_id),
-    supabase
-      .from('merchant_override_v')
-      .select('*')
-      .eq('merchant_id', m.merchant_id)
-      .order('date'),
+    supabase.from('merchant_override_v').select('*').eq('merchant_id', m.merchant_id).order('date'),
     supabase
       .from('merchant_branch_list_v')
       .select('id, name, state, paused_at')
@@ -54,8 +46,9 @@ export default async function HoursPage({
   const allHours = (hoursRes.data as HoursRow[] | null) ?? [];
   const overrides = (overrideRes.data as OverrideRow[] | null) ?? [];
   const branches =
-    (branchRes.data as { id: string; name: string; state: string; paused_at: string | null }[] | null) ??
-    [];
+    (branchRes.data as
+      | { id: string; name: string; state: string; paused_at: string | null }[]
+      | null) ?? [];
 
   /* Null branch means the shared week. A merchant with one set
      of hours keeps them there, which is why it is the default
@@ -96,7 +89,7 @@ export default async function HoursPage({
           label="Open now"
           value={m.accepting_orders ? 'Yes' : 'No'}
           note={m.accepting_orders ? 'taking orders' : 'not accepting'}
-          noteTone={m.accepting_orders ? "good" : "danger"}
+          noteTone={m.accepting_orders ? 'good' : 'danger'}
         />
         <Tile
           label="Weekly open hours"
@@ -107,14 +100,18 @@ export default async function HoursPage({
           label="Overrides this week"
           value={String(thisWeek.length)}
           note={activeToday ? `${hhmm(activeToday.closes)} today` : 'none active'}
-          noteTone={activeToday ? "gold" : "plain"}
+          noteTone={activeToday ? 'gold' : 'plain'}
         />
         <Tile
           label="Next holiday"
           value={nextHoliday ? nextHoliday.date.slice(5) : '—'}
           note={nextHoliday?.reason ?? 'none scheduled'}
         />
-        <Tile label="Guests see" value={m.accepting_orders ? 'Open' : 'Closed'} note="from live state" />
+        <Tile
+          label="Guests see"
+          value={m.accepting_orders ? 'Open' : 'Closed'}
+          note="from live state"
+        />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -215,9 +212,7 @@ export default async function HoursPage({
                           {o.closed ? 'Closed' : `until ${hhmm(o.closes)}`}
                         </td>
                         <td className="text-muted px-4 py-2.5">{o.reason ?? '—'}</td>
-                        <td className="text-muted px-4 py-2.5">
-                          {o.branch_name ?? 'All'}
-                        </td>
+                        <td className="text-muted px-4 py-2.5">{o.branch_name ?? 'All'}</td>
                         <td className="px-4 py-2.5">
                           <span
                             className={`rounded-full px-2 py-0.5 text-[0.6875rem] font-extrabold ${

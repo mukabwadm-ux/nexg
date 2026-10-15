@@ -76,9 +76,9 @@ export function ReferralLink({ hostId, code }: { hostId: string; code: string | 
       ) : (
         <>
           <p className="mt-2 text-[0.8125rem] font-semibold leading-[1.65] text-white/60">
-            You do not have a code yet. Creating one takes a second and it is yours for good —
-            every host who signs up through it is tracked back to you, and the reward is credited
-            when their first unit takes an order.
+            You do not have a code yet. Creating one takes a second and it is yours for good — every
+            host who signs up through it is tracked back to you, and the reward is credited when
+            their first unit takes an order.
           </p>
           <div className="mt-4">
             <Submit

@@ -112,9 +112,7 @@ export default async function TeamPage() {
                       <td className="px-4 py-3">
                         <span
                           className={`inline-block rounded-full px-2 py-0.5 text-[0.6875rem] font-extrabold ${
-                            x.role === 'owner'
-                              ? 'bg-gold-soft text-gold-text'
-                              : 'bg-bg text-muted'
+                            x.role === 'owner' ? 'bg-gold-soft text-gold-text' : 'bg-bg text-muted'
                           }`}
                         >
                           {ROLE_LABEL[x.role] ?? x.role}
@@ -132,11 +130,7 @@ export default async function TeamPage() {
                         {x.caps?.see_money ? ' · money' : ''}
                       </td>
                       <td className="px-4 py-3">
-                        <MemberActions
-                          merchantId={m.merchant_id}
-                          member={x}
-                          branches={branches}
-                        />
+                        <MemberActions merchantId={m.merchant_id} member={x} branches={branches} />
                       </td>
                     </tr>
                   ))}
@@ -165,9 +159,8 @@ export default async function TeamPage() {
             <section className="border-gold/40 bg-gold-soft rounded-xl border p-4">
               <p className="text-[0.875rem] font-extrabold">You are the only owner</p>
               <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.65]">
-                If you lose this login, nobody can change payout details or invite anyone. Making
-                a second owner takes a minute and is the one piece of housekeeping worth doing
-                today.
+                If you lose this login, nobody can change payout details or invite anyone. Making a
+                second owner takes a minute and is the one piece of housekeeping worth doing today.
               </p>
             </section>
           ) : null}
@@ -177,8 +170,8 @@ export default async function TeamPage() {
               What an invitation is
             </h2>
             <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-              A message, and nothing more. It grants no access until that person signs in with
-              the number or address it went to. Withdraw it and the link stops working.
+              A message, and nothing more. It grants no access until that person signs in with the
+              number or address it went to. Withdraw it and the link stops working.
             </p>
           </section>
         </aside>

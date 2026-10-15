@@ -314,7 +314,9 @@ function describePlace(place: Place): string {
   const parts = [
     place.unit_no ? `${place.unit_no},` : null,
     place.address_line ?? place.label,
-    place.address_line && place.label && !place.label.startsWith('Pinned') ? `(${place.label})` : null,
+    place.address_line && place.label && !place.label.startsWith('Pinned')
+      ? `(${place.label})`
+      : null,
   ].filter(Boolean);
   return parts.join(' ').trim();
 }

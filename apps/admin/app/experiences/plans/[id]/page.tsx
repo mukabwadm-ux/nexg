@@ -78,8 +78,7 @@ export default async function PlanWorkbenchPage({ params }: { params: { id: stri
    * `Record<string, unknown>` and narrowed field by field a few
    * lines down either way.
    */
-  const MESSAGE_SELECT: string =
-    'id, author_type, body, created_at, staff_user(display_name)';
+  const MESSAGE_SELECT: string = 'id, author_type, body, created_at, staff_user(display_name)';
 
   const messagesQuery = supabase
     .from('plan_message')

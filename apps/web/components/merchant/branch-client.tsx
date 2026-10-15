@@ -2,12 +2,7 @@
 
 import * as React from 'react';
 
-import {
-  deleteBranch,
-  pauseBranch,
-  resumeBranch,
-  saveBranch,
-} from '@/app/merchant/actions';
+import { deleteBranch, pauseBranch, resumeBranch, saveBranch } from '@/app/merchant/actions';
 import {
   Actions,
   Area,
@@ -178,8 +173,8 @@ export function BranchDrawer({
                 ) : (
                   <>
                     <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.6]">
-                      Stops new orders here. Orders already accepted finish as normal, and the
-                      other branches are unaffected.
+                      Stops new orders here. Orders already accepted finish as normal, and the other
+                      branches are unaffected.
                     </p>
                     <div className="mt-2 space-y-2">
                       <Text
@@ -213,9 +208,9 @@ export function BranchDrawer({
                   />
                 </div>
                 <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold leading-[1.6]">
-                  Refused while orders are in progress here, and refused if it is your only
-                  branch — that would take the business off Explore entirely. Statements and the
-                  audit trail are kept either way.
+                  Refused while orders are in progress here, and refused if it is your only branch —
+                  that would take the business off Explore entirely. Statements and the audit trail
+                  are kept either way.
                 </p>
               </div>
             </div>
@@ -239,13 +234,7 @@ export function AddBranch({ merchantId }: { merchantId: string }) {
   );
 }
 
-export function OpenBranch({
-  merchantId,
-  branch,
-}: {
-  merchantId: string;
-  branch: BranchRow;
-}) {
+export function OpenBranch({ merchantId, branch }: { merchantId: string; branch: BranchRow }) {
   return (
     <BranchDrawer
       merchantId={merchantId}

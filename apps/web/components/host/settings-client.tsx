@@ -47,7 +47,11 @@ const FEATURES: { key: string; label: string; consequence: string }[] = [
 ];
 
 const EVENTS: { key: string; label: string; channel: string }[] = [
-  { key: 'delivery_at_reception', label: 'Delivery arriving at reception', channel: 'In-app + sound' },
+  {
+    key: 'delivery_at_reception',
+    label: 'Delivery arriving at reception',
+    channel: 'In-app + sound',
+  },
   { key: 'retired_card_scanned', label: 'Retired QR card scanned', channel: 'Push' },
   { key: 'request_waiting', label: 'Request waiting on you', channel: 'Push + WhatsApp' },
   { key: 'caretaker_unconfirmed', label: 'Caretaker not confirmed after 48 h', channel: 'Push' },
@@ -145,9 +149,7 @@ export function Settings({
     language: settings.language,
     time_zone: settings.time_zone,
   });
-  const [features, setFeatures] = React.useState<Record<string, boolean>>(
-    settings.features ?? {},
-  );
+  const [features, setFeatures] = React.useState<Record<string, boolean>>(settings.features ?? {});
   const [rules, setRules] = React.useState<Record<string, string[]>>(
     settings.notification_rules ?? {},
   );
@@ -161,7 +163,13 @@ export function Settings({
   });
 
   const [look, setLook] = React.useState<ThemeRow>(
-    theme ?? { theme: 'nexg', accent: null, sidebar: 'light', density: 'comfortable', font_size: 'default' },
+    theme ?? {
+      theme: 'nexg',
+      accent: null,
+      sidebar: 'light',
+      density: 'comfortable',
+      font_size: 'default',
+    },
   );
 
   const save = useAction();
@@ -226,7 +234,10 @@ export function Settings({
                     onChange={(e) => setGeneral({ ...general, display_name: e.target.value })}
                   />
                 </Field>
-                <Field label="Default city" hint="Changed by host ops — it sets your zones and pricing.">
+                <Field
+                  label="Default city"
+                  hint="Changed by host ops — it sets your zones and pricing."
+                >
                   <Text value={settings.city_name ?? '—'} readOnly />
                 </Field>
                 <Field label="Language">
@@ -278,10 +289,7 @@ export function Settings({
                 the name and the consequence.
               */}
               {FEATURES.map((f) => (
-                <div
-                  key={f.key}
-                  className="flex items-start justify-between gap-4 px-4 py-3"
-                >
+                <div key={f.key} className="flex items-start justify-between gap-4 px-4 py-3">
                   <span className="min-w-0">
                     <span
                       id={`feature-${f.key}-label`}
@@ -526,30 +534,33 @@ export function Settings({
         <Panel title="Guest landing branding">
           <div className="space-y-4 p-4">
             <p className="text-muted text-[0.8125rem] font-semibold leading-[1.7]">
-              What a guest sees after scanning one of your cards. It sits inside NexG&apos;s frame
-              — the payment, the merchants and the delivery are ours, and a page that looked
-              entirely like yours would make that unclear at the point it matters.
+              What a guest sees after scanning one of your cards. It sits inside NexG&apos;s frame —
+              the payment, the merchants and the delivery are ours, and a page that looked entirely
+              like yours would make that unclear at the point it matters.
             </p>
             <Grid>
-              <Field label="Welcome headline" wide hint="Up to a line. Reviewed by host ops before it goes live.">
+              <Field
+                label="Welcome headline"
+                wide
+                hint="Up to a line. Reviewed by host ops before it goes live."
+              >
                 <Text
                   value={landing.landing_headline}
-                  onChange={(e) =>
-                    setLanding({ ...landing, landing_headline: e.target.value })
-                  }
+                  onChange={(e) => setLanding({ ...landing, landing_headline: e.target.value })}
                   placeholder="Welcome to Riverside"
                 />
               </Field>
               <Field label="Brand colour" hint="Used for accents on the landing page only.">
                 <Text
                   value={landing.landing_brand_colour}
-                  onChange={(e) =>
-                    setLanding({ ...landing, landing_brand_colour: e.target.value })
-                  }
+                  onChange={(e) => setLanding({ ...landing, landing_brand_colour: e.target.value })}
                   placeholder="#1F3A5F"
                 />
               </Field>
-              <Field label="Logo" hint="PNG or SVG up to 1 MB. Upload is handled by host ops for now.">
+              <Field
+                label="Logo"
+                hint="PNG or SVG up to 1 MB. Upload is handled by host ops for now."
+              >
                 <Text value="None uploaded" readOnly />
               </Field>
             </Grid>
@@ -575,8 +586,8 @@ export function Settings({
             ))}
           </div>
           <p className="text-muted-light border-border border-t px-4 py-3 text-[0.6875rem] font-semibold leading-[1.6]">
-            Signing out everywhere is handled by host ops today, and it ends every session
-            including this one. A front-desk tablet shows its lock schedule once one is enrolled.
+            Signing out everywhere is handled by host ops today, and it ends every session including
+            this one. A front-desk tablet shows its lock schedule once one is enrolled.
           </p>
         </Panel>
       ) : null}
@@ -611,9 +622,9 @@ export function Settings({
               </Field>
             </Grid>
             <p className="text-muted text-[0.8125rem] font-semibold leading-[1.7]">
-              You are invoiced only for welcome packages you ask us to place. Guest orders are
-              paid by the guest to the merchant and never pass through your account — see
-              Earnings &amp; Invoices, where the two are deliberately never added together.
+              You are invoiced only for welcome packages you ask us to place. Guest orders are paid
+              by the guest to the merchant and never pass through your account — see Earnings &amp;
+              Invoices, where the two are deliberately never added together.
             </p>
           </div>
         </Panel>

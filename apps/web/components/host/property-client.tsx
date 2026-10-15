@@ -30,7 +30,6 @@ import { KINDS, type Photo } from './vocab';
  * for it before anything goes live.
  */
 
-
 export interface PropertyForEdit {
   id: string;
   photos?: unknown;

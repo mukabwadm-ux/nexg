@@ -128,9 +128,7 @@ async function signatureValid(raw: string, header: string, secret: string): Prom
     ['sign'],
   );
   const signed = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(raw));
-  const expected = [...new Uint8Array(signed)]
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
+  const expected = [...new Uint8Array(signed)].map((b) => b.toString(16).padStart(2, '0')).join('');
 
   if (presented.length !== expected.length) return false;
   let diff = 0;

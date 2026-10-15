@@ -136,9 +136,9 @@ export default async function HostOperationsPage() {
           <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.65]">
             The rule names {needsCaretaker.map((r) => r.caretaker_name ?? 'someone').join(', ')}.
             Until they confirm, a rider arriving at{' '}
-            {needsCaretaker.map((r) => r.unit_name).join(', ')} has no one expecting them. We do
-            not quietly fall back to another rule — a bag left somewhere the host did not choose
-            is worse than a rider who calls.
+            {needsCaretaker.map((r) => r.unit_name).join(', ')} has no one expecting them. We do not
+            quietly fall back to another rule — a bag left somewhere the host did not choose is
+            worse than a rider who calls.
           </p>
         </div>
       ) : null}
@@ -170,8 +170,8 @@ export default async function HostOperationsPage() {
 
             <HowItWorks title="Delivery hours">
               Outside the hours you set, your card still scans and the menu still shows — what
-              changes is that merchants who cannot reach you are filtered out rather than
-              accepting an order they will have to cancel.
+              changes is that merchants who cannot reach you are filtered out rather than accepting
+              an order they will have to cancel.
             </HowItWorks>
           </>
         }
@@ -221,9 +221,7 @@ export default async function HostOperationsPage() {
         {rows.some((r) => r.handoff_note) ? (
           <section className="border-border bg-surface rounded-xl border">
             <div className="border-border border-b px-4 py-3">
-              <h2 className="text-[0.875rem] font-extrabold tracking-tight">
-                Notes a rider sees
-              </h2>
+              <h2 className="text-[0.875rem] font-extrabold tracking-tight">Notes a rider sees</h2>
             </div>
             <div className="divide-border divide-y">
               {rows

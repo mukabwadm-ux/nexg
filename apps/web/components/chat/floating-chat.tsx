@@ -146,9 +146,7 @@ export function FloatingChat({ citySlug }: { citySlug?: string | null }) {
             <div className="px-4 py-6 text-center">
               <p className="text-[0.9375rem] font-extrabold tracking-tight">Got it.</p>
               <p className="text-muted mt-1.5 text-[0.8125rem] font-semibold">{sent.message}</p>
-              <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold">
-                Your reference
-              </p>
+              <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold">Your reference</p>
               <p className="font-mono text-base font-extrabold tracking-tight">{sent.reference}</p>
               <button
                 type="button"
@@ -166,7 +164,7 @@ export function FloatingChat({ citySlug }: { citySlug?: string | null }) {
                * loses exactly the people who were in a hurry.
                */}
               <label className="block">
-                <span className="text-muted-light text-[0.6875rem] font-extrabold tracking-wide uppercase">
+                <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
                   Phone or email
                 </span>
                 <input
@@ -179,7 +177,7 @@ export function FloatingChat({ citySlug }: { citySlug?: string | null }) {
               </label>
 
               <label className="block">
-                <span className="text-muted-light text-[0.6875rem] font-extrabold tracking-wide uppercase">
+                <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
                   Your name <span className="normal-case opacity-70">(optional)</span>
                 </span>
                 <input
@@ -190,7 +188,7 @@ export function FloatingChat({ citySlug }: { citySlug?: string | null }) {
               </label>
 
               <label className="block">
-                <span className="text-muted-light text-[0.6875rem] font-extrabold tracking-wide uppercase">
+                <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
                   What is it about
                 </span>
                 <select
@@ -207,7 +205,7 @@ export function FloatingChat({ citySlug }: { citySlug?: string | null }) {
               </label>
 
               <label className="block">
-                <span className="text-muted-light text-[0.6875rem] font-extrabold tracking-wide uppercase">
+                <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
                   What do you need
                 </span>
                 <textarea

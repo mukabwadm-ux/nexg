@@ -137,8 +137,8 @@ export default async function RiderHealth() {
       {s === null ? (
         <Panel title="Your band">
           <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
-            Nothing scored yet. Your first snapshot is taken after your first full week of trips —
-            a band built from three deliveries would say more about the week than about you.
+            Nothing scored yet. Your first snapshot is taken after your first full week of trips — a
+            band built from three deliveries would say more about the week than about you.
           </p>
         </Panel>
       ) : (
@@ -169,9 +169,7 @@ export default async function RiderHealth() {
             <section className="border-border bg-surface rounded-xl border px-4 py-3">
               <p className="text-[0.8125rem] font-extrabold">
                 <span className={`rounded-full px-2 py-0.5 ${band.tone}`}>{band.label}</span>
-                <span className="text-muted-light ml-2 font-semibold">
-                  as of {when(s.as_of)}
-                </span>
+                <span className="text-muted-light ml-2 font-semibold">as of {when(s.as_of)}</span>
               </p>
               <p className="text-muted mt-1.5 text-[0.8125rem] font-semibold leading-[1.6]">
                 {band.means}
@@ -213,8 +211,7 @@ export default async function RiderHealth() {
                 </div>
                 <p className="text-muted-light border-border border-t px-4 py-2.5 text-[0.6875rem] font-semibold leading-[1.6]">
                   The weights are the ones actually used to compute your score, read from the
-                  snapshot rather than typed onto this page. If they change, this changes with
-                  them.
+                  snapshot rather than typed onto this page. If they change, this changes with them.
                 </p>
               </Panel>
 
@@ -228,9 +225,7 @@ export default async function RiderHealth() {
                             Level {x.level}
                             <span
                               className={`ml-2 rounded-full px-2 py-0.5 text-[0.6875rem] font-extrabold ${
-                                x.active
-                                  ? 'bg-danger-bg text-danger'
-                                  : 'bg-success/10 text-success'
+                                x.active ? 'bg-danger-bg text-danger' : 'bg-success/10 text-success'
                               }`}
                             >
                               {x.active ? 'Active' : x.cleared_at ? 'Cleared' : 'Expired'}

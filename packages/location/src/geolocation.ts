@@ -156,7 +156,9 @@ function isHandheld(): boolean {
  * visitor to drag the pin rather than present a guess as an
  * address.
  */
-export function accuracyBand(metres: number | null | undefined): 'exact' | 'street' | 'area' | 'city' {
+export function accuracyBand(
+  metres: number | null | undefined,
+): 'exact' | 'street' | 'area' | 'city' {
   if (metres === null || metres === undefined) return 'city';
   if (metres <= 25) return 'exact';
   if (metres <= 100) return 'street';

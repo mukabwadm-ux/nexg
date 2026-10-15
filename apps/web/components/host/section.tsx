@@ -194,8 +194,8 @@ export function NotBuiltYet({
         </div>
         {instead ?? (
           <p className="text-muted-light text-[0.8125rem] font-semibold">
-            Until it is built, the concierge desk handles this for you — reach them from Get Help
-            at the top of any page.
+            Until it is built, the concierge desk handles this for you — reach them from Get Help at
+            the top of any page.
           </p>
         )}
       </div>

@@ -291,7 +291,11 @@ export function LocationStep() {
           <p className="text-[0.9375rem] font-extrabold">Where is your main branch?</p>
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <Button loading={locating} loadingText="Locating…" onClick={() => void pinFromBrowser()}>
+            <Button
+              loading={locating}
+              loadingText="Locating…"
+              onClick={() => void pinFromBrowser()}
+            >
               <span className="flex items-center gap-2">
                 <LocateFixed className="h-4 w-4" aria-hidden="true" />
                 Use my location

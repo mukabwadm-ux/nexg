@@ -186,7 +186,15 @@ export function PayoutStep() {
     router.push('/merchants/status');
   };
 
-  if (!draftId) return <NoDraft step={6} eyebrow="Getting paid" startHref="/merchants/apply/start" what="set payout details for" />;
+  if (!draftId)
+    return (
+      <NoDraft
+        step={6}
+        eyebrow="Getting paid"
+        startHref="/merchants/apply/start"
+        what="set payout details for"
+      />
+    );
   if (!loaded) return null;
 
   return (

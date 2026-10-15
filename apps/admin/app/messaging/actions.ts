@@ -100,11 +100,7 @@ export async function resolveConversation(
   };
 }
 
-export async function pinDecision(
-  id: string,
-  summary: string,
-  reason: string,
-): Promise<Result> {
+export async function pinDecision(id: string, summary: string, reason: string): Promise<Result> {
   const supabase = createClient();
   const { error } = await supabase.rpc('rpc_msg_pin_decision', {
     p_conversation: id,

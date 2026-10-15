@@ -82,8 +82,7 @@ export default async function ChargeToRoom() {
   const failed = all.filter((f) => f.sync === 'failed');
   const postedToday = all.filter(
     (f) =>
-      f.status === 'posted' &&
-      new Date(f.created_at).toDateString() === new Date().toDateString(),
+      f.status === 'posted' && new Date(f.created_at).toDateString() === new Date().toDateString(),
   );
   const outstanding = all
     .filter((f) => f.status === 'pending' || f.status === 'approved')
@@ -92,7 +91,8 @@ export default async function ChargeToRoom() {
   /* Whether the feature belongs to this account at all. An
      empty table and "you do not have this" look identical in a
      zero, so they are told apart before anything is counted. */
-  const features = (settingsRes.data as { features: Record<string, boolean> | null } | null)?.features ?? {};
+  const features =
+    (settingsRes.data as { features: Record<string, boolean> | null } | null)?.features ?? {};
   const enabled = features.charge_to_room === true;
 
   return (
@@ -110,19 +110,17 @@ export default async function ChargeToRoom() {
       {!enabled ? (
         <>
           <section className="border-border bg-surface rounded-xl border p-5">
-            <h2 className="text-[1rem] font-extrabold tracking-tight">
-              This one is for hotels
-            </h2>
+            <h2 className="text-[1rem] font-extrabold tracking-tight">This one is for hotels</h2>
             <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
-              Charging to a room needs a folio to charge to — a property management system, a
-              front desk that can approve a posting, and a nightly reconciliation against it.
-              Apartments and serviced units take payment the ordinary way, at checkout, and
-              nothing here would apply to them.
+              Charging to a room needs a folio to charge to — a property management system, a front
+              desk that can approve a posting, and a nightly reconciliation against it. Apartments
+              and serviced units take payment the ordinary way, at checkout, and nothing here would
+              apply to them.
             </p>
             <p className="text-muted-light mt-3 text-[0.8125rem] font-semibold leading-[1.7]">
-              If you do run a hotel and this should be on, ask host ops to enable it. It is
-              switched on per account because it needs your PMS details and a desk device paired
-              before the first posting, not after.
+              If you do run a hotel and this should be on, ask host ops to enable it. It is switched
+              on per account because it needs your PMS details and a desk device paired before the
+              first posting, not after.
             </p>
           </section>
 
@@ -163,30 +161,31 @@ export default async function ChargeToRoom() {
             empty="No postings yet. The first one appears here the moment a guest chooses Charge to room."
           >
             {all.map((f) => {
-                const st = STATUS[f.status] ?? { label: f.status, tone: 'plain' as const };
-                const sy = SYNC[f.sync] ?? { label: f.sync, tone: 'plain' as const };
-                return (
-                  <Tr key={f.id}>
-                    <Td strong>{f.order_reference}</Td>
-                    <Td strong>{f.room_no}</Td>
-                    <Td>{f.guest_surname}</Td>
-                    <Td strong>{kes(f.amount)}</Td>
-                    <Td>
-                      <Pill tone={st.tone}>{st.label}</Pill>
-                    </Td>
-                    <Td>
-                      <Pill tone={sy.tone}>{sy.label}</Pill>
-                    </Td>
-                    <Td muted>{when(f.created_at)}</Td>
-                  </Tr>
-                );
+              const st = STATUS[f.status] ?? { label: f.status, tone: 'plain' as const };
+              const sy = SYNC[f.sync] ?? { label: f.sync, tone: 'plain' as const };
+              return (
+                <Tr key={f.id}>
+                  <Td strong>{f.order_reference}</Td>
+                  <Td strong>{f.room_no}</Td>
+                  <Td>{f.guest_surname}</Td>
+                  <Td strong>{kes(f.amount)}</Td>
+                  <Td>
+                    <Pill tone={st.tone}>{st.label}</Pill>
+                  </Td>
+                  <Td>
+                    <Pill tone={sy.tone}>{sy.label}</Pill>
+                  </Td>
+                  <Td muted>{when(f.created_at)}</Td>
+                </Tr>
+              );
             })}
           </Table>
 
-
           <section className="border-border bg-surface rounded-xl border">
             <div className="border-border border-b px-4 py-3">
-              <h2 className="text-[0.875rem] font-extrabold tracking-tight">When a posting does not reach your PMS</h2>
+              <h2 className="text-[0.875rem] font-extrabold tracking-tight">
+                When a posting does not reach your PMS
+              </h2>
             </div>
             <Fact
               label="The money is not lost"

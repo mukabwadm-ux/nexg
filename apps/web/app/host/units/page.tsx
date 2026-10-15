@@ -103,7 +103,8 @@ export default async function HostUnitsPage({
   /* The things that will not fix themselves, named by unit. */
   const attention: { unit: string; what: string }[] = [];
   for (const u of all) {
-    if (!u.handoff) attention.push({ unit: u.name, what: 'No hand-off rule · unit cannot go live' });
+    if (!u.handoff)
+      attention.push({ unit: u.name, what: 'No hand-off rule · unit cannot go live' });
     else if (u.handoff === 'caretaker' && !u.caretaker_confirmed_at)
       attention.push({ unit: u.name, what: 'Caretaker has not confirmed' });
     if (u.qr_cards === 0) attention.push({ unit: u.name, what: 'No QR card generated' });
@@ -278,8 +279,8 @@ export default async function HostUnitsPage({
 
             <HowItWorks title="Who you see in a unit">
               A guest&apos;s first name and the dates, from a booking you entered or a calendar
-              synced. Never a surname, an email or an unmasked phone — those columns do not exist
-              on a stay.
+              synced. Never a surname, an email or an unmasked phone — those columns do not exist on
+              a stay.
             </HowItWorks>
           </>
         }
@@ -323,14 +324,12 @@ export default async function HostUnitsPage({
                     {u.guest_now ?? (u.occupied ? 'Guest' : 'Vacant')}
                   </Td>
                   <Td muted>
-                    {u.next_check_in ? `${when(u.next_check_in)}${u.next_guest ? ` · ${u.next_guest}` : ''}` : DASH}
+                    {u.next_check_in
+                      ? `${when(u.next_check_in)}${u.next_guest ? ` · ${u.next_guest}` : ''}`
+                      : DASH}
                   </Td>
                   <Td>
-                    {u.handoff ? (
-                      handoffLabel(u.handoff)
-                    ) : (
-                      <Pill tone="danger">Not set</Pill>
-                    )}
+                    {u.handoff ? handoffLabel(u.handoff) : <Pill tone="danger">Not set</Pill>}
                   </Td>
                   <Td right>
                     {u.qr_placed}/{u.qr_cards}
@@ -340,11 +339,7 @@ export default async function HostUnitsPage({
                     <Pill tone={st.tone}>{st.label}</Pill>
                   </Td>
                   <Td right>
-                    <EditUnit
-                      hostId={me.id}
-                      unit={u as UnitForEdit}
-                      properties={properties}
-                    />
+                    <EditUnit hostId={me.id} unit={u as UnitForEdit} properties={properties} />
                   </Td>
                 </Tr>
               );

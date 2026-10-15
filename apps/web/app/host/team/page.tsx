@@ -101,9 +101,8 @@ export default async function HostTeamPage() {
         </table>
       </div>
       <p className="text-muted-light text-[0.75rem] font-semibold leading-[1.7]">
-        Inviting a manager goes through the concierge desk for now. An invite grants real access
-        to guest arrivals, so it wants a confirmed identity rather than an address anybody can
-        type.
+        Inviting a manager goes through the concierge desk for now. An invite grants real access to
+        guest arrivals, so it wants a confirmed identity rather than an address anybody can type.
       </p>
     </HostSection>
   );

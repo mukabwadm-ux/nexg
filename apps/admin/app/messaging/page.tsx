@@ -18,11 +18,7 @@ import {
   fmtSeconds,
   sla,
 } from '@/components/messaging/shared';
-import {
-  Channels,
-  type ChannelRow,
-  type WhatsAppWindowRow,
-} from '@/components/messaging/channels';
+import { Channels, type ChannelRow, type WhatsAppWindowRow } from '@/components/messaging/channels';
 import {
   CannedReplies,
   DeskSettings,
@@ -300,45 +296,45 @@ export default async function MessagingPage({
         ) : null}
 
         {isQueue ? (
-        <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
-          {/* ───────────────────────────────────── the queue */}
-          <div className="border-border bg-surface overflow-hidden rounded-xl border">
-            {list.length === 0 ? (
-              <Empty>
-                {tab === 'inbox'
-                  ? 'Nothing waiting. Not a loading state — the queue is genuinely empty.'
-                  : 'No internal threads. One opens when somebody escalates a conversation.'}
-              </Empty>
-            ) : (
-              <ul>
-                {list.map((r) => {
-                  const s = sla(r.overdue_s, r.first_responded_at !== null);
-                  const on = selected?.id === r.id;
-                  return (
-                    <li key={r.id}>
-                      <Link
-                        href={`${base}&chip=${chip}&id=${r.id}`}
-                        className={`border-border block border-b px-3.5 py-3 transition-colors last:border-0 ${
-                          on ? 'bg-bg border-l-ink border-l-[3px]' : 'hover:bg-bg'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`h-2 w-2 shrink-0 rounded-full ${s.dot}`}
-                            aria-hidden="true"
-                          />
-                          <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-extrabold">
-                            {/* Same rule as the header: a thread is
+          <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
+            {/* ───────────────────────────────────── the queue */}
+            <div className="border-border bg-surface overflow-hidden rounded-xl border">
+              {list.length === 0 ? (
+                <Empty>
+                  {tab === 'inbox'
+                    ? 'Nothing waiting. Not a loading state — the queue is genuinely empty.'
+                    : 'No internal threads. One opens when somebody escalates a conversation.'}
+                </Empty>
+              ) : (
+                <ul>
+                  {list.map((r) => {
+                    const s = sla(r.overdue_s, r.first_responded_at !== null);
+                    const on = selected?.id === r.id;
+                    return (
+                      <li key={r.id}>
+                        <Link
+                          href={`${base}&chip=${chip}&id=${r.id}`}
+                          className={`border-border block border-b px-3.5 py-3 transition-colors last:border-0 ${
+                            on ? 'bg-bg border-l-ink border-l-[3px]' : 'hover:bg-bg'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`h-2 w-2 shrink-0 rounded-full ${s.dot}`}
+                              aria-hidden="true"
+                            />
+                            <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-extrabold">
+                              {/* Same rule as the header: a thread is
                                 named by what it is about, a guest
                                 conversation by who it is with. */}
-                            {r.kind === 'external' ? (r.with_whom ?? r.subject) : r.subject}
-                          </span>
-                          <span className="text-muted-light shrink-0 text-[0.625rem] font-semibold">
-                            {ago(r.last_message_at)}
-                          </span>
-                        </div>
+                              {r.kind === 'external' ? (r.with_whom ?? r.subject) : r.subject}
+                            </span>
+                            <span className="text-muted-light shrink-0 text-[0.625rem] font-semibold">
+                              {ago(r.last_message_at)}
+                            </span>
+                          </div>
 
-                        {/*
+                          {/*
                           The subject, when the row is named by
                           somebody else.
 
@@ -352,78 +348,76 @@ export default async function MessagingPage({
                           appeared nowhere until the thread was
                           opened.
                         */}
-                        {r.kind === 'external' && r.subject && r.subject !== r.with_whom ? (
-                          <p className="text-ink mt-0.5 truncate text-[0.75rem] font-bold">
-                            {r.subject}
+                          {r.kind === 'external' && r.subject && r.subject !== r.with_whom ? (
+                            <p className="text-ink mt-0.5 truncate text-[0.75rem] font-bold">
+                              {r.subject}
+                            </p>
+                          ) : null}
+
+                          <div className="mt-1 flex flex-wrap items-center gap-1">
+                            {r.topic ? (
+                              <Pill tone="bg-bg text-muted">{TOPIC_LABEL[r.topic]}</Pill>
+                            ) : null}
+                            {r.object_label ? (
+                              <span className="text-gold text-[0.625rem] font-extrabold">
+                                {r.object_label}
+                              </span>
+                            ) : null}
+                            {r.internal_notes > 0 ? (
+                              <span className="text-warn text-[0.625rem] font-extrabold">
+                                {r.internal_notes} note{r.internal_notes === 1 ? '' : 's'}
+                              </span>
+                            ) : null}
+                          </div>
+
+                          {r.snippet ? (
+                            <p className="text-muted mt-1 line-clamp-2 text-[0.75rem] font-semibold">
+                              {r.snippet}
+                            </p>
+                          ) : null}
+
+                          <p className="text-muted-light mt-1 text-[0.625rem] font-semibold">
+                            {[
+                              s.text,
+                              CHANNEL_LABEL[r.current_channel],
+                              r.assignee ?? 'unassigned',
+                              r.escalated_to.length ? r.escalated_to.join(', ') : null,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
                           </p>
-                        ) : null}
-
-                        <div className="mt-1 flex flex-wrap items-center gap-1">
-                          {r.topic ? (
-                            <Pill tone="bg-bg text-muted">{TOPIC_LABEL[r.topic]}</Pill>
-                          ) : null}
-                          {r.object_label ? (
-                            <span className="text-gold text-[0.625rem] font-extrabold">
-                              {r.object_label}
-                            </span>
-                          ) : null}
-                          {r.internal_notes > 0 ? (
-                            <span className="text-warn text-[0.625rem] font-extrabold">
-                              {r.internal_notes} note{r.internal_notes === 1 ? '' : 's'}
-                            </span>
-                          ) : null}
-                        </div>
-
-                        {r.snippet ? (
-                          <p className="text-muted mt-1 line-clamp-2 text-[0.75rem] font-semibold">
-                            {r.snippet}
-                          </p>
-                        ) : null}
-
-                        <p className="text-muted-light mt-1 text-[0.625rem] font-semibold">
-                          {[
-                            s.text,
-                            CHANNEL_LABEL[r.current_channel],
-                            r.assignee ?? 'unassigned',
-                            r.escalated_to.length ? r.escalated_to.join(', ') : null,
-                          ]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </p>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-            <p className="text-muted-light border-border border-t px-3.5 py-2.5 text-[0.625rem] font-semibold">
-              {tab === 'inbox'
-                ? 'Sorted by urgency, then by who has waited longest. A conversation stops being an SLA problem once it has had its first reply, even while it stays open.'
-                : 'A thread keeps the decision and the links with the record it is about.'}
-            </p>
-          </div>
-
-          {/* ─────────────────────────────── the conversation */}
-          {head ? (
-            <Conversation
-              head={head}
-              messages={messages}
-              isMine={head.assignee_id === staff.staffId}
-              canReplyExternal={canReplyExternal}
-              isParticipant={isParticipant}
-            />
-          ) : (
-            <div className="border-border bg-surface rounded-xl border">
-              <Empty>Pick a conversation on the left.</Empty>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <p className="text-muted-light border-border border-t px-3.5 py-2.5 text-[0.625rem] font-semibold">
+                {tab === 'inbox'
+                  ? 'Sorted by urgency, then by who has waited longest. A conversation stops being an SLA problem once it has had its first reply, even while it stays open.'
+                  : 'A thread keeps the decision and the links with the record it is about.'}
+              </p>
             </div>
-          )}
-        </div>
+
+            {/* ─────────────────────────────── the conversation */}
+            {head ? (
+              <Conversation
+                head={head}
+                messages={messages}
+                isMine={head.assignee_id === staff.staffId}
+                canReplyExternal={canReplyExternal}
+                isParticipant={isParticipant}
+              />
+            ) : (
+              <div className="border-border bg-surface rounded-xl border">
+                <Empty>Pick a conversation on the left.</Empty>
+              </div>
+            )}
+          </div>
         ) : null}
 
         {tab === 'channels' ? <Channels channels={channels} whatsapp={whatsapp} /> : null}
-        {tab === 'insights' ? (
-          <Insights daily={daily} topics={topics} hours={hours} />
-        ) : null}
+        {tab === 'insights' ? <Insights daily={daily} topics={topics} hours={hours} /> : null}
         {tab === 'canned' ? <CannedReplies rows={canned} /> : null}
         {tab === 'settings' ? <DeskSettings rules={rules} roster={roster} /> : null}
 

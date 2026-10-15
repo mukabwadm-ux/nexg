@@ -149,8 +149,8 @@ export default async function RiderSupport() {
               </div>
             )}
             <p className="text-muted-light border-border border-t px-4 py-2.5 text-[0.6875rem] font-semibold leading-[1.6]">
-              A ticket opened from a call or WhatsApp appears here too, logged by whoever took it
-              — so the desk remembers what you asked last week.
+              A ticket opened from a call or WhatsApp appears here too, logged by whoever took it —
+              so the desk remembers what you asked last week.
             </p>
           </Panel>
         </div>
@@ -170,8 +170,8 @@ export default async function RiderSupport() {
             </h2>
             <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
               In danger, or somebody with you is: SOS in the app, or the 24-hour NexG line. It
-              reaches Live Operations, who can see where you are. Do not open a ticket for that
-              and wait.
+              reaches Live Operations, who can see where you are. Do not open a ticket for that and
+              wait.
             </p>
           </section>
         </aside>

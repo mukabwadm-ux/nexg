@@ -1,6 +1,11 @@
 'use client';
 
-import { LocationProvider, type LocationActions, type Place, type ResolutionStep } from '@nexg/location';
+import {
+  LocationProvider,
+  type LocationActions,
+  type Place,
+  type ResolutionStep,
+} from '@nexg/location';
 import * as React from 'react';
 
 import {

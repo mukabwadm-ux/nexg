@@ -87,11 +87,7 @@ export default async function HostPrivacyPage() {
           note="cannot start yet"
           tone={unverified.length > 0 ? 'gold' : 'good'}
         />
-        <Kpi
-          label="Fulfilled"
-          value={String(rows.length - open.length)}
-          note="closed out"
-        />
+        <Kpi label="Fulfilled" value={String(rows.length - open.length)} note="closed out" />
         <Kpi label="Statutory window" value="30 days" note="Data Protection Act" />
       </KpiRow>
 
@@ -125,8 +121,8 @@ export default async function HostPrivacyPage() {
         </div>
         <p className="text-muted-light mt-4 text-[0.75rem] font-semibold leading-[1.65]">
           This is a database rule, not a screen rule. The columns for a guest&apos;s surname and
-          email do not exist on a stay, so there is nothing for a future page, a future export or
-          a future bug to leak.
+          email do not exist on a stay, so there is nothing for a future page, a future export or a
+          future bug to leak.
         </p>
       </div>
 
@@ -135,9 +131,7 @@ export default async function HostPrivacyPage() {
           <>
             <section className="border-border bg-surface rounded-xl border">
               <div className="border-border border-b px-4 py-3">
-                <h2 className="text-[0.875rem] font-extrabold tracking-tight">
-                  The four requests
-                </h2>
+                <h2 className="text-[0.875rem] font-extrabold tracking-tight">The four requests</h2>
               </div>
               <Fact label="Access" value="a copy" />
               <Fact label="Rectification" value="correct it" />
@@ -147,14 +141,14 @@ export default async function HostPrivacyPage() {
 
             <HowItWorks title="Identity first">
               Nothing is handed over or deleted until we have verified the person asking is the
-              person the data is about. An access request answered to the wrong person is itself
-              a breach, and it is the easier of the two mistakes to make.
+              person the data is about. An access request answered to the wrong person is itself a
+              breach, and it is the easier of the two mistakes to make.
             </HowItWorks>
 
             <HowItWorks title="Erasure is not total">
-              An order we are legally required to keep for tax stays, with the guest detached
-              from it. We say that to the guest in the response rather than reporting a deletion
-              that did not fully happen.
+              An order we are legally required to keep for tax stays, with the guest detached from
+              it. We say that to the guest in the response rather than reporting a deletion that did
+              not fully happen.
             </HowItWorks>
           </>
         }
@@ -171,11 +165,7 @@ export default async function HostPrivacyPage() {
               <Td muted>{when(r.received_at)}</Td>
               <Td muted>{r.due_at ? when(r.due_at) : DASH}</Td>
               <Td>
-                {r.verified ? (
-                  <Pill tone="good">Verified</Pill>
-                ) : (
-                  <Pill tone="warn">Awaiting</Pill>
-                )}
+                {r.verified ? <Pill tone="good">Verified</Pill> : <Pill tone="warn">Awaiting</Pill>}
               </Td>
               <Td>
                 {r.overdue ? (

@@ -31,12 +31,7 @@ export default async function HostHomePage() {
     supabase.from('host_banner_photo_v').select('path').eq('host_id', me.id).maybeSingle(),
     supabase.from('host_setup_progress_v').select('*').eq('host_id', me.id).maybeSingle(),
     supabase.from('host_attention_v').select('*').eq('host_id', me.id).order('sort'),
-    supabase
-      .from('unit_readiness_v')
-      .select('*')
-      .eq('host_id', me.id)
-      .order('created_at')
-      .limit(1),
+    supabase.from('unit_readiness_v').select('*').eq('host_id', me.id).order('created_at').limit(1),
   ]);
 
   const home = homeRes.data as HostHome | null;
@@ -51,19 +46,22 @@ export default async function HostHomePage() {
   }
   const progress = progressRes.data as SetupProgress | null;
   const attention = (attentionRes.data as Attention[] | null) ?? [];
-  const readiness = (readinessRes.data as
-    | {
-        unit_id: string;
-        unit_name: string;
-        address_done: boolean;
-        handoff_done: boolean;
-        contact_confirmed: boolean;
-        hours_done: boolean;
-        qr_placed: boolean;
-        ready_count: number;
-        ready_of: number;
-      }[]
-    | null)?.[0] ?? null;
+  const readiness =
+    (
+      readinessRes.data as
+        | {
+            unit_id: string;
+            unit_name: string;
+            address_done: boolean;
+            handoff_done: boolean;
+            contact_confirmed: boolean;
+            hours_done: boolean;
+            qr_placed: boolean;
+            ready_count: number;
+            ready_of: number;
+          }[]
+        | null
+    )?.[0] ?? null;
 
   if (!home || !progress) {
     /* Not an error page. A host record that exists but has no
@@ -73,8 +71,8 @@ export default async function HostHomePage() {
       <main className="mx-auto max-w-xl px-4 py-20 text-center">
         <h1 className="text-xl font-extrabold tracking-tight">We cannot load your portal</h1>
         <p className="text-muted mt-2 text-[0.9375rem] font-semibold">
-          Your host account exists but we could not read its summary. This is ours to fix, not
-          yours — the concierge desk has been able to see it.
+          Your host account exists but we could not read its summary. This is ours to fix, not yours
+          — the concierge desk has been able to see it.
         </p>
       </main>
     );
@@ -132,9 +130,7 @@ export default async function HostHomePage() {
       ]
     : [
         {
-          label: `${home.units_setting_up} unit${
-            home.units_setting_up === 1 ? '' : 's'
-          } in setup`,
+          label: `${home.units_setting_up} unit${home.units_setting_up === 1 ? '' : 's'} in setup`,
           tone: 'plain' as const,
         },
         { label: 'QR card not generated yet', tone: 'plain' as const },
@@ -170,7 +166,9 @@ export default async function HostHomePage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[2rem] font-extrabold leading-none tracking-tight">
-                {live ? (today?.orders_today ?? 0) : `${progress.done_count} / ${progress.of_count}`}
+                {live
+                  ? (today?.orders_today ?? 0)
+                  : `${progress.done_count} / ${progress.of_count}`}
               </p>
               <p className="mt-1 text-[0.75rem] font-semibold text-white/60">
                 {live
@@ -203,12 +201,7 @@ export default async function HostHomePage() {
           arriving={(arrivingRes.data as ArrivingRow[] | null) ?? []}
         />
       ) : (
-        <HomeSetup
-          home={home}
-          progress={progress}
-          attention={attention}
-          readiness={readiness}
-        />
+        <HomeSetup home={home} progress={progress} attention={attention} readiness={readiness} />
       )}
     </HostShell>
   );

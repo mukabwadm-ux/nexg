@@ -31,8 +31,8 @@ export default async function MerchantDashboard() {
       <main className="mx-auto max-w-xl px-4 py-20 text-center">
         <h1 className="text-xl font-extrabold tracking-tight">We cannot load your dashboard</h1>
         <p className="text-muted mt-2 text-[0.9375rem] font-semibold">
-          Your business exists but we could not read its summary. That is ours to fix — merchant
-          ops can already see it.
+          Your business exists but we could not read its summary. That is ours to fix — merchant ops
+          can already see it.
         </p>
       </main>
     );

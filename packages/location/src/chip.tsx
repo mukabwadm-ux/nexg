@@ -137,7 +137,14 @@ export function DeliverToChip({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
  */
 export function describe(
   chip: ChipState,
-  place: { label?: string; city?: string | null; zone?: string | null; eta_min?: number | null; eta_max?: number | null; nearest_km?: number | null } | null,
+  place: {
+    label?: string;
+    city?: string | null;
+    zone?: string | null;
+    eta_min?: number | null;
+    eta_max?: number | null;
+    nearest_km?: number | null;
+  } | null,
 ): { title: string; hint: string } {
   switch (chip) {
     case 'empty':

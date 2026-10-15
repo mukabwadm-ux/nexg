@@ -31,9 +31,8 @@ export function RiderNoDraft() {
     >
       <div className="border-border bg-surface rounded-2xl border p-5">
         <p className="text-muted text-[0.8125rem] font-semibold leading-[1.7]">
-          Nothing has been lost. An application is held against the account you
-          started it with, so signing in on the device you began on brings it
-          back exactly where you left it.
+          Nothing has been lost. An application is held against the account you started it with, so
+          signing in on the device you began on brings it back exactly where you left it.
         </p>
       </div>
     </RiderShell>

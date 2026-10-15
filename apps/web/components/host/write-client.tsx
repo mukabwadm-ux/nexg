@@ -103,8 +103,8 @@ export function WriteToUs({
         {sentId ? (
           <div className="space-y-4">
             <p className="bg-success/10 text-success rounded-lg px-3 py-2.5 text-[0.8125rem] font-semibold leading-[1.65]">
-              Sent to {desk?.label.split(' — ')[0] ?? 'us'}. You will see the reply in Messages
-              and we will notify you.
+              Sent to {desk?.label.split(' — ')[0] ?? 'us'}. You will see the reply in Messages and
+              we will notify you.
             </p>
             <Actions>
               <Submit
@@ -188,8 +188,8 @@ export function WriteToUs({
             </Actions>
 
             <p className="text-muted-light text-[0.6875rem] font-semibold leading-[1.6]">
-              Notes the desk writes to each other are invisible to you — not filtered by this
-              page, invisible at the database. You see what is said to you.
+              Notes the desk writes to each other are invisible to you — not filtered by this page,
+              invisible at the database. You see what is said to you.
             </p>
           </div>
         )}
@@ -247,9 +247,7 @@ export function Reply({ conversationId }: { conversationId: string }) {
         >
           Send
         </Submit>
-        <span className="text-muted-light text-[0.6875rem] font-semibold">
-          Ctrl + Enter sends
-        </span>
+        <span className="text-muted-light text-[0.6875rem] font-semibold">Ctrl + Enter sends</span>
       </div>
       {outcome && !outcome.ok ? (
         <p className="bg-danger/10 text-danger mt-2.5 rounded-lg px-3 py-2 text-[0.75rem] font-semibold">

@@ -206,9 +206,9 @@ export function HomeSetup({
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-[0.75rem] font-extrabold">What going live unlocks</span>
               <span className="flex-1 text-[0.75rem] font-semibold leading-[1.6] text-white/55">
-                Your QR card pack, guest ordering from the unit, deliveries with your hand-off
-                rule, requests handled by the concierge desk, and the monthly statement. Everything
-                else is open to explore with sample data marked PREVIEW.
+                Your QR card pack, guest ordering from the unit, deliveries with your hand-off rule,
+                requests handled by the concierge desk, and the monthly statement. Everything else
+                is open to explore with sample data marked PREVIEW.
               </span>
             </div>
           </div>
@@ -227,7 +227,9 @@ export function HomeSetup({
             href="/host/units"
             title="Units & Rooms"
             note="Address, hand-off, hours and the QR card — five things per unit"
-            chip={readiness ? `${readiness.ready_count} of ${readiness.ready_of} ready` : 'no units'}
+            chip={
+              readiness ? `${readiness.ready_count} of ${readiness.ready_of} ready` : 'no units'
+            }
             chipTone="danger"
           />
           <Tile
@@ -272,9 +274,9 @@ export function HomeSetup({
             </h2>
             <p className="mt-2 max-w-xl text-[0.8125rem] font-semibold leading-[1.65] text-white/60">
               Paste{' '}
-              <strong className="text-gold font-mono">{home.verification_code ?? DASH}</strong>{' '}
-              into your listing description and leave it for 24 hours; we check it and remove the
-              step. Prefer not to edit the listing? Upload a host-dashboard screenshot or book a
+              <strong className="text-gold font-mono">{home.verification_code ?? DASH}</strong> into
+              your listing description and leave it for 24 hours; we check it and remove the step.
+              Prefer not to edit the listing? Upload a host-dashboard screenshot or book a
               five-minute call instead.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-3">

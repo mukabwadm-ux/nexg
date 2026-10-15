@@ -79,7 +79,7 @@ export default async function FinancePage({
     through_entry: number | null;
   } | null;
 
-/*
+  /*
    * The same window the projections roll the tiles up over:
    * the first of this month to today, in Nairobi time. Verify
    * is handed exactly this, so it checks what is on screen
@@ -223,11 +223,7 @@ export default async function FinancePage({
 
   if (tab === 'fees') {
     const [lines, take] = await Promise.all([
-      supabase
-        .from('fin_fee_line_v')
-        .select('*')
-        .gte('day', monthStart)
-        .lte('day', today),
+      supabase.from('fin_fee_line_v').select('*').gte('day', monthStart).lte('day', today),
       supabase.from('fin_merchant_take_v').select('*').limit(100),
     ]);
 

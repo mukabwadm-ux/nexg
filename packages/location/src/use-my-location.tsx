@@ -4,11 +4,7 @@ import { Lock, MapPin } from 'lucide-react';
 import * as React from 'react';
 
 import { ConfirmPin } from './confirm-pin';
-import {
-  accuracyBand,
-  readPositionOnce,
-  type ConsentState,
-} from './geolocation';
+import { accuracyBand, readPositionOnce, type ConsentState } from './geolocation';
 import { useLocation } from './store';
 import type { Place } from './types';
 

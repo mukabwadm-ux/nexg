@@ -168,9 +168,9 @@ export default async function HostPackagesPage() {
                 Make one that suits your guests
               </p>
               <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-                Name it, list what goes in, set a price and the lead time you can actually meet.
-                A NexG package cannot be edited — it is shared across every host in the city —
-                but you can copy one and change your copy.
+                Name it, list what goes in, set a price and the lead time you can actually meet. A
+                NexG package cannot be edited — it is shared across every host in the city — but you
+                can copy one and change your copy.
               </p>
               <div className="mt-4">
                 <CreatePackage hostId={me.id} />
@@ -184,8 +184,8 @@ export default async function HostPackagesPage() {
             <div>
               <h2 className="text-[0.875rem] font-extrabold tracking-tight">The catalogue</h2>
               <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
-                {catalogue.length} available ·{' '}
-                {catalogue.filter((c) => c.host_id === me.id).length} yours
+                {catalogue.length} available · {catalogue.filter((c) => c.host_id === me.id).length}{' '}
+                yours
               </span>
             </div>
             <CreatePackage hostId={me.id} />
@@ -232,15 +232,17 @@ export default async function HostPackagesPage() {
                     <PackageCardActions
                       hostId={me.id}
                       units={units}
-                      pkg={{
-                        id: c.id,
-                        name: c.name,
-                        description: c.description,
-                        price_kes: c.price === null ? 0 : Number(c.price),
-                        lead_hours: c.lead_hours,
-                        items: c.items,
-                        mine: c.host_id === me.id,
-                      } satisfies PackageForEdit}
+                      pkg={
+                        {
+                          id: c.id,
+                          name: c.name,
+                          description: c.description,
+                          price_kes: c.price === null ? 0 : Number(c.price),
+                          lead_hours: c.lead_hours,
+                          items: c.items,
+                          mine: c.host_id === me.id,
+                        } satisfies PackageForEdit
+                      }
                     />
                   </div>
                 </article>
