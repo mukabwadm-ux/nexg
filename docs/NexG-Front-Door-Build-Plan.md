@@ -55,7 +55,7 @@ Suggested pacing: M0–M1 week 1, M2 week 2, M3 week 3, M4 week 4, M5 week 5, M6
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL` | Supabase project settings |
 | `SUPABASE_AUTH_GOOGLE_CLIENT_ID`, `SUPABASE_AUTH_GOOGLE_SECRET` | Google Cloud OAuth |
 | `STAFF_EMAIL_DOMAIN=nexgapp.com` | fixed |
-| `NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY`, `GOOGLE_MAPS_SERVER_KEY` | Google Cloud |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAPS_ID`, `GOOGLE_MAPS_API_KEY` | Google Cloud (see `docs/going-live.md`) |
 | `AT_USERNAME`, `AT_API_KEY`, `AT_SENDER_ID` | Africa's Talking |
 | `RESEND_API_KEY`, `EMAIL_FROM=NexG <hello@mail.nexgapp.com>` | Resend |
 | `SENTRY_DSN`, `NEXT_PUBLIC_POSTHOG_KEY` | Sentry, PostHog |
