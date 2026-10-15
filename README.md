@@ -15,11 +15,7 @@ it. That rule is enforced in the database, not the interface.
 | `packages/config` | Shared ESLint, TypeScript and Tailwind configuration                      |
 | `supabase/`       | Local Supabase project: `config.toml`, migrations, edge functions         |
 
-The specification lives in [`docs/`](docs/) and governs everything here:
-
-- [`NexG-Build-Prompt-01-Front-Door.md`](docs/NexG-Build-Prompt-01-Front-Door.md) — the master spec
-- [`NexG-Front-Door-Build-Plan.md`](docs/NexG-Front-Door-Build-Plan.md) — milestones M0 to M7
-- [`docs/design-refs/`](docs/design-refs/) — the signed-off artboards
+The specification lives in [`docs/`](docs/) and governs everything here
 
 ## Status
 
