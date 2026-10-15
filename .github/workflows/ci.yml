@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, nexg-app]
   push:
-    branches: [main]
+    branches: [main, nexg-app]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -43,12 +43,24 @@ jobs:
         run: supabase test db
 
       # The committed types must match the schema they claim to describe.
+      # Runs the same `pnpm db:types` developers run (same schemas, same
+      # Prettier config), so the check cannot disagree with the script.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
       - name: Check generated types are current
         run: |
-          supabase gen types typescript --local --schema public \
-            > /tmp/types.generated.ts
-          npx --yes prettier@3.4.2 --write /tmp/types.generated.ts
-          if ! diff -u packages/db/src/types.generated.ts /tmp/types.generated.ts; then
+          pnpm db:types
+          if ! git diff --exit-code -- packages/db/src/types.generated.ts; then
             echo "::error::packages/db/src/types.generated.ts is stale. Run 'pnpm db:types' and commit the result."
             exit 1
           fi
