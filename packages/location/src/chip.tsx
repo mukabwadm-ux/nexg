@@ -174,7 +174,9 @@ export function describe(
         place?.eta_min && place?.eta_max ? `${place.eta_min}–${place.eta_max} min` : null;
       return {
         title: place?.label ?? 'Your address',
-        hint: [place?.zone, window].filter(Boolean).join(' · ') || 'Confirmed pin',
+        /* No zone is not a problem — a point inside a city's radius is
+           served — so the city stands in where a zone name would go. */
+        hint: [place?.zone ?? place?.city, window].filter(Boolean).join(' · ') || 'Confirmed pin',
       };
     }
   }

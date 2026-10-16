@@ -43465,6 +43465,10 @@ export type Database = {
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
       fn_data_request_blockers: { Args: { p_request_id: string }; Returns: Json };
       fn_decrypt_secret: { Args: { p_cipher: string }; Returns: string };
+      fn_delivery_band: {
+        Args: { p_city_id: string; p_from: unknown; p_to: unknown };
+        Returns: Json;
+      };
       fn_document_chase_state: {
         Args: {
           p_owner_id: string;
@@ -43979,6 +43983,17 @@ export type Database = {
         };
       };
       fn_run_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_serving_city: {
+        Args: { p_point: unknown };
+        Returns: {
+          id: string;
+          km: number;
+          name: string;
+          radius_km: number;
+          slug: string;
+          status: Database['public']['Enums']['city_status'];
+        }[];
+      };
       fn_setting_int: { Args: { p_default: number; p_key: string }; Returns: number };
       fn_settlement_owed: {
         Args: { p_city_id?: string; p_period_end: string; p_period_start: string };

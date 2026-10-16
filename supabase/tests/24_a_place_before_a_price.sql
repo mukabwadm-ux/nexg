@@ -53,20 +53,22 @@ select ok(
                               (select v::double precision from t where k='zone_lng')) ->> 'eta_min')::int > 0,
   'With the window the guest is quoted, from the zone rather than a constant.');
 
-/* Syokimau: inside Kenya, near Nairobi, outside every zone. */
+/* Syokimau: outside every drawn zone, but 17 km from the centre of
+   Nairobi and inside its radius. We deliver there. */
 select is(
-  public.rpc_coverage_lookup(-1.3650, 36.9500) ->> 'coverage',
-  'outside',
-  'A point outside every zone is outside, not covered.');
+  public.rpc_coverage_lookup(-1.3650, 36.9500) ->> 'city',
+  'Nairobi',
+  'A point in no zone but inside a live city''s radius is served by that city.');
 
+/* Kitui: 130 km from Nairobi, beyond every city we serve. */
 select ok(
-  (public.rpc_coverage_lookup(-1.3650, 36.9500) ->> 'nearest_km')::numeric between 1 and 60,
-  'And the distance to the nearest covered zone is a real number somebody could walk or drive.');
+  (public.rpc_coverage_lookup(-1.3670, 38.0100) ->> 'nearest_km')::numeric between 50 and 200,
+  'Beyond every radius is outside, with the real distance still to go.');
 
-select isnt(
-  public.rpc_coverage_lookup(-1.3650, 36.9500) ->> 'nearest_zone',
-  null,
-  'It names that zone — "not available" with no alternative is a dead end.');
+select is(
+  public.rpc_coverage_lookup(-1.3670, 38.0100) ->> 'nearest_city',
+  'Nairobi',
+  'It names the nearest city we serve — "not available" with no alternative is a dead end.');
 
 /*
  * The distinction that matters most on this screen. Kampala is
