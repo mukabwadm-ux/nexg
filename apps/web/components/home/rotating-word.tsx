@@ -20,10 +20,11 @@ import * as React from 'react';
  *   Motion is optional. prefers-reduced-motion shows the first word, typed
  *   in full, and stops.
  *
- *   One size for every word. At the artboard's 1440 the hero column is 752px
- *   and "Pharmaceutical Products" measures 858px at 72px type — so the hero
- *   sits at 60px, where the longest phrase fits on one line. Below that the
- *   column narrows and the longest phrase wraps; the reserved box absorbs it.
+ *   One size for every word. At the artboard's 1440 the hero column is 752px,
+ *   and the hero sits at 60px so the longest phrase fits on one line (it was
+ *   sized for "Pharmaceutical Products", since shortened to "Pharmaceuticals").
+ *   Below that the column narrows and a long phrase wraps; the reserved box
+ *   absorbs it.
  */
 
 export const ROTATING_WORDS = [
@@ -31,7 +32,7 @@ export const ROTATING_WORDS = [
   'Flowers',
   'Laundry',
   'Food and drinks',
-  'Pharmaceutical Products',
+  'Pharmaceuticals',
 ] as const;
 
 /** Milliseconds. Slower than a plain fade, because the typing carries the eye. */
