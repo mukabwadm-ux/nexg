@@ -53,11 +53,15 @@ export async function GET(request: Request) {
    */
   const serverKey = process.env['GOOGLE_MAPS_API_KEY'] ?? '';
 
+  /* Search needs a key, not a map. Gating on maps() would demand
+     the browser key and Map ID too, so a deployment with only the
+     server key set returned nothing and blamed the Map ID. */
   const capability = maps();
-  if (!capability.live) {
+  const key = serverKey || capability.key;
+  if (!key) {
     return NextResponse.json({
       results: local,
-      reason: capability.why,
+      reason: 'Address search is off. Set GOOGLE_MAPS_API_KEY (Places API (New)).',
     });
   }
 
@@ -66,7 +70,7 @@ export async function GET(request: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Goog-Api-Key': serverKey || capability.key,
+        'X-Goog-Api-Key': key,
         'X-Goog-FieldMask':
           'places.displayName,places.formattedAddress,places.location,places.plusCode',
       },

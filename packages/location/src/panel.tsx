@@ -180,8 +180,9 @@ export function Panel() {
 /**
  * Address search.
  *
- * Google Places is the intended source and is wired through the
- * route handler so the key never reaches the browser. Until a
+ * Google Places is the source, called from the route handler so
+ * the server key (GOOGLE_MAPS_API_KEY) never reaches the browser.
+ * Until a
  * key is configured this returns nothing rather than a plausible
  * list — an invented address is worse than no address, because
  * somebody will order to it.
