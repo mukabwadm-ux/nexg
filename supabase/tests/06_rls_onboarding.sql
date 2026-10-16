@@ -10,7 +10,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(19);
+select plan(20);
 
 /*
  * Foreign keys and triggers are suspended for the cleanup below,
@@ -93,9 +93,15 @@ select is(
 );
 
 select is(
-  (select count(*)::int from public.zone_for_point(36.9600, -1.4700)),
+  (select count(*)::int from public.zone_for_point(37.2630, -1.5170)),
   0,
-  'Kitengela is outside every zone'
+  'Machakos is outside every zone'
+);
+
+select is(
+  (select name from public.zone_for_point(36.9600, -1.4760)),
+  'Kitengela',
+  'and Kitengela has a zone of its own'
 );
 
 -- --------------------------------------------- which documents this business owes
