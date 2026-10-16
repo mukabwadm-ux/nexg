@@ -63,9 +63,9 @@ export function LocationBanner() {
     );
   }
 
-  /* C · a confirmed pin outside coverage. The nearest covered
-     zone and the real distance, because a vague "not available"
-     leaves somebody guessing whether to walk ten minutes. */
+  /* C · a confirmed pin beyond every city we serve. The nearest
+     city and the real distance past its edge, because a vague "not
+     available" leaves somebody guessing how far off they are. */
   if (chip === 'outside') {
     return (
       <Bar tone="danger">
@@ -74,11 +74,12 @@ export function LocationBanner() {
           <strong className="font-extrabold">
             We do not deliver to {place?.label ?? 'that address'} yet.
           </strong>{' '}
-          {place?.nearest_zone ? (
+          {place?.nearest_city ? (
             <>
-              Nearest covered area: <strong className="font-extrabold">{place.nearest_zone}</strong>
-              {place.nearest_km ? `, ${place.nearest_km} km away` : ''}. Leave your number and we
-              will tell you the day we open there — no fake availability.
+              Nearest city we serve:{' '}
+              <strong className="font-extrabold">{place.nearest_city}</strong>
+              {place.nearest_km ? `, ${place.nearest_km} km beyond our delivery area` : ''}. Leave
+              your number and we will tell you the day we reach you.
             </>
           ) : (
             <>Leave your number and we will tell you the day we open there.</>

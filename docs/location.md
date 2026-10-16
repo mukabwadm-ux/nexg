@@ -47,8 +47,10 @@ Each is one banner under the nav and one chip variant. **No state blocks the pag
 |---|---|---|
 | Skipped → IP city | `Nairobi · from your connection` | city-wide estimates, we ask again at checkout |
 | Blocked in the browser | `Choose a delivery location` | shown once, padlock hint, search stays the control |
-| Confirmed pin, outside coverage | `[Estate], Syokimau · Outside coverage` | nearest covered zone with the **real** distance, waitlist |
+| Confirmed pin, beyond every city we serve | `[Village], Kitui · Outside coverage` | nearest served city with the **real** distance past its edge, waitlist |
 | City not launched | `Kampala · Not live yet` | readable pages, ordering closed, waitlist |
+
+**What "covered" means.** A pin is covered when it falls inside a drawn zone, *or* when it is within the radius (`city.max_radius_km`, 30 km by default) of a live or soft-launch city — `public.fn_serving_city`. Syokimau is in no zone but 17 km from the centre of Nairobi, so it is covered and the chip reads `Nairobi`. Zones still matter where they exist: they carry the ETA window, the tier and the pause. The delivery fee does not come from the zone; it comes from the merchant-to-door distance (`public.fn_delivery_band`: ≤3, 3–6, 6–8 and over 8 km, refused past `fees.delivery.max_km`).
 
 The status dot mirrors precision, not coverage: gold = nothing set, gold = city only, green = a confirmed pin. A visitor can tell at a glance whether the prices in front of them are real.
 

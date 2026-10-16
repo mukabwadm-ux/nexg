@@ -276,7 +276,7 @@ select throws_matching(
 
 select throws_matching(
   $$select public.rpc_merchant_add_store(
-      'a2000000-0000-4000-8000-000000000001', '[Nowhere]', '[Street]', -4.0435, 39.6682)$$,
+      'a2000000-0000-4000-8000-000000000001', '[Nowhere]', '[Street]', -2.9000, 38.5000)$$,
   'outside every area',
   'A store outside every delivery area is refused, with what to do about it.');
 

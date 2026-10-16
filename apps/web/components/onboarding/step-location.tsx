@@ -14,6 +14,17 @@ import { useOnboarding } from './store';
 import type { DraftBranch } from './types';
 import { ZoneMap, type MapPin, type ZoneBounds } from './zone-map';
 
+/**
+ * The city whose delivery radius reaches this pin, or null. A pin in
+ * no drawn zone is still somewhere we deliver from when it is inside
+ * a city we trade in — the same answer a guest's address gets.
+ */
+async function servingCity(lat: number, lng: number): Promise<string | null> {
+  const { data } = await createClient().rpc('rpc_coverage_lookup', { p_lat: lat, p_lng: lng });
+  const answer = data as { coverage?: string; city?: string | null } | null;
+  return answer?.coverage === 'covered' ? (answer.city ?? null) : null;
+}
+
 const BRANCH_BANDS = [
   { value: 'just_this_one', label: 'Just this one' },
   { value: '2_3', label: '2–3' },
@@ -37,9 +48,10 @@ const PARKING = [
 /**
  * Step 3 — where a rider collects from.
  *
- * The zone is the gate on this whole flow: a merchant outside every zone
- * cannot be listed, because we would be promising a guest a delivery we
- * cannot make. So the pin is judged by the database the moment it moves, and
+ * Where we deliver is the gate on this whole flow: a drawn zone, or anywhere
+ * inside the radius of a city we trade in. A merchant beyond both cannot be
+ * listed, because we would be promising a guest a delivery we cannot make.
+ * So the pin is judged by the database the moment it moves, and
  * the answer is shown on the screen rather than saved up for a phone call
  * two days later.
  */
@@ -56,6 +68,8 @@ export function LocationStep() {
     nearest: string;
     city: string;
   } | null>(null);
+  /* The city serving a pin that sits in no drawn zone. */
+  const [serving, setServing] = React.useState<string | null>(null);
   const [loaded, setLoaded] = React.useState(false);
 
   const draftId = draft?.id ?? null;
@@ -112,6 +126,22 @@ export function LocationStep() {
   const primary = branches[0];
   const hasPin = !!primary?.lat && !!primary?.lng;
   const inZone = !!primary?.zone;
+  const served = inZone || !!serving;
+
+  /* A saved pin outside every drawn zone: ask which city serves it,
+     so a returning merchant is not shown a waitlist they are not on. */
+  const savedLat = primary?.lat ?? null;
+  const savedLng = primary?.lng ?? null;
+  React.useEffect(() => {
+    if (!loaded || inZone || savedLat === null || savedLng === null) return;
+    let cancelled = false;
+    void servingCity(savedLat, savedLng).then((city) => {
+      if (!cancelled) setServing(city);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [loaded, inZone, savedLat, savedLng]);
 
   const persist = async (next: DraftBranch[]) => {
     const withPins = next.filter((b) => b.lat !== null && b.lng !== null);
@@ -129,10 +159,17 @@ export function LocationStep() {
       await lookUpDistance(first.lng!, first.lat!);
     } else {
       setOutside(null);
+      setServing(null);
     }
   };
 
   const lookUpDistance = async (lng: number, lat: number) => {
+    const city = await servingCity(lat, lng);
+    setServing(city);
+    if (city) {
+      setOutside(null);
+      return;
+    }
     const supabase = createClient();
     const { data } = await supabase.rpc('distance_to_nearest_zone', { p_lng: lng, p_lat: lat });
     const row = (data as { km: number; zone_name: string; city_name: string }[] | null)?.[0];
@@ -228,10 +265,12 @@ export function LocationStep() {
       label: draft?.trading_name || '[Your business]',
       sub: b.zone
         ? `${b.zone} · ${b.tier} zone ✓`
-        : outside
-          ? `${outside.km} km outside our zone`
-          : undefined,
-      outside: !b.zone,
+        : serving && index === 0
+          ? `${serving} delivery area ✓`
+          : outside
+            ? `${outside.km} km outside our zone`
+            : undefined,
+      outside: !b.zone && !(serving && index === 0),
       ...(branches.length > 1 ? { index: index + 1 } : {}),
     }));
 
@@ -268,7 +307,7 @@ export function LocationStep() {
               Back
             </Button>
             <ContinueButton
-              disabled={!inZone}
+              disabled={!served}
               onClick={() => {
                 patch({}, 4);
                 router.push('/merchants/apply/hours');
@@ -526,6 +565,11 @@ export function LocationStep() {
                   can order from you
                 </>
               )
+            ) : serving ? (
+              <>
+                Inside our {serving} delivery area — guests nearby can order from you. Delivery
+                times are worked out from the distance to each guest.
+              </>
             ) : outside ? (
               <>
                 We do not deliver from {primary?.address_text || 'there'} yet. {outside.city} Core
