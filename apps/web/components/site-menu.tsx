@@ -204,13 +204,13 @@ export function SiteMenu({
                     <Link
                       href={section.href}
                       onClick={close}
-                      className="focus-visible:ring-gold hover:text-gold-text flex min-h-[3.5rem] items-center gap-3 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 sm:min-h-[3.8rem] sm:gap-4"
+                      className="focus-visible:ring-gold hover:text-gold-text flex min-h-[3rem] items-center gap-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 sm:min-h-[3.8rem] sm:gap-4"
                     >
-                      <span className="text-gold-text w-6 shrink-0 self-start pt-1.5 text-xs font-bold sm:self-center sm:pt-0">
+                      <span className="text-gold-text w-6 shrink-0 self-start pt-1 text-[0.6875rem] font-bold sm:self-center sm:pt-0 sm:text-xs">
                         {section.number}
                       </span>
                       <span className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                        <span className="flex-1 text-[1.375rem] font-extrabold leading-tight tracking-tight sm:text-[1.625rem] sm:leading-none">
+                        <span className="flex-1 text-lg font-bold leading-snug tracking-tight sm:text-[1.625rem] sm:font-extrabold sm:leading-none">
                           {t(section.key)}
                         </span>
                         {(section.noteKey || section.note) && (
@@ -252,7 +252,7 @@ export function SiteMenu({
                         </span>
                         {/* Stacked on a phone, side by side from sm up. */}
                         <span className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-center sm:gap-3">
-                          <span className="flex-1 text-[0.9375rem] font-extrabold leading-snug text-white">
+                          <span className="flex-1 text-sm font-extrabold leading-snug text-white sm:text-[0.9375rem]">
                             {t(link.key)}
                           </span>
                           <span className="text-xs leading-snug text-white/50 sm:shrink-0">
