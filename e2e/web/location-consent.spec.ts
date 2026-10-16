@@ -7,7 +7,10 @@ import { expect, test } from '@playwright/test';
  * feature: the browser's geolocation API is called **only**
  * inside the click handler of "Use my current location". Never
  * on load, never on a route change, never on scroll, never on a
- * timer, never because a modal opened.
+ * timer, never because a modal opened — with one exception, tested
+ * below: a phone whose visitor has already granted permission is
+ * read once on open. A granted permission cannot prompt, so it
+ * cannot be punished.
  *
  * It is not a privacy nicety. Chrome degrades and then
  * auto-blocks geolocation prompts that arrive without a user
@@ -125,6 +128,53 @@ test.describe('location is never read without a gesture', () => {
       expect(after).toHaveLength(1);
       expect(after[0]!.kind).toBe('getCurrentPosition');
     }
+  });
+
+  /*
+   * The one read without a tap. A phone whose visitor has already
+   * allowed location is placed where they are standing when the site
+   * opens — a granted permission cannot prompt, so this cannot be
+   * punished. A laptop is not: its fix is a Wi-Fi guess, not a door.
+   */
+  test('a phone that already allowed location is read once on open', async ({ page }, info) => {
+    test.skip(!info.project.name.includes('mobile'), 'Phones only.');
+    await page.context().grantPermissions(['geolocation']);
+    await page.addInitScript(SPY);
+    await page.goto('/');
+    await page.waitForTimeout(3000);
+
+    const calls = await page.evaluate(
+      () => (window as unknown as { __geoCalls: { kind: string }[] }).__geoCalls,
+    );
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.kind).toBe('getCurrentPosition');
+  });
+
+  test('a laptop that already allowed location is not read on open', async ({ page }, info) => {
+    test.skip(info.project.name.includes('mobile'), 'Desktops only.');
+    await page.context().grantPermissions(['geolocation']);
+    await page.addInitScript(SPY);
+    await page.goto('/');
+    await page.waitForTimeout(3000);
+
+    const calls = await page.evaluate(
+      () => (window as unknown as { __geoCalls: unknown[] }).__geoCalls,
+    );
+    expect(calls).toEqual([]);
+  });
+
+  test('a place picked by hand this visit is not overridden by GPS', async ({ page }, info) => {
+    test.skip(!info.project.name.includes('mobile'), 'Phones only.');
+    await page.context().grantPermissions(['geolocation']);
+    await page.addInitScript(SPY);
+    await page.addInitScript(() => sessionStorage.setItem('nexg.loc.manual', '1'));
+    await page.goto('/');
+    await page.waitForTimeout(3000);
+
+    const calls = await page.evaluate(
+      () => (window as unknown as { __geoCalls: unknown[] }).__geoCalls,
+    );
+    expect(calls).toEqual([]);
   });
 
   test('nothing anywhere starts a watchPosition', async ({ page }) => {

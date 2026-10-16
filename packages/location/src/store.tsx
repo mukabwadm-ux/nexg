@@ -2,7 +2,14 @@
 
 import * as React from 'react';
 
-import { accuracyBand, consentState, type ConsentState } from './geolocation';
+import {
+  ACCURACY_NEEDS_CONFIRMING_M,
+  accuracyBand,
+  consentState,
+  isHandheld,
+  readBestPosition,
+  type ConsentState,
+} from './geolocation';
 import type { ChipState, LocationState, Place, ResolutionStep, SavedPlace } from './types';
 
 /**
@@ -22,6 +29,11 @@ const PLACES_KEY = 'nexg.places';
 const SESSION_KEY = 'nexg.loc.session';
 const ASKED_KEY = 'nexg.loc.asked';
 const CURRENT_KEY = 'nexg.loc.current';
+/** Set when the visitor picks a place by hand; GPS leaves it alone for the visit. */
+const MANUAL_KEY = 'nexg.loc.manual';
+
+/** A fresh fix this close to a saved place is that place, gate number and all. */
+const SAME_PLACE_M = 50;
 
 /** 90 days, per the spec. A pin older than that is probably a trip, not a home. */
 const DEVICE_PLACE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
@@ -40,6 +52,11 @@ export interface LocationActions {
     reason?: string;
   }>;
   coverage: (lat: number, lng: number) => Promise<Partial<Place> & { coverage: string }>;
+  /** Street name for a pin. Optional: without it the pin shows coordinates. */
+  reverse?: (
+    lat: number,
+    lng: number,
+  ) => Promise<{ address_line: string | null; plus_code: string | null } | null>;
   note: (action: string, detail?: { band?: string; step?: string }) => Promise<void>;
   listSaved: () => Promise<SavedPlace[]>;
   remove: (id: string) => Promise<{ ok: boolean; message?: string }>;
@@ -62,6 +79,13 @@ interface Ctx extends LocationState {
   blockedNoticeSeen: boolean;
   markBlockedNoticeSeen: () => void;
   setConsent: (state: ConsentState) => void;
+  /** Google Maps for the confirm view. Absent or empty, it falls back to the drawing. */
+  maps: MapsConfig | null;
+}
+
+export interface MapsConfig {
+  key: string;
+  mapId: string;
 }
 
 const LocationContext = React.createContext<Ctx | null>(null);
@@ -171,10 +195,12 @@ export function LocationProvider({
   actions,
   /** Resolved on the server before the page was sent: QR token, deep link, IP city. */
   initial,
+  maps = null,
 }: {
   children: React.ReactNode;
   actions: LocationActions;
   initial?: { place: Place | null; step: ResolutionStep } | null;
+  maps?: MapsConfig | null;
 }) {
   const [place, setPlaceState] = React.useState<Place | null>(initial?.place ?? null);
   const [step, setStep] = React.useState<ResolutionStep>(initial?.step ?? 'none');
@@ -226,11 +252,10 @@ export function LocationProvider({
    * left are the two steps only the browser can see: a signed-in
    * guest's saved places, and this device's own storage.
    *
-   * Note what does not happen here. Even when `consentState()`
-   * comes back `granted`, no position is read. A returning
-   * visitor is placed from their last pin and offered the
-   * button. Re-reading GPS because permission was given once is
-   * tracking, whatever it is called.
+   * Nothing here reads a position. The one read without a tap —
+   * a phone whose visitor already allowed location — is the
+   * effect below, and it runs after this has placed them from
+   * what the browser already knows.
    */
   React.useEffect(() => {
     if (!deviceId) return;
@@ -336,12 +361,104 @@ export function LocationProvider({
     };
   }, []);
 
+  /* ─────────────────────────────── on a phone, where they are standing
+   *
+   * The ride-hailing behaviour: open the site on a phone that has
+   * already allowed location and the pin is where you are. Only
+   * when permission is already `granted` — that state cannot
+   * prompt, so this never spends the visitor's one chance to be
+   * asked well — and only once per page load, as a reading, not a
+   * watch.
+   *
+   * It stands aside for a place somebody chose: a host's QR card,
+   * a shared link, or anything picked by hand this visit. And a
+   * fix that is only good to a city block is not used at all; the
+   * saved pin is a better guess than a vague one.
+   */
+  const savedRef = React.useRef(savedPlaces);
+  savedRef.current = savedPlaces;
+  const stepRef = React.useRef(step);
+  stepRef.current = step;
+  const autoTried = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!ready || consent !== 'granted' || autoTried.current || !isHandheld()) return;
+    const chosen = stepRef.current;
+    if (chosen === 'qr' || chosen === 'deep_link' || chosen === 'point') return;
+    const pickedByHand = () => {
+      try {
+        return safeStorage('session')?.getItem(MANUAL_KEY) === '1';
+      } catch {
+        return false;
+      }
+    };
+    if (pickedByHand()) return;
+
+    autoTried.current = true;
+    let cancelled = false;
+
+    void (async () => {
+      const result = await readBestPosition();
+      if (cancelled || !result.ok) return;
+      const { fix } = result;
+      if (fix.accuracy_m > ACCURACY_NEEDS_CONFIRMING_M) return;
+      void actions.note('allowed', { band: accuracyBand(fix.accuracy_m), step: 'gps' });
+
+      /* Standing at a place they saved: that place, with the gate
+         number and landmark they gave it, not a bare coordinate. */
+      const known = savedRef.current.find((p) => metresBetween(p, fix) <= SAME_PLACE_M);
+      let next: Place;
+      if (known) {
+        next = { ...known, accuracy_m: fix.accuracy_m };
+      } else {
+        const [cover, street] = await Promise.all([
+          actions.coverage(fix.lat, fix.lng),
+          actions.reverse
+            ? actions.reverse(fix.lat, fix.lng).catch(() => null)
+            : Promise.resolve(null),
+        ]);
+        next = {
+          label: street?.address_line ?? 'Current location',
+          ...cover,
+          address_line: street?.address_line ?? null,
+          plus_code: street?.plus_code ?? null,
+          lat: fix.lat,
+          lng: fix.lng,
+          accuracy_m: fix.accuracy_m,
+          source: 'gps',
+        } as Place;
+      }
+
+      /* They may have picked something by hand while the GPS was answering. */
+      if (cancelled || pickedByHand()) return;
+      setPlaceState(next);
+      setStep('gps');
+      writeJSON(safeStorage('local'), CURRENT_KEY, { place: next, step: 'gps' });
+      channel.current?.postMessage({ place: next, step: 'gps' });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, consent, actions]);
+
   const setPlace = React.useCallback(
     async (next: Place, nextStep: ResolutionStep) => {
       setPlaceState(next);
       setStep(nextStep);
       writeJSON(safeStorage('local'), CURRENT_KEY, { place: next, step: nextStep });
       channel.current?.postMessage({ place: next, step: nextStep });
+
+      /* Chosen by hand — a search result, a saved place. GPS does
+         not overwrite that for the rest of this visit: somebody
+         sending dinner to the office has said so. */
+      if (nextStep !== 'gps') {
+        try {
+          safeStorage('session')?.setItem(MANUAL_KEY, '1');
+        } catch {
+          /* ignore */
+        }
+      }
 
       /* Kept on the device for the next visit regardless of
          whether it also reached an account — a signed-in guest
@@ -435,6 +552,7 @@ export function LocationProvider({
     blockedNoticeSeen,
     markBlockedNoticeSeen,
     setConsent,
+    maps: maps && maps.key && maps.mapId ? maps : null,
   };
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;

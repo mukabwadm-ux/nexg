@@ -1,6 +1,6 @@
 'use client';
 
-import { readPositionOnce } from '@nexg/location';
+import { readBestPosition } from '@nexg/location';
 import { Button, Input, useToast } from '@nexg/ui';
 import { LocateFixed, MapPin as MapPinIcon, Plus, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -192,7 +192,7 @@ export function LocationStep() {
    */
   const pinFromBrowser = async () => {
     setLocating(true);
-    const result = await readPositionOnce();
+    const result = await readBestPosition();
     setLocating(false);
 
     if (!result.ok) {
