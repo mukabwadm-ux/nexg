@@ -159,7 +159,7 @@ const en: Dictionary = {
 
   // ── chrome
   'nav.explore': 'Explore',
-  'nav.experience': 'Customize your experience',
+  'nav.experience': 'Experience',
   'nav.experience.note': 'Build a day to your budget',
   'nav.howItWorks': 'How it works',
   'nav.cities': 'Cities',
