@@ -104,7 +104,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 "answer this first". */}
             {asked && <FloatingChat />}
 
-          {/* Rendered only when they have not answered, so a returning
+            {/* Rendered only when they have not answered, so a returning
                 visitor never sees it and nothing flickers on their screen
                 while the client works out whether to hide it — and only
                 once the location question is settled, so the two first-visit

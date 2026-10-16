@@ -1,8 +1,50 @@
 'use server';
 
+import { unstable_cache } from 'next/cache';
 import { headers } from 'next/headers';
 
 import { createPublicClient } from '@/lib/supabase/public';
+
+/* Result types Google gives for a spot a rider can walk up to, best first. */
+const PRECISE = ['street_address', 'premise', 'subpremise', 'establishment', 'point_of_interest'];
+
+interface GeocodeBody {
+  status: string;
+  error_message?: string;
+  plus_code?: { global_code?: string };
+  results?: { formatted_address: string; types: string[] }[];
+}
+
+/*
+ * Cached by grid cell for 30 days. A cell is the same ~11 m square
+ * as `fn_geo_cell` in the database: two pins a few metres apart are
+ * one doorway, one lookup and one charge. A failed lookup throws, so
+ * it is never cached — a key without Geocoding enabled today must not
+ * mean no street names for a month after somebody fixes it.
+ */
+const geocodeCell = unstable_cache(
+  async (cell: string) => {
+    const key = process.env['GOOGLE_MAPS_API_KEY'] ?? '';
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${cell}&language=en&key=${key}`,
+      { cache: 'no-store', signal: AbortSignal.timeout(3000) },
+    );
+    const body = (await response.json()) as GeocodeBody;
+    if (body.status === 'ZERO_RESULTS') return { address_line: null, plus_code: null };
+    if (body.status !== 'OK') {
+      throw new Error(`Geocoding ${body.status}: ${body.error_message ?? 'no message'}`);
+    }
+    const results = body.results ?? [];
+    const best = results.find((r) => r.types.some((t) => PRECISE.includes(t))) ?? results[0];
+    return {
+      /* "Kenya" is on every one of them and tells a rider nothing. */
+      address_line: best ? best.formatted_address.replace(/,\s*Kenya$/, '') : null,
+      plus_code: body.plus_code?.global_code ?? null,
+    };
+  },
+  ['reverse-geocode'],
+  { revalidate: 60 * 60 * 24 * 30 },
+);
 
 /**
  * The server half of the location layer.
@@ -35,6 +77,30 @@ export async function coverageFor(lat: number, lng: number) {
   const { data, error } = await supabase.rpc('rpc_coverage_lookup', { p_lat: lat, p_lng: lng });
   if (error) return { coverage: 'unknown', message: error.message };
   return data as Record<string, unknown> & { coverage: string };
+}
+
+/**
+ * A street name for a pin, from Google's Geocoding API.
+ *
+ * Uses the server key (GOOGLE_MAPS_API_KEY), which must have the
+ * Geocoding API among its API restrictions. Any failure comes back
+ * as null and the confirm view shows coordinates instead: a missing
+ * street name is not a reason to stop somebody ordering.
+ */
+export async function streetFor(
+  lat: number,
+  lng: number,
+): Promise<{ address_line: string | null; plus_code: string | null } | null> {
+  if (!process.env['GOOGLE_MAPS_API_KEY']) return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+    return null;
+  }
+  try {
+    return await geocodeCell(`${lat.toFixed(4)},${lng.toFixed(4)}`);
+  } catch (e) {
+    console.warn('[location] reverse geocode failed:', (e as Error).message);
+    return null;
+  }
 }
 
 export async function confirmPlace(payload: Record<string, unknown>) {

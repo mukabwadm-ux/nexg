@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, nexg-app]
   push:
-    branches: [main]
+    branches: [main, nexg-app]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -23,10 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Pinned: newer CLIs change `gen types` output (2.121 added
+      # ComputedFields), which makes the types check fail with no schema
+      # change. Bump deliberately, then run `pnpm db:types` and commit.
       - name: Set up the Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.121.0
 
       # Proves the schema rebuilds from an empty database, which is the M2
       # definition of done — not just that it applies to whatever is lying around.
@@ -43,15 +46,36 @@ jobs:
         run: supabase test db
 
       # The committed types must match the schema they claim to describe.
+      # Runs the same `pnpm db:types` developers run (same schemas, same
+      # Prettier config), so the check cannot disagree with the script.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
       - name: Check generated types are current
         run: |
-          supabase gen types typescript --local --schema public \
-            > /tmp/types.generated.ts
-          npx --yes prettier@3.4.2 --write /tmp/types.generated.ts
-          if ! diff -u packages/db/src/types.generated.ts /tmp/types.generated.ts; then
+          pnpm db:types
+          if ! git diff --exit-code -- packages/db/src/types.generated.ts; then
             echo "::error::packages/db/src/types.generated.ts is stale. Run 'pnpm db:types' and commit the result."
             exit 1
           fi
+
+      # Lets anyone without Docker download the regenerated file and commit it.
+      - name: Upload regenerated types
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: types-generated
+          path: packages/db/src/types.generated.ts
+          retention-days: 7
 
       - name: Stop Supabase
         if: always()
@@ -113,6 +137,29 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      # Both apps need a Supabase to start, and the admin suite signs in as
+      # the staff user `supabase/seed.sql` creates, so run the local stack.
+      - name: Set up the Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Start Supabase
+        run: supabase start
+
+      # NEXT_PUBLIC_* values are inlined at build time, so these must be
+      # set before `pnpm build`, not just before the servers start.
+      - name: Point the apps at local Supabase
+        run: |
+          eval "$(supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${ANON_KEY:-$PUBLISHABLE_KEY}"
+            echo "SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY:-$SECRET_KEY}"
+            echo "DATABASE_URL=$DB_URL"
+            echo "NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3000"
+          } >> "$GITHUB_ENV"
+
       - name: Build
         run: pnpm build
 
@@ -129,3 +176,7 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop --no-backup

@@ -63,10 +63,15 @@ export default async function HostSupportPage() {
   const resolved = rows.filter((t) => t.resolved_at !== null);
 
   const replyTimes = answered
-    .map((t) => (new Date(t.first_reply_at as string).getTime() - new Date(t.created_at).getTime()) / 60000)
+    .map(
+      (t) =>
+        (new Date(t.first_reply_at as string).getTime() - new Date(t.created_at).getTime()) / 60000,
+    )
     .sort((a, b) => a - b);
   const medianReply =
-    replyTimes.length >= 3 ? Math.round(replyTimes[Math.floor(replyTimes.length / 2)] as number) : null;
+    replyTimes.length >= 3
+      ? Math.round(replyTimes[Math.floor(replyTimes.length / 2)] as number)
+      : null;
 
   return (
     <HostSection
@@ -106,9 +111,9 @@ export default async function HostSupportPage() {
       <section className="bg-ink rounded-xl p-5 text-white">
         <h2 className="text-[1.0625rem] font-extrabold tracking-tight">Reach host ops</h2>
         <p className="mt-1.5 text-[0.8125rem] font-semibold leading-[1.7] text-white/60">
-          One desk, three ways in. Whichever you use, it lands in the same place and shows up in
-          the table below — so nothing is lost because it was said on WhatsApp rather than typed
-          into a form.
+          One desk, three ways in. Whichever you use, it lands in the same place and shows up in the
+          table below — so nothing is lost because it was said on WhatsApp rather than typed into a
+          form.
         </p>
         <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
           <a
@@ -144,8 +149,8 @@ export default async function HostSupportPage() {
             </section>
 
             <HowItWorks title="A guest with no delivery">
-              Call, do not write. Out of hours the desk answers a phone and not a form, and a
-              guest standing at a gate at eleven is the one case where that difference matters.
+              Call, do not write. Out of hours the desk answers a phone and not a form, and a guest
+              standing at a gate at eleven is the one case where that difference matters.
             </HowItWorks>
 
             <HowItWorks title="Why your threads are listed">

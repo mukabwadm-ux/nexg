@@ -264,6 +264,9 @@ importers:
 
   packages/location:
     dependencies:
+      '@nexg/ui':
+        specifier: workspace:*
+        version: link:../ui
       lucide-react:
         specifier: 0.469.0
         version: 0.469.0(react@18.3.1)
@@ -271,6 +274,9 @@ importers:
       '@nexg/config':
         specifier: workspace:*
         version: link:../config
+      '@types/google.maps':
+        specifier: ^3.66.5
+        version: 3.66.5
       '@types/react':
         specifier: 18.3.17
         version: 18.3.17

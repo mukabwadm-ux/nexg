@@ -86,9 +86,14 @@ export default async function RiderIncidents() {
   const paid = all.reduce((sum, i) => sum + (i.compensation_kes ?? 0), 0);
 
   const acks = acknowledged
-    .map((i) => (new Date(i.acknowledged_at as string).getTime() - new Date(i.happened_at).getTime()) / 60000)
+    .map(
+      (i) =>
+        (new Date(i.acknowledged_at as string).getTime() - new Date(i.happened_at).getTime()) /
+        60000,
+    )
     .sort((a, b) => a - b);
-  const medianAck = acks.length >= 3 ? Math.round(acks[Math.floor(acks.length / 2)] as number) : null;
+  const medianAck =
+    acks.length >= 3 ? Math.round(acks[Math.floor(acks.length / 2)] as number) : null;
 
   return (
     <RiderBoard>
@@ -106,7 +111,13 @@ export default async function RiderIncidents() {
         />
         <Tile value={String(all.length)} label="On your record" note="all time" />
         <Tile
-          value={medianAck === null ? '—' : medianAck < 60 ? `${medianAck} min` : `${Math.round(medianAck / 60)} h`}
+          value={
+            medianAck === null
+              ? '—'
+              : medianAck < 60
+                ? `${medianAck} min`
+                : `${Math.round(medianAck / 60)} h`
+          }
           label="Median acknowledgement"
           note={medianAck === null ? `${acks.length} of 3 needed` : 'on your reports'}
         />
@@ -122,8 +133,8 @@ export default async function RiderIncidents() {
           <Panel title="Everything reported">
             {all.length === 0 ? (
               <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
-                Nothing has gone wrong. Long may it last — and if it does, report it from the
-                order screen or the 24-hour line rather than waiting until you are home.
+                Nothing has gone wrong. Long may it last — and if it does, report it from the order
+                screen or the 24-hour line rather than waiting until you are home.
               </p>
             ) : (
               <div className="divide-border divide-y">
@@ -202,9 +213,9 @@ export default async function RiderIncidents() {
               In danger right now
             </h2>
             <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-              Use SOS in the app or call the 24-hour NexG line. It reaches Live Operations, who
-              can see where you are and who is near you. Out of hours a person answers a phone,
-              not a form — and that difference only matters when it matters.
+              Use SOS in the app or call the 24-hour NexG line. It reaches Live Operations, who can
+              see where you are and who is near you. Out of hours a person answers a phone, not a
+              form — and that difference only matters when it matters.
             </p>
           </section>
 

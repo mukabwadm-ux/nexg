@@ -69,7 +69,8 @@ export default async function HostMessagesPage({
   const open = all.filter((c) => c.status !== 'resolved' && c.status !== 'closed');
   const unread = all.filter((c) => c.unread > 0);
   const resolved = all.filter((c) => c.resolved_at !== null);
-  const rows = tab === 'all' ? all : tab === 'unread' ? unread : tab === 'resolved' ? resolved : open;
+  const rows =
+    tab === 'all' ? all : tab === 'unread' ? unread : tab === 'resolved' ? resolved : open;
 
   const unreadTotal = all.reduce((a, c) => a + c.unread, 0);
 
@@ -145,8 +146,8 @@ export default async function HostMessagesPage({
                 <WriteToUs hostId={me.id} />
               </div>
               <p className="text-muted-light border-border border-t px-4 py-2.5 text-[0.6875rem] font-semibold leading-[1.6]">
-                Replying from inside this page is the next piece. Both routes above land in the
-                same thread, so nothing is lost by using them meanwhile.
+                Replying from inside this page is the next piece. Both routes above land in the same
+                thread, so nothing is lost by using them meanwhile.
               </p>
             </section>
 
@@ -161,8 +162,8 @@ export default async function HostMessagesPage({
 
             <HowItWorks title="Why notes are invisible">
               An agent writing &ldquo;check whether this host has paid&rdquo; to a colleague is
-              working, not hiding. Those notes are invisible to you at the database, not filtered
-              by this page — there is no query anywhere that could show you one.
+              working, not hiding. Those notes are invisible to you at the database, not filtered by
+              this page — there is no query anywhere that could show you one.
             </HowItWorks>
           </>
         }

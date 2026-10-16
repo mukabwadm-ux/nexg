@@ -187,7 +187,12 @@ export async function generateCard(unitId: string, spot: string): Promise<Outcom
     p_owner_id: unitId,
     p_placement: spot as never,
   });
-  return unwrap(data, error, ALL, 'Card generated. Print it and mark it placed once it is in the room.');
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Card generated. Print it and mark it placed once it is in the room.',
+  );
 }
 
 export async function markCardPlaced(qrId: string): Promise<Outcome> {
@@ -211,12 +216,22 @@ export async function voidCard(qrId: string, reason: string): Promise<Outcome> {
     p_qr_id: qrId,
     p_reason: reason || 'Voided by the host',
   });
-  return unwrap(data, error, ALL, 'Voided. Scans of it are still logged so you can see if it is still out there.');
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Voided. Scans of it are still logged so you can see if it is still out there.',
+  );
 }
 
 export async function testScan(qrId: string): Promise<Outcome> {
   const { data, error } = await createClient().rpc('rpc_qr_test_scan', { p_qr_id: qrId });
-  return unwrap(data, error, ALL, 'Test scan recorded. It is flagged as a test and left out of Analytics.');
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Test scan recorded. It is flagged as a test and left out of Analytics.',
+  );
 }
 
 // ───────────────────────────────────────────────────── bookings
@@ -466,10 +481,7 @@ export async function startConversation(input: {
   );
 }
 
-export async function replyToConversation(
-  conversationId: string,
-  body: string,
-): Promise<Outcome> {
+export async function replyToConversation(conversationId: string, body: string): Promise<Outcome> {
   const { data, error } = await createClient().rpc('rpc_host_message_reply', {
     p_conversation: conversationId,
     p_body: body,

@@ -137,7 +137,14 @@ export function DeliverToChip({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
  */
 export function describe(
   chip: ChipState,
-  place: { label?: string; city?: string | null; zone?: string | null; eta_min?: number | null; eta_max?: number | null; nearest_km?: number | null } | null,
+  place: {
+    label?: string;
+    city?: string | null;
+    zone?: string | null;
+    eta_min?: number | null;
+    eta_max?: number | null;
+    nearest_km?: number | null;
+  } | null,
 ): { title: string; hint: string } {
   switch (chip) {
     case 'empty':
@@ -167,7 +174,9 @@ export function describe(
         place?.eta_min && place?.eta_max ? `${place.eta_min}–${place.eta_max} min` : null;
       return {
         title: place?.label ?? 'Your address',
-        hint: [place?.zone, window].filter(Boolean).join(' · ') || 'Confirmed pin',
+        /* No zone is not a problem — a point inside a city's radius is
+           served — so the city stands in where a zone name would go. */
+        hint: [place?.zone ?? place?.city, window].filter(Boolean).join(' · ') || 'Confirmed pin',
       };
     }
   }

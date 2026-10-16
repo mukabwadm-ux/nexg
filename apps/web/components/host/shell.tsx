@@ -73,7 +73,11 @@ export function hostNav({
   const i = (n: React.ReactNode) => n;
   return [
     { href: '/host', label: 'Home', icon: i(<Home className="h-4 w-4" />) },
-    { href: '/host/properties', label: 'My Properties', icon: i(<Building2 className="h-4 w-4" />) },
+    {
+      href: '/host/properties',
+      label: 'My Properties',
+      icon: i(<Building2 className="h-4 w-4" />),
+    },
     {
       href: '/host/units',
       label: 'Units & Rooms',
@@ -87,7 +91,11 @@ export function hostNav({
       locked: !live,
       badge: live && qrToPlace > 0 ? qrToPlace : null,
     },
-    { href: '/host/bookings', label: 'Bookings & Guests', icon: i(<CalendarCheck className="h-4 w-4" />) },
+    {
+      href: '/host/bookings',
+      label: 'Bookings & Guests',
+      icon: i(<CalendarCheck className="h-4 w-4" />),
+    },
     { href: '/host/operations', label: 'Guest Operations', icon: i(<Users className="h-4 w-4" />) },
     {
       href: '/host/deliveries',
@@ -114,8 +122,16 @@ export function hostNav({
       icon: i(<MessageSquare className="h-4 w-4" />),
       badge: unreadMessages > 0 ? unreadMessages : null,
     },
-    { href: '/host/packages', label: 'Packages & Amenities', icon: i(<Gift className="h-4 w-4" />) },
-    { href: '/host/earnings', label: 'Earnings & Invoices', icon: i(<Receipt className="h-4 w-4" />) },
+    {
+      href: '/host/packages',
+      label: 'Packages & Amenities',
+      icon: i(<Gift className="h-4 w-4" />),
+    },
+    {
+      href: '/host/earnings',
+      label: 'Earnings & Invoices',
+      icon: i(<Receipt className="h-4 w-4" />),
+    },
     { href: '/host/analytics', label: 'Analytics', icon: i(<BarChart3 className="h-4 w-4" />) },
     { href: '/host/team', label: 'Team', icon: i(<Users className="h-4 w-4" />) },
     { href: '/host/refer', label: 'Refer a Host', icon: i(<UserPlus className="h-4 w-4" />) },
@@ -169,11 +185,7 @@ export function HostShell({
         {photoUrl ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={photoUrl}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+            <img src={photoUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
             <div className="from-ink via-ink/85 to-ink/70 absolute inset-0 bg-gradient-to-r" />
           </>
         ) : null}
@@ -204,7 +216,11 @@ export function HostShell({
               <div className="border-gold/25 from-gold/25 relative hidden h-[7.5rem] w-[7.5rem] shrink-0 items-end justify-center overflow-hidden rounded-xl border bg-gradient-to-br to-transparent pb-2 sm:flex">
                 {photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={photoUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <img
+                    src={photoUrl}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
                 ) : (
                   <span className="text-[0.5rem] font-extrabold uppercase tracking-[0.12em] text-white/40">
                     Photo · Property

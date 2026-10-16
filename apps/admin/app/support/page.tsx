@@ -270,59 +270,60 @@ export default async function SupportAndTicketsPage({
                 </section>
 
                 {/*
-                  * What the form asked, and what they answered.
-                  *
-                  * The body is a sentence for reading; this is the
-                  * same thing as fields, so an agent arranging a
-                  * table for four does not have to parse a
-                  * paragraph to find the time. Rendered from
-                  * whatever the form sent, so a form can add a
-                  * question without this page changing.
-                  */}
+                 * What the form asked, and what they answered.
+                 *
+                 * The body is a sentence for reading; this is the
+                 * same thing as fields, so an agent arranging a
+                 * table for four does not have to parse a
+                 * paragraph to find the time. Rendered from
+                 * whatever the form sent, so a form can add a
+                 * question without this page changing.
+                 */}
                 {(() => {
                   /* `details` is Json, so it is narrowed once here
                      rather than cast at each use. */
                   const asked =
-                    selected.details && typeof selected.details === 'object' &&
+                    selected.details &&
+                    typeof selected.details === 'object' &&
                     !Array.isArray(selected.details)
                       ? (selected.details as Record<string, unknown>)
                       : null;
                   return asked && Object.keys(asked).length > 0 ? (
-                  <aside className="border-border bg-surface mb-4 rounded-2xl border p-5">
-                    <h2 className="text-sm font-extrabold uppercase tracking-wide">
-                      What they asked for
-                    </h2>
-                    {selected.source_form ? (
-                      <p className="text-muted-light mt-0.5 text-xs font-semibold">
-                        from the {selected.source_form.replace(/_/g, ' ')} form
-                      </p>
-                    ) : null}
-                    <dl className="mt-3 space-y-2 text-sm">
-                      {Object.entries(asked)
-                        .filter(([k, v]) => {
-                          if (v === null || v === '' || v === undefined) return false;
-                          /* Coordinates are not something a person
+                    <aside className="border-border bg-surface mb-4 rounded-2xl border p-5">
+                      <h2 className="text-sm font-extrabold uppercase tracking-wide">
+                        What they asked for
+                      </h2>
+                      {selected.source_form ? (
+                        <p className="text-muted-light mt-0.5 text-xs font-semibold">
+                          from the {selected.source_form.replace(/_/g, ' ')} form
+                        </p>
+                      ) : null}
+                      <dl className="mt-3 space-y-2 text-sm">
+                        {Object.entries(asked)
+                          .filter(([k, v]) => {
+                            if (v === null || v === '' || v === undefined) return false;
+                            /* Coordinates are not something a person
                              reads. They are summarised in a sentence
                              below instead. */
-                          return k !== 'lat' && k !== 'lng' && k !== 'location_source';
-                        })
-                        .map(([key, value]) => (
-                          <div key={key} className="flex justify-between gap-3">
-                            <dt className="text-muted-light shrink-0 font-semibold">
-                              {DETAIL_LABEL[key] ?? key.replace(/_/g, ' ')}
-                            </dt>
-                            <dd className="text-right font-bold">
-                              {DETAIL_VALUE[String(value)] ?? String(value)}
-                            </dd>
-                          </div>
-                        ))}
-                    </dl>
-                    {typeof asked.lat === 'number' && typeof asked.lng === 'number' ? (
-                      <p className="text-muted-light mt-2 text-xs font-semibold">
-                        They dropped a pin, so the spot is settled — no need to ask which gate.
-                      </p>
-                    ) : null}
-                  </aside>
+                            return k !== 'lat' && k !== 'lng' && k !== 'location_source';
+                          })
+                          .map(([key, value]) => (
+                            <div key={key} className="flex justify-between gap-3">
+                              <dt className="text-muted-light shrink-0 font-semibold">
+                                {DETAIL_LABEL[key] ?? key.replace(/_/g, ' ')}
+                              </dt>
+                              <dd className="text-right font-bold">
+                                {DETAIL_VALUE[String(value)] ?? String(value)}
+                              </dd>
+                            </div>
+                          ))}
+                      </dl>
+                      {typeof asked.lat === 'number' && typeof asked.lng === 'number' ? (
+                        <p className="text-muted-light mt-2 text-xs font-semibold">
+                          They dropped a pin, so the spot is settled — no need to ask which gate.
+                        </p>
+                      ) : null}
+                    </aside>
                   ) : null;
                 })()}
 

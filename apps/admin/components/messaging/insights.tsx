@@ -143,7 +143,7 @@ export function Insights({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Topic</th>
                 <th className="px-4 py-2 text-right">Total</th>
                 <th className="px-4 py-2 text-right">Still open</th>
@@ -212,14 +212,14 @@ export function Insights({
       <section>
         <h2 className="mb-1 text-[0.9375rem] font-extrabold tracking-tight">Day by day</h2>
         <p className="text-muted-light mb-3 text-xs font-semibold">
-          Newest first. Reopened is the honest counterweight to resolved — a conversation closed
-          and reopened was not resolved, it was ended.
+          Newest first. Reopened is the honest counterweight to resolved — a conversation closed and
+          reopened was not resolved, it was ended.
         </p>
 
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Day</th>
                 <th className="px-4 py-2 text-right">Opened</th>
                 <th className="px-4 py-2 text-right">Resolved</th>
@@ -246,9 +246,7 @@ export function Insights({
                   >
                     <td className="px-4 py-2.5 font-extrabold">{dayLabel(d.day)}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{d.opened}</td>
-                    <td className="text-muted px-4 py-2.5 text-right tabular-nums">
-                      {d.resolved}
-                    </td>
+                    <td className="text-muted px-4 py-2.5 text-right tabular-nums">{d.resolved}</td>
                     <td className="text-muted px-4 py-2.5 text-right tabular-nums">
                       {d.resolved_first_touch}
                     </td>

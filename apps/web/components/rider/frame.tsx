@@ -36,8 +36,7 @@ export async function riderContext(): Promise<RiderContext> {
   const active = h?.status === 'active';
   const documentsToDo =
     (h?.documents_missing ?? 0) + (h?.documents_to_fix ?? 0) + (h?.documents_asked_for ?? 0);
-  const cashDue =
-    (h?.cash_cap ?? 0) > 0 && (h?.cash_on_hand ?? 0) >= (h?.cash_cap ?? 0) * 0.8;
+  const cashDue = (h?.cash_cap ?? 0) > 0 && (h?.cash_on_hand ?? 0) >= (h?.cash_cap ?? 0) * 0.8;
 
   return {
     me,
@@ -109,8 +108,8 @@ export function NotBuiltYet({ what, willHold }: { what: string; willHold: string
       </h2>
       <p className="text-muted mt-1.5 text-[0.8125rem] font-semibold leading-[1.7]">{willHold}</p>
       <p className="text-muted-light mt-3 text-[0.75rem] font-semibold leading-[1.7]">
-        Until it is, rider ops handles this — the help icon in the top bar reaches them. Nothing
-        you have already done is affected, and SOS works from every screen regardless.
+        Until it is, rider ops handles this — the help icon in the top bar reaches them. Nothing you
+        have already done is affected, and SOS works from every screen regardless.
       </p>
     </div>
   );

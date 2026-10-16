@@ -4,18 +4,7 @@ import * as React from 'react';
 
 import { archivePackage, savePackage, schedulePackage } from '@/app/host/actions';
 
-import {
-  Actions,
-  Area,
-  Drawer,
-  Field,
-  Grid,
-  Said,
-  Select,
-  Submit,
-  Text,
-  useAction,
-} from './form';
+import { Actions, Area, Drawer, Field, Grid, Said, Select, Submit, Text, useAction } from './form';
 
 export interface PackageForEdit {
   id: string;
@@ -305,11 +294,7 @@ function SchedulePackage({
                 label="For the check-in on"
                 hint="We place it before the guest arrives. Earlier than the lead time is refused rather than promised."
               >
-                <Text
-                  type="datetime-local"
-                  value={at}
-                  onChange={(e) => setAt(e.target.value)}
-                />
+                <Text type="datetime-local" value={at} onChange={(e) => setAt(e.target.value)} />
               </Field>
               <Said outcome={outcome} />
               <Actions>

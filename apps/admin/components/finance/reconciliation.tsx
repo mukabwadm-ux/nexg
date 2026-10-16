@@ -73,7 +73,7 @@ export function Reconciliation({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Account</th>
                 <th className="px-4 py-2 text-right">Balance</th>
                 <th className="px-4 py-2 text-right">Entries</th>
@@ -152,7 +152,7 @@ export function Reconciliation({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Day</th>
                 <th className="px-4 py-2">Provider</th>
                 <th className="px-4 py-2 text-right">Payments</th>
@@ -222,7 +222,7 @@ export function Reconciliation({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Received</th>
                 <th className="px-4 py-2">Provider</th>
                 <th className="px-4 py-2">Event</th>
@@ -259,9 +259,7 @@ export function Reconciliation({
                     <td className="px-4 py-2.5">
                       <span
                         className={`rounded-full px-2 py-0.5 text-[0.6875rem] font-extrabold ${
-                          w.signature_ok
-                            ? 'bg-warn/10 text-warn'
-                            : 'bg-danger/10 text-danger'
+                          w.signature_ok ? 'bg-warn/10 text-warn' : 'bg-danger/10 text-danger'
                         }`}
                       >
                         {w.gap}

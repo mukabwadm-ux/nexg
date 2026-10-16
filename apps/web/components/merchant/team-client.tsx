@@ -2,12 +2,7 @@
 
 import * as React from 'react';
 
-import {
-  inviteMember,
-  removeMember,
-  revokeInvite,
-  updateMember,
-} from '@/app/merchant/actions';
+import { inviteMember, removeMember, revokeInvite, updateMember } from '@/app/merchant/actions';
 import {
   Actions,
   Drawer,
@@ -111,11 +106,7 @@ export function InviteMember({
               />
             </Field>
             <Field label="Role" wide>
-              <Select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                options={ROLES}
-              />
+              <Select value={role} onChange={(e) => setRole(e.target.value)} options={ROLES} />
             </Field>
           </Grid>
 
@@ -174,8 +165,7 @@ export function InviteMember({
               pending={pending}
               onClick={() =>
                 run(
-                  () =>
-                    inviteMember({ merchantId, contact, role, branches: picked, caps }),
+                  () => inviteMember({ merchantId, contact, role, branches: picked, caps }),
                   (o) => {
                     if (o.ok) {
                       setContact('');
@@ -335,8 +325,8 @@ export function MemberActions({
           <div className="border-border mt-6 border-t pt-5">
             <Said outcome={gone.outcome} />
             <p className="text-muted mt-2 text-[0.75rem] font-semibold leading-[1.6]">
-              Removing them takes effect on their next request. The last owner cannot be removed
-              — make somebody else an owner first, or the account is one nobody can change payout
+              Removing them takes effect on their next request. The last owner cannot be removed —
+              make somebody else an owner first, or the account is one nobody can change payout
               details on.
             </p>
             <div className="mt-3">
@@ -344,9 +334,7 @@ export function MemberActions({
                 type="button"
                 tone="danger"
                 pending={gone.pending}
-                onClick={() =>
-                  gone.run(() => removeMember(merchantId, member.user_id as string))
-                }
+                onClick={() => gone.run(() => removeMember(merchantId, member.user_id as string))}
               >
                 Remove from the team
               </Submit>

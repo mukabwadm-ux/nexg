@@ -91,13 +91,13 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
       </div>
 
       {/*
-        * The field that makes the rest of it answerable.
-        *
-        * This card took no contact detail at all, so a request
-        * arrived with what somebody wanted and no way to tell
-        * them it was on the way. WhatsApp because that is where
-        * the reply goes.
-        */}
+       * The field that makes the rest of it answerable.
+       *
+       * This card took no contact detail at all, so a request
+       * arrived with what somebody wanted and no way to tell
+       * them it was on the way. WhatsApp because that is where
+       * the reply goes.
+       */}
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Input
           id="phone"
@@ -284,9 +284,7 @@ function ThankYou({
 
       <div className="mt-4 flex flex-wrap gap-2">
         <Button variant="outline" size="sm" asChild>
-          <a href="/explore">
-            Browse while you wait
-          </a>
+          <a href="/explore">Browse while you wait</a>
         </Button>
         <Button
           variant="outline"

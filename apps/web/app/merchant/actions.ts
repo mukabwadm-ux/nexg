@@ -252,7 +252,12 @@ export async function pauseBranch(branchId: string, reason: string): Promise<Out
     p_branch_id: branchId,
     p_reason: reason,
   });
-  return unwrap(data, error, ALL, 'Paused. Guests see it as closed; orders already accepted finish.');
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Paused. Guests see it as closed; orders already accepted finish.',
+  );
 }
 
 export async function resumeBranch(branchId: string): Promise<Outcome> {
@@ -404,7 +409,12 @@ export async function replyToDispute(disputeId: string, reply: string): Promise<
     p_dispute_id: disputeId,
     p_reply: reply,
   });
-  return unwrap(data, error, ALL, 'Sent. NexG decides within one working day and you see the reasoning.');
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Sent. NexG decides within one working day and you see the reasoning.',
+  );
 }
 
 export async function acceptDispute(disputeId: string): Promise<Outcome> {

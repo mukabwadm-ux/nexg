@@ -56,7 +56,11 @@ export function when(iso: string | null | undefined): string {
 export function greeting(live: boolean, firstName: string): string {
   if (!live) return `Welcome, ${firstName}`;
   const hour = Number(
-    new Date().toLocaleString('en-GB', { hour: '2-digit', hour12: false, timeZone: 'Africa/Nairobi' }),
+    new Date().toLocaleString('en-GB', {
+      hour: '2-digit',
+      hour12: false,
+      timeZone: 'Africa/Nairobi',
+    }),
   );
   const part = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
   return `Good ${part}, ${firstName}`;
@@ -99,7 +103,7 @@ export function Tile({
   return (
     <Link
       href={href}
-      className="group bg-ink relative flex min-h-[9.5rem] flex-col justify-end overflow-hidden rounded-xl p-4 text-white transition-transform hover:-translate-y-0.5"
+      className="bg-ink group relative flex min-h-[9.5rem] flex-col justify-end overflow-hidden rounded-xl p-4 text-white transition-transform hover:-translate-y-0.5"
     >
       {/* The design calls for a photograph here. There is none
           yet, so this is the branded block rather than a stock
@@ -297,8 +301,12 @@ export function Ring({ done, of }: { done: number; of: number }) {
   const r = 26;
   const c = 2 * Math.PI * r;
   return (
-    <svg viewBox="0 0 64 64" className="h-[4.5rem] w-[4.5rem]" role="img"
-         aria-label={`${done} of ${of} ready`}>
+    <svg
+      viewBox="0 0 64 64"
+      className="h-[4.5rem] w-[4.5rem]"
+      role="img"
+      aria-label={`${done} of ${of} ready`}
+    >
       <circle cx="32" cy="32" r={r} fill="none" strokeWidth="6" className="stroke-border" />
       <circle
         cx="32"
@@ -339,9 +347,7 @@ export function Check({ done, label, note }: { done: boolean; label: string; not
       <span
         aria-hidden="true"
         className={`mt-[0.15rem] flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[0.5625rem] font-extrabold ${
-          done
-            ? 'border-success bg-success text-white'
-            : 'border-border-strong text-muted-light'
+          done ? 'border-success bg-success text-white' : 'border-border-strong text-muted-light'
         }`}
       >
         {done ? '✓' : ''}

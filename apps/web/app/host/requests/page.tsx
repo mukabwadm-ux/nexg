@@ -55,7 +55,10 @@ const OWNER: Record<string, string> = {
   auto: 'Auto-answered',
 };
 
-const STATUS: Record<string, { label: string; tone: 'good' | 'warn' | 'danger' | 'info' | 'plain' }> = {
+const STATUS: Record<
+  string,
+  { label: string; tone: 'good' | 'warn' | 'danger' | 'info' | 'plain' }
+> = {
   open: { label: 'Open', tone: 'info' },
   in_progress: { label: 'In progress', tone: 'info' },
   waiting_on_host: { label: 'Waiting on you', tone: 'warn' },
@@ -68,7 +71,8 @@ const STATUS: Record<string, { label: string; tone: 'good' | 'warn' | 'danger' |
 const TAB = {
   open: (r: RequestRow) => !['resolved', 'closed'].includes(r.status),
   waiting: (r: RequestRow) => r.status === 'waiting_on_host',
-  nexg: (r: RequestRow) => r.owner_kind.startsWith('nexg') && !['resolved', 'closed'].includes(r.status),
+  nexg: (r: RequestRow) =>
+    r.owner_kind.startsWith('nexg') && !['resolved', 'closed'].includes(r.status),
   resolved: (r: RequestRow) => ['resolved', 'closed'].includes(r.status),
 } as const;
 
@@ -207,8 +211,8 @@ export default async function HostRequestsPage({
                 ) : null}
                 <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.6]">
                   Replying, approving and the secure actions — updating a gate code, changing a
-                  hand-off rule — are the next piece of this build. The concierge desk can do all
-                  of them now; Get Help reaches them with this request attached.
+                  hand-off rule — are the next piece of this build. The concierge desk can do all of
+                  them now; Get Help reaches them with this request attached.
                 </p>
               </section>
             ) : null}
@@ -255,15 +259,24 @@ export default async function HostRequestsPage({
             </section>
 
             <HowItWorks title="What the guest sees">
-              Everything on this page is logged. A guest sees the outcome of a request — a code
-              that works, a late check-out confirmed — and never your codes, your notes or who on
-              your team handled it.
+              Everything on this page is logged. A guest sees the outcome of a request — a code that
+              works, a late check-out confirmed — and never your codes, your notes or who on your
+              team handled it.
             </HowItWorks>
           </>
         }
       >
         <Table
-          head={['Priority', 'Guest · unit', 'Type', 'Request', 'Owner', 'Due', 'Status', '>Action']}
+          head={[
+            'Priority',
+            'Guest · unit',
+            'Type',
+            'Request',
+            'Owner',
+            'Due',
+            'Status',
+            '>Action',
+          ]}
           empty={
             tab === 'open'
               ? 'Nothing open. Not a loading state — every request has been dealt with.'
@@ -278,11 +291,7 @@ export default async function HostRequestsPage({
                   <span className="capitalize">
                     <Dot
                       tone={
-                        r.priority === 'high'
-                          ? 'danger'
-                          : r.priority === 'medium'
-                            ? 'warn'
-                            : 'good'
+                        r.priority === 'high' ? 'danger' : r.priority === 'medium' ? 'warn' : 'good'
                       }
                     />
                     {r.priority}
@@ -329,9 +338,7 @@ export default async function HostRequestsPage({
 
         {typeBars.length > 0 ? (
           <section className="border-border bg-surface rounded-xl border p-4">
-            <h2 className="text-[0.9375rem] font-extrabold tracking-tight">
-              What guests ask for
-            </h2>
+            <h2 className="text-[0.9375rem] font-extrabold tracking-tight">What guests ask for</h2>
             <p className="text-muted-light mt-0.5 text-[0.75rem] font-semibold">
               Across every request on this account.
             </p>

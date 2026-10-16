@@ -4,11 +4,7 @@ import { Lock, MapPin } from 'lucide-react';
 import * as React from 'react';
 
 import { ConfirmPin } from './confirm-pin';
-import {
-  accuracyBand,
-  readPositionOnce,
-  type ConsentState,
-} from './geolocation';
+import { accuracyBand, readBestPosition, type ConsentState } from './geolocation';
 import { useLocation } from './store';
 import type { Place } from './types';
 
@@ -45,8 +41,9 @@ export function UseMyLocation({
     setError(null);
     void actions.note('clicked_use_location');
 
-    /* Inside the click. This is the whole rule. */
-    const result = await readPositionOnce();
+    /* Inside the click: this is the read that may prompt. On a phone
+       it refines until the GPS has a building, not a block. */
+    const result = await readBestPosition();
 
     if (!result.ok) {
       setBusy(false);
@@ -62,7 +59,12 @@ export function UseMyLocation({
     void actions.note('allowed', { band: accuracyBand(result.fix.accuracy_m) });
     setConsent('granted');
 
-    const cover = await actions.coverage(result.fix.lat, result.fix.lng);
+    const [cover, street] = await Promise.all([
+      actions.coverage(result.fix.lat, result.fix.lng),
+      actions.reverse
+        ? actions.reverse(result.fix.lat, result.fix.lng).catch(() => null)
+        : Promise.resolve(null),
+    ]);
     setBusy(false);
 
     /*
@@ -74,7 +76,9 @@ export function UseMyLocation({
      * guest sees the circle and moves the pin.
      */
     setPending({
-      label: 'Pinned location',
+      label: street?.address_line ?? 'Pinned location',
+      address_line: street?.address_line ?? null,
+      plus_code: street?.plus_code ?? null,
       /* The lookup is the authority on coverage, the zone and
          the window, so it is spread before the fields only this
          side knows. It always answers with a coverage value, so
@@ -142,9 +146,9 @@ export function UseMyLocation({
 function subLabel(consent: ConsentState): string {
   switch (consent) {
     case 'granted':
-      /* Permission already given, and still nothing read until
-         this is pressed. Saying so is the point. */
-      return 'You allowed this before — we still only read it when you tap.';
+      /* Permission already given. On a phone the pin is placed on
+         open; this refreshes it. Saying which is the point. */
+      return 'You allowed this before — on a phone we place your pin when you open the site. Tap to refresh it.';
     case 'denied':
       return 'Blocked in your browser · re-enable from the padlock in the address bar';
     case 'unavailable':

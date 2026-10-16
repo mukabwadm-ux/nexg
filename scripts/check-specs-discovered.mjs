@@ -24,9 +24,13 @@ import { readFileSync } from 'node:fs';
 
 const PLAYWRIGHT_ROOT = 'e2e/';
 
-const tracked = execFileSync('git', ['ls-files', '*.spec.ts', '*.spec.tsx', '*.test.ts', '*.test.tsx'], {
-  encoding: 'utf8',
-})
+const tracked = execFileSync(
+  'git',
+  ['ls-files', '*.spec.ts', '*.spec.tsx', '*.test.ts', '*.test.tsx'],
+  {
+    encoding: 'utf8',
+  },
+)
   .split('\n')
   .filter(Boolean);
 

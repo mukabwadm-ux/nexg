@@ -77,7 +77,11 @@ function toCsv(rows: Record<string, unknown>[]): string {
   ].join('\r\n');
 }
 
-export function Exports({ log, defaultFrom, defaultTo }: {
+export function Exports({
+  log,
+  defaultFrom,
+  defaultTo,
+}: {
   log: ExportLogRow[];
   defaultFrom: string;
   defaultTo: string;
@@ -157,9 +161,7 @@ export function Exports({ log, defaultFrom, defaultTo }: {
               <label
                 key={k.key}
                 className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${
-                  kind === k.key
-                    ? 'border-ink bg-bg'
-                    : 'border-border hover:border-border-strong'
+                  kind === k.key ? 'border-ink bg-bg' : 'border-border hover:border-border-strong'
                 }`}
               >
                 <input
@@ -181,7 +183,7 @@ export function Exports({ log, defaultFrom, defaultTo }: {
           </div>
 
           <div className="mt-4 flex flex-wrap items-end gap-3">
-            <label className="text-[0.6875rem] font-extrabold tracking-wide uppercase">
+            <label className="text-[0.6875rem] font-extrabold uppercase tracking-wide">
               <span className="text-muted-light block">From</span>
               <input
                 type="date"
@@ -191,7 +193,7 @@ export function Exports({ log, defaultFrom, defaultTo }: {
                 className="border-border-strong bg-surface mt-1 rounded-lg border px-3 py-2 text-[0.8125rem] font-semibold normal-case tracking-normal"
               />
             </label>
-            <label className="text-[0.6875rem] font-extrabold tracking-wide uppercase">
+            <label className="text-[0.6875rem] font-extrabold uppercase tracking-wide">
               <span className="text-muted-light block">To</span>
               <input
                 type="date"
@@ -217,8 +219,8 @@ export function Exports({ log, defaultFrom, defaultTo }: {
           </div>
 
           <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold">
-            A single export covers at most 92 days. Longer ranges are refused rather than
-            truncated — a truncated export looks exactly like a complete one.
+            A single export covers at most 92 days. Longer ranges are refused rather than truncated
+            — a truncated export looks exactly like a complete one.
           </p>
 
           {error ? (
@@ -242,7 +244,7 @@ export function Exports({ log, defaultFrom, defaultTo }: {
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">When</th>
                 <th className="px-4 py-2">Who</th>
                 <th className="px-4 py-2">What</th>

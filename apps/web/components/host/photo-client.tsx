@@ -8,7 +8,6 @@ import { createClient } from '@/lib/supabase/client';
 import { Said, useAction } from './form';
 import type { Photo } from './vocab';
 
-
 /** Ten megabytes, and the bucket enforces it too. */
 const MAX_BYTES = 10 * 1024 * 1024;
 const TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -127,11 +126,7 @@ export function PropertyPhotos({
           <div className="bg-ink relative h-32">
             {urls[cover.path] ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={urls[cover.path]}
-                alt=""
-                className="h-full w-full object-cover"
-              />
+              <img src={urls[cover.path]} alt="" className="h-full w-full object-cover" />
             ) : (
               <span className="text-muted-light absolute inset-0 flex items-center justify-center text-[0.6875rem] font-extrabold uppercase tracking-wide">
                 Loading
@@ -151,7 +146,11 @@ export function PropertyPhotos({
               <div className="bg-bg border-border h-16 overflow-hidden rounded-lg border">
                 {urls[p.path] ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={urls[p.path]} alt={p.alt ?? ''} className="h-full w-full object-cover" />
+                  <img
+                    src={urls[p.path]}
+                    alt={p.alt ?? ''}
+                    className="h-full w-full object-cover"
+                  />
                 ) : null}
               </div>
               <div className="mt-1 flex items-center justify-between gap-1">
@@ -204,9 +203,7 @@ export function PropertyPhotos({
         ) : null}
       </div>
 
-      {busy ? (
-        <p className="text-muted text-[0.75rem] font-semibold">Uploading…</p>
-      ) : null}
+      {busy ? <p className="text-muted text-[0.75rem] font-semibold">Uploading…</p> : null}
       {problem ? (
         <p className="bg-danger/10 text-danger rounded-lg px-3 py-2.5 text-[0.75rem] font-semibold leading-[1.6]">
           {problem}
@@ -227,4 +224,3 @@ export function PhotoAfterSaving() {
     </p>
   );
 }
-

@@ -9,7 +9,13 @@ import {
   takeConversation,
   type Result,
 } from '@/app/messaging/actions';
-import { CHANNEL_LABEL, InternalMark, TEAM_LABEL, TOPIC_LABEL, clock } from '@/components/messaging/shared';
+import {
+  CHANNEL_LABEL,
+  InternalMark,
+  TEAM_LABEL,
+  TOPIC_LABEL,
+  clock,
+} from '@/components/messaging/shared';
 import { Pill } from '@/components/live/shared';
 
 export interface MessageRow {
@@ -139,9 +145,7 @@ export function Conversation({
                     rather than why. */}
                 {internalOnly ? head.subject : (head.with_whom ?? head.subject)}
               </h2>
-              {head.priority === 'urgent' ? (
-                <Pill tone="bg-danger text-white">Urgent</Pill>
-              ) : null}
+              {head.priority === 'urgent' ? <Pill tone="bg-danger text-white">Urgent</Pill> : null}
               {head.object_label ? (
                 <Pill tone="bg-gold/15 text-gold-ink">{head.object_label}</Pill>
               ) : null}
@@ -195,13 +199,22 @@ export function Conversation({
       </header>
 
       {panel === 'escalate' ? (
-        <EscalatePanel id={head.id} onDone={(r) => { setFlash(r); setPanel('none'); }} />
+        <EscalatePanel
+          id={head.id}
+          onDone={(r) => {
+            setFlash(r);
+            setPanel('none');
+          }}
+        />
       ) : null}
       {panel === 'resolve' ? (
         <ResolvePanel
           id={head.id}
           topic={head.topic}
-          onDone={(r) => { setFlash(r); setPanel('none'); }}
+          onDone={(r) => {
+            setFlash(r);
+            setPanel('none');
+          }}
         />
       ) : null}
 
@@ -334,9 +347,7 @@ function Bubble({ m }: { m: MessageRow }) {
   if (m.visibility === 'internal') {
     return (
       <div className="border-warn/30 bg-warn/[0.08] rounded-xl border px-3 py-2.5">
-        <InternalMark>
-          Internal · only staff see this · {m.author ?? 'system'}
-        </InternalMark>
+        <InternalMark>Internal · only staff see this · {m.author ?? 'system'}</InternalMark>
         <p className="mt-1 text-[0.8125rem] font-semibold">{m.body}</p>
         <p className="text-muted-light mt-0.5 text-[0.6875rem] font-semibold">
           {clock(m.created_at)}
@@ -412,8 +423,8 @@ function EscalatePanel({ id, onDone }: { id: string; onDone: (r: Result) => void
           className="mt-0.5"
         />
         <span>
-          Hand the guest over to them as well. Without this you stay the one voice the guest hears
-          — which is usually what you want.
+          Hand the guest over to them as well. Without this you stay the one voice the guest hears —
+          which is usually what you want.
         </span>
       </label>
       <button
@@ -544,7 +555,9 @@ function ModeButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      title={disabled ? 'You joined this conversation to help, not to answer the guest.' : undefined}
+      title={
+        disabled ? 'You joined this conversation to help, not to answer the guest.' : undefined
+      }
       className={`rounded-full px-3 py-1.5 text-[0.75rem] font-extrabold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
         on ? 'bg-ink text-white' : 'border-border-strong bg-surface hover:border-ink border'
       }`}

@@ -4,17 +4,7 @@ import * as React from 'react';
 
 import { cancelBooking, connectCalendar, removeCalendar, saveBooking } from '@/app/host/actions';
 
-import {
-  Actions,
-  Drawer,
-  Field,
-  Grid,
-  Said,
-  Select,
-  Submit,
-  Text,
-  useAction,
-} from './form';
+import { Actions, Drawer, Field, Grid, Said, Select, Submit, Text, useAction } from './form';
 
 const SOURCES = [
   { value: 'entered', label: 'Entered by you' },
@@ -447,9 +437,9 @@ export function Calendars({
           </Actions>
 
           <p className="text-muted-light text-[0.6875rem] font-semibold leading-[1.6]">
-            It saves as waiting, not as connected. The sync worker runs separately, and a green
-            tick before anything had actually read your feed would have you stop entering bookings
-            by hand for nothing.
+            It saves as waiting, not as connected. The sync worker runs separately, and a green tick
+            before anything had actually read your feed would have you stop entering bookings by
+            hand for nothing.
           </p>
         </div>
       </Drawer>

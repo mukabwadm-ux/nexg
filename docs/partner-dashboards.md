@@ -49,7 +49,7 @@ Both need a reason — not bureaucracy, but because that sentence is what Suppor
 
 ### Adding a store
 
-`rpc_merchant_add_store` looks the zone up rather than asking for it. A merchant should not have to know NexG's delivery geometry, and letting them pick would mean a store could claim to be somewhere it is not. An address outside every zone is refused with what to do about it, because a store that takes orders nobody can deliver is worse than no store.
+`rpc_merchant_add_store` looks the zone up rather than asking for it. A merchant should not have to know NexG's delivery geometry, and letting them pick would mean a store could claim to be somewhere it is not. An address in no zone is accepted when it is inside the radius of the merchant's own city (`public.fn_serving_city`); one beyond every served city is refused with what to do about it, because a store that takes orders nobody can deliver is worse than no store.
 
 A new store is on file and waiting for a check before it trades — the first one was looked at by a person and so is this one.
 

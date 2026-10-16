@@ -103,8 +103,8 @@ export default async function RiderShifts() {
           <Panel title="Coming up">
             {upcoming.length === 0 ? (
               <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
-                Nothing committed. You can still take offers without a shift — a shift just puts
-                you first when there are more riders than orders.
+                Nothing committed. You can still take offers without a shift — a shift just puts you
+                first when there are more riders than orders.
               </p>
             ) : (
               <div className="divide-border divide-y">
@@ -200,9 +200,8 @@ export default async function RiderShifts() {
             </h2>
             <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
               You are not employed by the hour and nothing here changes that. A shift is a promise
-              that you will be online in a zone at a time, so dispatch can plan — and the only
-              thing it changes is who gets offered an order first when there are more riders than
-              orders.
+              that you will be online in a zone at a time, so dispatch can plan — and the only thing
+              it changes is who gets offered an order first when there are more riders than orders.
             </p>
           </section>
         </aside>

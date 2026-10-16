@@ -11,7 +11,7 @@
  * API, and an ESLint rule keeps it that way.
  */
 export { LocationProvider, useLocation, chipStateFor } from './store';
-export type { LocationActions } from './store';
+export type { LocationActions, MapsConfig } from './store';
 export { DeliverToChip, describe } from './chip';
 export { LocationSheet } from './sheet';
 export { LocationBanner } from './banners';
@@ -29,7 +29,10 @@ export { UseMyLocation } from './use-my-location';
 export {
   accuracyBand,
   consentState,
+  isHandheld,
+  readBestPosition,
   readPositionOnce,
+  ACCURACY_GOOD_M,
   ACCURACY_NEEDS_CONFIRMING_M,
 } from './geolocation';
 export type { ConsentState, Fix, FixResult } from './geolocation';

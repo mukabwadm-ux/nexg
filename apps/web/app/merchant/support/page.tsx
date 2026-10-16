@@ -58,8 +58,7 @@ export default async function SupportPage() {
   const replies = answered
     .map(
       (t) =>
-        (new Date(t.first_reply_at as string).getTime() - new Date(t.created_at).getTime()) /
-        60000,
+        (new Date(t.first_reply_at as string).getTime() - new Date(t.created_at).getTime()) / 60000,
     )
     .sort((a, b) => a - b);
   const median =
@@ -150,11 +149,7 @@ export default async function SupportPage() {
                                   : 'bg-warning-bg text-warning'
                             }`}
                           >
-                            {t.resolved_at
-                              ? 'Resolved'
-                              : t.first_reply_at
-                                ? 'Answered'
-                                : 'Open'}
+                            {t.resolved_at ? 'Resolved' : t.first_reply_at ? 'Answered' : 'Open'}
                           </span>
                         </td>
                       </tr>
@@ -164,8 +159,8 @@ export default async function SupportPage() {
               </div>
             )}
             <p className="text-muted-light border-border border-t px-4 py-2.5 text-[0.6875rem] font-semibold leading-[1.6]">
-              A ticket opened from a call or WhatsApp appears here too, logged by whoever took
-              it — so the desk remembers what you asked last week.
+              A ticket opened from a call or WhatsApp appears here too, logged by whoever took it —
+              so the desk remembers what you asked last week.
             </p>
           </Panel>
         </div>
@@ -184,9 +179,9 @@ export default async function SupportPage() {
               Urgent
             </h2>
             <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-              A rider or guest in danger at your premises: call the 24-hour NexG line, which
-              reaches Live Operations directly. Out of hours the desk answers a phone, not a
-              form, and that difference only matters when it matters.
+              A rider or guest in danger at your premises: call the 24-hour NexG line, which reaches
+              Live Operations directly. Out of hours the desk answers a phone, not a form, and that
+              difference only matters when it matters.
             </p>
           </section>
         </aside>

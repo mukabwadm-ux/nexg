@@ -1,10 +1,6 @@
 import { DASH, when } from '@/components/host/bits';
 import { HowItWorks, Pill, Table, Td, Tr, TwoColumn } from '@/components/host/module';
-import {
-  Settings,
-  type SettingsRow,
-  type ThemeRow,
-} from '@/components/host/settings-client';
+import { Settings, type SettingsRow, type ThemeRow } from '@/components/host/settings-client';
 import { HostSection, hostContext } from '@/components/host/section';
 
 export const metadata = { title: 'Settings' };
@@ -75,7 +71,13 @@ export default async function HostSettingsPage() {
         devices={[
           { label: 'This session', seen: 'Now', current: true },
           ...(team.length > 1
-            ? [{ label: `${team.length - 1} other team sign-in(s)`, seen: 'See Team', current: false }]
+            ? [
+                {
+                  label: `${team.length - 1} other team sign-in(s)`,
+                  seen: 'See Team',
+                  current: false,
+                },
+              ]
             : []),
         ]}
       />
@@ -84,8 +86,8 @@ export default async function HostSettingsPage() {
         rail={
           <>
             <HowItWorks title="Why your phone is read-only">
-              It is the number we verified you on and the one a rider calls. Changing it is a
-              staff action with a reason recorded against it, because a quiet change here is
+              It is the number we verified you on and the one a rider calls. Changing it is a staff
+              action with a reason recorded against it, because a quiet change here is
               indistinguishable from an account takeover.
             </HowItWorks>
 
@@ -96,9 +98,9 @@ export default async function HostSettingsPage() {
             </HowItWorks>
 
             <HowItWorks title="Leaving">
-              Ask host ops to close the account and your units stop accepting orders the same
-              day. Orders already placed finish; cards already in rooms stop working. Records we
-              have to keep for tax stay, with you detached.
+              Ask host ops to close the account and your units stop accepting orders the same day.
+              Orders already placed finish; cards already in rooms stop working. Records we have to
+              keep for tax stay, with you detached.
             </HowItWorks>
           </>
         }
@@ -138,8 +140,8 @@ export default async function HostSettingsPage() {
               {pending.length} invitation{pending.length === 1 ? '' : 's'} not yet accepted
             </p>
             <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.65]">
-              An invitation grants nothing until it is accepted. Until then that person cannot
-              sign in and sees none of your units.
+              An invitation grants nothing until it is accepted. Until then that person cannot sign
+              in and sees none of your units.
             </p>
           </div>
         ) : null}

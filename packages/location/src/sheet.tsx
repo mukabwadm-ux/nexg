@@ -106,7 +106,10 @@ export function LocationSheet() {
               </button>
             </div>
 
-            <h2 id="location-sheet-title" className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+            <h2
+              id="location-sheet-title"
+              className="text-2xl font-extrabold tracking-tight sm:text-3xl"
+            >
               Where should we deliver?
             </h2>
             <p className="text-muted mt-2 text-sm font-semibold">
@@ -132,7 +135,11 @@ export function LocationSheet() {
                 closeSheet('dismissed');
                 /* The panel is the search. One search box in the
                    product, not two that can disagree. */
-                setTimeout(() => document.querySelector<HTMLButtonElement>('[aria-haspopup="dialog"]')?.click(), 50);
+                setTimeout(
+                  () =>
+                    document.querySelector<HTMLButtonElement>('[aria-haspopup="dialog"]')?.click(),
+                  50,
+                );
               }}
               className="border-border hover:border-ink flex w-full items-center gap-2 rounded-xl border px-4 py-3 text-left transition-colors"
             >

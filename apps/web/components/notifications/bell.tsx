@@ -145,9 +145,7 @@ export function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }
           setOpen(!open);
           if (!open && unread > 0) void markRead();
         }}
-        aria-label={
-          unread > 0 ? `Notifications, ${unread} unread` : 'Notifications, nothing new'
-        }
+        aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications, nothing new'}
         aria-expanded={open}
         className={`relative flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
           tone === 'dark'
@@ -185,8 +183,8 @@ export function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }
 
           {rows.length === 0 ? (
             <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
-              Nothing yet. When an order moves, a refund lands or something changes on your
-              account, it shows up here.
+              Nothing yet. When an order moves, a refund lands or something changes on your account,
+              it shows up here.
             </p>
           ) : (
             <ul className="max-h-[26rem] overflow-y-auto">
@@ -251,7 +249,11 @@ function PushToggle() {
 
   React.useEffect(() => {
     void (async () => {
-      if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+      if (
+        typeof window === 'undefined' ||
+        !('serviceWorker' in navigator) ||
+        !('PushManager' in window)
+      ) {
         setState('unsupported');
         return;
       }

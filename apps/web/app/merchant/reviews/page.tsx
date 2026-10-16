@@ -44,11 +44,7 @@ const ENOUGH = 20;
  * writes one, because a reply that silently never appears is
  * worse than no reply button at all.
  */
-export default async function ReviewsPage({
-  searchParams,
-}: {
-  searchParams?: { tab?: string };
-}) {
+export default async function ReviewsPage({ searchParams }: { searchParams?: { tab?: string } }) {
   const { m } = await merchantContext();
   if (!m) return null;
 
@@ -119,9 +115,7 @@ export default async function ReviewsPage({
         />
         <Tile
           label="5★ share"
-          value={
-            s.ratings >= ENOUGH ? `${Math.round(((s.five ?? 0) / s.ratings) * 100)}%` : '—'
-          }
+          value={s.ratings >= ENOUGH ? `${Math.round(((s.five ?? 0) / s.ratings) * 100)}%` : '—'}
           note={s.ratings >= ENOUGH ? 'of all ratings' : `needs ${ENOUGH} ratings`}
         />
         <Tile
@@ -184,9 +178,7 @@ export default async function ReviewsPage({
                           {r.guest_first_name ?? 'Guest'}
                           <span className="text-gold-text ml-2">
                             {'★'.repeat(r.stars)}
-                            <span className="text-border-strong">
-                              {'★'.repeat(5 - r.stars)}
-                            </span>
+                            <span className="text-border-strong">{'★'.repeat(5 - r.stars)}</span>
                           </span>
                         </p>
                         {r.comment ? (
@@ -276,9 +268,9 @@ export default async function ReviewsPage({
               Reply rules
             </h2>
             <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-              Replies are public on your Explore page after moderation, usually within minutes.
-              No offers or discounts in a reply, and no personal details — a reply naming a guest
-              or their flat is refused. Kiswahili is welcome.
+              Replies are public on your Explore page after moderation, usually within minutes. No
+              offers or discounts in a reply, and no personal details — a reply naming a guest or
+              their flat is refused. Kiswahili is welcome.
             </p>
           </section>
         </aside>

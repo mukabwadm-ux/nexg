@@ -109,8 +109,8 @@ export function HomeLive({
           </h1>
           <p className="text-muted mt-2 max-w-2xl text-[0.9375rem] font-semibold leading-[1.7]">
             Here is what is happening across your properties today. NexG is handling guest chat,
-            orders and deliveries; everything below is live and every number opens the record
-            behind it.
+            orders and deliveries; everything below is live and every number opens the record behind
+            it.
           </p>
         </div>
 
@@ -138,18 +138,14 @@ export function HomeLive({
             href="/host/deliveries"
             title="Deliveries"
             note="Hand-off rules and proof of delivery"
-            chip={
-              (today?.arriving ?? 0) > 0 ? `${today?.arriving} arriving` : 'nothing in flight'
-            }
+            chip={(today?.arriving ?? 0) > 0 ? `${today?.arriving} arriving` : 'nothing in flight'}
             chipTone={(today?.arriving ?? 0) > 0 ? 'gold' : 'plain'}
           />
           <Tile
             href="/host/requests"
             title="Requests & Issues"
             note="Late delivery, access, extra towels · each with its chat"
-            chip={
-              (today?.open_requests ?? 0) > 0 ? `${today?.open_requests} open` : 'none open'
-            }
+            chip={(today?.open_requests ?? 0) > 0 ? `${today?.open_requests} open` : 'none open'}
             chipTone={(today?.open_requests ?? 0) > 0 ? 'danger' : 'plain'}
           />
           <Tile
@@ -258,7 +254,8 @@ export function HomeLive({
                         <td className="text-muted px-4 py-3">{when(r.scanned_at)}</td>
                         <td className="text-muted px-4 py-3">{r.guest_first_name || DASH}</td>
                         <td className="text-muted px-4 py-3">
-                          {r.merchant_name ?? (r.outcome === 'browsed' ? 'Browsed · no order' : DASH)}
+                          {r.merchant_name ??
+                            (r.outcome === 'browsed' ? 'Browsed · no order' : DASH)}
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">
                           {r.total_cents === null ? DASH : kes(r.total_cents)}

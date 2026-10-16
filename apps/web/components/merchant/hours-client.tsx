@@ -17,7 +17,6 @@ import {
 
 import { DAYS, hhmm, slotLabel, type HoursRow } from './hours-vocab';
 
-
 /**
  * One slot in the week grid.
  *
@@ -54,7 +53,7 @@ export function HoursSlot({
         onClick={() => setOpen(true)}
         className={`w-full rounded-lg border px-2 py-2 text-[0.75rem] font-extrabold transition-colors ${
           !row
-            ? 'border-border text-muted-light border-dashed hover:border-ink'
+            ? 'border-border text-muted-light hover:border-ink border-dashed'
             : isClosed
               ? 'border-border bg-bg text-muted-light'
               : 'border-success/30 bg-success/10 text-success hover:border-success'
@@ -181,9 +180,9 @@ export function CloseEarly({
           <div className="border-border space-y-2 rounded-lg border p-3">
             <p className="text-[0.8125rem] font-extrabold">What happens</p>
             <p className="text-muted text-[0.75rem] font-semibold leading-[1.6]">
-              Orders already accepted complete as normal — a kitchen that stops mid-order is a
-              guest with no dinner and a rider waiting. Guests browsing Explore see
-              &ldquo;closes at {closes} today&rdquo; before they order rather than after.
+              Orders already accepted complete as normal — a kitchen that stops mid-order is a guest
+              with no dinner and a rider waiting. Guests browsing Explore see &ldquo;closes at{' '}
+              {closes} today&rdquo; before they order rather than after.
             </p>
           </div>
 

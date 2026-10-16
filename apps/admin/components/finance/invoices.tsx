@@ -112,7 +112,7 @@ export function Invoices({ rows }: { rows: InvoiceRow[] }) {
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Who</th>
                 <th className="px-4 py-2">Period</th>
                 <th className="px-4 py-2 text-right">Amount</th>

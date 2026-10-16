@@ -116,18 +116,14 @@ export default async function HostEarningsPage() {
         </h2>
         <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.7]">
           Guests pay per order, the same as anybody else ordering from NexG. You are invoiced only
-          for welcome packages you ask us to place in a unit. There is no commission share on
-          guest orders — and if that ever changes it will be in your Host Agreement before it
-          appears on this page.
+          for welcome packages you ask us to place in a unit. There is no commission share on guest
+          orders — and if that ever changes it will be in your Host Agreement before it appears on
+          this page.
         </p>
       </div>
 
       <KpiRow>
-        <Kpi
-          label="Guest orders"
-          value={String(e.guest_order_count)}
-          note="through your cards"
-        />
+        <Kpi label="Guest orders" value={String(e.guest_order_count)} note="through your cards" />
         <Kpi
           label="Order value"
           value={kes(e.guest_order_value_cents)}
@@ -158,26 +154,36 @@ export default async function HostEarningsPage() {
           <>
             <section className="border-border bg-surface rounded-xl border">
               <div className="border-border border-b px-4 py-3">
-                <h2 className="text-[0.875rem] font-extrabold tracking-tight">
-                  The two numbers
-                </h2>
+                <h2 className="text-[0.875rem] font-extrabold tracking-tight">The two numbers</h2>
               </div>
               <Fact
-                label={<>Order value <span className="text-muted-light">· not yours</span></>}
+                label={
+                  <>
+                    Order value <span className="text-muted-light">· not yours</span>
+                  </>
+                }
                 value={kes(e.guest_order_value_cents)}
               />
               <Fact
-                label={<>Package charges <span className="text-muted-light">· you owe</span></>}
+                label={
+                  <>
+                    Package charges <span className="text-muted-light">· you owe</span>
+                  </>
+                }
                 value={`KES ${owedKes.toLocaleString('en-KE')}`}
               />
               <Fact
-                label={<>Referral rewards <span className="text-muted-light">· you earn</span></>}
+                label={
+                  <>
+                    Referral rewards <span className="text-muted-light">· you earn</span>
+                  </>
+                }
                 value={`KES ${Number(e.rewards_credited_kes).toLocaleString('en-KE')}`}
               />
               <p className="text-muted-light px-4 py-3 text-[0.6875rem] font-semibold leading-[1.6]">
-                These are not added together anywhere. Order value is a guest paying a merchant
-                and passes nowhere near your account; a combined total would be a number that
-                means nothing.
+                These are not added together anywhere. Order value is a guest paying a merchant and
+                passes nowhere near your account; a combined total would be a number that means
+                nothing.
               </p>
             </section>
 
@@ -188,9 +194,9 @@ export default async function HostEarningsPage() {
             </HowItWorks>
 
             <HowItWorks title="Statements">
-              A monthly statement in PDF and Excel is built from the first full month after you
-              go live. Until there is a full month to describe, this page is the record — an
-              export of two weeks labelled &ldquo;monthly&rdquo; is worse than none.
+              A monthly statement in PDF and Excel is built from the first full month after you go
+              live. Until there is a full month to describe, this page is the record — an export of
+              two weeks labelled &ldquo;monthly&rdquo; is worse than none.
             </HowItWorks>
           </>
         }
@@ -238,7 +244,9 @@ export default async function HostEarningsPage() {
                 balanceCents < 0 ? 'text-danger' : 'text-success'
               }`}
             >
-              {balanceCents < 0 ? `You owe ${kes(-balanceCents)}` : `Owed to you ${kes(balanceCents)}`}
+              {balanceCents < 0
+                ? `You owe ${kes(-balanceCents)}`
+                : `Owed to you ${kes(balanceCents)}`}
             </span>
           </div>
           {statement.length === 0 ? (

@@ -1,7 +1,15 @@
 import Link from 'next/link';
 import * as React from 'react';
 
-import { Empty, SectionTitle, kesMoney, money, shortDate, signedMoney, stamp } from '@/components/finance/shared';
+import {
+  Empty,
+  SectionTitle,
+  kesMoney,
+  money,
+  shortDate,
+  signedMoney,
+  stamp,
+} from '@/components/finance/shared';
 import { DASH, Pill } from '@/components/live/shared';
 
 export type RunRow = {
@@ -150,7 +158,7 @@ export function Settlement({
             </p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-extrabold tracking-tight tabular-nums">
+            <p className="text-2xl font-extrabold tabular-nums tracking-tight">
               {kesMoney(netTotal)}
             </p>
             <p className="text-muted-light text-[0.6875rem] font-semibold">net across all lines</p>
@@ -255,7 +263,7 @@ export function Settlement({
           ) : (
             <table className="w-full text-left">
               <thead className="border-border bg-bg border-b">
-                <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+                <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                   <th className="px-4 py-2">Partner</th>
                   <th className="px-4 py-2">Paying to</th>
                   <th className="px-4 py-2 text-right">Gross</th>
@@ -344,7 +352,7 @@ function Signature({
 }) {
   return (
     <div className="border-border bg-bg rounded-lg border p-3">
-      <p className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+      <p className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
         {n} approval
       </p>
       {email ? (

@@ -103,9 +103,9 @@ export function WaitlistTab({
           </p>
           <p className="text-muted mt-1 text-[0.75rem] font-semibold">
             They came through the old homepage card, which asked what somebody needed and never
-            asked how to reply. What they wanted is in the table below and is all that survives.
-            The card now takes a phone number and raises a support ticket instead, so this cannot
-            happen again — but these {unreachable.length} cannot be answered.
+            asked how to reply. What they wanted is in the table below and is all that survives. The
+            card now takes a phone number and raises a support ticket instead, so this cannot happen
+            again — but these {unreachable.length} cannot be answered.
           </p>
         </div>
       ) : null}
@@ -121,14 +121,13 @@ export function WaitlistTab({
       {stranded.length > 0 ? (
         <div className="border-warn/40 bg-warn/5 rounded-xl border p-4">
           <p className="text-warn text-[0.8125rem] font-extrabold">
-            {stranded.reduce((a, c) => a + Number(c.waiting), 0)} people are waiting for a city
-            that is already open.
+            {stranded.reduce((a, c) => a + Number(c.waiting), 0)} people are waiting for a city that
+            is already open.
           </p>
           <p className="text-muted mt-1 text-[0.75rem] font-semibold">
-            {stranded.map((c) => c.city_name).join(', ')}{' '}
-            {stranded.length === 1 ? 'is' : 'are'} live or in soft launch. These signups were taken
-            before launch and nothing has gone back to them since. They are the warmest list in the
-            product and nobody has written to them.
+            {stranded.map((c) => c.city_name).join(', ')} {stranded.length === 1 ? 'is' : 'are'}{' '}
+            live or in soft launch. These signups were taken before launch and nothing has gone back
+            to them since. They are the warmest list in the product and nobody has written to them.
           </p>
         </div>
       ) : null}
@@ -138,7 +137,7 @@ export function WaitlistTab({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">City</th>
                 <th className="px-4 py-2">Status</th>
                 <th className="px-4 py-2 text-right">Waiting</th>
@@ -207,7 +206,7 @@ export function WaitlistTab({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Contact</th>
                 <th className="px-4 py-2">What they asked for</th>
                 <th className="px-4 py-2">City</th>
@@ -278,10 +277,10 @@ export function WaitlistTab({
 function Stat({ label, value, note }: { label: string; value: number; note: string }) {
   return (
     <div className="border-border bg-surface rounded-xl border p-4">
-      <p className="text-muted-light text-[0.6875rem] font-extrabold tracking-wide uppercase">
+      <p className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
         {label}
       </p>
-      <p className="mt-1.5 text-2xl font-extrabold tracking-tight tabular-nums">{value}</p>
+      <p className="mt-1.5 text-2xl font-extrabold tabular-nums tracking-tight">{value}</p>
       <p className="text-muted-light mt-1 text-[0.6875rem] font-semibold">{note}</p>
     </div>
   );

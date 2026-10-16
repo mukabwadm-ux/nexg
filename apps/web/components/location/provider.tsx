@@ -1,6 +1,11 @@
 'use client';
 
-import { LocationProvider, type LocationActions, type Place, type ResolutionStep } from '@nexg/location';
+import {
+  LocationProvider,
+  type LocationActions,
+  type Place,
+  type ResolutionStep,
+} from '@nexg/location';
 import * as React from 'react';
 
 import {
@@ -10,7 +15,15 @@ import {
   listPlaces,
   noteLocationEvent,
   resolveLocation,
+  streetFor,
 } from '@/app/location-actions';
+
+/* Inlined at build time, like every NEXT_PUBLIC_ value. Both or neither:
+   without a Map ID the confirm view keeps its drawing. */
+const MAPS = {
+  key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
+  mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID ?? '',
+};
 
 /**
  * Binds the location layer to this app's server actions.
@@ -46,6 +59,7 @@ export function SiteLocationProvider({
       },
       coverage: async (lat, lng) =>
         (await coverageFor(lat, lng)) as Partial<Place> & { coverage: string },
+      reverse: async (lat, lng) => streetFor(lat, lng),
       note: async (action, detail) => {
         if (!sessionRef.current) {
           try {
@@ -82,7 +96,7 @@ export function SiteLocationProvider({
   );
 
   return (
-    <LocationProvider actions={actions} initial={initial}>
+    <LocationProvider actions={actions} initial={initial} maps={MAPS}>
       {children}
     </LocationProvider>
   );

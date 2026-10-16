@@ -97,7 +97,11 @@ export function riderNav({
       badge: documentsToDo > 0 ? documentsToDo : null,
       tone: 'danger',
     },
-    { href: '/rider/incidents', label: 'Incidents', icon: i(<TriangleAlert className="h-4 w-4" />) },
+    {
+      href: '/rider/incidents',
+      label: 'Incidents',
+      icon: i(<TriangleAlert className="h-4 w-4" />),
+    },
     { href: '/rider/refer', label: 'Refer a rider', icon: i(<UserPlus className="h-4 w-4" />) },
     { href: '/rider/profile', label: 'Account', icon: i(<Settings className="h-4 w-4" />) },
     { href: '/rider/support', label: 'Support', icon: i(<HelpCircle className="h-4 w-4" />) },

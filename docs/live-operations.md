@@ -100,7 +100,7 @@ To enable the map: set `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` and `NEXT_PUBLIC_GOOGLE
 - An escalated job in a zone makes it `short` regardless, because the cascade running out is the strongest evidence there is.
 - `load_per_free_rider` is **null** when nobody is free, not infinite. A glitchy number is one people stop reading.
 
-**Pausing a zone** stops NexG taking money in part of a city. It is narrower than the live-ops grant — ops manager, city lead or super admin only — requires a reason the guest will see, and writes a `high` audit event. Checkout asks exactly one question, `public.fn_zone_serviceable(point)`, so a pause cannot be half-applied.
+**Pausing a zone** stops NexG taking money in part of a city. It is narrower than the live-ops grant — ops manager, city lead or super admin only — requires a reason the guest will see, and writes a `high` audit event. Checkout asks exactly one question, `public.fn_zone_serviceable(point)`, so a pause cannot be half-applied. A point in no zone is served when it is inside a served city's radius; a pause stops only the zone it is on, so an address just outside a paused zone still takes orders.
 
 A timed pause ends itself (`dispatch.cron_zone_unpause`, every five minutes). An open-ended one is somebody's memory, and the dialog says so.
 

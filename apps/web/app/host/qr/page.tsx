@@ -153,7 +153,7 @@ export default async function HostQrPage() {
         />
         <Kpi
           label="Top spot"
-          value={topSpot ? spotLabel(topSpot[0]).split(' · ')[0] ?? DASH : DASH}
+          value={topSpot ? (spotLabel(topSpot[0]).split(' · ')[0] ?? DASH) : DASH}
           note={topSpot ? `${topSpot[1]} scans` : 'no scans yet'}
         />
         <Kpi

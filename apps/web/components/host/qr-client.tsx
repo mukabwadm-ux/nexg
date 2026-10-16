@@ -31,7 +31,6 @@ export interface UnitOption {
   taken: string[];
 }
 
-
 /* ═══════════════════════════════════════════════ generate */
 
 export function GenerateCards({ units }: { units: UnitOption[] }) {
@@ -83,8 +82,8 @@ export function GenerateCards({ units }: { units: UnitOption[] }) {
 
             {unit && !unit.label_public ? (
               <p className="bg-gold-soft text-gold-text rounded-lg px-3 py-2.5 text-[0.75rem] font-semibold leading-[1.6]">
-                This unit has no public name yet. That name is what gets printed on the card, so
-                set it in Units &amp; Rooms before generating one.
+                This unit has no public name yet. That name is what gets printed on the card, so set
+                it in Units &amp; Rooms before generating one.
               </p>
             ) : null}
 
@@ -199,8 +198,8 @@ export function ViewCard({ card }: { card: CardDetail }) {
                * the portal was broken rather than the code.
                */
               <div className="border-border text-muted-light flex h-[7.5rem] w-[7.5rem] shrink-0 items-center justify-center rounded-lg border bg-white p-2 text-center text-[0.625rem] font-semibold leading-[1.4]">
-                This code cannot be drawn — it has characters the card alphabet leaves out.
-                Replace the card to get a printable one.
+                This code cannot be drawn — it has characters the card alphabet leaves out. Replace
+                the card to get a printable one.
               </div>
             ) : (
               /* eslint-disable-next-line @next/next/no-img-element */
@@ -217,9 +216,7 @@ export function ViewCard({ card }: { card: CardDetail }) {
               <p className="text-[0.8125rem] font-extrabold">
                 {card.unit_public_name ?? card.unit_name ?? '—'}
               </p>
-              {card.property_name ? (
-                <p className="text-muted-light">{card.property_name}</p>
-              ) : null}
+              {card.property_name ? <p className="text-muted-light">{card.property_name}</p> : null}
               <p className="text-muted mt-1.5 break-all font-mono text-[0.6875rem]">
                 {origin}/q/{card.code}
               </p>
@@ -260,11 +257,7 @@ export function ViewCard({ card }: { card: CardDetail }) {
               press, which is the one number on this panel
               somebody is checking.
             */}
-            <Stat
-              label="Test scans"
-              value={String(card.test_scans)}
-              note="left out of Analytics"
-            />
+            <Stat label="Test scans" value={String(card.test_scans)} note="left out of Analytics" />
           </div>
 
           <p className="text-muted text-[0.75rem] font-semibold leading-[1.65]">
@@ -275,11 +268,7 @@ export function ViewCard({ card }: { card: CardDetail }) {
           <Said outcome={outcome} />
 
           <Actions>
-            <Submit
-              type="button"
-              pending={pending}
-              onClick={() => run(() => testScan(card.id))}
-            >
+            <Submit type="button" pending={pending} onClick={() => run(() => testScan(card.id))}>
               Test this card
             </Submit>
             <a
@@ -388,8 +377,7 @@ export function CardActions({
               pending={pending}
               onClick={() =>
                 run(
-                  () =>
-                    sheet === 'void' ? voidCard(qrId, reason) : replaceCard(qrId, reason),
+                  () => (sheet === 'void' ? voidCard(qrId, reason) : replaceCard(qrId, reason)),
                   (o) => {
                     if (o.ok) setSheet(null);
                   },
@@ -434,4 +422,3 @@ function Mini({
     </button>
   );
 }
-

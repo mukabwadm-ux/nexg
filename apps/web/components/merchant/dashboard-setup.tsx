@@ -151,8 +151,8 @@ export function DashboardSetup({
           <div className="w-full max-w-xs rounded-xl bg-black/35 p-4 backdrop-blur-sm lg:w-auto">
             <p className="text-gold text-[0.9375rem] font-extrabold">Your onboarding guide</p>
             <p className="mt-1.5 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-              Merchant ops is assigned to you until you go live. Ask anything in Messages, or book
-              a fifteen-minute setup call.
+              Merchant ops is assigned to you until you go live. Ask anything in Messages, or book a
+              fifteen-minute setup call.
             </p>
             <Link
               href="/merchant/messages"
@@ -313,9 +313,7 @@ export function DashboardSetup({
                 <ListOrdered className="h-4 w-4" aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[0.875rem] font-extrabold">
-                  No orders yet — you are not live
-                </p>
+                <p className="text-[0.875rem] font-extrabold">No orders yet — you are not live</p>
                 <p className="text-muted mt-0.5 text-[0.75rem] font-semibold leading-[1.6]">
                   This is where new orders arrive with an accept countdown, and where you mark them
                   Preparing and Ready. Finish steps 5 to 7 and the first real order shows up here.
@@ -397,7 +395,9 @@ export function DashboardSetup({
           </section>
 
           <section className="border-border bg-surface rounded-xl border p-5">
-            <h2 className="text-[0.9375rem] font-extrabold tracking-tight">This week&apos;s money</h2>
+            <h2 className="text-[0.9375rem] font-extrabold tracking-tight">
+              This week&apos;s money
+            </h2>
             <p className="mt-3 text-[1.75rem] font-extrabold tracking-tight">{kes(0)}</p>
             <p className="text-muted-light text-[0.8125rem] font-semibold">no orders yet</p>
             <p className="text-muted mt-3 text-[0.75rem] font-semibold leading-[1.65]">
@@ -432,7 +432,7 @@ export function BranchTile({ b, live }: { b: BranchCard; live: boolean }) {
   return (
     <Link
       href="/merchant/stores"
-      className="group bg-ink relative flex min-h-[8rem] flex-col justify-end overflow-hidden rounded-xl p-4 text-white transition-transform hover:-translate-y-0.5"
+      className="bg-ink group relative flex min-h-[8rem] flex-col justify-end overflow-hidden rounded-xl p-4 text-white transition-transform hover:-translate-y-0.5"
     >
       <span className="absolute inset-0 bg-gradient-to-br from-white/[0.07] to-transparent" />
       <span className="absolute left-4 top-4 text-[0.5rem] font-extrabold uppercase tracking-[0.12em] text-white/40">
@@ -452,9 +452,7 @@ export function BranchTile({ b, live }: { b: BranchCard; live: boolean }) {
           <span>
             {live ? `${b.orders_today} orders today` : `Catalogue ${b.catalogue_items} items`}
           </span>
-          <span>
-            {b.prep_avg_minutes ? `Prep ${b.prep_avg_minutes} min avg` : 'Prep — '}
-          </span>
+          <span>{b.prep_avg_minutes ? `Prep ${b.prep_avg_minutes} min avg` : 'Prep — '}</span>
         </span>
       </span>
     </Link>

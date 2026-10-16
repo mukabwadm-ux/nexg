@@ -20,21 +20,26 @@ Every screen that depends on one of these names the exact variable it is waiting
 
 In Google Cloud, on a project with billing enabled:
 
-1. **Maps JavaScript API** — enable it.
-2. **An API key**, restricted to:
-   - *Application restrictions* → HTTP referrers → `https://nexg-zjkl.vercel.app/*` and `https://nexg-sepia.vercel.app/*` (plus `http://localhost:3005/*` and `http://localhost:3006/*` for development)
+1. **Maps JavaScript API** and **Places API (New)** — enable both. "Places API (New)" is a separate entry from the legacy "Places API"; address search needs the new one.
+2. **A browser key** → `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, restricted to:
+   - *Application restrictions* → Websites → `https://nexg-zjkl.vercel.app/*` and `https://nexg-sepia.vercel.app/*`, plus each custom domain (e.g. `https://nexgapp.com/*`, `https://www.nexgapp.com/*`, `https://admin.nexgapp.com/*`), plus `http://localhost:3005/*` and `http://localhost:3006/*` for development
    - *API restrictions* → Maps JavaScript API only
-3. **A Map ID** (Google Cloud → Map Management), type **JavaScript**, with a style attached. The style is where NexG's palette goes — ink `#14110F`, gold `#C9A227`, roads muted.
+3. **A server key** → `GOOGLE_MAPS_API_KEY`, restricted to:
+   - *Application restrictions* → **None**. Vercel functions send no Referer and have no fixed IP, so a referrer-restricted key is refused with "Requests from referer <empty> are blocked".
+   - *API restrictions* → Places API (New) only
+4. **A Map ID** (Google Cloud → Map Management), type **JavaScript**, with a style attached. The style is where NexG's palette goes — ink `#14110F`, gold `#C9A227`, roads muted.
 
-Both are required. A key without a Map ID gives Google's default blue-and-beige, and **Advanced Markers silently refuse to render** — which looks exactly like a bug in our code. So the capability check demands both, and reports both when either is missing.
+The browser key and Map ID are both required to draw a map. A key without a Map ID gives Google's default blue-and-beige, and **Advanced Markers silently refuse to render** — which looks exactly like a bug in our code. So the capability check demands both, and reports both when either is missing. Address search needs only the server key.
 
 ### Where they go
 
 | | |
 |---|---|
-| Vercel → `nexg-zjkl` (admin) | both variables |
-| Vercel → `nexg-sepia` (web) | both variables |
-| `apps/admin/.env.local`, `apps/web/.env.local` | both, for development |
+| Vercel → `nexg-zjkl` (admin) | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAPS_ID` |
+| Vercel → `nexg` (web, `nexg-sepia.vercel.app`) | all three |
+| `apps/admin/.env.local`, `apps/web/.env.local` | the same, for development |
+
+`NEXT_PUBLIC_*` values are inlined at build time: after changing them, **redeploy**. Then run `bash scripts/maps-status.sh` to confirm search answers.
 
 ### What lights up
 

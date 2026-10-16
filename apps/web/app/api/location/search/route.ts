@@ -53,43 +53,44 @@ export async function GET(request: Request) {
    */
   const serverKey = process.env['GOOGLE_MAPS_API_KEY'] ?? '';
 
+  /* Search needs a key, not a map. Gating on maps() would demand
+     the browser key and Map ID too, so a deployment with only the
+     server key set returned nothing and blamed the Map ID. */
   const capability = maps();
-  if (!capability.live) {
+  const key = serverKey || capability.key;
+  if (!key) {
     return NextResponse.json({
       results: local,
-      reason: capability.why,
+      reason: 'Address search is off. Set GOOGLE_MAPS_API_KEY (Places API (New)).',
     });
   }
 
   try {
-    const response = await fetch(
-      'https://places.googleapis.com/v1/places:searchText',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Goog-Api-Key': serverKey || capability.key,
-          'X-Goog-FieldMask':
-            'places.displayName,places.formattedAddress,places.location,places.plusCode',
-        },
-        body: JSON.stringify({
-          textQuery: query,
-          /* Biased to the launch footprint rather than filtered
+    const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': key,
+        'X-Goog-FieldMask':
+          'places.displayName,places.formattedAddress,places.location,places.plusCode',
+      },
+      body: JSON.stringify({
+        textQuery: query,
+        /* Biased to the launch footprint rather than filtered
              to it: a hotel just outside a zone boundary is still
              a real place somebody may be standing in. */
-          locationBias: {
-            rectangle: {
-              low: { latitude: -4.8, longitude: 33.9 },
-              high: { latitude: 1.6, longitude: 41.9 },
-            },
+        locationBias: {
+          rectangle: {
+            low: { latitude: -4.8, longitude: 33.9 },
+            high: { latitude: 1.6, longitude: 41.9 },
           },
-          maxResultCount: 6,
-        }),
-        /* The visitor is waiting with a cursor in a box. A slow
+        },
+        maxResultCount: 6,
+      }),
+      /* The visitor is waiting with a cursor in a box. A slow
            geocoder must not hold the panel open. */
-        signal: AbortSignal.timeout(3000),
-      },
-    );
+      signal: AbortSignal.timeout(3000),
+    });
 
     if (!response.ok) {
       /*
@@ -251,7 +252,10 @@ async function knownPlaces(query: string) {
    * escape for these inside a filter value, and nobody searching
    * for a hotel needs a comma.
    */
-  const safe = query.replace(/[,().*"'%\\]/g, ' ').trim().slice(0, 60);
+  const safe = query
+    .replace(/[,().*"'%\\]/g, ' ')
+    .trim()
+    .slice(0, 60);
   if (safe.length < 3) return [];
 
   const supabase = createPublicClient();
@@ -263,13 +267,15 @@ async function knownPlaces(query: string) {
     .limit(5);
 
   return (
-    (data as {
-      trading_name: string;
-      branch_name: string | null;
-      city_name: string | null;
-      branch_latitude: number;
-      branch_longitude: number;
-    }[] | null) ?? []
+    (data as
+      | {
+          trading_name: string;
+          branch_name: string | null;
+          city_name: string | null;
+          branch_latitude: number;
+          branch_longitude: number;
+        }[]
+      | null) ?? []
   ).map((m) => ({
     label: m.trading_name,
     address_line: [m.branch_name, m.city_name].filter(Boolean).join(', ') || null,

@@ -48,11 +48,15 @@ export default async function HostVerifyPage() {
       {live ? (
         <div className="border-success/40 bg-success/5 rounded-xl border p-5">
           <p className="text-success text-[0.9375rem] font-extrabold">
-            Verified{home.went_live_at ? ` on ${new Date(home.went_live_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Africa/Nairobi' })}` : ''}.
+            Verified
+            {home.went_live_at
+              ? ` on ${new Date(home.went_live_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Africa/Nairobi' })}`
+              : ''}
+            .
           </p>
           <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.7]">
-            Nothing further is needed here. If you add a property that is not obviously part of
-            the same account, we may ask once more.
+            Nothing further is needed here. If you add a property that is not obviously part of the
+            same account, we may ask once more.
           </p>
         </div>
       ) : (
@@ -63,8 +67,8 @@ export default async function HostVerifyPage() {
                 Submitted. We are checking.
               </p>
               <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.7]">
-                Usually within one working day. You will get a message either way — including if
-                we cannot find the code, which is the common reason this takes a second go.
+                Usually within one working day. You will get a message either way — including if we
+                cannot find the code, which is the common reason this takes a second go.
               </p>
             </div>
           ) : null}
@@ -98,8 +102,8 @@ export default async function HostVerifyPage() {
                 Send a screenshot instead
               </h2>
               <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.7]">
-                Your host dashboard showing the listing. Covers the case where you would rather
-                not edit a listing that is converting well.
+                Your host dashboard showing the listing. Covers the case where you would rather not
+                edit a listing that is converting well.
               </p>
             </section>
 

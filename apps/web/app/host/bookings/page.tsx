@@ -88,7 +88,8 @@ export default async function HostBookingsPage({
   ]);
 
   const all = (stayRes.data as StayRow[] | null) ?? [];
-  const units = (unitRes.data as { id: string; name: string; property_name: string | null }[] | null) ?? [];
+  const units =
+    (unitRes.data as { id: string; name: string; property_name: string | null }[] | null) ?? [];
   const calendars = (calRes.data as CalendarRow[] | null) ?? [];
   const properties = (propRes.data as { id: string; name: string }[] | null) ?? [];
   const tab = searchParams?.tab ?? 'all';
@@ -117,9 +118,7 @@ export default async function HostBookingsPage({
       a +
       Math.max(
         1,
-        Math.round(
-          (new Date(s.check_out).getTime() - new Date(s.check_in).getTime()) / 86400000,
-        ),
+        Math.round((new Date(s.check_out).getTime() - new Date(s.check_in).getTime()) / 86400000),
       ),
     0,
   );
@@ -174,9 +173,8 @@ export default async function HostBookingsPage({
             same unit
           </p>
           <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.65]">
-            Flagged, not resolved. Two bookings in one unit usually means a calendar sync and a
-            host entered the same guest — and guessing which to keep is how a real booking
-            disappears.
+            Flagged, not resolved. Two bookings in one unit usually means a calendar sync and a host
+            entered the same guest — and guessing which to keep is how a real booking disappears.
           </p>
         </div>
       ) : null}
@@ -203,9 +201,7 @@ export default async function HostBookingsPage({
 
             <section className="border-border bg-surface rounded-xl border">
               <div className="border-border border-b px-4 py-3">
-                <h2 className="text-[0.875rem] font-extrabold tracking-tight">
-                  Guest sentiment
-                </h2>
+                <h2 className="text-[0.875rem] font-extrabold tracking-tight">Guest sentiment</h2>
               </div>
               {reviewed.length === 0 ? (
                 <p className="text-muted-light px-4 py-6 text-center text-[0.75rem] font-semibold">

@@ -143,7 +143,15 @@ export function DocumentsStep() {
 
   /* No application at all is a different thing from one still
      loading, and only the first is permanent. */
-  if (!draftId) return <NoDraft step={5} eyebrow="Verification" startHref="/merchants/apply/start" what="upload documents for" />;
+  if (!draftId)
+    return (
+      <NoDraft
+        step={5}
+        eyebrow="Verification"
+        startHref="/merchants/apply/start"
+        what="upload documents for"
+      />
+    );
   if (!loaded) return null;
 
   return (

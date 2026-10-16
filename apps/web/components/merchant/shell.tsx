@@ -75,7 +75,11 @@ export function merchantNav({
       locked: !live,
       badge: live && ordersOpen > 0 ? ordersOpen : null,
     },
-    { href: '/merchant/menu', label: 'Catalogue', icon: i(<UtensilsCrossed className="h-4 w-4" />) },
+    {
+      href: '/merchant/menu',
+      label: 'Catalogue',
+      icon: i(<UtensilsCrossed className="h-4 w-4" />),
+    },
     { href: '/merchant/hours', label: 'Hours', icon: i(<Clock className="h-4 w-4" />) },
     { href: '/merchant/stores', label: 'Branches', icon: i(<Building2 className="h-4 w-4" />) },
     { href: '/merchant/money', label: 'Money', icon: i(<CreditCard className="h-4 w-4" />) },

@@ -108,7 +108,9 @@ let failures = 0;
 const check = (name, actual, expected) => {
   const ok = actual === expected;
   if (!ok) failures += 1;
-  console.log(`${ok ? 'ok  ' : 'FAIL'}  ${name}${ok ? '' : `\n        got ${actual}\n        want ${expected}`}`);
+  console.log(
+    `${ok ? 'ok  ' : 'FAIL'}  ${name}${ok ? '' : `\n        got ${actual}\n        want ${expected}`}`,
+  );
 };
 
 for (const code of CODES.slice(0, 2)) {
@@ -169,7 +171,6 @@ for (const code of CODES.slice(0, 2)) {
   );
 }
 
-
 /*
  * And the real thing.
  *
@@ -197,8 +198,10 @@ function stamp(qrBuffer) {
       const dy = y < radius ? radius - y : y > plate - radius ? y - (plate - radius) : 0;
       if (dx * dx + dy * dy > radius * radius) continue;
       const i = ((y0 + y) * target.width + (x0 + x)) << 2;
-      target.data[i] = 255; target.data[i + 1] = 255;
-      target.data[i + 2] = 255; target.data[i + 3] = 255;
+      target.data[i] = 255;
+      target.data[i + 1] = 255;
+      target.data[i + 2] = 255;
+      target.data[i + 3] = 255;
     }
   }
 
@@ -206,16 +209,24 @@ function stamp(qrBuffer) {
   const scale = mark.width / box;
   for (let y = 0; y < box; y++) {
     for (let x = 0; x < box; x++) {
-      const sx0 = Math.floor(x * scale), sy0 = Math.floor(y * scale);
+      const sx0 = Math.floor(x * scale),
+        sy0 = Math.floor(y * scale);
       const sx1 = Math.max(sx0 + 1, Math.floor((x + 1) * scale));
       const sy1 = Math.max(sy0 + 1, Math.floor((y + 1) * scale));
-      let r = 0, g = 0, b = 0, a = 0, n = 0;
+      let r = 0,
+        g = 0,
+        b = 0,
+        a = 0,
+        n = 0;
       for (let sy = sy0; sy < sy1 && sy < mark.height; sy++) {
         for (let sx = sx0; sx < sx1 && sx < mark.width; sx++) {
           const j = (sy * mark.width + sx) << 2;
           const al = mark.data[j + 3] / 255;
-          r += mark.data[j] * al; g += mark.data[j + 1] * al; b += mark.data[j + 2] * al;
-          a += al; n += 1;
+          r += mark.data[j] * al;
+          g += mark.data[j + 1] * al;
+          b += mark.data[j + 2] * al;
+          a += al;
+          n += 1;
         }
       }
       if (n === 0) continue;

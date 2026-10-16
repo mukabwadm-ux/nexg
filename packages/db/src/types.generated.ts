@@ -14,6 +14,7 @@ export type Database = {
           signed_note: string | null;
           state: string;
         };
+        ComputedFields: never;
         Insert: {
           due_at?: string | null;
           id?: string;
@@ -48,6 +49,7 @@ export type Database = {
           role_key: string;
           staff_user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           city_id: string;
           decided_at?: string | null;
@@ -91,6 +93,7 @@ export type Database = {
           pii_fields: string[];
           two_person: boolean;
         };
+        ComputedFields: never;
         Insert: {
           action: string;
           default_severity?: Database['public']['Enums']['audit_severity'];
@@ -135,6 +138,7 @@ export type Database = {
           target_id: string | null;
           target_type: string | null;
         };
+        ComputedFields: never;
         Insert: {
           acknowledged_at?: string | null;
           acknowledged_by?: string | null;
@@ -213,6 +217,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           active?: boolean;
           description?: string | null;
@@ -286,6 +291,7 @@ export type Database = {
           fn_approver_name: string | null;
           fn_sentence: string | null;
         };
+        ComputedFields: 'canonical' | 'fn_actor_name' | 'fn_approver_name' | 'fn_sentence';
         Insert: {
           action: string;
           actor_id?: string | null;
@@ -366,6 +372,7 @@ export type Database = {
           staff_label: string | null;
           staff_user_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           closed_at?: string | null;
@@ -413,6 +420,7 @@ export type Database = {
           run_by: string | null;
           trigger: string;
         };
+        ComputedFields: never;
         Insert: {
           detail?: string | null;
           events_checked: number;
@@ -445,6 +453,7 @@ export type Database = {
           shipped_at: string | null;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           event_id: number;
           review_note?: string | null;
@@ -522,6 +531,7 @@ export type Database = {
           withdrawn_at: string | null;
           withdrawn_reason: string | null;
         };
+        ComputedFields: never;
         Insert: {
           chain_checked_at?: string | null;
           chain_ok?: boolean | null;
@@ -599,6 +609,7 @@ export type Database = {
           hash_at_freeze: string;
           pack_id: string;
         };
+        ComputedFields: never;
         Insert: {
           event_id: number;
           hash_at_freeze: string;
@@ -670,6 +681,7 @@ export type Database = {
           staff_user_id: string | null;
           what: string;
         };
+        ComputedFields: never;
         Insert: {
           actor_label?: string | null;
           at?: string;
@@ -741,6 +753,7 @@ export type Database = {
           staff_user_id: string;
           trusted: boolean;
         };
+        ComputedFields: never;
         Insert: {
           countries?: string[];
           device_fingerprint: string;
@@ -779,6 +792,7 @@ export type Database = {
           title: string;
           to_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           from_at?: string | null;
@@ -825,6 +839,7 @@ export type Database = {
           shared: boolean;
           tab: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           filter: NonNullable<Json>;
@@ -865,6 +880,7 @@ export type Database = {
           staff_user_id: string | null;
           user_agent: string | null;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           auth_method?: string | null;
@@ -921,6 +937,7 @@ export type Database = {
           transfer_basis: string | null;
           vendor: string;
         };
+        ComputedFields: never;
         Insert: {
           contract_reference?: string | null;
           country?: string | null;
@@ -997,6 +1014,7 @@ export type Database = {
           touches_pii: boolean | null;
           unregistered: boolean | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_alert_rule_v: {
@@ -1019,6 +1037,7 @@ export type Database = {
           time_window: string | null;
           title: string | null;
         };
+        ComputedFields: never;
         Insert: {
           active?: boolean | null;
           description?: string | null;
@@ -1088,6 +1107,7 @@ export type Database = {
           target_type: string | null;
           title: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'alert_rule_key_fkey';
@@ -1129,6 +1149,7 @@ export type Database = {
           who: string | null;
           who_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_data_access_v: {
@@ -1158,6 +1179,7 @@ export type Database = {
           target_id: string | null;
           target_type: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_evidence_v: {
@@ -1192,6 +1214,7 @@ export type Database = {
           withdrawn_at: string | null;
           withdrawn_reason: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'evidence_pack_legal_hold_id_fkey';
@@ -1226,6 +1249,7 @@ export type Database = {
           what: string | null;
           who: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'export_log_event_id_fkey';
@@ -1277,6 +1301,7 @@ export type Database = {
           retention_rules_unset: number | null;
           unregistered_events: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_legal_hold_v: {
@@ -1302,6 +1327,7 @@ export type Database = {
           title: string | null;
           to_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_module_v: {
@@ -1313,6 +1339,7 @@ export type Database = {
           module: string | null;
           unregistered: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_money_v: {
@@ -1346,6 +1373,7 @@ export type Database = {
           target_label: string | null;
           target_type: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_retention_v: {
@@ -1371,6 +1399,7 @@ export type Database = {
           subject: string | null;
           updated_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_sign_in_v: {
@@ -1399,23 +1428,39 @@ export type Database = {
           who: string | null;
           who_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
     };
     Functions: {
       canonical: {
-        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Args: {
+          e: Omit<
+            Database['audit']['Tables']['audit_event']['Row'],
+            Database['audit']['Tables']['audit_event']['ComputedFields']
+          >;
+        };
         Returns: string;
       };
       cron_chain_check: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_run_alerts: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_actor_name: {
-        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Args: {
+          e: Omit<
+            Database['audit']['Tables']['audit_event']['Row'],
+            Database['audit']['Tables']['audit_event']['ComputedFields']
+          >;
+        };
         Returns: string;
       };
       fn_ago: { Args: { p_at: string }; Returns: string };
       fn_approver_name: {
-        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Args: {
+          e: Omit<
+            Database['audit']['Tables']['audit_event']['Row'],
+            Database['audit']['Tables']['audit_event']['ComputedFields']
+          >;
+        };
         Returns: string;
       };
       fn_diff: { Args: { p_after: Json; p_before: Json }; Returns: Json };
@@ -1423,7 +1468,12 @@ export type Database = {
       fn_mask_payload: { Args: { p_fields: string[]; p_payload: Json }; Returns: Json };
       fn_require: { Args: { p_level: string }; Returns: string };
       fn_sentence: {
-        Args: { e: Database['audit']['Tables']['audit_event']['Row'] };
+        Args: {
+          e: Omit<
+            Database['audit']['Tables']['audit_event']['Row'],
+            Database['audit']['Tables']['audit_event']['ComputedFields']
+          >;
+        };
         Returns: string;
       };
       fn_under_hold: { Args: { p_subject_id: string; p_subject_type: string }; Returns: boolean };
@@ -1606,6 +1656,7 @@ export type Database = {
           why_nexg: string | null;
           withdrawn_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           answers?: NonNullable<Json>;
           candidate_id: string;
@@ -1716,6 +1767,7 @@ export type Database = {
           updated_at: string;
           years_experience: number | null;
         };
+        ComputedFields: never;
         Insert: {
           anonymised_at?: string | null;
           blocked?: boolean;
@@ -1774,6 +1826,7 @@ export type Database = {
           template_key: string | null;
           to: string | null;
         };
+        ComputedFields: never;
         Insert: {
           application_id?: string | null;
           body_html?: string | null;
@@ -1840,6 +1893,7 @@ export type Database = {
           updated_by: string | null;
           version: number;
         };
+        ComputedFields: never;
         Insert: {
           body_md: string;
           editable_before_send?: boolean;
@@ -1882,6 +1936,7 @@ export type Database = {
           scheduled_at: string | null;
           status: Database['hr']['Enums']['interview_status'];
         };
+        ComputedFields: never;
         Insert: {
           application_id: string;
           calendar_event_id?: string | null;
@@ -1972,6 +2027,7 @@ export type Database = {
           work_sample_paid: boolean;
           work_sample_pay_note: string | null;
         };
+        ComputedFields: never;
         Insert: {
           benefits_md?: string | null;
           city_id?: string | null;
@@ -2069,6 +2125,7 @@ export type Database = {
           posted_by: string | null;
           utm: string | null;
         };
+        ComputedFields: never;
         Insert: {
           channel: Database['hr']['Enums']['source'];
           enabled?: boolean;
@@ -2128,6 +2185,7 @@ export type Database = {
           sort: number;
           threshold: Json | null;
         };
+        ComputedFields: never;
         Insert: {
           auto_flag_template_id?: string | null;
           flag_key?: string | null;
@@ -2200,6 +2258,7 @@ export type Database = {
           score: number | null;
           visible_to: string;
         };
+        ComputedFields: never;
         Insert: {
           application_id: string;
           author_id?: string | null;
@@ -2268,6 +2327,7 @@ export type Database = {
           start_date: string | null;
           status: Database['hr']['Enums']['offer_status'];
         };
+        ComputedFields: never;
         Insert: {
           application_id: string;
           approved_by?: string | null;
@@ -2336,6 +2396,7 @@ export type Database = {
           requested_at: string;
           status: Database['hr']['Enums']['reference_status'];
         };
+        ComputedFields: never;
         Insert: {
           application_id: string;
           by?: string | null;
@@ -2386,6 +2447,7 @@ export type Database = {
           job_id: string | null;
           referrer_staff_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           application_id?: string | null;
           code: string;
@@ -2448,6 +2510,7 @@ export type Database = {
           label: string;
           sort: number;
         };
+        ComputedFields: never;
         Insert: {
           active?: boolean;
           candidate_text: string;
@@ -2472,6 +2535,7 @@ export type Database = {
           updated_by: string | null;
           value: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           key: string;
           label: string;
@@ -2499,6 +2563,7 @@ export type Database = {
           note: string | null;
           to_stage: Database['hr']['Enums']['stage'];
         };
+        ComputedFields: never;
         Insert: {
           application_id: string;
           at?: string;
@@ -2550,6 +2615,7 @@ export type Database = {
           name: string;
           sort: number;
         };
+        ComputedFields: never;
         Insert: {
           blurb?: string | null;
           id?: string;
@@ -2582,6 +2648,7 @@ export type Database = {
           submission_url: string | null;
           submitted_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           application_id: string;
           brief_sent_at?: string | null;
@@ -2673,6 +2740,7 @@ export type Database = {
           work_sample_payment: string | null;
           work_sample_score: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'application_candidate_id_fkey';
@@ -2720,6 +2788,7 @@ export type Database = {
           time_to_hire_days: number | null;
           unreviewed: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_jobs_v: {
@@ -2752,6 +2821,7 @@ export type Database = {
           unreviewed_over_3d: number | null;
           work_mode: Database['hr']['Enums']['work_mode'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'job_team_id_fkey';
@@ -2775,6 +2845,7 @@ export type Database = {
           rejected_count: number | null;
           rejected_with_feedback_pct: number | null;
         };
+        ComputedFields: never;
         Insert: {
           avg_max?: never;
           avg_score?: never;
@@ -3244,6 +3315,7 @@ export type Database = {
           note: string | null;
           pattern: string;
         };
+        ComputedFields: never;
         Insert: {
           channel: Database['public']['Enums']['acquisition_channel'];
           id?: string;
@@ -3276,6 +3348,7 @@ export type Database = {
           target_type: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           created_at?: string;
@@ -3405,6 +3478,7 @@ export type Database = {
           key: string;
           params: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           enabled?: boolean;
@@ -3500,6 +3574,7 @@ export type Database = {
           set_by: string | null;
           value: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           branch_id: string;
           field: string;
@@ -3577,6 +3652,7 @@ export type Database = {
           template_id: string | null;
           title: string;
         };
+        ComputedFields: never;
         Insert: {
           audience?: NonNullable<Json>;
           body: string;
@@ -3635,6 +3711,7 @@ export type Database = {
           notification_id: string | null;
           state: string;
         };
+        ComputedFields: never;
         Insert: {
           broadcast_id: string;
           merchant_id: string;
@@ -3756,6 +3833,7 @@ export type Database = {
           rider_id: string;
           state: string;
         };
+        ComputedFields: never;
         Insert: {
           broadcast_id: string;
           deferred_reason?: string | null;
@@ -3880,6 +3958,7 @@ export type Database = {
           unit_map: NonNullable<Json>;
           url: string | null;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           created_by?: string | null;
@@ -4020,6 +4099,7 @@ export type Database = {
           period_end: string;
           period_start: string;
         };
+        ComputedFields: never;
         Insert: {
           amount_kes: number;
           channel: Database['public']['Enums']['acquisition_channel'];
@@ -4060,6 +4140,7 @@ export type Database = {
           provider_ref: string;
           rider_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           account_reference?: string | null;
           amount_kes: number;
@@ -4186,6 +4267,7 @@ export type Database = {
           rider_id: string;
           settlement_line_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           amount_kes: number;
           created_at?: string;
@@ -4312,6 +4394,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           cap_default_kes?: number | null;
           cap_new_rider_days?: number;
@@ -4429,6 +4512,7 @@ export type Database = {
           sold_out_until: string | null;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           available?: boolean | null;
           branch_id: string;
@@ -4518,6 +4602,7 @@ export type Database = {
           reviewed_by: string | null;
           status: Database['public']['Enums']['edit_approval_status'];
         };
+        ComputedFields: never;
         Insert: {
           catalogue_item_id?: string | null;
           created_at?: string;
@@ -4671,6 +4756,7 @@ export type Database = {
           status: string;
           storage_path: string | null;
         };
+        ComputedFields: never;
         Insert: {
           applied_by?: string | null;
           created_at?: string;
@@ -4803,6 +4889,7 @@ export type Database = {
           sort: number;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           age_restricted?: boolean;
           available?: boolean;
@@ -4933,6 +5020,7 @@ export type Database = {
           item_id: string;
           sort: number;
         };
+        ComputedFields: never;
         Insert: {
           group_id: string;
           item_id: string;
@@ -4987,6 +5075,7 @@ export type Database = {
           status: string;
           storage_path: string;
         };
+        ComputedFields: never;
         Insert: {
           alt?: string | null;
           created_at?: string;
@@ -5052,6 +5141,7 @@ export type Database = {
           merchant_id: string;
           status: string;
         };
+        ComputedFields: never;
         Insert: {
           assignee_id?: string | null;
           booked_for?: string | null;
@@ -5199,6 +5289,7 @@ export type Database = {
           resolved_by: string | null;
           status: Database['public']['Enums']['price_flag_status'];
         };
+        ComputedFields: never;
         Insert: {
           app_price_kes?: number | null;
           catalogue_item_id: string;
@@ -5350,6 +5441,7 @@ export type Database = {
           sort: number;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           blurb?: string | null;
           created_at?: string;
@@ -5471,6 +5563,7 @@ export type Database = {
           sort: number;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           badge_rules?: NonNullable<Json>;
           card_kind: string;
@@ -5526,6 +5619,7 @@ export type Database = {
           timezone: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           centre?: unknown;
           city_manager_id?: string | null;
@@ -5598,6 +5692,7 @@ export type Database = {
           id: string;
           label: string;
         };
+        ComputedFields: never;
         Insert: {
           applies_to_categories?: string[] | null;
           city_id: string;
@@ -5700,6 +5795,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           code: Database['public']['Enums']['commission_tier_code'];
           criteria?: string | null;
@@ -5735,6 +5831,7 @@ export type Database = {
           note: string | null;
           price_override_kes: number | null;
         };
+        ComputedFields: never;
         Insert: {
           available?: boolean;
           capacity_override?: number | null;
@@ -5776,6 +5873,7 @@ export type Database = {
           since: string;
           staff_user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           capacity?: number;
           city_id: string;
@@ -5879,6 +5977,7 @@ export type Database = {
           section: string;
           sort: number;
         };
+        ComputedFields: never;
         Insert: {
           href?: string | null;
           icon?: string | null;
@@ -5912,6 +6011,7 @@ export type Database = {
           status: string;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           assigned_to?: string | null;
           category: Database['public']['Enums']['merchant_category'];
@@ -6073,6 +6173,7 @@ export type Database = {
           title: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           badge?: string | null;
           city_id: string;
@@ -6189,6 +6290,7 @@ export type Database = {
           sort: number;
           start_time: string | null;
         };
+        ComputedFields: never;
         Insert: {
           component_id: string;
           curated_day_id: string;
@@ -6259,6 +6361,7 @@ export type Database = {
           scope: string[];
           status: Database['public']['Enums']['data_request_status'];
         };
+        ComputedFields: never;
         Insert: {
           blocking_reasons?: NonNullable<Json>;
           bundle_expires_at?: string | null;
@@ -6335,6 +6438,7 @@ export type Database = {
           set_by: string | null;
           zone_id: string;
         };
+        ComputedFields: never;
         Insert: {
           expires_at?: string | null;
           radius_km?: number | null;
@@ -6418,6 +6522,7 @@ export type Database = {
           rider_id: string | null;
           status: Database['public']['Enums']['dispute_status'];
         };
+        ComputedFields: never;
         Insert: {
           amount_claimed_kes?: number | null;
           amount_refunded_kes?: number;
@@ -6695,6 +6800,7 @@ export type Database = {
           uploaded_by_staff_id: string | null;
           version: number;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           expires_at?: string | null;
@@ -6776,6 +6882,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           enabled?: boolean;
           key: string;
@@ -6816,6 +6923,7 @@ export type Database = {
           sent_at: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           channel?: string;
           created_at?: string;
@@ -6882,6 +6990,7 @@ export type Database = {
           updated_at: string;
           why_text: string | null;
         };
+        ComputedFields: never;
         Insert: {
           applies_when?: NonNullable<Json>;
           created_at?: string;
@@ -6950,6 +7059,7 @@ export type Database = {
           venue_name: string | null;
           venue_point: unknown;
         };
+        ComputedFields: never;
         Insert: {
           anchor_slot?: Database['public']['Enums']['block_slot'];
           category?: Database['public']['Enums']['event_category'];
@@ -7135,6 +7245,7 @@ export type Database = {
           updated_at: string;
           url: string;
         };
+        ComputedFields: never;
         Insert: {
           auth?: Json | null;
           city_id: string;
@@ -7268,6 +7379,7 @@ export type Database = {
           updated_at: string;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           booking_lead_hours?: number;
           capacity_per_day?: number | null;
@@ -7470,6 +7582,7 @@ export type Database = {
           updated_at: string;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           can_answer_holds?: boolean;
           city_id: string;
@@ -7707,6 +7820,7 @@ export type Database = {
           wanted_start: string | null;
           weeks: number;
         };
+        ComputedFields: never;
         Insert: {
           auto_renew?: boolean;
           booked_by?: string | null;
@@ -8036,6 +8150,7 @@ export type Database = {
           updated_at: string;
           version: number;
         };
+        ComputedFields: never;
         Insert: {
           blurb?: string | null;
           booking_id: string;
@@ -8234,6 +8349,7 @@ export type Database = {
           ran_at: string;
           result: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           action?: string;
           booking_id: string;
@@ -8309,6 +8425,7 @@ export type Database = {
           surface: string;
           view_hour: string | null;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           booking_id: string;
@@ -8519,6 +8636,7 @@ export type Database = {
           vat: number | null;
           week_start: string;
         };
+        ComputedFields: never;
         Insert: {
           booking_id: string;
           created_at?: string;
@@ -8721,6 +8839,7 @@ export type Database = {
           taps: number;
           views: number;
         };
+        ComputedFields: never;
         Insert: {
           booking_id: string;
           conversion?: number | null;
@@ -8910,6 +9029,7 @@ export type Database = {
           label: string;
           position: number;
         };
+        ComputedFields: never;
         Insert: {
           category?: Database['public']['Enums']['merchant_category'] | null;
           city_id: string;
@@ -9033,6 +9153,7 @@ export type Database = {
           vat_pct: number | null;
           version: string;
         };
+        ComputedFields: never;
         Insert: {
           approved_by?: string | null;
           auto_renew_default?: boolean;
@@ -9163,6 +9284,7 @@ export type Database = {
           sent_at: string | null;
           week_start: string;
         };
+        ComputedFields: never;
         Insert: {
           booking_id: string;
           payload: NonNullable<Json>;
@@ -9228,6 +9350,7 @@ export type Database = {
           updated_by: string | null;
           value: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           key: string;
           label: string;
@@ -9261,6 +9384,7 @@ export type Database = {
           status: Database['public']['Enums']['slot_status'];
           week_start: string;
         };
+        ComputedFields: never;
         Insert: {
           booking_id?: string | null;
           generated_at?: string;
@@ -9355,6 +9479,7 @@ export type Database = {
           label: string;
           state: string;
         };
+        ComputedFields: never;
         Insert: {
           amount_cents?: number | null;
           built_at?: string;
@@ -9391,6 +9516,7 @@ export type Database = {
           sort: number;
           title: string;
         };
+        ComputedFields: never;
         Insert: {
           amount_cents?: number | null;
           built_at?: string;
@@ -9425,6 +9551,7 @@ export type Database = {
           taken_by: string;
           to_date: string;
         };
+        ComputedFields: never;
         Insert: {
           from_date: string;
           id?: string;
@@ -9464,6 +9591,7 @@ export type Database = {
           sort: number;
           sql: string;
         };
+        ComputedFields: never;
         Insert: {
           blocks_outbound?: boolean;
           enabled?: boolean;
@@ -9496,6 +9624,7 @@ export type Database = {
           ran_at: string;
           value: number | null;
         };
+        ComputedFields: never;
         Insert: {
           breaches: number;
           detail?: Json | null;
@@ -9548,6 +9677,7 @@ export type Database = {
           rider_cost_cents: number;
           source_hash: string;
         };
+        ComputedFields: never;
         Insert: {
           as_of_entry_id: number;
           built_at?: string;
@@ -9665,6 +9795,7 @@ export type Database = {
           period_start: string;
           sort: number;
         };
+        ComputedFields: never;
         Insert: {
           amount_cents: number;
           as_of_entry_id: number;
@@ -9700,6 +9831,7 @@ export type Database = {
           party_id: string;
           party_type: 'merchant' | 'rider' | 'host' | 'hotel' | 'guest' | 'provider' | 'nexg';
         };
+        ComputedFields: never;
         Insert: {
           as_of_entry_id: number;
           built_at?: string;
@@ -9733,6 +9865,7 @@ export type Database = {
           row_count: number | null;
           stale_after: string;
         };
+        ComputedFields: never;
         Insert: {
           as_of?: string | null;
           as_of_entry_id?: number | null;
@@ -9767,6 +9900,7 @@ export type Database = {
           period_start: string;
           prior_amount_cents: number;
         };
+        ComputedFields: never;
         Insert: {
           account_code: string;
           amount_cents: number;
@@ -9797,6 +9931,7 @@ export type Database = {
           line_id: string;
           run_id: string;
         };
+        ComputedFields: never;
         Insert: {
           entry_id: number;
           line_id: string;
@@ -9864,6 +9999,7 @@ export type Database = {
           run_id: string;
           state: Database['public']['Enums']['settlement_line_state'];
         };
+        ComputedFields: never;
         Insert: {
           adjustment_cents?: number;
           adjustments?: NonNullable<Json>;
@@ -9961,6 +10097,7 @@ export type Database = {
           totals: NonNullable<Json>;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           approved_1_at?: string | null;
           approved_1_by?: string | null;
@@ -10121,6 +10258,7 @@ export type Database = {
           roles: string[];
           to_state: string;
         };
+        ComputedFields: never;
         Insert: {
           entity: string;
           from_state: string;
@@ -10145,6 +10283,7 @@ export type Database = {
           stay_key: string;
           used: number;
         };
+        ComputedFields: never;
         Insert: {
           hotel_id: string;
           last_order_at?: string | null;
@@ -10213,6 +10352,7 @@ export type Database = {
           sync: Database['public']['Enums']['folio_sync'];
           voided_reason: string | null;
         };
+        ComputedFields: never;
         Insert: {
           amount: number;
           cap_check?: NonNullable<Json>;
@@ -10301,6 +10441,7 @@ export type Database = {
           statement_id: string;
           status: Database['public']['Enums']['recon_status'];
         };
+        ComputedFields: never;
         Insert: {
           hotel_amount?: number | null;
           hotel_line_ref?: string | null;
@@ -10350,6 +10491,7 @@ export type Database = {
           params: NonNullable<Json>;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           enabled?: boolean;
           kind: Database['public']['Enums']['fraud_signal_kind'];
@@ -10387,6 +10529,7 @@ export type Database = {
           score: number | null;
           status: string;
         };
+        ComputedFields: never;
         Insert: {
           details?: NonNullable<Json>;
           detected_at?: string;
@@ -10507,6 +10650,7 @@ export type Database = {
           looked_up_at: string;
           plus_code: string | null;
         };
+        ComputedFields: never;
         Insert: {
           address_line?: string | null;
           cell: string;
@@ -10547,6 +10691,7 @@ export type Database = {
           user_id: string | null;
           vip: boolean;
         };
+        ComputedFields: never;
         Insert: {
           anonymised_at?: string | null;
           block_reason?: string | null;
@@ -10601,6 +10746,7 @@ export type Database = {
           lifted_by: string | null;
           reason: string;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           by?: string | null;
@@ -10660,6 +10806,7 @@ export type Database = {
           kind: Database['public']['Enums']['guest_consent_kind'];
           source: string;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           granted: boolean;
@@ -10719,6 +10866,7 @@ export type Database = {
           updated_at: string;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           accuracy_m?: number | null;
           address_line?: string | null;
@@ -10826,6 +10974,7 @@ export type Database = {
           updated_by: string | null;
           weight_pct: number;
         };
+        ComputedFields: never;
         Insert: {
           key: string;
           label: string;
@@ -10864,6 +11013,7 @@ export type Database = {
           prompt_merchants_days_before: number;
           source: string;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           country?: string | null;
@@ -11013,6 +11163,7 @@ export type Database = {
           verified_by: string | null;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           areas?: string[];
           billing_details?: NonNullable<Json>;
@@ -11196,6 +11347,7 @@ export type Database = {
           note: string | null;
           package_order_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           amount_kes: number;
           created_at?: string;
@@ -11318,6 +11470,7 @@ export type Database = {
           subtotal: number;
           total: number;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           due_at?: string | null;
@@ -11423,6 +11576,7 @@ export type Database = {
           id: string;
           subject: string | null;
         };
+        ComputedFields: never;
         Insert: {
           actor_id?: string | null;
           body: string;
@@ -11523,6 +11677,7 @@ export type Database = {
           minutes: number;
           priority: string;
         };
+        ComputedFields: never;
         Insert: {
           host_id: string;
           label: string;
@@ -11616,6 +11771,7 @@ export type Database = {
           statement_id: string | null;
           void_reason: string | null;
         };
+        ComputedFields: never;
         Insert: {
           code: string;
           created_at?: string;
@@ -11799,6 +11955,7 @@ export type Database = {
           unit_id: string | null;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           conversation_id?: string | null;
           created_at?: string;
@@ -12128,6 +12285,7 @@ export type Database = {
           units: string[] | null;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           accepted_at?: string | null;
           created_at?: string;
@@ -12241,6 +12399,7 @@ export type Database = {
           tier: Database['public']['Enums']['hotel_tier'] | null;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           agreement_pdf_path?: string | null;
           agreement_signed_at?: string | null;
@@ -12390,6 +12549,7 @@ export type Database = {
           updated_by: string | null;
           version: number;
         };
+        ComputedFields: never;
         Insert: {
           after_hours_handoff?: string | null;
           delivery_from?: string | null;
@@ -12461,6 +12621,7 @@ export type Database = {
           name: string;
           status: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           delivery_point_note?: string | null;
@@ -12523,6 +12684,7 @@ export type Database = {
           phone_last2: string | null;
           role: string | null;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           email?: string | null;
@@ -12600,6 +12762,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           charge_cap_per_stay?: number | null;
           charge_to_room?: boolean;
@@ -12682,6 +12845,7 @@ export type Database = {
           next_action_at: string | null;
           notes: string | null;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           by?: string | null;
@@ -12747,6 +12911,7 @@ export type Database = {
           room_type: string | null;
           status: string;
         };
+        ComputedFields: never;
         Insert: {
           floor?: string | null;
           hotel_id: string;
@@ -12810,6 +12975,7 @@ export type Database = {
           provider_ref: string | null;
           status: Database['public']['Enums']['invoice_status'];
         };
+        ComputedFields: never;
         Insert: {
           commission?: number;
           created_at?: string;
@@ -12881,6 +13047,7 @@ export type Database = {
           role: string;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           accepted_at?: string | null;
           created_at?: string;
@@ -12959,6 +13126,7 @@ export type Database = {
           severity: Database['public']['Enums']['incident_severity'];
           status: Database['public']['Enums']['incident_status'];
         };
+        ComputedFields: never;
         Insert: {
           acknowledged_at?: string | null;
           acknowledged_by?: string | null;
@@ -13201,6 +13369,7 @@ export type Database = {
           id: number;
           incident_id: string;
         };
+        ComputedFields: never;
         Insert: {
           author_id?: string | null;
           body: string;
@@ -13259,6 +13428,7 @@ export type Database = {
           updated_at: string;
           fn_integration_rotation_due: boolean | null;
         };
+        ComputedFields: 'fn_integration_rotation_due';
         Insert: {
           blocks?: string[];
           config?: NonNullable<Json>;
@@ -13310,6 +13480,7 @@ export type Database = {
           role_title: string;
           team: string | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           created_at?: string;
@@ -13421,6 +13592,7 @@ export type Database = {
           user_id: string | null;
           version: string;
         };
+        ComputedFields: never;
         Insert: {
           accepted_at?: string;
           accepted_by_name?: string | null;
@@ -13628,6 +13800,7 @@ export type Database = {
           status: string;
           version: number;
         };
+        ComputedFields: never;
         Insert: {
           approved_at?: string | null;
           approved_by?: string | null;
@@ -13690,6 +13863,7 @@ export type Database = {
           city_id: string;
           reason: string | null;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           city_id: string;
@@ -13781,6 +13955,7 @@ export type Database = {
           locale: string;
           requests: number;
         };
+        ComputedFields: never;
         Insert: {
           first_seen?: string;
           generated_at?: string | null;
@@ -13808,6 +13983,7 @@ export type Database = {
           step: string | null;
           surface: string;
         };
+        ComputedFields: never;
         Insert: {
           accuracy_band?: string | null;
           action: string;
@@ -13929,6 +14105,7 @@ export type Database = {
           went_live_by: string | null;
           when_busy: string;
         };
+        ComputedFields: never;
         Insert: {
           accepting_orders?: boolean;
           accepting_orders_changed_at?: string | null;
@@ -14298,6 +14475,7 @@ export type Database = {
           updated_at: string;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           address_text?: string | null;
           closed_at?: string | null;
@@ -14476,6 +14654,7 @@ export type Database = {
           shared_hours: boolean;
           single_payout: boolean;
         };
+        ComputedFields: never;
         Insert: {
           consolidated_statement?: boolean;
           parent_id: string;
@@ -14592,6 +14771,7 @@ export type Database = {
           revoked_at: string | null;
           sound_test_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           app_version?: string | null;
           branch_id?: string | null;
@@ -14760,6 +14940,7 @@ export type Database = {
           updated_at: string;
           vehicle: Database['public']['Enums']['vehicle_type'];
         };
+        ComputedFields: never;
         Insert: {
           branch_id?: string | null;
           created_at?: string;
@@ -15017,6 +15198,7 @@ export type Database = {
           trend: number[];
           weights: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           acceptance_pct?: number | null;
           as_of: string;
@@ -15150,6 +15332,7 @@ export type Database = {
           sort: number;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           branch_id?: string | null;
           closed?: boolean;
@@ -15312,6 +15495,7 @@ export type Database = {
           reason: string | null;
           source: Database['public']['Enums']['merchant_control_source'];
         };
+        ComputedFields: never;
         Insert: {
           branch_id?: string | null;
           closed?: boolean;
@@ -15482,6 +15666,7 @@ export type Database = {
           role: string;
           token_hash: string | null;
         };
+        ComputedFields: never;
         Insert: {
           accepted_at?: string | null;
           accepted_user_id?: string | null;
@@ -15610,6 +15795,7 @@ export type Database = {
           read_at: string | null;
           subject: string | null;
         };
+        ComputedFields: never;
         Insert: {
           actor_id?: string | null;
           body: string;
@@ -15747,6 +15933,7 @@ export type Database = {
           order_reference: string | null;
           status: string;
         };
+        ComputedFields: never;
         Insert: {
           amount_kes: number;
           applied_by?: string | null;
@@ -15888,6 +16075,7 @@ export type Database = {
           reviewer_id: string;
           started_at: string;
         };
+        ComputedFields: never;
         Insert: {
           checklist?: NonNullable<Json>;
           finished_at?: string | null;
@@ -16024,6 +16212,7 @@ export type Database = {
           tax_withheld_kes: number;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           adjustments_kes?: number;
           approved_by?: string | null;
@@ -16178,6 +16367,7 @@ export type Database = {
           second_approver_id: string | null;
           to_status: Database['public']['Enums']['partner_status'];
         };
+        ComputedFields: never;
         Insert: {
           actor_id?: string | null;
           created_at?: string;
@@ -16311,6 +16501,7 @@ export type Database = {
           merchant_id: string;
           reason: string;
         };
+        ComputedFields: never;
         Insert: {
           cleared_at?: string | null;
           cleared_by?: string | null;
@@ -16442,6 +16633,7 @@ export type Database = {
           merchant_id: string;
           terms_version_id: string;
         };
+        ComputedFields: never;
         Insert: {
           accepted_at?: string;
           accepted_by?: string | null;
@@ -16560,6 +16752,7 @@ export type Database = {
           status: string;
           version: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           effective_from: string;
@@ -16591,6 +16784,7 @@ export type Database = {
           updated_at: string;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           branches?: string[] | null;
           caps?: NonNullable<Json>;
@@ -16711,6 +16905,7 @@ export type Database = {
           updated_at: string;
           variables: string[];
         };
+        ComputedFields: never;
         Insert: {
           approved?: boolean;
           body: string;
@@ -16749,6 +16944,7 @@ export type Database = {
           required: boolean;
           sort: number;
         };
+        ComputedFields: never;
         Insert: {
           archived_at?: string | null;
           created_at?: string;
@@ -16868,6 +17064,7 @@ export type Database = {
           name: string;
           sort: number;
         };
+        ComputedFields: never;
         Insert: {
           available?: boolean;
           created_at?: string;
@@ -16911,6 +17108,7 @@ export type Database = {
           topic: Database['public']['Enums']['msg_topic'] | null;
           usage_count: number;
         };
+        ComputedFields: never;
         Insert: {
           action_key?: string | null;
           approved_at?: string | null;
@@ -16983,6 +17181,7 @@ export type Database = {
           subject: string;
           topic: Database['public']['Enums']['msg_topic'] | null;
         };
+        ComputedFields: never;
         Insert: {
           assignee_id?: string | null;
           city_id?: string | null;
@@ -17198,6 +17397,7 @@ export type Database = {
           trace_id: string | null;
           visibility: Database['public']['Enums']['msg_visibility'];
         };
+        ComputedFields: never;
         Insert: {
           action?: Json | null;
           attachments?: NonNullable<Json>;
@@ -17306,6 +17506,7 @@ export type Database = {
           object_id: string;
           object_type: string;
         };
+        ComputedFields: never;
         Insert: {
           conversation_id: string;
           id?: string;
@@ -17382,6 +17583,7 @@ export type Database = {
           team_key: string | null;
           user_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           can_reply_external?: boolean;
           can_see_internal?: boolean;
@@ -17478,6 +17680,7 @@ export type Database = {
           staff_user_id: string;
           state: string;
         };
+        ComputedFields: never;
         Insert: {
           active_count?: number;
           capacity?: number;
@@ -17519,6 +17722,7 @@ export type Database = {
           priority_out: Database['public']['Enums']['msg_priority'];
           resolution_sla_min: number | null;
         };
+        ComputedFields: never;
         Insert: {
           auto_link?: string | null;
           conditions?: NonNullable<Json>;
@@ -17554,6 +17758,7 @@ export type Database = {
           tagged_by: string | null;
           topic: Database['public']['Enums']['msg_topic'];
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           auto?: boolean;
@@ -17620,6 +17825,7 @@ export type Database = {
           linked_guest_id: string | null;
           session_hash: string;
         };
+        ComputedFields: never;
         Insert: {
           consent_at?: string | null;
           contact?: string | null;
@@ -17670,6 +17876,7 @@ export type Database = {
           provider_conversation_id: string | null;
           window_expires_at: string;
         };
+        ComputedFields: never;
         Insert: {
           conversation_id: string;
           last_inbound_at?: string | null;
@@ -17738,6 +17945,7 @@ export type Database = {
           to_email: string | null;
           to_phone: string | null;
         };
+        ComputedFields: never;
         Insert: {
           attempts?: number;
           created_at?: string;
@@ -17982,6 +18190,7 @@ export type Database = {
           status: string;
           template: string;
         };
+        ComputedFields: never;
         Insert: {
           channel: string;
           created_at?: string;
@@ -18029,6 +18238,7 @@ export type Database = {
           subject: string | null;
           template: string;
         };
+        ComputedFields: never;
         Insert: {
           attempts?: number;
           body?: string | null;
@@ -18090,6 +18300,7 @@ export type Database = {
           starts_at: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           booked?: number;
           capacity: number;
@@ -18242,6 +18453,7 @@ export type Database = {
           updated_at: string;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           branch_id?: string | null;
           cancel_note?: string | null;
@@ -18739,6 +18951,7 @@ export type Database = {
           reason: string;
           requires_merchant_ack: boolean;
         };
+        ComputedFields: never;
         Insert: {
           actor_id?: string | null;
           after?: Json | null;
@@ -18859,6 +19072,7 @@ export type Database = {
           photo_path: string | null;
           title: string;
         };
+        ComputedFields: never;
         Insert: {
           actor_id?: string | null;
           actor_label?: string | null;
@@ -18971,6 +19185,7 @@ export type Database = {
           removed_at: string | null;
           unit_price_cents: number;
         };
+        ComputedFields: never;
         Insert: {
           catalogue_item_id?: string | null;
           created_at?: string;
@@ -19100,6 +19315,7 @@ export type Database = {
           option_name: string;
           order_item_id: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           extra_cents?: number;
@@ -19170,6 +19386,7 @@ export type Database = {
           themes: string[];
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           about?: string;
           branch_id?: string | null;
@@ -19496,6 +19713,7 @@ export type Database = {
           status: string;
           unit_id: string;
         };
+        ComputedFields: never;
         Insert: {
           billed_invoice_id?: string | null;
           created_at?: string;
@@ -19672,6 +19890,7 @@ export type Database = {
           response_note: string | null;
           status: Database['public']['Enums']['hold_status'];
         };
+        ComputedFields: never;
         Insert: {
           channel: string;
           created_at?: string;
@@ -19748,6 +19967,7 @@ export type Database = {
           state: Database['public']['Enums']['payment_state'];
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           amount_cents: number;
           authorised_at?: string | null;
@@ -20095,6 +20315,7 @@ export type Database = {
           reference: string | null;
           signature_ok: boolean;
         };
+        ComputedFields: never;
         Insert: {
           dedupe_key: string;
           event: string;
@@ -20148,6 +20369,7 @@ export type Database = {
           status: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           checkout_order?: number;
           config_ref?: string | null;
@@ -20200,6 +20422,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           config_ref?: string | null;
           float_alert_amount?: number | null;
@@ -20273,6 +20496,7 @@ export type Database = {
           updated_at: string;
           user_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           answers?: NonNullable<Json>;
           approved_at?: string | null;
@@ -20464,6 +20688,7 @@ export type Database = {
           reason: string | null;
           to_concierge_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           from_concierge_id?: string | null;
@@ -20537,6 +20762,7 @@ export type Database = {
           title_snapshot: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           anchored?: boolean;
           assigned_driver_partner_id?: string | null;
@@ -20740,6 +20966,7 @@ export type Database = {
           plan_id: string;
           to_status: Database['public']['Enums']['plan_status'];
         };
+        ComputedFields: never;
         Insert: {
           actor?: string | null;
           at?: string;
@@ -20779,6 +21006,7 @@ export type Database = {
           plan_id: string;
           read_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           attachments?: NonNullable<Json>;
           author_id?: string | null;
@@ -20835,6 +21063,7 @@ export type Database = {
           summary: string | null;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           amenities?: string[];
           area?: string | null;
@@ -21056,6 +21285,7 @@ export type Database = {
           void_reason: string | null;
           voided_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           batch_id?: string | null;
           city_id?: string | null;
@@ -21329,6 +21559,7 @@ export type Database = {
           surface: string | null;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           auth_key: string;
           created_at?: string;
@@ -21364,6 +21595,7 @@ export type Database = {
           reason: string;
           session_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           code_attempted: string;
@@ -21398,6 +21630,7 @@ export type Database = {
           void_reason: string | null;
           voided_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           batch_id?: string;
           built_at?: string;
@@ -21559,6 +21792,7 @@ export type Database = {
           session_id: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           browsed_category?: string | null;
           city_id?: string | null;
@@ -21748,6 +21982,7 @@ export type Database = {
           session_id: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           browsed_category?: string | null;
           city_id?: string | null;
@@ -21838,6 +22073,7 @@ export type Database = {
           session_id: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           browsed_category?: string | null;
           city_id?: string | null;
@@ -21928,6 +22164,7 @@ export type Database = {
           session_id: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           browsed_category?: string | null;
           city_id?: string | null;
@@ -22018,6 +22255,7 @@ export type Database = {
           session_id: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           browsed_category?: string | null;
           city_id?: string | null;
@@ -22108,6 +22346,7 @@ export type Database = {
           session_id: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           browsed_category?: string | null;
           city_id?: string | null;
@@ -22198,6 +22437,7 @@ export type Database = {
           session_id: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           browsed_category?: string | null;
           city_id?: string | null;
@@ -22271,6 +22511,7 @@ export type Database = {
           status: string;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           bonus_amount_kes?: number | null;
           code?: string | null;
@@ -22398,6 +22639,7 @@ export type Database = {
           requested_by: string | null;
           status: string;
         };
+        ComputedFields: never;
         Insert: {
           amount_cents: number;
           approved_by?: string | null;
@@ -22533,6 +22775,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           anonymise?: boolean;
           approved_at?: string | null;
@@ -22616,6 +22859,7 @@ export type Database = {
           user_id: string | null;
           word_count: number;
         };
+        ComputedFields: never;
         Insert: {
           area_snapshot?: string | null;
           body: string;
@@ -22691,6 +22935,7 @@ export type Database = {
           sent_at: string;
           token_hash: string;
         };
+        ComputedFields: never;
         Insert: {
           channel?: string;
           expires_at: string;
@@ -22796,6 +23041,7 @@ export type Database = {
           waitlisted_at: string | null;
           years_riding: string | null;
         };
+        ComputedFields: never;
         Insert: {
           activated_at?: string | null;
           activated_by?: string | null;
@@ -23144,6 +23390,7 @@ export type Database = {
           reason: string;
           rider_id: string;
         };
+        ComputedFields: never;
         Insert: {
           amount_kes: number;
           approved_by?: string | null;
@@ -23266,6 +23513,7 @@ export type Database = {
           ip: unknown;
           rider_id: string;
         };
+        ComputedFields: never;
         Insert: {
           accepted_at?: string;
           accepted_by?: string | null;
@@ -23377,6 +23625,7 @@ export type Database = {
           status: string;
           version: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           effective_from: string;
@@ -23409,6 +23658,7 @@ export type Database = {
           params: NonNullable<Json>;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           created_at?: string;
@@ -23561,6 +23811,7 @@ export type Database = {
           rider_id: string;
           unbound_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           bound_at?: string;
           created_at?: string;
@@ -23678,6 +23929,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           enabled?: boolean;
           key: string;
@@ -23722,6 +23974,7 @@ export type Database = {
           total_kes: number;
           waiting_kes: number;
         };
+        ComputedFields: never;
         Insert: {
           base_kes?: number;
           cash_collected_kes?: number;
@@ -23861,6 +24114,7 @@ export type Database = {
           trips_30d: number;
           weights: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           acceptance_pct?: number | null;
           as_of: string;
@@ -23984,6 +24238,7 @@ export type Database = {
           updated_by: string | null;
           weight_pct: number;
         };
+        ComputedFields: never;
         Insert: {
           key: string;
           label: string;
@@ -24023,6 +24278,7 @@ export type Database = {
           rider_id: string;
           subject: string | null;
         };
+        ComputedFields: never;
         Insert: {
           actor_id?: string | null;
           body: string;
@@ -24151,6 +24407,7 @@ export type Database = {
           source: Database['public']['Enums']['rider_control_source'];
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           at?: string;
           id?: number;
@@ -24303,6 +24560,7 @@ export type Database = {
           status: string;
           version: string;
         };
+        ComputedFields: never;
         Insert: {
           approved_by?: string | null;
           base_per_trip_kes?: number | null;
@@ -24439,6 +24697,7 @@ export type Database = {
           relationship: string | null;
           rider_id: string;
         };
+        ComputedFields: never;
         Insert: {
           called_at?: string | null;
           called_by?: string | null;
@@ -24565,6 +24824,7 @@ export type Database = {
           status: string;
           void_reason: string | null;
         };
+        ComputedFields: never;
         Insert: {
           code: string;
           created_at?: string;
@@ -24761,6 +25021,7 @@ export type Database = {
           rider_id: string;
           started_at: string;
         };
+        ComputedFields: never;
         Insert: {
           checklist?: NonNullable<Json>;
           finished_at?: string | null;
@@ -24890,6 +25151,7 @@ export type Database = {
           tips_kes: number;
           trips: number;
         };
+        ComputedFields: never;
         Insert: {
           bonuses_kes?: number;
           cash_collected_kes?: number;
@@ -25119,6 +25381,7 @@ export type Database = {
           total_gross_kes: number;
           total_net_kes: number;
         };
+        ComputedFields: never;
         Insert: {
           approved_by?: string | null;
           b2c_file_path?: string | null;
@@ -25247,6 +25510,7 @@ export type Database = {
           second_approver_id: string | null;
           to_status: Database['public']['Enums']['rider_status'];
         };
+        ComputedFields: never;
         Insert: {
           actor_id?: string | null;
           created_at?: string;
@@ -25373,6 +25637,7 @@ export type Database = {
           reason: string;
           rider_id: string;
         };
+        ComputedFields: never;
         Insert: {
           cleared_at?: string | null;
           cleared_by?: string | null;
@@ -25499,6 +25764,7 @@ export type Database = {
           outcome: string | null;
           rider_id: string;
         };
+        ComputedFields: never;
         Insert: {
           assessor_id?: string | null;
           created_at?: string;
@@ -25613,6 +25879,7 @@ export type Database = {
           rider_id: string;
           score: number | null;
         };
+        ComputedFields: never;
         Insert: {
           attempts?: number;
           completed_at?: string | null;
@@ -25719,6 +25986,7 @@ export type Database = {
           landing_module: string | null;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           description?: string | null;
@@ -25760,6 +26028,7 @@ export type Database = {
           staff_user_id: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           approved_by?: string | null;
           city_id?: string | null;
@@ -25892,6 +26161,7 @@ export type Database = {
           note: string | null;
           role_key: string;
         };
+        ComputedFields: never;
         Insert: {
           level: string;
           module_key: string;
@@ -25925,6 +26195,7 @@ export type Database = {
           time_window: string;
           zone_id: string;
         };
+        ComputedFields: never;
         Insert: {
           committed_at?: string;
           date: string;
@@ -26070,6 +26341,7 @@ export type Database = {
           updated_at: string;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           display_name: string;
@@ -26112,6 +26384,7 @@ export type Database = {
           unit_id: string | null;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           check_in: string;
           check_out: string;
@@ -26338,6 +26611,7 @@ export type Database = {
           status: Database['public']['Enums']['stay_request_status'];
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           areas?: string[];
           assigned_to?: string | null;
@@ -26483,6 +26757,7 @@ export type Database = {
           unit_id: string;
           why: string | null;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           guest_response?: string | null;
@@ -26598,6 +26873,7 @@ export type Database = {
           text: string | null;
           themes: string[] | null;
         };
+        ComputedFields: never;
         Insert: {
           answered_at?: string | null;
           asked_at?: string | null;
@@ -26646,6 +26922,7 @@ export type Database = {
           result: Json | null;
           zone_id: string;
         };
+        ComputedFields: never;
         Insert: {
           applied_at?: string;
           applied_by?: string | null;
@@ -26720,6 +26997,7 @@ export type Database = {
           internal: boolean;
           ticket_id: string;
         };
+        ComputedFields: never;
         Insert: {
           body: string;
           created_at?: string;
@@ -26797,6 +27075,7 @@ export type Database = {
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           assigned_to?: string | null;
           body: string;
@@ -26934,6 +27213,7 @@ export type Database = {
           translated: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           engine?: Database['public']['Enums']['translation_engine'];
@@ -27020,6 +27300,7 @@ export type Database = {
           wifi_name: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           address_line?: string | null;
           archived_at?: string | null;
@@ -27345,6 +27626,7 @@ export type Database = {
           updated_at: string;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           body?: string | null;
           created_at?: string;
@@ -27390,6 +27672,7 @@ export type Database = {
           updated_at: string;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           accent?: string | null;
           density?: string;
@@ -27423,6 +27706,7 @@ export type Database = {
           source: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           consent_marketing?: boolean;
@@ -27534,6 +27818,7 @@ export type Database = {
           sort: number;
           status: string;
         };
+        ComputedFields: never;
         Insert: {
           archived_at?: string | null;
           city_id?: string | null;
@@ -27795,6 +28080,7 @@ export type Database = {
           guarded_by: string;
           reason: string;
         };
+        ComputedFields: never;
         Insert: {
           added_at?: string;
           function_name: string;
@@ -27816,6 +28102,7 @@ export type Database = {
           reason: string;
           recorded_in: string;
         };
+        ComputedFields: never;
         Insert: {
           added_at?: string;
           function_name: string;
@@ -27847,6 +28134,7 @@ export type Database = {
           trial_started_at: string | null;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           active?: boolean;
           city_id: string;
@@ -27961,6 +28249,7 @@ export type Database = {
           riders_needed: number | null;
           zone_id: string;
         };
+        ComputedFields: never;
         Insert: {
           dow: number;
           expected_orders?: number | null;
@@ -28059,6 +28348,7 @@ export type Database = {
           touches_pii: boolean | null;
           unregistered: boolean | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'event_meta_reviewed_by_fkey';
@@ -28098,6 +28388,7 @@ export type Database = {
           target_type: string | null;
           title: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'alert_acknowledged_by_fkey';
@@ -28215,6 +28506,7 @@ export type Database = {
           staff_user_id: string | null;
           who: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'break_glass_city_id_fkey';
@@ -28329,6 +28621,7 @@ export type Database = {
           target_id: string | null;
           target_type: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       audit_evidence_v: {
@@ -28363,6 +28656,7 @@ export type Database = {
           withdrawn_at: string | null;
           withdrawn_reason: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'evidence_pack_created_by_fkey';
@@ -28397,6 +28691,7 @@ export type Database = {
           what: string | null;
           who: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'export_log_event_id_fkey';
@@ -28448,6 +28743,7 @@ export type Database = {
           retention_rules_unset: number | null;
           unregistered_events: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       audit_known_device_v: {
@@ -28461,6 +28757,7 @@ export type Database = {
           staff_user_id: string | null;
           trusted: boolean | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'known_device_staff_user_id_fkey';
@@ -28494,6 +28791,7 @@ export type Database = {
           title: string | null;
           to_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'legal_hold_city_id_fkey';
@@ -28590,6 +28888,7 @@ export type Database = {
           module: string | null;
           unregistered: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       audit_money_v: {
@@ -28623,6 +28922,7 @@ export type Database = {
           target_label: string | null;
           target_type: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       audit_retention_v: {
@@ -28648,6 +28948,7 @@ export type Database = {
           subject: string | null;
           updated_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'retention_rule_approved_by_fkey';
@@ -28690,6 +28991,7 @@ export type Database = {
           succeeded: boolean | null;
           who: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'sign_in_staff_user_id_fkey';
@@ -28713,6 +29015,7 @@ export type Database = {
           ready_count: number | null;
           ready_of: number | null;
         };
+        ComputedFields: never;
         Insert: {
           address_and_pin?: never;
           branch_id?: string | null;
@@ -28839,6 +29142,7 @@ export type Database = {
           status: string | null;
           stays_created: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'calendar_connection_host_id_fkey';
@@ -28972,6 +29276,7 @@ export type Database = {
           work_sample_paid: boolean | null;
           work_sample_pay_note: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'job_city_id_fkey';
@@ -29064,6 +29369,7 @@ export type Database = {
           weeks_to_hire: number | null;
           work_mode: Database['hr']['Enums']['work_mode'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'job_city_id_fkey';
@@ -29145,6 +29451,7 @@ export type Database = {
           open_roles: number | null;
           sort: number | null;
         };
+        ComputedFields: never;
         Insert: {
           blurb?: string | null;
           id?: string | null;
@@ -29172,6 +29479,7 @@ export type Database = {
           swap_group: string | null;
           tiers: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'experience_component_city_id_fkey';
@@ -29258,6 +29566,7 @@ export type Database = {
           section_id: string | null;
           sort: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'catalogue_item_merchant_id_fkey';
@@ -29365,6 +29674,7 @@ export type Database = {
           service_charge_pct: number | null;
           status: Database['public']['Enums']['hotel_status'] | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       city_bounds_v: {
@@ -29376,6 +29686,7 @@ export type Database = {
           south: number | null;
           west: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       city_public_v: {
@@ -29391,6 +29702,7 @@ export type Database = {
           timezone: string | null;
           zones: number | null;
         };
+        ComputedFields: never;
         Insert: {
           country?: string | null;
           currency?: string | null;
@@ -29445,6 +29757,7 @@ export type Database = {
           title: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'experience_component_city_id_fkey';
@@ -29580,6 +29893,7 @@ export type Database = {
           skip_reason: string | null;
           vehicle: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_data_request_v: {
@@ -29603,6 +29917,7 @@ export type Database = {
           scope: string[] | null;
           status: Database['public']['Enums']['data_request_status'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'data_request_guest_id_fkey';
@@ -29635,6 +29950,7 @@ export type Database = {
           reason: string | null;
           reference: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_featured_badges_v: {
@@ -29652,6 +29968,7 @@ export type Database = {
           quotes_expiring: number | null;
           slots_this_week: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_featured_inventory_v: {
@@ -29679,6 +29996,7 @@ export type Database = {
           trading_name: string | null;
           week_start: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
@@ -29860,6 +30178,7 @@ export type Database = {
           views: number | null;
           week_start: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'featured_booking_city_id_fkey';
@@ -30053,6 +30372,7 @@ export type Database = {
           weeks: number | null;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'featured_booking_city_id_fkey';
@@ -30224,6 +30544,7 @@ export type Database = {
           trading_name: string | null;
           week_start: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'featured_placement_city_id_fkey';
@@ -30381,6 +30702,7 @@ export type Database = {
           status: Database['public']['Enums']['folio_status'] | null;
           sync: Database['public']['Enums']['folio_sync'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'folio_posting_hotel_id_fkey';
@@ -30436,6 +30758,7 @@ export type Database = {
           staff_notes: string | null;
           vip: boolean | null;
         };
+        ComputedFields: never;
         Insert: {
           anonymised_at?: string | null;
           block_reason?: string | null;
@@ -30505,6 +30828,7 @@ export type Database = {
           units_setting_up: number | null;
           units_stuck: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_host_directory_v: {
@@ -30533,6 +30857,7 @@ export type Database = {
           verified_at: string | null;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'host_city_id_fkey';
@@ -30630,6 +30955,7 @@ export type Database = {
           status: Database['public']['Enums']['hotel_status'] | null;
           tier: Database['public']['Enums']['hotel_tier'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'hotel_city_id_fkey';
@@ -30714,6 +31040,7 @@ export type Database = {
           live: number | null;
           needs_a_person: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_city_id_fkey';
@@ -30840,6 +31167,7 @@ export type Database = {
           zone: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_city_id_fkey';
@@ -31159,6 +31487,7 @@ export type Database = {
           zone: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_city_id_fkey';
@@ -31453,6 +31782,7 @@ export type Database = {
           trading_name: string | null;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
@@ -31620,6 +31950,7 @@ export type Database = {
           zone: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_city_id_fkey';
@@ -31922,6 +32253,7 @@ export type Database = {
           removed: boolean | null;
           unit_price_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_city_id_fkey';
@@ -32079,6 +32411,7 @@ export type Database = {
           photo_path: string | null;
           title: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_city_id_fkey';
@@ -32244,6 +32577,7 @@ export type Database = {
           units: number | null;
           units_listed: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'property_city_id_fkey';
@@ -32412,6 +32746,7 @@ export type Database = {
           scanned_at: string | null;
           session_hash: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'qr_scan_first_merchant_id_fkey';
@@ -32512,6 +32847,7 @@ export type Database = {
           sessions_7d: number | null;
           share_of_all_orders: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_rider_badges_v: {
@@ -32531,6 +32867,7 @@ export type Database = {
           suspended: number | null;
           unmatched_deposits: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_rider_directory_v: {
@@ -32572,6 +32909,7 @@ export type Database = {
           trips_30d: number | null;
           vehicle: Database['public']['Enums']['vehicle_type'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'rider_city_id_fkey';
@@ -32757,6 +33095,7 @@ export type Database = {
           source: string | null;
           status: Database['public']['Enums']['stay_request_status'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'stay_request_city_id_fkey';
@@ -32854,6 +33193,7 @@ export type Database = {
           zone: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'zone_city_id_fkey';
@@ -32943,6 +33283,7 @@ export type Database = {
           tier: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'zone_city_id_fkey';
@@ -33031,6 +33372,7 @@ export type Database = {
           tagline: string | null;
           title: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'curated_day_city_id_fkey';
@@ -33119,6 +33461,7 @@ export type Database = {
           rider_parking: string | null;
           status: Database['public']['Enums']['partner_status'] | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       dispatch_rider_v: {
@@ -33140,6 +33483,7 @@ export type Database = {
           vehicle: Database['public']['Enums']['vehicle_type'] | null;
           zones: string[] | null;
         };
+        ComputedFields: never;
         Insert: {
           alcohol_eligible?: boolean | null;
           capacity_class?: never;
@@ -33353,6 +33697,7 @@ export type Database = {
           rounds: number | null;
           stacking: boolean | null;
         };
+        ComputedFields: never;
         Insert: {
           accept_window_s?: never;
           boost_cents?: never;
@@ -33415,6 +33760,7 @@ export type Database = {
           venue_address: string | null;
           venue_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'event_city_id_fkey';
@@ -33516,6 +33862,7 @@ export type Database = {
           trading_name: string | null;
           valid_to: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
@@ -33688,6 +34035,7 @@ export type Database = {
           week_end: string | null;
           week_start: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'featured_placement_city_id_fkey';
@@ -33814,6 +34162,7 @@ export type Database = {
           weeks_open: number | null;
           what_it_is: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'featured_placement_city_id_fkey';
@@ -33903,6 +34252,7 @@ export type Database = {
           small_basket_fee: number | null;
           small_basket_threshold: number | null;
         };
+        ComputedFields: never;
         Insert: {
           cash_handling?: never;
           city_id?: string | null;
@@ -33946,6 +34296,7 @@ export type Database = {
           over_7d_cents: number | null;
           under_1d_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_export_log_v: {
@@ -33959,6 +34310,7 @@ export type Database = {
           taken_by_email: string | null;
           to_date: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'fin_export_log_taken_by_fkey';
@@ -33980,6 +34332,7 @@ export type Database = {
           order_count: number | null;
           per_order_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_freshness_v: {
@@ -33991,6 +34344,7 @@ export type Database = {
           stale_count: number | null;
           through_entry: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_invariant_v: {
@@ -34008,6 +34362,7 @@ export type Database = {
           stale: boolean | null;
           value: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_invoice_aging_v: {
@@ -34025,6 +34380,7 @@ export type Database = {
           status: string | null;
           total_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_invoice_v: {
@@ -34041,6 +34397,7 @@ export type Database = {
           status: string | null;
           total_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_merchant_take_v: {
@@ -34055,6 +34412,7 @@ export type Database = {
           revenue_cents: number | null;
           trading_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_overview_v: {
@@ -34074,6 +34432,7 @@ export type Database = {
           rider_cost_cents: number | null;
           take_rate_bps: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'fin_kpi_daily_city_id_fkey';
@@ -34156,6 +34515,7 @@ export type Database = {
           provider: string | null;
           provider_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_run_line_v: {
@@ -34198,6 +34558,7 @@ export type Database = {
           state: Database['public']['Enums']['settlement_line_state'] | null;
           verifies: boolean | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'fin_settlement_line_run_id_fkey';
@@ -34251,6 +34612,7 @@ export type Database = {
           totals: Json | null;
           updated_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'fin_settlement_run_approved_1_by_fkey';
@@ -34355,6 +34717,7 @@ export type Database = {
           source: string | null;
           tax_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       fin_webhook_gap_v: {
@@ -34372,6 +34735,7 @@ export type Database = {
           reference: string | null;
           signature_ok: boolean | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       finance_host_v: {
@@ -34389,6 +34753,7 @@ export type Database = {
           tier: string | null;
           unpaid: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'host_city_id_fkey';
@@ -34478,6 +34843,7 @@ export type Database = {
           single_payout: boolean | null;
           trading_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_city_id_fkey';
@@ -34651,6 +35017,7 @@ export type Database = {
           rider_id: string | null;
           status: Database['public']['Enums']['rider_status'] | null;
         };
+        ComputedFields: never;
         Insert: {
           cash_cap_effective?: never;
           cash_on_hand?: number | null;
@@ -34845,6 +35212,7 @@ export type Database = {
           point: unknown;
           weight: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_analytics_daily_v: {
@@ -34855,6 +35223,7 @@ export type Database = {
           orders: number | null;
           scans: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_analytics_hour_v: {
@@ -34865,6 +35234,7 @@ export type Database = {
           orders: number | null;
           scans: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_analytics_unit_v: {
@@ -34878,6 +35248,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_arriving_v: {
@@ -34893,6 +35264,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_attention_v: {
@@ -34905,6 +35277,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_banner_photo_v: {
@@ -34914,6 +35287,7 @@ export type Database = {
           property_id: string | null;
           property_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'property_host_id_fkey';
@@ -34998,6 +35372,7 @@ export type Database = {
           topic: Database['public']['Enums']['msg_topic'] | null;
           unread: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_data_request_v: {
@@ -35012,6 +35387,7 @@ export type Database = {
           status: string | null;
           verified: boolean | null;
         };
+        ComputedFields: never;
         Insert: {
           due_at?: string | null;
           fulfilled_at?: string | null;
@@ -35054,6 +35430,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_earnings_v: {
@@ -35067,6 +35444,7 @@ export type Database = {
           rewards_credited_kes: number | null;
           rewards_pending: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_folio_v: {
@@ -35086,6 +35464,7 @@ export type Database = {
           status: string | null;
           sync: string | null;
         };
+        ComputedFields: never;
         Insert: {
           amount?: number | null;
           commission_amount?: number | null;
@@ -35163,6 +35542,7 @@ export type Database = {
           unit_name: string | null;
           unit_status: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'unit_host_id_fkey';
@@ -35249,6 +35629,7 @@ export type Database = {
           verification_code: string | null;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_message_v: {
@@ -35264,6 +35645,7 @@ export type Database = {
           redacted: boolean | null;
           seq: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'msg_message_conversation_id_fkey';
@@ -35305,6 +35687,7 @@ export type Database = {
           rewards_from_ledger_cents: number | null;
           rewards_from_table_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_package_catalogue_v: {
@@ -35319,6 +35702,7 @@ export type Database = {
           sort: number | null;
           status: string | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           description?: string | null;
@@ -35430,6 +35814,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'package_order_host_id_fkey';
@@ -35575,6 +35960,7 @@ export type Database = {
           units_live: number | null;
           units_setup: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'property_host_id_fkey';
@@ -35658,6 +36044,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_qr_list_v: {
@@ -35687,6 +36074,7 @@ export type Database = {
           unit_public_name: string | null;
           voided_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'property_qr_host_id_fkey';
@@ -35770,6 +36158,7 @@ export type Database = {
           sessions: number | null;
           unit_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_referral_v: {
@@ -35785,6 +36174,7 @@ export type Database = {
           reward_status: string | null;
           stage: string | null;
         };
+        ComputedFields: never;
         Insert: {
           code?: string | null;
           created_at?: string | null;
@@ -35900,6 +36290,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'host_request_host_id_fkey';
@@ -36045,6 +36436,7 @@ export type Database = {
           tier: string | null;
           time_zone: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'host_city_id_fkey';
@@ -36138,6 +36530,7 @@ export type Database = {
           verification_code: string | null;
           verification_method: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_statement_v: {
@@ -36151,6 +36544,7 @@ export type Database = {
           memo: string | null;
           transaction_kind: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_stay_v: {
@@ -36178,6 +36572,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'stay_host_id_fkey';
@@ -36312,6 +36707,7 @@ export type Database = {
           status: string | null;
           topic: string | null;
         };
+        ComputedFields: never;
         Insert: {
           body?: string | null;
           created_at?: string | null;
@@ -36346,6 +36742,7 @@ export type Database = {
           units_without_qr: number | null;
           value_today_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       host_unit_list_v: {
@@ -36382,6 +36779,7 @@ export type Database = {
           status: string | null;
           unit_amenities: string[] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'unit_host_id_fkey';
@@ -36509,6 +36907,7 @@ export type Database = {
           status: Database['public']['Enums']['unit_status'] | null;
           unit_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'unit_host_id_fkey';
@@ -36604,6 +37003,7 @@ export type Database = {
           tier: Database['public']['Enums']['hotel_tier'] | null;
           users_count: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       hotel_desk_v: {
@@ -36624,6 +37024,7 @@ export type Database = {
           sla_state: string | null;
           status: Database['public']['Enums']['folio_status'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'folio_posting_hotel_id_fkey';
@@ -36672,6 +37073,7 @@ export type Database = {
           scans: number | null;
           sessions: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       integration_v: {
@@ -36693,6 +37095,7 @@ export type Database = {
           sort: number | null;
           status: string | null;
         };
+        ComputedFields: never;
         Insert: {
           blocks?: string[] | null;
           config?: Json | null;
@@ -36740,6 +37143,7 @@ export type Database = {
           requires_reacceptance_by: string | null;
           version: number | null;
         };
+        ComputedFields: never;
         Insert: {
           effective_from?: string | null;
           key?: string | null;
@@ -36769,6 +37173,7 @@ export type Database = {
           title: string | null;
           tone: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       merchant_branch_list_v: {
@@ -36797,6 +37202,7 @@ export type Database = {
           zone_id: string | null;
           zone_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
@@ -36938,6 +37344,7 @@ export type Database = {
           prep_minutes: number | null;
           state: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
@@ -37050,6 +37457,7 @@ export type Database = {
           trading_name: string | null;
           unread_messages: number | null;
         };
+        ComputedFields: never;
         Insert: {
           accepting_orders?: boolean | null;
           accepting_orders_source?: Database['public']['Enums']['merchant_control_source'] | null;
@@ -37124,6 +37532,7 @@ export type Database = {
           resolved_at: string | null;
           status: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'dispute_branch_id_fkey';
@@ -37268,6 +37677,7 @@ export type Database = {
           week_start: string | null;
           weeks: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'featured_booking_city_id_fkey';
@@ -37458,6 +37868,7 @@ export type Database = {
           trips_this_week: number | null;
           vehicle: Database['public']['Enums']['vehicle_type'] | null;
         };
+        ComputedFields: never;
         Insert: {
           activated_at?: string | null;
           first_name?: string | null;
@@ -37611,6 +38022,7 @@ export type Database = {
           unread_messages: number | null;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_city_id_fkey';
@@ -37697,6 +38109,7 @@ export type Database = {
           service: string | null;
           sort: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_hours_branch_id_fkey';
@@ -37833,6 +38246,7 @@ export type Database = {
           status: string | null;
           user_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       merchant_orders_v: {
@@ -37865,6 +38279,7 @@ export type Database = {
           total_cents: number | null;
           what_now: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_branch_id_fkey';
@@ -38003,6 +38418,7 @@ export type Database = {
           reason: string | null;
           source: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_hours_override_branch_id_fkey';
@@ -38154,6 +38570,7 @@ export type Database = {
           prep_minutes: number | null;
           trading_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
@@ -38260,6 +38677,7 @@ export type Database = {
           stars: number | null;
           themes: string[] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_rating_branch_id_fkey';
@@ -38467,6 +38885,7 @@ export type Database = {
           two: number | null;
           unanswered: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       merchant_settings_v: {
@@ -38488,6 +38907,7 @@ export type Database = {
           status: string | null;
           trading_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'merchant_city_id_fkey';
@@ -38582,6 +39002,7 @@ export type Database = {
           trading_name: string | null;
           went_live_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       merchant_ticket_v: {
@@ -38596,6 +39017,7 @@ export type Database = {
           status: string | null;
           topic: string | null;
         };
+        ComputedFields: never;
         Insert: {
           body?: string | null;
           created_at?: string | null;
@@ -38628,6 +39050,7 @@ export type Database = {
           gross_cents: number | null;
           merchant_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_merchant_id_fkey';
@@ -38726,6 +39149,7 @@ export type Database = {
           week_end: string | null;
           week_start: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       msg_badges_v: {
@@ -38734,6 +39158,7 @@ export type Database = {
           overdue: number | null;
           unassigned: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       msg_canned_reply_v: {
@@ -38754,6 +39179,7 @@ export type Database = {
           topic: string | null;
           usage_count: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'msg_canned_reply_approved_by_fkey';
@@ -38779,6 +39205,7 @@ export type Database = {
           total: number | null;
           unassigned: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       msg_desk_roster_v: {
@@ -38795,6 +39222,7 @@ export type Database = {
           staff_user_id: string | null;
           state: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'msg_presence_staff_user_id_fkey';
@@ -38813,6 +39241,7 @@ export type Database = {
           on_roster: number | null;
           online: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       msg_inbox_v: {
@@ -38848,6 +39277,7 @@ export type Database = {
           unassigned: boolean | null;
           with_whom: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'msg_conversation_assignee_id_fkey';
@@ -38940,6 +39370,7 @@ export type Database = {
           resolved: number | null;
           resolved_first_touch: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       msg_insight_hour_v: {
@@ -38949,6 +39380,7 @@ export type Database = {
           opened: number | null;
           opened_28d: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       msg_insight_topic_v: {
@@ -38961,6 +39393,7 @@ export type Database = {
           topic: string | null;
           total: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       msg_message_v: {
@@ -38984,6 +39417,7 @@ export type Database = {
           seq: number | null;
           visibility: Database['public']['Enums']['msg_visibility'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'msg_message_conversation_id_fkey';
@@ -39033,6 +39467,7 @@ export type Database = {
           status: Database['public']['Enums']['msg_conv_status'] | null;
           subject: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       msg_routing_rule_v: {
@@ -39049,6 +39484,7 @@ export type Database = {
           resolution_sla_min: number | null;
           team_volume_30d: number | null;
         };
+        ComputedFields: never;
         Insert: {
           auto_link?: string | null;
           conditions?: Json | null;
@@ -39090,6 +39526,7 @@ export type Database = {
           window_expires_at: string | null;
           window_open: boolean | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'msg_whatsapp_session_conversation_id_fkey';
@@ -39138,6 +39575,7 @@ export type Database = {
           status: string | null;
           template: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       order_money_v: {
@@ -39159,6 +39597,7 @@ export type Database = {
           rider_pay_cents: number | null;
           total_cents: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_city_id_fkey';
@@ -39265,6 +39704,7 @@ export type Database = {
           void_reason: string | null;
           voided_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'property_qr_city_id_fkey';
@@ -39487,6 +39927,7 @@ export type Database = {
           units_available: number | null;
           units_without_rate: number | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'property_city_id_fkey';
@@ -39580,6 +40021,7 @@ export type Database = {
           unit_amenities: string[] | null;
           unit_summary: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'unit_property_id_fkey';
@@ -39635,6 +40077,7 @@ export type Database = {
           sent_at: string | null;
           what_to_do: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'property_qr_city_id_fkey';
@@ -39824,6 +40267,7 @@ export type Database = {
           scans: number | null;
           sessions: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       qr_unmet_demand_v: {
@@ -39839,6 +40283,7 @@ export type Database = {
           sessions: number | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       qr_unprintable_v: {
@@ -39854,6 +40299,7 @@ export type Database = {
           owner_type: string | null;
           state: string | null;
         };
+        ComputedFields: never;
         Insert: {
           already_voided?: never;
           code?: string | null;
@@ -39987,6 +40433,7 @@ export type Database = {
           refund_id: string | null;
           requested_at: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_city_id_fkey';
@@ -40139,6 +40586,7 @@ export type Database = {
           published_at: string | null;
           rating: number | null;
         };
+        ComputedFields: never;
         Insert: {
           area_snapshot?: string | null;
           body?: string | null;
@@ -40192,6 +40640,7 @@ export type Database = {
           user_id: string | null;
           vehicle: Database['public']['Enums']['vehicle_type'] | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'rider_city_id_fkey';
@@ -40276,6 +40725,7 @@ export type Database = {
           title: string | null;
           tone: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       rider_cash_event_v: {
@@ -40288,6 +40738,7 @@ export type Database = {
           order_reference: string | null;
           rider_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           amount_kes?: number | null;
           created_at?: string | null;
@@ -40397,6 +40848,7 @@ export type Database = {
           remind_at_pct: number | null;
           rider_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       rider_deposit_v: {
@@ -40410,6 +40862,7 @@ export type Database = {
           provider_ref: string | null;
           rider_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           account_reference?: string | null;
           amount_kes?: number | null;
@@ -40531,6 +40984,7 @@ export type Database = {
           unit_id: string | null;
           unit_no: string | null;
         };
+        ComputedFields: never;
         Insert: {
           address_line?: string | null;
           after_hours_handoff?: never;
@@ -40590,6 +41044,7 @@ export type Database = {
           trips_30d: number | null;
           weights: Json | null;
         };
+        ComputedFields: never;
         Insert: {
           acceptance_pct?: number | null;
           as_of?: string | null;
@@ -40747,6 +41202,7 @@ export type Database = {
           unread_messages: number | null;
           vehicle: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'rider_city_id_fkey';
@@ -40836,6 +41292,7 @@ export type Database = {
           severity: string | null;
           status: string | null;
         };
+        ComputedFields: never;
         Insert: {
           acknowledged_at?: string | null;
           compensation_kes?: number | null;
@@ -40969,6 +41426,7 @@ export type Database = {
           store: string | null;
           what_now: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'order_rider_id_fkey';
@@ -41067,6 +41525,7 @@ export type Database = {
           total_kes: number | null;
           waiting_kes: number | null;
         };
+        ComputedFields: never;
         Insert: {
           base_kes?: number | null;
           cash_collected_kes?: number | null;
@@ -41190,6 +41649,7 @@ export type Database = {
           plate_no: string | null;
           vehicle: Database['public']['Enums']['vehicle_type'] | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           face_photo_path?: string | null;
@@ -41291,6 +41751,7 @@ export type Database = {
           reward_status: string | null;
           status: string | null;
         };
+        ComputedFields: never;
         Insert: {
           code?: string | null;
           created_at?: string | null;
@@ -41417,6 +41878,7 @@ export type Database = {
           submitted_at: string | null;
           vehicle: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       rider_shift_v: {
@@ -41431,6 +41893,7 @@ export type Database = {
           time_window: string | null;
           zone_name: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'shift_commitment_rider_id_fkey';
@@ -41522,6 +41985,7 @@ export type Database = {
           reason: string | null;
           rider_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           active?: never;
           cleared_at?: string | null;
@@ -41634,6 +42098,7 @@ export type Database = {
           status: string | null;
           topic: string | null;
         };
+        ComputedFields: never;
         Insert: {
           body?: string | null;
           created_at?: string | null;
@@ -41666,6 +42131,7 @@ export type Database = {
           dow: string | null;
           rider_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'rider_earning_rider_id_fkey';
@@ -41759,6 +42225,7 @@ export type Database = {
           total_kes: number | null;
           week_start: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       setting: {
@@ -41773,6 +42240,7 @@ export type Database = {
           updated_at: string | null;
           value: Json | null;
         };
+        ComputedFields: never;
         Insert: {
           approved_by?: string | null;
           city_id?: string | null;
@@ -41905,6 +42373,7 @@ export type Database = {
           zones_active: number | null;
           zones_trial: number | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           city_manager_id?: string | null;
@@ -41978,6 +42447,7 @@ export type Database = {
           unit: string | null;
           value_type: Database['settings']['Enums']['value_type'] | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       settings_dispatch_v: {
@@ -41994,6 +42464,7 @@ export type Database = {
           selection: string | null;
           stacking: boolean | null;
         };
+        ComputedFields: never;
         Insert: {
           accept_window_s?: never;
           boost_fee?: never;
@@ -42035,6 +42506,7 @@ export type Database = {
           status: string | null;
           version: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       settings_pricing_v: {
@@ -42056,6 +42528,7 @@ export type Database = {
           small_basket_fee: number | null;
           small_basket_threshold: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       settings_scheduled_v: {
@@ -42079,6 +42552,7 @@ export type Database = {
           status: Database['settings']['Enums']['change_status'] | null;
           title: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'change_set_approved_by_fkey';
@@ -42174,6 +42648,7 @@ export type Database = {
           cycle: string | null;
           instant_cashout: boolean | null;
         };
+        ComputedFields: never;
         Insert: {
           approvals?: never;
           city_id?: string | null;
@@ -42206,6 +42681,7 @@ export type Database = {
           trial_started_at: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           cod_allowed?: boolean | null;
@@ -42327,6 +42803,7 @@ export type Database = {
           tone: string | null;
           user_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       unit_context_v: {
@@ -42348,6 +42825,7 @@ export type Database = {
           status: Database['public']['Enums']['unit_status'] | null;
           unit_id: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'unit_city_id_fkey';
@@ -42442,6 +42920,7 @@ export type Database = {
           unit_id: string | null;
           unit_name: string | null;
         };
+        ComputedFields: never;
         Insert: {
           address_done?: never;
           caretaker_confirmed_at?: string | null;
@@ -42598,6 +43077,7 @@ export type Database = {
           unread: boolean | null;
           updated_at: string | null;
         };
+        ComputedFields: never;
         Insert: {
           body?: string | null;
           created_at?: string | null;
@@ -42638,6 +43118,7 @@ export type Database = {
           updated_at: string | null;
           user_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           accent?: string | null;
           density?: string | null;
@@ -42670,6 +43151,7 @@ export type Database = {
           waiting: number | null;
           waiting_for_an_open_city: boolean | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       waitlist_signup_v: {
@@ -42686,6 +43168,7 @@ export type Database = {
           reachable: boolean | null;
           source: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'waitlist_signup_city_id_fkey';
@@ -42765,6 +43248,7 @@ export type Database = {
           rule: string | null;
           severity: string | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       zone_bounds: {
@@ -42781,6 +43265,7 @@ export type Database = {
           tier: Database['public']['Enums']['zone_tier'] | null;
           west: number | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           cod_allowed?: boolean | null;
@@ -42980,6 +43465,10 @@ export type Database = {
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
       fn_data_request_blockers: { Args: { p_request_id: string }; Returns: Json };
       fn_decrypt_secret: { Args: { p_cipher: string }; Returns: string };
+      fn_delivery_band: {
+        Args: { p_city_id: string; p_from: unknown; p_to: unknown };
+        Returns: Json;
+      };
       fn_document_chase_state: {
         Args: {
           p_owner_id: string;
@@ -43071,7 +43560,12 @@ export type Database = {
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
       fn_integration_rotation_due: {
-        Args: { i: Database['public']['Tables']['integration']['Row'] };
+        Args: {
+          i: Omit<
+            Database['public']['Tables']['integration']['Row'],
+            Database['public']['Tables']['integration']['ComputedFields']
+          >;
+        };
         Returns: boolean;
       };
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
@@ -43357,7 +43851,13 @@ export type Database = {
       fn_review_checks: { Args: { p_body: string; p_plan_id: string }; Returns: Json };
       fn_rider_cash_cap: { Args: { p_rider_id: string }; Returns: number };
       fn_rider_condition_matches: {
-        Args: { p_condition: Json; p_rider: Database['public']['Tables']['rider']['Row'] };
+        Args: {
+          p_condition: Json;
+          p_rider: Omit<
+            Database['public']['Tables']['rider']['Row'],
+            Database['public']['Tables']['rider']['ComputedFields']
+          >;
+        };
         Returns: boolean;
       };
       fn_rider_document_state: {
@@ -43483,6 +43983,17 @@ export type Database = {
         };
       };
       fn_run_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_serving_city: {
+        Args: { p_point: unknown };
+        Returns: {
+          id: string;
+          km: number;
+          name: string;
+          radius_km: number;
+          slug: string;
+          status: Database['public']['Enums']['city_status'];
+        }[];
+      };
       fn_setting_int: { Args: { p_default: number; p_key: string }; Returns: number };
       fn_settlement_owed: {
         Args: { p_city_id?: string; p_period_end: string; p_period_start: string };
@@ -50433,6 +50944,7 @@ export type Database = {
           pair: string;
           threshold: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           group?: string | null;
           id?: string;
@@ -50488,6 +51000,7 @@ export type Database = {
           status: Database['settings']['Enums']['change_status'];
           title: string;
         };
+        ComputedFields: never;
         Insert: {
           applied_at?: string | null;
           approval_request_id?: string | null;
@@ -50570,6 +51083,7 @@ export type Database = {
           snapshot: NonNullable<Json>;
           source_city_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           created_by?: string | null;
@@ -50630,6 +51144,7 @@ export type Database = {
           surface: string;
           version: number;
         };
+        ComputedFields: never;
         Insert: {
           approved_at?: string | null;
           approved_by?: string | null;
@@ -50674,6 +51189,7 @@ export type Database = {
           unit: string | null;
           value_type: Database['settings']['Enums']['value_type'];
         };
+        ComputedFields: never;
         Insert: {
           approval_pair?: string;
           can_be_immediate?: boolean;
@@ -50724,6 +51240,7 @@ export type Database = {
           updated_at: string;
           updated_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           active?: boolean;
           audience: string;
@@ -50759,6 +51276,7 @@ export type Database = {
           resolved: NonNullable<Json>;
           written_at: string;
         };
+        ComputedFields: never;
         Insert: {
           city_id: string;
           day: string;
@@ -50825,6 +51343,7 @@ export type Database = {
           superseded_by: string | null;
           value: Json | null;
         };
+        ComputedFields: never;
         Insert: {
           activated_at?: string | null;
           approved_at?: string | null;
@@ -50974,6 +51493,7 @@ export type Database = {
           zones_active: number | null;
           zones_trial: number | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           city_manager_id?: string | null;
@@ -51047,6 +51567,7 @@ export type Database = {
           unit: string | null;
           value_type: Database['settings']['Enums']['value_type'] | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       console_scheduled_v: {
@@ -51070,6 +51591,7 @@ export type Database = {
           status: Database['settings']['Enums']['change_status'] | null;
           title: string | null;
         };
+        ComputedFields: never;
         Relationships: [
           {
             foreignKeyName: 'change_set_city_id_fkey';
@@ -51115,6 +51637,7 @@ export type Database = {
           selection: string | null;
           stacking: boolean | null;
         };
+        ComputedFields: never;
         Insert: {
           accept_window_s?: never;
           boost_fee?: never;
@@ -51162,6 +51685,7 @@ export type Database = {
           sort: number | null;
           status: string | null;
         };
+        ComputedFields: never;
         Insert: {
           blocks?: string[] | null;
           config?: Json | null;
@@ -51213,6 +51737,7 @@ export type Database = {
           status: string | null;
           version: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       payments_v: {
@@ -51230,6 +51755,7 @@ export type Database = {
           status: string | null;
           success_24h_pct: number | null;
         };
+        ComputedFields: never;
         Insert: {
           callbacks_failed?: never;
           checkout_order?: number | null;
@@ -51279,6 +51805,7 @@ export type Database = {
           small_basket_fee: number | null;
           small_basket_threshold: number | null;
         };
+        ComputedFields: never;
         Relationships: [];
       };
       settlement_v: {
@@ -51289,6 +51816,7 @@ export type Database = {
           cycle: string | null;
           instant_cashout: boolean | null;
         };
+        ComputedFields: never;
         Insert: {
           approvals?: never;
           city_id?: string | null;
@@ -51321,6 +51849,7 @@ export type Database = {
           trial_started_at: string | null;
           zone_id: string | null;
         };
+        ComputedFields: never;
         Insert: {
           city_id?: string | null;
           cod_allowed?: boolean | null;

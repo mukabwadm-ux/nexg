@@ -106,7 +106,8 @@ export function Panel() {
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[0.8125rem] font-extrabold">{r.label}</span>
                   <span className="text-muted-light block truncate text-[0.6875rem] font-semibold">
-                    {[r.zone, r.address_line].filter(Boolean).join(' · ') || 'Tap to confirm the pin'}
+                    {[r.zone, r.address_line].filter(Boolean).join(' · ') ||
+                      'Tap to confirm the pin'}
                   </span>
                 </span>
               </button>
@@ -119,13 +120,15 @@ export function Panel() {
 
       {savedPlaces.length > 0 ? (
         <>
-          <p className="text-muted-light mt-4 mb-1.5 text-[0.625rem] font-extrabold uppercase tracking-[0.12em]">
+          <p className="text-muted-light mb-1.5 mt-4 text-[0.625rem] font-extrabold uppercase tracking-[0.12em]">
             Saved &amp; recent
           </p>
           <ul>
             {savedPlaces.slice(0, 5).map((p) => {
               const current =
-                place && Math.abs(place.lat - p.lat) < 0.0005 && Math.abs(place.lng - p.lng) < 0.0005;
+                place &&
+                Math.abs(place.lat - p.lat) < 0.0005 &&
+                Math.abs(place.lng - p.lng) < 0.0005;
               const Icon = p.label?.toLowerCase().startsWith('home')
                 ? Home
                 : p.label?.toLowerCase().startsWith('work')
@@ -177,8 +180,9 @@ export function Panel() {
 /**
  * Address search.
  *
- * Google Places is the intended source and is wired through the
- * route handler so the key never reaches the browser. Until a
+ * Google Places is the source, called from the route handler so
+ * the server key (GOOGLE_MAPS_API_KEY) never reaches the browser.
+ * Until a
  * key is configured this returns nothing rather than a plausible
  * list — an invented address is worse than no address, because
  * somebody will order to it.

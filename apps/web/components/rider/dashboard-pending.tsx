@@ -175,8 +175,8 @@ export function DashboardPending({
                 Finish activation to start earning
               </h2>
               <p className="mt-0.5 text-[0.8125rem] font-semibold text-white/55">
-                Do these in any order. Your progress is saved; come back any time from your phone
-                or here.
+                Do these in any order. Your progress is saved; come back any time from your phone or
+                here.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -394,9 +394,9 @@ export function DashboardPending({
                   No jobs yet — you are not activated
                 </p>
                 <p className="text-muted mt-0.5 text-[0.75rem] font-semibold leading-[1.6]">
-                  This is where offers arrive with a countdown and the full pay breakdown, and
-                  where each job moves from pickup to hand-off. Finish steps 4 to 7 and your test
-                  delivery with rider ops shows up here first.
+                  This is where offers arrive with a countdown and the full pay breakdown, and where
+                  each job moves from pickup to hand-off. Finish steps 4 to 7 and your test delivery
+                  with rider ops shows up here first.
                 </p>
               </div>
             </div>

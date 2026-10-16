@@ -233,28 +233,25 @@ export function useAction(): {
   const [pending, setPending] = React.useState(false);
   const [outcome, setOutcome] = React.useState<Outcome | null>(null);
 
-  const run = React.useCallback(
-    (fn: () => Promise<Outcome>, onDone?: (o: Outcome) => void) => {
-      setPending(true);
-      setOutcome(null);
-      void fn()
-        .then((o) => {
-          setOutcome(o);
-          onDone?.(o);
-        })
-        .catch(() =>
-          setOutcome({
-            ok: false,
-            /* A thrown action means the request never reached
+  const run = React.useCallback((fn: () => Promise<Outcome>, onDone?: (o: Outcome) => void) => {
+    setPending(true);
+    setOutcome(null);
+    void fn()
+      .then((o) => {
+        setOutcome(o);
+        onDone?.(o);
+      })
+      .catch(() =>
+        setOutcome({
+          ok: false,
+          /* A thrown action means the request never reached
                Postgres, which is a different problem from a
                refusal and should not read like one. */
-            message: 'That did not reach us. Check your connection and try again.',
-          }),
-        )
-        .finally(() => setPending(false));
-    },
-    [],
-  );
+          message: 'That did not reach us. Check your connection and try again.',
+        }),
+      )
+      .finally(() => setPending(false));
+  }, []);
 
   return { pending, outcome, run, reset: () => setOutcome(null) };
 }

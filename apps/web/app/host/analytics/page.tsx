@@ -153,9 +153,7 @@ export default async function HostAnalyticsPage({
           <>
             <section className="border-border bg-surface rounded-xl border">
               <div className="border-border border-b px-4 py-3">
-                <h2 className="text-[0.875rem] font-extrabold tracking-tight">
-                  When guests scan
-                </h2>
+                <h2 className="text-[0.875rem] font-extrabold tracking-tight">When guests scan</h2>
               </div>
               <div className="space-y-1.5 px-4 py-4">
                 {scans === 0 ? (
@@ -183,9 +181,7 @@ export default async function HostAnalyticsPage({
 
             <section className="border-border bg-surface rounded-xl border">
               <div className="border-border border-b px-4 py-3">
-                <h2 className="text-[0.875rem] font-extrabold tracking-tight">
-                  What is excluded
-                </h2>
+                <h2 className="text-[0.875rem] font-extrabold tracking-tight">What is excluded</h2>
               </div>
               <Fact label="Bot scans" value="not counted" />
               <Fact label="Our test scans" value="not counted" />

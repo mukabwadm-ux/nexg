@@ -56,9 +56,7 @@ function rollUp(rows: FeeLineRow[]) {
     e.orders += Number(r.order_count);
     by.set(r.account_code, e);
   }
-  return [...by.entries()]
-    .map(([code, e]) => ({ code, ...e }))
-    .sort((a, b) => b.amount - a.amount);
+  return [...by.entries()].map(([code, e]) => ({ code, ...e })).sort((a, b) => b.amount - a.amount);
 }
 
 export function Fees({
@@ -101,7 +99,7 @@ export function Fees({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Fee</th>
                 <th className="px-4 py-2 text-right">Total</th>
                 <th className="px-4 py-2 text-right">Share</th>
@@ -150,7 +148,10 @@ export function Fees({
                 <tr className="text-[0.8125rem] font-extrabold">
                   <td className="px-4 py-2.5">Total revenue</td>
                   <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(total)}</td>
-                  <td colSpan={3} className="text-muted-light px-4 py-2.5 text-right text-[0.6875rem] font-semibold">
+                  <td
+                    colSpan={3}
+                    className="text-muted-light px-4 py-2.5 text-right text-[0.6875rem] font-semibold"
+                  >
                     Orders are not totalled: one order appears under several fees.
                   </td>
                 </tr>
@@ -176,7 +177,7 @@ export function Fees({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Merchant</th>
                 <th className="px-4 py-2">Tier</th>
                 <th className="px-4 py-2 text-right">Orders</th>
@@ -212,9 +213,7 @@ export function Fees({
                     >
                       <td className="px-4 py-2.5 font-extrabold">{t.trading_name}</td>
                       <td className="text-muted px-4 py-2.5">{t.commission_tier ?? DASH}</td>
-                      <td className="text-muted px-4 py-2.5 text-right tabular-nums">
-                        {t.orders}
-                      </td>
+                      <td className="text-muted px-4 py-2.5 text-right tabular-nums">{t.orders}</td>
                       <td className="text-muted px-4 py-2.5 text-right tabular-nums">
                         {kesMoney(t.merchant_cents)}
                       </td>
@@ -223,7 +222,10 @@ export function Fees({
                       </td>
                       <td className="text-muted px-4 py-2.5 text-right tabular-nums">
                         {t.agreed_pct === null ? (
-                          <span className="text-muted-light" title="No rate is recorded for this merchant">
+                          <span
+                            className="text-muted-light"
+                            title="No rate is recorded for this merchant"
+                          >
                             not set
                           </span>
                         ) : (
@@ -235,9 +237,7 @@ export function Fees({
                           off ? 'text-warn' : ''
                         }`}
                       >
-                        {t.effective_pct === null
-                          ? DASH
-                          : `${Number(t.effective_pct).toFixed(2)}%`}
+                        {t.effective_pct === null ? DASH : `${Number(t.effective_pct).toFixed(2)}%`}
                         {drift !== null && off ? (
                           <span className="block text-[0.625rem] font-semibold">
                             {drift > 0 ? '+' : '−'}

@@ -109,8 +109,8 @@ export default async function RiderRefer() {
                 <>
                   <p className="font-mono text-[2rem] font-extrabold tracking-[0.2em]">{code}</p>
                   <p className="text-muted mt-2 text-[0.8125rem] font-semibold leading-[1.6]">
-                    They enter this when they apply. It is the only thing that links them to you
-                    — if they forget it, rider ops cannot add it afterwards.
+                    They enter this when they apply. It is the only thing that links them to you —
+                    if they forget it, rider ops cannot add it afterwards.
                   </p>
                 </>
               ) : (
@@ -119,8 +119,8 @@ export default async function RiderRefer() {
                     No code issued yet
                   </p>
                   <p className="text-muted mt-2 text-[0.8125rem] font-semibold leading-[1.6]">
-                    Ask rider ops for your referral code and it appears here. It is issued once
-                    and does not change.
+                    Ask rider ops for your referral code and it appears here. It is issued once and
+                    does not change.
                   </p>
                 </>
               )}
@@ -130,8 +130,8 @@ export default async function RiderRefer() {
           <Panel title="People you brought">
             {all.length === 0 ? (
               <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
-                Nobody yet. The riders who do best at this bring one or two people they already
-                ride with, not a list of numbers.
+                Nobody yet. The riders who do best at this bring one or two people they already ride
+                with, not a list of numbers.
               </p>
             ) : (
               <div className="overflow-x-auto">
@@ -200,9 +200,9 @@ export default async function RiderRefer() {
               Why it waits for the trips
             </h2>
             <p className="mt-2 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-              Paying on sign-up pays for names, and a scheme that pays for names fills the city
-              with riders who never ride. Paying after the first week pays for somebody who
-              actually turned up — which is the person you were being asked for.
+              Paying on sign-up pays for names, and a scheme that pays for names fills the city with
+              riders who never ride. Paying after the first week pays for somebody who actually
+              turned up — which is the person you were being asked for.
             </p>
           </section>
         </aside>

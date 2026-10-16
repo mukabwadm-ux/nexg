@@ -13,6 +13,10 @@
  * closely, and the symptom — a permission prompt on page load —
  * is one a browser punishes permanently.
  *
+ * The one read without a tap is on a phone whose visitor has
+ * already granted permission (see `consentState`): a granted
+ * permission cannot prompt, so it cannot be punished.
+ *
  * Why it matters that much: Chrome degrades and eventually
  * auto-blocks geolocation prompts that arrive without a user
  * gesture, and a Block is not a decision a visitor can easily
@@ -37,13 +41,15 @@ export type FixResult =
  * What the browser will do if asked, without asking.
  *
  * `permissions.query` does not prompt and does not read a
- * position, so it is safe on load. It is used only to choose
- * wording — "Asks first" against "Allowed earlier" — never to
- * decide whether to read a location. Even `granted` does not
- * licence a silent read: a returning visitor is placed from
- * their saved pin and offered the button, because a page that
- * re-reads GPS because it once had permission is tracking,
- * whatever it calls itself.
+ * position, so it is safe on load. It chooses wording — "Asks
+ * first" against "Allowed earlier" — and it gates the one read
+ * that happens without a tap: on a phone, when the visitor has
+ * already allowed location, the page takes a single reading on
+ * open so they are placed where they are standing, the way a
+ * ride-hailing app opens on your pin. `granted` cannot prompt,
+ * so this never costs the ability to ask. It is still one
+ * reading per page load, never a watch, and never on a laptop,
+ * where a fix is a Wi-Fi guess rather than a doorway.
  */
 export async function consentState(): Promise<ConsentState> {
   if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
@@ -66,7 +72,8 @@ export async function consentState(): Promise<ConsentState> {
 /**
  * Read the position once.
  *
- * **Call this from inside a click handler and nowhere else.**
+ * **Call this from inside a click handler**, or — on a phone only —
+ * after `consentState()` has answered `granted`. Nowhere else.
  *
  * One reading, never `watchPosition`. Nothing on a public page
  * needs a stream of positions — the guest is choosing a delivery
@@ -80,7 +87,11 @@ export async function consentState(): Promise<ConsentState> {
  * it is worth the battery, because it is the difference between
  * a street and a building.
  */
-export function readPositionOnce(options?: { highAccuracy?: boolean }): Promise<FixResult> {
+export function readPositionOnce(options?: {
+  highAccuracy?: boolean;
+  /** Refuse a cached fix. Needed when refining: the cache is the coarse reading being replaced. */
+  fresh?: boolean;
+}): Promise<FixResult> {
   if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
     return Promise.resolve({
       ok: false,
@@ -131,14 +142,44 @@ export function readPositionOnce(options?: { highAccuracy?: boolean }): Promise<
         timeout: 8000,
         /* A fix from the last minute is the same fix. Re-reading
            it costs a second and a little battery for no new
-           information. */
-        maximumAge: 60_000,
+           information — unless the point is to replace it. */
+        maximumAge: options?.fresh ? 0 : 60_000,
       },
     );
   });
 }
 
-function isHandheld(): boolean {
+/** Good enough to stop refining: a building, not a block. */
+export const ACCURACY_GOOD_M = 20;
+
+/**
+ * The best fix the device can give, for a delivery pin.
+ *
+ * On a phone the first answer is often the network's guess while
+ * the GPS warms up. So it asks again, up to three single readings
+ * with the cache refused, and keeps the tightest — stopping as soon
+ * as one is within {@link ACCURACY_GOOD_M}. Separate readings, not
+ * `watchPosition`: nothing is left running, and each one ends when
+ * it answers.
+ *
+ * On a laptop there is no GPS to warm up; one reading is all the
+ * Wi-Fi will ever give.
+ */
+export async function readBestPosition(): Promise<FixResult> {
+  if (!isHandheld()) return readPositionOnce({ highAccuracy: false });
+
+  let best: Extract<FixResult, { ok: true }> | null = null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const result = await readPositionOnce({ highAccuracy: true, fresh: attempt > 0 });
+    if (!result.ok) return best ?? result;
+    if (!best || result.fix.accuracy_m < best.fix.accuracy_m) best = result;
+    if (best.fix.accuracy_m <= ACCURACY_GOOD_M) break;
+  }
+  return best!;
+}
+
+/** A phone or tablet: something with a GPS and a thumb rather than a mouse. */
+export function isHandheld(): boolean {
   if (typeof window === 'undefined') return false;
   if ('userAgentData' in navigator) {
     const data = (navigator as { userAgentData?: { mobile?: boolean } }).userAgentData;
@@ -156,7 +197,9 @@ function isHandheld(): boolean {
  * visitor to drag the pin rather than present a guess as an
  * address.
  */
-export function accuracyBand(metres: number | null | undefined): 'exact' | 'street' | 'area' | 'city' {
+export function accuracyBand(
+  metres: number | null | undefined,
+): 'exact' | 'street' | 'area' | 'city' {
   if (metres === null || metres === undefined) return 'city';
   if (metres <= 25) return 'exact';
   if (metres <= 100) return 'street';

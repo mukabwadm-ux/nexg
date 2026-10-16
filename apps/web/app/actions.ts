@@ -87,7 +87,7 @@ export async function submitLead(_prev: ActionResult | null, formData: FormData)
    * show each answer under its own label.
    */
   const body = [
-    `${d.need} — ${d.when === 'asap' ? 'as soon as possible' : (d.when_detail || 'at a time to arrange')}.`,
+    `${d.need} — ${d.when === 'asap' ? 'as soon as possible' : d.when_detail || 'at a time to arrange'}.`,
     `Staying at: ${d.staying_at}.`,
     d.notes ? `They added: ${d.notes}` : null,
   ]

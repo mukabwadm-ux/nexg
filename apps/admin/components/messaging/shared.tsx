@@ -53,7 +53,10 @@ export const TEAM_LABEL: Record<string, string> = {
  * anyone who cannot distinguish the dot — and what makes it
  * mean something precise rather than "bad".
  */
-export function sla(overdueS: number | null, answered: boolean): {
+export function sla(
+  overdueS: number | null,
+  answered: boolean,
+): {
   dot: string;
   text: string;
   urgent: boolean;
@@ -112,7 +115,7 @@ export function Tile({
         {label}
       </p>
       <p
-        className={`mt-1.5 text-2xl font-extrabold tracking-tight tabular-nums ${
+        className={`mt-1.5 text-2xl font-extrabold tabular-nums tracking-tight ${
           tone === 'warn' ? 'text-danger' : tone === 'good' ? 'text-success' : ''
         }`}
       >

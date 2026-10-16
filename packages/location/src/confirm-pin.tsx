@@ -4,6 +4,7 @@ import { Briefcase, Home, Info, MapPin } from 'lucide-react';
 import * as React from 'react';
 
 import { ACCURACY_NEEDS_CONFIRMING_M, accuracyBand } from './geolocation';
+import { PinMap } from './pin-map';
 import { useLocation } from './store';
 import type { Place } from './types';
 
@@ -13,6 +14,10 @@ import type { Place } from './types';
  * The step between "roughly here" and an address a rider can
  * find. Addresses, not distance, are what make deliveries late
  * in Nairobi — an estate name and a GPS circle are not a gate.
+ *
+ * With the Maps keys set, the pin sits on a real map that moves
+ * under it, and every move asks for the street name again. Without
+ * them it is the drawing below, moved with the nudge buttons.
  *
  * Three things are deliberate:
  *
@@ -38,8 +43,12 @@ export function ConfirmPin({
   onConfirm: (place: Place) => Promise<void> | void;
   onCancel: () => void;
 }) {
-  const { actions } = useLocation();
+  const { actions, maps } = useLocation();
   const [place, setPlace] = React.useState<Place>(candidate);
+  /* Where the reading put them, kept so the map can show the circle there. */
+  const [reading] = React.useState(() => ({ lat: candidate.lat, lng: candidate.lng }));
+  /* Each move asks for coverage and a street name; only the latest answer counts. */
+  const moveSeq = React.useRef(0);
   const [unit, setUnit] = React.useState(candidate.unit_no ?? '');
   const [gate, setGate] = React.useState(candidate.gate_no ?? '');
   const [landmark, setLandmark] = React.useState(candidate.landmark ?? '');
@@ -53,18 +62,42 @@ export function ConfirmPin({
   const coarse = accuracy > ACCURACY_NEEDS_CONFIRMING_M;
   const blocked = coarse && !nudged && !acknowledged;
 
-  async function nudge(dLat: number, dLng: number) {
-    const next = { ...place, lat: place.lat + dLat, lng: place.lng + dLng };
+  /*
+   * The pin moved — dragged on the map or nudged. A moved pin is a
+   * spot somebody chose, so the accuracy question is answered; the
+   * street name and coverage are asked again for the new point.
+   */
+  async function moveTo(at: { lat: number; lng: number }) {
+    const seq = ++moveSeq.current;
     setNudged(true);
-    const cover = await actions.coverage(next.lat, next.lng);
-    setPlace({ ...next, ...cover, accuracy_m: Math.min(accuracy, 25) } as Place);
+    setPlace((p) => ({ ...p, lat: at.lat, lng: at.lng, accuracy_m: Math.min(accuracy, 25) }));
+    const [cover, street] = await Promise.all([
+      actions.coverage(at.lat, at.lng),
+      actions.reverse ? actions.reverse(at.lat, at.lng).catch(() => null) : Promise.resolve(null),
+    ]);
+    if (seq !== moveSeq.current) return;
+    setPlace(
+      (p) =>
+        ({
+          ...p,
+          ...cover,
+          address_line: street?.address_line ?? null,
+          plus_code: street?.plus_code ?? null,
+          lat: at.lat,
+          lng: at.lng,
+        }) as Place,
+    );
+  }
+
+  function nudge(dLat: number, dLng: number) {
+    void moveTo({ lat: place.lat + dLat, lng: place.lng + dLng });
   }
 
   async function confirm() {
     setSaving(true);
     const label =
       saveAs === 'Just this once'
-        ? (place.address_line ?? place.zone ?? 'Delivery address')
+        ? (place.address_line ?? place.zone ?? place.city ?? 'Pinned location')
         : saveAs;
 
     const finished: Place = {
@@ -104,28 +137,44 @@ export function ConfirmPin({
           Browser accuracy{' '}
           <span className="text-ink font-extrabold tabular-nums">±{Math.round(accuracy)} m</span>
           <span className="text-muted-light">
-            · {accuracyBand(accuracy) === 'exact' ? 'precise enough' : 'please confirm the exact spot'}
+            ·{' '}
+            {accuracyBand(accuracy) === 'exact'
+              ? 'precise enough'
+              : 'please confirm the exact spot'}
           </span>
         </p>
 
-        <div className="relative mt-3 flex h-36 items-center justify-center overflow-hidden rounded-xl bg-[color:var(--color-border)]/30">
-          {/* The accuracy ring, drawn to scale against the pin so the
+        {maps ? (
+          <div className="mt-3">
+            <PinMap
+              apiKey={maps.key}
+              mapId={maps.mapId}
+              start={reading}
+              centre={{ lat: place.lat, lng: place.lng }}
+              accuracyM={candidate.accuracy_m ?? 0}
+              onSettle={(at) => void moveTo(at)}
+            />
+          </div>
+        ) : (
+          <div className="bg-[color:var(--color-border)]/30 relative mt-3 flex h-36 items-center justify-center overflow-hidden rounded-xl">
+            {/* The accuracy ring, drawn to scale against the pin so the
               uncertainty is a size rather than a number. */}
-          <span
-            aria-hidden="true"
-            className="bg-ink/10 ring-ink/20 absolute rounded-full ring-1"
-            style={{
-              width: `${Math.min(140, 28 + accuracy / 12)}px`,
-              height: `${Math.min(140, 28 + accuracy / 12)}px`,
-            }}
-          />
-          <span className="bg-gold ring-surface relative flex h-8 w-8 items-center justify-center rounded-full ring-4">
-            <MapPin className="text-ink h-4 w-4" aria-hidden="true" />
-          </span>
-          <span className="bg-ink absolute bottom-3 rounded-full px-3 py-1 text-[0.6875rem] font-extrabold text-white">
-            Move the pin to your gate or entrance
-          </span>
-        </div>
+            <span
+              aria-hidden="true"
+              className="bg-ink/10 ring-ink/20 absolute rounded-full ring-1"
+              style={{
+                width: `${Math.min(140, 28 + accuracy / 12)}px`,
+                height: `${Math.min(140, 28 + accuracy / 12)}px`,
+              }}
+            />
+            <span className="bg-gold ring-surface relative flex h-8 w-8 items-center justify-center rounded-full ring-4">
+              <MapPin className="text-ink h-4 w-4" aria-hidden="true" />
+            </span>
+            <span className="bg-ink absolute bottom-3 rounded-full px-3 py-1 text-[0.6875rem] font-extrabold text-white">
+              Move the pin to your gate or entrance
+            </span>
+          </div>
+        )}
 
         {/* Keyboard-reachable nudges. A drag-only control is
             unusable without a mouse, and this is on the path to
@@ -205,7 +254,9 @@ export function ConfirmPin({
         {place.coverage === 'covered' ? (
           <p className="text-success text-[0.75rem] font-extrabold">
             We deliver here{place.zone ? ` · ${place.zone}` : ''}
-            {place.eta_min && place.eta_max ? ` · ${place.eta_min}–${place.eta_max} min typical` : ''}
+            {place.eta_min && place.eta_max
+              ? ` · ${place.eta_min}–${place.eta_max} min typical`
+              : ''}
           </p>
         ) : place.coverage === 'unknown' ? null : (
           <p className="text-danger text-[0.75rem] font-extrabold">{place.message}</p>

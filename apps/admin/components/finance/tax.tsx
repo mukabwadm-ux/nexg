@@ -43,8 +43,8 @@ export function Tax({ rows }: { rows: TaxRow[] }) {
           </p>
           <p className="text-muted mt-1 text-[0.75rem] font-semibold">
             Nothing is computed for it, and nothing is assumed. Setting a rate is a decision for
-            whoever signs the returns, not something this screen should guess — so the line is
-            shown with the figure it would apply to and no tax against it.
+            whoever signs the returns, not something this screen should guess — so the line is shown
+            with the figure it would apply to and no tax against it.
           </p>
         </div>
       ) : null}
@@ -57,7 +57,7 @@ export function Tax({ rows }: { rows: TaxRow[] }) {
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Source</th>
                 <th className="px-4 py-2">Basis</th>
                 <th className="px-4 py-2 text-right">Amount it applies to</th>
@@ -123,8 +123,8 @@ export function Tax({ rows }: { rows: TaxRow[] }) {
         <ul className="text-muted mt-2 space-y-1.5 text-[0.8125rem] font-semibold">
           <li>
             · Output VAT on delivery, service and concierge revenue needs a rate and a decision on
-            whether NexG is the supplier or the agent. That determines whether VAT is charged on
-            the fee or on the whole basket, and the two give very different numbers.
+            whether NexG is the supplier or the agent. That determines whether VAT is charged on the
+            fee or on the whole basket, and the two give very different numbers.
           </li>
           <li>
             · eTIMS: whether each order needs an invoice transmitted, or whether a monthly summary

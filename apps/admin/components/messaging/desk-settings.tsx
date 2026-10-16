@@ -115,7 +115,7 @@ export function CannedReplies({ rows }: { rows: CannedRow[] }) {
       <div className="border-border bg-surface overflow-x-auto rounded-xl border">
         <table className="w-full text-left">
           <thead className="border-border bg-bg border-b">
-            <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+            <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
               <th className="px-4 py-2">Shortcut</th>
               <th className="px-4 py-2">What it says</th>
               <th className="px-4 py-2">For</th>
@@ -215,13 +215,7 @@ export function CannedReplies({ rows }: { rows: CannedRow[] }) {
 
 /* ═══════════════════════════════════════════════ Settings */
 
-export function DeskSettings({
-  rules,
-  roster,
-}: {
-  rules: RoutingRow[];
-  roster: RosterRow[];
-}) {
+export function DeskSettings({ rules, roster }: { rules: RoutingRow[]; roster: RosterRow[] }) {
   const disabled = rules.filter((r) => !r.enabled);
   const stale = roster.filter((r) => r.presence_stale && r.state !== 'off');
   const available = roster.filter((r) => r.state === 'available' && !r.presence_stale);
@@ -232,9 +226,9 @@ export function DeskSettings({
       <section>
         <h2 className="mb-1 text-[0.9375rem] font-extrabold tracking-tight">Who is on the desk</h2>
         <p className="text-muted-light mb-3 text-xs font-semibold">
-          Capacity is what routing believes. Somebody shown available who last pinged an hour ago
-          is not available, and routing to them is how a conversation sits unanswered while the
-          board says it was assigned.
+          Capacity is what routing believes. Somebody shown available who last pinged an hour ago is
+          not available, and routing to them is how a conversation sits unanswered while the board
+          says it was assigned.
         </p>
 
         <div className="mb-3 grid gap-3 sm:grid-cols-3">
@@ -256,7 +250,7 @@ export function DeskSettings({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Who</th>
                 <th className="px-4 py-2">State</th>
                 <th className="px-4 py-2 text-right">Handling</th>
@@ -306,9 +300,7 @@ export function DeskSettings({
                       ) : null}
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{r.active_count}</td>
-                    <td className="text-muted px-4 py-2.5 text-right tabular-nums">
-                      {r.capacity}
-                    </td>
+                    <td className="text-muted px-4 py-2.5 text-right tabular-nums">{r.capacity}</td>
                     <td className="text-muted px-4 py-2.5 text-[0.75rem]">
                       {stamp(r.on_shift_until)}
                     </td>
@@ -340,7 +332,7 @@ export function DeskSettings({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">#</th>
                 <th className="px-4 py-2">Rule</th>
                 <th className="px-4 py-2">Matches</th>
@@ -403,9 +395,9 @@ export function DeskSettings({
           </table>
         </div>
         <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold">
-          Rules are read-only here. Changing one changes where every future conversation goes, so
-          it belongs behind the same approval as the rest of Settings rather than behind a button
-          on a console tab.
+          Rules are read-only here. Changing one changes where every future conversation goes, so it
+          belongs behind the same approval as the rest of Settings rather than behind a button on a
+          console tab.
         </p>
       </section>
     </div>
@@ -425,11 +417,11 @@ function Stat({
 }) {
   return (
     <div className="border-border bg-surface rounded-xl border p-4">
-      <p className="text-muted-light text-[0.6875rem] font-extrabold tracking-wide uppercase">
+      <p className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
         {label}
       </p>
       <p
-        className={`mt-1.5 text-2xl font-extrabold tracking-tight tabular-nums ${
+        className={`mt-1.5 text-2xl font-extrabold tabular-nums tracking-tight ${
           warn ? 'text-warn' : ''
         }`}
       >

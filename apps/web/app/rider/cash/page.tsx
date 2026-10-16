@@ -110,14 +110,14 @@ export default async function RiderCash() {
         <Tile
           value={kesh(onHand)}
           label="On hand now"
-          note={
-            pct === null
-              ? 'no cap set for your city'
-              : `${pct}% of your ${kesh(cap)} cap`
-          }
+          note={pct === null ? 'no cap set for your city' : `${pct}% of your ${kesh(cap)} cap`}
           noteTone={band === 'danger' ? 'danger' : band === 'gold' ? 'gold' : 'good'}
         />
-        <Tile value={kesh(cap)} label="Your cap" note={cap === null ? 'not set' : 'per city rule'} />
+        <Tile
+          value={kesh(cap)}
+          label="Your cap"
+          note={cap === null ? 'not set' : 'per city rule'}
+        />
         <Tile
           value={kesh(c?.collected_today_kes ?? 0)}
           label="Collected today"
@@ -134,9 +134,7 @@ export default async function RiderCash() {
       {pct !== null && remindAt !== null && pct >= remindAt ? (
         <section
           className={`rounded-xl border px-4 py-3 ${
-            band === 'danger'
-              ? 'border-danger/30 bg-danger-bg'
-              : 'border-warning/40 bg-warning-bg'
+            band === 'danger' ? 'border-danger/30 bg-danger-bg' : 'border-warning/40 bg-warning-bg'
           }`}
         >
           <p
@@ -149,8 +147,8 @@ export default async function RiderCash() {
               : `You are at ${pct}% of your cap. Deposit before ${pauseAt ?? 100}% or offers pause.`}
           </p>
           <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.6]">
-            Pay to the NexG paybill with your rider reference. It matches automatically within a
-            few minutes; nothing needs sending to anybody when it does.
+            Pay to the NexG paybill with your rider reference. It matches automatically within a few
+            minutes; nothing needs sending to anybody when it does.
           </p>
         </section>
       ) : null}
@@ -255,9 +253,9 @@ export default async function RiderCash() {
               </div>
             )}
             <p className="text-muted-light border-border border-t px-4 py-2.5 text-[0.6875rem] font-semibold leading-[1.6]">
-              A deposit that has not matched is almost always the reference. Send the M-Pesa
-              message to rider ops and it is matched by hand the same day — the money is not lost,
-              it is only unlabelled.
+              A deposit that has not matched is almost always the reference. Send the M-Pesa message
+              to rider ops and it is matched by hand the same day — the money is not lost, it is
+              only unlabelled.
             </p>
           </Panel>
         </div>

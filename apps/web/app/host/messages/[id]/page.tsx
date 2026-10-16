@@ -48,11 +48,7 @@ export default async function HostThreadPage({ params }: { params: { id: string 
 
   const [convRes, msgRes] = await Promise.all([
     supabase.from('host_conversation_v').select('*').eq('id', params.id).maybeSingle(),
-    supabase
-      .from('host_message_v')
-      .select('*')
-      .eq('conversation_id', params.id)
-      .order('seq'),
+    supabase.from('host_message_v').select('*').eq('conversation_id', params.id).order('seq'),
   ]);
 
   const conv = convRes.data as Conversation | null;

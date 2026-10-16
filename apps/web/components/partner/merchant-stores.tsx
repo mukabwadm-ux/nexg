@@ -26,12 +26,12 @@ export interface StoreRow {
 /**
  * Stores, and adding another.
  *
- * There is no map here. NexG has no Maps key, and a drawn map with
- * a draggable pin that is not really geocoding anything would let
- * a merchant think they had placed their shop when they had not.
- * What works without one is coordinates — which every phone's map
- * app will give you by holding a finger on the spot — so that is
- * what this asks for, and it says where to get them.
+ * With the Maps keys set, the merchant drops a pin on a real Google
+ * map (`StoreMap`). Without them there is no map: a drawn one with a
+ * pin that is not really geocoding anything would let a merchant
+ * think they had placed their shop when they had not. What works
+ * then is coordinates — which every phone's map app will give you by
+ * holding a finger on the spot — so that is what this asks for.
  */
 export function Stores({
   merchantId,

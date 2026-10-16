@@ -134,7 +134,7 @@ export function Channels({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Channel</th>
                 <th className="px-4 py-2 text-right">Open now</th>
                 <th className="px-4 py-2 text-right">Unassigned</th>
@@ -223,7 +223,7 @@ export function Channels({
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
             <thead className="border-border bg-bg border-b">
-              <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Number</th>
                 <th className="px-4 py-2">About</th>
                 <th className="px-4 py-2">Status</th>
@@ -236,8 +236,8 @@ export function Channels({
                 <tr>
                   <td colSpan={5}>
                     <p className="text-muted-light px-4 py-8 text-center text-[0.8125rem] font-semibold">
-                      No WhatsApp conversations. The number is not connected yet, so this is what
-                      an unconnected channel looks like rather than a quiet one.
+                      No WhatsApp conversations. The number is not connected yet, so this is what an
+                      unconnected channel looks like rather than a quiet one.
                     </p>
                   </td>
                 </tr>

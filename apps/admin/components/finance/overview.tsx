@@ -160,7 +160,9 @@ export function Overview({
                       <Pill tone={sev.tone}>{sev.label}</Pill>
                       <p className="text-[0.875rem] font-extrabold tracking-tight">{d.title}</p>
                     </div>
-                    <p className="text-muted mt-1 text-[0.8125rem] font-semibold">{d.consequence}</p>
+                    <p className="text-muted mt-1 text-[0.8125rem] font-semibold">
+                      {d.consequence}
+                    </p>
                   </div>
                   <div className="text-right">
                     {d.amount_cents !== null ? (
@@ -256,7 +258,7 @@ export function Overview({
                   <tr className="border-border border-b">
                     <th
                       colSpan={2}
-                      className="text-muted-light px-4 py-2 text-[0.625rem] font-extrabold tracking-wide uppercase"
+                      className="text-muted-light px-4 py-2 text-[0.625rem] font-extrabold uppercase tracking-wide"
                     >
                       In · {kesMoney(inTotal)}
                     </th>
@@ -272,7 +274,7 @@ export function Overview({
                   <tr className="border-border bg-bg border-y">
                     <th
                       colSpan={2}
-                      className="text-muted-light px-4 py-2 text-[0.625rem] font-extrabold tracking-wide uppercase"
+                      className="text-muted-light px-4 py-2 text-[0.625rem] font-extrabold uppercase tracking-wide"
                     >
                       Out · {kesMoney(outTotal)}
                     </th>
@@ -309,7 +311,7 @@ export function Overview({
             ) : (
               <table className="w-full text-left">
                 <thead className="border-border bg-bg border-b">
-                  <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+                  <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                     <th className="px-4 py-2">Line</th>
                     <th className="px-4 py-2 text-right">This month</th>
                     <th className="px-4 py-2 text-right">Change</th>
@@ -368,7 +370,7 @@ export function Overview({
             ) : (
               <table className="w-full text-left">
                 <thead className="border-border bg-bg border-b">
-                  <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+                  <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                     <th className="px-4 py-2">City</th>
                     <th className="px-4 py-2 text-right">Orders</th>
                     <th className="px-4 py-2 text-right">Gross</th>
@@ -410,7 +412,7 @@ export function Overview({
             ) : (
               <table className="w-full text-left">
                 <thead className="border-border bg-bg border-b">
-                  <tr className="text-muted-light text-[0.625rem] font-extrabold tracking-wide uppercase">
+                  <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                     <th className="px-4 py-2">Partner</th>
                     <th className="px-4 py-2">Oldest</th>
                     <th className="px-4 py-2 text-right">Owed</th>
@@ -418,7 +420,10 @@ export function Overview({
                 </thead>
                 <tbody>
                   {owed.map((o, i) => (
-                    <tr key={`${o.party_type}-${i}`} className="border-border border-b last:border-0">
+                    <tr
+                      key={`${o.party_type}-${i}`}
+                      className="border-border border-b last:border-0"
+                    >
                       <td className="px-4 py-2.5 text-[0.8125rem] font-semibold">
                         {o.label}
                         <span className="text-muted-light ml-1.5 text-[0.6875rem]">
@@ -458,7 +463,7 @@ export function Overview({
                   const st = CAL_STATE[c.state] ?? CAL_DEFAULT;
                   return (
                     <tr key={c.id} className="border-border border-b last:border-0">
-                      <td className="px-4 py-2.5 text-[0.8125rem] font-extrabold whitespace-nowrap tabular-nums">
+                      <td className="whitespace-nowrap px-4 py-2.5 text-[0.8125rem] font-extrabold tabular-nums">
                         {shortDate(c.due_on)}
                       </td>
                       <td className="px-4 py-2.5 text-[0.8125rem] font-semibold">

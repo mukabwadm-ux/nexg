@@ -116,8 +116,8 @@ export function NotBuiltYet({ what, willHold }: { what: string; willHold: string
       </h2>
       <p className="text-muted mt-1.5 text-[0.8125rem] font-semibold leading-[1.7]">{willHold}</p>
       <p className="text-muted-light mt-3 text-[0.75rem] font-semibold leading-[1.7]">
-        Until it is, merchant ops handles this — the help icon in the top bar reaches them with
-        this page attached. Nothing you have entered elsewhere is affected.
+        Until it is, merchant ops handles this — the help icon in the top bar reaches them with this
+        page attached. Nothing you have entered elsewhere is affected.
       </p>
     </div>
   );

@@ -72,11 +72,10 @@ export default async function SettingsPage() {
             />
             <Row label="Owner email" value={s.contact_email ?? '—'} />
             <p className="text-muted-light px-4 py-3 text-[0.6875rem] font-semibold leading-[1.6]">
-              Your phone is shown masked even to you — it is the number we verified you on and
-              the one a rider calls, and a page that prints it in full is a page somebody
-              screenshots. Changing the name, category or phone is a staff action with a reason
-              recorded, because a quiet change here is indistinguishable from an account
-              takeover.
+              Your phone is shown masked even to you — it is the number we verified you on and the
+              one a rider calls, and a page that prints it in full is a page somebody screenshots.
+              Changing the name, category or phone is a staff action with a reason recorded, because
+              a quiet change here is indistinguishable from an account takeover.
             </p>
           </Panel>
 

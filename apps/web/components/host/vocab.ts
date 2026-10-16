@@ -90,8 +90,7 @@ export interface Photo {
 export function photosOf(v: unknown): Photo[] {
   if (!Array.isArray(v)) return [];
   return v.filter(
-    (p): p is Photo =>
-      typeof p === 'object' && p !== null && typeof (p as Photo).path === 'string',
+    (p): p is Photo => typeof p === 'object' && p !== null && typeof (p as Photo).path === 'string',
   );
 }
 

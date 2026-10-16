@@ -21,14 +21,31 @@ const CONTAINER = process.env.NEXG_DB_CONTAINER ?? 'supabase_db_nexg';
 function psql(sql) {
   return execFileSync(
     'docker',
-    ['exec', '-i', CONTAINER, 'psql', '-U', 'postgres', '-d', 'postgres', '-t', '-A', '-F', '\t', '-c', sql],
+    [
+      'exec',
+      '-i',
+      CONTAINER,
+      'psql',
+      '-U',
+      'postgres',
+      '-d',
+      'postgres',
+      '-t',
+      '-A',
+      '-F',
+      '\t',
+      '-c',
+      sql,
+    ],
     { encoding: 'utf8' },
   ).trim();
 }
 
 let rows;
 try {
-  rows = psql('select severity, rule, finding, detail from public.fn_wiring_check() order by severity, rule;');
+  rows = psql(
+    'select severity, rule, finding, detail from public.fn_wiring_check() order by severity, rule;',
+  );
 } catch (error) {
   console.error('Could not reach the database. Is `supabase start` running?');
   console.error(String(error.stderr ?? error.message).split('\n')[0]);
@@ -36,10 +53,13 @@ try {
 }
 
 const findings = rows
-  ? rows.split('\n').filter(Boolean).map((line) => {
-      const [severity, rule, finding, detail] = line.split('\t');
-      return { severity, rule, finding, detail };
-    })
+  ? rows
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => {
+        const [severity, rule, finding, detail] = line.split('\t');
+        return { severity, rule, finding, detail };
+      })
   : [];
 
 const critical = findings.filter((f) => f.severity === 'critical');

@@ -1,0 +1,71 @@
+{
+  "variant": "light",
+  "styles": [
+    {
+      "id": "natural.land",
+      "geometry": { "fillColor": "#F5F2EC" }
+    },
+    {
+      "id": "natural.land.landCover",
+      "geometry": { "fillColor": "#F0ECE4" }
+    },
+    {
+      "id": "natural.water",
+      "geometry": { "fillColor": "#D8DDDF" },
+      "label": { "textFillColor": "#6E7378", "textStrokeColor": "#F5F2EC" }
+    },
+    {
+      "id": "pointOfInterest",
+      "label": { "visible": false }
+    },
+    {
+      "id": "pointOfInterest.recreation.park",
+      "geometry": { "fillColor": "#E4E6DA" },
+      "label": { "visible": false }
+    },
+    {
+      "id": "infrastructure.building",
+      "geometry": { "fillColor": "#ECE8E1", "strokeColor": "#E2DDD4" }
+    },
+    {
+      "id": "infrastructure.roadNetwork.road",
+      "geometry": { "fillColor": "#FFFFFF", "strokeColor": "#E6E1D8" },
+      "label": { "textFillColor": "#8A847C", "textStrokeColor": "#FFFFFF" }
+    },
+    {
+      "id": "infrastructure.roadNetwork.road.highway",
+      "geometry": { "fillColor": "#EFE3BC", "strokeColor": "#D9C78A" },
+      "label": { "textFillColor": "#5C5548", "textStrokeColor": "#FFFFFF" }
+    },
+    {
+      "id": "infrastructure.roadNetwork.road.arterial",
+      "geometry": { "fillColor": "#FFFFFF", "strokeColor": "#DDD7CC" },
+      "label": { "textFillColor": "#7A746B" }
+    },
+    {
+      "id": "infrastructure.roadNetwork.road.local",
+      "geometry": { "fillColor": "#FBFAF7", "strokeColor": "#EAE6DF" },
+      "label": { "textFillColor": "#9A948B" }
+    },
+    {
+      "id": "infrastructure.roadNetwork.noTraffic",
+      "geometry": { "fillColor": "#F3F0EA" }
+    },
+    {
+      "id": "infrastructure.transitStation",
+      "label": { "textFillColor": "#7A746B", "pinFillColor": "#9A948B" }
+    },
+    {
+      "id": "infrastructure.railwayTrack",
+      "geometry": { "fillColor": "#D6D1C8" }
+    },
+    {
+      "id": "political.border",
+      "geometry": { "strokeColor": "#B8B1A6" }
+    },
+    {
+      "id": "political",
+      "label": { "textFillColor": "#14110F", "textStrokeColor": "#F5F2EC" }
+    }
+  ]
+}
