@@ -130,7 +130,7 @@ export function SiteMenu({
           <Dialog.Title className="sr-only">Menu</Dialog.Title>
 
           {/* ------------------------------------------------------- header */}
-          <header className="border-border/70 flex items-center justify-between border-b px-5 py-5 sm:px-9">
+          <header className="border-border/70 flex items-center justify-between border-b px-5 py-3.5 sm:px-9 sm:py-5">
             <span className="flex items-center gap-3">
               <Logo />
               <span className="text-micro text-muted-light font-bold uppercase">Menu</span>
@@ -143,7 +143,7 @@ export function SiteMenu({
             </Dialog.Close>
           </header>
 
-          <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-9">
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 sm:px-9 sm:py-5">
             {/*
              * Tapping anywhere on this opens the same sheet the
              * header chip opens — and closes the menu first,
@@ -193,25 +193,38 @@ export function SiteMenu({
               <ul>
                 {SECTIONS.map((section) => (
                   <li key={section.key} className="border-border/70 border-b last:border-0">
+                    {/*
+                     * Rows grow with their label. A fixed row height let
+                     * a long label that wrapped on a phone ("Customize
+                     * your experience") run over the rows either side.
+                     * On a phone the note goes under the label rather
+                     * than beside it, where it squeezed the label into
+                     * three lines.
+                     */}
                     <Link
                       href={section.href}
                       onClick={close}
-                      className="focus-visible:ring-gold hover:text-gold-text flex h-[3.8rem] items-center gap-4 transition-colors focus-visible:outline-none focus-visible:ring-2"
+                      className="focus-visible:ring-gold hover:text-gold-text flex min-h-[3rem] items-center gap-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 sm:min-h-[3.8rem] sm:gap-4"
                     >
-                      <span className="text-gold-text w-6 shrink-0 text-xs font-bold">
+                      <span className="text-gold-text w-6 shrink-0 self-start pt-1 text-[0.6875rem] font-bold sm:self-center sm:pt-0 sm:text-xs">
                         {section.number}
                       </span>
-                      <span className="flex-1 text-[1.625rem] font-extrabold leading-none tracking-tight">
-                        {t(section.key)}
-                      </span>
-                      {(section.noteKey || section.note) && (
-                        <span className="text-muted-light flex shrink-0 items-center gap-1.5 text-xs">
-                          {section.live && (
-                            <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
-                          )}
-                          {section.noteKey ? t(section.noteKey) : section.note}
+                      <span className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+                        <span className="flex-1 text-lg font-bold leading-snug tracking-tight sm:text-[1.625rem] sm:font-extrabold sm:leading-none">
+                          {t(section.key)}
                         </span>
-                      )}
+                        {(section.noteKey || section.note) && (
+                          <span className="text-muted-light flex shrink-0 items-center gap-1.5 text-xs">
+                            {section.live && (
+                              <span
+                                aria-hidden="true"
+                                className="bg-gold h-1.5 w-1.5 rounded-full"
+                              />
+                            )}
+                            {section.noteKey ? t(section.noteKey) : section.note}
+                          </span>
+                        )}
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -229,7 +242,7 @@ export function SiteMenu({
                       <Link
                         href={link.href}
                         onClick={close}
-                        className="focus-visible:ring-gold flex h-[3.55rem] items-center gap-3 focus-visible:outline-none focus-visible:ring-2"
+                        className="focus-visible:ring-gold flex min-h-[3.55rem] items-center gap-3 py-2.5 focus-visible:outline-none focus-visible:ring-2"
                       >
                         <span
                           aria-hidden="true"
@@ -237,10 +250,15 @@ export function SiteMenu({
                         >
                           <Icon className="h-4 w-4" />
                         </span>
-                        <span className="flex-1 text-[0.9375rem] font-extrabold text-white">
-                          {t(link.key)}
+                        {/* Stacked on a phone, side by side from sm up. */}
+                        <span className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-center sm:gap-3">
+                          <span className="flex-1 text-sm font-extrabold leading-snug text-white sm:text-[0.9375rem]">
+                            {t(link.key)}
+                          </span>
+                          <span className="text-xs leading-snug text-white/50 sm:shrink-0">
+                            {t(link.noteKey)}
+                          </span>
                         </span>
-                        <span className="shrink-0 text-xs text-white/50">{t(link.noteKey)}</span>
                       </Link>
                     </li>
                   );
@@ -250,26 +268,27 @@ export function SiteMenu({
           </div>
 
           {/* ------------------------------------------------------- footer */}
-          <footer className="border-border/70 border-t px-5 py-4 sm:px-9">
+          {/* The bottom padding clears a phone's home indicator. */}
+          <footer className="border-border/70 bg-bg border-t px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:px-9 sm:py-4">
             <div className="flex gap-3">
               <Link
                 href="/sign-in"
                 onClick={close}
-                className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold flex h-12 flex-1 items-center justify-center rounded-xl text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold flex h-11 flex-1 items-center justify-center rounded-xl text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:h-12"
               >
                 Sign in
               </Link>
               <Link
                 href="/sign-in"
                 onClick={close}
-                className="border-ink text-ink hover:bg-ink/5 focus-visible:ring-gold flex h-12 flex-1 items-center justify-center rounded-xl border-[1.5px] text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                className="border-ink text-ink hover:bg-ink/5 focus-visible:ring-gold flex h-11 flex-1 items-center justify-center rounded-xl border-[1.5px] text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:h-12"
               >
                 Create account
               </Link>
             </div>
 
-            <div className="mt-3 flex items-center gap-2">
-              <span className="bg-surface text-ink flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="bg-surface text-ink flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold">
                 <svg viewBox="0 0 24 24" className="text-gold h-3.5 w-3.5" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
                   <path
@@ -281,11 +300,11 @@ export function SiteMenu({
                 </svg>
                 English
               </span>
-              <span className="bg-surface text-ink rounded-full px-3 py-1.5 text-xs font-bold">
+              <span className="bg-surface text-ink whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold">
                 Kenya · KES
               </span>
 
-              <ul className="ml-auto flex items-center gap-2">
+              <ul className="ml-auto flex items-center gap-1.5 sm:gap-2">
                 {SOCIALS.map((social) => {
                   const Icon = social.icon;
                   return (

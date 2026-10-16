@@ -12,7 +12,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(12);
+select plan(13);
 
 create temp table p (k text primary key, g extensions.geography);
 insert into p (k, g) values
@@ -46,6 +46,20 @@ select is(
   (select count(*)::int from public.fn_serving_city((select g from p where k = 'kampala'))),
   0,
   'A waitlist city does not serve, even at its own centre.');
+
+/* The first six zones overlap at their edges by design; everything
+   added after them must not, or a point in two zones is named by
+   whichever happens to sort first. */
+select is(
+  (select count(*)::int
+     from public.zone a
+     join public.zone b on a.id < b.id and a.city_id = b.city_id
+    where (a.name not in ('Kilimani', 'Westlands', 'CBD', 'Karen', 'Langata', 'Runda')
+           or b.name not in ('Kilimani', 'Westlands', 'CBD', 'Karen', 'Langata', 'Runda'))
+      and extensions.st_area(extensions.st_intersection(
+            a.polygon::extensions.geometry, b.polygon::extensions.geometry)) > 0),
+  0,
+  'No zone added after the first six overlaps another.');
 
 -- ════════════════════════════════════════ what checkout asks
 
