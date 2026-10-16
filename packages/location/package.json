@@ -18,10 +18,12 @@
     "react-dom": "^18.3.1"
   },
   "dependencies": {
+    "@nexg/ui": "workspace:*",
     "lucide-react": "0.469.0"
   },
   "devDependencies": {
     "@nexg/config": "workspace:*",
+    "@types/google.maps": "^3.66.5",
     "@types/react": "18.3.17",
     "@types/react-dom": "18.3.5",
     "eslint": "8.57.1",
