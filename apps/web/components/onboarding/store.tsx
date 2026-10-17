@@ -315,7 +315,7 @@ export function OnboardingProvider({
       draft,
       readiness,
       categories,
-      categoryNotice,
+      categoryNotice: categoryNotice ?? null,
       save,
       patch,
       flush,

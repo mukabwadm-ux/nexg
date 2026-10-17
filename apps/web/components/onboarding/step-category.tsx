@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
+
 import { getCategoryById } from '@nexg/contracts';
 
 import { CategoryTile, DocumentsNote, QuestionCard } from './controls';
@@ -23,11 +24,19 @@ interface RequiredDocument {
  */
 export function CategoryStep() {
   const router = useRouter();
-  const { draft, categories, categoryNotice, setCategory, setSubcategory, setAnswers, flush } =
-    useOnboarding();
+  const {
+    draft,
+    categories,
+    categoryNotice,
+    save,
+    setCategory,
+    setSubcategory,
+    setAnswers,
+    flush,
+  } = useOnboarding();
   const [docs, setDocs] = React.useState<RequiredDocument[]>([]);
   const [docsLoading, setDocsLoading] = React.useState(false);
-  const [docsError, setDocsError] = React.useState(false);
+  const [docsError, setDocsError] = React.useState<string | null>(null);
   const [savingCategory, setSavingCategory] = React.useState(false);
   const [savingSubcategory, setSavingSubcategory] = React.useState(false);
   const [categorySaveFailed, setCategorySaveFailed] = React.useState(false);
@@ -52,14 +61,14 @@ export function CategoryStep() {
   React.useEffect(() => {
     if (!draftId || !draft?.category) {
       setDocs([]);
-      setDocsError(false);
+      setDocsError(null);
       setDocsLoading(false);
       return;
     }
 
     let cancelled = false;
     setDocsLoading(true);
-    setDocsError(false);
+    setDocsError(null);
     const timer = setTimeout(() => {
       void (async () => {
         try {
@@ -68,12 +77,14 @@ export function CategoryStep() {
             p_merchant_id: draftId,
           });
           if (cancelled) return;
+          if (error) {
+            setDocsError(error.message);
+            return;
+          }
           setDocs((data as RequiredDocument[] | null) ?? []);
-          setDocsError(!!error);
-        } catch {
+        } catch (error) {
           if (cancelled) return;
-          setDocs([]);
-          setDocsError(true);
+          setDocsError(error instanceof Error ? error.message : 'Please try again.');
         } finally {
           if (!cancelled) setDocsLoading(false);
         }
@@ -98,6 +109,7 @@ export function CategoryStep() {
     answered &&
     !savingCategory &&
     !savingSubcategory &&
+    !save.saving &&
     !categorySaveFailed &&
     !subcategorySaveFailed;
 
@@ -105,14 +117,19 @@ export function CategoryStep() {
     if (!draft?.category || !canContinue) return;
     setSavingCategory(true);
     setCategorySaveFailed(false);
-    const categorySaved = await setCategory(draft.category, answers);
-    const setupSaved = categorySaved && (await flush());
-    setSavingCategory(false);
-    if (!setupSaved) {
+    try {
+      const categorySaved = await setCategory(draft.category, answers);
+      const setupSaved = categorySaved && (await flush());
+      if (!setupSaved) {
+        setCategorySaveFailed(true);
+        return;
+      }
+      router.push('/merchants/apply/location');
+    } catch {
       setCategorySaveFailed(true);
-      return;
+    } finally {
+      setSavingCategory(false);
     }
-    router.push('/merchants/apply/location');
   };
 
   const selectCategory = async (category: (typeof categories)[number]) => {
@@ -189,7 +206,7 @@ export function CategoryStep() {
             label={category.label}
             description={category.description}
             selected={selectedCategoryId === category.category}
-            disabled={savingCategory}
+            disabled={savingCategory || savingSubcategory}
             onClick={() => void selectCategory(category)}
           />
         ))}
@@ -314,6 +331,11 @@ export function CategoryStep() {
             </DocumentsNote>
           )}
         </div>
+      )}
+      {docsError && (
+        <p role="alert" className="text-danger mt-4 text-sm font-semibold">
+          We could not load the document requirements: {docsError}
+        </p>
       )}
     </OnboardingShell>
   );

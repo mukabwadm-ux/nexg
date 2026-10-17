@@ -5,6 +5,7 @@ import {
   Banknote,
   Briefcase,
   CarFront,
+  BellRing,
   Compass,
   Flower2,
   Gift,
@@ -14,10 +15,11 @@ import {
   Laptop,
   Map,
   Package,
-  Pill as PillIcon,
   Plane,
-  ShieldAlert,
+  Pill as PillIcon,
   Scissors,
+  Ship,
+  ShieldAlert,
   Shirt,
   ShoppingCart,
   Sparkles,
@@ -45,6 +47,7 @@ import type { Question } from './types';
 const ICONS: Record<string, LucideIcon> = {
   Activity,
   Banknote,
+  BellRing,
   Briefcase,
   Car: CarFront,
   Compass,
@@ -71,7 +74,7 @@ const ICONS: Record<string, LucideIcon> = {
   Pill: PillIcon,
   ShoppingCart,
   Gift,
-  Ship: Truck,
+  Ship,
   Wrench,
 };
 
