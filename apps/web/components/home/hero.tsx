@@ -121,20 +121,21 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
   return (
     <section className="relative isolate overflow-hidden bg-[#0b0907] text-white">
       {/* ─────────────────────────────────────────────── the photograph */}
-      <div className="absolute inset-x-0 top-0 -z-10 h-[36rem] sm:h-[44rem] lg:inset-y-0 lg:left-auto lg:h-auto lg:w-[46%]">
+      <div className="absolute inset-x-0 top-0 -z-10 h-[36rem] sm:h-[44rem] lg:inset-y-0 lg:h-auto">
+        {/* One wide photograph (2752 × 1536): the whole scene on desktop,
+            framed on her and the skyline in the top of a phone. */}
         <Image
           src="/images/hero/stay-sunset.jpg"
           alt=""
           fill
           priority
-          sizes="(min-width: 1024px) 46vw, 100vw"
-          className="-scale-x-100 object-cover object-left-top lg:scale-x-100"
+          sizes="100vw"
+          className="object-cover object-[67%_30%] lg:object-[70%_center]"
         />
-        {/* Phone: mirrored so she sits on the right, as in the comp, and dark
-            from the middle down, where the text sits. */}
+        {/* Phone: dark from the middle down, where the text sits. */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/50 to-[#0b0907] lg:hidden" />
-        {/* Desktop: dark on the left, where the text sits, clear on the right. */}
-        <div className="absolute inset-0 hidden bg-gradient-to-r from-[#0b0907] via-[#0b0907]/0 via-30% to-transparent lg:block" />
+        {/* Desktop: dark behind the text on the left, the room already is. */}
+        <div className="absolute inset-0 hidden bg-gradient-to-r from-[#0b0907]/90 via-[#0b0907]/50 via-40% to-transparent to-70% lg:block" />
         <div className="absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t from-[#0b0907] to-transparent lg:block" />
       </div>
 
