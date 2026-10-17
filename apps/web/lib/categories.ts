@@ -29,3 +29,5 @@ export function categoryTiles(t: (key: string) => string) {
     ...('category' in item ? { category: item.category } : { href: item.href }),
   }));
 }
+
+export { CATEGORY_IMAGE_MAP, getCategoryImage } from '@nexg/contracts';

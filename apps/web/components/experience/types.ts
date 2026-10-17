@@ -51,6 +51,7 @@ export interface PlanRow {
   party_type: string;
   party_size: number;
   date: string | null;
+  end_date: string | null;
   budget_kes: number | null;
   moods: Mood[];
   answers: Record<string, unknown>;

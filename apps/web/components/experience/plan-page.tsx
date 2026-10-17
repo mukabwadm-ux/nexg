@@ -30,6 +30,7 @@ export function PlanPage({ initial }: { initial: PlanView }) {
   const [draft, setDraft] = React.useState('');
 
   const plan = view.plan;
+  const requestOnly = !view.blocks.some((block) => block.kind !== 'free');
   const partyLabel =
     plan.party_type === 'solo'
       ? 'for one'
@@ -75,7 +76,9 @@ export function PlanPage({ initial }: { initial: PlanView }) {
         ? 'We will ask you one question about it, once.'
         : plan.status === 'paid' || plan.status === 'in_progress'
           ? 'Your times and your driver are below. Anything wrong, message here.'
-          : 'They are calling the places on your list and will come back with a price you can approve or change.';
+          : requestOnly
+            ? 'Your budget and preferences are with the concierge. They will look for suitable options and come back with a price before anything is booked.'
+            : 'They are calling the places on your list and will come back with a price you can approve or change.';
 
   return (
     <main className="mx-auto max-w-[96rem] px-4 py-10 sm:px-8 lg:px-16">

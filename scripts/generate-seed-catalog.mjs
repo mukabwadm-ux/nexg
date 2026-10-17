@@ -32,50 +32,53 @@ const CAT_MAP = {
   'airport transfers': 'airport_transfers',
   'alcohol & beverages': 'alcohol_beverages',
   'fashion & apparel': 'fashion_apparel',
-  'beauty': 'beauty',
+  beauty: 'beauty',
   'vehicle rentals': 'vehicle_rentals',
-  'experiences': 'experiences',
+  experiences: 'experiences',
   'financial services': 'financial_services',
   'flowers & gifts': 'flowers_gifts',
   'restaurants & food': 'restaurants_food',
   'groceries & essentials': 'groceries_essentials',
   'laundry & cleaning': 'laundry_cleaning',
-  'marketplace': 'marketplace',
-  'pharmacy': 'pharmacy',
-  'health': 'health',
+  marketplace: 'marketplace',
+  pharmacy: 'pharmacy',
+  health: 'health',
   'tech & electronics': 'tech_electronics',
   'travel & tours': 'travel_tours',
   'vehicle services': 'vehicle_services',
-  'wellness': 'wellness',
+  wellness: 'wellness',
   'concierge services': 'concierge_services',
-  'logistics & shipping': 'logistics_shipping'
+  'logistics & shipping': 'logistics_shipping',
 };
 
 const AREA_COORDS = {
-  'Kilimani': { lat: -1.2921, lng: 36.7856 },
-  'Westlands': { lat: -1.2674, lng: 36.8110 },
-  'Kileleshwa': { lat: -1.2789, lng: 36.7904 },
-  'Lavington': { lat: -1.2854, lng: 36.7688 },
-  'Karen': { lat: -1.3197, lng: 36.7065 },
-  'Parklands': { lat: -1.2625, lng: 36.8241 },
-  'Riverside': { lat: -1.2715, lng: 36.7963 },
-  'Gigiri': { lat: -1.2330, lng: 36.8124 },
-  'Runda': { lat: -1.2144, lng: 36.8198 },
-  'Hurlingham': { lat: -1.2971, lng: 36.7915 },
+  Kilimani: { lat: -1.2921, lng: 36.7856 },
+  Westlands: { lat: -1.2674, lng: 36.811 },
+  Kileleshwa: { lat: -1.2789, lng: 36.7904 },
+  Lavington: { lat: -1.2854, lng: 36.7688 },
+  Karen: { lat: -1.3197, lng: 36.7065 },
+  Parklands: { lat: -1.2625, lng: 36.8241 },
+  Riverside: { lat: -1.2715, lng: 36.7963 },
+  Gigiri: { lat: -1.233, lng: 36.8124 },
+  Runda: { lat: -1.2144, lng: 36.8198 },
+  Hurlingham: { lat: -1.2971, lng: 36.7915 },
   'Upper Hill': { lat: -1.2988, lng: 36.8172 },
-  'CBD': { lat: -1.2864, lng: 36.8172 },
+  CBD: { lat: -1.2864, lng: 36.8172 },
   'South C': { lat: -1.3211, lng: 36.8285 },
   'South B': { lat: -1.3125, lng: 36.8402 },
   'Ngong Road': { lat: -1.2995, lng: 36.7761 },
   'Spring Valley': { lat: -1.2541, lng: 36.7925 },
-  'Loresho': { lat: -1.2520, lng: 36.7588 },
-  'Muthaiga': { lat: -1.2562, lng: 36.8375 },
-  'Eastleigh': { lat: -1.2783, lng: 36.8524 },
-  'Nairobi West': { lat: -1.3105, lng: 36.8210 }
+  Loresho: { lat: -1.252, lng: 36.7588 },
+  Muthaiga: { lat: -1.2562, lng: 36.8375 },
+  Eastleigh: { lat: -1.2783, lng: 36.8524 },
+  'Nairobi West': { lat: -1.3105, lng: 36.821 },
 };
 
 function slugify(text) {
-  return text.toString().toLowerCase().trim()
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
     .replace(/\s+/g, '_')
     .replace(/[^\w\-]+/g, '')
     .replace(/\-\-+/g, '_');

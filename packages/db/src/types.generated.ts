@@ -50599,7 +50599,27 @@ export type Database = {
         | 'pharmacy'
         | 'supermarket'
         | 'gift_shop'
-        | 'other';
+        | 'other'
+        | 'adults_only'
+        | 'airport_transfers'
+        | 'alcohol_beverages'
+        | 'fashion_apparel'
+        | 'beauty'
+        | 'vehicle_rentals'
+        | 'experiences'
+        | 'financial_services'
+        | 'flowers_gifts'
+        | 'restaurants_food'
+        | 'groceries_essentials'
+        | 'laundry_cleaning'
+        | 'marketplace'
+        | 'health'
+        | 'tech_electronics'
+        | 'travel_tours'
+        | 'vehicle_services'
+        | 'wellness'
+        | 'concierge_services'
+        | 'logistics_shipping';
       merchant_control_source: 'merchant' | 'staff' | 'system';
       merchant_user_role: 'owner' | 'manager';
       mood: 'wild' | 'taste' | 'night' | 'slow' | 'stay' | 'events';
