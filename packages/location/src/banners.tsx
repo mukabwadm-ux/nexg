@@ -19,11 +19,14 @@ import { useLocation } from './store';
  * otherwise see identical prices with identical confidence, and
  * only one of those pages is telling the truth.
  */
-export function LocationBanner() {
+export function LocationBanner({
+  /** Off where the page shows precision its own way (the homepage hero). */
+  hidden = false,
+}: { hidden?: boolean } = {}) {
   const { place, step, chip, consent, blockedNoticeSeen, openSheet, setPanelOpen } = useLocation();
   const [dismissed, setDismissed] = React.useState(false);
 
-  if (dismissed) return null;
+  if (hidden || dismissed) return null;
 
   /* B · the browser was asked and said no.
      Shown once, then search carries on being the control. The

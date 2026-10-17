@@ -128,6 +128,10 @@ export default async function HomePage() {
           signIn: t('nav.signIn'),
           openSearch: t('hero.openSearch'),
           scroll: t('hero.scroll'),
+          promptTitle: t('hero.prompt.title'),
+          promptBody: t('hero.prompt.body'),
+          promptCta: t('hero.prompt.cta'),
+          promptLater: t('hero.prompt.later'),
         }}
       />
 

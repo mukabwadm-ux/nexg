@@ -21,3 +21,23 @@ test('the homepage headline has a stable accessible name', async ({ page }) => {
   await expect(heading).toBeVisible();
   await expect(heading).toHaveAttribute('aria-label', 'Everything You Need. Wherever You Stay.');
 });
+
+/**
+ * A first visit opens on the page, not on a question.
+ *
+ * No precision banner over the hero and no location sheet over it; the
+ * question is a small prompt beside the location pill, a moment later.
+ */
+test('a first visit sees the homepage, then a prompt at the location pill', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForTimeout(2500);
+
+  await expect(page.getByRole('dialog', { name: /where should we deliver/i })).toHaveCount(0);
+  await expect(page.getByText(/from your internet connection/i)).toHaveCount(0);
+
+  const prompt = page.getByRole('status').filter({ hasText: 'Where should we deliver?' });
+  await expect(prompt).toBeVisible();
+
+  await prompt.getByRole('button', { name: 'Set my delivery spot' }).click();
+  await expect(page.getByRole('dialog', { name: /where should we deliver/i })).toBeVisible();
+});

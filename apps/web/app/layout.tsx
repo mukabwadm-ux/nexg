@@ -1,6 +1,6 @@
 import '@nexg/ui/globals.css';
 
-import { LocationBanner, LocationSheet, type Place, type ResolutionStep } from '@nexg/location';
+import { type Place, type ResolutionStep } from '@nexg/location';
 import { ToastProvider } from '@nexg/ui';
 import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
@@ -8,6 +8,7 @@ import { Manrope } from 'next/font/google';
 import { cityFromConnection } from '@/app/location-actions';
 import { WelcomeConsent } from '@/components/consent/welcome';
 import { AfterLocationSettled } from '@/components/location/after-location';
+import { LocationBannerSlot, LocationSheetSlot } from '@/components/location/chrome';
 import { SiteLocationProvider } from '@/components/location/provider';
 import { FloatingChat } from '@/components/chat/floating-chat';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
@@ -84,11 +85,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <SiteLocationProvider initial={initial}>
             {/* Under the nav on every page, and only when there is
                 something honest to say about precision. */}
-            <LocationBanner />
+            <LocationBannerSlot />
             {children}
             {/* Once per visit, over a rendered page, on the first
                 page that needs a place. */}
-            <LocationSheet />
+            <LocationSheetSlot />
 
             <RegisterServiceWorker />
 

@@ -19,7 +19,10 @@ import { useLocation } from './store';
  * what it costs: city-wide estimates, and we will ask again
  * before any price is locked.
  */
-export function LocationSheet() {
+export function LocationSheet({
+  /** Open by itself on a first visit. Off where the page asks in its own way. */
+  autoOpen = true,
+}: { autoOpen?: boolean } = {}) {
   const {
     sheetOpen,
     closeSheet,
@@ -43,11 +46,11 @@ export function LocationSheet() {
    * Only somebody we genuinely cannot place sees this.
    */
   React.useEffect(() => {
-    if (!ready || asked || sheetOpen) return;
+    if (!autoOpen || !ready || asked || sheetOpen) return;
     if (place && step !== 'ip_city') return;
     const timer = setTimeout(() => openSheet(place ? 'ip_city' : 'none'), 400);
     return () => clearTimeout(timer);
-  }, [ready, asked, sheetOpen, place, step, openSheet]);
+  }, [autoOpen, ready, asked, sheetOpen, place, step, openSheet]);
 
   /*
    * Escape dismisses it.
