@@ -172,7 +172,7 @@ provider is missing. None of them fakes a success.
 | SMS for the phone code | Code is real, hashed, 5 min, 3 attempts. With no sender the flow shows the code on screen and says why. | `setting.sms_provider` + a sender |
 | WhatsApp resume link | Token is real and single use; the link is shown to copy. | `setting.whatsapp_provider` |
 | WhatsApp document chase | `document_request` and `notification_log` rows are written; nothing is sent. | `setting.whatsapp_provider` |
-| Google Places prefill | Falls back to reading OpenGraph tags, which works for Instagram and most shop sites. | `GOOGLE_MAPS_API_KEY` |
+| Google Maps prefill | Places API fills the public business name and phone. A public email is best-effort from a `mailto:` link on the listed website; Google does not provide an email field. | `GOOGLE_MAPS_API_KEY` |
 | Draggable map pin | Replaced by "Use my location" (real coordinates) plus an area picker, over a coverage diagram drawn from the real polygons. | `GOOGLE_MAPS_API_KEY` |
 | Payout name lookup | Records "not checked" and says a person will do it. | `setting.payout_name_provider` |
 | Credentials email | Not built; `credentials_sent_at` and `password_set_at` exist for it. | `RESEND_API_KEY` |

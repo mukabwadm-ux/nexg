@@ -21,8 +21,12 @@ import { useOnboarding } from './store';
  */
 export function CategoryStep() {
   const router = useRouter();
-  const { draft, categories, setCategory, setAnswers, patch } = useOnboarding();
+  const { draft, categories, categoryNotice, save, setCategory, setAnswers, patch } =
+    useOnboarding();
   const [docs, setDocs] = React.useState<{ label: string; kind: string }[]>([]);
+  const [docsError, setDocsError] = React.useState<string | null>(null);
+  const [selectingCategory, setSelectingCategory] = React.useState(false);
+  const [categorySaveError, setCategorySaveError] = React.useState<string | null>(null);
 
   const config = categories.find((c) => c.category === draft?.category);
   const answers = draft?.answers ?? {};
@@ -37,13 +41,26 @@ export function CategoryStep() {
   React.useEffect(() => {
     if (!draftId || !draft?.category) return;
     let cancelled = false;
+    setDocs([]);
+    setDocsError(null);
     const timer = setTimeout(() => {
       void (async () => {
-        const supabase = createClient();
-        const { data } = await supabase.rpc('fn_merchant_required_docs', {
-          p_merchant_id: draftId,
-        });
-        if (!cancelled) setDocs((data as { label: string; kind: string }[] | null) ?? []);
+        try {
+          const supabase = createClient();
+          const { data, error } = await supabase.rpc('fn_merchant_required_docs', {
+            p_merchant_id: draftId,
+          });
+          if (cancelled) return;
+          if (error) {
+            setDocsError(error.message);
+            return;
+          }
+          setDocs((data as { label: string; kind: string }[] | null) ?? []);
+        } catch (error) {
+          if (!cancelled) {
+            setDocsError(error instanceof Error ? error.message : 'Please try again.');
+          }
+        }
       })();
     }, 500);
     return () => {
@@ -71,7 +88,13 @@ export function CategoryStep() {
             Back
           </Button>
           <ContinueButton
-            disabled={!draft?.category || !answered}
+            disabled={
+              !draft?.category ||
+              !answered ||
+              selectingCategory ||
+              save.saving ||
+              !!categorySaveError
+            }
             onClick={() => router.push('/merchants/apply/location')}
           >
             Continue
@@ -80,6 +103,20 @@ export function CategoryStep() {
         </>
       }
     >
+      {categoryNotice && (
+        <p
+          role="status"
+          className="border-warning/40 bg-warning-bg text-warning mb-5 rounded-xl border p-4 text-sm font-semibold leading-relaxed"
+        >
+          {categoryNotice}
+        </p>
+      )}
+      {categorySaveError && (
+        <p role="alert" className="text-danger mb-4 text-sm font-semibold">
+          {categorySaveError}
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {categories.map((category) => (
           <CategoryTile
@@ -87,9 +124,34 @@ export function CategoryStep() {
             icon={category.icon}
             label={category.label}
             selected={draft?.category === category.category}
+            disabled={selectingCategory}
             onClick={() => {
-              void setCategory(category.category, {});
-              patch({ subcategory: null });
+              setCategorySaveError(null);
+              setSelectingCategory(true);
+              void (async () => {
+                try {
+                  const changed = category.category !== draft?.category;
+                  const saved = await setCategory(
+                    category.category,
+                    changed ? {} : (draft?.answers ?? {}),
+                  );
+                  if (!saved) {
+                    setCategorySaveError(
+                      'We could not save this business type. Tap it again to retry.',
+                    );
+                    return;
+                  }
+                  if (changed) patch({ subcategory: null });
+                } catch (error) {
+                  setCategorySaveError(
+                    error instanceof Error
+                      ? `We could not save this business type: ${error.message}`
+                      : 'We could not save this business type. Tap it again to retry.',
+                  );
+                } finally {
+                  setSelectingCategory(false);
+                }
+              })();
             }}
           />
         ))}
@@ -152,6 +214,11 @@ export function CategoryStep() {
               ` · ${config.label.toLowerCase()} businesses are not eligible for paid featured placement.`}
           </DocumentsNote>
         </div>
+      )}
+      {docsError && (
+        <p role="alert" className="text-danger mt-4 text-sm font-semibold">
+          We could not load the document requirements: {docsError}
+        </p>
       )}
     </OnboardingShell>
   );

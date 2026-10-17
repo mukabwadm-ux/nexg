@@ -31,12 +31,13 @@ interface Store {
   draft: Draft | null;
   readiness: Readiness | null;
   categories: CategoryConfig[];
+  categoryNotice: string | null;
   save: SaveState;
 
   /** Local update plus a debounced write of the same fields. */
   patch: (fields: Partial<Draft>, step?: number) => void;
   /** Category changes reset the answers, so they are their own call. */
-  setCategory: (category: string, answers: Record<string, string | string[]>) => Promise<void>;
+  setCategory: (category: string, answers: Record<string, string | string[]>) => Promise<boolean>;
   setAnswers: (answers: Record<string, string | string[]>) => void;
   /** Replaces the branch list and returns it with each pin's zone resolved. */
   setBranches: (branches: DraftBranch[]) => Promise<DraftBranch[]>;
@@ -82,11 +83,13 @@ export function OnboardingProvider({
   initialDraft,
   initialReadiness,
   categories,
+  categoryNotice,
   children,
 }: {
   initialDraft: Draft | null;
   initialReadiness: Readiness | null;
   categories: CategoryConfig[];
+  categoryNotice?: string | null;
   children: React.ReactNode;
 }) {
   const [draft, setDraftState] = React.useState<Draft | null>(initialDraft);
@@ -165,7 +168,7 @@ export function OnboardingProvider({
 
   const setCategory = React.useCallback(
     async (category: string, answers: Record<string, string | string[]>) => {
-      if (!draftId) return;
+      if (!draftId) return false;
       setDraftState((c) => (c ? { ...c, category, answers } : c));
       setSave((s) => ({ ...s, saving: true }));
 
@@ -178,10 +181,11 @@ export function OnboardingProvider({
 
       if (error) {
         setSave({ saving: false, savedAt: null, error: error.message });
-        return;
+        return false;
       }
       setReadiness(data as unknown as Readiness);
       setSave({ saving: false, savedAt: Date.now(), error: null });
+      return true;
     },
     [draftId],
   );
@@ -253,6 +257,7 @@ export function OnboardingProvider({
       draft,
       readiness,
       categories,
+      categoryNotice: categoryNotice ?? null,
       save,
       patch,
       setCategory,
@@ -261,7 +266,18 @@ export function OnboardingProvider({
       setDraft: setDraftState,
       refresh,
     }),
-    [draft, readiness, categories, save, patch, setCategory, setAnswers, setBranches, refresh],
+    [
+      draft,
+      readiness,
+      categories,
+      categoryNotice,
+      save,
+      patch,
+      setCategory,
+      setAnswers,
+      setBranches,
+      refresh,
+    ],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
