@@ -100,11 +100,11 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
   const router = useRouter();
   const searchRef = React.useRef<HTMLInputElement>(null);
 
-  /* The city the search is scoped to: where the visitor is, until they
-     pick another one in the bar. */
-  const [cityPicked, setCityPicked] = React.useState<string | null>(null);
+  /* The city the search is scoped to: the one in the location pill. The
+     pill (and the menu) is where it is changed, so the search bar has no
+     picker of its own. */
   const placeCity = cities.some((c) => c.slug === place?.city_slug) ? place!.city_slug! : null;
-  const citySlug = cityPicked ?? placeCity ?? cities[0]?.slug ?? 'nairobi';
+  const citySlug = placeCity ?? cities[0]?.slug ?? 'nairobi';
 
   /* A place guessed from the connection is a city, not an area: showing its
      zone ("CBD") would claim we know where they are. */
@@ -133,7 +133,7 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
   ];
 
   return (
-    <section className="relative isolate overflow-hidden bg-[#0b0907] text-white">
+    <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#0b0907] text-white">
       {/* ─────────────────────────────────────────────── the photograph */}
       <div className="absolute inset-x-0 top-0 -z-10 h-[36rem] sm:h-[44rem] lg:inset-y-0 lg:h-auto">
         {/* One wide photograph (2752 × 1536): the whole scene on desktop,
@@ -164,48 +164,42 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
       />
 
       {/* ─────────────────────────────────────────────── the message */}
-      <div className="mx-auto max-w-[96rem] px-5 pb-10 pt-[11.5rem] sm:px-8 sm:pt-[13rem] lg:px-16 lg:pb-16 lg:pt-[13.5rem]">
-        <p className="text-gold text-[0.6875rem] font-bold uppercase tracking-[0.32em] sm:text-xs">
+      {/* Fills what the nav and the strip leave of one screen, centred in it. */}
+      <div className="mx-auto flex w-full max-w-[96rem] flex-1 flex-col justify-center px-5 pb-5 pt-[6.5rem] sm:px-8 sm:pt-28 lg:px-16 lg:pb-8 lg:pt-32">
+        <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
           {copy.eyebrow}
         </p>
         <h1
           aria-label={`${copy.titleLine1} ${copy.titleLine2}`}
-          className="mt-4 max-w-[46rem] text-[2.75rem] font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-[4.5rem]"
+          className="mt-3 max-w-[40rem] text-[2.125rem] font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]"
         >
           <span className="block">{copy.titleLine1}</span>
           <span className="text-gold block">{copy.titleLine2}</span>
         </h1>
-        <p className="mt-4 max-w-md text-base text-white/85 sm:text-lg">{copy.lede}</p>
+        <p className="mt-3 max-w-md text-[0.9375rem] text-white/85 sm:text-base">{copy.lede}</p>
 
         <HeroSearch
           inputRef={searchRef}
           copy={copy}
-          cities={cities}
           citySlug={citySlug}
-          onCity={setCityPicked}
           onSubmit={(q) =>
             router.push(`/explore?city=${citySlug}${q ? `&q=${encodeURIComponent(q)}` : ''}`)
           }
         />
 
         {/* Popular searches */}
-        <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center">
-          <p className="text-[0.9375rem] font-bold lg:font-semibold">
-            <span className="lg:hidden">
-              {copy.popular.replace(/:$/, '')}
-              <span aria-hidden="true" className="bg-gold mt-2 block h-0.5 w-8 rounded-full" />
-            </span>
-            <span className="hidden lg:inline">{copy.popular}</span>
-          </p>
-          <ul className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+        <div className="mt-5 flex flex-col gap-2.5 lg:flex-row lg:items-center lg:gap-3">
+          <p className="text-[0.8125rem] font-semibold text-white/85">{copy.popular}</p>
+          {/* One row: it scrolls sideways on a phone rather than taking two. */}
+          <ul className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
             {popular.map(({ icon: Icon, label, href }) => (
               <li key={label}>
                 <Link
                   href={href}
-                  className="hover:border-gold focus-visible:ring-gold flex min-h-11 items-center gap-2.5 rounded-full border border-white/25 bg-black/35 px-4 py-1.5 text-[0.8125rem] font-semibold backdrop-blur transition-colors focus-visible:outline-none focus-visible:ring-2 sm:h-12"
+                  className="hover:border-gold focus-visible:ring-gold flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-black/35 px-3.5 text-[0.8125rem] font-semibold backdrop-blur transition-colors focus-visible:outline-none focus-visible:ring-2"
                 >
-                  <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span className="leading-tight sm:truncate">{label}</span>
+                  <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  <span>{label}</span>
                 </Link>
               </li>
             ))}
@@ -215,38 +209,38 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
         <Link
           href="/experience"
           className={cn(
-            'focus-visible:ring-gold mt-7 flex h-14 items-center gap-4 rounded-full px-7 text-base font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:text-lg',
+            'focus-visible:ring-gold mt-5 flex h-12 items-center gap-3 rounded-full px-6 text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:text-base',
             /* Outlined on a phone, filled from sm up — as drawn. */
-            'border-gold border-[1.5px] text-white sm:inline-flex sm:border-0 sm:bg-[#FFC93C] sm:text-[#141414] sm:hover:bg-[#FFD35F]',
+            'border-gold border-[1.5px] text-white sm:inline-flex sm:self-start sm:border-0 sm:bg-[#FFC93C] sm:text-[#141414] sm:hover:bg-[#FFD35F]',
           )}
         >
-          <Plane className="text-gold h-5 w-5 sm:text-[#141414]" aria-hidden="true" />
+          <Plane className="text-gold h-4 w-4 sm:text-[#141414]" aria-hidden="true" />
           <span className="flex-1 sm:flex-none">{copy.plan}</span>
-          <ArrowRight className="text-gold h-5 w-5 sm:text-[#141414]" aria-hidden="true" />
+          <ArrowRight className="text-gold h-4 w-4 sm:text-[#141414]" aria-hidden="true" />
         </Link>
       </div>
 
       {/* ─────────────────────────────────────────────── why NexG */}
       <div className="relative border-t border-white/10 bg-black/40 backdrop-blur">
-        <ul className="mx-auto grid max-w-[96rem] grid-cols-5 px-2 py-5 sm:px-8 lg:px-16 lg:py-7">
+        <ul className="mx-auto grid max-w-[96rem] grid-cols-5 px-2 py-3 sm:px-8 lg:px-16 lg:py-4">
           {FEATURES.map(({ icon: Icon, title, body }, i) => (
             <li
               key={title}
               className={cn(
-                'flex flex-col items-center gap-1.5 px-1 text-center lg:flex-row lg:items-center lg:gap-4 lg:px-6 lg:text-left',
+                'flex flex-col items-center gap-1 px-1 text-center lg:flex-row lg:items-center lg:gap-3 lg:px-5 lg:text-left',
                 i > 0 && 'border-l border-white/10',
               )}
             >
               <Icon
-                className="text-gold h-7 w-7 shrink-0 lg:h-9 lg:w-9"
+                className="text-gold h-5 w-5 shrink-0 lg:h-7 lg:w-7"
                 aria-hidden="true"
                 strokeWidth={1.5}
               />
               <span>
-                <span className="block text-[0.75rem] font-bold leading-tight sm:text-sm lg:text-[0.9375rem]">
+                <span className="block text-[0.6875rem] font-bold leading-tight sm:text-xs lg:text-sm">
                   {title}
                 </span>
-                <span className="mt-0.5 block text-[0.625rem] leading-snug text-white/65 sm:text-xs lg:text-[0.8125rem]">
+                <span className="mt-0.5 block text-[0.5625rem] leading-snug text-white/65 sm:text-[0.6875rem] lg:text-xs">
                   {body}
                 </span>
               </span>
@@ -255,8 +249,11 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
         </ul>
       </div>
 
-      <a href="#start" className="flex flex-col items-center pb-5 text-xs text-white/70 lg:hidden">
-        <ChevronDown className="text-gold h-5 w-5" aria-hidden="true" />
+      <a
+        href="#start"
+        className="flex flex-col items-center pb-2 text-[0.6875rem] text-white/70 lg:hidden"
+      >
+        <ChevronDown className="text-gold h-4 w-4" aria-hidden="true" />
         {copy.scroll}
       </a>
     </section>
@@ -326,7 +323,7 @@ function HeroNav({
   const showPrompt = prompt && needsSpot && !sheetOpen && !solid;
 
   const round =
-    'focus-visible:ring-gold flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/55 backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-14 sm:w-14';
+    'focus-visible:ring-gold flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/55 backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-12 sm:w-12';
 
   return (
     <nav
@@ -339,17 +336,14 @@ function HeroNav({
       <div
         className={cn(
           'mx-auto flex max-w-[96rem] items-center justify-between gap-3 px-4 transition-[padding] sm:px-8 lg:px-16',
-          solid ? 'py-2' : 'py-4 sm:py-5',
+          solid ? 'py-2' : 'py-3 sm:py-4',
         )}
       >
         <Link href="/" aria-label="NexG Concierge, home" className="shrink-0">
           <Logo
             onDark
             priority
-            className={cn(
-              'w-auto transition-[height]',
-              solid ? 'h-12 sm:h-14' : 'h-[4.5rem] sm:h-24',
-            )}
+            className={cn('w-auto transition-[height]', solid ? 'h-11 sm:h-12' : 'h-16 sm:h-20')}
           />
         </Link>
 
@@ -368,7 +362,7 @@ function HeroNav({
                 onWhere();
               }}
               aria-label={`Deliver to ${where}. Change`}
-              className="focus-visible:ring-gold flex h-11 max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-black/55 pl-3.5 pr-3 text-sm font-semibold backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-14 sm:max-w-[16rem] sm:gap-3 sm:pl-5 sm:pr-4 sm:text-base"
+              className="focus-visible:ring-gold flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-black/55 pl-3.5 pr-3 text-sm font-semibold backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-12 sm:max-w-[16rem] sm:gap-2.5 sm:pl-4 sm:pr-3.5 sm:text-[0.9375rem]"
             >
               <MapPin
                 className="text-gold h-4 w-4 shrink-0 sm:h-5 sm:w-5"
@@ -453,16 +447,13 @@ function HeroNav({
 function HeroSearch({
   inputRef,
   copy,
-  cities,
   citySlug,
-  onCity,
   onSubmit,
 }: {
   inputRef: React.RefObject<HTMLInputElement>;
   copy: HeroCopy;
-  cities: City[];
+  /** From the location pill; changed there, not here. */
   citySlug: string;
-  onCity: (slug: string) => void;
   onSubmit: (q: string) => void;
 }) {
   const router = useRouter();
@@ -541,7 +532,7 @@ function HeroSearch({
   let index = -1;
 
   return (
-    <div ref={boxRef} className="relative mt-7 max-w-[54rem]">
+    <div ref={boxRef} className="relative mt-5 max-w-[38rem]">
       <form
         role="search"
         onSubmit={(e) => {
@@ -551,7 +542,7 @@ function HeroSearch({
         className="sm:focus-within:ring-gold flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:bg-white sm:p-1.5 sm:shadow-2xl sm:focus-within:ring-2"
       >
         <div className="focus-within:ring-gold flex min-w-0 flex-1 items-center rounded-full bg-white shadow-2xl focus-within:ring-2 sm:shadow-none sm:focus-within:ring-0">
-          <Search className="ml-5 h-6 w-6 shrink-0 text-[#141414] sm:ml-5" aria-hidden="true" />
+          <Search className="ml-4 h-5 w-5 shrink-0 text-[#141414]" aria-hidden="true" />
           <input
             ref={inputRef}
             type="search"
@@ -571,40 +562,15 @@ function HeroSearch({
             aria-activedescendant={active >= 0 ? `${listId}-${active}` : undefined}
             autoComplete="off"
             enterKeyHint="search"
-            className="h-14 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-4 text-base text-[#141414] shadow-none placeholder:text-[#6b6560] focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-auto [&::-webkit-search-cancel-button]:hidden"
+            className="h-12 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 text-[0.9375rem] text-[#141414] shadow-none placeholder:text-[#6b6560] focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-auto [&::-webkit-search-cancel-button]:hidden"
           />
-          <span aria-hidden="true" className="h-8 w-px shrink-0 bg-[#e3ddd3]" />
-          <label className="relative flex shrink-0 items-center gap-1.5 pl-3 pr-4 text-[0.9375rem] font-semibold text-[#141414] sm:pl-5 sm:pr-5">
-            <span className="sr-only">City to search in</span>
-            <MapPin
-              className="text-gold h-5 w-5"
-              aria-hidden="true"
-              fill="currentColor"
-              stroke="white"
-            />
-            <select
-              value={citySlug}
-              onChange={(e) => onCity(e.target.value)}
-              className="cursor-pointer appearance-none bg-transparent pr-6 focus:outline-none"
-            >
-              {cities.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              className="pointer-events-none absolute right-4 h-4 w-4 sm:right-5"
-              aria-hidden="true"
-            />
-          </label>
         </div>
         <button
           type="submit"
-          className="focus-visible:ring-gold flex h-14 items-center justify-center gap-3 rounded-full bg-[#FFC93C] px-8 text-lg font-bold text-[#141414] transition-colors hover:bg-[#FFD35F] focus-visible:outline-none focus-visible:ring-2 sm:h-auto sm:min-w-[11rem] sm:py-4"
+          className="focus-visible:ring-gold flex h-12 items-center justify-center gap-2 rounded-full bg-[#FFC93C] px-6 text-base font-bold text-[#141414] transition-colors hover:bg-[#FFD35F] focus-visible:outline-none focus-visible:ring-2 sm:h-auto sm:min-w-[8.5rem] sm:py-3"
         >
           {copy.searchButton}
-          <ArrowRight className="h-5 w-5" aria-hidden="true" />
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </button>
       </form>
 
@@ -614,7 +580,7 @@ function HeroSearch({
           id={listId}
           role="listbox"
           aria-label="Search results"
-          className="absolute inset-x-0 top-[3.75rem] z-30 max-h-[24rem] overflow-y-auto rounded-2xl bg-white p-2 text-[#141414] shadow-2xl sm:top-[4.75rem]"
+          className="absolute inset-x-0 top-[3.25rem] z-30 max-h-[22rem] overflow-y-auto rounded-2xl bg-white p-2 text-[#141414] shadow-2xl sm:top-[3.9rem]"
         >
           {loading && items.length === 0 ? (
             <p className="px-4 py-3 text-sm text-[#6b6560]">Searching…</p>
