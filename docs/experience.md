@@ -26,9 +26,11 @@ to the catalogue, and — as plainly as possible — what is not built yet.
 | Guest builder | `/experience/build` | built |
 | Guest plan page | `/experience/plan/[id]` | built |
 | Console: All experiences, Queue, Workbench | `/experiences` | built |
-| Console: Curated days, Components | `/experiences?tab=` | read-only |
-| Console: Events, Partners, Reports | — | not built |
-| Guest home, events pages, curated day pages, share link | — | not built |
+| Console: Curated days, Components | `/experiences?tab=` | editable; publish gates enforced |
+| Console: Events, Partners | `/experiences?tab=events` / `?tab=partners` | catalogue editing and review |
+| Console: Reports | — | not built |
+| Guest home | `/experience` | built |
+| Event details, curated day details, share link | — | not built |
 | Partner portal | — | not built |
 | Timers (SLA, quote expiry, hold expiry, review request) | — | not built |
 | Notification delivery | — | rows are queued; nothing sends |
@@ -74,6 +76,12 @@ fitting and no swap — `catalogue_health` exists to make that visible
 before a guest finds it.
 
 ## Adding to the catalogue
+
+Staff catalogue changes are made through `rpc_save_experience_catalogue`,
+which checks the growth/operations role and writes an audit event in the
+same transaction. Events and curated days remain drafts until the existing
+publish RPC accepts them; partners still have to pass the essential document
+gate before going live. A live component also requires its partner to be live.
 
 **A component.** Insert into `experience_component` with a `mood`, a
 `swap_group`, a `tier`, a price and `status = 'draft'`. A draft may have

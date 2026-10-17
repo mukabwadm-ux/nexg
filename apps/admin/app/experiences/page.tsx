@@ -1,8 +1,8 @@
-import { Card } from '@nexg/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { AllExperiences } from '@/components/experiences/all-experiences';
+import { ExperienceCatalogue } from '@/components/experiences/catalogue-manager';
 import { Queue } from '@/components/experiences/queue';
 import type { GuestRow, QueueRow, ReviewRow, Stats } from '@/components/experiences/shared';
 import { ConsoleHeader } from '@/components/console-header';
@@ -16,18 +16,16 @@ export const dynamic = 'force-dynamic';
 /**
  * Grow → Experiences.
  *
- * Seven tabs in the build prompt; four are built and read real data, and
- * the other three are shown as what they are rather than hidden. A tab
- * that is missing makes the console look smaller than the plan; a tab
- * that pretends to work is worse.
+ * Six tabs are live. Reports remains unavailable until it has real data
+ * and a defined source of truth.
  */
 const TABS = [
   { key: 'all', label: 'All experiences', built: true },
   { key: 'queue', label: 'Queue', built: true },
   { key: 'curated', label: 'Curated days', built: true },
   { key: 'components', label: 'Components', built: true },
-  { key: 'events', label: 'Events', built: false },
-  { key: 'partners', label: 'Partners', built: false },
+  { key: 'events', label: 'Events', built: true },
+  { key: 'partners', label: 'Partners', built: true },
   { key: 'reports', label: 'Reports', built: false },
 ];
 
@@ -134,8 +132,18 @@ export default async function ExperiencesPage({
           />
         )}
 
-        {(tab === 'curated' || tab === 'components') && (
-          <CatalogueTab kind={tab} supabase={supabase} />
+        {(tab === 'curated' || tab === 'components' || tab === 'events' || tab === 'partners') && (
+          <CatalogueTab
+            kind={tab}
+            supabase={supabase}
+            canEdit={staff.isSuperAdmin || staff.roles.includes('growth')}
+            canManagePartners={
+              staff.isSuperAdmin ||
+              staff.roles.includes('growth') ||
+              staff.roles.includes('ops_manager')
+            }
+            canActivatePartners={staff.isSuperAdmin || staff.roles.includes('ops_manager')}
+          />
         )}
       </main>
     </ConsoleShell>
@@ -153,166 +161,119 @@ export default async function ExperiencesPage({
 async function CatalogueTab({
   kind,
   supabase,
+  canEdit,
+  canManagePartners,
+  canActivatePartners,
 }: {
-  kind: 'curated' | 'components';
+  kind: 'curated' | 'components' | 'events' | 'partners';
   supabase: ReturnType<typeof createClient>;
+  canEdit: boolean;
+  canManagePartners: boolean;
+  canActivatePartners: boolean;
 }) {
-  if (kind === 'curated') {
-    const { data } = await supabase
-      .from('curated_day')
-      .select('id, title, tagline, badge, duration, price_per_person_kes, status, featured')
-      .order('sort');
+  const { data: cities } = await supabase.from('city').select('id, name, slug').order('sort');
 
+  if (kind === 'partners') {
+    const { data } = await supabase
+      .from('experience_partner')
+      .select(
+        'id, name, kind, city_id, contact_name, contact_phone, contact_email, preferred_channel, can_answer_holds, terms, status, went_live_at',
+      )
+      .order('name');
     return (
-      <Card className="mt-6 overflow-x-auto p-0">
-        <table className="w-full min-w-[40rem] text-left">
-          <thead>
-            <tr className="border-border text-muted-light border-b text-[0.625rem] font-extrabold uppercase tracking-wide">
-              <th className="px-4 py-3">Day</th>
-              <th className="px-4 py-3">Duration</th>
-              <th className="px-4 py-3">Per person</th>
-              <th className="px-4 py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(data ?? []).map((d) => (
-              <tr key={d.id} className="border-border border-b last:border-b-0">
-                <td className="px-4 py-3">
-                  <p className="text-[0.8125rem] font-extrabold">
-                    {d.title}
-                    {d.badge && (
-                      <span className="bg-gold-soft text-gold-text ml-2 rounded px-1.5 py-0.5 text-[0.5625rem] font-extrabold">
-                        {d.badge}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-muted-light text-[0.6875rem] font-semibold">{d.tagline}</p>
-                </td>
-                <td className="text-muted px-4 py-3 text-[0.75rem] font-semibold">{d.duration}</td>
-                <td className="px-4 py-3 text-[0.8125rem] font-bold">
-                  {d.price_per_person_kes === null
-                    ? 'KES [—]'
-                    : `KES ${d.price_per_person_kes.toLocaleString('en-KE')}`}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[0.625rem] font-extrabold ${
-                      d.status === 'live' ? 'bg-success-bg text-success' : 'bg-bg text-muted'
-                    }`}
-                  >
-                    {d.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-            {(data ?? []).length === 0 && (
-              <tr>
-                <td colSpan={4} className="text-muted px-4 py-10 text-center text-sm font-semibold">
-                  No curated days yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        <p className="text-muted-light border-border border-t px-4 py-3 text-[0.6875rem] font-semibold">
-          Read-only. The block editor is designed and not built — a day is published through
-          rpc_publish_curated_day, which refuses unless every block is live and priced.
-        </p>
-      </Card>
+      <ExperienceCatalogue
+        kind={kind}
+        cities={cities ?? []}
+        partners={data ?? []}
+        canEdit={canManagePartners}
+        canManagePartners={canManagePartners}
+        canActivatePartners={canActivatePartners}
+      />
     );
   }
 
-  const [{ data: components }, { data: health }] = await Promise.all([
+  if (kind === 'events') {
+    const [{ data }, { data: partners }] = await Promise.all([
+      supabase
+        .from('event')
+        .select(
+          'id, city_id, name, category, venue_name, venue_address, starts_at, ends_at, doors_at, organiser_name, organiser_url, ticket_url, ticket_partner_id, ticket_bands, nexg_can_hold_tickets, practical_note, cover_path, status, featured, anchor_slot, suggested_blocks, source, submitted_by_partner_id, submission_note, rejected_reason',
+        )
+        .order('starts_at', { ascending: false }),
+      supabase.from('experience_partner').select('id, name, city_id, status, kind').order('name'),
+    ]);
+    return (
+      <ExperienceCatalogue
+        kind={kind}
+        cities={cities ?? []}
+        events={data ?? []}
+        partners={partners ?? []}
+        canEdit={canEdit}
+        canManagePartners={canManagePartners}
+        canActivatePartners={canActivatePartners}
+      />
+    );
+  }
+
+  const [{ data: partners }, { data: components }, healthResult] = await Promise.all([
+    supabase.from('experience_partner').select('id, name, city_id, status, kind').order('name'),
     supabase
       .from('experience_component')
-      .select('id, title, subtitle, mood, swap_group, tier, price_kes, status')
+      .select(
+        'id, partner_id, city_id, kind, mood, title, subtitle, description, duration_min, default_slot, earliest_start, latest_start, price_kes, price_basis, min_party, max_party, party_types, includes, tags, tier, swap_group, status, booking_lead_hours, capacity_per_day, sort, cover_path',
+      )
       .order('mood')
       .order('swap_group')
       .order('tier'),
-    supabase.from('catalogue_health').select('*'),
+    kind === 'components'
+      ? supabase.from('catalogue_health').select('*')
+      : Promise.resolve({ data: null }),
   ]);
 
-  const thin = (health ?? []).filter((h) => (h.live_components ?? 0) > 0 && (h.tiers ?? 0) < 3);
+  if (kind === 'components') {
+    const thinGroups = (healthResult.data ?? []).flatMap((h) =>
+      h.swap_group && (h.live_components ?? 0) > 0 && (h.tiers ?? 0) < 3
+        ? [{ swap_group: h.swap_group, tiers: h.tiers ?? 0 }]
+        : [],
+    );
+    return (
+      <ExperienceCatalogue
+        kind={kind}
+        cities={cities ?? []}
+        partners={partners ?? []}
+        components={components ?? []}
+        thinGroups={thinGroups}
+        canEdit={canEdit}
+        canManagePartners={canManagePartners}
+        canActivatePartners={canActivatePartners}
+      />
+    );
+  }
+
+  const [{ data: days }, { data: blocks }] = await Promise.all([
+    supabase
+      .from('curated_day')
+      .select(
+        'id, city_id, slug, title, tagline, cover_path, badge, party_types, duration, price_per_person_kes, status, sort, featured',
+      )
+      .order('sort'),
+    supabase
+      .from('curated_day_block')
+      .select('id, curated_day_id, component_id, slot, start_time, sort')
+      .order('sort'),
+  ]);
 
   return (
-    <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
-      <Card className="overflow-x-auto p-0">
-        <table className="w-full min-w-[42rem] text-left">
-          <thead>
-            <tr className="border-border text-muted-light border-b text-[0.625rem] font-extrabold uppercase tracking-wide">
-              <th className="px-4 py-3">Component</th>
-              <th className="px-4 py-3">Mood</th>
-              <th className="px-4 py-3">Swap group</th>
-              <th className="px-4 py-3">Tier</th>
-              <th className="px-4 py-3">Price</th>
-              <th className="px-4 py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(components ?? []).map((c) => (
-              <tr key={c.id} className="border-border border-b last:border-b-0">
-                <td className="px-4 py-3">
-                  <p className="text-[0.8125rem] font-extrabold">{c.title}</p>
-                  <p className="text-muted-light text-[0.6875rem] font-semibold">{c.subtitle}</p>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="bg-bg text-ink rounded px-2 py-0.5 text-[0.625rem] font-extrabold uppercase">
-                    {c.mood}
-                  </span>
-                </td>
-                <td className="text-muted px-4 py-3 text-[0.6875rem] font-semibold">
-                  {c.swap_group}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    aria-label={`tier ${c.tier} of 5`}
-                    className="text-[0.625rem] tracking-wider"
-                  >
-                    {'●'.repeat(c.tier ?? 0)}
-                    <span className="text-border-strong">{'○'.repeat(5 - (c.tier ?? 0))}</span>
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-[0.8125rem] font-bold">
-                  {c.price_kes === null
-                    ? 'KES [—]'
-                    : `KES ${Number(c.price_kes).toLocaleString('en-KE')}`}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[0.625rem] font-extrabold ${
-                      c.status === 'live' ? 'bg-success-bg text-success' : 'bg-bg text-muted'
-                    }`}
-                  >
-                    {c.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
-
-      <Card className="p-5">
-        <h3 className="text-sm font-extrabold uppercase tracking-wide">Allocator health</h3>
-        <p className="text-muted mt-2 text-[0.75rem] font-semibold leading-[1.7]">
-          A part of the day with fewer than three tiers cannot be fitted to a budget and cannot be
-          swapped. The feature quietly stops working there.
-        </p>
-        <ul className="mt-3 space-y-2">
-          {thin.length === 0 ? (
-            <li className="text-success text-[0.75rem] font-bold">
-              Every live group has three or more tiers.
-            </li>
-          ) : (
-            thin.map((h, i) => (
-              <li key={i} className="text-[0.6875rem] font-semibold leading-[1.6]">
-                <span className="text-warning font-extrabold">{h.swap_group}</span> · {h.tiers} tier
-                {h.tiers === 1 ? '' : 's'} live — recruit one cheaper and one dearer supplier here.
-              </li>
-            ))
-          )}
-        </ul>
-      </Card>
-    </div>
+    <ExperienceCatalogue
+      kind={kind}
+      cities={cities ?? []}
+      partners={partners ?? []}
+      components={components ?? []}
+      days={days ?? []}
+      dayBlocks={blocks ?? []}
+      canEdit={canEdit}
+      canManagePartners={canManagePartners}
+      canActivatePartners={canActivatePartners}
+    />
   );
 }

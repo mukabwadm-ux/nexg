@@ -21,7 +21,7 @@ import { useOnboarding } from './store';
  */
 export function CategoryStep() {
   const router = useRouter();
-  const { draft, categories, setCategory, setAnswers } = useOnboarding();
+  const { draft, categories, setCategory, setAnswers, patch } = useOnboarding();
   const [docs, setDocs] = React.useState<{ label: string; kind: string }[]>([]);
 
   const config = categories.find((c) => c.category === draft?.category);
@@ -87,10 +87,45 @@ export function CategoryStep() {
             icon={category.icon}
             label={category.label}
             selected={draft?.category === category.category}
-            onClick={() => void setCategory(category.category, {})}
+            onClick={() => {
+              void setCategory(category.category, {});
+              patch({ subcategory: null });
+            }}
           />
         ))}
       </div>
+
+      {config && config.subcategories && config.subcategories.length > 0 && (
+        <div className="animate-in fade-in slide-in-from-bottom-2 mt-6 rounded-2xl border border-border bg-surface p-5 duration-300">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-bold text-ink">
+              Choose your primary vertical or specialty
+            </h3>
+            {draft?.subcategory && (
+              <span className="text-xs text-muted-light font-medium">Selected</span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {config.subcategories.map((sub) => {
+              const isSelected = draft?.subcategory === sub.id;
+              return (
+                <button
+                  key={sub.id}
+                  type="button"
+                  onClick={() => patch({ subcategory: sub.id })}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                    isSelected
+                      ? 'bg-gold text-ink font-bold shadow-sm'
+                      : 'border border-border bg-surface hover:border-ink text-ink/80'
+                  }`}
+                >
+                  {sub.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {config && config.questions.length > 0 && (
         <div className="animate-in fade-in slide-in-from-bottom-2 mt-6 grid gap-4 duration-300 lg:grid-cols-2">
