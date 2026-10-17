@@ -26,6 +26,7 @@ export const MerchantCategorySchema = z.object({
   color: z.string(),
   bg: z.string(),
   desc: z.string(),
+  image: z.string().optional(),
   cardKind: z.enum(['menu', 'services', 'products']),
   etaStyle: z.enum(['minutes', 'turnaround']),
   sort: z.number().int(),
@@ -2403,14 +2404,6 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
   }
 ] as const;
 
-/** All 21 categories */
-export const ALL_CATEGORIES = MERCHANT_TAXONOMY;
-
-/** Flat list of all 128 subcategories */
-export const ALL_SUBCATEGORIES: readonly MerchantSubcategory[] = MERCHANT_TAXONOMY.flatMap(
-  (cat) => cat.subcategories,
-);
-
 /** Legacy alias map to guarantee 100% backward compatibility */
 const LEGACY_CATEGORY_MAP: Record<string, string> = {
   restaurant: 'restaurants_food',
@@ -2425,11 +2418,71 @@ const LEGACY_CATEGORY_MAP: Record<string, string> = {
 };
 
 /**
+ * Authoritative map linking each vertical / category to its unique CC0 photograph.
+ * Includes both canonical IDs and legacy aliases.
+ */
+export const CATEGORY_IMAGE_MAP: Readonly<Record<string, string>> = {
+  adults_only: '/images/categories/adults-only.jpg',
+  airport_transfers: '/images/categories/airport.jpg',
+  airport: '/images/categories/airport.jpg',
+  alcohol_beverages: '/images/categories/drinks.jpg',
+  bar_liquor: '/images/categories/drinks.jpg',
+  beauty: '/images/categories/beauty.jpg',
+  beauty_fashion: '/images/categories/beauty.jpg',
+  concierge_services: '/images/categories/concierge.jpg',
+  experiences: '/images/categories/experiences.jpg',
+  fashion_apparel: '/images/categories/fashion.jpg',
+  financial_services: '/images/categories/financial-services.jpg',
+  flowers_gifts: '/images/categories/flowers.jpg',
+  florist: '/images/categories/flowers.jpg',
+  gift_shop: '/images/categories/gifts.jpg',
+  groceries_essentials: '/images/categories/groceries.jpg',
+  supermarket: '/images/categories/groceries.jpg',
+  health: '/images/categories/health.jpg',
+  laundry_cleaning: '/images/categories/laundry.jpg',
+  laundry: '/images/categories/laundry.jpg',
+  logistics_shipping: '/images/categories/logistics.jpg',
+  marketplace: '/images/categories/marketplace.jpg',
+  pharmacy: '/images/categories/pharmacy.jpg',
+  restaurants_food: '/images/categories/restaurants.jpg',
+  restaurant: '/images/categories/restaurants.jpg',
+  tech_electronics: '/images/categories/tech.jpg',
+  travel_tours: '/images/categories/travel-tours.jpg',
+  vehicle_rentals: '/images/categories/vehicle-rentals.jpg',
+  vehicle_services: '/images/categories/vehicle-services.jpg',
+  wellness: '/images/categories/wellness.jpg',
+};
+
+/**
+ * Get the unique photograph URL for a category ID or legacy alias.
+ */
+export function getCategoryImage(catId: string): string {
+  const normalizedId = LEGACY_CATEGORY_MAP[catId] || catId;
+  return CATEGORY_IMAGE_MAP[normalizedId] || CATEGORY_IMAGE_MAP[catId] || '/images/categories/restaurants.jpg';
+}
+
+/** All 21 categories with attached image paths */
+export const ALL_CATEGORIES: readonly MerchantCategory[] = MERCHANT_TAXONOMY.map((cat) => ({
+  ...cat,
+  image: getCategoryImage(cat.id),
+}));
+
+/** Flat list of all 128 subcategories */
+export const ALL_SUBCATEGORIES: readonly MerchantSubcategory[] = MERCHANT_TAXONOMY.flatMap(
+  (cat) => cat.subcategories,
+);
+
+/**
  * Look up a category by ID or legacy alias.
  */
 export function getCategoryById(id: string): MerchantCategory | undefined {
   const normalizedId = LEGACY_CATEGORY_MAP[id] || id;
-  return MERCHANT_TAXONOMY.find((cat) => cat.id === normalizedId);
+  const found = MERCHANT_TAXONOMY.find((cat) => cat.id === normalizedId);
+  if (!found) return undefined;
+  return {
+    ...found,
+    image: found.image || getCategoryImage(found.id),
+  };
 }
 
 /**

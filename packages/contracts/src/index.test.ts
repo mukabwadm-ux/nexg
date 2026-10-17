@@ -156,4 +156,19 @@ describe('merchant taxonomy', () => {
     expect(res.subcategories.some((s) => s.name.toLowerCase().includes('safari'))).toBe(true);
     expect(res.categories.some((c) => c.id === 'travel_tours')).toBe(true);
   });
+
+  it('provides a unique image for all 21 categories', async () => {
+    const { ALL_CATEGORIES, getCategoryImage } = await import('./taxonomy');
+    expect(ALL_CATEGORIES.length).toBe(21);
+    for (const cat of ALL_CATEGORIES) {
+      expect(cat.image).toBeDefined();
+      expect(cat.image?.startsWith('/images/categories/')).toBe(true);
+      expect(cat.image?.endsWith('.jpg')).toBe(true);
+    }
+    // Check legacy aliases resolve to image paths
+    expect(getCategoryImage('restaurant')).toBe('/images/categories/restaurants.jpg');
+    expect(getCategoryImage('supermarket')).toBe('/images/categories/groceries.jpg');
+    expect(getCategoryImage('bar_liquor')).toBe('/images/categories/drinks.jpg');
+  });
 });
+
