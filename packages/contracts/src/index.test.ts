@@ -171,4 +171,3 @@ describe('merchant taxonomy', () => {
     expect(getCategoryImage('bar_liquor')).toBe('/images/categories/drinks.jpg');
   });
 });
-

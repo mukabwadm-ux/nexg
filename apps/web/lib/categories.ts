@@ -31,4 +31,3 @@ export function categoryTiles(t: (key: string) => string) {
 }
 
 export { CATEGORY_IMAGE_MAP, getCategoryImage } from '@nexg/contracts';
-

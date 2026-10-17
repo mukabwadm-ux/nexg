@@ -113,21 +113,23 @@ export function CategoryExplorer() {
     <div className="space-y-10">
       {/* Search Header */}
       <div className="mx-auto max-w-3xl text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/5 px-4 py-1.5 text-xs font-black uppercase tracking-wider text-gold">
+        <div className="border-gold/30 bg-gold/5 text-gold inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black uppercase tracking-wider">
           <span>Official Nairobi Taxonomy</span>
           <span>·</span>
           <span>21 Verticals</span>
         </div>
-        <h1 className="mt-4 text-3xl font-black tracking-tight text-ink sm:text-5xl lg:text-6xl">
+        <h1 className="text-ink mt-4 text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
           Merchant Verticals & Categories
         </h1>
-        <p className="mt-3 text-base text-muted-light sm:text-lg">
-          Explore all 21 verified merchant vertical categories and {ALL_SUBCATEGORIES.length} specialized subcategories across Nairobi, curated for fast concierge delivery and trusted on-demand fulfillment.
+        <p className="text-muted-light mt-3 text-base sm:text-lg">
+          Explore all 21 verified merchant vertical categories and {ALL_SUBCATEGORIES.length}{' '}
+          specialized subcategories across Nairobi, curated for fast concierge delivery and trusted
+          on-demand fulfillment.
         </p>
 
         {/* Live Search Bar */}
         <div className="relative mt-8">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-light" />
+          <Search className="text-muted-light pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" />
           <input
             type="text"
             value={query}
@@ -136,12 +138,12 @@ export function CategoryExplorer() {
               if (selectedCategory) setSelectedCategory(null);
             }}
             placeholder="Search categories (e.g. Fine Dining, Vapes, Chauffeur, Safari, Electronics)..."
-            className="h-14 w-full rounded-2xl border border-border bg-surface pl-12 pr-10 text-base text-ink shadow-sm transition-all placeholder:text-muted-light focus:border-gold focus:outline-none focus:ring-4 focus:ring-gold/20"
+            className="border-border bg-surface text-ink placeholder:text-muted-light focus:border-gold focus:ring-gold/20 h-14 w-full rounded-2xl border pl-12 pr-10 text-base shadow-sm transition-all focus:outline-none focus:ring-4"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-muted-light hover:text-ink"
+              className="text-muted-light hover:text-ink absolute right-4 top-1/2 -translate-y-1/2 p-1"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -166,8 +168,8 @@ export function CategoryExplorer() {
                 onClick={() => setKindFilter(tab.key)}
                 className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
                   isActive
-                    ? 'bg-ink text-white shadow-sm ring-1 ring-ink'
-                    : 'border border-border bg-surface text-muted-light hover:border-border-strong hover:text-ink'
+                    ? 'bg-ink ring-ink text-white shadow-sm ring-1'
+                    : 'border-border bg-surface text-muted-light hover:border-border-strong hover:text-ink border'
                 }`}
               >
                 {tab.label}
@@ -179,12 +181,12 @@ export function CategoryExplorer() {
         {/* Active Filter Pill */}
         {selectedCategory && (
           <div className="mt-4 flex items-center justify-center gap-2">
-            <span className="text-xs font-medium text-muted-light">Viewing vertical:</span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-bold text-ink">
+            <span className="text-muted-light text-xs font-medium">Viewing vertical:</span>
+            <span className="border-border bg-surface text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold">
               {ALL_CATEGORIES.find((c) => c.id === selectedCategory)?.name}
               <button
                 onClick={() => setSelectedCategory(null)}
-                className="ml-1 text-muted-light hover:text-gold"
+                className="text-muted-light hover:text-gold ml-1"
                 aria-label="Clear category filter"
               >
                 <X className="h-3 w-3" />
@@ -196,8 +198,8 @@ export function CategoryExplorer() {
 
       {/* Categories Grid */}
       {filteredCategories.length === 0 ? (
-        <div className="rounded-3xl border border-border bg-surface p-12 text-center shadow-sm">
-          <p className="text-base font-semibold text-muted-light">
+        <div className="border-border bg-surface rounded-3xl border p-12 text-center shadow-sm">
+          <p className="text-muted-light text-base font-semibold">
             No merchant verticals found matching &ldquo;{query}&rdquo;
           </p>
           <button
@@ -206,7 +208,7 @@ export function CategoryExplorer() {
               setKindFilter('all');
               setSelectedCategory(null);
             }}
-            className="mt-3 text-sm font-bold text-gold underline underline-offset-4"
+            className="text-gold mt-3 text-sm font-bold underline underline-offset-4"
           >
             Clear all filters and view all categories
           </button>
@@ -217,21 +219,22 @@ export function CategoryExplorer() {
             const Icon = ICON_MAP[cat.icon] || Store;
             const imageSrc = cat.image || getCategoryImage(cat.id);
             const matchingSubs = trimmed
-              ? cat.subcategories.filter((s) =>
-                  s.name.toLowerCase().includes(trimmed) ||
-                  s.fields.some((f) => f.toLowerCase().includes(trimmed)) ||
-                  s.fulfillmentHint.toLowerCase().includes(trimmed),
+              ? cat.subcategories.filter(
+                  (s) =>
+                    s.name.toLowerCase().includes(trimmed) ||
+                    s.fields.some((f) => f.toLowerCase().includes(trimmed)) ||
+                    s.fulfillmentHint.toLowerCase().includes(trimmed),
                 )
               : cat.subcategories;
 
             return (
               <div
                 key={cat.id}
-                className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-xl"
+                className="border-border bg-surface hover:border-gold/40 group flex flex-col justify-between overflow-hidden rounded-3xl border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 <div>
                   {/* Category Photographic Banner */}
-                  <div className="relative h-48 w-full overflow-hidden bg-surface-raised sm:h-52">
+                  <div className="bg-surface-raised relative h-48 w-full overflow-hidden sm:h-52">
                     <Image
                       src={imageSrc}
                       alt={cat.name}
@@ -242,7 +245,7 @@ export function CategoryExplorer() {
                     />
 
                     {/* Gradient Overlay for high contrast */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/35 to-transparent" />
+                    <div className="from-ink/90 via-ink/35 absolute inset-0 bg-gradient-to-t to-transparent" />
 
                     {/* Top Badges */}
                     <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-2">
@@ -270,17 +273,17 @@ export function CategoryExplorer() {
 
                   {/* Card Content */}
                   <div className="p-6">
-                    <p className="line-clamp-2 text-sm leading-relaxed text-muted-light">
+                    <p className="text-muted-light line-clamp-2 text-sm leading-relaxed">
                       {cat.desc}
                     </p>
 
                     {/* Subcategories list */}
                     <div className="mt-5 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[0.6875rem] font-extrabold uppercase tracking-wider text-muted-light">
+                        <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wider">
                           Subcategories
                         </span>
-                        <span className="text-[0.6875rem] font-medium text-muted-light">
+                        <span className="text-muted-light text-[0.6875rem] font-medium">
                           {cat.subcategories.length} specialized
                         </span>
                       </div>
@@ -289,7 +292,7 @@ export function CategoryExplorer() {
                           <Link
                             key={sub.id}
                             href={`/explore?category=${cat.id}&subcategory=${sub.id}`}
-                            className="inline-block rounded-lg border border-border bg-bg px-2.5 py-1 text-xs font-semibold text-muted-light transition-all hover:border-gold hover:bg-gold/5 hover:text-ink"
+                            className="border-border bg-bg text-muted-light hover:border-gold hover:bg-gold/5 hover:text-ink inline-block rounded-lg border px-2.5 py-1 text-xs font-semibold transition-all"
                           >
                             {sub.name}
                           </Link>
@@ -297,7 +300,7 @@ export function CategoryExplorer() {
                         {matchingSubs.length > 7 && (
                           <Link
                             href={`/explore?category=${cat.id}`}
-                            className="inline-block px-1.5 py-1 text-xs font-bold text-gold transition-colors hover:underline"
+                            className="text-gold inline-block px-1.5 py-1 text-xs font-bold transition-colors hover:underline"
                           >
                             +{matchingSubs.length - 7} more
                           </Link>
@@ -308,10 +311,10 @@ export function CategoryExplorer() {
                 </div>
 
                 {/* Card Footer Link */}
-                <div className="border-t border-border bg-surface px-6 py-4">
+                <div className="border-border bg-surface border-t px-6 py-4">
                   <Link
                     href={`/explore?category=${cat.id}`}
-                    className="group/link flex items-center justify-between text-xs font-extrabold text-ink transition-colors hover:text-gold"
+                    className="group/link text-ink hover:text-gold flex items-center justify-between text-xs font-extrabold transition-colors"
                   >
                     <span>Browse all in {cat.name}</span>
                     <ArrowRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
@@ -324,8 +327,9 @@ export function CategoryExplorer() {
       )}
 
       {/* Summary Footer */}
-      <div className="border-t border-border pt-6 text-center text-xs font-medium text-muted-light">
-        Showing {filteredCategories.length} categories · {totalSubcatsFound} subcategories available across Nairobi · All images CC0 certified
+      <div className="border-border text-muted-light border-t pt-6 text-center text-xs font-medium">
+        Showing {filteredCategories.length} categories · {totalSubcatsFound} subcategories available
+        across Nairobi · All images CC0 certified
       </div>
     </div>
   );

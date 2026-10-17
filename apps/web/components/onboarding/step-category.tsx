@@ -96,13 +96,13 @@ export function CategoryStep() {
       </div>
 
       {config && config.subcategories && config.subcategories.length > 0 && (
-        <div className="animate-in fade-in slide-in-from-bottom-2 mt-6 rounded-2xl border border-border bg-surface p-5 duration-300">
+        <div className="animate-in fade-in slide-in-from-bottom-2 border-border bg-surface mt-6 rounded-2xl border p-5 duration-300">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-bold text-ink">
+            <h3 className="text-ink text-sm font-bold">
               Choose your primary vertical or specialty
             </h3>
             {draft?.subcategory && (
-              <span className="text-xs text-muted-light font-medium">Selected</span>
+              <span className="text-muted-light text-xs font-medium">Selected</span>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
@@ -116,7 +116,7 @@ export function CategoryStep() {
                   className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
                     isSelected
                       ? 'bg-gold text-ink font-bold shadow-sm'
-                      : 'border border-border bg-surface hover:border-ink text-ink/80'
+                      : 'border-border bg-surface hover:border-ink text-ink/80 border'
                   }`}
                 >
                   {sub.name}
