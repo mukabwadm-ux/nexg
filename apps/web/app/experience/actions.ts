@@ -14,10 +14,11 @@ export interface PlanResult {
 }
 
 /** Everything the builder needs, in the one round trip fn_plan_view exists for. */
-async function read(planId: string): Promise<PlanView | undefined> {
+async function read(planId: string): Promise<PlanView> {
   const supabase = createClient();
-  const { data } = await supabase.rpc('fn_plan_view', { p_plan_id: planId });
-  const view = (data as PlanView | null) ?? undefined;
+  const { data, error } = await supabase.rpc('fn_plan_view', { p_plan_id: planId });
+  if (error) throw new Error(error.message);
+  const view = (data as PlanView | null) ?? null;
 
   /*
    * fn_plan_view always returns an object; `plan` inside it is null when
@@ -25,7 +26,8 @@ async function read(planId: string): Promise<PlanView | undefined> {
    * or somebody else's day. A view with no plan in it is not a view, and
    * saying so here keeps every caller from having to know that.
    */
-  return view?.plan ? view : undefined;
+  if (!view?.plan) throw new Error('We could not load your experience draft. Please try again.');
+  return view;
 }
 
 /**
@@ -55,9 +57,12 @@ export async function ensurePlan(citySlug = 'nairobi'): Promise<PlanResult> {
    * One server action is one request, so the sign-in and the cookie that
    * carries it are written together and cannot race.
    */
-  let {
-    data: { user },
+  const {
+    data: { user: currentUser },
+    error: userError,
   } = await supabase.auth.getUser();
+  if (userError) return { ok: false, message: userError.message };
+  let user = currentUser;
 
   if (!user) {
     const { data: fresh, error } = await supabase.auth.signInAnonymously();
@@ -66,23 +71,26 @@ export async function ensurePlan(citySlug = 'nairobi'): Promise<PlanResult> {
   }
   if (!user) return { ok: false, message: 'Could not start a session.' };
 
-  const { data: existing } = await supabase
-    .from('plan')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('status', 'draft')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (existing) return { ok: true, planId: existing.id, view: await read(existing.id) };
-
-  const { data: city } = await supabase
+  const { data: city, error: cityError } = await supabase
     .from('city')
     .select('id')
     .eq('slug', citySlug)
     .maybeSingle();
+  if (cityError) return { ok: false, message: cityError.message };
   if (!city) return { ok: false, message: 'We are not in that city yet.' };
+
+  const { data: existing, error: existingError } = await supabase
+    .from('plan')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('city_id', city.id)
+    .eq('status', 'draft')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (existingError) return { ok: false, message: existingError.message };
+
+  if (existing) return { ok: true, planId: existing.id, view: await read(existing.id) };
 
   const { data: created, error } = await supabase
     .from('plan')
@@ -99,6 +107,7 @@ export interface PlanPatch {
   party_type?: string;
   party_size?: number;
   date?: string | null;
+  end_date?: string | null;
   budget_kes?: number;
   moods?: Mood[];
   answers?: Record<string, Json>;
@@ -166,7 +175,7 @@ export async function swapBlock(planId: string, blockId: string, componentId: st
         ? component.price_kes * Math.max(size, 1)
         : component.price_kes;
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('plan_block')
     .update({
       component_id: componentId,
@@ -176,12 +185,17 @@ export async function swapBlock(planId: string, blockId: string, componentId: st
       pay_on_day: component.pay_on_day ?? [],
     })
     .eq('id', blockId)
-    .eq('status', 'proposed');
+    .eq('status', 'proposed')
+    .select('id');
 
   if (error) return { ok: false, message: error.message };
+  if (!updated?.length) return { ok: false, message: 'That block can no longer be changed.' };
 
   /* The totals and the bar are derived, so they have to be recomputed. */
-  await supabase.rpc('fn_event_anchor_effects', { p_plan_id: planId });
+  const { error: effectsError } = await supabase.rpc('fn_event_anchor_effects', {
+    p_plan_id: planId,
+  });
+  if (effectsError) return { ok: false, message: effectsError.message };
   return { ok: true, planId, view: await read(planId) };
 }
 

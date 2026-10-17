@@ -148,10 +148,13 @@ export function DayTimeline({
   const hasStay = blocks.some((b) => b.kind === 'stay');
 
   if (blocks.length === 0) {
+    const hasPreferences = view.plan.moods.length > 0 || Boolean(view.plan.notes?.trim());
     return (
       <div className="border-border bg-surface rounded-2xl border p-8 text-center">
         <p className="text-muted text-sm font-semibold leading-[1.8]">
-          Pick a mood or two on the left and your day builds itself here.
+          {hasPreferences
+            ? 'No published experiences match this selection yet. Your budget and preferences are ready for a concierge to work with.'
+            : 'Pick a mood or two on the left and your day builds itself here.'}
         </p>
       </div>
     );
