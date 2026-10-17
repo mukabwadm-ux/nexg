@@ -79,14 +79,39 @@ const CATEGORY_CTA: Record<string, string> = {
 };
 
 /** The cards the artboard draws for an empty homepage. */
+/*
+ * Shown until a featured slot is sold. Each opens Explore for its kind of
+ * business, so the card leads somewhere real even though the name in
+ * brackets is not a merchant yet.
+ */
 const PLACEHOLDERS = [
-  { name: '[Italian restaurant]', meta: 'Fine dining · Westlands', cta: 'merchant.cta.menu' },
-  { name: '[Wine & spirits shop]', meta: 'Drinks · Parklands', cta: 'merchant.cta.shop' },
-  { name: '[Florist]', meta: 'Flowers & gifts · Kilimani', cta: 'merchant.cta.shop' },
+  {
+    name: '[Italian restaurant]',
+    meta: 'Fine dining · Westlands',
+    cta: 'merchant.cta.menu',
+    category: 'restaurant',
+    image: 'restaurants',
+  },
+  {
+    name: '[Wine & spirits shop]',
+    meta: 'Drinks · Parklands',
+    cta: 'merchant.cta.shop',
+    category: 'bar_liquor',
+    image: 'drinks',
+  },
+  {
+    name: '[Florist]',
+    meta: 'Flowers & gifts · Kilimani',
+    cta: 'merchant.cta.shop',
+    category: 'florist',
+    image: 'flowers',
+  },
   {
     name: '[Laundry & dry cleaning]',
     meta: 'Wash, iron, press · Kilimani',
     cta: 'merchant.cta.services',
+    category: 'laundry',
+    image: 'laundry',
   },
 ] as const;
 
@@ -139,33 +164,33 @@ export function FeaturedMerchants({
     return (
       <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {PLACEHOLDERS.map((merchant) => (
-          <li
-            key={merchant.name}
-            className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F]"
-          >
-            <Cover>
-              <Sponsored label={t('merchant.sponsored')} />
-              <span className="text-[0.625rem] uppercase tracking-widest text-white/35">
-                [Cover photo]
-              </span>
-              <Eta unit={t('merchant.min')} />
-            </Cover>
-            <div className="p-3">
-              <p className="truncate text-sm font-bold">{merchant.name}</p>
-              <p className="mt-0.5 truncate text-xs font-semibold text-white/50">{merchant.meta}</p>
-              {/*
-               * Not a link and not a button. There is no shop behind a
-               * bracketed name, so this is the shape of a call to action
-               * and not one — hidden from assistive technology, which
-               * would otherwise announce a control that does nothing.
-               */}
-              <span
-                aria-hidden="true"
-                className="bg-gold/60 text-ink/70 mt-3 block rounded-md py-1.5 text-center text-xs font-bold"
-              >
-                {t(merchant.cta)}
-              </span>
-            </div>
+          <li key={merchant.name}>
+            <Link
+              href={`/explore?category=${merchant.category}`}
+              className="focus-visible:ring-gold group block overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F] transition-colors hover:border-white/20 focus-visible:outline-none focus-visible:ring-2"
+            >
+              <Cover>
+                <Image
+                  src={`/images/categories/${merchant.image}.jpg`}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover opacity-90 transition-transform duration-300 group-hover:scale-105"
+                />
+                <Sponsored label={t('merchant.sponsored')} />
+                <Eta unit={t('merchant.min')} />
+              </Cover>
+              <div className="p-3">
+                <p className="truncate text-sm font-bold">{merchant.name}</p>
+                <p className="mt-0.5 truncate text-xs font-semibold text-white/50">
+                  {merchant.meta}
+                </p>
+                {/* Opens this kind of business on Explore until the slot is sold. */}
+                <span className="bg-gold text-ink group-hover:bg-gold/90 mt-3 block rounded-md py-1.5 text-center text-xs font-bold">
+                  {t(merchant.cta)}
+                </span>
+              </div>
+            </Link>
           </li>
         ))}
       </ul>

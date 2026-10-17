@@ -162,6 +162,8 @@ const en: Dictionary = {
   'home.featured.getFeatured': 'Get featured on the homepage →',
   'home.services.heading': 'Everything we arrange',
   'home.services.browseAll': 'Browse all services',
+  'home.bestSellers.heading': 'Best sellers',
+  'home.bestSellers.seeAll': 'See all',
   'home.join.heading': 'Host, ride, list or join.',
   'home.join.body':
     'Airbnb hosts give their guests a concierge. Riders and merchants make it happen. A small team builds it.',
@@ -331,6 +333,8 @@ const sw: Dictionary = {
   'home.featured.getFeatured': 'Pata nafasi maalum ukurasa wa mwanzo →',
   'home.services.heading': 'Kila kitu tunachopanga',
   'home.services.browseAll': 'Vinjari huduma zote',
+  'home.bestSellers.heading': 'Zinazouzwa zaidi',
+  'home.bestSellers.seeAll': 'Ona zote',
   'home.join.heading': 'Karibisha, endesha, orodhesha au jiunge.',
   'home.join.body':
     'Wenyeji wa Airbnb huwapa wageni wao msaidizi. Waendeshaji na wafanyabiashara hulifanya liwezekane. Timu ndogo hulijenga.',
