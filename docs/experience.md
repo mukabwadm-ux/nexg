@@ -23,7 +23,7 @@ to the catalogue, and — as plainly as possible — what is not built yet.
 | One-read plan view, mood chips | `20260101006600` | built |
 | Console roll-ups | `20260101006700` | built |
 | Assignment fixes | `20260101006800` | built |
-| Guest builder | `/experience/build` | built |
+| Guest builder | `/experience/build` | budget-aware; date range, preference requests and catalogue gaps handled |
 | Guest plan page | `/experience/plan/[id]` | built |
 | Console: All experiences, Queue, Workbench | `/experiences` | built |
 | Console: Curated days, Components | `/experiences?tab=` | editable; publish gates enforced |
@@ -50,7 +50,8 @@ deterministic: the same answers always produce the same day.
    point.
 3. **Fit the budget.** Step the most expensive swappable block down a
    tier while over; step the cheapest up while a quarter of the budget is
-   unspent and the step still fits. Bounded at 24 iterations.
+   unspent and the step still fits. A block without a cheaper option no
+   longer prevents other blocks from being adjusted. Bounded at 24 iterations.
 4. **Transport.** A driver for the day when the guest asked for one, or
    when three or more stops are more than four kilometres apart. A ride
    home is always added after a night or event block, with `included_by`
@@ -82,6 +83,13 @@ which checks the growth/operations role and writes an audit event in the
 same transaction. Events and curated days remain drafts until the existing
 publish RPC accepts them; partners still have to pass the essential document
 gate before going live. A live component also requires its partner to be live.
+
+When a city has no live catalogue match, guests can still send a budgeted
+request with their selected moods or notes. It is explicitly flagged for the
+concierge to source options; the page does not display a zero estimate as if
+it were a priced itinerary. For a custom date range, the allocator builds the
+first-day outline and sends the full range to the concierge for the remaining
+days.
 
 **A component.** Insert into `experience_component` with a `mood`, a
 `swap_group`, a `tier`, a price and `status = 'draft'`. A draft may have

@@ -96,8 +96,10 @@ const TRANSPORT = [
 ];
 
 export function Builder({
+  citySlug,
   chips,
   events,
+  availabilityError,
   budgetMin,
   budgetMax,
   medianHint,
@@ -105,8 +107,10 @@ export function Builder({
   preselectEvent,
   preselectCuratedDay,
 }: {
+  citySlug: string;
   chips: MoodChip[];
   events: EventCard[];
+  availabilityError: string | null;
   budgetMin: number;
   budgetMax: number;
   /** [low, high] of what people actually pay, or null below 20 paid days. */
@@ -130,13 +134,17 @@ export function Builder({
   const [duration, setDuration] = React.useState('day');
   const [party, setParty] = React.useState('couple');
   const [size, setSize] = React.useState(2);
+  const [date, setDate] = React.useState('');
+  const [endDate, setEndDate] = React.useState('');
   const [budget, setBudget] = React.useState(DEFAULT_BUDGET_KES);
   const [moods, setMoods] = React.useState<Mood[]>([]);
   const [answers, setAnswers] = React.useState<Record<string, Json>>({});
   const [notes, setNotes] = React.useState('');
+  const [startError, setStartError] = React.useState<string | null>(null);
 
   const pending = React.useRef<PlanPatch>({});
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saving = React.useRef<Promise<boolean> | null>(null);
 
   /*
    * StrictMode mounts, unmounts and remounts this in development, and a
@@ -150,41 +158,61 @@ export function Builder({
    */
   const started = React.useRef(false);
 
+  const loadPlan = React.useCallback(async () => {
+    setStarting(true);
+    setStartError(null);
+    try {
+      const result = await ensurePlan(citySlug);
+      if (!result.ok || !result.view || !result.planId) {
+        const message = result.message ?? 'We could not load your draft. Please try again.';
+        setStartError(message);
+        toast({ title: 'Could not start', description: message, tone: 'danger' });
+        return;
+      }
+
+      setView(result.view);
+      setPlanId(result.planId);
+      const p = result.view.plan;
+      setDuration(p.duration);
+      setParty(p.party_type);
+      setSize(p.party_size);
+      setDate(p.date ?? '');
+      setEndDate(p.end_date ?? '');
+      const startingBudget = Math.min(
+        budgetMax,
+        Math.max(budgetMin, p.budget_kes ?? DEFAULT_BUDGET_KES),
+      );
+      setBudget(startingBudget);
+      setMoods(p.moods ?? []);
+      setAnswers((p.answers as Record<string, Json>) ?? {});
+      setNotes(p.notes ?? '');
+
+      if (p.budget_kes !== startingBudget) {
+        const result2 = await savePlan(result.planId, { budget_kes: startingBudget });
+        if (!result2.ok) {
+          const message = result2.message ?? 'We could not save your starting budget.';
+          setStartError(message);
+          toast({ title: 'Could not save your budget', description: message, tone: 'danger' });
+        } else if (result2.view) {
+          setView(result2.view);
+        }
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'We could not load your draft. Please try again.';
+      setStartError(message);
+      toast({ title: 'Could not start', description: message, tone: 'danger' });
+    } finally {
+      setStarting(false);
+    }
+  }, [budgetMax, budgetMin, citySlug, toast]);
+
   // ── the draft, and the session that owns it ────────────────────────
   React.useEffect(() => {
     if (started.current) return;
     started.current = true;
-    (async () => {
-      const result = await ensurePlan();
-      if (result.ok && result.view) {
-        setView(result.view);
-        setPlanId(result.planId ?? null);
-        const p = result.view.plan;
-        setDuration(p.duration);
-        setParty(p.party_type);
-        setSize(p.party_size);
-        if (p.budget_kes) setBudget(p.budget_kes);
-        setMoods(p.moods ?? []);
-        setAnswers((p.answers as Record<string, Json>) ?? {});
-        setNotes(p.notes ?? '');
-
-        /*
-         * The slider has to start somewhere, and where it starts is a
-         * statement: a guest reading "KES 40,000" on the control and
-         * "of KES [—]" on the card is being shown two different answers
-         * to the same question. So the starting position is written
-         * through on first load, and the two agree from the first frame.
-         */
-        if (p.budget_kes === null) {
-          const result2 = await savePlan(result.planId!, { budget_kes: DEFAULT_BUDGET_KES });
-          if (result2.ok && result2.view) setView(result2.view);
-        }
-      } else if (result.message) {
-        toast({ title: 'Could not start', description: result.message, tone: 'danger' });
-      }
-      setStarting(false);
-    })();
-  }, [toast]);
+    void loadPlan();
+  }, [loadPlan]);
 
   /* An event chosen on the events page arrives as a query parameter, and
      should look the same as having tapped it here. */
@@ -204,14 +232,26 @@ export function Builder({
     if (!planId || !preselectCuratedDay) return;
     let live = true;
     (async () => {
-      const result = await applyCuratedDay(planId, preselectCuratedDay);
-      if (!live) return;
-      if (result.ok && result.view) {
-        setView(result.view);
-        setMoods(result.view.plan.moods ?? []);
-        setDuration(result.view.plan.duration);
-      } else if (result.message) {
-        toast({ title: 'Could not open that day', description: result.message, tone: 'danger' });
+      try {
+        const result = await applyCuratedDay(planId, preselectCuratedDay);
+        if (!live) return;
+        if (result.ok && result.view) {
+          setView(result.view);
+          setMoods(result.view.plan.moods ?? []);
+          setDuration(result.view.plan.duration);
+          setDate(result.view.plan.date ?? '');
+          setEndDate(result.view.plan.end_date ?? '');
+        } else if (result.message) {
+          toast({ title: 'Could not open that day', description: result.message, tone: 'danger' });
+        }
+      } catch (error) {
+        if (live) {
+          toast({
+            title: 'Could not open that day',
+            description: error instanceof Error ? error.message : 'Please try again.',
+            tone: 'danger',
+          });
+        }
       }
     })();
     return () => {
@@ -231,22 +271,46 @@ export function Builder({
     timer.current = setTimeout(() => void flush(), 250);
   }
 
-  async function flush() {
-    if (!planId) return;
-    const patch = pending.current;
-    pending.current = {};
-    if (Object.keys(patch).length === 0) return;
-    const result = await savePlan(planId, patch);
-    if (result.ok && result.view) setView(result.view);
-    else if (result.message)
-      toast({ title: 'Could not save', description: result.message, tone: 'danger' });
+  async function flush(): Promise<boolean> {
+    if (!planId) return false;
+    if (saving.current) return saving.current;
+    if (Object.keys(pending.current).length === 0) return true;
+
+    saving.current = (async () => {
+      while (Object.keys(pending.current).length > 0) {
+        const patch = pending.current;
+        pending.current = {};
+        let result;
+        try {
+          result = await savePlan(planId, patch);
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : 'We could not save your changes.';
+          toast({ title: 'Could not save', description: message, tone: 'danger' });
+          return false;
+        }
+        if (result.ok && result.view) setView(result.view);
+        else {
+          toast({ title: 'Could not save', description: result.message, tone: 'danger' });
+          return false;
+        }
+      }
+      return true;
+    })();
+
+    try {
+      return await saving.current;
+    } finally {
+      saving.current = null;
+      if (Object.keys(pending.current).length > 0) void flush();
+    }
   }
 
   /** Send must never outrun the debounce, or the concierge gets the day
       as it was one tap ago. */
-  async function flushNow() {
+  async function flushNow(): Promise<boolean> {
     if (timer.current) clearTimeout(timer.current);
-    await flush();
+    return flush();
   }
 
   function toggleMood(mood: Mood) {
@@ -266,14 +330,25 @@ export function Builder({
   async function onSwap(blockId: string, componentId: string) {
     if (!planId) return;
     setBusyBlock(blockId);
-    const result = await swapBlock(planId, blockId, componentId);
-    setBusyBlock(null);
-    if (result.ok && result.view) setView(result.view);
-    else if (result.message)
-      toast({ title: 'Could not swap', description: result.message, tone: 'danger' });
+    try {
+      const result = await swapBlock(planId, blockId, componentId);
+      if (result.ok && result.view) setView(result.view);
+      else if (result.message)
+        toast({ title: 'Could not swap', description: result.message, tone: 'danger' });
+    } catch (error) {
+      toast({
+        title: 'Could not swap',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        tone: 'danger',
+      });
+    } finally {
+      setBusyBlock(null);
+    }
   }
 
   const partyLabel = party === 'solo' ? 'for one' : party === 'couple' ? 'for two' : `for ${size}`;
+  const hasActivities = view?.blocks.some((block) => block.kind !== 'free') ?? false;
+  const canSendRequest = hasActivities || moods.length > 0 || notes.trim().length > 0;
 
   const byMood = React.useMemo(() => {
     const map = new Map<Mood, MoodChip[]>();
@@ -284,6 +359,18 @@ export function Builder({
     }
     return map;
   }, [chips]);
+
+  if (startError && !view) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-24 text-center sm:px-8">
+        <h1 className="text-2xl font-extrabold tracking-tight">Your day is not ready yet.</h1>
+        <p className="text-muted mt-3 text-sm leading-relaxed">{startError}</p>
+        <Button className="mt-5" onClick={() => void loadPlan()}>
+          Try again
+        </Button>
+      </main>
+    );
+  }
 
   if (starting) {
     return (
@@ -319,7 +406,13 @@ export function Builder({
                     on={duration === d.key}
                     onClick={() => {
                       setDuration(d.key);
-                      queue({ duration: d.key });
+                      if (d.key === 'dates') {
+                        queue({ duration: d.key });
+                      } else {
+                        setDate('');
+                        setEndDate('');
+                        queue({ duration: d.key, date: null, end_date: null });
+                      }
                     }}
                   >
                     {d.label}
@@ -376,10 +469,57 @@ export function Builder({
             </QuestionCard>
           </div>
 
+          {duration === 'dates' && (
+            <Card className="mt-4 p-5">
+              <p className="text-[0.9375rem] font-extrabold">When are you going?</p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <label className="text-muted text-xs font-bold">
+                  First day
+                  <input
+                    aria-label="First day"
+                    type="date"
+                    value={date}
+                    onChange={(event) => {
+                      const nextDate = event.target.value;
+                      setDate(nextDate);
+                      if (endDate && nextDate && endDate < nextDate) setEndDate(nextDate);
+                      queue({
+                        date: nextDate || null,
+                        end_date: (endDate && endDate >= nextDate ? endDate : nextDate) || null,
+                      });
+                    }}
+                    className="border-border-strong bg-bg mt-1 h-11 w-full rounded-lg border px-3 text-sm font-semibold"
+                  />
+                </label>
+                <label className="text-muted text-xs font-bold">
+                  Last day
+                  <input
+                    aria-label="Last day"
+                    type="date"
+                    min={date || undefined}
+                    value={endDate}
+                    onChange={(event) => {
+                      setEndDate(event.target.value);
+                      queue({ end_date: event.target.value || null });
+                    }}
+                    className="border-border-strong bg-bg mt-1 h-11 w-full rounded-lg border px-3 text-sm font-semibold"
+                  />
+                </label>
+              </div>
+              <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold leading-relaxed">
+                Your budget shapes the first-day outline. Add any plans for later days in your note
+                for the concierge.
+              </p>
+            </Card>
+          )}
+
           {/* budget */}
           <Card className="mt-4 p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className="text-[0.9375rem] font-extrabold">Your budget for the day</p>
+              <p className="text-[0.9375rem] font-extrabold">
+                Your budget for{' '}
+                {duration === 'weekend' || duration === 'dates' ? 'each day' : 'the day'}
+              </p>
               <p className="text-xl font-extrabold tracking-tight">
                 {keslabel(budget)}
                 <span className="text-muted-light ml-1 text-xs font-bold">{partyLabel}</span>
@@ -415,6 +555,12 @@ export function Builder({
               </span>
               <span>{keslabel(budgetMax)}+</span>
             </div>
+            {(duration === 'weekend' || duration === 'dates') && (
+              <p className="text-muted-light mt-2 text-[0.6875rem] font-semibold leading-relaxed">
+                This outline shows the first day. Add any later-day plans in your note for the
+                concierge.
+              </p>
+            )}
           </Card>
 
           {/* moods */}
@@ -464,12 +610,22 @@ export function Builder({
           </div>
 
           {/* because you chose … */}
+          {availabilityError && (
+            <p
+              role="alert"
+              className="border-warning/40 bg-warning-bg text-warning mt-4 rounded-xl border p-3 text-xs font-semibold leading-relaxed"
+            >
+              {availabilityError}
+            </p>
+          )}
+
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {moods.map((mood) => (
               <BecauseCard key={mood} mood={mood} label={MOODS.find((m) => m.key === mood)!.label}>
                 <div className="flex flex-wrap gap-2">
-                  {mood === 'events'
-                    ? events.slice(0, 3).map((event) => (
+                  {mood === 'events' ? (
+                    events.length > 0 ? (
+                      events.slice(0, 3).map((event) => (
                         <Chip
                           key={event.id}
                           on={((answers.events as string[]) ?? []).includes(event.id)}
@@ -482,15 +638,23 @@ export function Builder({
                           })}
                         </Chip>
                       ))
-                    : (byMood.get(mood) ?? []).map((chip) => (
-                        <Chip
-                          key={chip.id}
-                          on={((answers[mood] as string[]) ?? []).includes(chip.id)}
-                          onClick={() => toggleChip(mood, chip.id)}
-                        >
-                          {chip.title}
-                        </Chip>
-                      ))}
+                    ) : (
+                      <p className="text-muted-light text-xs font-semibold">
+                        No upcoming events are listed yet. A concierge can still look for something
+                        within your budget.
+                      </p>
+                    )
+                  ) : (
+                    (byMood.get(mood) ?? []).map((chip) => (
+                      <Chip
+                        key={chip.id}
+                        on={((answers[mood] as string[]) ?? []).includes(chip.id)}
+                        onClick={() => toggleChip(mood, chip.id)}
+                      >
+                        {chip.title}
+                      </Chip>
+                    ))
+                  )}
                   {mood !== 'events' && (byMood.get(mood) ?? []).length === 0 && (
                     <p className="text-muted-light text-xs font-semibold">
                       Nothing listed here yet — tell your concierge and they will find it.
@@ -550,14 +714,31 @@ export function Builder({
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
             <p className="text-[0.5625rem] font-extrabold uppercase tracking-[0.18em]">
               Your day
-              {view?.plan?.date
-                ? ` · ${new Date(view.plan.date).toLocaleDateString('en-GB', { weekday: 'long' })}`
+              {view?.plan?.date ? ` · ${formatPlanDate(view.plan.date)}` : ''}
+              {view?.plan?.end_date && view.plan.end_date !== view.plan.date
+                ? ` – ${formatPlanDate(view.plan.end_date)}`
                 : ''}
             </p>
             <p className="text-muted-light text-[0.625rem] font-semibold">rebuilds as you tap</p>
           </div>
 
-          {view && <BudgetCard view={view} />}
+          {view &&
+            (hasActivities ? (
+              <BudgetCard view={view} />
+            ) : (
+              <div className="border-border bg-surface rounded-2xl border p-5">
+                <p className="text-sm font-extrabold">
+                  {moods.length > 0
+                    ? 'No listed experiences match these choices yet.'
+                    : 'Choose a mood to start shaping your day.'}
+                </p>
+                <p className="text-muted mt-2 text-xs leading-relaxed">
+                  {moods.length > 0
+                    ? `Nothing has been priced yet. Share your ${keslabel(budget)} budget and preferences with a concierge, and they can look for suitable options.`
+                    : `Your ${keslabel(budget)} budget will guide the recommendations as you choose.`}
+                </p>
+              </div>
+            ))}
 
           <div className="mt-3">
             {view && (
@@ -576,13 +757,12 @@ export function Builder({
              * told no — which is how production looks right now, before
              * any partner is signed.
              */
-            disabled={!view || view.blocks.filter((b) => b.kind !== 'free').length === 0}
+            disabled={!view || !canSendRequest}
             onClick={async () => {
-              await flushNow();
-              setAskContact(true);
+              if (await flushNow()) setAskContact(true);
             }}
           >
-            Send my day to a concierge →
+            {hasActivities ? 'Send my day to a concierge →' : 'Ask a concierge to find options →'}
           </Button>
 
           <p className="text-muted-light mt-3 text-center text-[0.6875rem] font-semibold leading-[1.7]">
@@ -599,18 +779,37 @@ export function Builder({
           busy={sending}
           onSend={async (name, phone) => {
             setSending(true);
-            const result = await sendPlan(planId, name, phone);
-            setSending(false);
-            if (!result.ok) {
-              toast({ title: 'Not sent', description: result.message, tone: 'danger' });
-              return;
+            try {
+              if (!(await flushNow())) return;
+              const result = await sendPlan(planId, name, phone);
+              if (!result.ok) {
+                toast({ title: 'Not sent', description: result.message, tone: 'danger' });
+                return;
+              }
+              router.push(`/experience/plan/${planId}`);
+            } catch (error) {
+              toast({
+                title: 'Not sent',
+                description: error instanceof Error ? error.message : 'Please try again.',
+                tone: 'danger',
+              });
+            } finally {
+              setSending(false);
             }
-            router.push(`/experience/plan/${planId}`);
           }}
+          requestOnly={!hasActivities}
         />
       )}
     </main>
   );
+}
+
+function formatPlanDate(value: string): string {
+  return new Date(`${value}T12:00:00`).toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  });
 }
 
 function QuestionCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -684,10 +883,12 @@ function ContactDialog({
   onClose,
   onSend,
   busy,
+  requestOnly,
 }: {
   onClose: () => void;
   onSend: (name: string, phone: string) => void;
   busy: boolean;
+  requestOnly: boolean;
 }) {
   const [name, setName] = React.useState('');
   const [phone, setPhone] = React.useState('');
@@ -703,8 +904,9 @@ function ContactDialog({
       <div className="border-border bg-surface relative w-full max-w-md rounded-2xl border p-6">
         <h2 className="text-xl font-extrabold tracking-tight">Where do we reach you?</h2>
         <p className="text-muted mt-2 text-[0.875rem] leading-[1.8]">
-          A concierge reads your day, calls the places on it, and comes back with a price you can
-          approve or change. Nothing is booked and nothing is charged before that.
+          {requestOnly
+            ? 'A concierge will use your budget and preferences to look for suitable options. Nothing is booked or charged before you approve a quote.'
+            : 'A concierge reads your day, calls the places on it, and comes back with a price you can approve or change. Nothing is booked and nothing is charged before that.'}
         </p>
 
         <div className="mt-4 grid gap-3">

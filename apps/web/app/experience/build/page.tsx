@@ -50,7 +50,11 @@ export default async function BuildPage({
     );
   }
 
-  const [{ data: chips }, { data: events }, { data: settings }] = await Promise.all([
+  const [
+    { data: chips, error: chipsError },
+    { data: events, error: eventsError },
+    { data: settings, error: settingsError },
+  ] = await Promise.all([
     supabase.rpc('fn_mood_chips', { p_city_id: city.id }),
     supabase.from('event_public').select('*').eq('city_id', city.id).order('starts_at').limit(8),
     supabase
@@ -68,17 +72,27 @@ export default async function BuildPage({
   );
   const num = (key: string, fallback: number | null) => {
     const raw = setting[key];
-    return raw === null || raw === undefined ? fallback : Number(raw);
+    if (raw === null || raw === undefined) return fallback;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : fallback;
   };
+  const budgetMin = Math.max(1000, num('experience_budget_min_kes', 5000) ?? 5000);
+  const budgetMax = Math.max(budgetMin, num('experience_budget_max_kes', 150000) ?? 150000);
 
   return (
     <>
       <SiteHeader />
       <Builder
+        citySlug={slug}
         chips={(chips as MoodChip[] | null) ?? []}
         events={(events as EventCard[] | null) ?? []}
-        budgetMin={num('experience_budget_min_kes', 5000)!}
-        budgetMax={num('experience_budget_max_kes', 150000)!}
+        availabilityError={
+          chipsError || eventsError || settingsError
+            ? 'Some live experience details could not be loaded. You can still share your preferences and budget with a concierge.'
+            : null
+        }
+        budgetMin={budgetMin}
+        budgetMax={budgetMax}
         /*
          * Null until there are paid days to take a median of. The builder
          * renders [—] rather than a plausible range, because the hint
