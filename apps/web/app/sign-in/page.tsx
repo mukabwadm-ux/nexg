@@ -23,11 +23,8 @@ export default function SignInPage({ searchParams }: { searchParams?: { tab?: st
           the first screen for no benefit. */}
       <div className="bg-ink relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex">
         <Link href="/" className="flex items-center gap-3">
-          <Logo className="h-10 w-auto" onDark />
-          {/* The wordmark says NexG; this says which part of it. */}
-          <span className="text-gold/90 text-sm font-extrabold uppercase tracking-[0.18em]">
-            Concierge
-          </span>
+          {/* The lockup carries CONCIERGE itself. */}
+          <Logo className="h-24 w-auto" onDark />
         </Link>
 
         <div className="max-w-lg">

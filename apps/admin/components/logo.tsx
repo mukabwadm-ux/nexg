@@ -1,76 +1,44 @@
 import { cn } from '@nexg/ui';
+import Image from 'next/image';
 
 /**
- * The NexG logo: the NEXG wordmark, with the cloche on the G.
+ * The NexG logo: the pin with the cloche, NEXG, and CONCIERGE beneath.
  *
- * Vector rather than the supplied PNG. The paths are the supplied artwork
- * — same 376 × 136 canvas, same letterforms, same #E5B65F — so this is the
- * file, not a redraw of it, and it stays crisp at the 24 px it renders in a
- * sidebar and the 64 px it renders on a sign-in panel without shipping three
- * raster sizes.
+ * The supplied artwork, as two PNGs rather than a redraw: one for light
+ * grounds (black pin and lettering) and one for dark (white). The masters
+ * are packages/ui/brand/nexg-logo-light-bg.png and -dark-bg.png; each app
+ * serves a copy from public/brand. The pin alone (nexg-mark.png) is what
+ * scripts/build-brand-assets.py turns into the favicon, the app icons and
+ * the QR centre mark — at 16 px the full lockup is a smudge.
  *
- * The black strokes are `currentColor` rather than #000000, which is what
- * makes one component work on cream, on white and on the ink surfaces: the
- * wrapper sets the colour and only the gold stays fixed, exactly as drawn.
- *
- * There was a pin above this and a CONCIERGE rule below it, from an earlier
- * lockup. Both are gone — the supplied logo is the wordmark alone.
+ * The lockup is stacked and close to square (771 × 736), so it needs more
+ * height than the old wordmark did to stay legible; size it with a height
+ * class and the width follows.
  */
+const LOCKUP = { width: 771, height: 736 } as const;
+
 export function Logo({
   className,
   onDark = false,
-  title = 'NexG',
+  title = 'NexG Concierge',
+  priority = false,
 }: {
   className?: string;
   onDark?: boolean;
   /** Set to null on a mark that sits beside the word "NexG" already. */
   title?: string | null;
+  /** In a header, so it is not lazy-loaded. */
+  priority?: boolean;
 }) {
   return (
-    <svg
-      viewBox="8 184 376 136"
-      className={cn('h-8 w-auto', onDark ? 'text-white' : 'text-ink', className)}
-      role={title ? 'img' : 'presentation'}
-      {...(title ? { 'aria-label': title } : { 'aria-hidden': true })}
-    >
-      {/* N */}
-      <path
-        fill="currentColor"
-        d="M16.7,205.9H29c1.3,0,2.5,0.7,3.2,1.7l34.5,56.5c1.8,3,6.8,1.8,6.8-1.6v-53.2c0-1.9,1.6-3.4,3.7-3.4h11.6 c2,0,3.7,1.5,3.7,3.4V308c0,1.9-1.6,3.4-3.7,3.4H76.4c-1.3,0-2.5-0.7-3.2-1.7l-34.5-56.3c-1.8-3-6.9-1.8-6.9,1.6v53 c0,1.9-1.6,3.4-3.7,3.4H16.7c-2,0-3.7-1.5-3.7-3.4v-98.8C13,207.4,14.7,205.9,16.7,205.9z"
-      />
-      {/* E */}
-      <path
-        fill="currentColor"
-        d="M110.7,206.4h54.5c2.7,0,5,2.2,5,5v9.8c0,2.7-2.2,5-5,5H133c-2.7,0-5,2.2-5,5v9.2c0,2.7,2.2,5,5,5h32.2 c2.7,0,5,2.2,5,5v9.4c0,2.7-2.2,5-5,5H133c-2.7,0-5,2.2-5,5v17.9c0,2.7,2.2,5,5,5h32.2c2.7,0,5,2.2,5,5v9.8c0,2.7-2.2,5-5,5h-54.5 c-2.7,0-5-2.2-5-5v-95.7C105.8,208.6,108,206.4,110.7,206.4z"
-      />
-      {/* X — two strokes take the text colour, two are gold. */}
-      <path
-        fill="currentColor"
-        d="M244.7,249.9l24.8-34.4c3-4.1-0.2-9.7-5.6-9.7h-8.8c-2.2,0-4.3,1-5.6,2.8l-18.5,25.5c-1.2,1.7-1.1,4,0.2,5.6l8.7,10.4 C241.2,251.5,243.6,251.4,244.7,249.9z"
-      />
-      <path
-        fill="currentColor"
-        d="M241.5,262.9l-8.3,11.5c-1.3,1.8-1.4,4.3-0.2,6.2l17.6,28.3c1.2,1.9,3.2,3.1,5.3,3.1h8.4c5.1,0,8.2-6.1,5.3-10.7L246,263.1 C244.9,261.4,242.7,261.3,241.5,262.9z"
-      />
-      <path
-        fill="#E5B65F"
-        d="M227.6,240.1l-22.8-31.6c-1-1.4-2.7-2.2-4.5-2.2h-12.1c-4.3,0-6.8,4.4-4.5,7.7l29.4,40.8 c1.2,1.7,1.2,3.8,0,5.5l-31.9,44.1c-2.4,3.3,0.2,7.7,4.5,7.7H198c1.8,0,3.5-0.8,4.5-2.2l25.2-35l0.1,0.1l11.2-15.5 c1.3-1.8,1.2-4.1-0.2-5.8l-11-13.4C227.7,240.2,227.6,240.1,227.6,240.1z"
-      />
-      {/* The cloche handle, and the G it sits on. */}
-      <path
-        fill="#E5B65F"
-        stroke="#E5B65F"
-        strokeWidth="4"
-        strokeMiterlimit="10"
-        d="M320.5,202.1c-1.8-0.7-3-2.9-3-5.6v-3.1c0-3.2,1.9-5.8,4.3-5.8h15c2.3,0,4.3,2.6,4.3,5.8v3.1 c0,2.6-1.2,4.8-2.9,5.5"
-      />
-      <path
-        fill="#E5B65F"
-        stroke="#E5B65F"
-        strokeWidth="5"
-        strokeMiterlimit="10"
-        d="M338.5,201.4c-2.2,0.4-6.2-1.1-6.4,4.4c-0.1,2.4,0,5.1,2,5.2c13.1,0,23.3,6.4,29.5,14.2 c10.7,13.5,3.2,15-5.3,14.3c0,0-4.6-0.7-6-2.4c-12.9-16.1-38.5-11.1-46.5,2.4c-7.8,13.1-11.1,53.7,21.3,54.3 c11.9,0.2,18.5-2.4,25.3-13.5c2.1-3.5-0.4-7.9-4.4-7.9l-15,0.2c-2.8,0-5.2-2.2-5.2-5.1v-6.3c0-2.8,2.2-5,5-5.1l33.8-0.3 c2.8,0,5.1,2.2,5.1,5c0.5,26.1-15.7,51.9-43.3,51.1c-59.9,0.7-60.9-97.8-1.8-101.1c0.9-0.1,0.8-3.6,0.7-5c-0.1-4.7-7.6-4.4-7.6-4.4"
-      />
-    </svg>
+    <Image
+      src={onDark ? '/brand/nexg-logo-on-dark.png' : '/brand/nexg-logo.png'}
+      width={LOCKUP.width}
+      height={LOCKUP.height}
+      alt={title ?? ''}
+      {...(title ? {} : { 'aria-hidden': true })}
+      priority={priority}
+      className={cn('h-12 w-auto', className)}
+    />
   );
 }

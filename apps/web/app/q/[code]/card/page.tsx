@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+import { Logo } from '@/components/logo';
 import { normaliseCode, PLACEMENT_LABEL, qrSvg, qrUrl } from '@/lib/qr';
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -92,12 +93,9 @@ export default async function CardPage({
           style={{ height: '148mm' }}
         >
           <div className="text-center">
-            <p
-              className="text-[0.625rem] font-extrabold uppercase tracking-[0.2em]"
-              style={{ color: '#B8901F' }}
-            >
-              NexG
-            </p>
+            {/* Not lazy: a card printed before the logo loads goes out without it. */}
+            <Logo priority className="mx-auto h-[16mm] w-auto" />
+
             <p className="mt-3 text-[1.0625rem] font-extrabold leading-tight tracking-tight">
               Scan to order to this door
             </p>
