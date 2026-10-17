@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getCategoryById, searchTaxonomy } from '@nexg/contracts';
 
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -129,13 +130,39 @@ export async function GET(request: Request) {
   const like = `%${q}%`;
   const supabase = createPublicClient();
 
-  const services: SearchItem[] = SERVICES.filter(
+  const taxonomyMatch = searchTaxonomy(q);
+  const taxonomyServices: SearchItem[] = [
+    ...taxonomyMatch.subcategories.slice(0, 3).map((sub) => ({
+      kind: 'service' as const,
+      title: sub.name,
+      subtitle: getCategoryById(sub.categoryId)?.name ?? 'Merchant Category',
+      href: `/explore?city=${city}&category=${sub.categoryId}&subcategory=${sub.id}`,
+    })),
+    ...taxonomyMatch.categories.slice(0, 2).map((cat) => ({
+      kind: 'service' as const,
+      title: cat.name,
+      subtitle: cat.desc,
+      href: `/explore?city=${city}&category=${cat.id}`,
+    })),
+  ];
+
+  const hardcodedServices: SearchItem[] = SERVICES.filter(
     (s) =>
       s.words.some((w) => w.startsWith(lower) || lower.includes(w)) ||
       s.title.toLowerCase().includes(lower),
   )
     .slice(0, 3)
     .map((s) => ({ kind: 'service', title: s.title, subtitle: s.subtitle, href: s.href(city) }));
+
+  const seenTitles = new Set<string>();
+  const services: SearchItem[] = [];
+  for (const item of [...taxonomyServices, ...hardcodedServices]) {
+    if (!seenTitles.has(item.title.toLowerCase())) {
+      seenTitles.add(item.title.toLowerCase());
+      services.push(item);
+    }
+    if (services.length >= 4) break;
+  }
 
   const { data: cityRow } = await supabase.from('city').select('id').eq('slug', city).maybeSingle();
   const cityId = cityRow?.id ?? null;

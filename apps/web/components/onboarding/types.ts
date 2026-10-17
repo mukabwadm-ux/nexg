@@ -18,13 +18,28 @@ export interface BadgeRule {
   tone: 'success' | 'neutral';
 }
 
+export interface CategorySubcategory {
+  id: string;
+  name: string;
+  icon: string;
+  fulfillmentHint?: string;
+  workflowHint?: string;
+  fields?: string[];
+  suggestedItemCount?: number;
+  defaultWorkflow?: string;
+}
+
 export interface CategoryConfig {
   category: string;
   label: string;
   icon: string;
+  color?: string;
+  bg?: string;
+  description?: string;
   card_kind: 'menu' | 'services' | 'products';
   eta_style: 'minutes' | 'turnaround';
   questions: Question[];
+  subcategories?: CategorySubcategory[];
   badge_rules: Record<string, Record<string, BadgeRule>>;
   featured_eligible: boolean;
   requires_ops_mapping: boolean;
@@ -75,6 +90,7 @@ export interface Draft {
   contact_phone: string;
   contact_email: string | null;
   category: string | null;
+  subcategory?: string | null;
   category_other: string | null;
   answers: Record<string, string | string[]>;
   city_id: string | null;

@@ -1,5 +1,6 @@
 'use server';
 
+import type { Json } from '@nexg/db';
 import { revalidatePath } from 'next/cache';
 
 import { createClient } from '@/lib/supabase/server';
@@ -263,6 +264,31 @@ export async function replyToReview(reviewId: string, body: string): Promise<Out
 }
 
 // ──────────────────────────────────────────────────────── catalogue
+
+export type CatalogueKind = 'partner' | 'component' | 'curated_day' | 'event';
+
+export async function saveCatalogueRecord(input: {
+  kind: CatalogueKind;
+  id: string | null;
+  data: Json;
+  blocks?: Json;
+}): Promise<Outcome & { id?: string }> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('rpc_save_experience_catalogue', {
+    p_kind: input.kind,
+    p_id: input.id,
+    p_data: input.data,
+    p_blocks: input.blocks ?? [],
+  });
+  const bad = fail(error);
+  if (bad) return bad;
+  if (!data) return { ok: false, message: 'The catalogue record was not returned after saving.' };
+
+  revalidatePath('/experiences');
+  revalidatePath('/experience');
+  revalidatePath('/experience/build');
+  return { ok: true, id: data, message: 'Catalogue saved.' };
+}
 
 export async function publishEvent(eventId: string): Promise<Outcome> {
   const supabase = createClient();

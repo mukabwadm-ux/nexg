@@ -56,6 +56,7 @@ export function useOnboarding(): Store {
 const SAVEABLE: readonly string[] = [
   'trading_name',
   'legal_name',
+  'subcategory',
   'contact_name',
   'contact_email',
   'cover_photo_path',

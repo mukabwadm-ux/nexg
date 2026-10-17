@@ -269,3 +269,5 @@ export function normaliseMsisdn(input: string): string | null {
   const candidate = `+${n}`;
   return Msisdn.safeParse(candidate).success ? candidate : null;
 }
+
+export * from './taxonomy';

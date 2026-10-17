@@ -49699,6 +49699,10 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_save_experience_catalogue: {
+        Args: { p_blocks?: Json; p_data: Json; p_id: string | null; p_kind: string };
+        Returns: string;
+      };
       rpc_send_plan: {
         Args: { p_guest_name?: string; p_guest_phone?: string; p_plan_id: string };
         Returns: {
@@ -52346,6 +52350,26 @@ export const Constants = {
         'supermarket',
         'gift_shop',
         'other',
+        'adults_only',
+        'airport_transfers',
+        'alcohol_beverages',
+        'fashion_apparel',
+        'beauty',
+        'vehicle_rentals',
+        'experiences',
+        'financial_services',
+        'flowers_gifts',
+        'restaurants_food',
+        'groceries_essentials',
+        'laundry_cleaning',
+        'marketplace',
+        'health',
+        'tech_electronics',
+        'travel_tours',
+        'vehicle_services',
+        'wellness',
+        'concierge_services',
+        'logistics_shipping',
       ],
       merchant_control_source: ['merchant', 'staff', 'system'],
       merchant_user_role: ['owner', 'manager'],

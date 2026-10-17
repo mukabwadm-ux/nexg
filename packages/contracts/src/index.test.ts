@@ -134,3 +134,26 @@ describe('parse shapes the error for a response', () => {
     }
   });
 });
+
+describe('merchant taxonomy', () => {
+  it('has 21 categories and 128 subcategories', async () => {
+    const { ALL_CATEGORIES, ALL_SUBCATEGORIES } = await import('./taxonomy');
+    expect(ALL_CATEGORIES.length).toBe(21);
+    expect(ALL_SUBCATEGORIES.length).toBe(128);
+  });
+
+  it('resolves categories by id and legacy alias', async () => {
+    const { getCategoryById } = await import('./taxonomy');
+    expect(getCategoryById('restaurants_food')?.name).toBe('Restaurants & Food');
+    // Legacy alias
+    expect(getCategoryById('restaurant')?.name).toBe('Restaurants & Food');
+    expect(getCategoryById('supermarket')?.name).toBe('Groceries & Essentials');
+  });
+
+  it('searches taxonomy by query', async () => {
+    const { searchTaxonomy } = await import('./taxonomy');
+    const res = searchTaxonomy('safari');
+    expect(res.subcategories.some((s) => s.name.toLowerCase().includes('safari'))).toBe(true);
+    expect(res.categories.some((c) => c.id === 'travel_tours')).toBe(true);
+  });
+});

@@ -19,7 +19,7 @@ export default async function ApplyLayout({ children }: { children: React.ReactN
     supabase
       .from('category_config')
       .select(
-        'category, label, icon, card_kind, eta_style, questions, badge_rules, featured_eligible, requires_ops_mapping, sort',
+        'category, label, icon, card_kind, eta_style, questions, badge_rules, featured_eligible, requires_ops_mapping, sort, subcategories, color, bg, description',
       )
       .neq('category', 'gift_shop')
       .order('sort'),
