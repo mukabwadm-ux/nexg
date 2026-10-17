@@ -50,7 +50,7 @@ const listingFor = unstable_cache(
       supabase
         .from('merchant_public')
         .select(
-          'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
+          'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
         )
         .eq('city_slug', citySlug)
         .order('listed_at', { ascending: false }),
@@ -66,6 +66,32 @@ const listingFor = unstable_cache(
   { revalidate: 3600, tags: ['merchants'] },
 );
 
+/*
+ * "Near you": how far a merchant's branch may be from the visitor's spot to
+ * count. The platform's default delivery limit (fees.delivery.max_km); a
+ * merchant further than this would be refused at checkout anyway.
+ */
+const NEAR_KM = 15;
+
+function parseNear(raw: string | undefined): { lat: number; lng: number } | null {
+  if (!raw) return null;
+  const [lat, lng] = raw.split(',').map(Number);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (Math.abs(lat!) > 90 || Math.abs(lng!) > 180) return null;
+  return { lat: lat!, lng: lng! };
+}
+
+/** Great-circle distance in km. */
+function kmBetween(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad;
+  const dLng = (b.lng - a.lng) * rad;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+
 export default async function ExplorePage({
   searchParams,
 }: {
@@ -76,6 +102,8 @@ export default async function ExplorePage({
     open?: string;
     picks?: string;
     q?: string;
+    /** "lat,lng": only merchants that deliver to this spot, nearest first. */
+    near?: string;
   };
 }) {
   /*
@@ -107,8 +135,9 @@ export default async function ExplorePage({
     picksOnly: searchParams?.picks === '1',
   };
   const query = (searchParams?.q ?? '').trim().toLowerCase();
+  const near = parseNear(searchParams?.near);
 
-  const hrefFor = (patch: Partial<FilterState> & { q?: string | null }) => {
+  const hrefFor = (patch: Partial<FilterState> & { q?: string | null; near?: string | null }) => {
     const next = { ...state, ...patch };
     const params = new URLSearchParams();
     if (next.city) params.set('city', next.city);
@@ -118,11 +147,25 @@ export default async function ExplorePage({
     if (next.picksOnly) params.set('picks', '1');
     const q = 'q' in patch ? patch.q : (searchParams?.q ?? null);
     if (q) params.set('q', q);
+    /* Kept across every other filter: switching category near you stays near you. */
+    const nearParam = 'near' in patch ? patch.near : (searchParams?.near ?? null);
+    if (nearParam && near) params.set('near', nearParam);
     const search = params.toString();
     return search ? `/explore?${search}` : '/explore';
   };
 
-  const visible = listed.filter((merchant) => {
+  /* Distance from the visitor's spot, where both ends are known. */
+  const kmTo = (m: { branch_latitude: number | null; branch_longitude: number | null }) =>
+    near && m.branch_latitude != null && m.branch_longitude != null
+      ? kmBetween(near, { lat: m.branch_latitude, lng: m.branch_longitude })
+      : null;
+
+  const filtered = listed.filter((merchant) => {
+    /* Near you: a branch with no pin cannot be shown to reach the visitor. */
+    if (near) {
+      const km = kmTo(merchant);
+      if (km === null || km > NEAR_KM) return false;
+    }
     if (state.category && merchant.category !== state.category) return false;
     if (state.area && merchant.branch_name !== state.area) return false;
     if (state.openNow && merchant.accepting_orders === false) return false;
@@ -134,6 +177,10 @@ export default async function ExplorePage({
     }
     return true;
   });
+
+  const visible = near
+    ? [...filtered].sort((a, b) => (kmTo(a) ?? Infinity) - (kmTo(b) ?? Infinity))
+    : filtered;
 
   const picks = listed.filter((m) => m.concierge_pick).slice(0, 3);
   const areas = [...new Set(listed.map((m) => m.branch_name).filter(Boolean))] as string[];
@@ -341,8 +388,16 @@ export default async function ExplorePage({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-[0.9375rem] font-bold">
                 {visible.length} {visible.length === 1 ? 'merchant delivers' : 'merchants deliver'}{' '}
-                to {cityName} right now
+                {near ? 'to your spot' : `to ${cityName}`} right now
               </p>
+              {near && (
+                <Link
+                  href={hrefFor({ near: null })}
+                  className="text-muted-light hover:text-ink text-xs font-bold transition-colors"
+                >
+                  Show all in {cityName}
+                </Link>
+              )}
               {query && (
                 <Link
                   href={hrefFor({ q: null })}
@@ -357,16 +412,21 @@ export default async function ExplorePage({
               <div className="mt-6">
                 <EmptyState
                   icon={<Store className="h-5 w-5" />}
-                  title="Nothing matches that yet"
-                  description="No business here fits those filters. Try another area or category — or ask the concierge, since plenty of what guests want never comes from a listing."
+                  title={near ? 'Nobody near you yet' : 'Nothing matches that yet'}
+                  description={
+                    near
+                      ? `No business within ${NEAR_KM} km of your spot fits that yet. See everything in ${cityName}, or ask the concierge — plenty of what guests want never comes from a listing.`
+                      : 'No business here fits those filters. Try another area or category — or ask the concierge, since plenty of what guests want never comes from a listing.'
+                  }
                   action={{
-                    label: 'Clear filters',
+                    label: near ? `See all in ${cityName}` : 'Clear filters',
                     href: hrefFor({
-                      category: null,
+                      category: near ? state.category : null,
                       area: null,
                       openNow: false,
                       picksOnly: false,
                       q: null,
+                      near: null,
                     }),
                   }}
                 />
