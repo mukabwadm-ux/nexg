@@ -5,6 +5,8 @@ import * as React from 'react';
 
 import { useLocation } from './store';
 
+const CITY_BANNER_DISMISSED_KEY = 'nexg.loc.city-banner.dismissed';
+
 /**
  * One banner under the nav, one chip variant, per state.
  *
@@ -24,9 +26,27 @@ export function LocationBanner({
   hidden = false,
 }: { hidden?: boolean } = {}) {
   const { place, step, chip, consent, blockedNoticeSeen, openSheet, setPanelOpen } = useLocation();
-  const [dismissed, setDismissed] = React.useState(false);
+  const [cityBannerDismissed, setCityBannerDismissed] = React.useState<boolean | null>(null);
+  const [noticeDismissed, setNoticeDismissed] = React.useState(false);
 
-  if (hidden || dismissed) return null;
+  React.useEffect(() => {
+    try {
+      setCityBannerDismissed(window.sessionStorage.getItem(CITY_BANNER_DISMISSED_KEY) === 'true');
+    } catch {
+      setCityBannerDismissed(false);
+    }
+  }, []);
+
+  const dismissCityBanner = () => {
+    try {
+      window.sessionStorage.setItem(CITY_BANNER_DISMISSED_KEY, 'true');
+    } catch {
+      // Keep the dismissal for this render if browser storage is unavailable.
+    }
+    setCityBannerDismissed(true);
+  };
+
+  if (hidden) return null;
 
   /* B · the browser was asked and said no.
      Shown once, then search carries on being the control. The
@@ -104,6 +124,8 @@ export function LocationBanner({
      checkout will ask again — said here rather than discovered
      at the moment of payment. */
   if (chip === 'city' || step === 'ip_city') {
+    if (cityBannerDismissed !== false) return null;
+
     return (
       <Bar tone="gold">
         <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -117,7 +139,7 @@ export function LocationBanner({
         <Action onClick={() => openSheet('banner')} variant="dark">
           Set my delivery spot
         </Action>
-        <Action onClick={() => setDismissed(true)} variant="link">
+        <Action onClick={dismissCityBanner} variant="link">
           Dismiss
         </Action>
       </Bar>
@@ -127,11 +149,13 @@ export function LocationBanner({
   /* A paused zone is covered, not uncovered — different sentence,
      different action. */
   if (place?.paused && place.message) {
+    if (noticeDismissed) return null;
+
     return (
       <Bar tone="gold">
         <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
         <span className="flex-1">{place.message}</span>
-        <Action onClick={() => setDismissed(true)} variant="link">
+        <Action onClick={() => setNoticeDismissed(true)} variant="link">
           Dismiss
         </Action>
       </Bar>
