@@ -18,13 +18,11 @@ import {
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense } from 'react';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { CityCarousel } from '@/components/home/city-carousel';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
-import { LeadForm } from '@/components/home/lead-form';
 import { NotifyForm } from '@/components/home/notify-form';
 import { SiteFooter } from '@/components/site-footer';
 import { getTranslations } from '@/lib/i18n';
@@ -136,65 +134,6 @@ export default async function HomePage() {
       />
 
       <main>
-        {/* ------------------------------------------- ask a concierge */}
-        {/*
-          The request form that used to sit in the hero. Still the fastest
-          way to ask for anything, and the target of the menu's "Ask a
-          concierge" and the hero's "Airport pickup" (#start).
-        */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-12 sm:px-8 lg:px-16 lg:pb-16 lg:pt-16">
-          <div className="grid gap-8 lg:grid-cols-[1fr_32rem] lg:gap-12">
-            <div className="lg:pt-6">
-              <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
-                <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
-                {t('home.availableNow')}
-              </span>
-
-              <h2 className="mt-5 text-3xl/[1.16] font-extrabold tracking-tight sm:text-4xl/[1.16] lg:text-5xl/[1.16]">
-                {t('home.title')}
-              </h2>
-
-              <p className="mt-4 text-2xl font-extrabold tracking-tight sm:text-[1.75rem]">
-                <span className="text-gold">{t('home.youWantIt')}</span>{' '}
-                <span className="text-ink">{t('home.weGotYou')}</span>
-              </p>
-
-              <p className="text-muted mt-4 max-w-md text-[1.0625rem] font-semibold leading-[1.7]">
-                {t('home.lede')}
-              </p>
-
-              <dl className="mt-7 flex flex-wrap gap-x-10 gap-y-4">
-                {[
-                  { value: allCities.length || '—', label: t('home.stat.cities') },
-                  { value: CATEGORIES.length, label: t('home.stat.categories') },
-                  { value: '100%', label: t('home.stat.tracking') },
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <dt className="sr-only">{stat.label}</dt>
-                    <dd>
-                      <span className="block text-2xl font-extrabold tracking-tight">
-                        {stat.value}
-                      </span>
-                      <span className="text-muted-light block text-xs">{stat.label}</span>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            {/*
-              LeadForm reads ?need= to prefill itself, which needs a boundary
-              for the page to prerender. The fallback is the card's own shape
-              so nothing jumps when it hydrates.
-            */}
-            <Suspense
-              fallback={<div className="bg-surface shadow-raised min-h-[28rem] rounded-2xl" />}
-            >
-              <LeadForm />
-            </Suspense>
-          </div>
-        </section>
-
         {/* ---------------------------------------------------- how it works */}
         <section id="how-it-works" className="mx-auto max-w-[96rem] px-4 pb-12 sm:px-8 lg:px-16">
           <ol className="grid gap-4 sm:grid-cols-3 sm:gap-6">
@@ -265,7 +204,7 @@ export default async function HomePage() {
               return (
                 <li key={request.key}>
                   <Link
-                    href={`/?need=${encodeURIComponent(t(request.key))}#start`}
+                    href={`/ask?need=${encodeURIComponent(t(request.key))}`}
                     className="border-border-strong bg-surface hover:border-ink/40 hover:bg-bg focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                   >
                     <span
@@ -281,7 +220,7 @@ export default async function HomePage() {
             })}
             <li>
               <Link
-                href="/#start"
+                href="/ask"
                 className="bg-ink hover:bg-ink/90 focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center rounded-full px-4 py-2 text-sm font-bold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               >
                 {t('home.popular.other')}
