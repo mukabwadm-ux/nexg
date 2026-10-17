@@ -29,12 +29,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 
-import {
-  ALL_CATEGORIES,
-  ALL_SUBCATEGORIES,
-  getCategoryImage,
-  type MerchantCategory,
-} from '@nexg/contracts';
+import { ALL_CATEGORIES, getCategoryImage, type MerchantCategory } from '@nexg/contracts';
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Utensils: UtensilsCrossed,
@@ -111,21 +106,11 @@ export function CategoryExplorer() {
 
   return (
     <div className="space-y-10">
-      {/* Search Header */}
+      {/* Header */}
       <div className="mx-auto max-w-3xl text-center">
-        <div className="border-gold/30 bg-gold/5 text-gold inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black uppercase tracking-wider">
-          <span>Official Nairobi Taxonomy</span>
-          <span>·</span>
-          <span>21 Verticals</span>
-        </div>
-        <h1 className="text-ink mt-4 text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
-          Merchant Verticals & Categories
+        <h1 className="text-ink text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
+          All Categories
         </h1>
-        <p className="text-muted-light mt-3 text-base sm:text-lg">
-          Explore all 21 verified merchant vertical categories and {ALL_SUBCATEGORIES.length}{' '}
-          specialized subcategories across Nairobi, curated for fast concierge delivery and trusted
-          on-demand fulfillment.
-        </p>
 
         {/* Live Search Bar */}
         <div className="relative mt-8">
