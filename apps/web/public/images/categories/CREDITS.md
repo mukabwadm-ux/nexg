@@ -14,6 +14,7 @@ than asserted.
 | `drinks.jpg`      | CC0 1.0 | Paulina Lohunko   | [Wine Bottle](https://stocksnap.io/photo/wine-bottle-SFRR9NXST6)                       |
 | `flowers.jpg`     | CC0 1.0 | Paulina Lohunko   | [Bouquet Flowers](https://stocksnap.io/photo/bouquet-flowers-I5U0KA81R5)               |
 | `laundry.jpg`     | CC0 1.0 | Freestocks.org    | [Washingmachine Laundry](https://stocksnap.io/photo/washingmachine-laundry-CH3TPVQGU3) |
+| `airport.jpg`     | CC0 1.0 | Skitter Photo     | [Airport Terminal](https://stocksnap.io/photo/airport-terminal-6CF5A4506E)             |
 | `gifts.jpg`       | CC0 1.0 | Daria Nepriakhina | [Present Gift](https://stocksnap.io/photo/present-gift-206B1A2E4C)                     |
 
 Found through the Openverse API (licence CC0, source StockSnap), taken at

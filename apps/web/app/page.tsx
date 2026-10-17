@@ -11,15 +11,16 @@ import {
   Ticket,
 } from 'lucide-react';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { CityCarousel } from '@/components/home/city-carousel';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
+import { PopularCategories } from '@/components/home/popular-categories';
 import { NotifyForm } from '@/components/home/notify-form';
 import { SiteFooter } from '@/components/site-footer';
+import { categoryTiles } from '@/lib/categories';
 import { getTranslations } from '@/lib/i18n';
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -30,23 +31,6 @@ export const metadata: Metadata = {
 };
 
 /* Copy below comes from the `BookingFirst` artboard and is signed off. */
-
-/*
- * Popular categories: real photographs (CC0, see
- * public/images/categories/CREDITS.md), each opening Explore filtered to
- * the merchant category it names. The list grows with the merchant
- * catalogue.
- */
-const POPULAR_CATEGORIES = [
-  { key: 'home.pc.restaurants', image: 'restaurants', category: 'restaurant' },
-  { key: 'home.pc.groceries', image: 'groceries', category: 'supermarket' },
-  { key: 'home.pc.pharmacy', image: 'pharmacy', category: 'pharmacy' },
-  { key: 'home.pc.beauty', image: 'beauty', category: 'beauty_fashion' },
-  { key: 'home.pc.drinks', image: 'drinks', category: 'bar_liquor' },
-  { key: 'home.pc.flowers', image: 'flowers', category: 'florist' },
-  { key: 'home.pc.laundry', image: 'laundry', category: 'laundry' },
-  { key: 'home.pc.gifts', image: 'gifts', category: 'gift_shop' },
-] as const;
 
 const CATEGORIES = [
   { key: 'home.cat.transfers', icon: Plane },
@@ -131,61 +115,14 @@ export default async function HomePage() {
         {/* ---------------------------------------------- popular categories */}
         <section
           id="popular"
-          className="mx-auto max-w-[96rem] scroll-mt-20 px-4 pb-14 pt-12 sm:px-8 lg:px-16"
+          className="mx-auto max-w-[96rem] scroll-mt-20 px-4 py-16 sm:px-8 sm:py-20 lg:px-16 lg:py-24"
         >
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight">
-              <span
-                aria-hidden="true"
-                className="bg-ink text-gold flex h-7 w-7 items-center justify-center rounded-full"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-              </span>
-              {t('home.popular.heading')}
-            </h2>
-            <p className="text-muted-light text-xs font-semibold">{t('home.popular.sub')}</p>
-          </div>
-
-          {/* One row: it scrolls sideways on a phone, nine across on desktop. */}
-          <ul className="-mx-4 mt-5 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-9 lg:gap-4 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden">
-            {POPULAR_CATEGORIES.map((item) => (
-              <li key={item.key} className="w-[6.75rem] shrink-0 sm:w-32 lg:w-auto">
-                <Link
-                  href={`/explore?category=${item.category}`}
-                  className="focus-visible:ring-gold group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                >
-                  <span className="shadow-card bg-surface relative block aspect-square overflow-hidden rounded-2xl">
-                    <Image
-                      src={`/images/categories/${item.image}.jpg`}
-                      alt=""
-                      fill
-                      sizes="(min-width: 1024px) 10vw, 8rem"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </span>
-                  <span className="mt-2 block text-center text-[0.8125rem] font-bold leading-tight">
-                    {t(item.key)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-            <li className="w-[6.75rem] shrink-0 sm:w-32 lg:w-auto">
-              <Link
-                href="/ask"
-                className="focus-visible:ring-gold group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              >
-                <span className="bg-ink text-gold shadow-card flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl transition-colors group-hover:bg-[#1f1d1b]">
-                  <Sparkles className="h-7 w-7" aria-hidden="true" />
-                  <span className="px-2 text-center text-[0.6875rem] font-semibold text-white/70">
-                    {t('home.popular.otherHint')}
-                  </span>
-                </span>
-                <span className="mt-2 block text-center text-[0.8125rem] font-bold leading-tight">
-                  {t('home.popular.other')}
-                </span>
-              </Link>
-            </li>
-          </ul>
+          <PopularCategories
+            heading={t('home.popular.heading')}
+            sub={t('home.popular.sub')}
+            allLabel={t('home.popular.all')}
+            items={categoryTiles(t)}
+          />
         </section>
 
         {/* ------------------------------------------------------- featured */}
