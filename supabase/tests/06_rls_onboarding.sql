@@ -10,7 +10,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(20);
+select plan(26);
 
 /*
  * Foreign keys and triggers are suspended for the cleanup below,
@@ -132,10 +132,59 @@ select is(
 update public.merchant set answers = '{"serves_alcohol": "yes"}'::jsonb
 where id = 'cccccccc-0000-0000-0000-000000000001';
 
+update public.merchant set category = 'restaurants_food'
+where id = 'cccccccc-0000-0000-0000-000000000001';
+
+select is(
+  (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')),
+  5,
+  'the canonical restaurant category keeps its category and answer-based document rules'
+);
+
+update public.merchant set category = 'restaurant'
+where id = 'cccccccc-0000-0000-0000-000000000001';
+
 -- ------------------------------------------------------------- the write guard
 
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"55555555-5555-5555-5555-555555555555","role":"authenticated"}';
+
+select lives_ok(
+  $$select public.rpc_merchant_set_subcategory(
+    'cccccccc-0000-0000-0000-000000000001', 'restaurant'
+  )$$,
+  'an owner can save a specialty that belongs to their category'
+);
+
+select is(
+  (select subcategory from public.merchant
+   where id = 'cccccccc-0000-0000-0000-000000000001'),
+  'restaurant',
+  'the selected specialty persists on the merchant draft'
+);
+
+select lives_ok(
+  $$select public.rpc_merchant_set_subcategory(
+    'cccccccc-0000-0000-0000-000000000001', ''
+  )$$,
+  'an owner can clear the selected specialty'
+);
+
+select is(
+  (select subcategory from public.merchant
+   where id = 'cccccccc-0000-0000-0000-000000000001'),
+  null::text,
+  'clearing a specialty stores null on the merchant draft'
+);
+
+select throws_ok(
+  $$select public.rpc_merchant_set_subcategory(
+    'cccccccc-0000-0000-0000-000000000001', 'adult_products'
+  )$$,
+  '23514',
+  'Choose a specialty shown for this business category.',
+  'an owner cannot save a specialty from a different category'
+);
 
 select throws_ok(
   $$update public.merchant set featured = true where id = 'cccccccc-0000-0000-0000-000000000001'$$,

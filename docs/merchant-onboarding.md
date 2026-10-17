@@ -61,7 +61,18 @@ everyone. `supabase/tests/06_rls_onboarding.sql` fails if someone does that.
 
 ## How to add a category
 
-One row in `category_config`, by migration:
+The onboarding chooser is built from `MERCHANT_TAXONOMY` in
+`packages/contracts/src/taxonomy.ts`. Add the category and its specialties
+there, including the customer workflow and the listing fields each specialty
+needs. Step 2 uses those entries for the category tiles and tailored setup
+preview.
+
+Also add the matching `merchant_category` enum value and `category_config`
+row in Supabase migrations. The database row remains authoritative for
+category-specific questions, badges and document rules; the web taxonomy does
+not replace those server-side requirements.
+
+For example, the database row includes:
 
 ```sql
 insert into public.category_config
@@ -69,12 +80,23 @@ insert into public.category_config
 values ('butchery', 'Butchery', 'Beef', 'products', 'minutes', 10, '[…]', '{…}');
 ```
 
-- `category` must already exist in the `merchant_category` enum.
+- Apply the enum migration before the category data migration. Do not add and
+  use a new enum value in the same migration transaction.
+- `category` must exist in both the canonical taxonomy and the
+  `merchant_category` enum.
 - `icon` is a lucide-react name; add it to the `ICONS` map in
-  `components/onboarding/controls.tsx` or it falls back to a gift.
+  `components/onboarding/controls.tsx` or the tile uses the store icon.
 - `card_kind` decides whether the merchant is asked for a menu, services or
   products; `eta_style` whether their card says "delivers in 25 min" or
   "back next day".
+- `subcategories[].defaultWorkflow` and `subcategories[].fields` drive the
+  specialty-specific onboarding preview. Keep them descriptive; document
+  requirements and conditional rules belong in the database as described
+  below.
+- Specialty selections are persisted through
+  `rpc_merchant_set_subcategory`, which checks that the selected specialty
+  belongs to the merchant's category. Keep the category's configured
+  `subcategories` JSON aligned with the taxonomy migration.
 
 ## How to add a question
 

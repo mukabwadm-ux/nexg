@@ -5550,9 +5550,12 @@ export type Database = {
       category_config: {
         Row: {
           badge_rules: NonNullable<Json>;
+          bg: string | null;
           card_kind: string;
           category: Database['public']['Enums']['merchant_category'];
+          color: string | null;
           created_at: string;
+          description: string | null;
           eta_style: string;
           extra_doc_rules: NonNullable<Json>;
           featured_eligible: boolean;
@@ -5561,14 +5564,18 @@ export type Database = {
           questions: NonNullable<Json>;
           requires_ops_mapping: boolean;
           sort: number;
+          subcategories: NonNullable<Json>;
           updated_at: string;
         };
         ComputedFields: never;
         Insert: {
           badge_rules?: NonNullable<Json>;
+          bg?: string | null;
           card_kind: string;
           category: Database['public']['Enums']['merchant_category'];
+          color?: string | null;
           created_at?: string;
+          description?: string | null;
           eta_style: string;
           extra_doc_rules?: NonNullable<Json>;
           featured_eligible?: boolean;
@@ -5577,13 +5584,17 @@ export type Database = {
           questions?: NonNullable<Json>;
           requires_ops_mapping?: boolean;
           sort?: number;
+          subcategories?: NonNullable<Json>;
           updated_at?: string;
         };
         Update: {
           badge_rules?: NonNullable<Json>;
+          bg?: string | null;
           card_kind?: string;
           category?: Database['public']['Enums']['merchant_category'];
+          color?: string | null;
           created_at?: string;
+          description?: string | null;
           eta_style?: string;
           extra_doc_rules?: NonNullable<Json>;
           featured_eligible?: boolean;
@@ -5592,6 +5603,7 @@ export type Database = {
           questions?: NonNullable<Json>;
           requires_ops_mapping?: boolean;
           sort?: number;
+          subcategories?: NonNullable<Json>;
           updated_at?: string;
         };
         Relationships: [];
@@ -14093,6 +14105,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -14177,6 +14190,7 @@ export type Database = {
           status?: Database['public']['Enums']['partner_status'];
           status_reason?: string | null;
           strike_count?: number;
+          subcategory?: string | null;
           submitted_at?: string | null;
           suspended_at?: string | null;
           suspended_by?: string | null;
@@ -14260,6 +14274,7 @@ export type Database = {
           status?: Database['public']['Enums']['partner_status'];
           status_reason?: string | null;
           strike_count?: number;
+          subcategory?: string | null;
           submitted_at?: string | null;
           suspended_at?: string | null;
           suspended_by?: string | null;
@@ -38568,6 +38583,7 @@ export type Database = {
           pay_on_delivery_cap_kes: number | null;
           pay_on_delivery_enabled: boolean | null;
           prep_minutes: number | null;
+          subcategory: string | null;
           trading_name: string | null;
         };
         ComputedFields: never;
@@ -43666,6 +43682,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -47233,6 +47250,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -47329,6 +47347,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -47555,6 +47574,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -47711,6 +47731,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -47807,6 +47828,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -47899,6 +47921,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -47931,6 +47954,10 @@ export type Database = {
           p_name?: string;
         };
         Returns: string;
+      };
+      rpc_merchant_set_subcategory: {
+        Args: { p_merchant_id: string; p_subcategory: string };
+        Returns: Json;
       };
       rpc_merchant_settings_update: {
         Args: { p_merchant_id: string; p_patch: Json };
@@ -48005,6 +48032,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -48109,6 +48137,7 @@ export type Database = {
           status: Database['public']['Enums']['partner_status'];
           status_reason: string | null;
           strike_count: number;
+          subcategory: string | null;
           submitted_at: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -49700,7 +49729,7 @@ export type Database = {
         };
       };
       rpc_save_experience_catalogue: {
-        Args: { p_blocks?: Json; p_data: Json; p_id: string | null; p_kind: string };
+        Args: { p_blocks?: Json; p_data: Json; p_id: string; p_kind: string };
         Returns: string;
       };
       rpc_send_plan: {

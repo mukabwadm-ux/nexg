@@ -2,25 +2,30 @@
 
 import {
   Activity,
-  BellRing,
+  Banknote,
   Briefcase,
-  Car,
+  CarFront,
+  BellRing,
   Compass,
   Flower2,
   Gift,
   GlassWater,
   Heart,
+  HeartPulse,
   Laptop,
+  Map,
+  Package,
   Plane,
   Pill as PillIcon,
   Scissors,
   Ship,
-  Shirt,
   ShieldAlert,
+  Shirt,
   ShoppingCart,
   Sparkles,
   Store,
   Ticket,
+  Truck,
   Utensils,
   Wine,
   Wrench,
@@ -41,29 +46,36 @@ import type { Question } from './types';
 
 const ICONS: Record<string, LucideIcon> = {
   Activity,
+  Banknote,
   BellRing,
   Briefcase,
-  Car,
+  Car: CarFront,
   Compass,
+  Flower: Flower2,
+  Flower2,
+  GlassWater,
+  Heart,
+  HeartPulse,
+  Laptop,
+  Map,
+  Package,
+  Plane,
+  Pills: PillIcon,
+  Shield: ShieldAlert,
+  ShieldAlert,
+  Sparkles,
+  Store,
+  Ticket,
+  Truck,
   Utensils,
   Wine,
   Shirt,
-  ShieldAlert,
-  Plane,
-  GlassWater,
-  Sparkles,
-  Ticket,
-  Store,
-  Pills: PillIcon,
-  Heart,
-  Laptop,
-  Wrench,
-  Ship,
-  Flower2,
   Scissors,
   Pill: PillIcon,
   ShoppingCart,
   Gift,
+  Ship,
+  Wrench,
 };
 
 export function Chip({
@@ -97,17 +109,19 @@ export function Chip({
 export function CategoryTile({
   icon,
   label,
+  description,
   selected,
   onClick,
-  disabled,
+  disabled = false,
 }: {
   icon: string;
   label: string;
+  description?: string;
   selected: boolean;
   onClick: () => void;
   disabled?: boolean;
 }) {
-  const Icon = ICONS[icon] ?? Gift;
+  const Icon = ICONS[icon] ?? Store;
 
   return (
     <button
@@ -115,21 +129,26 @@ export function CategoryTile({
       aria-pressed={selected}
       disabled={disabled}
       onClick={onClick}
-      className={`focus-visible:ring-gold flex flex-col items-center gap-3 rounded-2xl border p-5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`focus-visible:ring-gold flex min-h-24 flex-col items-center justify-center gap-2 rounded-xl border px-3 py-4 text-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:min-h-24 ${
         selected
-          ? 'border-ink bg-ink text-white'
-          : 'border-border bg-surface hover:border-border-strong'
+          ? 'border-gold bg-gold/10 text-ink ring-gold/40 ring-1'
+          : 'border-border bg-surface text-ink hover:border-gold/60'
       }`}
     >
       <span
         aria-hidden="true"
-        className={`flex h-11 w-11 items-center justify-center rounded-xl ${
-          selected ? 'bg-gold text-ink' : 'bg-bg text-ink'
+        className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+          selected ? 'bg-gold/20 text-gold-text' : 'bg-bg text-ink'
         }`}
       >
-        <Icon className="h-5 w-5" />
+        <Icon className="h-[1.125rem] w-[1.125rem]" />
       </span>
-      <span className="text-[0.8125rem] font-extrabold">{label}</span>
+      <span className="text-[0.8125rem] font-bold leading-tight">{label}</span>
+      {description && (
+        <span className="text-muted-light line-clamp-2 text-[0.6875rem] leading-snug">
+          {description}
+        </span>
+      )}
     </button>
   );
 }
