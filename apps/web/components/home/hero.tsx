@@ -250,7 +250,7 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
       </div>
 
       <a
-        href="#how-it-works"
+        href="#popular"
         className="flex flex-col items-center pb-2 text-[0.6875rem] text-white/70 lg:hidden"
       >
         <ChevronDown className="text-gold h-4 w-4" aria-hidden="true" />

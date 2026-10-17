@@ -16,7 +16,6 @@ import {
   UtensilsCrossed,
 } from 'lucide-react';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
@@ -35,12 +34,6 @@ export const metadata: Metadata = {
 };
 
 /* Copy below comes from the `BookingFirst` artboard and is signed off. */
-
-const HOW_IT_WORKS = [
-  { key: 'home.step1', image: '/images/how-it-works/ask-in-a-sentence.jpg' },
-  { key: 'home.step2', image: '/images/how-it-works/a-concierge-takes-it.jpg' },
-  { key: 'home.step3', image: '/images/how-it-works/track-and-pay.jpg' },
-] as const;
 
 const POPULAR_REQUESTS = [
   { key: 'home.req.dinner', icon: UtensilsCrossed },
@@ -134,57 +127,11 @@ export default async function HomePage() {
       />
 
       <main>
-        {/* ---------------------------------------------------- how it works */}
-        <section id="how-it-works" className="mx-auto max-w-[96rem] px-4 pb-12 sm:px-8 lg:px-16">
-          <ol className="grid gap-4 sm:grid-cols-3 sm:gap-6">
-            {HOW_IT_WORKS.map((step, index) => (
-              <li
-                key={step.key}
-                /* The tile is a hover-reveal, so it needs a tab stop: without one a
-                   sighted keyboard user can never read the copy. The rule cannot see
-                   that, hence the exception. */
-                // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-                tabIndex={0}
-                className="focus-visible:ring-gold focus-visible:ring-offset-bg group relative aspect-[418/197] min-w-0 overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              >
-                {/* Decorative: the panel below carries the same meaning in text. */}
-                <Image
-                  src={step.image}
-                  alt=""
-                  fill
-                  sizes="(min-width: 640px) 33vw, 100vw"
-                  className="object-cover"
-                />
-
-                {/*
-                  The gold card, revealed on hover.
-
-                  The base state is visible, and only devices that actually
-                  support hover start it hidden — a touch screen has no hover,
-                  so the copy would otherwise be unreachable. Focus reveals it
-                  too, which is why the tile is focusable: without that a
-                  sighted keyboard user could never read it. The text stays in
-                  the DOM throughout, so screen readers get it in every state.
-                */}
-                <div className="bg-gold absolute inset-0 flex flex-col p-4 transition-opacity duration-300 sm:p-5 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-                  <span
-                    aria-hidden="true"
-                    className="bg-ink text-gold flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-extrabold"
-                  >
-                    {index + 1}
-                  </span>
-                  <h3 className="mt-4 text-base font-extrabold">{t(`${step.key}.title`)}</h3>
-                  <p className="text-ink/80 mt-1.5 text-[0.9375rem] font-semibold leading-[1.7]">
-                    {t(`${step.key}.body`)}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-
         {/* ------------------------------------------------ popular requests */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
+        <section
+          id="popular"
+          className="mx-auto max-w-[96rem] scroll-mt-20 px-4 pb-14 pt-12 sm:px-8 lg:px-16"
+        >
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight">
               <span
