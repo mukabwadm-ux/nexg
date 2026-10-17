@@ -53,7 +53,7 @@ const SECTIONS = [
   {
     number: '04',
     key: 'nav.askConcierge',
-    href: '/#start',
+    href: '/ask',
     noteKey: null,
     note: 'Online now',
     live: true,

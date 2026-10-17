@@ -118,7 +118,7 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
   const needsSpot = chip === 'empty' || chip === 'city';
 
   const popular: { icon: LucideIcon; label: string; href: string }[] = [
-    { icon: Plane, label: 'Airport pickup', href: '/?need=Airport%20Transfer#start' },
+    { icon: Plane, label: 'Airport pickup', href: '/ask?need=Airport%20Transfer' },
     { icon: BedDouble, label: 'Hotel stays', href: '/stays' },
     {
       icon: Flower2,
@@ -250,7 +250,7 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
       </div>
 
       <a
-        href="#start"
+        href="#how-it-works"
         className="flex flex-col items-center pb-2 text-[0.6875rem] text-white/70 lg:hidden"
       >
         <ChevronDown className="text-gold h-4 w-4" aria-hidden="true" />
@@ -587,7 +587,7 @@ function HeroSearch({
           ) : items.length === 0 ? (
             <p className="px-4 py-3 text-sm text-[#6b6560]">
               Nothing matches “{term}” yet. Press Enter to search everything, or{' '}
-              <Link href="/#start" className="font-semibold underline">
+              <Link href="/ask" className="font-semibold underline">
                 ask a concierge
               </Link>
               .

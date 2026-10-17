@@ -27,6 +27,7 @@ import { expect, test } from '@playwright/test';
 const PUBLIC_ROUTES = [
   '/',
   '/explore',
+  '/ask',
   '/help',
   '/careers',
   '/merchants',
@@ -229,7 +230,7 @@ test.describe('a guessed city is never presented as an address', () => {
         }),
       );
     });
-    await page.goto('/');
+    await page.goto('/ask');
     await page.waitForTimeout(2500);
 
     await expect(
@@ -257,7 +258,7 @@ test.describe('a guessed city is never presented as an address', () => {
         }),
       );
     });
-    await page.goto('/');
+    await page.goto('/ask');
     await page.waitForTimeout(2500);
     await expect(page.locator('#staying_at')).not.toHaveValue('');
   });
