@@ -43,6 +43,7 @@ export function StartStep({
 
   const [url, setUrl] = React.useState('');
   const [found, setFound] = React.useState<PrefillResult | null>(null);
+  const [placeConfirmed, setPlaceConfirmed] = React.useState(false);
   const [fetching, setFetching] = React.useState(false);
 
   const [tradingName, setTradingName] = React.useState(
@@ -62,16 +63,67 @@ export function StartStep({
   const [starting, setStarting] = React.useState(false);
   const [code, setCode] = React.useState('');
   const [devCode, setDevCode] = React.useState<string | null>(null);
-  const [verified, setVerified] = React.useState(false);
+  const [verified, setVerified] = React.useState(!!draft?.phone_verified_at);
   const [verifying, setVerifying] = React.useState(false);
+  const [codeError, setCodeError] = React.useState<string | null>(null);
 
   const fetchLink = async () => {
     setFetching(true);
-    const result = await prefillFromUrl(url);
-    setFetching(false);
-    setFound(result);
-    if (!result.ok) {
-      toast({ title: 'We could not read that link', description: result.message, tone: 'danger' });
+    try {
+      const result = await prefillFromUrl(url);
+      setFound(result);
+      if (!result.ok) {
+        toast({
+          title: 'We could not read that link',
+          description: result.message,
+          tone: 'danger',
+        });
+        return;
+      }
+      setMethod('link');
+      setPlaceConfirmed(false);
+      if (result.name) setTradingName(result.name);
+      if (result.phone) setPhone(result.phone);
+      if (result.email) {
+        setEmail(result.email);
+        setEmailChoice('add');
+      }
+    } catch {
+      toast({
+        title: 'We could not read that link',
+        description: 'Check your connection, or enter your business details manually.',
+        tone: 'danger',
+      });
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const requestPhoneCode = async (merchantId: string) => {
+    setCodeError(null);
+    setDevCode(null);
+    setCode('');
+    try {
+      const supabase = createClient();
+      const { data: sent, error } = await supabase.rpc('rpc_merchant_request_phone_code', {
+        p_merchant_id: merchantId,
+      });
+      if (error) {
+        setCodeError(error.message);
+        toast({ title: 'We could not send a code', description: error.message, tone: 'danger' });
+        return;
+      }
+
+      const result = sent as { verified?: boolean; delivered?: boolean; code?: string } | null;
+      if (result?.verified) {
+        setVerified(true);
+        return;
+      }
+      setDevCode(result?.code ?? null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Check your connection and retry.';
+      setCodeError(message);
+      toast({ title: 'We could not send a code', description: message, tone: 'danger' });
     }
   };
 
@@ -97,7 +149,19 @@ export function StartStep({
      * it exists, which is what makes every later step safe to save without
      * asking who is asking.
      */
-    const session = await ensureApplicantSession();
+    let session: string | null;
+    try {
+      session = await ensureApplicantSession();
+    } catch (error) {
+      setStarting(false);
+      toast({
+        title: 'We could not start a secure session',
+        description:
+          error instanceof Error ? error.message : 'Check your connection and try again.',
+        tone: 'danger',
+      });
+      return;
+    }
     if (!session) {
       setStarting(false);
       toast({
@@ -128,24 +192,23 @@ export function StartStep({
       return;
     }
 
-    const { data: row } = await supabase
+    const { data: row, error: rowError } = await supabase
       .from('merchant')
       .select('*')
       .eq('id', merchantId as string)
       .maybeSingle();
-    if (row) setDraft(row as Draft);
-
-    const { data: sent } = await supabase.rpc('rpc_merchant_request_phone_code', {
-      p_merchant_id: merchantId as string,
-    });
-    setStarting(false);
-
-    const result = sent as { verified?: boolean; delivered?: boolean; code?: string } | null;
-    if (result?.verified) {
-      setVerified(true);
+    if (rowError || !row) {
+      setStarting(false);
+      toast({
+        title: 'Your draft was created, but could not be opened',
+        description: rowError?.message ?? 'Refresh this page to continue.',
+        tone: 'danger',
+      });
       return;
     }
-    setDevCode(result?.code ?? null);
+    setDraft(row as Draft);
+    setStarting(false);
+    await requestPhoneCode(merchantId as string);
   };
 
   const verify = async () => {
@@ -231,7 +294,7 @@ export function StartStep({
           icon={<Link2 className="h-5 w-5" />}
           badge="Fastest · ~3 min"
           title="Paste a link"
-          description="Your Google Maps, Instagram or Jumia Food page. We pull your name, photos, hours and menu — you just confirm."
+          description="Paste your Google Maps listing. We will fill in its public business name and phone, then you can confirm and edit them."
           selected={method === 'link'}
           onClick={() => setMethod('link')}
         />
@@ -286,13 +349,22 @@ export function StartStep({
                 <Chip
                   selected
                   onClick={() => {
-                    setTradingName(found.name ?? '');
-                    setMethod('link');
+                    setPlaceConfirmed(true);
                   }}
                 >
                   Yes, that is me
                 </Chip>
-                <Chip selected={false} onClick={() => setFound(null)}>
+                <Chip
+                  selected={false}
+                  onClick={() => {
+                    setFound(null);
+                    setPlaceConfirmed(false);
+                    setTradingName('');
+                    setPhone(null);
+                    setEmail('');
+                    setEmailChoice(null);
+                  }}
+                >
                   No, search again
                 </Chip>
               </div>
@@ -306,27 +378,85 @@ export function StartStep({
                 label="Business name — as guests should see it"
                 value={tradingName}
                 onChange={(event) => setTradingName(event.target.value)}
+                disabled={started}
               />
               <Input
                 id="link_contact_name"
                 label="Your name"
                 value={contactName}
                 onChange={(event) => setContactName(event.target.value)}
+                disabled={started}
               />
-              <PhoneInput id="link_phone" label="Phone" value={phone} onChange={setPhone} />
+              <PhoneInput
+                id="link_phone"
+                label="Phone for verification and business contact"
+                hint="We prefill the public listing number when available. Use a number you can receive a code on."
+                value={phone}
+                onChange={setPhone}
+                disabled={started}
+              />
+              <Input
+                id="link_email"
+                type="email"
+                label="Business email (optional)"
+                hint={
+                  found?.email
+                    ? 'Found on the public website linked from this listing. Please confirm it.'
+                    : 'Google does not publish email addresses on business listings. Add your business email if you have one.'
+                }
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                onBlur={() => started && patch({ contact_email: email || null })}
+                disabled={started}
+              />
               {!started && (
-                <div className="flex items-end">
+                <div className="flex items-end sm:col-span-2">
                   <Button
                     block
                     loading={starting}
                     loadingText="Saving…"
+                    disabled={
+                      !tradingName.trim() || !phone || (found?.ok === true && !placeConfirmed)
+                    }
                     onClick={() => void start('link')}
                   >
                     Send me a code
                   </Button>
                 </div>
               )}
+              {started && !verified && (
+                <CodeEntry
+                  code={code}
+                  onChange={setCode}
+                  onVerify={() => void verify()}
+                  verifying={verifying}
+                  onResend={() => {
+                    if (draft) void requestPhoneCode(draft.id);
+                  }}
+                />
+              )}
             </div>
+          )}
+
+          {method === 'link' && devCode && !verified && (
+            <p className="border-warning/40 bg-warning-bg text-warning mt-4 rounded-xl border p-3 text-xs font-bold leading-[1.7]">
+              SMS is not connected on this environment, so we cannot text you. Your code is{' '}
+              <strong className="font-mono text-sm tracking-widest">{devCode}</strong>. Once an SMS
+              sender is configured this code only ever exists in the message.
+            </p>
+          )}
+
+          {method === 'link' && codeError && (
+            <p role="alert" className="text-danger mt-3 text-sm font-semibold">
+              {codeError}
+            </p>
+          )}
+
+          {method === 'link' && verified && (
+            <p className="border-success/30 bg-success-bg text-success mt-5 flex items-center gap-2 rounded-xl border p-3 text-[0.8125rem] font-bold">
+              <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Phone verified. Your progress saves automatically from here.
+            </p>
           )}
         </div>
       )}
@@ -362,6 +492,7 @@ export function StartStep({
             <PhoneInput
               id="contact_phone"
               label="Phone — we text a code, no password to remember"
+              hint="Use a number you can receive a verification code on."
               value={phone}
               onChange={setPhone}
               disabled={started}
@@ -374,7 +505,9 @@ export function StartStep({
                 onChange={setCode}
                 onVerify={() => void verify()}
                 verifying={verifying}
-                onResend={() => void start('scratch')}
+                onResend={() => {
+                  if (draft) void requestPhoneCode(draft.id);
+                }}
               />
             )}
           </div>
@@ -396,6 +529,12 @@ export function StartStep({
               SMS is not connected on this environment, so we cannot text you. Your code is{' '}
               <strong className="font-mono text-sm tracking-widest">{devCode}</strong>. Once an SMS
               sender is configured this code only ever exists in the message.
+            </p>
+          )}
+
+          {codeError && (
+            <p role="alert" className="text-danger mt-3 text-sm font-semibold">
+              {codeError}
             </p>
           )}
 
