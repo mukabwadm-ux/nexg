@@ -2,20 +2,16 @@ import { Button, Card, Tag } from '@nexg/ui';
 import {
   ArrowRight,
   Car,
-  Flower2,
   Gift,
   Landmark,
   Martini,
-  Pill,
   Plane,
-  Scissors,
   Shirt,
-  ShoppingCart,
   Sparkles,
   Ticket,
-  UtensilsCrossed,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
@@ -35,16 +31,21 @@ export const metadata: Metadata = {
 
 /* Copy below comes from the `BookingFirst` artboard and is signed off. */
 
-const POPULAR_REQUESTS = [
-  { key: 'home.req.dinner', icon: UtensilsCrossed },
-  { key: 'home.req.airport', icon: Plane },
-  { key: 'home.req.laundry', icon: Shirt },
-  { key: 'home.req.flowers', icon: Flower2 },
-  { key: 'home.req.pharmacy', icon: Pill },
-  { key: 'home.req.wine', icon: Martini },
-  { key: 'home.req.beauty', icon: Scissors },
-  { key: 'home.req.driver', icon: Car },
-  { key: 'home.req.groceries', icon: ShoppingCart },
+/*
+ * Popular categories: real photographs (CC0, see
+ * public/images/categories/CREDITS.md), each opening Explore filtered to
+ * the merchant category it names. The list grows with the merchant
+ * catalogue.
+ */
+const POPULAR_CATEGORIES = [
+  { key: 'home.pc.restaurants', image: 'restaurants', category: 'restaurant' },
+  { key: 'home.pc.groceries', image: 'groceries', category: 'supermarket' },
+  { key: 'home.pc.pharmacy', image: 'pharmacy', category: 'pharmacy' },
+  { key: 'home.pc.beauty', image: 'beauty', category: 'beauty_fashion' },
+  { key: 'home.pc.drinks', image: 'drinks', category: 'bar_liquor' },
+  { key: 'home.pc.flowers', image: 'flowers', category: 'florist' },
+  { key: 'home.pc.laundry', image: 'laundry', category: 'laundry' },
+  { key: 'home.pc.gifts', image: 'gifts', category: 'gift_shop' },
 ] as const;
 
 const CATEGORIES = [
@@ -127,7 +128,7 @@ export default async function HomePage() {
       />
 
       <main>
-        {/* ------------------------------------------------ popular requests */}
+        {/* ---------------------------------------------- popular categories */}
         <section
           id="popular"
           className="mx-auto max-w-[96rem] scroll-mt-20 px-4 pb-14 pt-12 sm:px-8 lg:px-16"
@@ -145,32 +146,43 @@ export default async function HomePage() {
             <p className="text-muted-light text-xs font-semibold">{t('home.popular.sub')}</p>
           </div>
 
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {POPULAR_REQUESTS.map((request) => {
-              const Icon = request.icon;
-              return (
-                <li key={request.key}>
-                  <Link
-                    href={`/ask?need=${encodeURIComponent(t(request.key))}`}
-                    className="border-border-strong bg-surface hover:border-ink/40 hover:bg-bg focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="bg-gold-soft text-gold-text flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                    </span>
-                    {t(request.key)}
-                  </Link>
-                </li>
-              );
-            })}
-            <li>
+          {/* One row: it scrolls sideways on a phone, nine across on desktop. */}
+          <ul className="-mx-4 mt-5 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-9 lg:gap-4 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden">
+            {POPULAR_CATEGORIES.map((item) => (
+              <li key={item.key} className="w-[6.75rem] shrink-0 sm:w-32 lg:w-auto">
+                <Link
+                  href={`/explore?category=${item.category}`}
+                  className="focus-visible:ring-gold group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                >
+                  <span className="shadow-card bg-surface relative block aspect-square overflow-hidden rounded-2xl">
+                    <Image
+                      src={`/images/categories/${item.image}.jpg`}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1024px) 10vw, 8rem"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </span>
+                  <span className="mt-2 block text-center text-[0.8125rem] font-bold leading-tight">
+                    {t(item.key)}
+                  </span>
+                </Link>
+              </li>
+            ))}
+            <li className="w-[6.75rem] shrink-0 sm:w-32 lg:w-auto">
               <Link
                 href="/ask"
-                className="bg-ink hover:bg-ink/90 focus-visible:ring-gold inline-flex min-h-[2.5rem] items-center rounded-full px-4 py-2 text-sm font-bold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                className="focus-visible:ring-gold group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               >
-                {t('home.popular.other')}
+                <span className="bg-ink text-gold shadow-card flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl transition-colors group-hover:bg-[#1f1d1b]">
+                  <Sparkles className="h-7 w-7" aria-hidden="true" />
+                  <span className="px-2 text-center text-[0.6875rem] font-semibold text-white/70">
+                    {t('home.popular.otherHint')}
+                  </span>
+                </span>
+                <span className="mt-2 block text-center text-[0.8125rem] font-bold leading-tight">
+                  {t('home.popular.other')}
+                </span>
               </Link>
             </li>
           </ul>
