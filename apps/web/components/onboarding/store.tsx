@@ -172,7 +172,7 @@ export function OnboardingProvider({
         const supabase = createClient();
         const { data, error } = await supabase.rpc('rpc_merchant_set_subcategory', {
           p_merchant_id: draftId,
-          p_subcategory: subcategory,
+          p_subcategory: subcategory ?? '',
         });
 
         if (error) {

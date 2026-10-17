@@ -10,7 +10,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(26);
 
 /*
  * Foreign keys and triggers are suspended for the cleanup below,
@@ -161,6 +161,20 @@ select is(
    where id = 'cccccccc-0000-0000-0000-000000000001'),
   'restaurant',
   'the selected specialty persists on the merchant draft'
+);
+
+select lives_ok(
+  $$select public.rpc_merchant_set_subcategory(
+    'cccccccc-0000-0000-0000-000000000001', ''
+  )$$,
+  'an owner can clear the selected specialty'
+);
+
+select is(
+  (select subcategory from public.merchant
+   where id = 'cccccccc-0000-0000-0000-000000000001'),
+  null::text,
+  'clearing a specialty stores null on the merchant draft'
 );
 
 select throws_ok(

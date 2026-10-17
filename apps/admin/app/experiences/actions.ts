@@ -276,7 +276,8 @@ export async function saveCatalogueRecord(input: {
   const supabase = createClient();
   const { data, error } = await supabase.rpc('rpc_save_experience_catalogue', {
     p_kind: input.kind,
-    p_id: input.id,
+    // SQL accepts null here to create a record; generated RPC Args only models UUIDs as strings.
+    p_id: input.id as never,
     p_data: input.data,
     p_blocks: input.blocks ?? [],
   });

@@ -73,7 +73,7 @@ begin
     else m.category::text
   end;
 
-  if p_subcategory is not null and not exists (
+  if nullif(p_subcategory, '') is not null and not exists (
     select 1
     from public.category_config as category
     cross join lateral jsonb_array_elements(category.subcategories) as subcategory(value)
@@ -85,11 +85,11 @@ begin
   end if;
 
   update public.merchant
-  set subcategory = p_subcategory,
+  set subcategory = nullif(p_subcategory, ''),
       onboarding_step = greatest(onboarding_step, 2)
   where id = m.id;
 
-  if m.subcategory is distinct from p_subcategory then
+  if m.subcategory is distinct from nullif(p_subcategory, '') then
     perform audit.log(
       p_actor_type => 'merchant_user'::public.actor_type,
       p_module => 'merchant',
@@ -97,7 +97,7 @@ begin
       p_target_type => 'merchant',
       p_target_id => m.id,
       p_before => jsonb_build_object('subcategory', m.subcategory),
-      p_after => jsonb_build_object('subcategory', p_subcategory)
+      p_after => jsonb_build_object('subcategory', nullif(p_subcategory, ''))
     );
   end if;
 
