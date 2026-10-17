@@ -23,11 +23,10 @@ import { Suspense } from 'react';
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { CityCarousel } from '@/components/home/city-carousel';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
+import { Hero } from '@/components/home/hero';
 import { LeadForm } from '@/components/home/lead-form';
-import { RotatingWord } from '@/components/home/rotating-word';
 import { NotifyForm } from '@/components/home/notify-form';
 import { SiteFooter } from '@/components/site-footer';
-import { SiteHeader } from '@/components/site-header';
 import { getTranslations } from '@/lib/i18n';
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -76,7 +75,7 @@ const CATEGORIES = [
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const { t } = await getTranslations();
+  const { locale, t } = await getTranslations();
   const supabase = createPublicClient();
 
   // Live and soft-launch cities first, then the waitlist — as designed.
@@ -110,11 +109,36 @@ export default async function HomePage() {
 
   return (
     <>
-      <SiteHeader action={{ label: t('nav.signIn'), href: '/sign-in' }} />
+      <Hero
+        locale={locale}
+        cities={
+          openCities.length > 0
+            ? openCities.map((c) => ({ slug: c.slug, name: c.name }))
+            : [{ slug: 'nairobi', name: 'Nairobi' }]
+        }
+        copy={{
+          eyebrow: t('hero.eyebrow'),
+          titleLine1: t('hero.title1'),
+          titleLine2: t('hero.title2'),
+          lede: t('hero.lede'),
+          searchPlaceholder: t('hero.searchPlaceholder'),
+          searchButton: t('hero.search'),
+          popular: t('hero.popular'),
+          plan: t('hero.plan'),
+          signIn: t('nav.signIn'),
+          openSearch: t('hero.openSearch'),
+          scroll: t('hero.scroll'),
+        }}
+      />
 
       <main>
-        {/* ------------------------------------------------------------ hero */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-8 sm:px-8 lg:px-16 lg:pb-16 lg:pt-12">
+        {/* ------------------------------------------- ask a concierge */}
+        {/*
+          The request form that used to sit in the hero. Still the fastest
+          way to ask for anything, and the target of the menu's "Ask a
+          concierge" and the hero's "Airport pickup" (#start).
+        */}
+        <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-12 sm:px-8 lg:px-16 lg:pb-16 lg:pt-16">
           <div className="grid gap-8 lg:grid-cols-[1fr_32rem] lg:gap-12">
             <div className="lg:pt-6">
               <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
@@ -122,22 +146,11 @@ export default async function HomePage() {
                 {t('home.availableNow')}
               </span>
 
-              {/*
-                The accessible name stays "Everything at your Doorstep" however
-                the gold word is cycling; RotatingWord is hidden from assistive
-                technology and reserves its own space so nothing below shifts.
-              */}
-              <h1
-                aria-label={t('home.title')}
-                className="mt-5 text-4xl/[1.16] font-extrabold tracking-tight sm:text-5xl/[1.16] lg:text-6xl/[1.16]"
-              >
-                <RotatingWord />
-                <span aria-hidden="true" className="block">
-                  {t('home.atYourDoorstep')}
-                </span>
-              </h1>
+              <h2 className="mt-5 text-3xl/[1.16] font-extrabold tracking-tight sm:text-4xl/[1.16] lg:text-5xl/[1.16]">
+                {t('home.title')}
+              </h2>
 
-              <p className="mt-6 text-2xl font-extrabold tracking-tight sm:text-[2rem]">
+              <p className="mt-4 text-2xl font-extrabold tracking-tight sm:text-[1.75rem]">
                 <span className="text-gold">{t('home.youWantIt')}</span>{' '}
                 <span className="text-ink">{t('home.weGotYou')}</span>
               </p>

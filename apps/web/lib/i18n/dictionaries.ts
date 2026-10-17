@@ -92,6 +92,16 @@ const en: Dictionary = {
   'consent.denied': 'No location shared — pick a city whenever you like.',
 
   // ── the homepage
+  'hero.eyebrow': 'Stay · Explore · Experience',
+  'hero.title1': 'Everything You Need.',
+  'hero.title2': 'Wherever You Stay.',
+  'hero.lede': 'Services, experiences and opportunities — all in one place.',
+  'hero.searchPlaceholder': 'Search for restaurants, services, experiences…',
+  'hero.search': 'Search',
+  'hero.popular': 'Popular searches:',
+  'hero.plan': 'Plan your trip / stay',
+  'hero.openSearch': 'Search',
+  'hero.scroll': 'Scroll to explore',
   'home.availableNow': 'Concierges available now in Nairobi',
   'home.title': 'Everything at your Doorstep',
   'home.atYourDoorstep': 'at your Doorstep',
@@ -238,6 +248,16 @@ const sw: Dictionary = {
   'consent.denied': 'Hukushiriki mahali ulipo — chagua jiji wakati wowote.',
 
   // ── ukurasa wa mwanzo
+  'hero.eyebrow': 'Kaa · Gundua · Furahia',
+  'hero.title1': 'Kila Unachohitaji.',
+  'hero.title2': 'Popote Unapokaa.',
+  'hero.lede': 'Huduma, matukio na fursa — mahali pamoja.',
+  'hero.searchPlaceholder': 'Tafuta migahawa, huduma, matukio…',
+  'hero.search': 'Tafuta',
+  'hero.popular': 'Utafutaji maarufu:',
+  'hero.plan': 'Panga safari / makazi yako',
+  'hero.openSearch': 'Tafuta',
+  'hero.scroll': 'Sogeza kuona zaidi',
   'home.availableNow': 'Wasaidizi wanapatikana sasa Nairobi',
   'home.title': 'Kila kitu Mlangoni Pako',
   'home.atYourDoorstep': 'Mlangoni Pako',
