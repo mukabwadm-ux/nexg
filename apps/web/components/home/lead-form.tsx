@@ -38,6 +38,12 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
   const seeded = initialNeed ?? fromQuery;
 
   const [need, setNeed] = React.useState<string>(seeded ?? 'Food');
+
+  /* The hero's "Airport pickup" links here with ?need= on the same page,
+     after this has mounted; follow it rather than only reading it once. */
+  React.useEffect(() => {
+    if (fromQuery && (NEEDS as readonly string[]).includes(fromQuery)) setNeed(fromQuery);
+  }, [fromQuery]);
   const [when, setWhen] = React.useState<'asap' | 'later'>('asap');
   const [state, formAction] = useFormState<ActionResult | null, FormData>(submitLead, null);
   const { toast } = useToast();
