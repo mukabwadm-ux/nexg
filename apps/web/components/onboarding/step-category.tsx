@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@nexg/ui';
+import { Button, useToast } from '@nexg/ui';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -11,6 +11,23 @@ import { getCategoryById } from '@nexg/contracts';
 import { CategoryTile, DocumentsNote, QuestionCard } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
+import { questionsForSubcategory } from './subcategory-questions';
+
+const SUBCATEGORY_SETUP_CATEGORIES = new Set([
+  'adults_only',
+  'airport_transfers',
+  'fashion_apparel',
+  'vehicle_rentals',
+  'experiences',
+  'financial_services',
+  'marketplace',
+  'health',
+  'tech_electronics',
+  'travel_tours',
+  'vehicle_services',
+  'wellness',
+  'concierge_services',
+]);
 
 interface RequiredDocument {
   label: string;
@@ -19,11 +36,12 @@ interface RequiredDocument {
 
 /**
  * Step 2 — choose a business type and the specialty-specific setup it needs.
- * Category questions and document rules remain driven by category_config and
- * fn_merchant_required_docs; the shared taxonomy supplies all 21 choices.
+ * Existing questions and document rules remain database-driven; taxonomy
+ * fields supply required setup questions for categories without existing forms.
  */
 export function CategoryStep() {
   const router = useRouter();
+  const { toast } = useToast();
   const {
     draft,
     categories,
@@ -51,6 +69,11 @@ export function CategoryStep() {
   const selectedSubcategory = config?.subcategories?.find(
     (subcategory) => subcategory.id === draft?.subcategory,
   );
+  const subcategoryQuestions =
+    selectedSubcategory && config && SUBCATEGORY_SETUP_CATEGORIES.has(config.category)
+      ? questionsForSubcategory(selectedSubcategory)
+      : [];
+  const questions = [...(config?.questions ?? []), ...subcategoryQuestions];
 
   /*
    * The document list is computed by the same database rules as the documents
@@ -98,7 +121,7 @@ export function CategoryStep() {
   }, [draftId, draft?.category, answersKey]);
 
   const answered = config
-    ? config.questions.every((question) => {
+    ? questions.every((question) => {
         const value = answers[question.key];
         return Array.isArray(value) ? value.length > 0 : !!value;
       })
@@ -122,11 +145,21 @@ export function CategoryStep() {
       const setupSaved = categorySaved && (await flush());
       if (!setupSaved) {
         setCategorySaveFailed(true);
+        toast({
+          title: 'We could not save your business type',
+          description: 'Please try again before continuing.',
+          tone: 'danger',
+        });
         return;
       }
       router.push('/merchants/apply/location');
     } catch {
       setCategorySaveFailed(true);
+      toast({
+        title: 'We could not save your business type',
+        description: 'Please try again before continuing.',
+        tone: 'danger',
+      });
     } finally {
       setSavingCategory(false);
     }
@@ -139,19 +172,48 @@ export function CategoryStep() {
     setCategorySaveFailed(false);
     setSavingCategory(true);
     let saved = await setCategory(category.category, isRetry ? answers : {});
-    if (saved) saved = await setSubcategory(null);
+    if (saved && draft?.subcategory) saved = await setSubcategory(null);
     setSavingCategory(false);
     setCategorySaveFailed(!saved);
     setSubcategorySaveFailed(false);
+    if (!saved) {
+      toast({
+        title: 'We could not save your business type',
+        description: 'Please try selecting it again.',
+        tone: 'danger',
+      });
+    }
   };
 
   const chooseSubcategory = async (subcategoryId: string) => {
     if (draft?.subcategory === subcategoryId && !subcategorySaveFailed) return;
     setSavingSubcategory(true);
     setSubcategorySaveFailed(false);
-    const saved = await setSubcategory(subcategoryId);
+    const nextSubcategory = config?.subcategories?.find((item) => item.id === subcategoryId);
+    const categoryId = draft?.category;
+    let saved = !!nextSubcategory && !!categoryId;
+    if (nextSubcategory && categoryId) {
+      const retainedKeys = new Set([
+        ...(config?.questions.map((question) => question.key) ?? []),
+        ...(SUBCATEGORY_SETUP_CATEGORIES.has(config?.category ?? '')
+          ? questionsForSubcategory(nextSubcategory).map((question) => question.key)
+          : []),
+      ]);
+      const retainedAnswers = Object.fromEntries(
+        Object.entries(answers).filter(([key]) => retainedKeys.has(key)),
+      );
+      saved = await setCategory(categoryId, retainedAnswers);
+    }
+    if (saved) saved = await setSubcategory(subcategoryId);
     setSavingSubcategory(false);
     setSubcategorySaveFailed(!saved);
+    if (!saved) {
+      toast({
+        title: 'We could not save your specialty',
+        description: 'Please try selecting it again.',
+        tone: 'danger',
+      });
+    }
   };
 
   return (
@@ -178,17 +240,6 @@ export function CategoryStep() {
           className="border-warning/40 bg-warning-bg text-warning mb-4 rounded-xl border px-4 py-3 text-[0.8125rem] leading-relaxed"
         >
           {categoryNotice}
-        </p>
-      )}
-
-      {(categorySaveFailed || subcategorySaveFailed) && (
-        <p
-          role="alert"
-          className="border-danger/30 bg-danger/5 text-danger mb-4 rounded-xl border px-4 py-3 text-[0.8125rem] leading-relaxed"
-        >
-          We couldn’t save your {subcategorySaveFailed ? 'specialty' : 'business type'}. Your
-          selection is still shown; tap it again to retry or contact our team if the problem
-          continues.
         </p>
       )}
 
@@ -288,9 +339,9 @@ export function CategoryStep() {
         </section>
       )}
 
-      {config && config.questions.length > 0 && (
+      {questions.length > 0 && (
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          {config.questions.map((question) => (
+          {questions.map((question) => (
             <QuestionCard
               key={question.key}
               question={question}

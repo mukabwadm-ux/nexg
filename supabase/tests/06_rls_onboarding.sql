@@ -10,7 +10,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(26);
+select plan(28);
 
 /*
  * Foreign keys and triggers are suspended for the cleanup below,
@@ -142,6 +142,34 @@ select is(
 );
 
 update public.merchant set category = 'restaurant'
+where id = 'cccccccc-0000-0000-0000-000000000001';
+
+update public.merchant
+set category = 'adults_only',
+    subcategory = 'adult_products',
+    answers = '{"packaging_style":"discreet","age_gate_method":"both","signature_required":"yes"}'::jsonb
+where id = 'cccccccc-0000-0000-0000-000000000001';
+
+select is(
+  (public.fn_merchant_readiness('cccccccc-0000-0000-0000-000000000001') ->> 'business_basics')::boolean,
+  false,
+  'a taxonomy-driven business is not ready while any selected-specialty answer is missing'
+);
+
+update public.merchant
+set answers = '{"packaging_style":"discreet","age_gate_method":"both","signature_required":"yes","min_order":"500"}'::jsonb
+where id = 'cccccccc-0000-0000-0000-000000000001';
+
+select is(
+  (public.fn_merchant_readiness('cccccccc-0000-0000-0000-000000000001') ->> 'business_basics')::boolean,
+  true,
+  'all selected-specialty answers complete business basics'
+);
+
+update public.merchant
+set category = 'restaurant',
+    subcategory = null,
+    answers = '{"serves_alcohol":"yes"}'::jsonb
 where id = 'cccccccc-0000-0000-0000-000000000001';
 
 -- ------------------------------------------------------------- the write guard
