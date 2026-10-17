@@ -1,25 +1,17 @@
 import { Button, Card, Tag } from '@nexg/ui';
-import {
-  ArrowRight,
-  Car,
-  Gift,
-  Landmark,
-  Martini,
-  Plane,
-  Shirt,
-  Sparkles,
-  Ticket,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
+import { BestSellers } from '@/components/home/best-sellers';
 import { CityCarousel } from '@/components/home/city-carousel';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
 import { PopularCategories } from '@/components/home/popular-categories';
 import { NotifyForm } from '@/components/home/notify-form';
 import { SiteFooter } from '@/components/site-footer';
+import { BEST_SELLERS } from '@/lib/best-sellers';
 import { categoryTiles } from '@/lib/categories';
 import { getTranslations } from '@/lib/i18n';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -29,19 +21,6 @@ export const metadata: Metadata = {
   description:
     'Tell us where you are staying and what you need. A vetted local concierge confirms the plan, the price and the timing, and delivers it to your door.',
 };
-
-/* Copy below comes from the `BookingFirst` artboard and is signed off. */
-
-const CATEGORIES = [
-  { key: 'home.cat.transfers', icon: Plane },
-  { key: 'home.cat.alcohol', icon: Martini },
-  { key: 'home.cat.fashion', icon: Shirt },
-  { key: 'home.cat.beauty', icon: Sparkles },
-  { key: 'home.cat.rentals', icon: Car },
-  { key: 'home.cat.experiences', icon: Ticket },
-  { key: 'home.cat.financial', icon: Landmark },
-  { key: 'home.cat.flowers', icon: Gift },
-] as const;
 
 /*
  * Cached and re-rendered at most once an hour. Everything on this page is the
@@ -169,36 +148,16 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* -------------------------------------------- everything we arrange */}
+        {/* ---------------------------------------------------- best sellers */}
+        {/* A paid placement; the products are placeholders until it is sold. */}
         <section className="bg-surface">
           <div className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
-                {t('home.services.heading')}
-              </h2>
-              <Link href="/explore" className="text-sm font-bold underline underline-offset-4">
-                {t('home.services.browseAll')}
-              </Link>
-            </div>
-
-            <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {CATEGORIES.map((category) => {
-                const Icon = category.icon;
-                return (
-                  <li key={category.key}>
-                    <Card className="flex h-full items-center gap-3">
-                      <span
-                        aria-hidden="true"
-                        className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                      >
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <span className="text-sm font-bold">{t(category.key)}</span>
-                    </Card>
-                  </li>
-                );
-              })}
-            </ul>
+            <BestSellers
+              heading={t('home.bestSellers.heading')}
+              seeAll={t('home.bestSellers.seeAll')}
+              sponsored={t('merchant.sponsored')}
+              items={BEST_SELLERS}
+            />
           </div>
         </section>
 
