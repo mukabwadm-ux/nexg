@@ -49700,7 +49700,7 @@ export type Database = {
         };
       };
       rpc_save_experience_catalogue: {
-        Args: { p_blocks?: Json; p_data: Json; p_id: string; p_kind: string };
+        Args: { p_blocks?: Json; p_data: Json; p_id: string | null; p_kind: string };
         Returns: string;
       };
       rpc_send_plan: {
