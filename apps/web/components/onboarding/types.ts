@@ -97,6 +97,7 @@ export interface Draft {
   status: string;
   onboarding_step: number;
   onboarding_source: string | null;
+  phone_verified_at?: string | null;
   cover_photo_path: string | null;
   price_band: string | null;
   hours_pattern: string | null;

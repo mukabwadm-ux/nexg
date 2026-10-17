@@ -1,14 +1,29 @@
 'use client';
 
 import {
+  Activity,
+  BellRing,
+  Briefcase,
+  Car,
+  Compass,
   Flower2,
   Gift,
+  GlassWater,
+  Heart,
+  Laptop,
+  Plane,
   Pill as PillIcon,
   Scissors,
+  Ship,
   Shirt,
+  ShieldAlert,
   ShoppingCart,
+  Sparkles,
+  Store,
+  Ticket,
   Utensils,
   Wine,
+  Wrench,
   type LucideIcon,
 } from 'lucide-react';
 import * as React from 'react';
@@ -25,9 +40,25 @@ import type { Question } from './types';
  */
 
 const ICONS: Record<string, LucideIcon> = {
+  Activity,
+  BellRing,
+  Briefcase,
+  Car,
+  Compass,
   Utensils,
   Wine,
   Shirt,
+  ShieldAlert,
+  Plane,
+  GlassWater,
+  Sparkles,
+  Ticket,
+  Store,
+  Pills: PillIcon,
+  Heart,
+  Laptop,
+  Wrench,
+  Ship,
   Flower2,
   Scissors,
   Pill: PillIcon,
@@ -68,11 +99,13 @@ export function CategoryTile({
   label,
   selected,
   onClick,
+  disabled,
 }: {
   icon: string;
   label: string;
   selected: boolean;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   const Icon = ICONS[icon] ?? Gift;
 
@@ -80,8 +113,9 @@ export function CategoryTile({
     <button
       type="button"
       aria-pressed={selected}
+      disabled={disabled}
       onClick={onClick}
-      className={`focus-visible:ring-gold flex flex-col items-center gap-3 rounded-2xl border p-5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+      className={`focus-visible:ring-gold flex flex-col items-center gap-3 rounded-2xl border p-5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
         selected
           ? 'border-ink bg-ink text-white'
           : 'border-border bg-surface hover:border-border-strong'
