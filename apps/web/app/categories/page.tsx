@@ -5,8 +5,8 @@ import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 
 export const metadata: Metadata = {
-  title: 'Merchant Verticals & Categories · NexG',
-  description: 'Browse all 21 categories and 128 subcategories across Nairobi on NexG.',
+  title: 'All Categories · NexG',
+  description: 'Browse all categories and services across Nairobi on NexG.',
 };
 
 /**
