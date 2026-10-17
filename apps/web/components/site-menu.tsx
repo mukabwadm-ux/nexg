@@ -124,7 +124,7 @@ export function SiteMenu({
           {/* ------------------------------------------------------- header */}
           <header className="border-border/70 flex items-center justify-between border-b px-5 py-3.5 sm:px-9 sm:py-5">
             <span className="flex items-center gap-3">
-              <Logo />
+              <Logo className="h-11" />
               <span className="text-micro text-muted-light font-bold uppercase">Menu</span>
             </span>
             <Dialog.Close

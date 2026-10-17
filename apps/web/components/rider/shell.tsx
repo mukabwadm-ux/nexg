@@ -134,7 +134,7 @@ export function RiderShell({
       {/* ═══════════════════════════════════ the dark sidebar */}
       <aside className="bg-ink hidden w-[13rem] shrink-0 flex-col text-white lg:flex">
         <Link href="/rider" className="block px-5 py-5">
-          <Logo className="h-7 w-auto" onDark />
+          <Logo className="h-16 w-auto" onDark priority />
           <span className="text-gold/80 mt-0.5 block text-[0.5625rem] font-extrabold uppercase tracking-[0.2em]">
             Rider
           </span>
@@ -169,7 +169,7 @@ export function RiderShell({
         <header className="border-border bg-surface sticky top-0 z-30 border-b">
           <div className="flex flex-wrap items-center gap-2.5 px-4 py-3 sm:px-5">
             <Link href="/rider" className="lg:hidden">
-              <Logo className="h-6 w-auto" />
+              <Logo className="h-10 w-auto" />
             </Link>
 
             <span className="border-border-strong bg-surface hidden items-center gap-2 rounded-lg border px-3.5 py-2 text-[0.8125rem] font-extrabold sm:flex">

@@ -21,7 +21,7 @@ export default function SignInPage({
       {/* The dark half, as the A0 artboard draws it. */}
       <div className="bg-ink relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex">
         <div className="flex items-center gap-3">
-          <Logo className="h-9 w-auto" onDark />
+          <Logo className="h-24 w-auto" onDark />
           <span className="border-gold/40 text-gold rounded-full border px-2.5 py-1 text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
             Admin console
           </span>

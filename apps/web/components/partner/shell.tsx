@@ -51,7 +51,7 @@ export function PartnerShell({
             href={kind === 'merchant' ? '/merchant' : '/rider'}
             className="flex items-center gap-3"
           >
-            <Logo className="h-8 w-auto" onDark />
+            <Logo className="h-12 w-auto" onDark />
             <span className="text-gold/90 text-[0.6875rem] font-extrabold uppercase tracking-[0.18em]">
               {kind === 'merchant' ? 'Merchant' : 'Rider'}
             </span>

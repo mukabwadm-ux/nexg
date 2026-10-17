@@ -68,7 +68,7 @@ export function ShellFrame({
       <header className="border-border bg-bg sticky top-0 z-30 border-b">
         <div className="mx-auto flex h-[4.75rem] max-w-[90rem] items-center gap-4 px-4 sm:px-8">
           <Link href="/" className="flex shrink-0 items-center gap-3">
-            <Logo className="h-7 w-auto" />
+            <Logo className="h-12 w-auto" priority />
             <span aria-hidden="true" className="bg-border-strong hidden h-6 w-px sm:block" />
             <span className="text-muted hidden text-sm font-bold sm:block">{label}</span>
           </Link>

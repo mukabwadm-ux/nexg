@@ -143,7 +143,7 @@ export function MerchantShell({
       {/* ═══════════════════════════════════ the dark sidebar */}
       <aside className="bg-ink hidden w-[13rem] shrink-0 flex-col text-white lg:flex">
         <Link href="/merchant" className="block px-5 py-5">
-          <Logo className="h-7 w-auto" onDark />
+          <Logo className="h-16 w-auto" onDark priority />
         </Link>
 
         <MerchantSideNav nav={nav} />
@@ -177,7 +177,7 @@ export function MerchantShell({
         <header className="border-border bg-surface sticky top-0 z-30 border-b">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-5">
             <Link href="/merchant" className="lg:hidden">
-              <Logo className="h-6 w-auto" />
+              <Logo className="h-10 w-auto" />
             </Link>
 
             {branchName ? (

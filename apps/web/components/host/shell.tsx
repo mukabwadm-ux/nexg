@@ -194,7 +194,7 @@ export function HostShell({
         <div className="relative mx-auto max-w-[96rem] px-4 py-5 sm:px-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <Link href="/host" className="flex items-center gap-3">
-              <Logo className="h-8 w-auto" onDark />
+              <Logo className="h-14 w-auto" onDark priority />
             </Link>
             <div className="flex items-center gap-2">
               <Link
@@ -340,7 +340,7 @@ export function HostShell({
       <footer className="bg-ink mt-10 text-white">
         <div className="mx-auto flex max-w-[96rem] flex-wrap items-center justify-between gap-4 px-4 py-7 sm:px-6">
           <div className="flex items-center gap-3">
-            <Logo className="h-7 w-auto" onDark />
+            <Logo className="h-12 w-auto" onDark />
             <span className="text-[0.8125rem] font-semibold text-white/50">
               Your comfort, simplified.
             </span>
