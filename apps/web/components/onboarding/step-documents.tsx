@@ -7,6 +7,7 @@ import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 import { uploadDocument } from '@/lib/uploads';
+import { getCategoryById } from '@nexg/contracts';
 
 import { DocumentsNote } from './controls';
 import { NoDraft } from './no-draft';
@@ -57,7 +58,10 @@ export function DocumentsStep() {
   const [loaded, setLoaded] = React.useState(false);
 
   const draftId = draft?.id ?? null;
-  const config = categories.find((c) => c.category === draft?.category);
+  const categoryId = draft?.category
+    ? (getCategoryById(draft.category)?.id ?? draft.category)
+    : null;
+  const config = categories.find((category) => category.category === categoryId);
 
   const load = React.useCallback(async () => {
     if (!draftId) return;

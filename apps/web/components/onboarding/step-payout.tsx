@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
+import { getCategoryById } from '@nexg/contracts';
 
 import { Chip } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
@@ -62,7 +63,10 @@ export function PayoutStep() {
   const { toast } = useToast();
   const { draft, categories, patch, refresh } = useOnboarding();
 
-  const config = categories.find((c) => c.category === draft?.category);
+  const categoryId = draft?.category
+    ? (getCategoryById(draft.category)?.id ?? draft.category)
+    : null;
+  const config = categories.find((category) => category.category === categoryId);
   const noun =
     config?.card_kind === 'services'
       ? 'services'

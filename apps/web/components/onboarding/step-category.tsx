@@ -5,47 +5,81 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
+import { getCategoryById } from '@nexg/contracts';
 
 import { CategoryTile, DocumentsNote, QuestionCard } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
 
+interface RequiredDocument {
+  label: string;
+  kind: string;
+}
+
 /**
- * Step 2 — what kind of business this is, and the follow-ups that implies.
- *
- * The questions are not in this file. They come from category_config, which
- * is also what fn_merchant_required_docs reads to decide which licences to
- * demand. That matters more than it looks: the merchant is told "your
- * answers decide which documents we ask for", and the only way to keep that
- * promise is for both halves to read the same row.
+ * Step 2 — choose a business type and the specialty-specific setup it needs.
+ * Category questions and document rules remain driven by category_config and
+ * fn_merchant_required_docs; the shared taxonomy supplies all 21 choices.
  */
 export function CategoryStep() {
   const router = useRouter();
-  const { draft, categories, setCategory, setAnswers, patch } = useOnboarding();
-  const [docs, setDocs] = React.useState<{ label: string; kind: string }[]>([]);
+  const { draft, categories, categoryNotice, setCategory, setSubcategory, setAnswers, flush } =
+    useOnboarding();
+  const [docs, setDocs] = React.useState<RequiredDocument[]>([]);
+  const [docsLoading, setDocsLoading] = React.useState(false);
+  const [docsError, setDocsError] = React.useState(false);
+  const [savingCategory, setSavingCategory] = React.useState(false);
+  const [savingSubcategory, setSavingSubcategory] = React.useState(false);
+  const [categorySaveFailed, setCategorySaveFailed] = React.useState(false);
+  const [subcategorySaveFailed, setSubcategorySaveFailed] = React.useState(false);
 
-  const config = categories.find((c) => c.category === draft?.category);
+  const selectedCategoryId = draft?.category
+    ? (getCategoryById(draft.category)?.id ?? draft.category)
+    : null;
+  const config = categories.find((category) => category.category === selectedCategoryId);
   const answers = draft?.answers ?? {};
   const draftId = draft?.id ?? null;
+  const selectedSubcategory = config?.subcategories?.find(
+    (subcategory) => subcategory.id === draft?.subcategory,
+  );
 
   /*
-   * The document list is asked of the database rather than worked out here,
-   * so the count under the questions is the same count the documents step
-   * will show and the same one a reviewer will see.
+   * The document list is computed by the same database rules as the documents
+   * step, so the merchant sees only requirements for this business and its
+   * answers.
    */
   const answersKey = JSON.stringify(answers);
   React.useEffect(() => {
-    if (!draftId || !draft?.category) return;
+    if (!draftId || !draft?.category) {
+      setDocs([]);
+      setDocsError(false);
+      setDocsLoading(false);
+      return;
+    }
+
     let cancelled = false;
+    setDocsLoading(true);
+    setDocsError(false);
     const timer = setTimeout(() => {
       void (async () => {
-        const supabase = createClient();
-        const { data } = await supabase.rpc('fn_merchant_required_docs', {
-          p_merchant_id: draftId,
-        });
-        if (!cancelled) setDocs((data as { label: string; kind: string }[] | null) ?? []);
+        try {
+          const supabase = createClient();
+          const { data, error } = await supabase.rpc('fn_merchant_required_docs', {
+            p_merchant_id: draftId,
+          });
+          if (cancelled) return;
+          setDocs((data as RequiredDocument[] | null) ?? []);
+          setDocsError(!!error);
+        } catch {
+          if (cancelled) return;
+          setDocs([]);
+          setDocsError(true);
+        } finally {
+          if (!cancelled) setDocsLoading(false);
+        }
       })();
-    }, 500);
+    }, 350);
+
     return () => {
       cancelled = true;
       clearTimeout(timer);
@@ -53,82 +87,192 @@ export function CategoryStep() {
   }, [draftId, draft?.category, answersKey]);
 
   const answered = config
-    ? config.questions.every((q) => {
-        const value = answers[q.key];
+    ? config.questions.every((question) => {
+        const value = answers[question.key];
         return Array.isArray(value) ? value.length > 0 : !!value;
       })
     : false;
+  const canContinue =
+    !!draft?.category &&
+    !!selectedSubcategory &&
+    answered &&
+    !savingCategory &&
+    !savingSubcategory &&
+    !categorySaveFailed &&
+    !subcategorySaveFailed;
+
+  const continueToLocation = async () => {
+    if (!draft?.category || !canContinue) return;
+    setSavingCategory(true);
+    setCategorySaveFailed(false);
+    const categorySaved = await setCategory(draft.category, answers);
+    const setupSaved = categorySaved && (await flush());
+    setSavingCategory(false);
+    if (!setupSaved) {
+      setCategorySaveFailed(true);
+      return;
+    }
+    router.push('/merchants/apply/location');
+  };
+
+  const selectCategory = async (category: (typeof categories)[number]) => {
+    const isRetry = category.category === draft?.category && categorySaveFailed;
+    if (category.category === draft?.category && !isRetry) return;
+
+    setCategorySaveFailed(false);
+    setSavingCategory(true);
+    let saved = await setCategory(category.category, isRetry ? answers : {});
+    if (saved) saved = await setSubcategory(null);
+    setSavingCategory(false);
+    setCategorySaveFailed(!saved);
+    setSubcategorySaveFailed(false);
+  };
+
+  const chooseSubcategory = async (subcategoryId: string) => {
+    if (draft?.subcategory === subcategoryId && !subcategorySaveFailed) return;
+    setSavingSubcategory(true);
+    setSubcategorySaveFailed(false);
+    const saved = await setSubcategory(subcategoryId);
+    setSavingSubcategory(false);
+    setSubcategorySaveFailed(!saved);
+  };
 
   return (
     <OnboardingShell
       step={2}
       eyebrow="About your business"
       title="What do you sell?"
-      intro="Tap one. We will only ask the follow-ups that apply to that kind of business — a laundry never sees restaurant questions."
+      intro="Tap one. We’ll only ask follow-up questions for this kind of business, then show the setup steps for your specialty."
       footer={
         <>
           <Button variant="outline" size="lg" onClick={() => router.push('/merchants/apply/start')}>
             Back
           </Button>
-          <ContinueButton
-            disabled={!draft?.category || !answered}
-            onClick={() => router.push('/merchants/apply/location')}
-          >
+          <ContinueButton disabled={!canContinue} onClick={() => void continueToLocation()}>
             Continue
           </ContinueButton>
           <FooterNote>Your answers decide which documents we ask for</FooterNote>
         </>
       }
     >
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {categoryNotice && (
+        <p
+          role="status"
+          className="border-warning/40 bg-warning-bg text-warning mb-4 rounded-xl border px-4 py-3 text-[0.8125rem] leading-relaxed"
+        >
+          {categoryNotice}
+        </p>
+      )}
+
+      {(categorySaveFailed || subcategorySaveFailed) && (
+        <p
+          role="alert"
+          className="border-danger/30 bg-danger/5 text-danger mb-4 rounded-xl border px-4 py-3 text-[0.8125rem] leading-relaxed"
+        >
+          We couldn’t save your {subcategorySaveFailed ? 'specialty' : 'business type'}. Your
+          selection is still shown; tap it again to retry or contact our team if the problem
+          continues.
+        </p>
+      )}
+
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <h2 className="text-ink text-sm font-bold">Choose a business category</h2>
+        <span className="text-muted-light text-xs font-semibold">
+          {categories.length} business types
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {categories.map((category) => (
           <CategoryTile
             key={category.category}
             icon={category.icon}
             label={category.label}
-            selected={draft?.category === category.category}
-            onClick={() => {
-              void setCategory(category.category, {});
-              patch({ subcategory: null });
-            }}
+            description={category.description}
+            selected={selectedCategoryId === category.category}
+            disabled={savingCategory}
+            onClick={() => void selectCategory(category)}
           />
         ))}
       </div>
 
-      {config && config.subcategories && config.subcategories.length > 0 && (
-        <div className="animate-in fade-in slide-in-from-bottom-2 border-border bg-surface mt-6 rounded-2xl border p-5 duration-300">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-ink text-sm font-bold">
-              Choose your primary vertical or specialty
-            </h3>
-            {draft?.subcategory && (
-              <span className="text-muted-light text-xs font-medium">Selected</span>
-            )}
+      {config && (
+        <section
+          aria-labelledby="specialty-heading"
+          className="border-border bg-surface mt-6 rounded-2xl border p-4 sm:p-5"
+        >
+          <div className="mb-3">
+            <h2 id="specialty-heading" className="text-ink text-sm font-bold">
+              What kind of {config.label.toLowerCase()} business?
+            </h2>
+            <p className="text-muted mt-1 text-xs leading-relaxed">
+              Select the closest match to tailor your listing and setup.
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {config.subcategories.map((sub) => {
-              const isSelected = draft?.subcategory === sub.id;
+            {config.subcategories?.map((subcategory) => {
+              const selected = draft?.subcategory === subcategory.id;
               return (
                 <button
-                  key={sub.id}
+                  key={subcategory.id}
                   type="button"
-                  onClick={() => patch({ subcategory: sub.id })}
-                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
-                    isSelected
-                      ? 'bg-gold text-ink font-bold shadow-sm'
-                      : 'border-border bg-surface hover:border-ink text-ink/80 border'
+                  aria-pressed={selected}
+                  disabled={savingSubcategory || savingCategory}
+                  onClick={() => void chooseSubcategory(subcategory.id)}
+                  className={`focus-visible:ring-gold rounded-full px-3.5 py-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 ${
+                    selected
+                      ? 'bg-ink text-white'
+                      : 'border-border-strong bg-surface text-ink hover:border-ink border'
                   }`}
                 >
-                  {sub.name}
+                  {subcategory.name}
                 </button>
               );
             })}
           </div>
-        </div>
+        </section>
+      )}
+
+      {selectedSubcategory && (
+        <section
+          aria-labelledby="setup-heading"
+          className="border-border bg-surface mt-4 rounded-2xl border p-4 sm:p-5"
+        >
+          <h2 id="setup-heading" className="text-ink text-sm font-bold">
+            Your {selectedSubcategory.name.toLowerCase()} setup
+          </h2>
+          <p className="text-muted mt-1 text-xs leading-relaxed">
+            We’ll guide you through this process as you build your listing.
+          </p>
+          <ol className="mt-4 flex flex-wrap gap-2">
+            {(selectedSubcategory.defaultWorkflow ?? '')
+              .split(/\s*→\s*/)
+              .filter(Boolean)
+              .map((step, index) => (
+                <li
+                  key={`${step}-${index}`}
+                  className="border-border bg-bg text-ink flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold"
+                >
+                  <span className="bg-gold/20 text-gold-text flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-extrabold">
+                    {index + 1}
+                  </span>
+                  {step}
+                </li>
+              ))}
+          </ol>
+          {!!selectedSubcategory.fields?.length && (
+            <p className="text-muted mt-4 text-xs leading-relaxed">
+              Setup details include{' '}
+              <span className="text-ink font-semibold">
+                {selectedSubcategory.fields.map(humanizeField).join(', ')}
+              </span>
+              .
+            </p>
+          )}
+        </section>
       )}
 
       {config && config.questions.length > 0 && (
-        <div className="animate-in fade-in slide-in-from-bottom-2 mt-6 grid gap-4 duration-300 lg:grid-cols-2">
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
           {config.questions.map((question) => (
             <QuestionCard
               key={question.key}
@@ -140,19 +284,45 @@ export function CategoryStep() {
         </div>
       )}
 
-      {config && docs.length > 0 && (
-        <div className="mt-6">
-          <DocumentsNote>
-            As a {config.label.toLowerCase()} you will need <strong>{docs.length} documents</strong>{' '}
-            ({docs.map((d) => d.label).join(', ')})
-            {docs.some((d) => d.kind === 'liquor_licence' || d.kind === 'food_handler_cert')
-              ? '.'
-              : ' — no food or liquor paperwork.'}
-            {!config.featured_eligible &&
-              ` · ${config.label.toLowerCase()} businesses are not eligible for paid featured placement.`}
-          </DocumentsNote>
+      {config && (
+        <div className="mt-4">
+          {docsLoading ? (
+            <p className="text-muted-light text-xs" role="status">
+              Checking the documents for this business type…
+            </p>
+          ) : docsError ? (
+            <p
+              className="border-warning/40 bg-warning-bg text-warning rounded-xl border p-4 text-xs leading-relaxed"
+              role="status"
+            >
+              We couldn’t check the document requirements right now. You can continue, and the
+              verification step will show the requirements when they’re available.
+            </p>
+          ) : docs.length > 0 ? (
+            <DocumentsNote>
+              As a {config.label.toLowerCase()} you will need{' '}
+              <strong>{docs.length} documents</strong> (
+              {docs.map((document) => document.label).join(', ')}). The verification step will
+              confirm whether anything else applies.
+              {!config.featured_eligible &&
+                ` ${config.label} businesses are not eligible for paid featured placement.`}
+            </DocumentsNote>
+          ) : (
+            <DocumentsNote>
+              No additional documents are currently listed for this business type. If your specialty
+              needs a licence or permit, our team will confirm it during verification.
+            </DocumentsNote>
+          )}
         </div>
       )}
     </OnboardingShell>
   );
+}
+
+function humanizeField(field: string): string {
+  return field
+    .replace(/_(text|hrs|min|kes|sqm|sqft)$/g, '')
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }

@@ -3,6 +3,7 @@
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
+import { getCategoryById } from '@nexg/contracts';
 
 import { ReadyRing } from './shell-frame';
 import { useOnboarding } from './store';
@@ -71,7 +72,12 @@ export function LivePreview() {
 
   if (!draft) return null;
 
-  const config = categories.find((c) => c.category === draft.category);
+  const categoryId = draft.category
+    ? (getCategoryById(draft.category)?.id ?? draft.category)
+    : null;
+  const config = categoryId
+    ? categories.find((category) => category.category === categoryId)
+    : undefined;
   const name = draft.trading_name?.trim() || '[Your business name]';
 
   /* The first answer worth showing after the category — the cuisine, the
@@ -83,6 +89,9 @@ export function LivePreview() {
       return q.options?.find((o) => o.value === picked)?.label;
     })
     .find(Boolean);
+  const selectedSubcategory = config?.subcategories?.find(
+    (subcategory) => subcategory.id === draft.subcategory,
+  )?.name;
 
   const area = branch?.zone?.name ?? null;
   const eta = branch?.zone
@@ -93,6 +102,7 @@ export function LivePreview() {
 
   const meta = [
     config?.label,
+    selectedSubcategory,
     firstAnswer,
     area ? `${area}, Nairobi` : null,
     /* "Delivers in [—] min" until the pin has landed in a zone. Never a

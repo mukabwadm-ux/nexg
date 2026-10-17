@@ -31,12 +31,16 @@ interface Store {
   draft: Draft | null;
   readiness: Readiness | null;
   categories: CategoryConfig[];
+  categoryNotice: string | null;
   save: SaveState;
 
   /** Local update plus a debounced write of the same fields. */
   patch: (fields: Partial<Draft>, step?: number) => void;
+  /** Persist pending ordinary fields before advancing to the next step. */
+  flush: () => Promise<boolean>;
   /** Category changes reset the answers, so they are their own call. */
-  setCategory: (category: string, answers: Record<string, string | string[]>) => Promise<void>;
+  setCategory: (category: string, answers: Record<string, string | string[]>) => Promise<boolean>;
+  setSubcategory: (subcategory: string | null) => Promise<boolean>;
   setAnswers: (answers: Record<string, string | string[]>) => void;
   /** Replaces the branch list and returns it with each pin's zone resolved. */
   setBranches: (branches: DraftBranch[]) => Promise<DraftBranch[]>;
@@ -56,7 +60,6 @@ export function useOnboarding(): Store {
 const SAVEABLE: readonly string[] = [
   'trading_name',
   'legal_name',
-  'subcategory',
   'contact_name',
   'contact_email',
   'cover_photo_path',
@@ -82,11 +85,13 @@ export function OnboardingProvider({
   initialDraft,
   initialReadiness,
   categories,
+  categoryNotice = null,
   children,
 }: {
   initialDraft: Draft | null;
   initialReadiness: Readiness | null;
   categories: CategoryConfig[];
+  categoryNotice?: string | null;
   children: React.ReactNode;
 }) {
   const [draft, setDraftState] = React.useState<Draft | null>(initialDraft);
@@ -101,13 +106,16 @@ export function OnboardingProvider({
   const pending = React.useRef<Record<string, unknown>>({});
   const pendingStep = React.useRef<number>(0);
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const answerTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const draftId = draft?.id ?? null;
 
-  const flush = React.useCallback(async () => {
-    if (!draftId) return;
+  const flush = React.useCallback(async (): Promise<boolean> => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    if (!draftId) return false;
     const fields = pending.current;
     const step = pendingStep.current;
-    if (Object.keys(fields).length === 0 && step === 0) return;
+    if (Object.keys(fields).length === 0 && step === 0) return true;
 
     pending.current = {};
     pendingStep.current = 0;
@@ -131,11 +139,12 @@ export function OnboardingProvider({
       pending.current = { ...fields, ...pending.current };
       pendingStep.current = Math.max(step, pendingStep.current);
       setSave({ saving: false, savedAt: null, error: error.message });
-      return;
+      return false;
     }
 
     setReadiness(data as unknown as Readiness);
     setSave({ saving: false, savedAt: Date.now(), error: null });
+    return true;
   }, [draftId]);
 
   const patch = React.useCallback(
@@ -153,6 +162,39 @@ export function OnboardingProvider({
     [flush],
   );
 
+  const setSubcategory = React.useCallback(
+    async (subcategory: string | null): Promise<boolean> => {
+      if (!draftId) return false;
+      setDraftState((current) => (current ? { ...current, subcategory } : current));
+      setSave((current) => ({ ...current, saving: true, error: null }));
+
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase.rpc('rpc_merchant_set_subcategory', {
+          p_merchant_id: draftId,
+          p_subcategory: subcategory,
+        });
+
+        if (error) {
+          setSave({ saving: false, savedAt: null, error: error.message });
+          return false;
+        }
+
+        setReadiness(data as unknown as Readiness);
+        setSave({ saving: false, savedAt: Date.now(), error: null });
+        return true;
+      } catch (error) {
+        setSave({
+          saving: false,
+          savedAt: null,
+          error: error instanceof Error ? error.message : 'Could not save the business specialty',
+        });
+        return false;
+      }
+    },
+    [draftId],
+  );
+
   /* A tab closing mid-debounce would otherwise drop the last tap. */
   React.useEffect(() => {
     const onHide = () => void flush();
@@ -164,24 +206,45 @@ export function OnboardingProvider({
   }, [flush]);
 
   const setCategory = React.useCallback(
-    async (category: string, answers: Record<string, string | string[]>) => {
-      if (!draftId) return;
-      setDraftState((c) => (c ? { ...c, category, answers } : c));
+    async (category: string, answers: Record<string, string | string[]>): Promise<boolean> => {
+      if (!draftId) return false;
+      if (answerTimer.current) clearTimeout(answerTimer.current);
+      setDraftState((c) =>
+        c
+          ? {
+              ...c,
+              category,
+              answers,
+              subcategory: c.category === category ? c.subcategory : null,
+            }
+          : c,
+      );
       setSave((s) => ({ ...s, saving: true }));
 
-      const supabase = createClient();
-      const { data, error } = await supabase.rpc('rpc_merchant_set_category', {
-        p_merchant_id: draftId,
-        p_category: category as never,
-        p_answers: answers,
-      });
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase.rpc('rpc_merchant_set_category', {
+          p_merchant_id: draftId,
+          p_category: category as never,
+          p_answers: answers,
+        });
 
-      if (error) {
-        setSave({ saving: false, savedAt: null, error: error.message });
-        return;
+        if (error) {
+          setSave({ saving: false, savedAt: null, error: error.message });
+          return false;
+        }
+
+        setReadiness(data as unknown as Readiness);
+        setSave({ saving: false, savedAt: Date.now(), error: null });
+        return true;
+      } catch (error) {
+        setSave({
+          saving: false,
+          savedAt: null,
+          error: error instanceof Error ? error.message : 'Could not save the business category',
+        });
+        return false;
       }
-      setReadiness(data as unknown as Readiness);
-      setSave({ saving: false, savedAt: Date.now(), error: null });
     },
     [draftId],
   );
@@ -191,7 +254,6 @@ export function OnboardingProvider({
    * price band on the card is derived from one of them, and a derived value
    * is not the merchant's to set directly.
    */
-  const answerTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const category = draft?.category ?? null;
 
   const setAnswers = React.useCallback(
@@ -253,15 +315,31 @@ export function OnboardingProvider({
       draft,
       readiness,
       categories,
+      categoryNotice,
       save,
       patch,
+      flush,
       setCategory,
+      setSubcategory,
       setAnswers,
       setBranches,
       setDraft: setDraftState,
       refresh,
     }),
-    [draft, readiness, categories, save, patch, setCategory, setAnswers, setBranches, refresh],
+    [
+      draft,
+      readiness,
+      categories,
+      categoryNotice,
+      save,
+      patch,
+      flush,
+      setCategory,
+      setSubcategory,
+      setAnswers,
+      setBranches,
+      refresh,
+    ],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

@@ -47629,6 +47629,10 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_merchant_set_subcategory: {
+        Args: { p_merchant_id: string; p_subcategory: string | null };
+        Returns: Json;
+      };
       rpc_merchant_set_controls: {
         Args: {
           p_accepting_orders?: boolean;
