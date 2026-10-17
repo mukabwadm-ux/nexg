@@ -93,6 +93,11 @@ values ('butchery', 'Butchery', 'Beef', 'products', 'minutes', 10, '[â€¦]', '{â€
   specialty-specific onboarding preview. Keep them descriptive; document
   requirements and conditional rules belong in the database as described
   below.
+- The 13 categories with taxonomy-driven setup questions render every selected
+  specialty field as a required answer. `fn_merchant_readiness` checks those
+  same fields server-side against `category_config.subcategories`; keep the
+  taxonomy fields and database subcategory data aligned when adding or changing
+  a specialty.
 - Specialty selections are persisted through
   `rpc_merchant_set_subcategory`, which checks that the selected specialty
   belongs to the merchant's category. Keep the category's configured
