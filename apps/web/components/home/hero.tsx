@@ -64,6 +64,10 @@ export interface HeroCopy {
   signIn: string;
   openSearch: string;
   scroll: string;
+  promptTitle: string;
+  promptBody: string;
+  promptCta: string;
+  promptLater: string;
 }
 
 interface City {
@@ -72,6 +76,8 @@ interface City {
 }
 
 const MIN_CHARS = 3;
+/** Session flag: the visitor has answered or dismissed the hero's location prompt. */
+const PROMPT_KEY = 'nexg.loc.heroPrompt';
 
 const FEATURES: { icon: LucideIcon; title: string; body: string }[] = [
   { icon: Zap, title: 'Speed', body: 'Fast, reliable and convenient' },
@@ -90,7 +96,7 @@ const KIND_ICON: Record<SearchItem['kind'], LucideIcon> = {
 };
 
 export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[]; locale: Locale }) {
-  const { place, chip, openSheet } = useLocation();
+  const { place, chip, openSheet, sheetOpen } = useLocation();
   const router = useRouter();
   const searchRef = React.useRef<HTMLInputElement>(null);
 
@@ -100,8 +106,16 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
   const placeCity = cities.some((c) => c.slug === place?.city_slug) ? place!.city_slug! : null;
   const citySlug = cityPicked ?? placeCity ?? cities[0]?.slug ?? 'nairobi';
 
+  /* A place guessed from the connection is a city, not an area: showing its
+     zone ("CBD") would claim we know where they are. */
   const where =
-    chip === 'empty' ? 'Set location' : (place?.zone ?? place?.city ?? place?.label ?? 'Nairobi');
+    chip === 'empty'
+      ? 'Set location'
+      : chip === 'city'
+        ? (place?.city ?? 'Nairobi')
+        : (place?.zone ?? place?.city ?? place?.label ?? 'Nairobi');
+  /* No exact spot yet: nothing at all, or only the connection's guess. */
+  const needsSpot = chip === 'empty' || chip === 'city';
 
   const popular: { icon: LucideIcon; label: string; href: string }[] = [
     { icon: Plane, label: 'Airport pickup', href: '/?need=Airport%20Transfer#start' },
@@ -141,6 +155,8 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
 
       <HeroNav
         where={where}
+        needsSpot={needsSpot}
+        sheetOpen={sheetOpen}
         onWhere={() => openSheet('hero')}
         onSearch={() => searchRef.current?.focus()}
         locale={locale}
@@ -251,12 +267,16 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
 
 function HeroNav({
   where,
+  needsSpot,
+  sheetOpen,
   onWhere,
   onSearch,
   locale,
   copy,
 }: {
   where: string;
+  needsSpot: boolean;
+  sheetOpen: boolean;
   onWhere: () => void;
   onSearch: () => void;
   locale: Locale;
@@ -270,6 +290,40 @@ function HeroNav({
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  /*
+   * The first-visit question, asked where the answer lives.
+   *
+   * Instead of a banner above the hero or a sheet over it before the page
+   * has been seen, a small card points at the location pill a moment after
+   * load — only while there is no exact spot, and only until it is used or
+   * dismissed this visit.
+   */
+  const [prompt, setPrompt] = React.useState(false);
+  React.useEffect(() => {
+    let dismissed = false;
+    try {
+      dismissed = window.sessionStorage.getItem(PROMPT_KEY) === '1';
+    } catch {
+      /* ignore */
+    }
+    if (!needsSpot || dismissed) {
+      setPrompt(false);
+      return;
+    }
+    const timer = setTimeout(() => setPrompt(true), 1200);
+    return () => clearTimeout(timer);
+  }, [needsSpot]);
+
+  const dismissPrompt = () => {
+    setPrompt(false);
+    try {
+      window.sessionStorage.setItem(PROMPT_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+  };
+  const showPrompt = prompt && needsSpot && !sheetOpen && !solid;
 
   const round =
     'focus-visible:ring-gold flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/55 backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-14 sm:w-14';
@@ -300,21 +354,75 @@ function HeroNav({
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-4">
-          <button
-            type="button"
-            onClick={onWhere}
-            aria-label={`Deliver to ${where}. Change`}
-            className="focus-visible:ring-gold flex h-11 max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-black/55 pl-3.5 pr-3 text-sm font-semibold backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-14 sm:max-w-[16rem] sm:gap-3 sm:pl-5 sm:pr-4 sm:text-base"
-          >
-            <MapPin
-              className="text-gold h-4 w-4 shrink-0 sm:h-5 sm:w-5"
-              aria-hidden="true"
-              fill="currentColor"
-              stroke="#0b0907"
-            />
-            <span className="truncate">{where}</span>
-            <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
-          </button>
+          <div className="relative">
+            {showPrompt && (
+              <span
+                aria-hidden="true"
+                className="ring-gold pointer-events-none absolute inset-0 animate-ping rounded-full opacity-60 ring-2"
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                dismissPrompt();
+                onWhere();
+              }}
+              aria-label={`Deliver to ${where}. Change`}
+              className="focus-visible:ring-gold flex h-11 max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-black/55 pl-3.5 pr-3 text-sm font-semibold backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-14 sm:max-w-[16rem] sm:gap-3 sm:pl-5 sm:pr-4 sm:text-base"
+            >
+              <MapPin
+                className="text-gold h-4 w-4 shrink-0 sm:h-5 sm:w-5"
+                aria-hidden="true"
+                fill="currentColor"
+                stroke="#0b0907"
+              />
+              <span className="truncate">{where}</span>
+              <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
+            </button>
+
+            {showPrompt && (
+              <div
+                role="status"
+                className="text-ink absolute right-0 top-full z-50 mt-3 w-[17rem] rounded-2xl bg-white p-4 shadow-2xl sm:w-[19rem]"
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-1.5 right-8 h-3 w-3 rotate-45 bg-white"
+                />
+                <p className="flex items-center gap-2 text-sm font-extrabold">
+                  <MapPin
+                    className="text-gold h-4 w-4"
+                    aria-hidden="true"
+                    fill="currentColor"
+                    stroke="white"
+                  />
+                  {copy.promptTitle}
+                </p>
+                <p className="mt-1 text-[0.8125rem] leading-snug text-[#6b6560]">
+                  {copy.promptBody}
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      dismissPrompt();
+                      onWhere();
+                    }}
+                    className="focus-visible:ring-gold flex-1 rounded-full bg-[#FFC93C] px-4 py-2.5 text-[0.8125rem] font-bold text-[#141414] hover:bg-[#FFD35F] focus-visible:outline-none focus-visible:ring-2"
+                  >
+                    {copy.promptCta}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={dismissPrompt}
+                    className="rounded-full px-3 py-2.5 text-[0.8125rem] font-semibold text-[#6b6560] hover:text-[#141414]"
+                  >
+                    {copy.promptLater}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* The comp: an account button on desktop, a search button on a phone. */}
           <Link href="/sign-in" aria-label={copy.signIn} className={cn(round, 'hidden sm:flex')}>

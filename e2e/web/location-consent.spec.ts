@@ -99,7 +99,9 @@ test.describe('location is never read without a gesture', () => {
 
   test('opening the sheet does not ask — only the button does', async ({ page }) => {
     await page.addInitScript(SPY);
-    await page.goto('/');
+    /* Not the homepage: there the hero asks beside its location pill and
+       the sheet does not open by itself. */
+    await page.goto('/explore');
     await page.waitForTimeout(3000);
 
     /* The sheet opens by itself on a first visit. That must not
