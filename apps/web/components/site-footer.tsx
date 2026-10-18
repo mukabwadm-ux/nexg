@@ -27,8 +27,8 @@ export async function SiteFooter({
 
   return (
     <footer className="border-border bg-bg border-t">
-      <div className="mx-auto flex max-w-[96rem] flex-col gap-4 px-4 py-[3.75rem] sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-16">
-        <Logo className="h-16" />
+      <div className="mx-auto flex max-w-[96rem] flex-col items-start gap-4 px-4 py-[3.75rem] sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-16">
+        <Logo className="h-20 sm:h-16" />
         <div className="flex flex-col gap-2 sm:items-end">
           <nav aria-label="Footer" className="flex flex-wrap gap-4">
             {LINKS.map((link) => (
