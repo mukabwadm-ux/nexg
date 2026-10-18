@@ -207,7 +207,7 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
         </div>
 
         <Link
-          href="/experience"
+          href="/ask"
           className={cn(
             'focus-visible:ring-gold mt-5 flex h-12 items-center gap-3 rounded-full px-6 text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:text-base',
             /* Outlined on a phone, filled from sm up — as drawn. */
