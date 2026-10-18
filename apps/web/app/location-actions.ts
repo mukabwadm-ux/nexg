@@ -2,6 +2,7 @@
 
 import { unstable_cache } from 'next/cache';
 import { headers } from 'next/headers';
+import type { Coverage, Place } from '@nexg/location';
 
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -52,8 +53,8 @@ const geocodeCell = unstable_cache(
  * Everything here is a thin call onto a database function,
  * because coverage, zones and saved places are decided in one
  * place and these actions must not become a second opinion. The
- * one piece of real logic is the IP fallback, and only because
- * the headers it reads exist nowhere else.
+ * The connection-city fallback runs after the initial render because
+ * its headers and coverage lookup are not needed to show the page.
  */
 
 export interface ResolvedPlace {
@@ -152,7 +153,8 @@ export async function noteLocationEvent(
 /**
  * Where the connection says they are.
  *
- * The last rung of the ladder and the weakest. It is a city, not
+ * The last rung of the ladder and the weakest, resolved after hydration.
+ * It is a city, not
  * a place: the headers resolve to the exit point of a mobile
  * network, which in Kenya can be a different town from the
  * handset. So it is used only to open the site somewhere
@@ -164,10 +166,7 @@ export async function noteLocationEvent(
  * Nairobi — a hard-coded city would be indistinguishable on
  * screen from a real resolution.
  */
-export async function cityFromConnection(): Promise<{
-  step: 'ip_city';
-  place: Record<string, unknown>;
-} | null> {
+export async function cityFromConnection(): Promise<{ step: 'ip_city'; place: Place } | null> {
   const h = headers();
   const rawLat = h.get('x-vercel-ip-latitude');
   const rawLng = h.get('x-vercel-ip-longitude');
@@ -190,21 +189,23 @@ export async function cityFromConnection(): Promise<{
   if (lat === 0 && lng === 0) return null;
 
   const cover = await coverageFor(lat, lng);
-  const cityName =
-    (cover.city as string | undefined) ??
-    (cover.nearest_city as string | undefined) ??
-    h.get('x-vercel-ip-city');
+  const city =
+    stringField(cover.city) ?? stringField(cover.nearest_city) ?? h.get('x-vercel-ip-city');
 
-  if (!cityName) return null;
+  if (!city) return null;
+
+  const coverage = isCoverage(cover.coverage) ? cover.coverage : 'unknown';
+  const citySlug = stringField(cover.city_slug) ?? stringField(cover.nearest_city_slug);
 
   return {
     step: 'ip_city',
     place: {
-      ...cover,
-      label: `${decodeURIComponent(cityName)} · from your connection`,
-      city: decodeURIComponent(cityName),
+      label: `${decodeURIComponent(city)} · from your connection`,
+      city: decodeURIComponent(city),
+      city_slug: citySlug,
       lat,
       lng,
+      coverage,
       /*
        * Deliberately coarse. The confirm view reads this to
        * decide whether a pin needs adjusting, and a city-level
@@ -212,6 +213,29 @@ export async function cityFromConnection(): Promise<{
        */
       accuracy_m: 20000,
       source: 'ip_city',
+      zone_id: stringField(cover.zone_id),
+      zone: stringField(cover.zone),
+      eta_min: numberField(cover.eta_min),
+      eta_max: numberField(cover.eta_max),
+      paused: typeof cover.paused === 'boolean' ? cover.paused : undefined,
+      nearest_city: stringField(cover.nearest_city),
+      nearest_city_slug: stringField(cover.nearest_city_slug),
+      nearest_km: numberField(cover.nearest_km),
+      message: stringField(cover.message),
     },
   };
+}
+
+function stringField(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function numberField(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function isCoverage(value: unknown): value is Coverage {
+  return (
+    value === 'covered' || value === 'outside' || value === 'unlaunched' || value === 'unknown'
+  );
 }

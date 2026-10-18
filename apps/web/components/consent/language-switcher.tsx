@@ -1,9 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { setLocale } from '@/app/consent-actions';
+import { notifyPreferencesUpdated } from '@/components/consent/personalized-chrome';
 import { localeName } from '@/lib/i18n/dictionaries';
 
 /**
@@ -24,6 +25,7 @@ import { localeName } from '@/lib/i18n/dictionaries';
  */
 export function LanguageSwitcher({ locale, locales }: { locale: string; locales: string[] }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [busy, setBusy] = React.useState<string | null>(null);
 
   if (locales.length < 2) return null;
@@ -43,7 +45,13 @@ export function LanguageSwitcher({ locale, locales }: { locale: string; locales:
               setBusy(option);
               await setLocale(option);
               setBusy(null);
-              router.refresh();
+              document.documentElement.lang = option;
+              notifyPreferencesUpdated();
+              if (pathname === '/' || pathname === '/localized-home') {
+                router.replace('/');
+              } else {
+                router.refresh();
+              }
             }}
             className={`rounded-full px-2.5 py-1 text-xs font-bold transition-colors ${
               on ? 'bg-ink text-white' : 'text-muted hover:text-ink disabled:opacity-50'

@@ -6,8 +6,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { markAsked, setLocale } from '@/app/consent-actions';
+import { notifyPreferencesUpdated } from '@/components/consent/personalized-chrome';
 import {
   isAuthored,
+  isLocaleTag,
   localeName,
   pickLocale,
   translator,
@@ -61,10 +63,18 @@ export function WelcomeConsent({
     label: '',
     locale: null,
   });
+  const [activeLocale, setActiveLocale] = React.useState(locale);
 
-  const t = translator(locale);
+  const t = translator(activeLocale);
 
   React.useEffect(() => {
+    const cookies = document.cookie.split(';').map((cookie) => cookie.trim());
+    const savedLocale = cookies
+      .find((cookie) => cookie.startsWith('nexg_locale='))
+      ?.slice('nexg_locale='.length);
+    if (savedLocale && isLocaleTag(savedLocale)) setActiveLocale(savedLocale);
+    if (cookies.includes('nexg_asked=1')) return;
+
     const languages = navigator.languages?.length ? [...navigator.languages] : [navigator.language];
     const match = pickLocale(languages);
 
@@ -77,7 +87,6 @@ export function WelcomeConsent({
     const offerable = match && (isAuthored(match) || canTranslate) ? match : null;
 
     setPreferred({ label: localeName(languages[0] ?? 'en'), locale: offerable });
-    /* Mounted at all means the server decided they have not been asked. */
     setVisible(true);
   }, [canTranslate]);
 
@@ -87,12 +96,13 @@ export function WelcomeConsent({
     setBusy('dismiss');
     await markAsked();
     setVisible(false);
-    router.refresh();
+    notifyPreferencesUpdated();
   };
 
   const applyLanguage = async () => {
-    if (preferred.locale && preferred.locale !== locale) {
+    if (preferred.locale && preferred.locale !== activeLocale) {
       await setLocale(preferred.locale);
+      document.documentElement.lang = preferred.locale;
       return true;
     }
     return false;
@@ -104,17 +114,30 @@ export function WelcomeConsent({
     await markAsked();
     setBusy(null);
     setVisible(false);
-    router.refresh();
-    if (changed) router.refresh();
+    notifyPreferencesUpdated();
+    if (changed) {
+      if (pathname === '/' || pathname === '/localized-home') {
+        router.replace('/');
+      } else {
+        router.refresh();
+      }
+    }
   };
 
   const languageOnly = async () => {
     setBusy('language');
-    await applyLanguage();
+    const changed = await applyLanguage();
     await markAsked();
     setBusy(null);
     setVisible(false);
-    router.refresh();
+    notifyPreferencesUpdated();
+    if (changed) {
+      if (pathname === '/' || pathname === '/localized-home') {
+        router.replace('/');
+      } else {
+        router.refresh();
+      }
+    }
   };
 
   return (
@@ -160,7 +183,7 @@ export function WelcomeConsent({
           <Button loading={busy === 'both'} onClick={() => void accept()}>
             {t('consent.allow')}
           </Button>
-          {preferred.locale && preferred.locale !== locale && (
+          {preferred.locale && preferred.locale !== activeLocale && (
             <Button
               variant="outline"
               loading={busy === 'language'}

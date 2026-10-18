@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { unstable_cache } from 'next/cache';
 
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -128,19 +129,27 @@ export function hasBeenAsked(): boolean {
  * the machine has already filled. Not every language in the world —
  * only the ones this site can actually speak today.
  */
-export async function availableLocales(): Promise<string[]> {
-  try {
-    const supabase = createPublicClient();
-    const { data } = await supabase
-      .from('locale_request')
-      .select('locale')
-      .not('generated_at', 'is', null);
+const loadAvailableLocales = unstable_cache(
+  async (): Promise<string[]> => {
+    try {
+      const supabase = createPublicClient();
+      const { data } = await supabase
+        .from('locale_request')
+        .select('locale')
+        .not('generated_at', 'is', null);
 
-    const generated = ((data as { locale: string }[] | null) ?? []).map((r) => r.locale);
-    return [...new Set([...AUTHORED_LOCALES, ...generated])];
-  } catch {
-    return [...AUTHORED_LOCALES];
-  }
+      const generated = ((data as { locale: string }[] | null) ?? []).map((r) => r.locale);
+      return [...new Set([...AUTHORED_LOCALES, ...generated])];
+    } catch {
+      return [...AUTHORED_LOCALES];
+    }
+  },
+  ['available-locales'],
+  { revalidate: 3600 },
+);
+
+export async function availableLocales(): Promise<string[]> {
+  return loadAvailableLocales();
 }
 
 /** Whether we could show this language, given a key and a cache. */

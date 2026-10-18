@@ -52,10 +52,20 @@ export const config = {
    * the number they are previewing. The guard for that is the first
    * thing in the function.
    */
-  matcher: ['/q/:code*'],
+  matcher: ['/', '/q/:code*'],
 };
 
 export async function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === '/') {
+    const locale = request.cookies.get('nexg_locale')?.value;
+    if (locale && locale !== 'en') {
+      const localized = request.nextUrl.clone();
+      localized.pathname = '/localized-home';
+      return NextResponse.rewrite(localized);
+    }
+    return NextResponse.next();
+  }
+
   const segments = request.nextUrl.pathname.split('/').filter(Boolean);
 
   /* /q/{code} and nothing below it. The printable card lives at

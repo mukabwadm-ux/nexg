@@ -1,18 +1,16 @@
 import '@nexg/ui/globals.css';
 
-import { type Place, type ResolutionStep } from '@nexg/location';
 import { ToastProvider } from '@nexg/ui';
 import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 
-import { cityFromConnection } from '@/app/location-actions';
-import { WelcomeConsent } from '@/components/consent/welcome';
-import { AfterLocationSettled } from '@/components/location/after-location';
+import { PersonalizedChrome } from '@/components/consent/personalized-chrome';
+import { WelcomeGate } from '@/components/consent/welcome-gate';
 import { LocationBannerSlot, LocationSheetSlot } from '@/components/location/chrome';
 import { SiteLocationProvider } from '@/components/location/provider';
-import { FloatingChat } from '@/components/chat/floating-chat';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
-import { canMachineTranslate, getLocale, hasBeenAsked } from '@/lib/i18n';
+import { DEFAULT_LOCALE } from '@/lib/i18n/dictionaries';
+import { canMachineTranslate } from '@/lib/i18n/translate';
 
 /**
  * Manrope 400/600/700/800 (spec section 2), self-hosted by next/font so there
@@ -50,39 +48,12 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  /*
-   * Read on the server, so the page arrives in the right language rather
-   * than flashing English and then swapping. `lang` follows it, which is
-   * what a screen reader uses to choose a voice.
-   */
-  const locale = getLocale();
-  const asked = hasBeenAsked();
-
-  /*
-   * The last rung of the resolution ladder, walked on the server
-   * so the page arrives already pointed at a plausible city
-   * instead of resolving one after hydration and shifting under
-   * the reader.
-   *
-   * This is the only location work that happens without being
-   * asked for, and it is deliberately the weakest kind: an edge
-   * header, a city, labelled "from your connection" everywhere
-   * it appears, and never enough to lock a price. The browser's
-   * own location is not touched here or anywhere else on load —
-   * that happens inside a click, in one file, and a test fails
-   * the build if it ever happens anywhere else.
-   */
-  const fromConnection = await cityFromConnection();
-  const initial = fromConnection
-    ? { place: fromConnection.place as unknown as Place, step: 'ip_city' as ResolutionStep }
-    : null;
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={locale} className={manrope.variable}>
+    <html lang="en" className={manrope.variable}>
       <body className="bg-bg text-ink min-h-dvh font-sans">
         <ToastProvider>
-          <SiteLocationProvider initial={initial}>
+          <SiteLocationProvider initial={null}>
             {/* Under the nav on every page, and only when there is
                 something honest to say about precision. */}
             <LocationBannerSlot />
@@ -92,6 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <LocationSheetSlot />
 
             <RegisterServiceWorker />
+            <PersonalizedChrome />
 
             {/* Real support: what somebody types here becomes a
                 conversation on the concierge desk, routed to a
@@ -103,18 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 together puts a button on screen that cannot be
                 pressed — which reads as broken rather than as
                 "answer this first". */}
-            {asked && <FloatingChat />}
-
-            {/* Rendered only when they have not answered, so a returning
-                visitor never sees it and nothing flickers on their screen
-                while the client works out whether to hide it — and only
-                once the location question is settled, so the two first-visit
-                asks queue rather than stack. */}
-            {!asked && (
-              <AfterLocationSettled>
-                <WelcomeConsent locale={locale} canTranslate={canMachineTranslate()} />
-              </AfterLocationSettled>
-            )}
+            <WelcomeGate locale={DEFAULT_LOCALE} canTranslate={canMachineTranslate()} />
           </SiteLocationProvider>
         </ToastProvider>
       </body>

@@ -9,6 +9,7 @@ import {
 import * as React from 'react';
 
 import {
+  cityFromConnection,
   confirmPlace,
   coverageFor,
   deletePlace,
@@ -45,6 +46,11 @@ export function SiteLocationProvider({
 
   const actions = React.useMemo<LocationActions>(
     () => ({
+      connection: async () => {
+        const result = await cityFromConnection();
+        if (!result) return null;
+        return { place: result.place, step: result.step };
+      },
       resolve: async (context) => {
         const result = await resolveLocation(context);
         return {

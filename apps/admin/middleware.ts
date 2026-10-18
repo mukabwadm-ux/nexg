@@ -30,6 +30,28 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  const { pathname } = request.nextUrl;
+  const isSignIn = pathname.startsWith('/sign-in');
+  const projectRef = new URL(url).hostname.split('.')[0];
+  const authCookie = `sb-${projectRef}-auth-token`;
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some(({ name }) => name === authCookie || name.startsWith(`${authCookie}.`));
+
+  /*
+   * An absent Supabase session cookie cannot identify a signed-in user.
+   * Avoid a network validation call for the common anonymous request,
+   * including first visits to sign-in; chunked Supabase cookies are covered.
+   */
+  if (!hasAuthCookie) {
+    if (isSignIn) return response;
+
+    const signInUrl = request.nextUrl.clone();
+    signInUrl.pathname = '/sign-in';
+    if (pathname !== '/') signInUrl.searchParams.set('next', pathname);
+    return NextResponse.redirect(signInUrl);
+  }
+
   const supabase = createServerClient(url, key, {
     cookies: {
       getAll() {
@@ -48,9 +70,6 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-  const isSignIn = pathname.startsWith('/sign-in');
 
   if (!user && !isSignIn) {
     const url = request.nextUrl.clone();

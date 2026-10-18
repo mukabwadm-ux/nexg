@@ -39,6 +39,7 @@ const SAME_PLACE_M = 50;
 const DEVICE_PLACE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 
 export interface LocationActions {
+  connection?: () => Promise<{ place: Place; step: 'ip_city' } | null>;
   resolve: (context: Record<string, unknown>) => Promise<{
     step: ResolutionStep;
     chip_state: ChipState;
@@ -248,9 +249,9 @@ export function LocationProvider({
 
   /* ───────────────────────────────── the rest of the resolution ladder
    *
-   * The server has already tried QR, deep link and IP. What is
-   * left are the two steps only the browser can see: a signed-in
-   * guest's saved places, and this device's own storage.
+   * The server may provide a QR or deep-link place. On the client,
+   * this device and a signed-in guest's saved places take precedence
+   * over the coarse connection-city fallback.
    *
    * Nothing here reads a position. The one read without a tap —
    * a phone whose visitor already allowed location — is the
@@ -318,25 +319,44 @@ export function LocationProvider({
         /* Signed out, or the call failed. Neither is worth a
            message: the device's own list still works. */
       }
-      if (cancelled || account.length === 0) return;
+      if (cancelled) return;
 
-      setSavedPlaces([
-        ...account,
-        ...device.filter((d) => !account.some((a) => metresBetween(a, d) < 30)),
-      ]);
+      if (account.length > 0) {
+        setSavedPlaces([
+          ...account,
+          ...device.filter((d) => !account.some((a) => metresBetween(a, d) < 30)),
+        ]);
+
+        /*
+         * The account wins over the device only when the device had
+         * nothing. Somebody who set an address on this machine a
+         * minute ago should not have it replaced by where they
+         * ordered from last week because a signed-in list arrived
+         * late.
+         */
+        setPlaceState((current) => {
+          if (current) return current;
+          setStep('account');
+          return account[0] as Place;
+        });
+        return;
+      }
 
       /*
-       * The account wins over the device only when the device had
-       * nothing. Somebody who set an address on this machine a
-       * minute ago should not have it replaced by where they
-       * ordered from last week because a signed-in list arrived
-       * late.
+       * The connection-based city is a last resort. Resolve it after
+       * the page has rendered and only after local and account places
+       * have been checked, so a slow location lookup cannot delay the
+       * first response or override a more precise saved address.
        */
-      setPlaceState((current) => {
-        if (current) return current;
-        setStep('account');
-        return account[0] as Place;
-      });
+      if (!fromThisDevice && actions.connection) {
+        const result = await actions.connection();
+        if (cancelled || !result) return;
+        setPlaceState((current) => {
+          if (current) return current;
+          setStep(result.step);
+          return result.place;
+        });
+      }
     })();
 
     return () => {

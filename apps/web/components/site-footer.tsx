@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { LanguageSwitcher } from '@/components/consent/language-switcher';
 import { availableLocales, getTranslations } from '@/lib/i18n';
+import type { Locale, Translate } from '@/lib/i18n/dictionaries';
 
 import { Logo } from './logo';
 
@@ -12,8 +13,16 @@ const LINKS = [
   { key: 'footer.contact', href: '/help' },
 ] as const;
 
-export async function SiteFooter() {
-  const { locale, t } = await getTranslations();
+export async function SiteFooter({
+  locale: pageLocale,
+  translate,
+}: {
+  locale?: Locale;
+  translate?: Translate;
+} = {}) {
+  const pageTranslations =
+    pageLocale && translate ? { locale: pageLocale, t: translate } : await getTranslations();
+  const { locale, t } = pageTranslations;
   const locales = await availableLocales();
 
   return (
