@@ -101,6 +101,25 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Set up the Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Start Supabase
+        run: supabase start
+
+      - name: Point the apps at local Supabase
+        run: |
+          eval "$(supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${ANON_KEY:-$PUBLISHABLE_KEY}"
+            echo "SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY:-$SECRET_KEY}"
+            echo "DATABASE_URL=$DB_URL"
+            echo "NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3000"
+          } >> "$GITHUB_ENV"
+
       - name: Build
         run: pnpm build
 
@@ -115,6 +134,10 @@ jobs:
 
       - name: Check formatting
         run: pnpm format:check
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop --no-backup
 
   e2e:
     name: Playwright
