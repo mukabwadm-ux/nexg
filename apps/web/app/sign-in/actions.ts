@@ -59,6 +59,15 @@ const credentials = z.object({
   password: z.string().min(6, 'Passwords are at least 6 characters.'),
 });
 
+const recoveryEmail = z.object({
+  email: z.string().trim().email('Enter a valid email address.'),
+});
+
+const newPassword = z
+  .string()
+  .min(6, 'Passwords are at least 6 characters.')
+  .max(72, 'Password must be 72 characters or fewer.');
+
 const signUpSchema = credentials.extend({
   first_name: z.string().trim().min(1, 'Enter your first name.').max(80),
   last_name: z.string().trim().min(1, 'Enter your last name.').max(80),
@@ -100,6 +109,56 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
     message: 'Signed in.',
     redirectTo: await landingFor(supabase, roleOf(formData.get('role'))),
   };
+}
+
+export async function requestPasswordRecovery(formData: FormData): Promise<AuthResult> {
+  const parsed = recoveryEmail.safeParse({ email: formData.get('email') });
+  if (!parsed.success) {
+    return { ok: false, message: parsed.error.issues[0]?.message ?? 'Enter a valid email address.' };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nexgapp.com';
+  const redirectTo = new URL('/auth/callback?next=/reset-password', siteUrl).toString();
+  const supabase = createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email.toLowerCase(), {
+    redirectTo,
+  });
+
+  if (error) {
+    return { ok: false, message: 'We could not send the recovery email. Please try again.' };
+  }
+
+  return {
+    ok: true,
+    message: 'If an account uses that email, a password recovery link is on its way.',
+  };
+}
+
+export async function updateRecoveredPassword(formData: FormData): Promise<AuthResult> {
+  const password = newPassword.safeParse(formData.get('password'));
+  const confirmation = newPassword.safeParse(formData.get('confirmPassword'));
+
+  if (!password.success) {
+    return { ok: false, message: password.error.issues[0]?.message ?? 'Check your new password.' };
+  }
+  if (!confirmation.success) {
+    return {
+      ok: false,
+      message: confirmation.error.issues[0]?.message ?? 'Confirm your new password.',
+    };
+  }
+  if (password.data !== confirmation.data) {
+    return { ok: false, message: 'The passwords do not match.' };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.auth.updateUser({ password: password.data });
+
+  if (error) {
+    return { ok: false, message: 'This recovery link is invalid or has expired. Request a new one.' };
+  }
+
+  return { ok: true, message: 'Your password has been updated.' };
 }
 
 /**

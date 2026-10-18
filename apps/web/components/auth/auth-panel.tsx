@@ -198,6 +198,15 @@ export function AuthPanel({ initialTab = 'signin' }: { initialTab?: 'signin' | '
             />
           </div>
 
+          {tab === 'signin' && (
+            <Link
+              href="/forgot-password"
+              className="text-ink mt-3 inline-block text-sm font-bold underline underline-offset-4"
+            >
+              Forgot password?
+            </Link>
+          )}
+
           {tab === 'create' && (
             <div className="mt-4">
               <PhoneInput

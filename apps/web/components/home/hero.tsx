@@ -62,7 +62,6 @@ export interface HeroCopy {
   popular: string;
   plan: string;
   signIn: string;
-  openSearch: string;
   scroll: string;
   promptTitle: string;
   promptBody: string;
@@ -98,8 +97,6 @@ const KIND_ICON: Record<SearchItem['kind'], LucideIcon> = {
 export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[]; locale: Locale }) {
   const { place, chip, openSheet, sheetOpen } = useLocation();
   const router = useRouter();
-  const searchRef = React.useRef<HTMLInputElement>(null);
-
   /* The city the search is scoped to: the one in the location pill. The
      pill (and the menu) is where it is changed, so the search bar has no
      picker of its own. */
@@ -158,7 +155,6 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
         needsSpot={needsSpot}
         sheetOpen={sheetOpen}
         onWhere={() => openSheet('hero')}
-        onSearch={() => searchRef.current?.focus()}
         locale={locale}
         copy={copy}
       />
@@ -179,7 +175,6 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
         <p className="mt-3 max-w-md text-[0.9375rem] text-white/85 sm:text-base">{copy.lede}</p>
 
         <HeroSearch
-          inputRef={searchRef}
           copy={copy}
           citySlug={citySlug}
           onSubmit={(q) =>
@@ -267,7 +262,6 @@ function HeroNav({
   needsSpot,
   sheetOpen,
   onWhere,
-  onSearch,
   locale,
   copy,
 }: {
@@ -275,7 +269,6 @@ function HeroNav({
   needsSpot: boolean;
   sheetOpen: boolean;
   onWhere: () => void;
-  onSearch: () => void;
   locale: Locale;
   copy: HeroCopy;
 }) {
@@ -422,15 +415,6 @@ function HeroNav({
           <Link href="/sign-in" aria-label={copy.signIn} className={cn(round, 'hidden sm:flex')}>
             <User className="text-gold h-5 w-5" aria-hidden="true" fill="currentColor" />
           </Link>
-          <button
-            type="button"
-            onClick={onSearch}
-            aria-label={copy.openSearch}
-            className={cn(round, 'sm:hidden')}
-          >
-            <Search className="h-5 w-5" aria-hidden="true" />
-          </button>
-
           <SiteMenu locale={locale}>
             <button type="button" aria-label="Open menu" className={round}>
               <Menu className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
@@ -445,12 +429,10 @@ function HeroNav({
 /* ═══════════════════════════════════════════════════════════ search */
 
 function HeroSearch({
-  inputRef,
   copy,
   citySlug,
   onSubmit,
 }: {
-  inputRef: React.RefObject<HTMLInputElement>;
   copy: HeroCopy;
   /** From the location pill; changed there, not here. */
   citySlug: string;
@@ -544,7 +526,6 @@ function HeroSearch({
         <div className="focus-within:ring-gold flex min-w-0 flex-1 items-center rounded-full bg-white shadow-2xl focus-within:ring-2 sm:shadow-none sm:focus-within:ring-0">
           <Search className="ml-4 h-5 w-5 shrink-0 text-[#141414]" aria-hidden="true" />
           <input
-            ref={inputRef}
             type="search"
             value={q}
             onChange={(e) => {

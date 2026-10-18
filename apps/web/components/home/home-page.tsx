@@ -74,7 +74,6 @@ export async function HomePageContent({
           popular: t('hero.popular'),
           plan: t('hero.plan'),
           signIn: t('nav.signIn'),
-          openSearch: t('hero.openSearch'),
           scroll: t('hero.scroll'),
           promptTitle: t('hero.prompt.title'),
           promptBody: t('hero.prompt.body'),
