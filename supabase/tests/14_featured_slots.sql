@@ -12,7 +12,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(38);
+select plan(39);
 
 create temp table t_ids (k text primary key, v bigint);
 
@@ -473,6 +473,16 @@ select is(
   (select count(*)::int from pg_matviews where matviewname = 'featured_live_v'),
   0,
   'featured_live_v is a view, so the homepage never shows a stale band.');
+
+select ok(
+  not coalesce(
+    (select reloptions @> array['security_invoker=true']
+     from pg_class where oid = 'public.featured_live_v'::regclass),
+    false
+  )
+  and has_table_privilege('anon', 'public.featured_live_v', 'select')
+  and not has_table_privilege('anon', 'public.featured_slot_week', 'select'),
+  'Guests can read the filtered featured view without access to its source table.');
 
 /*
  * Asserted as behaviour rather than by reading the view's SQL.
