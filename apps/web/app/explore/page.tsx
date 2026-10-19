@@ -136,12 +136,45 @@ export default async function ExplorePage({
    * being served, so every live merchant is listed there regardless of the
    * city or `explore_visible` set on its record.
    */
-  const listed = (all ?? []).filter(
+  const real = (all ?? []).filter(
     (m): m is typeof m & { id: string; trading_name: string } =>
       Boolean(m.id) &&
       Boolean(m.trading_name) &&
       (citySlug === 'nairobi' || m.city_slug === citySlug),
   );
+
+  /*
+   * Until a merchant is live in Nairobi, every category shows a labelled
+   * "coming soon" stand-in spread across the zones. They are not linkable and
+   * disappear as soon as one real merchant goes live.
+   */
+  const cityZones = (zones ?? []).filter((zone) => zone.city_id === cityId);
+  const placeholders =
+    citySlug === 'nairobi' && real.length === 0
+      ? TAXONOMY_CATEGORIES.map((category, index) => ({
+          id: `placeholder-${category}`,
+          trading_name: `${CATEGORY_LABEL[category]} partner`,
+          category,
+          category_other: null,
+          cover_photo_path: null,
+          branch_name: cityZones.length ? cityZones[index % cityZones.length]!.name : null,
+          branch_address: null,
+          branch_latitude: null,
+          branch_longitude: null,
+          city_name: cityName,
+          city_slug: citySlug,
+          zone_id: cityZones.length ? cityZones[index % cityZones.length]!.id : null,
+          concierge_pick: false,
+          featured: false,
+          accepting_orders: true,
+          explore_visible: true,
+          listed_at: null,
+          placeholder: true,
+        }))
+      : [];
+  const listed = [...real, ...placeholders] as ((typeof real)[number] & {
+    placeholder?: boolean;
+  })[];
 
   const state: FilterState = {
     city: citySlug,

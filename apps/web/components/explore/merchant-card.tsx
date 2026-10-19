@@ -132,6 +132,8 @@ export interface ExploreMerchant {
   concierge_pick: boolean | null;
   featured: boolean | null;
   accepting_orders: boolean | null;
+  /** A stand-in shown until real merchants go live; not linkable. */
+  placeholder?: boolean;
 }
 
 /** The current merchant taxonomy, in the order the Explore category row shows it. */
@@ -162,10 +164,13 @@ export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
   const category = merchant.category ?? 'other';
   const Icon = CATEGORY_ICON[category] ?? Store;
   const open = merchant.accepting_orders !== false;
+  const placeholder = merchant.placeholder === true;
+  const Wrapper = placeholder ? 'div' : Link;
+  const wrapperProps = placeholder ? {} : { href: `/explore/${merchant.id}` };
 
   return (
     <li className="border-border bg-surface shadow-card hover:shadow-raised group overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-0.5">
-      <Link href={`/explore/${merchant.id}`} className="block">
+      <Wrapper {...(wrapperProps as { href: string })} className="block">
         <div className="from-bg to-border/40 relative flex h-44 items-center justify-center overflow-hidden bg-gradient-to-br">
           <span
             className={`absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.625rem] font-extrabold ${
@@ -176,7 +181,7 @@ export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
               aria-hidden="true"
               className={`h-1.5 w-1.5 rounded-full ${open ? 'bg-success' : 'bg-danger'}`}
             />
-            {open ? 'Open' : 'Closed'}
+            {placeholder ? 'Coming soon' : open ? 'Open' : 'Closed'}
           </span>
 
           {merchant.concierge_pick && (
@@ -215,15 +220,21 @@ export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
             {merchant.branch_name && ` Â· ${merchant.branch_name}`}
           </p>
         </div>
-      </Link>
+      </Wrapper>
 
       <div className="flex items-center justify-between gap-3 px-4 pb-4">
         <span className="text-muted-light text-xs font-semibold">
           Delivery from KES {VALUE_PLACEHOLDER}
         </span>
-        <Button variant="gold" size="sm" asChild>
-          <Link href={`/explore/${merchant.id}`}>{CTA[category] ?? 'View'}</Link>
-        </Button>
+        {placeholder ? (
+          <Button variant="gold" size="sm" disabled>
+            Coming soon
+          </Button>
+        ) : (
+          <Button variant="gold" size="sm" asChild>
+            <Link href={`/explore/${merchant.id}`}>{CTA[category] ?? 'View'}</Link>
+          </Button>
+        )}
       </div>
     </li>
   );
