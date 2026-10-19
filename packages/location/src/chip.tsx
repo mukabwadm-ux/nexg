@@ -36,7 +36,7 @@ const DOT: Record<ChipState, string> = {
 };
 
 export function DeliverToChip({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
-  const { place, chip, panelOpen, setPanelOpen } = useLocation();
+  const { place, chip, sheetOpen, panelOpen, setPanelOpen, openSheet } = useLocation();
   const ref = React.useRef<HTMLDivElement>(null);
 
   /* Click-away and Escape, because this opens over a page
@@ -64,8 +64,11 @@ export function DeliverToChip({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
     <div ref={ref} className="relative">
       <button
         type="button"
-        onClick={() => setPanelOpen(!panelOpen)}
-        aria-expanded={panelOpen}
+        onClick={() => {
+          setPanelOpen(false);
+          openSheet('header');
+        }}
+        aria-expanded={sheetOpen || panelOpen}
         aria-haspopup="dialog"
         aria-label={`Deliver to ${title}. Change the delivery location.`}
         className={

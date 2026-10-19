@@ -26,6 +26,7 @@ export function LocationSheet({
   const {
     sheetOpen,
     closeSheet,
+    setPanelOpen,
     savedPlaces,
     place,
     setPlace,
@@ -136,13 +137,7 @@ export function LocationSheet({
               type="button"
               onClick={() => {
                 closeSheet('dismissed');
-                /* The panel is the search. One search box in the
-                   product, not two that can disagree. */
-                setTimeout(
-                  () =>
-                    document.querySelector<HTMLButtonElement>('[aria-haspopup="dialog"]')?.click(),
-                  50,
-                );
+                setTimeout(() => setPanelOpen(true), 50);
               }}
               className="border-border hover:border-ink flex w-full items-center gap-2 rounded-xl border px-4 py-3 text-left transition-colors"
             >

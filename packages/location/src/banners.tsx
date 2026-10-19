@@ -25,7 +25,7 @@ export function LocationBanner({
   /** Off where the page shows precision its own way (the homepage hero). */
   hidden = false,
 }: { hidden?: boolean } = {}) {
-  const { place, step, chip, consent, blockedNoticeSeen, openSheet, setPanelOpen } = useLocation();
+  const { place, step, chip, consent, blockedNoticeSeen, openSheet } = useLocation();
   const [cityBannerDismissed, setCityBannerDismissed] = React.useState<boolean | null>(null);
   const [noticeDismissed, setNoticeDismissed] = React.useState(false);
 
@@ -61,7 +61,7 @@ export function LocationBanner({
           browser — that is fine. Type your address instead, or re-enable it from the padlock icon
           in the address bar whenever you like. We will not ask again this visit.
         </span>
-        <Action onClick={() => setPanelOpen(true)} variant="outline">
+        <Action onClick={() => openSheet('banner')} variant="outline">
           Type my address
         </Action>
       </Bar>
