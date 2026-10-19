@@ -12,7 +12,6 @@ import {
   TAXONOMY_CATEGORIES,
 } from '@/components/explore/merchant-card';
 import { CategoryScroller } from '@/components/explore/category-scroller';
-import { MerchantRow, type RowItem } from '@/components/explore/merchant-row';
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
 import { SiteFooter } from '@/components/site-footer';
 import { ExploreFollowsLocation } from '@/components/location/explore-sync';
@@ -234,39 +233,6 @@ export default async function ExplorePage({
   const visible = near
     ? [...filtered].sort((a, b) => (kmTo(a) ?? Infinity) - (kmTo(b) ?? Infinity))
     : filtered;
-
-  /*
-   * A category page shows what each merchant sells, so it needs their
-   * catalogue. Only fetched there, and only for the merchants on screen.
-   */
-  const itemsByMerchant = new Map<string, RowItem[]>();
-  if (state.category) {
-    const ids = visible
-      .filter((m) => !(m as { placeholder?: boolean }).placeholder)
-      .slice(0, 24)
-      .map((m) => m.id);
-    if (ids.length > 0) {
-      const { data: rows } = await createPublicClient()
-        .from('catalogue_section')
-        .select(
-          'merchant_id, sort, catalogue_item(id, name, price_kes, available, highlighted, sort)',
-        )
-        .in('merchant_id', ids)
-        .order('sort', { ascending: true });
-      for (const section of rows ?? []) {
-        const list = itemsByMerchant.get(section.merchant_id) ?? [];
-        const items = [
-          ...((section.catalogue_item as
-            | (RowItem & { available: boolean; highlighted: boolean; sort?: number })[]
-            | null) ?? []),
-        ]
-          .filter((item) => item.available)
-          .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
-        list.push(...items);
-        itemsByMerchant.set(section.merchant_id, list);
-      }
-    }
-  }
 
   const picks = listed
     .filter((m) => m.concierge_pick && (!state.zone || m.zone_id === state.zone))
@@ -518,16 +484,6 @@ export default async function ExplorePage({
                   }}
                 />
               </div>
-            ) : state.category && visible.some((m) => !(m as { placeholder?: boolean }).placeholder) ? (
-              <ul className="mt-5 space-y-4">
-                {visible.map((merchant) => (
-                  <MerchantRow
-                    key={merchant.id}
-                    merchant={merchant as ExploreMerchant}
-                    items={(itemsByMerchant.get(merchant.id) ?? []).slice(0, 12)}
-                  />
-                ))}
-              </ul>
             ) : (
               <ul className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {visible.map((merchant) => (
