@@ -518,7 +518,7 @@ export default async function ExplorePage({
                   }}
                 />
               </div>
-            ) : state.category ? (
+            ) : state.category && visible.some((m) => !(m as { placeholder?: boolean }).placeholder) ? (
               <ul className="mt-5 space-y-4">
                 {visible.map((merchant) => (
                   <MerchantRow
