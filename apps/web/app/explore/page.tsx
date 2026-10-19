@@ -46,7 +46,7 @@ const LEGACY_CATEGORIES = [
  * nothing but a re-render.
  */
 const listingFor = unstable_cache(
-  async (citySlug: string) => {
+  async () => {
     const supabase = createPublicClient();
     const [merchantResult, cityResult, zoneResult] = await Promise.all([
       supabase
@@ -54,7 +54,6 @@ const listingFor = unstable_cache(
         .select(
           'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, zone_id, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
         )
-        .eq('city_slug', citySlug)
         .order('listed_at', { ascending: false }),
       supabase
         .from('city')
@@ -122,9 +121,9 @@ export default async function ExplorePage({
    * of what is cached — so resolve it from the default city first, then use
    * whatever the visitor asked for.
    */
-  const { cities: allCities } = await listingFor('nairobi');
+  const { cities: allCities } = await listingFor();
   const citySlug = searchParams?.city ?? allCities[0]?.slug ?? 'nairobi';
-  const { merchants: all, cities, zones } = await listingFor(citySlug);
+  const { merchants: all, cities, zones } = await listingFor();
   const cityName = cities?.find((c) => c.slug === citySlug)?.name ?? 'your city';
   const cityId = cities?.find((c) => c.slug === citySlug)?.id;
   const selectedZone =
@@ -132,48 +131,16 @@ export default async function ExplorePage({
 
   /*
    * merchant_public is the only merchant data anon can read and it cannot
-   * return anything that is not live (ground rule 5). `explore_visible` is a
-   * separate switch staff control — it narrows this listing, it does not
-   * widen what anyone can see.
+   * return anything that is not live (ground rule 5). Nairobi is the only city
+   * being served, so every live merchant is listed there regardless of the
+   * city or `explore_visible` set on its record.
    */
-  const real = (all ?? []).filter(
+  const listed = (all ?? []).filter(
     (m): m is typeof m & { id: string; trading_name: string } =>
-      Boolean(m.id) && Boolean(m.trading_name) && m.explore_visible !== false,
+      Boolean(m.id) &&
+      Boolean(m.trading_name) &&
+      (citySlug === 'nairobi' || m.city_slug === citySlug),
   );
-
-  /*
-   * Nairobi is the only city being served. Until a merchant is live there,
-   * every category shows a labelled "coming soon" stand-in spread across the
-   * zones, so the page and the zone filter can be seen working. They are not
-   * linkable and disappear as soon as one real merchant goes live.
-   */
-  const cityZones = (zones ?? []).filter((zone) => zone.city_id === cityId);
-  const placeholders =
-    citySlug === 'nairobi' && real.length === 0
-      ? TAXONOMY_CATEGORIES.map((category, index) => ({
-          id: `placeholder-${category}`,
-          trading_name: `${CATEGORY_LABEL[category]} partner`,
-          category,
-          category_other: null,
-          cover_photo_path: null,
-          branch_name: cityZones.length ? cityZones[index % cityZones.length]!.name : null,
-          branch_address: null,
-          branch_latitude: null,
-          branch_longitude: null,
-          city_name: cityName,
-          city_slug: citySlug,
-          zone_id: cityZones.length ? cityZones[index % cityZones.length]!.id : null,
-          concierge_pick: false,
-          featured: false,
-          accepting_orders: true,
-          explore_visible: true,
-          listed_at: null,
-          placeholder: true,
-        }))
-      : [];
-  const listed = [...real, ...placeholders] as ((typeof real)[number] & {
-    placeholder?: boolean;
-  })[];
 
   const state: FilterState = {
     city: citySlug,
