@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { BestSellers } from '@/components/home/best-sellers';
-import { CityCarousel } from '@/components/home/city-carousel';
+import { DeliveryZones } from '@/components/home/delivery-zones';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
 import { NotifyForm } from '@/components/home/notify-form';
@@ -19,8 +19,13 @@ import { createPublicClient } from '@/lib/supabase/public';
 const getHomeData = unstable_cache(
   async () => {
     const supabase = createPublicClient();
-    const [cityResult, featuredResult] = await Promise.all([
+    const [cityResult, zoneResult, featuredResult] = await Promise.all([
       supabase.from('city').select('id, slug, name, status').order('sort', { ascending: true }),
+      supabase
+        .from('zone')
+        .select('id, city_id, name')
+        .eq('active', true)
+        .order('name', { ascending: true }),
       supabase
         .from('featured_live_v')
         .select(
@@ -34,14 +39,17 @@ const getHomeData = unstable_cache(
     if (cityResult.error) {
       throw new Error(`Could not load homepage cities: ${cityResult.error.message}`);
     }
+    if (zoneResult.error) {
+      throw new Error(`Could not load homepage delivery zones: ${zoneResult.error.message}`);
+    }
     if (featuredResult.error) {
       throw new Error(`Could not load homepage features: ${featuredResult.error.message}`);
     }
 
-    return { cities: cityResult.data, featured: featuredResult.data };
+    return { cities: cityResult.data, zones: zoneResult.data, featured: featuredResult.data };
   },
   ['homepage-public-data'],
-  { revalidate: 3600 },
+  { revalidate: 300 },
 );
 
 export async function HomePageContent({
@@ -52,8 +60,11 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const { cities: allCities, featured } = await getHomeData();
+  const { cities: allCities, zones, featured } = await getHomeData();
   const openCities = allCities.filter((c) => c.status !== 'waitlist');
+  const zonesInOpenCities = zones.filter((zone) =>
+    openCities.some((city) => city.id === zone.city_id),
+  );
 
   return (
     <>
@@ -149,14 +160,12 @@ export async function HomePageContent({
           </div>
         </section>
 
-        <section id="cities" className="py-14 sm:py-16">
+        <section id="delivery-zones" className="py-14 sm:py-16">
           <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
-            <CityCarousel cities={allCities} />
-            {openCities.length > 0 && (
-              <p className="text-muted-light mt-8 text-center text-xs font-semibold">
-                Open for orders in {openCities.map((c) => c.name).join(', ')}.
-              </p>
-            )}
+            <DeliveryZones
+              cities={openCities.map(({ id, name, status }) => ({ id, name, status }))}
+              zones={zonesInOpenCities}
+            />
           </div>
         </section>
 
