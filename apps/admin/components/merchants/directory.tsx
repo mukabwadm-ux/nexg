@@ -169,7 +169,7 @@ export function Directory({
                     )}
                   </div>
                   <Link
-                    href={`/merchants/${app.id}/review`}
+                    href={`/merchants/${app.id}`}
                     className="bg-ink hover:bg-ink/90 shrink-0 rounded-lg px-4 py-2 text-[0.8125rem] font-bold text-white transition-colors"
                   >
                     Review

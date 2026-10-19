@@ -300,7 +300,7 @@ function JobPanel({
             Open pipeline · {job.total_applicants}
           </Link>
           <a
-            href={`/careers/${job.slug}`}
+            href={`${process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://nexgapp.com')}/careers/${job.slug}`}
             className="border-border-strong hover:border-ink rounded-lg border px-3 py-2 text-center text-[0.8125rem] font-bold transition-colors"
           >
             Preview public page

@@ -128,7 +128,7 @@ export default function ScanPage() {
       </Link>
 
       <Link
-        href="/concierge"
+        href="/ask"
         className="border-border mt-3 block rounded-xl border bg-white px-5 py-4 text-center text-[0.875rem] font-extrabold"
       >
         Ask a concierge for something specific
