@@ -9,6 +9,7 @@ import {
   CATEGORY_LABEL,
   type ExploreMerchant,
   MerchantCard,
+  TAXONOMY_CATEGORIES,
 } from '@/components/explore/merchant-card';
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
 import { SiteFooter } from '@/components/site-footer';
@@ -26,7 +27,8 @@ export const metadata: Metadata = {
 /** A merchant that went live a minute ago belongs here now. */
 export const dynamic = 'force-dynamic';
 
-const CATEGORY_ORDER = [
+/* Categories from before the current taxonomy; shown only while a merchant still uses one. */
+const LEGACY_CATEGORIES = [
   'restaurant',
   'bar_liquor',
   'laundry',
@@ -134,10 +136,44 @@ export default async function ExplorePage({
    * separate switch staff control — it narrows this listing, it does not
    * widen what anyone can see.
    */
-  const listed = (all ?? []).filter(
+  const real = (all ?? []).filter(
     (m): m is typeof m & { id: string; trading_name: string } =>
       Boolean(m.id) && Boolean(m.trading_name) && m.explore_visible !== false,
   );
+
+  /*
+   * Nairobi is the only city being served. Until a merchant is live there,
+   * every category shows a labelled "coming soon" stand-in spread across the
+   * zones, so the page and the zone filter can be seen working. They are not
+   * linkable and disappear as soon as one real merchant goes live.
+   */
+  const cityZones = (zones ?? []).filter((zone) => zone.city_id === cityId);
+  const placeholders =
+    citySlug === 'nairobi' && real.length === 0
+      ? TAXONOMY_CATEGORIES.map((category, index) => ({
+          id: `placeholder-${category}`,
+          trading_name: `${CATEGORY_LABEL[category]} partner`,
+          category,
+          category_other: null,
+          cover_photo_path: null,
+          branch_name: cityZones.length ? cityZones[index % cityZones.length]!.name : null,
+          branch_address: null,
+          branch_latitude: null,
+          branch_longitude: null,
+          city_name: cityName,
+          city_slug: citySlug,
+          zone_id: cityZones.length ? cityZones[index % cityZones.length]!.id : null,
+          concierge_pick: false,
+          featured: false,
+          accepting_orders: true,
+          explore_visible: true,
+          listed_at: null,
+          placeholder: true,
+        }))
+      : [];
+  const listed = [...real, ...placeholders] as ((typeof real)[number] & {
+    placeholder?: boolean;
+  })[];
 
   const state: FilterState = {
     city: citySlug,
@@ -201,7 +237,10 @@ export default async function ExplorePage({
     .filter((m) => m.concierge_pick && (!state.zone || m.zone_id === state.zone))
     .slice(0, 3);
   const areas = [...new Set(listed.map((m) => m.branch_name).filter(Boolean))] as string[];
-  const usedCategories = CATEGORY_ORDER.filter((c) => listed.some((m) => m.category === c));
+  const usedCategories = [
+    ...TAXONOMY_CATEGORIES,
+    ...LEGACY_CATEGORIES.filter((c) => listed.some((m) => m.category === c)),
+  ];
 
   return (
     <>

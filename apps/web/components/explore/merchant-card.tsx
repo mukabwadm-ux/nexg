@@ -132,16 +132,45 @@ export interface ExploreMerchant {
   concierge_pick: boolean | null;
   featured: boolean | null;
   accepting_orders: boolean | null;
+  /** A stand-in shown until real merchants go live; not linkable. */
+  placeholder?: boolean;
 }
+
+/** The current merchant taxonomy, in the order the Explore category row shows it. */
+export const TAXONOMY_CATEGORIES = [
+  'restaurants_food',
+  'groceries_essentials',
+  'alcohol_beverages',
+  'flowers_gifts',
+  'beauty',
+  'wellness',
+  'health',
+  'fashion_apparel',
+  'tech_electronics',
+  'laundry_cleaning',
+  'marketplace',
+  'experiences',
+  'travel_tours',
+  'airport_transfers',
+  'vehicle_rentals',
+  'vehicle_services',
+  'logistics_shipping',
+  'financial_services',
+  'concierge_services',
+  'adults_only',
+] as const;
 
 export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
   const category = merchant.category ?? 'other';
   const Icon = CATEGORY_ICON[category] ?? Store;
   const open = merchant.accepting_orders !== false;
+  const placeholder = merchant.placeholder === true;
+  const Wrapper = placeholder ? 'div' : Link;
+  const wrapperProps = placeholder ? {} : { href: `/explore/${merchant.id}` };
 
   return (
     <li className="border-border bg-surface shadow-card hover:shadow-raised overflow-hidden rounded-2xl border transition-shadow">
-      <Link href={`/explore/${merchant.id}`} className="block">
+      <Wrapper {...(wrapperProps as { href: string })} className="block">
         <div className="bg-bg relative flex h-40 items-center justify-center">
           <span
             className={`absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.625rem] font-extrabold ${
@@ -152,7 +181,7 @@ export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
               aria-hidden="true"
               className={`h-1.5 w-1.5 rounded-full ${open ? 'bg-success' : 'bg-danger'}`}
             />
-            {open ? 'Open' : 'Closed'}
+            {placeholder ? 'Coming soon' : open ? 'Open' : 'Closed'}
           </span>
 
           {merchant.concierge_pick && (
@@ -191,15 +220,21 @@ export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
             {merchant.branch_name && ` · ${merchant.branch_name}`}
           </p>
         </div>
-      </Link>
+      </Wrapper>
 
       <div className="flex items-center justify-between gap-3 px-4 pb-4">
         <span className="text-muted-light text-xs font-semibold">
           Delivery from KES {VALUE_PLACEHOLDER}
         </span>
-        <Button variant="gold" size="sm" asChild>
-          <Link href={`/explore/${merchant.id}`}>{CTA[category] ?? 'View'}</Link>
-        </Button>
+        {placeholder ? (
+          <Button variant="gold" size="sm" disabled>
+            Coming soon
+          </Button>
+        ) : (
+          <Button variant="gold" size="sm" asChild>
+            <Link href={`/explore/${merchant.id}`}>{CTA[category] ?? 'View'}</Link>
+          </Button>
+        )}
       </div>
     </li>
   );
