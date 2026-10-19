@@ -322,8 +322,8 @@ function HeroNav({
     <nav
       aria-label="Main"
       className={cn(
-        'fixed inset-x-0 top-0 z-40 transition-colors duration-300',
-        solid ? 'bg-[#0b0907]/95 shadow-lg backdrop-blur' : 'bg-transparent',
+        'fixed inset-x-0 top-0 z-50 transition-colors duration-300',
+        solid ? 'bg-[#0b0907] shadow-lg' : 'bg-transparent',
       )}
     >
       <div

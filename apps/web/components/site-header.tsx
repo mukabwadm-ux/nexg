@@ -41,7 +41,7 @@ export async function SiteHeader({ action, signIn, tone = 'light' }: SiteHeaderP
   const cta = action ?? { label: t('nav.signIn'), href: '/sign-in' };
 
   return (
-    <header className="border-border/60 bg-bg/90 sticky top-0 z-30 border-b backdrop-blur">
+    <header className="border-border/60 bg-bg sticky top-0 z-50 border-b">
       <div className="mx-auto flex max-w-[96rem] items-center justify-between gap-3 px-4 py-3 sm:px-8 lg:px-16">
         <Link href="/" aria-label="NexG Concierge, home" className="shrink-0">
           <Logo priority className="h-12 sm:h-16" />
