@@ -118,7 +118,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
         </nav>
 
         {/* ------------------------------------------------------------ hero */}
-        <div className="bg-ink relative mt-4 flex h-52 items-center justify-center overflow-hidden rounded-2xl sm:h-64">
+        <div className="bg-ink relative mt-4 flex h-56 items-end overflow-hidden rounded-2xl sm:h-72">
           {merchant.concierge_pick && (
             <span className="bg-gold text-ink absolute left-4 top-4 z-10 rounded-full px-3 py-1.5 text-[0.625rem] font-extrabold uppercase tracking-[0.12em]">
               ★ Concierge pick
@@ -134,44 +134,25 @@ export default async function MerchantPage({ params }: { params: { id: string } 
               priority
             />
           ) : (
-            <Icon aria-hidden="true" className="text-gold/20 h-24 w-24" />
+            <Icon
+              aria-hidden="true"
+              className="text-gold/20 absolute right-8 top-1/2 h-32 w-32 -translate-y-1/2"
+            />
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          <div className="relative p-5 text-white sm:p-8">
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
+              {merchant.trading_name}
+            </h1>
+            <p className="mt-2 max-w-2xl text-[0.9375rem] font-semibold text-white/75">
+              {merchant.category_other ?? CATEGORY_LABEL[category]}
+              {merchant.branch_name && ` · ${merchant.branch_name}`}
+              {merchant.city_name && `, ${merchant.city_name}`}
+            </p>
+          </div>
         </div>
 
-        <div className="border-border bg-surface relative -mt-8 rounded-2xl border p-5 sm:p-7">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h1 className="flex flex-wrap items-center gap-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                {merchant.trading_name}
-                <span
-                  className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.6875rem] font-bold ${
-                    open ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger'
-                  }`}
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`h-1.5 w-1.5 rounded-full ${open ? 'bg-success' : 'bg-danger'}`}
-                  />
-                  {open ? 'Open now' : 'Not taking orders'}
-                </span>
-              </h1>
-              <p className="text-muted mt-2 max-w-2xl text-[0.9375rem] font-semibold leading-[1.7]">
-                {merchant.category_other ?? CATEGORY_LABEL[category]}
-                {merchant.branch_name && ` · ${merchant.branch_name}`}
-                {merchant.city_name && `, ${merchant.city_name}`}
-              </p>
-            </div>
-
-            <Button asChild className="shrink-0">
-              <Link href="/#ask">
-                <span className="inline-flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Ask the concierge
-                </span>
-              </Link>
-            </Button>
-          </div>
-
+        <div className="border-border bg-surface mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3 sm:px-5">
           {/*
            * Every figure a guest would use to decide — delivery time, fee,
            * minimum order — comes from an orders domain that does not exist.
@@ -179,7 +160,18 @@ export default async function MerchantPage({ params }: { params: { id: string } 
            * invented 25 minutes is worse than one who knows we have not said
            * (ground rule 3).
            */}
-          <ul className="mt-5 flex flex-wrap gap-2">
+          <ul className="flex flex-wrap items-center gap-2">
+            <li
+              className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.6875rem] font-bold ${
+                open ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger'
+              }`}
+            >
+              <span
+                aria-hidden="true"
+                className={`h-1.5 w-1.5 rounded-full ${open ? 'bg-success' : 'bg-danger'}`}
+              />
+              {open ? 'Open now' : 'Not taking orders'}
+            </li>
             {[
               { icon: Clock, text: `${VALUE_PLACEHOLDER} min to your hotel` },
               { icon: MapPin, text: `Delivery from KES ${VALUE_PLACEHOLDER}` },
@@ -194,6 +186,15 @@ export default async function MerchantPage({ params }: { params: { id: string } 
               </li>
             ))}
           </ul>
+
+          <Button asChild size="sm" className="shrink-0">
+            <Link href="/#ask">
+              <span className="inline-flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Ask the concierge
+              </span>
+            </Link>
+          </Button>
         </div>
 
         {/* --------------------------------------------------------- catalogue */}

@@ -1,4 +1,3 @@
-import { Button } from '@nexg/ui';
 import Link from 'next/link';
 
 import { TodayMarker } from './today-marker';
@@ -21,7 +20,7 @@ export interface CatalogueSection {
 }
 
 /** Whole shillings, grouped — "KES 1,450". */
-function price(kes: number | null): string {
+export function price(kes: number | null): string {
   if (kes === null) return 'Ask the desk';
   /*
    * Grouped by hand rather than with toLocaleString. Node and the browser do
@@ -46,16 +45,27 @@ export function Catalogue({
   merchantName: string;
   sections: CatalogueSection[];
 }) {
+  const popular = sections.flatMap((s) => s.items).filter((i) => i.highlighted && i.available);
+  const groups: CatalogueSection[] =
+    popular.length > 0
+      ? [{ id: 'popular', name: 'Most ordered', blurb: null, items: popular.slice(0, 6) }, ...sections]
+      : sections;
+
   return (
     <div className="space-y-8">
-      {/* Jump links, as the artboard's category pills. */}
-      {sections.length > 1 && (
-        <nav aria-label="Menu sections" className="flex flex-wrap gap-2">
-          {sections.map((section) => (
+      {/* Sticky section tabs, as in the reference. */}
+      {groups.length > 1 && (
+        <nav
+          aria-label="Menu sections"
+          className="bg-bg/95 border-border sticky top-[4.5rem] z-20 -mx-1 flex gap-1 overflow-x-auto border-b px-1 py-2 backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {groups.map((section, index) => (
             <a
               key={section.id}
               href={`#section-${section.id}`}
-              className="border-border-strong bg-surface text-ink hover:border-ink rounded-full border px-3.5 py-1.5 text-[0.8125rem] font-bold transition-colors"
+              className={`hover:bg-surface shrink-0 rounded-full px-3.5 py-1.5 text-[0.8125rem] font-bold transition-colors ${
+                index === 0 ? 'bg-ink text-white hover:bg-ink' : 'text-muted hover:text-ink'
+              }`}
             >
               {section.name}
             </a>
@@ -63,8 +73,8 @@ export function Catalogue({
         </nav>
       )}
 
-      {sections.map((section) => (
-        <section key={section.id} id={`section-${section.id}`} className="scroll-mt-6">
+      {groups.map((section) => (
+        <section key={section.id} id={`section-${section.id}`} className="scroll-mt-32">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h2 className="text-2xl font-extrabold tracking-tight">{section.name}</h2>
             {section.blurb && (
@@ -72,17 +82,25 @@ export function Catalogue({
             )}
           </div>
 
-          <ul className="mt-4 space-y-2.5">
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {section.items.map((item) => (
               <li
                 key={item.id}
-                className={`border-border bg-surface flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4 ${
+                className={`border-border bg-surface hover:border-gold flex min-h-[7.5rem] overflow-hidden rounded-xl border transition-colors ${
                   item.available ? '' : 'opacity-60'
                 }`}
               >
-                <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-center gap-2 text-[0.9375rem] font-extrabold">
-                    {item.name}
+                <div className="flex min-w-0 flex-1 flex-col justify-between p-3.5">
+                  <div>
+                    <p className="text-[0.9375rem] font-extrabold leading-snug">{item.name}</p>
+                    {item.description && (
+                      <p className="text-muted-light mt-1 line-clamp-2 text-xs font-semibold leading-snug">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className="text-[0.9375rem] font-extrabold">{price(item.price_kes)}</span>
                     {item.highlighted && item.available && (
                       <span className="bg-gold-soft text-gold-text rounded-full px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide">
                         Popular
@@ -93,29 +111,23 @@ export function Catalogue({
                         18+ · ID
                       </span>
                     )}
-                  </p>
-                  {item.description && (
-                    <p className="text-muted-light mt-0.5 text-xs font-semibold leading-snug">
-                      {item.description}
-                    </p>
-                  )}
-                  {!item.available && (
-                    <p className="text-danger mt-1 text-xs font-bold">Sold out today</p>
-                  )}
+                    {!item.available && (
+                      <span className="text-danger text-xs font-bold">Sold out today</span>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-3">
-                  <span className="text-[0.9375rem] font-extrabold">{price(item.price_kes)}</span>
+                <div className="from-bg to-border/40 relative flex w-28 shrink-0 items-center justify-center bg-gradient-to-br sm:w-32">
                   {item.available ? (
-                    <Button variant="gold" size="sm" asChild>
-                      <Link
-                        href={`/?need=${encodeURIComponent(`${item.name} from ${merchantName}`)}`}
-                      >
-                        Ask for this
-                      </Link>
-                    </Button>
+                    <Link
+                      href={`/?need=${encodeURIComponent(`${item.name} from ${merchantName}`)}`}
+                      aria-label={`Ask for ${item.name}`}
+                      className="bg-gold text-ink hover:bg-gold/90 absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold shadow-raised transition-colors"
+                    >
+                      +
+                    </Link>
                   ) : (
-                    <span className="border-border text-muted-light rounded-lg border px-3 py-1.5 text-xs font-bold">
+                    <span className="text-muted-light text-[0.625rem] font-bold uppercase">
                       Unavailable
                     </span>
                   )}

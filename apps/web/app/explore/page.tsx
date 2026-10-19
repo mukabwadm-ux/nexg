@@ -12,6 +12,7 @@ import {
   TAXONOMY_CATEGORIES,
 } from '@/components/explore/merchant-card';
 import { CategoryScroller } from '@/components/explore/category-scroller';
+import { MerchantRow, type RowItem } from '@/components/explore/merchant-row';
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
 import { SiteFooter } from '@/components/site-footer';
 import { ExploreFollowsLocation } from '@/components/location/explore-sync';
@@ -234,6 +235,39 @@ export default async function ExplorePage({
     ? [...filtered].sort((a, b) => (kmTo(a) ?? Infinity) - (kmTo(b) ?? Infinity))
     : filtered;
 
+  /*
+   * A category page shows what each merchant sells, so it needs their
+   * catalogue. Only fetched there, and only for the merchants on screen.
+   */
+  const itemsByMerchant = new Map<string, RowItem[]>();
+  if (state.category) {
+    const ids = visible
+      .filter((m) => !(m as { placeholder?: boolean }).placeholder)
+      .slice(0, 24)
+      .map((m) => m.id);
+    if (ids.length > 0) {
+      const { data: rows } = await createPublicClient()
+        .from('catalogue_section')
+        .select(
+          'merchant_id, sort, catalogue_item(id, name, price_kes, available, highlighted, sort)',
+        )
+        .in('merchant_id', ids)
+        .order('sort', { ascending: true });
+      for (const section of rows ?? []) {
+        const list = itemsByMerchant.get(section.merchant_id) ?? [];
+        const items = [
+          ...((section.catalogue_item as
+            | (RowItem & { available: boolean; highlighted: boolean; sort?: number })[]
+            | null) ?? []),
+        ]
+          .filter((item) => item.available)
+          .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+        list.push(...items);
+        itemsByMerchant.set(section.merchant_id, list);
+      }
+    }
+  }
+
   const picks = listed
     .filter((m) => m.concierge_pick && (!state.zone || m.zone_id === state.zone))
     .slice(0, 3);
@@ -321,57 +355,44 @@ export default async function ExplorePage({
         </div>
 
         {/* Categories */}
-        <CategoryScroller>
-          <li>
-            <Link
-              href={hrefFor({ category: null })}
-              aria-current={!state.category ? 'true' : undefined}
-              className={`flex h-full flex-col items-center gap-2 rounded-xl border p-3 text-center transition-colors ${
-                !state.category
-                  ? 'border-ink bg-ink text-white'
-                  : 'border-border bg-surface hover:border-border-strong'
-              }`}
-            >
-              <span
-                aria-hidden="true"
-                className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                  !state.category ? 'bg-gold text-ink' : 'bg-bg text-muted'
-                }`}
-              >
-                <Store className="h-4 w-4" />
-              </span>
-              <span className="text-[0.6875rem] font-bold leading-tight">All</span>
-            </Link>
-          </li>
-          {usedCategories.map((category) => {
-            const Icon = CATEGORY_ICON[category] ?? Store;
-            const on = state.category === category;
-            return (
-              <li key={category}>
-                <Link
-                  href={hrefFor({ category: on ? null : category })}
-                  aria-current={on ? 'true' : undefined}
-                  className={`flex h-full flex-col items-center gap-2 rounded-xl border p-3 text-center transition-colors ${
-                    on
-                      ? 'border-ink bg-ink text-white'
-                      : 'border-border bg-surface hover:border-border-strong'
-                  }`}
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                      on ? 'bg-gold text-ink' : 'bg-bg text-muted'
-                    }`}
+        <h2 className="mt-8 text-lg font-extrabold tracking-tight">Browse by category</h2>
+        <CategoryScroller className="mt-3" itemClass="[&>li]:w-[5.5rem]">
+          {[{ key: null as string | null, label: 'All', Icon: Store }]
+            .concat(
+              usedCategories.map((category) => ({
+                key: category,
+                label: CATEGORY_LABEL[category] ?? category,
+                Icon: CATEGORY_ICON[category] ?? Store,
+              })),
+            )
+            .map(({ key, label, Icon }) => {
+              const on = state.category === key;
+              return (
+                <li key={key ?? 'all'}>
+                  <Link
+                    href={hrefFor({ category: on ? null : key })}
+                    aria-current={on ? 'true' : undefined}
+                    className="group flex flex-col items-center gap-2 text-center"
                   >
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <span className="text-[0.6875rem] font-bold leading-tight">
-                    {CATEGORY_LABEL[category]}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
+                    <span
+                      aria-hidden="true"
+                      className={`flex h-16 w-16 items-center justify-center rounded-full border-2 transition-colors ${
+                        on
+                          ? 'border-gold bg-ink text-gold'
+                          : 'border-border bg-surface text-muted group-hover:border-gold'
+                      }`}
+                    >
+                      <Icon className="h-6 w-6" />
+                    </span>
+                    <span
+                      className={`text-[0.6875rem] leading-tight ${on ? 'text-ink font-extrabold' : 'text-muted font-bold'}`}
+                    >
+                      {label}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
         </CategoryScroller>
 
         {/* Concierge picks */}
@@ -497,6 +518,16 @@ export default async function ExplorePage({
                   }}
                 />
               </div>
+            ) : state.category ? (
+              <ul className="mt-5 space-y-4">
+                {visible.map((merchant) => (
+                  <MerchantRow
+                    key={merchant.id}
+                    merchant={merchant as ExploreMerchant}
+                    items={(itemsByMerchant.get(merchant.id) ?? []).slice(0, 12)}
+                  />
+                ))}
+              </ul>
             ) : (
               <ul className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {visible.map((merchant) => (
