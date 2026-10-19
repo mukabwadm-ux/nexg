@@ -1,15 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import dynamic from 'next/dynamic';
 
+import { WhatsAppButton } from '@/components/chat/whatsapp-button';
 import { isLocaleTag } from '@/lib/i18n/dictionaries';
 
 const PREFERENCES_UPDATED = 'nexg:preferences-updated';
-const FloatingChat = dynamic(
-  () => import('@/components/chat/floating-chat').then((module) => module.FloatingChat),
-  { ssr: false },
-);
 
 function readCookie(name: string): string | null {
   const prefix = `${name}=`;
@@ -25,13 +21,10 @@ export function notifyPreferencesUpdated(): void {
 }
 
 export function PersonalizedChrome() {
-  const [asked, setAsked] = React.useState(false);
-
   React.useEffect(() => {
     const update = () => {
       const locale = readCookie('nexg_locale');
       if (locale && isLocaleTag(locale)) document.documentElement.lang = locale;
-      setAsked(readCookie('nexg_asked') === '1');
     };
 
     update();
@@ -39,5 +32,5 @@ export function PersonalizedChrome() {
     return () => window.removeEventListener(PREFERENCES_UPDATED, update);
   }, []);
 
-  return asked ? <FloatingChat /> : null;
+  return <WhatsAppButton />;
 }

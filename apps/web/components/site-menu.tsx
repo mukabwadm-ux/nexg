@@ -81,7 +81,7 @@ const SOCIALS = [
   { label: 'Instagram', href: 'https://instagram.com', icon: Instagram },
   { label: 'X', href: 'https://x.com', icon: XLogo },
   { label: 'Facebook', href: 'https://facebook.com', icon: Facebook },
-  { label: 'WhatsApp', href: 'https://wa.me/', icon: MessageCircle },
+  { label: 'WhatsApp', href: 'https://wa.me/254143819478', icon: MessageCircle },
 ] as const;
 
 export function SiteMenu({

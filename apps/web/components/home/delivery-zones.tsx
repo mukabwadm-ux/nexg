@@ -22,6 +22,51 @@ const PLACEHOLDER_BACKGROUNDS = [
   'linear-gradient(150deg, #D4A72C, #5A4212)',
 ] as const;
 
+function ZoneCard({
+  zone,
+  position,
+  className,
+}: {
+  zone: DeliveryZone;
+  position: number;
+  className: string;
+}) {
+  return (
+    <li className={className}>
+      <Link
+        href={`/explore?city=${encodeURIComponent(zone.citySlug)}&zone=${encodeURIComponent(zone.id)}`}
+        aria-label={`Explore merchants in ${zone.name}`}
+        className="focus-visible:ring-gold group flex flex-col items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4"
+      >
+        <span
+          aria-hidden="true"
+          className="ring-gold/70 relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full ring-4 sm:h-36 sm:w-36 lg:h-[10.5rem] lg:w-[10.5rem]"
+          style={{
+            background: PLACEHOLDER_BACKGROUNDS[position % PLACEHOLDER_BACKGROUNDS.length],
+          }}
+        >
+          <span className="absolute inset-2 rounded-full border border-white/15" />
+          <span className="text-2xl font-black tracking-[0.18em] text-white/55 sm:text-3xl">
+            {zone.name.slice(0, 3).toUpperCase()}
+          </span>
+          <ArrowUpRight
+            aria-hidden="true"
+            className="absolute right-4 top-4 h-4 w-4 text-white/65 opacity-0 transition-opacity group-hover:opacity-100"
+          />
+        </span>
+
+        <span className="border-border bg-surface shadow-card group-hover:border-gold relative z-10 -mt-4 flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-bold transition-colors">
+          {zone.name}
+          <ArrowUpRight aria-hidden="true" className="text-gold h-3.5 w-3.5" />
+        </span>
+      </Link>
+      <span className="text-muted-light mt-1.5 text-[0.625rem] font-semibold uppercase tracking-wide">
+        Temporary image
+      </span>
+    </li>
+  );
+}
+
 export function DeliveryZones({ zones }: { zones: DeliveryZone[] }) {
   const [page, setPage] = React.useState(0);
   const pageCount = Math.max(1, Math.ceil(zones.length / PER_PAGE));
@@ -41,7 +86,7 @@ export function DeliveryZones({ zones }: { zones: DeliveryZone[] }) {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="hidden items-center gap-3 sm:flex">
           <p className="text-muted-light text-sm font-semibold">
             {zones.length === 0 ? 0 : start + 1}–{start + shown.length} of {zones.length}
           </p>
@@ -68,46 +113,31 @@ export function DeliveryZones({ zones }: { zones: DeliveryZone[] }) {
         </div>
       </div>
 
-      <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
-        {shown.map((zone, index) => (
-          <li key={zone.id} className="flex flex-col items-center">
-            <Link
-              href={`/explore?city=${encodeURIComponent(zone.citySlug)}&zone=${encodeURIComponent(zone.id)}`}
-              aria-label={`Explore merchants in ${zone.name}`}
-              className="focus-visible:ring-gold group flex flex-col items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4"
-            >
-              <span
-                aria-hidden="true"
-                className="ring-gold/70 relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full ring-4 sm:h-36 sm:w-36 lg:h-[10.5rem] lg:w-[10.5rem]"
-                style={{
-                  background:
-                    PLACEHOLDER_BACKGROUNDS[(start + index) % PLACEHOLDER_BACKGROUNDS.length],
-                }}
-              >
-                <span className="absolute inset-2 rounded-full border border-white/15" />
-                <span className="text-2xl font-black tracking-[0.18em] text-white/55 sm:text-3xl">
-                  {zone.name.slice(0, 3).toUpperCase()}
-                </span>
-                <ArrowUpRight
-                  aria-hidden="true"
-                  className="absolute right-4 top-4 h-4 w-4 text-white/65 opacity-0 transition-opacity group-hover:opacity-100"
-                />
-              </span>
+      {/* A swipeable row on a phone, like Best sellers; paged from tablet up. */}
+      <ul className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-3 [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden">
+        {zones.map((zone, index) => (
+          <ZoneCard
+            key={zone.id}
+            zone={zone}
+            position={index}
+            className="flex w-40 shrink-0 snap-start flex-col items-center"
+          />
+        ))}
+      </ul>
 
-              <span className="border-border bg-surface shadow-card group-hover:border-gold relative z-10 -mt-4 flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-bold transition-colors">
-                {zone.name}
-                <ArrowUpRight aria-hidden="true" className="text-gold h-3.5 w-3.5" />
-              </span>
-            </Link>
-            <span className="text-muted-light mt-1.5 text-[0.625rem] font-semibold uppercase tracking-wide">
-              Temporary image
-            </span>
-          </li>
+      <ul className="mt-8 hidden grid-cols-3 gap-x-4 gap-y-6 sm:grid lg:grid-cols-5">
+        {shown.map((zone, index) => (
+          <ZoneCard
+            key={zone.id}
+            zone={zone}
+            position={start + index}
+            className="flex flex-col items-center"
+          />
         ))}
       </ul>
 
       {pageCount > 1 && (
-        <div className="mt-8 flex justify-center gap-1.5">
+        <div className="mt-8 hidden justify-center gap-1.5 sm:flex">
           {Array.from({ length: pageCount }).map((_, index) => (
             <button
               key={index}
