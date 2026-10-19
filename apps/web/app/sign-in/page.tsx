@@ -16,7 +16,13 @@ const PROMISES = [
   'Same login for guests, riders and merchants',
 ] as const;
 
-export default function SignInPage({ searchParams }: { searchParams?: { tab?: string } }) {
+export default function SignInPage({
+  searchParams,
+}: {
+  searchParams?: { tab?: string; next?: string };
+}) {
+  const next =
+    searchParams?.next && /^\/(?!\/)/.test(searchParams.next) ? searchParams.next : undefined;
   return (
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       {/* The dark half. Hidden on phones, where it would push the form off
@@ -77,7 +83,7 @@ export default function SignInPage({ searchParams }: { searchParams?: { tab?: st
         </div>
 
         <div className="flex flex-1 items-center justify-center py-8">
-          <AuthPanel initialTab={searchParams?.tab === 'create' ? 'create' : 'signin'} />
+          <AuthPanel initialTab={searchParams?.tab === 'create' ? 'create' : 'signin'} next={next} />
         </div>
       </div>
     </div>

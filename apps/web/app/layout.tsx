@@ -4,6 +4,8 @@ import { ToastProvider } from '@nexg/ui';
 import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 
+import { CartBar } from '@/components/cart/add-to-cart';
+import { CartProvider } from '@/components/cart/cart-provider';
 import { PersonalizedChrome } from '@/components/consent/personalized-chrome';
 import { WelcomeGate } from '@/components/consent/welcome-gate';
 import { LocationBannerSlot, LocationSheetSlot } from '@/components/location/chrome';
@@ -54,10 +56,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-bg text-ink min-h-dvh font-sans">
         <ToastProvider>
           <SiteLocationProvider initial={null}>
+            <CartProvider>
             {/* Under the nav on every page, and only when there is
                 something honest to say about precision. */}
             <LocationBannerSlot />
             {children}
+            <CartBar />
             {/* Once per visit, over a rendered page, on the first
                 page that needs a place. */}
             <LocationSheetSlot />
@@ -76,6 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 pressed — which reads as broken rather than as
                 "answer this first". */}
             <WelcomeGate locale={DEFAULT_LOCALE} canTranslate={canMachineTranslate()} />
+            </CartProvider>
           </SiteLocationProvider>
         </ToastProvider>
       </body>

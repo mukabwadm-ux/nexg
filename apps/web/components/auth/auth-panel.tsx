@@ -46,7 +46,13 @@ const ROLES: { value: AccountRole; label: string; hint: string; icon: React.Reac
  * provider yet, so the working path is email and password — which the artboard
  * also offers — and the phone field says so rather than pretending.
  */
-export function AuthPanel({ initialTab = 'signin' }: { initialTab?: 'signin' | 'create' }) {
+export function AuthPanel({
+  initialTab = 'signin',
+  next,
+}: {
+  initialTab?: 'signin' | 'create';
+  next?: string;
+}) {
   const { toast } = useToast();
   const router = useRouter();
 
@@ -74,7 +80,7 @@ export function AuthPanel({ initialTab = 'signin' }: { initialTab?: 'signin' | '
     }
 
     toast({ title: 'Welcome', description: result.message, tone: 'success' });
-    router.push(result.redirectTo ?? '/');
+    router.push(next ?? result.redirectTo ?? '/');
     router.refresh();
   };
 

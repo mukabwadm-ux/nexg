@@ -201,7 +201,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
           <section aria-label="Catalogue">
             {menu.length > 0 ? (
-              <Catalogue merchantName={merchant.trading_name} sections={menu} />
+              <Catalogue merchantId={merchant.id} merchantName={merchant.trading_name} sections={menu} />
             ) : (
               <div className="border-border bg-surface rounded-2xl border p-6 sm:p-8">
                 <span

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { AddToCart } from '@/components/cart/add-to-cart';
 
 import { TodayMarker } from './today-marker';
 
@@ -33,15 +33,14 @@ export function price(kes: number | null): string {
 /**
  * The merchant's menu.
  *
- * There is no basket. Adding something to one only means anything once an
- * order can be placed, and a button that fills a basket nobody can check out
- * is a worse lie than no button — so each item offers the route that does
- * work, which is asking the concierge for it by name.
+ * Items go into a one-merchant basket that is priced and paid at /checkout.
  */
 export function Catalogue({
+  merchantId,
   merchantName,
   sections,
 }: {
+  merchantId: string;
   merchantName: string;
   sections: CatalogueSection[];
 }) {
@@ -119,13 +118,12 @@ export function Catalogue({
 
                 <div className="from-bg to-border/40 relative flex w-28 shrink-0 items-center justify-center bg-gradient-to-br sm:w-32">
                   {item.available ? (
-                    <Link
-                      href={`/?need=${encodeURIComponent(`${item.name} from ${merchantName}`)}`}
-                      aria-label={`Ask for ${item.name}`}
-                      className="bg-gold text-ink hover:bg-gold/90 absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold shadow-raised transition-colors"
-                    >
-                      +
-                    </Link>
+                    <div className="absolute bottom-2 right-2">
+                      <AddToCart
+                        merchant={{ id: merchantId, name: merchantName }}
+                        item={item}
+                      />
+                    </div>
                   ) : (
                     <span className="text-muted-light text-[0.625rem] font-bold uppercase">
                       Unavailable
@@ -139,8 +137,8 @@ export function Catalogue({
       ))}
 
       <p className="text-muted-light text-xs font-semibold leading-[1.7]">
-        Prices are set by {merchantName} and may differ from in-store prices. Nothing is bought
-        until a concierge has quoted you and you have approved it.
+        Prices are set by {merchantName}. Delivery and service fees are shown at checkout before
+        you pay.
       </p>
     </div>
   );
