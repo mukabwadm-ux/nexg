@@ -6,6 +6,7 @@ export interface FilterState {
   city: string;
   category: string | null;
   area: string | null;
+  zone: string | null;
   openNow: boolean;
   picksOnly: boolean;
 }
@@ -28,7 +29,7 @@ export function FilterRail({
   areas: string[];
   hrefFor: (patch: Partial<FilterState>) => string;
 }) {
-  const anyFilter = state.category || state.area || state.openNow || state.picksOnly;
+  const anyFilter = state.category || state.area || state.zone || state.openNow || state.picksOnly;
 
   return (
     <aside aria-label="Filters" className="space-y-4">
@@ -37,7 +38,13 @@ export function FilterRail({
           <h2 className="text-[0.9375rem] font-extrabold">Filters</h2>
           {anyFilter && (
             <Link
-              href={hrefFor({ category: null, area: null, openNow: false, picksOnly: false })}
+              href={hrefFor({
+                category: null,
+                area: null,
+                zone: null,
+                openNow: false,
+                picksOnly: false,
+              })}
               className="text-muted-light hover:text-ink text-xs font-bold transition-colors"
             >
               Clear

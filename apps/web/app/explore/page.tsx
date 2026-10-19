@@ -46,21 +46,29 @@ const CATEGORY_ORDER = [
 const listingFor = unstable_cache(
   async (citySlug: string) => {
     const supabase = createPublicClient();
-    const [{ data: merchants }, { data: cities }] = await Promise.all([
+    const [merchantResult, cityResult, zoneResult] = await Promise.all([
       supabase
         .from('merchant_public')
         .select(
-          'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
+          'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, zone_id, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
         )
         .eq('city_slug', citySlug)
         .order('listed_at', { ascending: false }),
       supabase
         .from('city')
-        .select('slug, name, status')
+        .select('id, slug, name, status')
         .neq('status', 'waitlist')
         .order('sort', { ascending: true }),
+      supabase.from('zone').select('id, city_id, name').eq('active', true),
     ]);
-    return { merchants: merchants ?? [], cities: cities ?? [] };
+    if (zoneResult.error) {
+      throw new Error(`Could not load active delivery zones: ${zoneResult.error.message}`);
+    }
+    return {
+      merchants: merchantResult.data ?? [],
+      cities: cityResult.data ?? [],
+      zones: zoneResult.data ?? [],
+    };
   },
   ['explore-listing'],
   { revalidate: 3600, tags: ['merchants'] },
@@ -99,6 +107,7 @@ export default async function ExplorePage({
     city?: string;
     category?: string;
     area?: string;
+    zone?: string;
     open?: string;
     picks?: string;
     q?: string;
@@ -113,8 +122,11 @@ export default async function ExplorePage({
    */
   const { cities: allCities } = await listingFor('nairobi');
   const citySlug = searchParams?.city ?? allCities[0]?.slug ?? 'nairobi';
-  const { merchants: all, cities } = await listingFor(citySlug);
+  const { merchants: all, cities, zones } = await listingFor(citySlug);
   const cityName = cities?.find((c) => c.slug === citySlug)?.name ?? 'your city';
+  const cityId = cities?.find((c) => c.slug === citySlug)?.id;
+  const selectedZone =
+    zones?.find((zone) => zone.id === searchParams?.zone && zone.city_id === cityId) ?? null;
 
   /*
    * merchant_public is the only merchant data anon can read and it cannot
@@ -131,6 +143,7 @@ export default async function ExplorePage({
     city: citySlug,
     category: searchParams?.category ?? null,
     area: searchParams?.area ?? null,
+    zone: selectedZone?.id ?? null,
     openNow: searchParams?.open === '1',
     picksOnly: searchParams?.picks === '1',
   };
@@ -143,6 +156,7 @@ export default async function ExplorePage({
     if (next.city) params.set('city', next.city);
     if (next.category) params.set('category', next.category);
     if (next.area) params.set('area', next.area);
+    if (next.zone) params.set('zone', next.zone);
     if (next.openNow) params.set('open', '1');
     if (next.picksOnly) params.set('picks', '1');
     const q = 'q' in patch ? patch.q : (searchParams?.q ?? null);
@@ -168,6 +182,7 @@ export default async function ExplorePage({
     }
     if (state.category && merchant.category !== state.category) return false;
     if (state.area && merchant.branch_name !== state.area) return false;
+    if (state.zone && merchant.zone_id !== state.zone) return false;
     if (state.openNow && merchant.accepting_orders === false) return false;
     if (state.picksOnly && !merchant.concierge_pick) return false;
     if (query) {
@@ -182,7 +197,9 @@ export default async function ExplorePage({
     ? [...filtered].sort((a, b) => (kmTo(a) ?? Infinity) - (kmTo(b) ?? Infinity))
     : filtered;
 
-  const picks = listed.filter((m) => m.concierge_pick).slice(0, 3);
+  const picks = listed
+    .filter((m) => m.concierge_pick && (!state.zone || m.zone_id === state.zone))
+    .slice(0, 3);
   const areas = [...new Set(listed.map((m) => m.branch_name).filter(Boolean))] as string[];
   const usedCategories = CATEGORY_ORDER.filter((c) => listed.some((m) => m.category === c));
 
@@ -218,7 +235,7 @@ export default async function ExplorePage({
             {(cities ?? []).map((city) => (
               <Link
                 key={city.slug}
-                href={hrefFor({ city: city.slug, area: null })}
+                href={hrefFor({ city: city.slug, area: null, zone: null })}
                 aria-current={city.slug === citySlug ? 'true' : undefined}
                 className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${
                   city.slug === citySlug
@@ -248,6 +265,7 @@ export default async function ExplorePage({
           <form action="/explore" className="flex w-full max-w-sm gap-2">
             <input type="hidden" name="city" value={citySlug} />
             {state.category && <input type="hidden" name="category" value={state.category} />}
+            {state.zone && <input type="hidden" name="zone" value={state.zone} />}
             <input
               type="search"
               name="q"
@@ -388,7 +406,12 @@ export default async function ExplorePage({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-[0.9375rem] font-bold">
                 {visible.length} {visible.length === 1 ? 'merchant delivers' : 'merchants deliver'}{' '}
-                {near ? 'to your spot' : `to ${cityName}`} right now
+                {near
+                  ? 'to your spot'
+                  : selectedZone
+                    ? `in ${selectedZone.name}`
+                    : `to ${cityName}`}{' '}
+                right now
               </p>
               {near && (
                 <Link
@@ -416,13 +439,16 @@ export default async function ExplorePage({
                   description={
                     near
                       ? `No business within ${NEAR_KM} km of your spot fits that yet. See everything in ${cityName}, or ask the concierge — plenty of what guests want never comes from a listing.`
-                      : 'No business here fits those filters. Try another area or category — or ask the concierge, since plenty of what guests want never comes from a listing.'
+                      : selectedZone
+                        ? `No merchants are listed in ${selectedZone.name} just yet. Try another zone or ask the concierge — plenty of what guests want never comes from a listing.`
+                        : 'No business here fits those filters. Try another area or category — or ask the concierge, since plenty of what guests want never comes from a listing.'
                   }
                   action={{
-                    label: near ? `See all in ${cityName}` : 'Clear filters',
+                    label: near || selectedZone ? `See all in ${cityName}` : 'Clear filters',
                     href: hrefFor({
                       category: near ? state.category : null,
                       area: null,
+                      zone: null,
                       openNow: false,
                       picksOnly: false,
                       q: null,

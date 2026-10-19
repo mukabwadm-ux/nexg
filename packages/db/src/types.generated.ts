@@ -38585,6 +38585,7 @@ export type Database = {
           prep_minutes: number | null;
           subcategory: string | null;
           trading_name: string | null;
+          zone_id: string | null;
         };
         ComputedFields: never;
         Relationships: [

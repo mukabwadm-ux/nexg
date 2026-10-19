@@ -163,8 +163,10 @@ export async function HomePageContent({
         <section id="delivery-zones" className="py-14 sm:py-16">
           <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
             <DeliveryZones
-              cities={openCities.map(({ id, name, status }) => ({ id, name, status }))}
-              zones={zonesInOpenCities}
+              zones={zonesInOpenCities.flatMap((zone) => {
+                const city = openCities.find((candidate) => candidate.id === zone.city_id);
+                return city ? [{ ...zone, citySlug: city.slug }] : [];
+              })}
             />
           </div>
         </section>
