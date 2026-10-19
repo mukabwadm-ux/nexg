@@ -11,6 +11,7 @@ import {
   MerchantCard,
   TAXONOMY_CATEGORIES,
 } from '@/components/explore/merchant-card';
+import { CategoryScroller } from '@/components/explore/category-scroller';
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
 import { SiteFooter } from '@/components/site-footer';
 import { ExploreFollowsLocation } from '@/components/location/explore-sync';
@@ -287,7 +288,7 @@ export default async function ExplorePage({
         </div>
 
         {/* Categories */}
-        <ul className="mt-7 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9">
+        <CategoryScroller>
           <li>
             <Link
               href={hrefFor({ category: null })}
@@ -338,7 +339,7 @@ export default async function ExplorePage({
               </li>
             );
           })}
-        </ul>
+        </CategoryScroller>
 
         {/* Concierge picks */}
         {picks.length > 0 && !state.category && !state.area && !query && (
