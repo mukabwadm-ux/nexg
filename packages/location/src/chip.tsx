@@ -1,6 +1,6 @@
 'use client';
 
-import { MapPin } from 'lucide-react';
+import { ChevronDown, MapPin } from 'lucide-react';
 import * as React from 'react';
 
 import { Panel } from './panel';
@@ -68,58 +68,57 @@ export function DeliverToChip({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
         aria-expanded={panelOpen}
         aria-haspopup="dialog"
         aria-label={`Deliver to ${title}. Change the delivery location.`}
-        className={`flex max-w-full items-center gap-2 rounded-xl border px-2 py-1.5 text-left transition-colors sm:gap-3 sm:px-3 sm:py-2 ${
+        className={
           tone === 'dark'
-            ? 'border-white/15 bg-white/[0.06] hover:border-white/30'
-            : 'border-border bg-surface hover:border-ink/40'
-        }`}
+            ? 'focus-visible:ring-gold flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 text-left text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:max-w-[13rem] sm:px-4'
+            : 'border-border bg-surface hover:border-ink/40 flex max-w-full items-center gap-2 rounded-xl border px-2 py-1.5 text-left transition-colors sm:gap-3 sm:px-3 sm:py-2'
+        }
       >
-        <span className="relative shrink-0">
-          <span
-            className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-              chip === 'empty' || chip === 'city' ? 'bg-gold' : 'bg-ink'
-            }`}
-          >
+        {tone === 'dark' ? (
+          <>
             <MapPin
-              className={`h-4 w-4 ${chip === 'empty' || chip === 'city' ? 'text-ink' : 'text-gold'}`}
+              className="text-gold h-4 w-4 shrink-0"
               aria-hidden="true"
+              fill="currentColor"
+              stroke="#0b0907"
             />
-          </span>
-          <span
-            className={`absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ${
-              DOT[chip]
-            } ${tone === 'dark' ? 'ring-ink' : 'ring-surface'}`}
-            aria-hidden="true"
-          />
-        </span>
+            <span className="truncate text-[0.8125rem] font-bold sm:text-sm">{title}</span>
+            <ChevronDown className="h-3.5 w-3.5 shrink-0 text-white/70" aria-hidden="true" />
+          </>
+        ) : (
+          <>
+            <span className="relative shrink-0">
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                  chip === 'empty' || chip === 'city' ? 'bg-gold' : 'bg-ink'
+                }`}
+              >
+                <MapPin
+                  className={`h-4 w-4 ${chip === 'empty' || chip === 'city' ? 'text-ink' : 'text-gold'}`}
+                  aria-hidden="true"
+                />
+              </span>
+              <span
+                className={`absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ${DOT[chip]} ring-surface`}
+                aria-hidden="true"
+              />
+            </span>
 
-        <span className="min-w-0">
-          <span className="text-gold block text-[0.5625rem] font-extrabold uppercase tracking-[0.12em]">
-            Deliver to
-          </span>
-          <span
-            className={`block truncate text-[0.8125rem] font-extrabold sm:text-sm ${
-              tone === 'dark' ? 'text-white' : 'text-ink'
-            }`}
-          >
-            {title}
-          </span>
-        </span>
+            <span className="min-w-0">
+              <span className="text-gold block text-[0.5625rem] font-extrabold uppercase tracking-[0.12em]">
+                Deliver to
+              </span>
+              <span className="text-ink block truncate text-[0.8125rem] font-extrabold sm:text-sm">
+                {title}
+              </span>
+            </span>
 
-        <span
-          className={`hidden shrink-0 border-l pl-3 text-right md:block ${
-            tone === 'dark' ? 'border-white/15' : 'border-border'
-          }`}
-        >
-          <span
-            className={`block text-[0.6875rem] font-semibold ${
-              tone === 'dark' ? 'text-white/60' : 'text-muted-light'
-            }`}
-          >
-            {hint}
-          </span>
-          <span className="text-gold block text-[0.6875rem] font-extrabold">Change</span>
-        </span>
+            <span className="border-border hidden shrink-0 border-l pl-3 text-right md:block">
+              <span className="text-muted-light block text-[0.6875rem] font-semibold">{hint}</span>
+              <span className="text-gold block text-[0.6875rem] font-extrabold">Change</span>
+            </span>
+          </>
+        )}
       </button>
 
       {panelOpen ? <Panel /> : null}

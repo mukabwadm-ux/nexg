@@ -4,6 +4,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { describe as describePlace, useLocation } from '@nexg/location';
 import { cn } from '@nexg/ui';
 import {
+  ArrowRight,
   Briefcase,
   Home,
   Bike,
@@ -86,9 +87,11 @@ const SOCIALS = [
 export function SiteMenu({
   children,
   locale = DEFAULT_LOCALE,
+  quickLink,
 }: {
   children: React.ReactNode;
   locale?: Locale;
+  quickLink?: { label: string; href: string };
 }) {
   const t = translator(locale);
 
@@ -222,6 +225,17 @@ export function SiteMenu({
                 ))}
               </ul>
             </nav>
+
+            {quickLink && (
+              <Link
+                href={quickLink.href}
+                onClick={close}
+                className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold mt-5 flex min-h-12 items-center justify-between gap-3 rounded-xl px-4 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2"
+              >
+                {quickLink.label}
+                <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </Link>
+            )}
 
             {/* ----------------------------------------------- partner block */}
             <div className="bg-ink mt-5 rounded-2xl px-4 py-4">

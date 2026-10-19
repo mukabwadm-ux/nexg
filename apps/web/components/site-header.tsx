@@ -1,8 +1,7 @@
 import { DeliverToChip } from '@nexg/location';
 
 import { NotificationBell } from './notifications/bell';
-import { Button } from '@nexg/ui';
-import { Menu } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import Link from 'next/link';
 
 import { getTranslations } from '@/lib/i18n';
@@ -13,13 +12,8 @@ import { SiteMenu } from './site-menu';
 export interface SiteHeaderProps {
   /** The right-hand call to action, which differs per page. */
   action?: { label: string; href: string };
-  /** The text link beside it. */
+  /** Destination and accessible label for the account icon. */
   signIn?: { label: string; href: string };
-  /**
-   * The header on a dark hero needs light text. Only the chip
-   * cares — everything else already inherits.
-   */
-  tone?: 'light' | 'dark';
 }
 
 /**
@@ -33,62 +27,38 @@ export interface SiteHeaderProps {
  * remembering. Informational pages keep it too, so the next
  * click into Explore is already placed.
  */
-export async function SiteHeader({ action, signIn, tone = 'light' }: SiteHeaderProps) {
+export async function SiteHeader({ action, signIn }: SiteHeaderProps) {
   const { locale, t } = await getTranslations();
-
-  /* Defaulted here rather than in the signature so the fallback label is
-     translated too — a hard-coded default parameter cannot be. */
-  const cta = action ?? { label: t('nav.signIn'), href: '/sign-in' };
+  const account = signIn ?? { label: t('nav.signIn'), href: '/sign-in' };
 
   return (
-    <header className="border-border/60 bg-bg sticky top-0 z-50 border-b">
-      <div className="mx-auto flex max-w-[96rem] items-center justify-between gap-3 px-4 py-3 sm:px-8 lg:px-16">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0907] text-white">
+      <div className="mx-auto flex min-h-[3.75rem] max-w-[96rem] items-center justify-between gap-3 px-4 py-2 sm:px-8 lg:px-16">
         <Link href="/" aria-label="NexG Concierge, home" className="shrink-0">
-          <Logo priority className="h-12 sm:h-16" />
+          <Logo onDark priority className="h-11 w-auto sm:h-12" />
         </Link>
 
-        {/* Centre on wide screens, because it is the control the
-            whole page depends on — not a utility tucked beside
-            the menu. */}
-        <div className="hidden min-w-0 flex-1 justify-center lg:flex">
-          <DeliverToChip tone={tone} />
-        </div>
-
         <div className="flex items-center gap-2 sm:gap-3">
-          {signIn && (
-            <Link
-              href={signIn.href}
-              className="text-muted hover:text-ink hidden text-sm font-semibold transition-colors sm:block"
-            >
-              {signIn.label}
-            </Link>
-          )}
+          <DeliverToChip tone="dark" />
+          <NotificationBell tone="dark" />
+          <Link
+            href={account.href}
+            aria-label={account.label}
+            className="focus-visible:ring-gold text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11"
+          >
+            <User className="h-4 w-4" aria-hidden="true" fill="currentColor" />
+          </Link>
 
-          {/* Renders nothing for a signed-out visitor: a bell
-              over an empty drawer is a promise we have not made. */}
-          <NotificationBell tone={tone} />
-
-          <Button variant="gold" size="sm" asChild>
-            <Link href={cta.href}>{cta.label}</Link>
-          </Button>
-
-          <SiteMenu locale={locale}>
+          <SiteMenu locale={locale} quickLink={action}>
             <button
               type="button"
               aria-label="Open menu"
-              className="border-border-strong bg-surface hover:bg-bg focus-visible:ring-gold flex h-9 w-9 items-center justify-center rounded-lg border transition-colors focus-visible:outline-none focus-visible:ring-2"
+              className="focus-visible:ring-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11"
             >
-              <Menu className="h-4 w-4" aria-hidden="true" />
+              <Menu className="h-5 w-5" aria-hidden="true" />
             </button>
           </SiteMenu>
         </div>
-      </div>
-
-      {/* Below the fold of the nav on phones. Never hidden: a
-          visitor on a phone is the one most likely to be
-          somewhere other than home. */}
-      <div className="border-border/60 border-t px-4 py-2 lg:hidden">
-        <DeliverToChip tone={tone} />
       </div>
     </header>
   );

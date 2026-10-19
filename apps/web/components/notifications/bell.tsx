@@ -147,9 +147,9 @@ export function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }
         }}
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications, nothing new'}
         aria-expanded={open}
-        className={`relative flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
+        className={`relative flex h-10 w-10 items-center justify-center rounded-full border transition-colors sm:h-11 sm:w-11 ${
           tone === 'dark'
-            ? 'border-white/15 bg-white/[0.06] text-white hover:border-white/30'
+            ? 'text-gold border-white/15 bg-white/[0.04] hover:bg-white/[0.08]'
             : 'border-border-strong bg-surface hover:bg-bg'
         }`}
       >
