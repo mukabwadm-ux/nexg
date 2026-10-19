@@ -130,7 +130,7 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
   ];
 
   return (
-    <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#0b0907] text-white">
+    <section className="relative isolate z-50 flex min-h-[100svh] flex-col overflow-hidden bg-[#0b0907] text-white">
       {/* ─────────────────────────────────────────────── the photograph */}
       <div className="absolute inset-x-0 top-0 -z-10 h-[36rem] sm:h-[44rem] lg:inset-y-0 lg:h-auto">
         {/* One wide photograph (2752 × 1536): the whole scene on desktop,
