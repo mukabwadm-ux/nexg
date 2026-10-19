@@ -115,11 +115,16 @@ const PLACEHOLDERS = [
   },
 ] as const;
 
+/* A swipeable row on a phone, like Best sellers; a grid from tablet up. */
+const ROW =
+  '-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden';
+const CARD = 'w-[16.5rem] shrink-0 snap-start sm:w-auto';
+
 const COVER_FALLBACK = 'bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E]';
 
 function Cover({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`relative flex h-36 items-center justify-center ${COVER_FALLBACK}`}>
+    <div className={`relative flex h-44 items-center justify-center sm:h-36 ${COVER_FALLBACK}`}>
       {children}
     </div>
   );
@@ -162,9 +167,9 @@ export function FeaturedMerchants({
 
   if (rows.length === 0) {
     return (
-      <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className={ROW}>
         {PLACEHOLDERS.map((merchant) => (
-          <li key={merchant.name}>
+          <li key={merchant.name} className={CARD}>
             <Link
               href={`/explore?category=${merchant.category}`}
               className="focus-visible:ring-gold group block overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F] transition-colors hover:border-white/20 focus-visible:outline-none focus-visible:ring-2"
@@ -174,7 +179,7 @@ export function FeaturedMerchants({
                   src={`/images/categories/${merchant.image}.jpg`}
                   alt=""
                   fill
-                  sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 18rem"
                   className="object-cover opacity-90 transition-transform duration-300 group-hover:scale-105"
                 />
                 <Sponsored label={t('merchant.sponsored')} />
@@ -198,7 +203,7 @@ export function FeaturedMerchants({
   }
 
   return (
-    <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <ul className={ROW}>
       {rows.map((merchant) => {
         const category = merchant.merchant_category ?? 'other';
         const Icon = CATEGORY_ICON[category] ?? Sparkles;
@@ -210,7 +215,7 @@ export function FeaturedMerchants({
         return (
           <li
             key={merchant.booking_id ?? merchant.merchant_id}
-            className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F] transition-colors hover:border-white/20"
+            className={`${CARD} overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F] transition-colors hover:border-white/20`}
           >
             {/*
              * The whole card, not just the button at the bottom. On a
@@ -232,7 +237,7 @@ export function FeaturedMerchants({
                     src={merchant.cover_photo_path}
                     alt=""
                     fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 18rem"
                     className="object-cover"
                   />
                 ) : (
