@@ -18,7 +18,7 @@ export interface SendOutcome {
   error?: string;
 }
 
-const FROM = process.env.EMAIL_FROM ?? 'NexG <hello@nexgapp.com>';
+const FROM = process.env.EMAIL_FROM ?? 'NexG <hello@billing.nexgapp.com>';
 
 async function deliver(to: string, subject: string, text: string): Promise<SendOutcome> {
   const key = process.env.RESEND_API_KEY;
