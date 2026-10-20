@@ -18,8 +18,42 @@ export interface SendOutcome {
   error?: string;
 }
 
-const FROM = process.env.EMAIL_FROM ?? 'NexG Finance <finance@nexgapp.com>';
-const REPLY_TO = process.env.EMAIL_REPLY_TO ?? 'finance@nexgapp.com';
+const FALLBACK_FROM = process.env.EMAIL_FROM ?? 'NexG Support <info@nexgapp.com>';
+const FALLBACK_REPLY_TO = process.env.EMAIL_REPLY_TO ?? 'info@nexgapp.com';
+
+/**
+ * The sender for ticket emails comes from Settings > Email routing ("support"),
+ * so it can be changed without a deploy. If the lookup fails the environment
+ * values above are used, because a missing setting must not stop a reply.
+ */
+async function senderFor(routeKey: string): Promise<{ from: string; replyTo: string; enabled: boolean }> {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (url && anon) {
+      const res = await fetch(`${url}/rest/v1/rpc/rpc_email_route_public`, {
+        method: 'POST',
+        headers: { apikey: anon, Authorization: `Bearer ${anon}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_key: routeKey }),
+        cache: 'no-store',
+        signal: AbortSignal.timeout(3_000),
+      });
+      if (res.ok) {
+        const r = (await res.json()) as { from?: string; reply_to?: string | null; enabled?: boolean } | null;
+        if (r?.from) {
+          return {
+            from: r.from,
+            replyTo: r.reply_to ?? FALLBACK_REPLY_TO,
+            enabled: r.enabled !== false,
+          };
+        }
+      }
+    }
+  } catch {
+    /* fall through to the environment values */
+  }
+  return { from: FALLBACK_FROM, replyTo: FALLBACK_REPLY_TO, enabled: true };
+}
 
 async function deliver(to: string, subject: string, text: string): Promise<SendOutcome> {
   const key = process.env.RESEND_API_KEY;
@@ -31,6 +65,11 @@ async function deliver(to: string, subject: string, text: string): Promise<SendO
     };
   }
 
+  const sender = await senderFor('support');
+  if (!sender.enabled) {
+    return { status: 'skipped', error: 'Support emails are switched off in Settings > Email routing.' };
+  }
+
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -38,7 +77,7 @@ async function deliver(to: string, subject: string, text: string): Promise<SendO
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: FROM, to: [to], reply_to: REPLY_TO, subject, text }),
+      body: JSON.stringify({ from: sender.from, to: [to], reply_to: sender.replyTo, subject, text }),
       // A slow provider must not hold a guest's form open.
       signal: AbortSignal.timeout(10_000),
     });

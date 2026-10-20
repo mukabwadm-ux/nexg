@@ -45,6 +45,32 @@ function done(message: string, extra: Partial<Outcome> = {}): Outcome {
   return { ok: true, message, ...extra };
 }
 
+// ─────────────────────────────────────────────── email routing
+
+export async function saveEmailRoute(input: {
+  key: string;
+  fromName: string;
+  fromEmail: string;
+  replyTo: string;
+  recipient: string;
+  enabled: boolean;
+}): Promise<Outcome> {
+  const { error } = await s().rpc(
+    'rpc_email_route_set' as never,
+    {
+      p_key: input.key,
+      p_from_name: input.fromName,
+      p_from_email: input.fromEmail,
+      p_reply_to: input.replyTo,
+      p_recipient: input.recipient,
+      p_enabled: input.enabled,
+    } as never,
+  );
+  const failed = fail(error);
+  if (failed) return failed;
+  return done('Saved. It applies to the next email sent.');
+}
+
 // ─────────────────────────────────────────────── drafting
 
 export async function stageChange(input: {

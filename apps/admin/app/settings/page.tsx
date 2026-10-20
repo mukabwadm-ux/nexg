@@ -10,6 +10,7 @@ import {
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { SaveBar, ScheduledBanner } from '@/components/settings/controls';
+import { EmailRoutingTab, type EmailRouteRow } from '@/components/settings/email-routing';
 import {
   type ChangeSetRow,
   type CityRow,
@@ -91,6 +92,12 @@ export default async function SettingsPage({
     ]);
     waitlistCities = (cityRes.data as WaitlistCityRow[] | null) ?? [];
     waitlistSignups = (signupRes.data as WaitlistSignupRow[] | null) ?? [];
+  }
+
+  let emailRoutes: EmailRouteRow[] = [];
+  if (tab === 'emails') {
+    const { data } = await s.rpc('rpc_email_routes' as never);
+    emailRoutes = (data as unknown as EmailRouteRow[] | null) ?? [];
   }
 
   const [{ data: cities }, { data: definitions }, { data: changeSets }] = await Promise.all([
@@ -297,6 +304,7 @@ export default async function SettingsPage({
         {tab === 'fees' && <FeesTab {...props} />}
         {tab === 'payments' && <PaymentsTab {...props} />}
         {tab === 'notifications' && <NotificationsTab />}
+        {tab === 'emails' && <EmailRoutingTab routes={emailRoutes} />}
         {tab === 'branding' && <BrandingTab {...props} />}
         {tab === 'retention' && <RetentionTab {...props} />}
         {tab === 'waitlist' && <WaitlistTab cities={waitlistCities} signups={waitlistSignups} />}

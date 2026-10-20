@@ -11,6 +11,7 @@ export const TABS = [
   { key: 'fees', label: 'Fees & dispatch' },
   { key: 'payments', label: 'Payments & integrations' },
   { key: 'notifications', label: 'Notifications & templates' },
+  { key: 'emails', label: 'Email routing' },
   { key: 'branding', label: 'Branding & legal' },
   { key: 'retention', label: 'Data & retention' },
   { key: 'waitlist', label: 'Waitlist' },
@@ -36,6 +37,11 @@ export const TAB_COPY: Record<string, { title: string; subtitle: string }> = {
   notifications: {
     title: 'Notifications & templates',
     subtitle: 'Every message NexG sends, in both languages, with who gets what and when',
+  },
+  emails: {
+    title: 'Email routing',
+    subtitle:
+      'Which address each kind of website email is sent from, and which inbox receives team alerts · changes apply to the next email sent',
   },
   waitlist: {
     title: 'Waitlist',
