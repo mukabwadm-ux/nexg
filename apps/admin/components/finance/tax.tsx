@@ -28,7 +28,38 @@ export interface TaxRow {
   rate_source: string;
 }
 
-export function Tax({ rows }: { rows: TaxRow[] }) {
+export interface TaxDocRow {
+  id: string;
+  number: string;
+  kind: string;
+  purpose: string;
+  party_name: string | null;
+  party_pin: string | null;
+  issued_at: string;
+  net_cents: number;
+  vat_cents: number;
+  gross_cents: number;
+  kra_status: string;
+  kra_reference: string | null;
+}
+
+export interface VatMonthRow {
+  month: string;
+  documents: number;
+  net_cents: number;
+  vat_cents: number;
+  pending_kra: number;
+}
+
+export function Tax({
+  rows,
+  docs = [],
+  months = [],
+}: {
+  rows: TaxRow[];
+  docs?: TaxDocRow[];
+  months?: VatMonthRow[];
+}) {
   const gaps = rows.filter((r) => !r.configured);
   const known = rows.filter((r) => r.configured);
   const taxKnown = known.reduce((a, r) => a + Number(r.tax_cents ?? 0), 0);
@@ -36,6 +67,91 @@ export function Tax({ rows }: { rows: TaxRow[] }) {
 
   return (
     <div className="space-y-6">
+      <section>
+        <SectionTitle note="Output VAT on commission and fees, from the numbered tax documents.">
+          VAT by month
+        </SectionTitle>
+        <div className="border-border bg-surface overflow-x-auto rounded-xl border">
+          <table className="w-full text-left">
+            <thead className="border-border bg-bg border-b">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
+                <th className="px-4 py-2">Month</th>
+                <th className="px-4 py-2 text-right">Documents</th>
+                <th className="px-4 py-2 text-right">Before VAT</th>
+                <th className="px-4 py-2 text-right">VAT</th>
+                <th className="px-4 py-2 text-right">Awaiting KRA</th>
+              </tr>
+            </thead>
+            <tbody>
+              {months.length === 0 ? (
+                <tr>
+                  <td colSpan={5}>
+                    <Empty>No tax documents yet. They are issued when an order is paid.</Empty>
+                  </td>
+                </tr>
+              ) : (
+                months.map((m) => (
+                  <tr key={m.month} className="border-border border-b text-[0.8125rem] font-semibold last:border-0">
+                    <td className="px-4 py-2.5 font-extrabold">{m.month}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{m.documents}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(m.net_cents)}</td>
+                    <td className="px-4 py-2.5 text-right font-extrabold tabular-nums">{kesMoney(m.vat_cents)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{m.pending_kra}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <SectionTitle note="Newest first. KRA status stays pending until an e-invoicing provider is connected.">
+          Tax documents
+        </SectionTitle>
+        <div className="border-border bg-surface overflow-x-auto rounded-xl border">
+          <table className="w-full min-w-[48rem] text-left">
+            <thead className="border-border bg-bg border-b">
+              <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
+                <th className="px-4 py-2">Number</th>
+                <th className="px-4 py-2">To</th>
+                <th className="px-4 py-2">For</th>
+                <th className="px-4 py-2 text-right">Before VAT</th>
+                <th className="px-4 py-2 text-right">VAT</th>
+                <th className="px-4 py-2 text-right">Total</th>
+                <th className="px-4 py-2">KRA</th>
+              </tr>
+            </thead>
+            <tbody>
+              {docs.length === 0 ? (
+                <tr>
+                  <td colSpan={7}>
+                    <Empty>Nothing issued yet.</Empty>
+                  </td>
+                </tr>
+              ) : (
+                docs.map((d) => (
+                  <tr key={d.id} className="border-border border-b text-[0.8125rem] font-semibold last:border-0">
+                    <td className="px-4 py-2.5 font-mono text-[0.75rem] font-extrabold">{d.number}</td>
+                    <td className="px-4 py-2.5">
+                      {d.party_name ?? '—'}
+                      {d.party_pin ? <span className="text-muted-light"> · {d.party_pin}</span> : null}
+                    </td>
+                    <td className="text-muted px-4 py-2.5">
+                      {d.purpose === 'merchant_commission' ? 'Commission' : 'Guest fees'}
+                    </td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(d.net_cents)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(d.vat_cents)}</td>
+                    <td className="px-4 py-2.5 text-right font-extrabold tabular-nums">{kesMoney(d.gross_cents)}</td>
+                    <td className="px-4 py-2.5 capitalize">{d.kra_status.replace(/_/g, ' ')}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       {gaps.length > 0 ? (
         <div className="border-warn/40 bg-warn/5 rounded-xl border p-4">
           <p className="text-warn text-[0.8125rem] font-extrabold">
@@ -122,9 +238,9 @@ export function Tax({ rows }: { rows: TaxRow[] }) {
         <h3 className="text-[0.9375rem] font-extrabold tracking-tight">Before this is filed</h3>
         <ul className="text-muted mt-2 space-y-1.5 text-[0.8125rem] font-semibold">
           <li>
-            · Output VAT on delivery, service and concierge revenue needs a rate and a decision on
-            whether NexG is the supplier or the agent. That determines whether VAT is charged on the
-            fee or on the whole basket, and the two give very different numbers.
+            · Output VAT on commission and fees is now charged at the configured rate (16%) and
+            numbered on a tax document per order. The remaining decision for whoever signs the
+            returns is whether NexG is the supplier or the agent for delivery.
           </li>
           <li>
             · eTIMS: whether each order needs an invoice transmitted, or whether a monthly summary

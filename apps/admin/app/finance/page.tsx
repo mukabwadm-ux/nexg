@@ -23,7 +23,7 @@ import {
 } from '@/components/finance/reconciliation';
 import { Settlement, type LineRow, type RunRow } from '@/components/finance/settlement';
 import { Freshness } from '@/components/finance/shared';
-import { Tax, type TaxRow } from '@/components/finance/tax';
+import { Tax, type TaxDocRow, type TaxRow, type VatMonthRow } from '@/components/finance/tax';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -248,8 +248,22 @@ export default async function FinancePage({
   }
 
   if (tab === 'tax') {
-    const { data } = await supabase.from('fin_tax_position_v').select('*').order('sort');
-    body = <Tax rows={(data as TaxRow[] | null) ?? []} />;
+    const [position, docs, months] = await Promise.all([
+      supabase.from('fin_tax_position_v').select('*').order('sort'),
+      supabase
+        .from('tax_invoice' as never)
+        .select('id, number, kind, purpose, party_name, party_pin, issued_at, net_cents, vat_cents, gross_cents, kra_status, kra_reference')
+        .order('issued_at', { ascending: false })
+        .limit(100),
+      supabase.from('tax_vat_summary_v' as never).select('*').order('month', { ascending: false }).limit(24),
+    ]);
+    body = (
+      <Tax
+        rows={(position.data as TaxRow[] | null) ?? []}
+        docs={(docs.data as unknown as TaxDocRow[] | null) ?? []}
+        months={(months.data as unknown as VatMonthRow[] | null) ?? []}
+      />
+    );
   }
 
   if (tab === 'exports') {
