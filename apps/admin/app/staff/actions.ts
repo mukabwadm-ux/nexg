@@ -89,6 +89,21 @@ export async function setStatus(
   return { ok: true, message: status === 'active' ? 'Reactivated.' : 'Deactivated, immediately.' };
 }
 
+export async function resetStaffCredentials(staffId: string): Promise<ActionResult> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('rpc_staff_reset_credentials' as never, {
+    p_staff_id: staffId,
+  } as never);
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/staff');
+  const result = data as { one_time_password?: string } | null;
+  return {
+    ok: true,
+    message: 'New login issued. Their old password and sessions no longer work.',
+    ...(result?.one_time_password ? { oneTimePassword: result.one_time_password } : {}),
+  };
+}
+
 export async function signOutEverywhere(staffId: string): Promise<ActionResult> {
   const supabase = createClient();
   const { data, error } = await supabase.rpc('rpc_staff_sign_out_everywhere', {

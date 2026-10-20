@@ -5,7 +5,14 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import type { RoleRow } from '@/app/staff/page';
-import { requestRole, setRoles, setScope, setStatus, signOutEverywhere } from '@/app/staff/actions';
+import {
+  requestRole,
+  resetStaffCredentials,
+  setRoles,
+  setScope,
+  setStatus,
+  signOutEverywhere,
+} from '@/app/staff/actions';
 
 import { DIRECT_ROLES, RoleBadge, when, type StaffRow } from './shared';
 
@@ -47,6 +54,7 @@ export function PersonPanel({
     person.access_expires_at ? person.access_expires_at.slice(0, 10) : '',
   );
   const [proposing, setProposing] = React.useState<'super_admin' | 'finance' | null>(null);
+  const [resetIssued, setResetIssued] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setPicked(person.roles.filter((r) => DIRECT_ROLES.includes(r)));
@@ -242,6 +250,35 @@ export function PersonPanel({
           >
             Sign out everywhere
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={isSelf}
+            loading={busy === 'reset'}
+            onClick={async () => {
+              if (
+                !window.confirm(
+                  `Issue a new password for ${person.display_name}? Their current password and open sessions stop working immediately.`,
+                )
+              )
+                return;
+              setBusy('reset');
+              const r = await resetStaffCredentials(person.staff_id);
+              setBusy(null);
+              if (!r.ok) {
+                toast({ title: 'Not allowed', description: r.message, tone: 'danger' });
+                return;
+              }
+              if (r.oneTimePassword) {
+                setResetIssued(r.oneTimePassword);
+              } else {
+                toast({ title: 'Done', description: r.message, tone: 'success' });
+              }
+              router.refresh();
+            }}
+          >
+            Reset login credentials
+          </Button>
           {person.status === 'active' ? (
             <Button
               size="sm"
@@ -289,7 +326,74 @@ export function PersonPanel({
           }}
         />
       )}
+
+      {resetIssued && (
+        <ResetCredentialsDialog
+          person={person}
+          password={resetIssued}
+          onClose={() => setResetIssued(null)}
+        />
+      )}
     </Card>
+  );
+}
+
+/**
+ * The reveal-once screen for a reset, the same shape as the one shown when
+ * a staff account is first created: a password handed out by hand, never
+ * stored in plain text and never shown again after this box closes.
+ */
+function ResetCredentialsDialog({
+  person,
+  password,
+  onClose,
+}: {
+  person: StaffRow;
+  password: string;
+  onClose: () => void;
+}) {
+  const [copied, setCopied] = React.useState(false);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="bg-ink/40 absolute inset-0"
+      />
+      <div className="border-border bg-surface relative w-full max-w-lg rounded-2xl border p-6">
+        <h2 className="text-xl font-extrabold tracking-tight">
+          {person.display_name}&rsquo;s new login
+        </h2>
+        <p className="text-muted mt-2 text-[0.9375rem] leading-[1.8]">
+          Their old password and every open session stopped working the moment you did this. Give
+          them this one — it is shown once, and closing this box is the last time anyone sees it,
+          including you.
+        </p>
+        <div className="border-border-strong bg-bg mt-4 flex items-center gap-2 rounded-xl border p-3">
+          <code className="min-w-0 flex-1 truncate font-mono text-sm font-bold">{password}</code>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              void navigator.clipboard.writeText(password);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+          >
+            {copied ? 'Copied' : 'Copy'}
+          </Button>
+        </div>
+        <p className="border-warning/40 bg-warning-bg text-warning mt-4 rounded-xl border p-3 text-xs font-bold leading-[1.7]">
+          Send it over something that is not email, if you can. If it is lost, a super admin has to
+          issue another.
+        </p>
+        <Button block className="mt-5" onClick={onClose}>
+          Done
+        </Button>
+      </div>
+    </div>
   );
 }
 
