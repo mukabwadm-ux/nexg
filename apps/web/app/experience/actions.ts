@@ -61,7 +61,10 @@ export async function ensurePlan(citySlug = 'nairobi'): Promise<PlanResult> {
     data: { user: currentUser },
     error: userError,
   } = await supabase.auth.getUser();
-  if (userError) return { ok: false, message: userError.message };
+  // A first-time visitor has no session yet; that is not a failure.
+  if (userError && userError.name !== 'AuthSessionMissingError') {
+    return { ok: false, message: userError.message };
+  }
   let user = currentUser;
 
   if (!user) {
