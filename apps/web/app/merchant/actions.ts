@@ -205,6 +205,76 @@ export async function setItemAvailable(itemId: string, available: boolean): Prom
   };
 }
 
+/*
+ * Prices and new items. Row security on catalogue_item already limits
+ * every write here to members of the merchant, and checkout re-reads the
+ * price from this table, so a change is live for the next order.
+ */
+function cleanPrice(value: number): number | null {
+  const n = Math.round(Number(value));
+  return Number.isFinite(n) && n > 0 && n <= 1_000_000 ? n : null;
+}
+
+export async function setItemPrice(itemId: string, priceKes: number): Promise<Outcome> {
+  const price = cleanPrice(priceKes);
+  if (price === null) return { ok: false, message: 'Enter a price between KES 1 and 1,000,000.' };
+  const { error } = await createClient()
+    .from('catalogue_item')
+    .update({ price_kes: price })
+    .eq('id', itemId);
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/merchant/menu');
+  revalidatePath('/explore', 'layout');
+  return { ok: true, message: 'Price updated. New orders use it straight away.' };
+}
+
+export async function addMenuItem(input: {
+  merchantId: string;
+  sectionId?: string | null;
+  newSection?: string;
+  name: string;
+  description?: string;
+  priceKes: number;
+  ageRestricted?: boolean;
+}): Promise<Outcome> {
+  const supabase = createClient();
+  const name = input.name.trim();
+  const price = cleanPrice(input.priceKes);
+  if (!name) return { ok: false, message: 'Give the item a name.' };
+  if (price === null) return { ok: false, message: 'Enter a price between KES 1 and 1,000,000.' };
+
+  let sectionId = input.sectionId ?? null;
+  if (!sectionId) {
+    const sectionName = (input.newSection ?? '').trim() || 'Menu';
+    const { data: made, error: sectionError } = await supabase
+      .from('catalogue_section')
+      .insert({ merchant_id: input.merchantId, name: sectionName })
+      .select('id')
+      .single();
+    if (sectionError || !made) return { ok: false, message: sectionError?.message ?? 'Could not add the section.' };
+    sectionId = (made as { id: string }).id;
+  }
+
+  const { error } = await supabase.from('catalogue_item').insert({
+    merchant_id: input.merchantId,
+    section_id: sectionId,
+    name,
+    description: input.description?.trim() || null,
+    price_kes: price,
+    age_restricted: input.ageRestricted ?? false,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/merchant/menu');
+  return { ok: true, message: `${name} added to your menu.` };
+}
+
+export async function removeMenuItem(itemId: string): Promise<Outcome> {
+  const { error } = await createClient().from('catalogue_item').delete().eq('id', itemId);
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/merchant/menu');
+  return { ok: true, message: 'Item removed.' };
+}
+
 // ─────────────────────────────────────────────────── branches
 
 /**

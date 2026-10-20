@@ -83,6 +83,11 @@ export function merchantNav({
     { href: '/merchant/hours', label: 'Hours', icon: i(<Clock className="h-4 w-4" />) },
     { href: '/merchant/stores', label: 'Branches', icon: i(<Building2 className="h-4 w-4" />) },
     { href: '/merchant/money', label: 'Money', icon: i(<CreditCard className="h-4 w-4" />) },
+    {
+      href: '/merchant/transactions',
+      label: 'Transactions',
+      icon: i(<CreditCard className="h-4 w-4" />),
+    },
     { href: '/merchant/analytics', label: 'Analytics', icon: i(<BarChart3 className="h-4 w-4" />) },
     {
       href: '/merchant/featured',

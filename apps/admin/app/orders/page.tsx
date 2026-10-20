@@ -193,7 +193,11 @@ export default async function OrdersPage({
           counts.action === 1 ? 'needs' : 'need'
         } action`}
         action={
-          <ManualOrder
+          <div className="flex items-center gap-4">
+            <Link href="/transactions" className="text-gold-text text-sm font-extrabold hover:underline">
+              Transactions
+            </Link>
+            <ManualOrder
             cityId={city.id}
             merchants={
               (merchants as
@@ -201,6 +205,7 @@ export default async function OrdersPage({
                 | null) ?? []
             }
           />
+          </div>
         }
       />
 
@@ -337,7 +342,15 @@ export default async function OrdersPage({
             </p>
           </Card>
 
-          <div>
+          <div className="space-y-3">
+            {detail && (
+              <Link
+                href={`/transactions/${selectedId}`}
+                className="bg-ink block rounded-xl px-4 py-2.5 text-center text-[0.8125rem] font-extrabold text-white"
+              >
+                Full transaction breakdown →
+              </Link>
+            )}
             {detail ? (
               <OrderPanel
                 order={detail}
