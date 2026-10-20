@@ -19,6 +19,7 @@ import Link from 'next/link';
 
 import { signOut } from '@/app/sign-in/actions';
 import { Logo } from '@/components/logo';
+import { StaffBell } from '@/components/staff-bell';
 import type { StaffContext } from '@/lib/staff';
 
 /**
@@ -183,6 +184,7 @@ export function ConsoleShell({
               </span>
             </span>
           </Link>
+          <StaffBell />
           <form action={signOut}>
             <button
               type="submit"

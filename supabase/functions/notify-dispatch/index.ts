@@ -134,7 +134,10 @@ async function send(row: Due): Promise<Outcome> {
     case 'sms':
       return sendSms(row.recipient, row.body);
     case 'email':
-      return sendEmail(row.recipient, row.subject ?? 'NexG', row.body);
+      return sendEmail(row.recipient, row.subject ?? 'NexG', row.body, {
+        from: typeof row.payload?.from === 'string' ? row.payload.from : undefined,
+        replyTo: typeof row.payload?.reply_to === 'string' ? row.payload.reply_to : undefined,
+      });
     case 'whatsapp':
       return sendWhatsApp(row.recipient, row.body);
     default:
@@ -217,7 +220,12 @@ async function sendSms(to: string, body: string): Promise<Outcome> {
   };
 }
 
-async function sendEmail(to: string, subject: string, body: string): Promise<Outcome> {
+async function sendEmail(
+  to: string,
+  subject: string,
+  body: string,
+  sender?: { from?: string; replyTo?: string },
+): Promise<Outcome> {
   if (!RESEND_API_KEY || !EMAIL_FROM) {
     return {
       ok: false,
@@ -232,7 +240,13 @@ async function sendEmail(to: string, subject: string, body: string): Promise<Out
         Authorization: `Bearer ${RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: EMAIL_FROM, to: [to], subject, text: body }),
+      body: JSON.stringify({
+        from: sender?.from || EMAIL_FROM,
+        to: [to],
+        subject,
+        text: body,
+        ...(sender?.replyTo ? { reply_to: sender.replyTo } : {}),
+      }),
     });
     const data = await res.json();
     if (res.ok) return { ok: true, provider: 'resend', ref: data.id };
