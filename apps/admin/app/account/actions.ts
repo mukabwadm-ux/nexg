@@ -38,8 +38,11 @@ export async function updateProfile(formData: FormData): Promise<ActionResult> {
 
 export async function setAvatarPath(path: string | null): Promise<ActionResult> {
   const supabase = createClient();
-  const { error } = await loose(supabase, 'rpc_my_staff_avatar_set', { p_path: path });
+  const { data, error } = await loose(supabase, 'rpc_my_staff_avatar_set', { p_path: path });
   if (error) return { ok: false, message: clean(error.message) };
+  if (typeof data === 'string' && data) {
+    await supabase.storage.from('staff-avatars').remove([data]);
+  }
   revalidatePath('/', 'layout');
   return { ok: true, message: path ? 'Photo updated.' : 'Photo removed.' };
 }
