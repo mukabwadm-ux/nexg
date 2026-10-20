@@ -27,6 +27,8 @@ export interface StaffContext {
   staffId: string;
   displayName: string;
   email: string;
+  /** Short-lived signed URL for the profile photo, if they have one. */
+  avatarUrl: string | null;
   /** Role keys granted to this account, across all cities. */
   roles: string[];
   isSuperAdmin: boolean;
@@ -78,6 +80,19 @@ export async function requireStaff(): Promise<StaffContext> {
     .maybeSingle();
 
   if (!staff || staff.status !== 'active') redirect('/sign-in?denied=1');
+
+  /* A photo is optional and never worth failing a page over. The column is
+     newer than the generated types, hence the loose read. */
+  let avatarUrl: string | null = null;
+  const { data: mine } = (await supabase.rpc('rpc_my_staff_profile' as never)) as unknown as {
+    data: { avatar_path?: string | null } | null;
+  };
+  if (mine?.avatar_path) {
+    const { data: signed } = await supabase.storage
+      .from('staff-avatars')
+      .createSignedUrl(mine.avatar_path, 3600);
+    avatarUrl = signed?.signedUrl ?? null;
+  }
 
   const { data: grants } = await supabase
     .from('role_grant')
@@ -142,6 +157,7 @@ export async function requireStaff(): Promise<StaffContext> {
     staffId: staff.id,
     displayName: staff.display_name ?? staff.email,
     email: staff.email,
+    avatarUrl,
     roles,
     /*
      * This read `roles.includes('ops_manager')`, which is a different role.

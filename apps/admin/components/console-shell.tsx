@@ -154,20 +154,35 @@ export function ConsoleShell({
         </nav>
 
         <div className="flex items-center gap-3 border-t border-white/10 px-5 py-4">
-          <span
-            aria-hidden="true"
-            className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-extrabold"
+          <Link
+            href="/account"
+            aria-label="Your profile"
+            className="flex min-w-0 flex-1 items-center gap-3"
           >
-            {initials || '—'}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-[0.8125rem] font-bold">{staff.email}</span>
-            <span className="block truncate text-[0.625rem] font-semibold uppercase tracking-wide text-white/40">
-              {(staff.isSuperAdmin ? 'Super admin' : staff.roles.join(' · ') || 'No role') +
-                ' · ' +
-                scope}
+            {staff.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
+              <img
+                src={staff.avatarUrl}
+                alt=""
+                className="h-9 w-9 shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <span
+                aria-hidden="true"
+                className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-extrabold"
+              >
+                {initials || '—'}
+              </span>
+            )}
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[0.8125rem] font-bold">{staff.email}</span>
+              <span className="block truncate text-[0.625rem] font-semibold uppercase tracking-wide text-white/40">
+                {(staff.isSuperAdmin ? 'Super admin' : staff.roles.join(' · ') || 'No role') +
+                  ' · ' +
+                  scope}
+              </span>
             </span>
-          </span>
+          </Link>
           <form action={signOut}>
             <button
               type="submit"
