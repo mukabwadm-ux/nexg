@@ -18,7 +18,8 @@ export interface SendOutcome {
   error?: string;
 }
 
-const FROM = process.env.EMAIL_FROM ?? 'NexG <hello@billing.nexgapp.com>';
+const FROM = process.env.EMAIL_FROM ?? 'NexG Finance <finance@nexgapp.com>';
+const REPLY_TO = process.env.EMAIL_REPLY_TO ?? 'finance@nexgapp.com';
 
 async function deliver(to: string, subject: string, text: string): Promise<SendOutcome> {
   const key = process.env.RESEND_API_KEY;
@@ -37,7 +38,7 @@ async function deliver(to: string, subject: string, text: string): Promise<SendO
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: FROM, to: [to], subject, text }),
+      body: JSON.stringify({ from: FROM, to: [to], reply_to: REPLY_TO, subject, text }),
       // A slow provider must not hold a guest's form open.
       signal: AbortSignal.timeout(10_000),
     });
