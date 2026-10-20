@@ -97,10 +97,11 @@ export default async function PaymentReturn({ params }: { params: { reference: s
   }
 
   return (
-    <Shell title="We are checking with your bank.">
+    <Shell title="Waiting for your payment.">
+      <meta httpEquiv="refresh" content="5" />
       <p>
-        {amount} is being confirmed. This usually takes a few seconds, and it finishes whether or
-        not you stay on this page.
+        {amount} is being confirmed. If you were sent an M-Pesa prompt, enter your PIN on your
+        phone — this page updates by itself.
       </p>
       <p className="text-muted-light mt-3 text-[0.8125rem] font-semibold">
         Reference {payment.reference}. If money has left your account and this has not changed

@@ -158,6 +158,25 @@ export function CheckoutForm() {
         return;
       }
 
+      if (method === 'mpesa_stk') {
+        const stk = await fetch('/api/payments/mpesa/start', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ orderId: result.order_id, phone }),
+        });
+        const sent = (await stk.json()) as { ok: boolean; message?: string; reference?: string };
+        if (!sent.ok) {
+          setError(
+            `Your order ${result.reference} is saved, but the M-Pesa prompt could not be sent. ${sent.message ?? ''}`,
+          );
+          cart.clear();
+          return;
+        }
+        cart.clear();
+        router.push(`/pay/${sent.reference ?? result.reference}`);
+        return;
+      }
+
       const res = await fetch('/api/payments/paystack/start', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
