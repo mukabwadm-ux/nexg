@@ -175,9 +175,19 @@ export function BreakdownView({ b }: { b: Breakdown }) {
             <Row label="Basket" value={kes(n('merchant_gross_cents'))} />
             <Row
               label="NexG commission"
-              note={`${n('commission_pct')}%`}
+              note={`${n('commission_pct')}% incl. VAT`}
               value={kes(n('commission_cents'))}
               negative
+            />
+            <Row
+              label="of which commission"
+              value={kes(n('commission_ex_vat_cents'))}
+              note="before VAT"
+            />
+            <Row
+              label="of which VAT"
+              value={kes(n('commission_vat_cents'))}
+              note={`${n('vat_pct')}%`}
             />
             <Row label="Merchant receives" value={kes(n('merchant_net_cents'))} strong />
 
@@ -200,6 +210,20 @@ export function BreakdownView({ b }: { b: Breakdown }) {
                   NexG
                 </p>
                 <Row label="Platform revenue" value={kes(n('platform_gross_cents'))} />
+                <Row
+                  label="VAT to KRA"
+                  note={`${n('vat_pct')}% on commission and fees`}
+                  value={kes(n('vat_total_cents'))}
+                  negative
+                />
+                {n('host_share_cents') > 0 && (
+                  <Row
+                    label="Host share"
+                    note={`${n('host_share_pct')}% of commission before VAT`}
+                    value={kes(n('host_share_cents'))}
+                    negative
+                  />
+                )}
                 <Row
                   label="Payment provider fee"
                   note={`${n('processor_fee_pct')}%`}
