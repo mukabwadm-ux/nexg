@@ -1,5 +1,5 @@
 import { EmptyState, StatusBadge } from '@nexg/ui';
-import { Inbox } from 'lucide-react';
+import { ArrowRight, Inbox } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -35,11 +35,31 @@ const DETAIL_LABEL: Record<string, string> = {
   notes: 'They added',
   from_role: 'Filling in as',
   topic: 'Topic they chose',
+  kind: 'They are a',
+  units_band: 'How many units',
+  handoff: 'How riders hand over',
+  listing_link: 'Listing link',
+  address: 'First unit address',
+  city: 'City',
 };
 
 const DETAIL_VALUE: Record<string, string> = {
   asap: 'As soon as possible',
   later: 'At a time to arrange',
+  /* What a host told us on the landing page. */
+  single_unit: 'Single unit',
+  multi_unit: 'A few units',
+  property_manager: 'Property manager',
+  '1': '1 unit',
+  '2_5': '2 to 5 units',
+  '6_20': '6 to 20 units',
+  '20_plus': '20 units or more',
+  guest_meets_at_gate: 'Guest meets at gate',
+  leave_with_askari: 'Leave with askari',
+  lockbox: 'Lockbox',
+  call_guest_first: 'Call guest first',
+  reception: 'Reception',
+  caretaker: 'Caretaker',
 };
 
 const TOPIC_LABEL: Record<string, string> = {
@@ -305,7 +325,14 @@ export default async function SupportAndTicketsPage({
                             /* Coordinates are not something a person
                              reads. They are summarised in a sentence
                              below instead. */
-                            return k !== 'lat' && k !== 'lng' && k !== 'location_source';
+                            return (
+                              k !== 'lat' &&
+                              k !== 'lng' &&
+                              k !== 'location_source' &&
+                              /* The host record has a link under it; a bare
+                                 uuid on its own line is just noise. */
+                              k !== 'host_id'
+                            );
                           })
                           .map(([key, value]) => (
                             <div key={key} className="flex justify-between gap-3">
@@ -322,6 +349,20 @@ export default async function SupportAndTicketsPage({
                         <p className="text-muted-light mt-2 text-xs font-semibold">
                           They dropped a pin, so the spot is settled — no need to ask which gate.
                         </p>
+                      ) : null}
+                      {/*
+                       * A host application also made a host record, and
+                       * that is where the verification happens. The
+                       * ticket is the queue; the record is the work.
+                       */}
+                      {typeof asked.host_id === 'string' ? (
+                        <Link
+                          href={`/hotels/hosts/${asked.host_id}/verify`}
+                          className="text-ink mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold underline underline-offset-4"
+                        >
+                          Open the host record
+                          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Link>
                       ) : null}
                     </aside>
                   ) : null;

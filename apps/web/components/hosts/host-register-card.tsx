@@ -89,6 +89,13 @@ export function HostRegisterCard() {
           We&rsquo;ve saved what you typed, so setting up the hand-off rule picks up where you left
           off.
         </p>
+        {done.ticketReference ? (
+          <p className="mt-3 text-sm font-semibold leading-[1.8] text-[#5B5B5B]">
+            Your reference is{' '}
+            <span className="font-extrabold text-[#1A1A1A]">{done.ticketReference}</span> &mdash;
+            quote it if you call us.
+          </p>
+        ) : null}
       </div>
     );
   }
