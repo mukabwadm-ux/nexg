@@ -6,6 +6,8 @@ export interface HostApplyResult {
   ok: boolean;
   message: string;
   hostId?: string;
+  /** The desk's reference for this application, e.g. NX-T-1042. */
+  ticketReference?: string;
 }
 
 export interface HostApplyInput {
@@ -58,6 +60,11 @@ export async function applyAsHost(input: HostApplyInput): Promise<HostApplyResul
     return { ok: false, message: error.message };
   }
 
-  const result = data as { ok: boolean; host_id: string } | null;
-  return { ok: true, message: 'Thanks — we will verify your listing.', hostId: result?.host_id };
+  const result = data as { ok: boolean; host_id: string; ticket_reference?: string } | null;
+  return {
+    ok: true,
+    message: 'Thanks — we will verify our listing.',
+    hostId: result?.host_id,
+    ...(result?.ticket_reference ? { ticketReference: result.ticket_reference } : {}),
+  };
 }
