@@ -17,13 +17,27 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
 import { encodeCursor, decodeCursor, jsonError, parseQuery } from '@/lib/http';
-import { ListRequest, PublicMerchant, PageEnvelope } from '@nexg/contracts/api';
+import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
+import { ListRequest, PublicMerchant } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // cache for 60 seconds
 
 export async function GET(request: Request) {
+  // Resolve the credential first: a bad key is refused before any work is done.
+  let credential;
+  try {
+    credential = await authenticate(request);
+    requireScope(credential, API_SCOPES.public_read);
+    await enforceRateLimit(credential);
+  } catch (e) {
+    if (e instanceof ApiAuthError) {
+      return jsonError(e.code, e.message, { status: e.status });
+    }
+    return jsonError('internal_error', 'Something went wrong on our side.', { status: 500 });
+  }
+
   const url = new URL(request.url);
   const queryResult = parseQuery(ListRequest, url.searchParams);
 
@@ -32,7 +46,7 @@ export async function GET(request: Request) {
   }
 
   const { cursor, limit: rawLimit, city, category, q } = queryResult.data;
-  const limit = Math.min(Math.max(rawLimit, 1), 100);
+  const limit = Math.min(Math.max(rawLimit ?? 25, 1), 100);
 
   const supabase = createPublicClient();
 
@@ -78,9 +92,8 @@ export async function GET(request: Request) {
 
   // Build the next cursor from the last item
   let nextCursor: string | null = null;
-  if (hasMore && items.length > 0) {
-    const last = items[items.length - 1];
-    nextCursor = encodeCursor(last.listed_at ?? '', last.id ?? '');
+  const last = items[items.length - 1];
+  if (hasMore && last) {    nextCursor = encodeCursor(last.listed_at ?? '', last.id ?? '');
   }
 
   // Validate against the schema (defense in depth)

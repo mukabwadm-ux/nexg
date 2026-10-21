@@ -9,7 +9,7 @@ const nextConfig = {
    */
   distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
   // The workspace packages ship TypeScript source rather than a build output.
-  transpilePackages: ['@nexg/db'],
+  transpilePackages: ['@nexg/ui', '@nexg/db'],
   eslint: {
     // `pnpm lint` runs ESLint as its own CI step; do not run it twice.
     ignoreDuringBuilds: true,

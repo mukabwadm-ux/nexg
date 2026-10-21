@@ -3330,6 +3330,413 @@ export type Database = {
         };
         Relationships: [];
       };
+      api_idempotency: {
+        Row: {
+          created_at: string;
+          endpoint: string;
+          id: string;
+          idempotency_key: string;
+          merchant_id: string;
+          order_id: string | null;
+          response: NonNullable<Json>;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          endpoint: string;
+          id?: string;
+          idempotency_key: string;
+          merchant_id: string;
+          order_id?: string | null;
+          response: NonNullable<Json>;
+        };
+        Update: {
+          created_at?: string;
+          endpoint?: string;
+          id?: string;
+          idempotency_key?: string;
+          merchant_id?: string;
+          order_id?: string | null;
+          response?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_live_orders_needs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_live_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_order_detail_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_arriving_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_delivery_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_qr_activity_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'order';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'order_money_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_jobs_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      api_key: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          created_by_user: string | null;
+          expires_at: string | null;
+          id: string;
+          key_hash: string;
+          key_prefix: string;
+          last_used_at: string | null;
+          merchant_id: string | null;
+          rate_limit: number;
+          revoke_reason: string | null;
+          revoked_at: string | null;
+          revoked_by: string | null;
+          scopes: Database['public']['Enums']['api_credential_scope'][];
+          state: Database['public']['Enums']['api_credential_state'];
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          created_by_user?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          key_hash: string;
+          key_prefix: string;
+          last_used_at?: string | null;
+          merchant_id?: string | null;
+          rate_limit?: number;
+          revoke_reason?: string | null;
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+          scopes?: Database['public']['Enums']['api_credential_scope'][];
+          state?: Database['public']['Enums']['api_credential_state'];
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          created_by_user?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          key_hash?: string;
+          key_prefix?: string;
+          last_used_at?: string | null;
+          merchant_id?: string | null;
+          rate_limit?: number;
+          revoke_reason?: string | null;
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+          scopes?: Database['public']['Enums']['api_credential_scope'][];
+          state?: Database['public']['Enums']['api_credential_state'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_key_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_revoked_by_fkey';
+            columns: ['revoked_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      api_rate_window: {
+        Row: {
+          key_id: string;
+          used: number;
+          window_start: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          key_id: string;
+          used?: number;
+          window_start: string;
+        };
+        Update: {
+          key_id?: string;
+          used?: number;
+          window_start?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_rate_window_key_id_fkey';
+            columns: ['key_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_key';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      api_service: {
+        Row: {
+          active: boolean;
+          code: string;
+          created_at: string;
+          id: string;
+          kind: string;
+          label: string;
+          price_key: string;
+          unit_basis: string;
+          unit_label: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          code: string;
+          created_at?: string;
+          id?: string;
+          kind: string;
+          label: string;
+          price_key: string;
+          unit_basis?: string;
+          unit_label?: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          code?: string;
+          created_at?: string;
+          id?: string;
+          kind?: string;
+          label?: string;
+          price_key?: string;
+          unit_basis?: string;
+          unit_label?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       approval_request: {
         Row: {
           city_id: string | null;
@@ -7032,6 +7439,46 @@ export type Database = {
           sort?: number;
           updated_at?: string;
           why_text?: string | null;
+        };
+        Relationships: [];
+      };
+      email_route: {
+        Row: {
+          description: string | null;
+          enabled: boolean;
+          from_email: string;
+          from_name: string;
+          key: string;
+          label: string;
+          recipient: string | null;
+          reply_to: string | null;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          description?: string | null;
+          enabled?: boolean;
+          from_email: string;
+          from_name?: string;
+          key: string;
+          label: string;
+          recipient?: string | null;
+          reply_to?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          description?: string | null;
+          enabled?: boolean;
+          from_email?: string;
+          from_name?: string;
+          key?: string;
+          label?: string;
+          recipient?: string | null;
+          reply_to?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
         };
         Relationships: [];
       };
@@ -14068,6 +14515,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -14153,6 +14601,7 @@ export type Database = {
           hours?: Json | null;
           hours_pattern?: string | null;
           id?: string;
+          kra_pin?: string | null;
           landmark?: string | null;
           late_night_until?: string | null;
           legal_name?: string | null;
@@ -14237,6 +14686,7 @@ export type Database = {
           hours?: Json | null;
           hours_pattern?: string | null;
           id?: string;
+          kra_pin?: string | null;
           landmark?: string | null;
           late_night_until?: string | null;
           legal_name?: string | null;
@@ -18192,6 +18642,25 @@ export type Database = {
           },
         ];
       };
+      notification_email_kind: {
+        Row: {
+          enabled: boolean;
+          kind: string;
+          note: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          enabled?: boolean;
+          kind: string;
+          note?: string | null;
+        };
+        Update: {
+          enabled?: boolean;
+          kind?: string;
+          note?: string | null;
+        };
+        Relationships: [];
+      };
       notification_log: {
         Row: {
           channel: string;
@@ -18300,6 +18769,291 @@ export type Database = {
             columns: ['notification_log_id'];
             isOneToOne: false;
             referencedRelation: 'notification_log';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      oauth_access_token: {
+        Row: {
+          client_id: string;
+          created_at: string;
+          expires_at: string;
+          id: string;
+          revoked_at: string | null;
+          scopes: string[];
+          subject_id: string;
+          subject_type: Database['public']['Enums']['actor_type'];
+          token_hash: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          client_id: string;
+          created_at?: string;
+          expires_at?: string;
+          id?: string;
+          revoked_at?: string | null;
+          scopes: string[];
+          subject_id: string;
+          subject_type: Database['public']['Enums']['actor_type'];
+          token_hash: string;
+        };
+        Update: {
+          client_id?: string;
+          created_at?: string;
+          expires_at?: string;
+          id?: string;
+          revoked_at?: string | null;
+          scopes?: string[];
+          subject_id?: string;
+          subject_type?: Database['public']['Enums']['actor_type'];
+          token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'oauth_access_token_client_id_fkey';
+            columns: ['client_id'];
+            isOneToOne: false;
+            referencedRelation: 'oauth_client';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      oauth_authorization_code: {
+        Row: {
+          client_id: string;
+          code_challenge: string | null;
+          code_challenge_method: string | null;
+          code_hash: string;
+          created_at: string;
+          expires_at: string;
+          id: string;
+          redeemed_at: string | null;
+          redirect_uri: string;
+          scopes: string[];
+          subject_id: string;
+          subject_type: Database['public']['Enums']['actor_type'];
+        };
+        ComputedFields: never;
+        Insert: {
+          client_id: string;
+          code_challenge?: string | null;
+          code_challenge_method?: string | null;
+          code_hash: string;
+          created_at?: string;
+          expires_at?: string;
+          id?: string;
+          redeemed_at?: string | null;
+          redirect_uri: string;
+          scopes: string[];
+          subject_id: string;
+          subject_type: Database['public']['Enums']['actor_type'];
+        };
+        Update: {
+          client_id?: string;
+          code_challenge?: string | null;
+          code_challenge_method?: string | null;
+          code_hash?: string;
+          created_at?: string;
+          expires_at?: string;
+          id?: string;
+          redeemed_at?: string | null;
+          redirect_uri?: string;
+          scopes?: string[];
+          subject_id?: string;
+          subject_type?: Database['public']['Enums']['actor_type'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'oauth_authorization_code_client_id_fkey';
+            columns: ['client_id'];
+            isOneToOne: false;
+            referencedRelation: 'oauth_client';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      oauth_client: {
+        Row: {
+          allowed_scopes: string[];
+          client_id: string;
+          client_secret_hash: string;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          merchant_id: string | null;
+          name: string;
+          rate_limit: number;
+          redirect_uris: string[];
+          revoked_at: string | null;
+          state: Database['public']['Enums']['api_credential_state'];
+        };
+        ComputedFields: never;
+        Insert: {
+          allowed_scopes?: string[];
+          client_id: string;
+          client_secret_hash: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          merchant_id?: string | null;
+          name: string;
+          rate_limit?: number;
+          redirect_uris: string[];
+          revoked_at?: string | null;
+          state?: Database['public']['Enums']['api_credential_state'];
+        };
+        Update: {
+          allowed_scopes?: string[];
+          client_id?: string;
+          client_secret_hash?: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          merchant_id?: string | null;
+          name?: string;
+          rate_limit?: number;
+          redirect_uris?: string[];
+          revoked_at?: string | null;
+          state?: Database['public']['Enums']['api_credential_state'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'oauth_client_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      oauth_refresh_token: {
+        Row: {
+          client_id: string;
+          created_at: string;
+          expires_at: string;
+          family_id: string;
+          id: string;
+          revoked_at: string | null;
+          scopes: string[];
+          subject_id: string;
+          subject_type: Database['public']['Enums']['actor_type'];
+          token_hash: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          client_id: string;
+          created_at?: string;
+          expires_at?: string;
+          family_id?: string;
+          id?: string;
+          revoked_at?: string | null;
+          scopes: string[];
+          subject_id: string;
+          subject_type: Database['public']['Enums']['actor_type'];
+          token_hash: string;
+        };
+        Update: {
+          client_id?: string;
+          created_at?: string;
+          expires_at?: string;
+          family_id?: string;
+          id?: string;
+          revoked_at?: string | null;
+          scopes?: string[];
+          subject_id?: string;
+          subject_type?: Database['public']['Enums']['actor_type'];
+          token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'oauth_refresh_token_client_id_fkey';
+            columns: ['client_id'];
+            isOneToOne: false;
+            referencedRelation: 'oauth_client';
             referencedColumns: ['id'];
           },
         ];
@@ -19976,7 +20730,9 @@ export type Database = {
           merchant_id: string | null;
           order_id: string | null;
           paid_at: string | null;
+          payer_phone: string | null;
           provider: string;
+          provider_receipt: string | null;
           provider_ref: string | null;
           reference: string;
           state: Database['public']['Enums']['payment_state'];
@@ -20002,7 +20758,9 @@ export type Database = {
           merchant_id?: string | null;
           order_id?: string | null;
           paid_at?: string | null;
+          payer_phone?: string | null;
           provider?: string;
+          provider_receipt?: string | null;
           provider_ref?: string | null;
           reference: string;
           state?: Database['public']['Enums']['payment_state'];
@@ -20027,7 +20785,9 @@ export type Database = {
           merchant_id?: string | null;
           order_id?: string | null;
           paid_at?: string | null;
+          payer_phone?: string | null;
           provider?: string;
+          provider_receipt?: string | null;
           provider_ref?: string | null;
           reference?: string;
           state?: Database['public']['Enums']['payment_state'];
@@ -20426,6 +21186,31 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      payout_plan: {
+        Row: {
+          key: string;
+          note: string | null;
+          placeholder: boolean;
+          updated_at: string;
+          value: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          key: string;
+          note?: string | null;
+          placeholder?: boolean;
+          updated_at?: string;
+          value: number;
+        };
+        Update: {
+          key?: string;
+          note?: string | null;
+          placeholder?: boolean;
+          updated_at?: string;
+          value?: number;
+        };
+        Relationships: [];
       };
       payout_rail: {
         Row: {
@@ -26348,30 +27133,45 @@ export type Database = {
       };
       staff_user: {
         Row: {
+          avatar_path: string | null;
+          bio: string | null;
           created_at: string;
           display_name: string;
           email: string;
           id: string;
+          job_title: string | null;
+          phone: string | null;
           status: Database['public']['Enums']['staff_status'];
+          timezone: string;
           updated_at: string;
           user_id: string;
         };
         ComputedFields: never;
         Insert: {
+          avatar_path?: string | null;
+          bio?: string | null;
           created_at?: string;
           display_name: string;
           email: string;
           id?: string;
+          job_title?: string | null;
+          phone?: string | null;
           status?: Database['public']['Enums']['staff_status'];
+          timezone?: string;
           updated_at?: string;
           user_id: string;
         };
         Update: {
+          avatar_path?: string | null;
+          bio?: string | null;
           created_at?: string;
           display_name?: string;
           email?: string;
           id?: string;
+          job_title?: string | null;
+          phone?: string | null;
           status?: Database['public']['Enums']['staff_status'];
+          timezone?: string;
           updated_at?: string;
           user_id?: string;
         };
@@ -27212,6 +28012,205 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'waitlist_city_v';
             referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      tax_counter: {
+        Row: {
+          last_number: number;
+          year: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          last_number?: number;
+          year: number;
+        };
+        Update: {
+          last_number?: number;
+          year?: number;
+        };
+        Relationships: [];
+      };
+      tax_invoice: {
+        Row: {
+          city_id: string | null;
+          created_at: string;
+          currency: string;
+          gross_cents: number;
+          id: string;
+          issued_at: string;
+          kind: string;
+          kra_reference: string | null;
+          kra_response: Json | null;
+          kra_status: string;
+          kra_submitted_at: string | null;
+          net_cents: number;
+          number: string;
+          order_id: string | null;
+          party_id: string | null;
+          party_name: string | null;
+          party_pin: string | null;
+          party_type: string;
+          purpose: string;
+          vat_cents: number;
+          vat_pct: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          gross_cents: number;
+          id?: string;
+          issued_at?: string;
+          kind?: string;
+          kra_reference?: string | null;
+          kra_response?: Json | null;
+          kra_status?: string;
+          kra_submitted_at?: string | null;
+          net_cents: number;
+          number: string;
+          order_id?: string | null;
+          party_id?: string | null;
+          party_name?: string | null;
+          party_pin?: string | null;
+          party_type: string;
+          purpose: string;
+          vat_cents: number;
+          vat_pct: number;
+        };
+        Update: {
+          city_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          gross_cents?: number;
+          id?: string;
+          issued_at?: string;
+          kind?: string;
+          kra_reference?: string | null;
+          kra_response?: Json | null;
+          kra_status?: string;
+          kra_submitted_at?: string | null;
+          net_cents?: number;
+          number?: string;
+          order_id?: string | null;
+          party_id?: string | null;
+          party_name?: string | null;
+          party_pin?: string | null;
+          party_type?: string;
+          purpose?: string;
+          vat_cents?: number;
+          vat_pct?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_live_orders_needs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_live_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_order_detail_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_arriving_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_delivery_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_qr_activity_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'order';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'order_money_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'tax_invoice_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_jobs_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      tax_invoice_line: {
+        Row: {
+          description: string;
+          gross_cents: number;
+          id: string;
+          invoice_id: string;
+          net_cents: number;
+          position: number;
+          vat_cents: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          description: string;
+          gross_cents: number;
+          id?: string;
+          invoice_id: string;
+          net_cents: number;
+          position: number;
+          vat_cents: number;
+        };
+        Update: {
+          description?: string;
+          gross_cents?: number;
+          id?: string;
+          invoice_id?: string;
+          net_cents?: number;
+          position?: number;
+          vat_cents?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'tax_invoice_line_invoice_id_fkey';
+            columns: ['invoice_id'];
+            isOneToOne: false;
+            referencedRelation: 'tax_invoice';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -42823,6 +43822,17 @@ export type Database = {
         ComputedFields: never;
         Relationships: [];
       };
+      tax_vat_summary_v: {
+        Row: {
+          documents: number | null;
+          month: string | null;
+          net_cents: number | null;
+          pending_kra: number | null;
+          vat_cents: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
       unit_context_v: {
         Row: {
           area: string | null;
@@ -43408,6 +44418,31 @@ export type Database = {
       };
       fn_anonymise_guest: { Args: { p_guest_id: string }; Returns: undefined };
       fn_answer_matches: { Args: { p_answers: Json; p_condition: Json }; Returns: boolean };
+      fn_api_key_issue: {
+        Args: {
+          p_created_by?: string;
+          p_created_by_user?: string;
+          p_expires_at?: string;
+          p_merchant_id?: string;
+          p_rate_limit?: number;
+          p_scopes?: Database['public']['Enums']['api_credential_scope'][];
+        };
+        Returns: {
+          key_id: string;
+          key_prefix: string;
+          raw_key: string;
+        }[];
+      };
+      fn_api_key_lookup: {
+        Args: { p_raw_key: string };
+        Returns: {
+          key_id: string;
+          merchant_id: string;
+          rate_limit: number;
+          scopes: Database['public']['Enums']['api_credential_scope'][];
+        }[];
+      };
+      fn_api_key_spend: { Args: { p_key_id: string; p_limit: number }; Returns: boolean };
       fn_approval_raise: {
         Args: {
           p_body?: string;
@@ -43493,6 +44528,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      fn_email_route_for: { Args: { p_template: string }; Returns: string };
       fn_encrypt_secret: { Args: { p_plain: string }; Returns: string };
       fn_event_anchor_effects: { Args: { p_plan_id: string }; Returns: undefined };
       fn_expire_documents: { Args: Record<PropertyKey, never>; Returns: number };
@@ -43570,6 +44606,16 @@ export type Database = {
       fn_fit_budget: { Args: { p_plan_id: string }; Returns: undefined };
       fn_folio_caller_may_charge: { Args: { p_hotel_id: string }; Returns: boolean };
       fn_folio_escalation_sweep: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_form_alert: {
+        Args: {
+          p_href?: string;
+          p_lines: string[];
+          p_reply_to?: string;
+          p_subject: string;
+          p_template: string;
+        };
+        Returns: undefined;
+      };
       fn_geo_cell: {
         Args: { p_lat: number; p_lng: number; p_precision?: number };
         Returns: string;
@@ -43646,6 +44692,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -43807,6 +44854,21 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_notify_staff: {
+        Args: {
+          p_body?: string;
+          p_city_id?: string;
+          p_href?: string;
+          p_kind: string;
+          p_module: string;
+          p_object_id?: string;
+          p_object_type?: string;
+          p_tag?: string;
+          p_title: string;
+          p_tone?: Database['public']['Enums']['notification_tone'];
+        };
+        Returns: number;
+      };
       fn_notify_user: {
         Args: {
           p_body?: string;
@@ -43822,10 +44884,12 @@ export type Database = {
         Returns: string;
       };
       fn_order_lateness: { Args: { p_delivered: string; p_promised: string }; Returns: number };
+      fn_order_money_scope: { Args: { p_order_id: string }; Returns: string };
       fn_order_needs_action: { Args: { p_order_id: string }; Returns: string[] };
       fn_order_reference: { Args: Record<PropertyKey, never>; Returns: string };
       fn_order_reprice: { Args: { p_changes: Json; p_order_id: string }; Returns: Json };
       fn_order_require: { Args: { p_city_id: string; p_what: string }; Returns: string };
+      fn_order_split: { Args: { p_order_id: string }; Returns: Json };
       fn_outbound_blocked: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_partner_home: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_partner_recompute_status: {
@@ -43848,12 +44912,26 @@ export type Database = {
       };
       fn_plan_view: { Args: { p_plan_id: string }; Returns: Json };
       fn_plate_matches: { Args: { p_plate: string; p_read: string }; Returns: boolean };
+      fn_price_api_service: {
+        Args: {
+          p_at?: string;
+          p_band?: number;
+          p_city_id: string;
+          p_quantity: number;
+          p_service: Omit<
+            Database['public']['Tables']['api_service']['Row'],
+            Database['public']['Tables']['api_service']['ComputedFields']
+          >;
+        };
+        Returns: Json;
+      };
       fn_price_order: {
         Args: {
           p_at?: string;
           p_band?: number;
           p_category: string;
           p_city_id: string;
+          p_merchant_id?: string;
           p_subtotal_cents: number;
         };
         Returns: Json;
@@ -44061,9 +45139,12 @@ export type Database = {
           title: string;
         }[];
       };
+      fn_tax_issue_order: { Args: { p_order_id: string }; Returns: number };
+      fn_tax_next_number: { Args: { p_at?: string }; Returns: string };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
       fn_wa_window: { Args: { p_conversation: string }; Returns: Json };
+      fn_web_order_quote: { Args: { p_payload: Json }; Returns: Json };
       fn_wiring_check: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -44238,6 +45319,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_api_key_revoke: { Args: { p_key_id: string; p_reason?: string }; Returns: boolean };
       rpc_approval_decide: {
         Args: { p_approve: boolean; p_note?: string; p_request_id: string };
         Returns: {
@@ -45554,6 +46636,35 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_email_route_public: { Args: { p_key: string }; Returns: Json };
+      rpc_email_route_set: {
+        Args: {
+          p_enabled: boolean;
+          p_from_email: string;
+          p_from_name: string;
+          p_key: string;
+          p_recipient: string;
+          p_reply_to: string;
+        };
+        Returns: Json;
+      };
+      rpc_email_routes: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          can_edit: boolean;
+          description: string;
+          enabled: boolean;
+          failed_30d: number;
+          from_email: string;
+          from_name: string;
+          key: string;
+          label: string;
+          recipient: string;
+          reply_to: string;
+          sent_30d: number;
+          updated_at: string;
+        }[];
       };
       rpc_experience_guests: {
         Args: { p_city_id?: string; p_filter?: string };
@@ -47214,6 +48325,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -47311,6 +48423,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -47538,6 +48651,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -47695,6 +48809,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -47792,6 +48907,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -47885,6 +49001,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -47996,6 +49113,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -48101,6 +49219,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
@@ -48264,6 +49383,22 @@ export type Database = {
         Returns: Json;
       };
       rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
+      rpc_my_staff_avatar_set: { Args: { p_path: string }; Returns: string };
+      rpc_my_staff_email_change: {
+        Args: { p_current_password: string; p_new_email: string };
+        Returns: Json;
+      };
+      rpc_my_staff_profile: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_staff_profile_update: {
+        Args: {
+          p_bio?: string;
+          p_display_name: string;
+          p_job_title?: string;
+          p_phone?: string;
+          p_timezone?: string;
+        };
+        Returns: Json;
+      };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -48298,6 +49433,7 @@ export type Database = {
         Args: { p_changes: Json; p_order_id: string; p_reason: string };
         Returns: Json;
       };
+      rpc_order_breakdown: { Args: { p_order_id: string }; Returns: Json };
       rpc_order_contact: {
         Args: { p_channel: string; p_order_id: string; p_party: string; p_reveal?: boolean };
         Returns: Json;
@@ -48307,6 +49443,12 @@ export type Database = {
         Args: { p_detail?: Json; p_event: string; p_order_id: string; p_reason: string };
         Returns: Json;
       };
+      rpc_order_place_api: {
+        Args: { p_api_key: string; p_idempotency_key: string; p_payload: Json };
+        Returns: Json;
+      };
+      rpc_order_place_web: { Args: { p_payload: Json }; Returns: Json };
+      rpc_order_quote_web: { Args: { p_payload: Json }; Returns: Json };
       rpc_order_refund: {
         Args: {
           p_amount_cents: number;
@@ -48402,6 +49544,28 @@ export type Database = {
       rpc_payment_begin_order: { Args: { p_order_id: string }; Returns: Json };
       rpc_payment_method_toggle: {
         Args: { p_enabled: boolean; p_key: string; p_reason: string };
+        Returns: Json;
+      };
+      rpc_payment_mpesa_callback: {
+        Args: {
+          p_amount_kes?: number;
+          p_checkout_request_id: string;
+          p_payload: Json;
+          p_phone?: string;
+          p_receipt?: string;
+          p_result_code: number;
+          p_result_desc: string;
+          p_secret_ok: boolean;
+        };
+        Returns: Json;
+      };
+      rpc_payment_mpesa_sent: {
+        Args: {
+          p_checkout_request_id: string;
+          p_merchant_request_id: string;
+          p_phone: string;
+          p_reference: string;
+        };
         Returns: Json;
       };
       rpc_payment_webhook: {
@@ -49968,6 +51132,7 @@ export type Database = {
         Args: { p_display_name: string; p_email: string; p_roles?: string[] };
         Returns: Json;
       };
+      rpc_staff_reset_credentials: { Args: { p_staff_id: string }; Returns: Json };
       rpc_staff_set_roles: { Args: { p_roles: string[]; p_staff_id: string }; Returns: string[] };
       rpc_staff_set_scope: {
         Args: { p_city_id?: string; p_expires_at?: string; p_staff_id: string };
@@ -50218,6 +51383,15 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_tax_issue_missing: { Args: Record<PropertyKey, never>; Returns: number };
+      rpc_tax_set_kra_status: {
+        Args: { p_invoice_id: string; p_note?: string; p_reference?: string; p_status: string };
+        Returns: undefined;
+      };
+      rpc_transactions_list: {
+        Args: { p_limit?: number; p_merchant_id?: string; p_offset?: number; p_search?: string };
+        Returns: Json;
+      };
       rpc_translations_put: { Args: { p_locale: string; p_rows: Json }; Returns: number };
       rpc_unit_caretaker_confirm: { Args: { p_token?: string; p_unit_id: string }; Returns: Json };
       rpc_unit_caretaker_invite: { Args: { p_unit_id: string }; Returns: Json };
@@ -50466,6 +51640,13 @@ export type Database = {
         | 'paid_social'
         | 'events';
       actor_type: 'staff' | 'merchant_user' | 'rider' | 'guest' | 'host_user' | 'system';
+      api_credential_scope:
+        | 'public_read'
+        | 'merchant_read'
+        | 'merchant_write'
+        | 'internal_read'
+        | 'internal_write';
+      api_credential_state: 'active' | 'revoked' | 'expired';
       approval_kind:
         | 'merchant_suspension'
         | 'staff_role_grant'
@@ -52237,6 +53418,14 @@ export const Constants = {
         'events',
       ],
       actor_type: ['staff', 'merchant_user', 'rider', 'guest', 'host_user', 'system'],
+      api_credential_scope: [
+        'public_read',
+        'merchant_read',
+        'merchant_write',
+        'internal_read',
+        'internal_write',
+      ],
+      api_credential_state: ['active', 'revoked', 'expired'],
       approval_kind: [
         'merchant_suspension',
         'staff_role_grant',

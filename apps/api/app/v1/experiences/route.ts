@@ -9,13 +9,26 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
 import { encodeCursor, decodeCursor, jsonError, parseQuery } from '@/lib/http';
-import { PublicEvent, ListRequest, PageEnvelope } from '@nexg/contracts/api';
+import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
+import { PublicEvent, ListRequest } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export async function GET(request: Request) {
+  // Resolve the credential first: a bad key is refused before any work is done.
+  let credential;
+  try {
+    credential = await authenticate(request);
+    requireScope(credential, API_SCOPES.public_read);
+    await enforceRateLimit(credential);
+  } catch (e) {
+    if (e instanceof ApiAuthError) {
+      return jsonError(e.code, e.message, { status: e.status });
+    }
+    return jsonError('internal_error', 'Something went wrong on our side.', { status: 500 });
+  }
   const url = new URL(request.url);
   const queryResult = parseQuery(ListRequest, url.searchParams);
 
@@ -24,11 +37,11 @@ export async function GET(request: Request) {
   }
 
   const { cursor, limit: rawLimit, city, q } = queryResult.data;
-  const limit = Math.min(Math.max(rawLimit, 1), 100);
+  const limit = Math.min(Math.max(rawLimit ?? 25, 1), 100);
 
   const supabase = createPublicClient();
 
-  // Build the query — events are sorted by starts_at, then id
+  // Build the query â€” events are sorted by starts_at, then id
   let dbQuery = supabase
     .from('event_public')
     .select('id, city_id, name, category, venue_name, venue_address, starts_at, ends_at, doors_at, cover_path, featured, anchor_slot, organiser_name, organiser_url, ticket_url, ticket_bands, nexg_can_hold_tickets, practical_note, suggested_blocks')
@@ -46,7 +59,7 @@ export async function GET(request: Request) {
 
   // Apply filters
   if (city) {
-    // Need city_id from city slug — join through city table
+    // Need city_id from city slug â€” join through city table
     const { data: cityRow } = await supabase
       .from('city')
       .select('id')
@@ -72,15 +85,14 @@ export async function GET(request: Request) {
   const items = hasMore ? rows.slice(0, limit) : rows;
 
   let nextCursor: string | null = null;
-  if (hasMore && items.length > 0) {
-    const last = items[items.length - 1];
-    nextCursor = encodeCursor(last.starts_at ?? '', last.id ?? '');
+  const last = items[items.length - 1];
+  if (hasMore && last) {    nextCursor = encodeCursor(last.starts_at ?? '', last.id ?? '');
   }
 
   const response = {
     ok: true,
     data: {
-      items: (items as any[]).map((item) => PublicEvent.parse(item)),
+      items: (items as Array<Record<string, unknown>>).map((item) => PublicEvent.parse(item)),
       next_cursor: nextCursor,
     },
     meta: {

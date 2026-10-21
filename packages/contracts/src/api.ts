@@ -33,7 +33,9 @@
  */
 import { z } from 'zod';
 
-import { Money, PageRequest, Uuid } from './index';
+import { IdempotencyKey, Money, PageRequest, Uuid } from './index';
+
+export { IdempotencyKey, Uuid };
 
 /* ════════════════════════════════════════════════════════════════════════════ the envelope */
 
@@ -265,3 +267,108 @@ export const ListRequest = PageRequest.extend({
 export type ListRequest = z.infer<typeof ListRequest>;
 
 export { PageRequest };
+/* ════════════════════════════════════════════════════════════════════════════ the write path */
+
+/**
+ * A booking for a service, made through the API.
+ *
+ * The caller says how many and when. It does not say what it costs,
+ * because a caller that can state a price can state zero, and a
+ * merchant asking for a discount is a conversation rather than a field
+ * in a request. The price is read from the fee settings when the
+ * booking is placed.
+ */
+export const ServiceBooking = z
+  .object({
+    /** The service code, e.g. `airport_transfer`. */
+    service: z.string().min(1).max(64),
+    /** How many units. For a transfer, that is passengers. */
+    quantity: z.number().int().min(1).max(60).default(1),
+    /** Where we collect from. Required for a ride or a courier. */
+    pickup_label: z.string().max(240).optional(),
+    pickup_lat: z.number().min(-90).max(90).optional(),
+    pickup_lng: z.number().min(-180).max(180).optional(),
+    /** Where we are going. Required for a ride or a courier. */
+    dropoff_label: z.string().max(240).optional(),
+    dropoff_lat: z.number().min(-90).max(90).optional(),
+    dropoff_lng: z.number().min(-180).max(180).optional(),
+    /** When. Optional: a booking can be "as soon as possible". */
+    scheduled_for: z.string().datetime({ offset: true }).optional(),
+    /** The people travelling. Names and numbers, for the rider. */
+    passengers: z
+      .array(
+        z
+          .object({
+            name: z.string().max(120).optional(),
+            phone: z.string().max(32).optional(),
+            /** A flight number, when the trip starts at an airport. */
+            flight: z.string().max(32).optional(),
+          })
+          .strict(),
+      )
+      .max(60)
+      .optional(),
+    /** How they want to pay. */
+    payment_method: z
+      .enum(['on_account', 'mpesa_stk', 'card'])
+      .default('on_account'),
+    /** Anything the driver should know. */
+    note: z.string().max(1000).optional(),
+  })
+  .strict();
+
+export type ServiceBooking = z.infer<typeof ServiceBooking>;
+
+/**
+ * What a booking comes back as.
+ *
+ * `total_cents` is what the booking cost, frozen at the moment it was
+ * placed. It is not a quote and it will not change: the money on an
+ * order is stored, not recomputed, because a figure that moves is a
+ * figure two people can be shown different values of.
+ */
+export const BookingReceipt = z
+  .object({
+    ok: z.literal(true),
+    order_id: Uuid,
+    reference: z.string(),
+    service: z.string(),
+    quantity: z.number().int().positive(),
+    total_cents: Money,
+    currency: z.literal('KES'),
+    payment_method: z.string(),
+    scheduled_for: z.string().nullable().optional(),
+  })
+  .strict();
+
+export type BookingReceipt = z.infer<typeof BookingReceipt>;
+
+/**
+ * The header a write carries.
+ *
+ * `Idempotency-Key` is required on every write. Without it, a retry
+ * after a timeout makes a second order, and a second airport transfer
+ * is a second pickup that nobody asked for.
+ */
+export const IdempotencyHeader = z
+  .object({
+    'idempotency-key': IdempotencyKey,
+  })
+  .strict();
+
+export type IdempotencyHeader = z.infer<typeof IdempotencyHeader>;
+
+/**
+ * The services a merchant can book.
+ */
+export const ApiService = z
+  .object({
+    code: z.string(),
+    label: z.string(),
+    kind: z.enum(['ride', 'booking', 'courier', 'experience']),
+    unit_label: z.string(),
+    active: z.boolean(),
+  })
+  .strict();
+
+export type ApiService = z.infer<typeof ApiService>;

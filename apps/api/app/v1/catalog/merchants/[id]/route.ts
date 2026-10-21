@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
 import { jsonError } from '@/lib/http';
+import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { PublicMerchant, CatalogueItem, Uuid } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
@@ -20,6 +21,18 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // Resolve the credential first: a bad key is refused before any work is done.
+  let credential;
+  try {
+    credential = await authenticate(request);
+    requireScope(credential, API_SCOPES.public_read);
+    await enforceRateLimit(credential);
+  } catch (e) {
+    if (e instanceof ApiAuthError) {
+      return jsonError(e.code, e.message, { status: e.status });
+    }
+    return jsonError('internal_error', 'Something went wrong on our side.', { status: 500 });
+  }
   const { id } = await params;
 
   // Validate UUID
