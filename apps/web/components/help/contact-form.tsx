@@ -196,7 +196,7 @@ export function ContactForm() {
           type="submit"
           block
           size="lg"
-          className="h-13 mt-5 rounded-xl"
+          className="mt-5 h-[3.6rem] rounded-xl"
           loading={pending}
           loadingText="Sending…"
           trailingIcon={<ArrowRight className="text-gold h-4 w-4" />}
