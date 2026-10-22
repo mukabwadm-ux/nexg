@@ -9,15 +9,21 @@ import { type SignInResult, signIn } from '@/app/sign-in/actions';
 export function SignInForm({
   next,
   denied,
+  idle,
   domain,
 }: {
   next: string;
   denied: boolean;
+  idle: boolean;
   domain: string | null;
 }) {
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(
-    denied ? 'That account is not on the staff list. Ask your manager to add you.' : null,
+    denied
+      ? 'That account is not on the staff list. Ask your manager to add you.'
+      : idle
+        ? 'You were signed out after 5 minutes of inactivity.'
+        : null,
   );
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
