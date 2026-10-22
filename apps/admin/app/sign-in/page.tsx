@@ -14,7 +14,7 @@ const ASSURANCES = [
 export default function SignInPage({
   searchParams,
 }: {
-  searchParams?: { next?: string; denied?: string };
+  searchParams?: { next?: string; denied?: string; idle?: string };
 }) {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -60,6 +60,7 @@ export default function SignInPage({
         <SignInForm
           next={searchParams?.next ?? '/'}
           denied={searchParams?.denied === '1'}
+          idle={searchParams?.idle === '1'}
           domain={process.env.STAFF_EMAIL_DOMAIN ?? null}
         />
       </div>

@@ -69,6 +69,20 @@ export async function signOut() {
 }
 
 /**
+ * The idle timeout's entry in the sign-in log. Same record as pressing
+ * Out — the log answers "when did this session end", and "the console
+ * closed it after inactivity" and "the person left" should not look
+ * like different severities, only different facts.
+ *
+ * Called from the idle-signout route, not a form, so it is a plain
+ * export with no client surface of its own.
+ */
+export async function recordIdleSignOut(email: string) {
+  const supabase = createClient();
+  await record(supabase, email, 'signed_out');
+}
+
+/**
  * Write the attempt down.
  *
  * Every one, including the refusals — those are the interesting

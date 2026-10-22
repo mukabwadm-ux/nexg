@@ -18,6 +18,7 @@ import {
 import Link from 'next/link';
 
 import { signOut } from '@/app/sign-in/actions';
+import { IdleTimer } from '@/components/idle-timer';
 import { Logo } from '@/components/logo';
 import { StaffBell } from '@/components/staff-bell';
 import type { StaffContext } from '@/lib/staff';
@@ -91,6 +92,8 @@ export function ConsoleShell({
 
   return (
     <div className="lg:grid lg:min-h-dvh lg:grid-cols-[15rem_minmax(0,1fr)]">
+      {/* The idle rule's client half; the middleware is the other half. */}
+      <IdleTimer />
       <aside aria-label="Console sidebar" className="bg-ink flex flex-col text-white lg:min-h-dvh">
         <div className="flex items-center gap-2 px-5 py-5">
           <Logo className="h-12 w-auto shrink-0" onDark priority />

@@ -1,14 +1,22 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { STAFF_SEEN_COOKIE, STAFF_IDLE_TIMEOUT_MS, isStaffIdle } from '@/lib/idle';
+
 /**
  * Keeps the Supabase session fresh and keeps signed-out visitors out of the
- * console.
+ * console, and closes a session that has gone quiet.
  *
  * This is chrome, not security: every table the console reads is behind RLS
  * that checks staff_user and role_grant, so a forged cookie gets an empty
  * console rather than someone else's data. The redirect exists so a signed-out
  * staff member lands on sign-in instead of a page of blanks.
+ *
+ * The idle rule is the one piece here that is security rather than chrome:
+ * it is enforced on the server, on every request, and cannot be bypassed by
+ * keeping a tab open or blocking scripts. Each authenticated request touches
+ * a last-seen cookie; a request that arrives more than STAFF_IDLE_TIMEOUT_MS
+ * after the previous one ends the session, whatever the browser says.
  */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -84,6 +92,52 @@ export async function middleware(request: NextRequest) {
     url.pathname = '/';
     url.search = '';
     return NextResponse.redirect(url);
+  }
+
+  if (user) {
+    /*
+     * The idle gate. Last-seen travels with the request; a request that
+     * arrives more than the timeout after the previous one closes the
+     * session. The clock is the server's cookie trail, not the browser:
+     * a tab left open, a laptop asleep, a script blocked — none of them
+     * can keep the cookie young.
+     *
+     * Supabase's own token lifetime is a project-wide setting shared
+     * with the public site, so the console cannot shorten it there. This
+     * is the console's own rule, and it is deliberately stricter.
+     */
+    if (isStaffIdle(Number(request.cookies.get(STAFF_SEEN_COOKIE)?.value ?? 0), Date.now())) {
+      /*
+       * End the session rather than merely redirecting. Clearing the
+       * auth cookies here means the next request cannot present them
+       * again, so an idle timeout is a real sign-out, not a nag that a
+       * still-valid cookie walks straight past.
+       */
+      const signInUrl = request.nextUrl.clone();
+      signInUrl.pathname = '/sign-in';
+      signInUrl.search = '';
+      signInUrl.searchParams.set('idle', '1');
+
+      const expired = NextResponse.redirect(signInUrl);
+      for (const cookie of request.cookies.getAll()) {
+        if (cookie.name.startsWith('sb-')) {
+          expired.cookies.set(cookie.name, '', { path: '/', maxAge: 0 });
+        }
+      }
+      expired.cookies.set(STAFF_SEEN_COOKIE, '', { path: '/', maxAge: 0 });
+      return expired;
+    }
+
+    response.cookies.set(STAFF_SEEN_COOKIE, String(Date.now()), {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      /*
+       * The cookie outlives the timeout slightly so the gate reads
+       * "idle for over five minutes", never "never seen you".
+       */
+      maxAge: Math.ceil(STAFF_IDLE_TIMEOUT_MS / 1000) * 2,
+    });
   }
 
   return response;
