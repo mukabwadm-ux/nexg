@@ -372,3 +372,36 @@ export const ApiService = z
   .strict();
 
 export type ApiService = z.infer<typeof ApiService>;
+
+/**
+ * A booking, read back.
+ *
+ * The receipt you get from `POST /v1/orders` is the answer to the
+ * question "did you book it?". This is the answer to "where is it
+ * now?", which is the question a merchant asks ten minutes later.
+ *
+ * The shape is deliberately flat and deliberately thin. A merchant's
+ * own order is not public data, so none of the fields here are the
+ * kind the catalogue publishes; and a caller that has a key bound to
+ * the merchant does not need a separate "read your orders" concept
+ * to be told the stage of an order it placed.
+ */
+export const ApiOrder = z
+  .object({
+    order_id: Uuid,
+    reference: z.string(),
+    service: z.string(),
+    quantity: z.number().int().positive(),
+    stage: z.string(),
+    payment_method: z.string(),
+    payment_status: z.string(),
+    currency: z.literal('KES'),
+    total_cents: Money,
+    scheduled_for: z.string().nullable(),
+    pickup_label: z.string().nullable(),
+    dropoff_label: z.string().nullable(),
+    created_at: z.string(),
+  })
+  .strict();
+
+export type ApiOrder = z.infer<typeof ApiOrder>;
