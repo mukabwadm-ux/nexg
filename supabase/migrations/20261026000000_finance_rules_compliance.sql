@@ -144,8 +144,7 @@ values
    'Approved rate card: KES 80 base + KES 25 per commenced km.', now()),
   ('fees.delivery.per_km', 'global', '25'::jsonb, 'active', now(),
    'Approved rate card: KES 80 base + KES 25 per commenced km.', now())
-on conflict (key, scope_kind, scope_id, scope_category, status, effective_from)
-do nothing;
+on conflict do nothing;
 
 -- ════════════════════════════════════════════════════════════════════════
 -- 3. RIDER ALLOCATION: VAT-EXCLUSIVE BASIS + SURCHARGES
