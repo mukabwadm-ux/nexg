@@ -39,7 +39,7 @@ values
 on conflict (id) do nothing;
 
 comment on column settings.version.status is
-  'active = in use; pending_approval = proposed but not approved; superseded = replaced; cancelled = rejected';
+  'active = in use; awaiting_approval = proposed but not approved; superseded = replaced; rejected = declined; draft = being prepared';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- 2. DELIVERY PRICING: PER-KILOMETER FORMULA
