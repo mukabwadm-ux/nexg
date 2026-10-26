@@ -1,6 +1,6 @@
 # Finance Compliance Rollback Guide
 
-**Migration:** `20261026000001_finance_rules_rollback.sql`  
+**Manual rollback script:** `supabase/rollback/finance_rules_rollback.sql`
 **Reverts:** `20261026000000_finance_rules_compliance.sql`  
 **Date:** 2026-10-26
 
@@ -144,7 +144,7 @@ SELECT * FROM public.fn_verify_rollback();
 psql $PRODUCTION_DB_URL
 
 # 2. Execute rollback immediately
-\i supabase/migrations/20261026000001_finance_rules_rollback.sql
+\i supabase/rollback/finance_rules_rollback.sql
 
 # 3. Verify rollback
 SELECT * FROM public.fn_verify_rollback();
@@ -190,7 +190,7 @@ psql $PRODUCTION_DB_URL -c "
 
 # 4. Execute rollback
 psql $PRODUCTION_DB_URL \
-  -f supabase/migrations/20261026000001_finance_rules_rollback.sql
+  -f supabase/rollback/finance_rules_rollback.sql
 
 # 5. Verify
 psql $PRODUCTION_DB_URL -c "SELECT * FROM public.fn_verify_rollback();"
@@ -311,7 +311,7 @@ psql $PRODUCTION_DB_URL \
 
 # 3. Run test suite
 psql $PRODUCTION_DB_URL \
-  -f supabase/tests/40_finance_compliance_calculations.sql
+  -f supabase/manual-tests/40_finance_compliance_calculations.sql
 
 # 4. Monitor closely
 ./scripts/monitor-orders.sh --duration 60m

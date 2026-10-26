@@ -1,6 +1,7 @@
--- ROLLBACK migration for finance rules compliance
+-- Manual rollback script for finance rules compliance.
 --
--- Reverts migration 20261026000000_finance_rules_compliance.sql
+-- This file lives outside supabase/migrations because it must never be
+-- applied automatically during a fresh database setup.
 --
 -- SAFETY:
 --   * Does not delete data, only deactivates new rules
@@ -43,7 +44,7 @@ begin;
 --    and value = '800'::jsonb
 --    and status = 'superseded';
 
-raise notice 'Step 1: Small-order surcharge kept disabled (restore manually if needed)';
+-- raise notice 'Step 1: Small-order surcharge kept disabled (restore manually if needed)';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- STEP 2: DEACTIVATE PER-KILOMETER DELIVERY PRICING
@@ -55,15 +56,15 @@ update settings.version
  where key in ('fees.delivery.base', 'fees.delivery.per_km')
    and status = 'active';
 
-raise notice 'Step 2: Per-kilometer delivery pricing deactivated';
-raise notice '        → System will fall back to band-based pricing';
+-- raise notice 'Step 2: Per-kilometer delivery pricing deactivated';
+-- raise notice '        → System will fall back to band-based pricing';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- STEP 3: RESTORE OLD ORDER SPLIT AS PRIMARY
 -- ════════════════════════════════════════════════════════════════════════
 
 -- Rename new function to archive version
-alter function if exists public.fn_order_split_corrected(uuid)
+alter function public.fn_order_split_corrected(uuid)
   rename to fn_order_split_vat_exclusive;
 
 comment on function public.fn_order_split_vat_exclusive(uuid) is
@@ -72,9 +73,9 @@ comment on function public.fn_order_split_vat_exclusive(uuid) is
 -- Original fn_order_split remains as-is and becomes primary again
 -- No changes needed - UI should call fn_order_split by default
 
-raise notice 'Step 3: Rider allocation reverted to original function';
-raise notice '        → fn_order_split_corrected renamed to fn_order_split_vat_exclusive';
-raise notice '        → Original fn_order_split is now primary';
+-- raise notice 'Step 3: Rider allocation reverted to original function';
+-- raise notice '        → fn_order_split_corrected renamed to fn_order_split_vat_exclusive';
+-- raise notice '        → Original fn_order_split is now primary';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- STEP 4: RE-ENABLE CASH ON DELIVERY (if was enabled before)
@@ -90,15 +91,15 @@ raise notice '        → Original fn_order_split is now primary';
 --        updated_at = now()
 --  where key = 'cash_on_delivery';
 
-raise notice 'Step 4: Cash on delivery kept disabled (enable manually if needed)';
-raise notice '        → Check feature_flag table to re-enable';
+-- raise notice 'Step 4: Cash on delivery kept disabled (enable manually if needed)';
+-- raise notice '        → Check feature_flag table to re-enable';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- STEP 5: RESTORE OLD TAX INVOICE FUNCTION AS PRIMARY
 -- ════════════════════════════════════════════════════════════════════════
 
 -- Rename new function to archive version
-alter function if exists public.fn_tax_issue_order_compliant(uuid)
+alter function public.fn_tax_issue_order_compliant(uuid)
   rename to fn_tax_issue_order_supplier_specific;
 
 comment on function public.fn_tax_issue_order_supplier_specific(uuid) is
@@ -107,9 +108,9 @@ comment on function public.fn_tax_issue_order_supplier_specific(uuid) is
 -- Original fn_tax_issue_order remains and becomes primary again
 -- It creates 2 invoices: merchant commission + guest fees grouped
 
-raise notice 'Step 5: Tax invoicing reverted to original function';
-raise notice '        → fn_tax_issue_order_compliant renamed to fn_tax_issue_order_supplier_specific';
-raise notice '        → Original fn_tax_issue_order is now primary';
+-- raise notice 'Step 5: Tax invoicing reverted to original function';
+-- raise notice '        → fn_tax_issue_order_compliant renamed to fn_tax_issue_order_supplier_specific';
+-- raise notice '        → Original fn_tax_issue_order is now primary';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- STEP 6: ARCHIVE NEW TABLES (keep data for audit)
@@ -130,9 +131,9 @@ alter table if exists public.property_manager_statement
 comment on table public.property_manager_archive_20261026 is
   'Archived property manager data from finance compliance migration. Can be restored if needed.';
 
-raise notice 'Step 6: Property manager tables archived';
-raise notice '        → Renamed to *_archive_20261026';
-raise notice '        → Data preserved for audit and potential restoration';
+-- raise notice 'Step 6: Property manager tables archived';
+-- raise notice '        → Renamed to *_archive_20261026';
+-- raise notice '        → Data preserved for audit and potential restoration';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- STEP 7: KEEP FEATURE FLAGS BUT MARK AS INACTIVE
@@ -146,8 +147,8 @@ update public.feature_flag
        updated_at = now()
  where key = 'cash_on_delivery';
 
-raise notice 'Step 7: Feature flags retained';
-raise notice '        → Marked with rollback timestamp';
+-- raise notice 'Step 7: Feature flags retained';
+-- raise notice '        → Marked with rollback timestamp';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- STEP 8: KEEP NEW COLUMNS (with defaults for safety)
@@ -161,9 +162,9 @@ raise notice '        → Marked with rollback timestamp';
 -- These stay but are optional, so old code still works
 -- Future orders can use them when ready
 
-raise notice 'Step 8: New order columns retained';
-raise notice '        → collected_by, weather_fee_cents, delivery_supplier';
-raise notice '        → All have defaults, old code unaffected';
+-- raise notice 'Step 8: New order columns retained';
+-- raise notice '        → collected_by, weather_fee_cents, delivery_supplier';
+-- raise notice '        → All have defaults, old code unaffected';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- STEP 9: RESTORE CHECKOUT TO USE OLD DELIVERY PRICING
@@ -241,7 +242,7 @@ begin
         select 1 from settings.version
         where key = 'fees.small_basket_fee'
           and value = '30'::jsonb
-          and status = 'pending_approval'
+          and status = 'awaiting_approval'
       ) then 'DISABLED'
       else 'UNKNOWN'
     end,
@@ -337,44 +338,44 @@ comment on function public.fn_verify_rollback() is
 
 grant execute on function public.fn_verify_rollback() to authenticated;
 
-raise notice 'Step 10: Rollback verification function created';
-raise notice '         → Run: SELECT * FROM public.fn_verify_rollback();';
+-- raise notice 'Step 10: Rollback verification function created';
+-- raise notice '         → Run: SELECT * FROM public.fn_verify_rollback();';
 
 -- ════════════════════════════════════════════════════════════════════════
 -- ROLLBACK COMPLETE
 -- ════════════════════════════════════════════════════════════════════════
 
-raise notice '';
-raise notice '════════════════════════════════════════════════════════════';
-raise notice 'ROLLBACK COMPLETE';
-raise notice '════════════════════════════════════════════════════════════';
-raise notice '';
-raise notice 'What was reverted:';
-raise notice '  ✓ Per-kilometer delivery pricing → band-based';
-raise notice '  ✓ VAT-exclusive rider allocation → gross-based';
-raise notice '  ✓ Supplier-specific tax invoices → grouped invoices';
-raise notice '  ✓ Property manager tables → archived';
-raise notice '';
-raise notice 'What was preserved:';
-raise notice '  • All order data (no orders deleted)';
-raise notice '  • Tax invoices already issued';
-raise notice '  • New database columns (harmless)';
-raise notice '  • Property manager data (archived for audit)';
-raise notice '  • Feature flag system';
-raise notice '';
-raise notice 'Verification:';
-raise notice '  Run: SELECT * FROM public.fn_verify_rollback();';
-raise notice '';
-raise notice 'To re-apply compliance rules:';
-raise notice '  Run migration 20261026000000_finance_rules_compliance.sql again';
-raise notice '  (safe to re-run, will detect existing state)';
-raise notice '';
-raise notice 'Manual actions if needed:';
-raise notice '  • Re-enable COD: UPDATE feature_flag SET enabled=true WHERE key=''cash_on_delivery'';';
-raise notice '  • Restore KES 250 surcharge: See commented SQL in Step 1';
-raise notice '  • Restore property managers: RENAME archived tables back';
-raise notice '';
-raise notice '════════════════════════════════════════════════════════════';
+-- raise notice '';
+-- raise notice '════════════════════════════════════════════════════════════';
+-- raise notice 'ROLLBACK COMPLETE';
+-- raise notice '════════════════════════════════════════════════════════════';
+-- raise notice '';
+-- raise notice 'What was reverted:';
+-- raise notice '  ✓ Per-kilometer delivery pricing → band-based';
+-- raise notice '  ✓ VAT-exclusive rider allocation → gross-based';
+-- raise notice '  ✓ Supplier-specific tax invoices → grouped invoices';
+-- raise notice '  ✓ Property manager tables → archived';
+-- raise notice '';
+-- raise notice 'What was preserved:';
+-- raise notice '  • All order data (no orders deleted)';
+-- raise notice '  • Tax invoices already issued';
+-- raise notice '  • New database columns (harmless)';
+-- raise notice '  • Property manager data (archived for audit)';
+-- raise notice '  • Feature flag system';
+-- raise notice '';
+-- raise notice 'Verification:';
+-- raise notice '  Run: SELECT * FROM public.fn_verify_rollback();';
+-- raise notice '';
+-- raise notice 'To re-apply compliance rules:';
+-- raise notice '  Run migration 20261026000000_finance_rules_compliance.sql again';
+-- raise notice '  (safe to re-run, will detect existing state)';
+-- raise notice '';
+-- raise notice 'Manual actions if needed:';
+-- raise notice '  • Re-enable COD: UPDATE feature_flag SET enabled=true WHERE key=''cash_on_delivery'';';
+-- raise notice '  • Restore KES 250 surcharge: See commented SQL in Step 1';
+-- raise notice '  • Restore property managers: RENAME archived tables back';
+-- raise notice '';
+-- raise notice '════════════════════════════════════════════════════════════';
 
 commit;
 

@@ -76,10 +76,10 @@ Applying migration 20261026000000_finance_rules_compliance.sql...
 export LOCAL_DB="postgresql://postgres:postgres@localhost:54322/postgres"
 
 # Run base test suite
-psql $LOCAL_DB -f supabase/tests/40_finance_compliance_calculations.sql
+psql $LOCAL_DB -f supabase/manual-tests/40_finance_compliance_calculations.sql
 
 # Run extended test suite
-psql $LOCAL_DB -f supabase/tests/41_finance_extended_scenarios.sql
+psql $LOCAL_DB -f supabase/manual-tests/41_finance_extended_scenarios.sql
 ```
 
 **Expected output:**
@@ -125,8 +125,8 @@ SELECT public.fn_price_order(
 
 ### Step 6: Test Rollback (Optional but Recommended)
 ```bash
-# Apply rollback migration
-psql $LOCAL_DB -f supabase/migrations/20261026000001_finance_rules_rollback.sql
+# Run the manual rollback script
+psql $LOCAL_DB -f supabase/rollback/finance_rules_rollback.sql
 
 # Verify rollback worked
 psql $LOCAL_DB -c "SELECT * FROM public.fn_verify_rollback();"
@@ -199,8 +199,8 @@ psql "postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgre
 export STAGING_DB="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
 
 # Run test suites
-psql $STAGING_DB -f supabase/tests/40_finance_compliance_calculations.sql
-psql $STAGING_DB -f supabase/tests/41_finance_extended_scenarios.sql
+psql $STAGING_DB -f supabase/manual-tests/40_finance_compliance_calculations.sql
+psql $STAGING_DB -f supabase/manual-tests/41_finance_extended_scenarios.sql
 ```
 
 ### Step 6: Access Staging Dashboard
@@ -475,7 +475,7 @@ cd /c/Users/Mukabwa/Documents/nexg/nexg
 supabase start
 supabase db push
 psql postgresql://postgres:postgres@localhost:54322/postgres \
-  -f supabase/tests/40_finance_compliance_calculations.sql
+  -f supabase/manual-tests/40_finance_compliance_calculations.sql
 ```
 
 ---

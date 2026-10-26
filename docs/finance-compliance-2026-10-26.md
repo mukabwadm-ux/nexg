@@ -15,7 +15,7 @@ This migration implements the approved finance rules shared on 2026-10-26, bring
 **Approved:** KES 30 below KES 500 (pending approval)  
 **Action:**
 - Deactivated KES 250/800 rule
-- Added KES 30/500 as `pending_approval` status
+- Added KES 30/500 as `awaiting_approval` status
 - Will not charge customers until explicitly activated
 
 **Impact:** No small-order surcharge will be applied until finance approves and activates

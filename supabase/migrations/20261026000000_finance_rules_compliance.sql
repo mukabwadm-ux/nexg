@@ -32,10 +32,10 @@ update settings.version
 insert into settings.version
   (key, scope_kind, value, status, effective_from, reason)
 values
-  ('fees.small_basket_threshold', 'global', '500'::jsonb, 'pending_approval',
-   null, 'Proposed: KES 30 surcharge below KES 500. Awaiting approval.'),
-  ('fees.small_basket_fee', 'global', '30'::jsonb, 'pending_approval',
-   null, 'Proposed: KES 30 surcharge below KES 500. Awaiting approval.')
+  ('fees.small_basket_threshold', 'global', '500'::jsonb, 'awaiting_approval',
+   now(), 'Proposed: KES 30 surcharge below KES 500. Awaiting approval.'),
+  ('fees.small_basket_fee', 'global', '30'::jsonb, 'awaiting_approval',
+   now(), 'Proposed: KES 30 surcharge below KES 500. Awaiting approval.')
 on conflict (id) do nothing;
 
 comment on column settings.version.status is
@@ -144,8 +144,7 @@ values
    'Approved rate card: KES 80 base + KES 25 per commenced km.', now()),
   ('fees.delivery.per_km', 'global', '25'::jsonb, 'active', now(),
    'Approved rate card: KES 80 base + KES 25 per commenced km.', now())
-on conflict (key, scope_kind, scope_id, scope_category, status, effective_from)
-do nothing;
+on conflict do nothing;
 
 -- ════════════════════════════════════════════════════════════════════════
 -- 3. RIDER ALLOCATION: VAT-EXCLUSIVE BASIS + SURCHARGES

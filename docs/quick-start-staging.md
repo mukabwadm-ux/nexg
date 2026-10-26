@@ -98,7 +98,7 @@ Applying migration 20261026000000_finance_rules_compliance.sql...
 export LOCAL_DB="postgresql://postgres:postgres@localhost:54322/postgres"
 
 # Run base test suite (29 assertions)
-psql $LOCAL_DB -f supabase/tests/40_finance_compliance_calculations.sql
+psql $LOCAL_DB -f supabase/manual-tests/40_finance_compliance_calculations.sql
 ```
 
 **Expected Output:**
@@ -118,7 +118,7 @@ If tests pass, run extended tests:
 
 ```bash
 # Run extended test suite (47 assertions, 3 businesses)
-psql $LOCAL_DB -f supabase/tests/41_finance_extended_scenarios.sql
+psql $LOCAL_DB -f supabase/manual-tests/41_finance_extended_scenarios.sql
 ```
 
 ---
@@ -170,8 +170,8 @@ SELECT public.fn_delivery_price_per_km(
 Test that you can safely rollback if needed:
 
 ```bash
-# Apply rollback migration
-psql $LOCAL_DB -f supabase/migrations/20261026000001_finance_rules_rollback.sql
+# Run the manual rollback script
+psql $LOCAL_DB -f supabase/rollback/finance_rules_rollback.sql
 
 # Verify rollback worked
 psql $LOCAL_DB -c "SELECT * FROM public.fn_verify_rollback();"
@@ -340,7 +340,7 @@ supabase db push
 
 # 5. Run tests
 psql postgresql://postgres:postgres@localhost:54322/postgres \
-  -f supabase/tests/40_finance_compliance_calculations.sql
+  -f supabase/manual-tests/40_finance_compliance_calculations.sql
 ```
 
 **Then open:** http://localhost:54323 to see your staging database! 🎯
