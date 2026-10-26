@@ -170,8 +170,8 @@ SELECT public.fn_delivery_price_per_km(
 Test that you can safely rollback if needed:
 
 ```bash
-# Apply rollback migration
-psql $LOCAL_DB -f supabase/migrations/20261026000001_finance_rules_rollback.sql
+# Run the manual rollback script
+psql $LOCAL_DB -f supabase/rollback/finance_rules_rollback.sql
 
 # Verify rollback worked
 psql $LOCAL_DB -c "SELECT * FROM public.fn_verify_rollback();"

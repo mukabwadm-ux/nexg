@@ -125,8 +125,8 @@ SELECT public.fn_price_order(
 
 ### Step 6: Test Rollback (Optional but Recommended)
 ```bash
-# Apply rollback migration
-psql $LOCAL_DB -f supabase/migrations/20261026000001_finance_rules_rollback.sql
+# Run the manual rollback script
+psql $LOCAL_DB -f supabase/rollback/finance_rules_rollback.sql
 
 # Verify rollback worked
 psql $LOCAL_DB -c "SELECT * FROM public.fn_verify_rollback();"
