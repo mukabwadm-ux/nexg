@@ -1,13 +1,16 @@
 -- Finance compliance test suite
 --
 -- Tests the approved finance rules implementation against known scenarios.
--- Run after migration 20261026000000_finance_rules_compliance.sql
+-- Run manually after the finance migrations:
+-- psql "$LOCAL_DB" -f supabase/manual-tests/40_finance_compliance_calculations.sql
 --
 -- Test methodology:
 --   * Each test creates an order with known inputs
 --   * Calls the new calculation functions
 --   * Asserts outputs match hand-calculated expected values
 --   * Tests edge cases and boundary conditions
+
+create schema if not exists test;
 
 begin;
 
@@ -643,4 +646,4 @@ $$;
 rollback;
 
 -- To run these tests:
--- psql -h localhost -U postgres -d nexg -f supabase/tests/40_finance_compliance_calculations.sql
+-- psql "$LOCAL_DB" -f supabase/manual-tests/40_finance_compliance_calculations.sql

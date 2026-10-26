@@ -98,7 +98,7 @@ Applying migration 20261026000000_finance_rules_compliance.sql...
 export LOCAL_DB="postgresql://postgres:postgres@localhost:54322/postgres"
 
 # Run base test suite (29 assertions)
-psql $LOCAL_DB -f supabase/tests/40_finance_compliance_calculations.sql
+psql $LOCAL_DB -f supabase/manual-tests/40_finance_compliance_calculations.sql
 ```
 
 **Expected Output:**
@@ -118,7 +118,7 @@ If tests pass, run extended tests:
 
 ```bash
 # Run extended test suite (47 assertions, 3 businesses)
-psql $LOCAL_DB -f supabase/tests/41_finance_extended_scenarios.sql
+psql $LOCAL_DB -f supabase/manual-tests/41_finance_extended_scenarios.sql
 ```
 
 ---
@@ -340,7 +340,7 @@ supabase db push
 
 # 5. Run tests
 psql postgresql://postgres:postgres@localhost:54322/postgres \
-  -f supabase/tests/40_finance_compliance_calculations.sql
+  -f supabase/manual-tests/40_finance_compliance_calculations.sql
 ```
 
 **Then open:** http://localhost:54323 to see your staging database! 🎯

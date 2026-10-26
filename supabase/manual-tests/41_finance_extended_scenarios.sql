@@ -7,6 +7,8 @@
 --
 -- Tests different commission structures, order sizes, and edge cases
 
+create schema if not exists test;
+
 begin;
 
 -- Test helper from base suite
@@ -818,4 +820,4 @@ $$;
 rollback;
 
 -- To run these extended tests:
--- psql -h localhost -U postgres -d nexg_test -f supabase/tests/41_finance_extended_scenarios.sql
+-- psql "$LOCAL_DB" -f supabase/manual-tests/41_finance_extended_scenarios.sql

@@ -311,7 +311,7 @@ psql $PRODUCTION_DB_URL \
 
 # 3. Run test suite
 psql $PRODUCTION_DB_URL \
-  -f supabase/tests/40_finance_compliance_calculations.sql
+  -f supabase/manual-tests/40_finance_compliance_calculations.sql
 
 # 4. Monitor closely
 ./scripts/monitor-orders.sh --duration 60m

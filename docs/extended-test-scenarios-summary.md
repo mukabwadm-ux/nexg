@@ -411,7 +411,7 @@ Status: ✅ READY FOR STAGING DEPLOYMENT
 ### Local Testing
 ```bash
 psql -h localhost -U postgres -d nexg_test \
-  -f supabase/tests/41_finance_extended_scenarios.sql
+  -f supabase/manual-tests/41_finance_extended_scenarios.sql
 ```
 
 ### Staging Verification
@@ -420,7 +420,7 @@ psql -h localhost -U postgres -d nexg_test \
 supabase db push --db-url $STAGING_DB
 
 # Run extended tests
-psql $STAGING_DB -f supabase/tests/41_finance_extended_scenarios.sql
+psql $STAGING_DB -f supabase/manual-tests/41_finance_extended_scenarios.sql
 ```
 
 ### Expected Output

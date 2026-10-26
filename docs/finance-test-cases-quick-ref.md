@@ -200,7 +200,7 @@ Rider surcharges = VAT-exclusive × 100%
 ### Option 1: Full Test Suite
 ```bash
 psql -h localhost -U postgres -d nexg_test \
-  -f supabase/tests/40_finance_compliance_calculations.sql
+  -f supabase/manual-tests/40_finance_compliance_calculations.sql
 ```
 
 ### Option 2: Individual Test
@@ -220,7 +220,7 @@ ROLLBACK;
 supabase db push --db-url $STAGING_DB
 
 # Run tests
-psql $STAGING_DB -f supabase/tests/40_finance_compliance_calculations.sql
+psql $STAGING_DB -f supabase/manual-tests/40_finance_compliance_calculations.sql
 
 # Verify with real orders
 psql $STAGING_DB -c "
