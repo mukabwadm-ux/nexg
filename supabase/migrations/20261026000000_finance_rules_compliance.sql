@@ -32,10 +32,10 @@ update settings.version
 insert into settings.version
   (key, scope_kind, value, status, effective_from, reason)
 values
-  ('fees.small_basket_threshold', 'global', '500'::jsonb, 'pending_approval',
-   null, 'Proposed: KES 30 surcharge below KES 500. Awaiting approval.'),
-  ('fees.small_basket_fee', 'global', '30'::jsonb, 'pending_approval',
-   null, 'Proposed: KES 30 surcharge below KES 500. Awaiting approval.')
+  ('fees.small_basket_threshold', 'global', '500'::jsonb, 'awaiting_approval',
+   now(), 'Proposed: KES 30 surcharge below KES 500. Awaiting approval.'),
+  ('fees.small_basket_fee', 'global', '30'::jsonb, 'awaiting_approval',
+   now(), 'Proposed: KES 30 surcharge below KES 500. Awaiting approval.')
 on conflict (id) do nothing;
 
 comment on column settings.version.status is

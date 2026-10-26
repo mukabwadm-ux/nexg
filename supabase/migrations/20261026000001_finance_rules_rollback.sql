@@ -241,7 +241,7 @@ begin
         select 1 from settings.version
         where key = 'fees.small_basket_fee'
           and value = '30'::jsonb
-          and status = 'pending_approval'
+          and status = 'awaiting_approval'
       ) then 'DISABLED'
       else 'UNKNOWN'
     end,

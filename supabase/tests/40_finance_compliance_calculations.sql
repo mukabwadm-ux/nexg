@@ -56,16 +56,16 @@ begin
   select value::text::numeric into v_pending_threshold
     from settings.version
    where key = 'fees.small_basket_threshold'
-     and status = 'pending_approval';
+     and status = 'awaiting_approval';
 
   select value::text::numeric into v_pending_fee
     from settings.version
    where key = 'fees.small_basket_fee'
-     and status = 'pending_approval';
+     and status = 'awaiting_approval';
 
   perform test.assert(
     v_pending_threshold = 500 and v_pending_fee = 30,
-    'New KES 30 below KES 500 surcharge should exist as pending_approval'
+    'New KES 30 below KES 500 surcharge should exist as awaiting_approval'
   );
 
   raise notice '  ✓ Small-order surcharge correctly disabled';
