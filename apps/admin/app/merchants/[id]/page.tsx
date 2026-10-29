@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import {
-  deleteMerchantDraft,
+  deleteMerchant,
   goLive,
   rejectDocument,
   setMerchantDeactivated,
@@ -34,6 +34,7 @@ export default async function MerchantApplicationPage({ params }: { params: { id
     .from('merchant')
     .select('*, city(name)')
     .eq('id', params.id)
+    .is('deleted_at', null)
     .maybeSingle();
 
   /* What their placement actually is, if they have one. The boolean
@@ -171,13 +172,7 @@ export default async function MerchantApplicationPage({ params }: { params: { id
   const outstanding = review.filter((d) => d.required && d.status !== 'verified');
   const city = merchant.city as { name: string } | null;
   const primary = branches?.[0];
-  const canManageLifecycle =
-    staff.isSuperAdmin || staff.roles.includes('merchant_ops');
-  const canDeleteDraft =
-    merchant.status === 'applied' &&
-    merchant.submitted_at === null &&
-    merchant.went_live_at === null;
-
+  const canManageLifecycle = staff.isSuperAdmin || staff.roles.includes('merchant_ops');
   return (
     <ConsoleShell staff={staff} current="/merchants">
       <ConsoleHeader
@@ -311,7 +306,7 @@ export default async function MerchantApplicationPage({ params }: { params: { id
             )}
 
             <FeaturedNow
-              merchantName={merchant.trading_name ?? merchant.legal_name ?? 'this merchant'}
+              merchantName={merchant.trading_name ?? merchant.legal_name ?? ''}
               placement={
                 featuredPlacement?.placement_kind && featuredPlacement.until
                   ? {
@@ -336,14 +331,13 @@ export default async function MerchantApplicationPage({ params }: { params: { id
                 merchantName={merchant.trading_name ?? merchant.legal_name ?? 'this merchant'}
                 status={merchant.status}
                 isDeactivated={!!merchant.deactivated_at}
-                canDeleteDraft={canDeleteDraft}
                 onSetDeactivated={async (deactivated, reason) => {
                   'use server';
                   return setMerchantDeactivated(params.id, deactivated, reason);
                 }}
-                onDeleteDraft={async (confirmationName, reason) => {
+                onDelete={async (confirmationName, reason) => {
                   'use server';
-                  return deleteMerchantDraft(params.id, confirmationName, reason);
+                  return deleteMerchant(params.id, confirmationName, reason);
                 }}
               />
             )}
@@ -354,8 +348,7 @@ export default async function MerchantApplicationPage({ params }: { params: { id
                   Activation paused
                 </h2>
                 <p className="text-muted mt-2 text-sm font-semibold leading-[1.7]">
-                  Reactivate this merchant from Merchant access before changing its listing
-                  status.
+                  Reactivate this merchant from Merchant access before changing its listing status.
                 </p>
               </Card>
             ) : (

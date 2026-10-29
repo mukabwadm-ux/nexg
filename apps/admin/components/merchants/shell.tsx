@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 /**
- * The twelve tabs, in the order the overview sheet lists them.
+ * The merchant sections, in the order the overview sheet lists them.
  *
  * Every tab keeps its filters in the URL, so a link pasted into Slack
  * opens the same screen the sender was looking at. That is why the tab
@@ -9,6 +9,8 @@ import Link from 'next/link';
  */
 export const MERCHANT_TABS = [
   { key: 'directory', label: 'Directory', built: true },
+  { key: 'deactivated', label: 'Deactivated', built: true },
+  { key: 'deleted', label: 'Deleted', built: true },
   { key: 'pipeline', label: 'Pipeline', built: true },
   { key: 'health', label: 'Health', built: true },
   { key: 'disputes', label: 'Disputes', built: true },

@@ -151,17 +151,17 @@ export async function setMerchantDeactivated(
   };
 }
 
-export async function deleteMerchantDraft(
+export async function deleteMerchant(
   merchantId: string,
   confirmationName: string,
   reason: string,
 ): Promise<ReviewResult> {
   if (!confirmationName.trim() || !reason.trim()) {
-    return { ok: false, message: 'Enter the merchant name and a reason to confirm deletion.' };
+    return { ok: false, message: 'Enter the merchant name and a reason to move it to Deleted.' };
   }
 
   const supabase = createClient();
-  const { error } = await supabase.rpc('rpc_merchant_delete_draft', {
+  const { error } = await supabase.rpc('rpc_merchant_soft_delete', {
     p_merchant_id: merchantId,
     p_confirmation_name: confirmationName,
     p_reason: reason.trim(),
@@ -170,7 +170,36 @@ export async function deleteMerchantDraft(
 
   revalidatePath('/merchants');
   revalidatePath(`/merchants/${merchantId}`);
-  return { ok: true, message: 'Unsubmitted draft permanently deleted.' };
+  return {
+    ok: true,
+    message: 'Merchant moved to Deleted for 90 days. Its financial and audit records are retained.',
+  };
+}
+
+export async function restoreDeletedMerchant(
+  merchantId: string,
+  reason: string,
+): Promise<ReviewResult> {
+  if (!reason.trim()) {
+    return {
+      ok: false,
+      message: 'Enter a reason so the restoration is recorded in the audit trail.',
+    };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_merchant_restore_deleted', {
+    p_merchant_id: merchantId,
+    p_reason: reason.trim(),
+  });
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath('/merchants');
+  revalidatePath(`/merchants/${merchantId}`);
+  return {
+    ok: true,
+    message: 'Merchant restored. Order intake and public visibility remain off until staff review.',
+  };
 }
 
 /**

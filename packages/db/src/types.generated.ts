@@ -14509,6 +14509,12 @@ export type Database = {
           deactivated_by: string | null;
           deactivation_reason: string | null;
           deactivation_state: Json | null;
+          deleted_at: string | null;
+          deleted_until: string | null;
+          deleted_by: string | null;
+          deletion_reason: string | null;
+          deletion_state: Json | null;
+          deleted_anonymized_at: string | null;
           explore_visible: boolean;
           featured: boolean;
           fleet_delivery_pay_to_merchant: boolean;
@@ -14599,6 +14605,12 @@ export type Database = {
           deactivated_by?: string | null;
           deactivation_reason?: string | null;
           deactivation_state?: Json | null;
+          deleted_at?: string | null;
+          deleted_until?: string | null;
+          deleted_by?: string | null;
+          deletion_reason?: string | null;
+          deletion_state?: Json | null;
+          deleted_anonymized_at?: string | null;
           explore_visible?: boolean;
           featured?: boolean;
           fleet_delivery_pay_to_merchant?: boolean;
@@ -14688,6 +14700,12 @@ export type Database = {
           deactivated_by?: string | null;
           deactivation_reason?: string | null;
           deactivation_state?: Json | null;
+          deleted_at?: string | null;
+          deleted_until?: string | null;
+          deleted_by?: string | null;
+          deletion_reason?: string | null;
+          deletion_state?: Json | null;
+          deleted_anonymized_at?: string | null;
           explore_visible?: boolean;
           featured?: boolean;
           fleet_delivery_pay_to_merchant?: boolean;
@@ -32792,6 +32810,8 @@ export type Database = {
           city_slug: string | null;
           concierge_pick: boolean | null;
           created_at: string | null;
+          deactivated_at: string | null;
+          deleted_at: string | null;
           explore_visible: boolean | null;
           featured: boolean | null;
           gmv_30d_kes: number | null;
@@ -32895,6 +32915,29 @@ export type Database = {
             referencedColumns: ['merchant_id'];
           },
         ];
+      };
+      console_merchant_deactivated_v: {
+        Row: {
+          deactivated_at: string | null;
+          deactivation_reason: string | null;
+          city_name: string | null;
+          id: string | null;
+          status: Database['public']['Enums']['partner_status'] | null;
+          trading_name: string | null;
+        };
+        Relationships: [];
+      };
+      console_merchant_deleted_v: {
+        Row: {
+          city_name: string | null;
+          deleted_at: string | null;
+          deleted_until: string | null;
+          deletion_reason: string | null;
+          id: string | null;
+          status: Database['public']['Enums']['partner_status'] | null;
+          trading_name: string | null;
+        };
+        Relationships: [];
       };
       console_order_detail_v: {
         Row: {
@@ -48886,6 +48929,18 @@ export type Database = {
       rpc_merchant_set_deactivated: {
         Args: { p_deactivated: boolean; p_merchant_id: string; p_reason: string };
         Returns: Json;
+      };
+      rpc_merchant_soft_delete: {
+        Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
+        Returns: Json;
+      };
+      rpc_merchant_restore_deleted: {
+        Args: { p_merchant_id: string; p_reason: string };
+        Returns: Json;
+      };
+      cron_merchant_deleted_retention: {
+        Args: Record<PropertyKey, never>;
+        Returns: number;
       };
       rpc_merchant_set_featured: {
         Args: { p_featured: boolean; p_merchant_id: string; p_reason?: string };

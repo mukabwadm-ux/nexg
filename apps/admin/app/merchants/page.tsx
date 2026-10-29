@@ -1,8 +1,14 @@
 import type { Metadata } from 'next';
 
+import { restoreDeletedMerchant } from '@/app/merchants/actions';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { Directory, type Application } from '@/components/merchants/directory';
+import {
+  DeactivatedMerchantsTab,
+  type DeactivatedMerchantRow,
+} from '@/components/merchants/deactivated';
+import { DeletedMerchantsTab, type DeletedMerchantRow } from '@/components/merchants/deleted';
 import { MERCHANT_TABS, MerchantTabs } from '@/components/merchants/shell';
 import { num, type Counts, type DirectoryRow } from '@/components/merchants/shared';
 import {
@@ -29,7 +35,7 @@ export const dynamic = 'force-dynamic';
 /**
  * Grow → Partners → Merchants.
  *
- * Twelve tabs over one domain. Each loads only its own data — the page
+ * Merchant operations share one domain. Each loads only its own data — the page
  * is dynamic and a staff member looking at Disputes has no reason to
  * pay for the document expiry query.
  *
@@ -50,16 +56,45 @@ export default async function MerchantsPage({
     : 'directory';
   const filter = searchParams?.filter ?? 'all';
 
-  const [{ data: countsRaw }, { data: directory }] = await Promise.all([
+  const needsHistoryNames = ['disputes', 'catalogue', 'finance', 'documents'].includes(tab);
+  const [
+    { data: countsRaw },
+    { data: directory },
+    { data: deactivated },
+    { data: deleted },
+    { data: historyNames },
+  ] = await Promise.all([
     supabase.rpc('rpc_merchant_console_counts', {}),
     supabase.from('console_merchant_directory_v').select('*').order('created_at', {
       ascending: false,
     }),
+    tab === 'deactivated'
+      ? supabase
+          .from('console_merchant_deactivated_v')
+          .select('*')
+          .order('deactivated_at', { ascending: false })
+      : Promise.resolve({ data: null }),
+    tab === 'deleted'
+      ? supabase
+          .from('console_merchant_deleted_v')
+          .select('*')
+          .order('deleted_at', { ascending: false })
+      : Promise.resolve({ data: null }),
+    needsHistoryNames
+      ? supabase.from('merchant').select('id, trading_name')
+      : Promise.resolve({ data: null }),
   ]);
 
   const counts = (countsRaw as Counts | null) ?? ({} as Counts);
   const rows = (directory as DirectoryRow[] | null) ?? [];
-  const byId = new Map(rows.map((r) => [r.id, r]));
+  const deactivatedRows = (deactivated as DeactivatedMerchantRow[] | null) ?? [];
+  const deletedRows = (deleted as DeletedMerchantRow[] | null) ?? [];
+  const byId = new Map(
+    ((historyNames as Pick<DirectoryRow, 'id' | 'trading_name'>[] | null) ?? rows).map((row) => [
+      row.id,
+      row,
+    ]),
+  );
 
   return (
     <ConsoleShell staff={staff} current="/merchants">
@@ -80,6 +115,16 @@ export default async function MerchantsPage({
             counts={counts}
             filter={filter}
             selected={searchParams?.selected ?? null}
+          />
+        )}
+
+        {tab === 'deactivated' && <DeactivatedMerchantsTab rows={deactivatedRows} />}
+
+        {tab === 'deleted' && (
+          <DeletedMerchantsTab
+            rows={deletedRows}
+            canRestore={staff.isSuperAdmin || staff.roles.includes('merchant_ops')}
+            onRestore={restoreDeletedMerchant}
           />
         )}
 
@@ -199,7 +244,9 @@ async function loadHealth(supabase: Db, rows: DirectoryRow[]) {
   };
 }
 
-async function loadDisputes(supabase: Db, byId: Map<string, DirectoryRow>) {
+type MerchantNameRow = Pick<DirectoryRow, 'id' | 'trading_name'>;
+
+async function loadDisputes(supabase: Db, byId: Map<string, MerchantNameRow>) {
   const { data } = await supabase
     .from('dispute')
     .select(
@@ -305,7 +352,7 @@ async function loadHours(supabase: Db, rows: DirectoryRow[]) {
   };
 }
 
-async function loadCatalogue(supabase: Db, byId: Map<string, DirectoryRow>) {
+async function loadCatalogue(supabase: Db, byId: Map<string, MerchantNameRow>) {
   const [{ data: flags }, { data: edits }, { data: photos }, { data: imports }, { count }] =
     await Promise.all([
       supabase
@@ -356,7 +403,7 @@ async function loadCatalogue(supabase: Db, byId: Map<string, DirectoryRow>) {
   };
 }
 
-async function loadFinance(supabase: Db, byId: Map<string, DirectoryRow>, rows: DirectoryRow[]) {
+async function loadFinance(supabase: Db, byId: Map<string, MerchantNameRow>, rows: DirectoryRow[]) {
   const [{ data: statements }, { data: tiers }] = await Promise.all([
     supabase
       .from('merchant_statement')
@@ -381,7 +428,7 @@ async function loadFinance(supabase: Db, byId: Map<string, DirectoryRow>, rows: 
   };
 }
 
-async function loadDocuments(supabase: Db, byId: Map<string, DirectoryRow>) {
+async function loadDocuments(supabase: Db, byId: Map<string, MerchantNameRow>) {
   const [{ data: docs }, { data: terms }, { data: automation }] = await Promise.all([
     supabase
       .from('document')
