@@ -124,6 +124,55 @@ export async function setPaused(
   return { ok: true, message: paused ? 'Listing paused.' : 'Listing live again.' };
 }
 
+export async function setMerchantDeactivated(
+  merchantId: string,
+  deactivated: boolean,
+  reason: string,
+): Promise<ReviewResult> {
+  if (!reason.trim()) {
+    return { ok: false, message: 'Enter a reason so the change is recorded in the audit trail.' };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_merchant_set_deactivated', {
+    p_merchant_id: merchantId,
+    p_deactivated: deactivated,
+    p_reason: reason.trim(),
+  });
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath('/merchants');
+  revalidatePath(`/merchants/${merchantId}`);
+  return {
+    ok: true,
+    message: deactivated
+      ? 'Merchant deactivated. Its history and account remain intact.'
+      : 'Merchant reactivated. Review order intake before enabling it.',
+  };
+}
+
+export async function deleteMerchantDraft(
+  merchantId: string,
+  confirmationName: string,
+  reason: string,
+): Promise<ReviewResult> {
+  if (!confirmationName.trim() || !reason.trim()) {
+    return { ok: false, message: 'Enter the merchant name and a reason to confirm deletion.' };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_merchant_delete_draft', {
+    p_merchant_id: merchantId,
+    p_confirmation_name: confirmationName,
+    p_reason: reason.trim(),
+  });
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath('/merchants');
+  revalidatePath(`/merchants/${merchantId}`);
+  return { ok: true, message: 'Unsubmitted draft permanently deleted.' };
+}
+
 /**
  * Suspension is proposed, not done. A different staff member has to approve
  * it — the database enforces that, this just starts the request.

@@ -89,10 +89,28 @@ values ('butchery', 'Butchery', 'Beef', 'products', 'minutes', 10, '[…]', '{�
 - `card_kind` decides whether the merchant is asked for a menu, services or
   products; `eta_style` whether their card says "delivers in 25 min" or
   "back next day".
-- `subcategories[].defaultWorkflow` and `subcategories[].fields` drive the
-  specialty-specific onboarding preview. Keep them descriptive; document
-  requirements and conditional rules belong in the database as described
-  below.
+- `prepTimeRequired` controls whether the onboarding asks for a per-order
+  preparation estimate. It is intentionally enabled for Restaurants & Food;
+  categories that sell stocked goods, services or bookings do not receive a
+  kitchen-style preparation slider. Delivery estimates remain platform
+  calculated.
+- `getCatalogueExample` supplies category-specific name, description, price
+  and photo prompts for the first catalogue entries and the merchant catalogue.
+  Adult specialties can override the category prompt individually. Examples
+  are prompts only, never suggested or enforced prices. Keep examples relevant
+  to the real thing sold, not a restaurant default.
+- Product and service photos use the private `catalogue-images` bucket.
+  Uploads are scoped by the merchant id in the storage path; only a member of
+  that merchant can upload. The storefront receives short-lived signed URLs
+  only for live, guest-visible merchants. Accept JPEG, PNG or WebP up to 5 MB.
+- `subcategories[].fields` drive the specialty-specific onboarding questions.
+  An optional `subcategories[].workflow` describes merchant setup, the guest
+  journey and order handling separately. Keep its status as `designed` until
+  those steps are implemented; `policyNote` identifies requirements needing
+  verification or additional platform work. The older `defaultWorkflow` string
+  remains the fallback preview for specialties without staged workflows.
+  Document requirements and conditional rules belong in the database as
+  described below.
 - The 13 categories with taxonomy-driven setup questions render every selected
   specialty field as a required answer. `fn_merchant_readiness` checks those
   same fields server-side against `category_config.subcategories`; keep the
@@ -120,6 +138,21 @@ is there, and the admin console reads the same labels back.
 The questions live in the database rather than in a TypeScript constant for
 one reason: the answers decide which documents we demand, and
 `fn_merchant_required_docs` cannot consult a web bundle.
+
+## Deactivation and draft deletion
+
+Merchant Ops and super admins can deactivate a merchant from its admin record.
+Deactivation is reversible, retains the merchant and its history, and records
+the reason in the audit trail. A merchant that was live returns to its
+previous status when reactivated, but order intake remains off until staff
+review and enable it.
+
+Permanent deletion is limited to unsubmitted `applied` drafts. The database
+refuses deletion if it finds an order, payment or other financial/placement
+history, an approval, compliance documents or requests, or uploaded merchant
+images. Deactivate those records instead. The action rechecks these rules and
+the caller’s merchant/city authorization in the database; the admin UI is not
+the security boundary.
 
 ## How to add a document rule
 

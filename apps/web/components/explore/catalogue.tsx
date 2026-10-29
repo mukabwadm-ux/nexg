@@ -10,6 +10,8 @@ export interface CatalogueItem {
   available: boolean;
   age_restricted: boolean;
   highlighted: boolean;
+  photo_url?: string | null;
+  photo_path?: string | null;
 }
 
 export interface CatalogueSection {
@@ -47,7 +49,10 @@ export function Catalogue({
   const popular = sections.flatMap((s) => s.items).filter((i) => i.highlighted && i.available);
   const groups: CatalogueSection[] =
     popular.length > 0
-      ? [{ id: 'popular', name: 'Most ordered', blurb: null, items: popular.slice(0, 6) }, ...sections]
+      ? [
+          { id: 'popular', name: 'Most ordered', blurb: null, items: popular.slice(0, 6) },
+          ...sections,
+        ]
       : sections;
 
   return (
@@ -63,7 +68,7 @@ export function Catalogue({
               key={section.id}
               href={`#section-${section.id}`}
               className={`hover:bg-surface shrink-0 rounded-full px-3.5 py-1.5 text-[0.8125rem] font-bold transition-colors ${
-                index === 0 ? 'bg-ink text-white hover:bg-ink' : 'text-muted hover:text-ink'
+                index === 0 ? 'bg-ink hover:bg-ink text-white' : 'text-muted hover:text-ink'
               }`}
             >
               {section.name}
@@ -117,12 +122,17 @@ export function Catalogue({
                 </div>
 
                 <div className="from-bg to-border/40 relative flex w-28 shrink-0 items-center justify-center bg-gradient-to-br sm:w-32">
+                  {item.photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.photo_url}
+                      alt={item.name}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : null}
                   {item.available ? (
-                    <div className="absolute bottom-2 right-2">
-                      <AddToCart
-                        merchant={{ id: merchantId, name: merchantName }}
-                        item={item}
-                      />
+                    <div className="absolute bottom-2 right-2 z-10">
+                      <AddToCart merchant={{ id: merchantId, name: merchantName }} item={item} />
                     </div>
                   ) : (
                     <span className="text-muted-light text-[0.625rem] font-bold uppercase">
@@ -137,8 +147,8 @@ export function Catalogue({
       ))}
 
       <p className="text-muted-light text-xs font-semibold leading-[1.7]">
-        Prices are set by {merchantName}. Delivery and service fees are shown at checkout before
-        you pay.
+        Prices are set by {merchantName}. Delivery and service fees are shown at checkout before you
+        pay.
       </p>
     </div>
   );

@@ -2,6 +2,7 @@ import { PageHead } from '@/components/merchant/frame';
 import { Menu, type ItemRow, type SectionRow } from '@/components/partner/merchant-menu';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
+import { getCatalogueExample } from '@nexg/contracts';
 
 export const metadata = { title: 'Menu' };
 export const dynamic = 'force-dynamic';
@@ -16,18 +17,33 @@ export default async function MerchantMenu() {
   const me = await requireMerchant();
   const supabase = createClient();
 
-  const [{ data, error }, { data: sectionData }] = await Promise.all([
+  const [{ data, error }, { data: sectionData }, { data: merchantData }] = await Promise.all([
     supabase
       .from('catalogue_item')
-      .select('id, name, description, price_kes, available, age_restricted, sort')
+      .select('id, name, description, price_kes, available, age_restricted, sort, photo_path')
       .eq('merchant_id', me.id)
       .order('sort'),
     supabase.from('catalogue_section').select('id, name').eq('merchant_id', me.id).order('sort'),
+    supabase.from('merchant').select('category, subcategory').eq('id', me.id).maybeSingle(),
   ]);
 
-  const items = (data as ItemRow[] | null) ?? [];
+  const itemRows = (data as ItemRow[] | null) ?? [];
+  const photoPaths = itemRows.flatMap((item) => (item.photo_path ? [item.photo_path] : []));
+  const { data: signedPhotos } = photoPaths.length
+    ? await supabase.storage.from('catalogue-images').createSignedUrls(photoPaths, 60 * 60)
+    : { data: [] };
+  const photoUrls = new Map(
+    (signedPhotos ?? []).flatMap((photo) =>
+      photo.signedUrl ? [[photo.path, photo.signedUrl]] : [],
+    ),
+  );
+  const items = itemRows.map((item) => ({
+    ...item,
+    photo_url: item.photo_path ? (photoUrls.get(item.photo_path) ?? null) : null,
+  }));
   const sections = (sectionData as SectionRow[] | null) ?? [];
   const on = items.filter((i) => i.available);
+  const catalogueExample = getCatalogueExample(merchantData?.category, merchantData?.subcategory);
 
   return (
     <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
@@ -40,7 +56,13 @@ export default async function MerchantMenu() {
           Your menu could not be read: {error.message}
         </p>
       )}
-      <Menu items={items} available={on.length} merchantId={me.id} sections={sections} />
+      <Menu
+        items={items}
+        available={on.length}
+        merchantId={me.id}
+        sections={sections}
+        catalogueExample={catalogueExample}
+      />
     </div>
   );
 }

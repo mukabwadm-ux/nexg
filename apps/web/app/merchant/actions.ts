@@ -228,20 +228,80 @@ export async function setItemPrice(itemId: string, priceKes: number): Promise<Ou
   return { ok: true, message: 'Price updated. New orders use it straight away.' };
 }
 
-export async function addMenuItem(input: {
+export async function addMenuItems(input: {
   merchantId: string;
   sectionId?: string | null;
   newSection?: string;
-  name: string;
-  description?: string;
-  priceKes: number;
-  ageRestricted?: boolean;
+  items: {
+    name: string;
+    description?: string;
+    priceKes: number;
+    ageRestricted?: boolean;
+    photoPath?: string | null;
+  }[];
 }): Promise<Outcome> {
+  if (!input || !Array.isArray(input.items) || input.items.length < 1 || input.items.length > 50) {
+    return { ok: false, message: 'Add between 1 and 50 products at a time.' };
+  }
+  if (typeof input.merchantId !== 'string' || !input.merchantId) {
+    return {
+      ok: false,
+      message: 'We could not identify your merchant account. Refresh and try again.',
+    };
+  }
+
   const supabase = createClient();
-  const name = input.name.trim();
-  const price = cleanPrice(input.priceKes);
-  if (!name) return { ok: false, message: 'Give the item a name.' };
-  if (price === null) return { ok: false, message: 'Enter a price between KES 1 and 1,000,000.' };
+  const items: {
+    name: string;
+    description: string | null;
+    price_kes: number;
+    age_restricted: boolean;
+    photo_path: string | null;
+  }[] = [];
+  for (const [index, item] of input.items.entries()) {
+    if (!item || typeof item.name !== 'string') {
+      return { ok: false, message: `Enter a name for product ${index + 1}.` };
+    }
+    const name = item.name.trim();
+    if (item.description !== undefined && typeof item.description !== 'string') {
+      return { ok: false, message: `Enter a valid description for product ${index + 1}.` };
+    }
+    const description = item.description?.trim() || null;
+    const price = cleanPrice(item.priceKes);
+    if (!name) return { ok: false, message: `Product ${index + 1} needs a name.` };
+    if (price === null) {
+      return {
+        ok: false,
+        message: `Enter a price between KES 1 and 1,000,000 for ${name || `product ${index + 1}`}.`,
+      };
+    }
+    if (description && description.length > 400) {
+      return {
+        ok: false,
+        message: `The description for ${name} must be 400 characters or fewer.`,
+      };
+    }
+    const photoPath = item.photoPath ?? null;
+    if (
+      photoPath !== null &&
+      (typeof photoPath !== 'string' ||
+        photoPath.split('/').length !== 2 ||
+        photoPath.split('/')[0] !== input.merchantId ||
+        !/^[0-9a-f-]{36}\.(jpg|png|webp)$/i.test(photoPath.split('/')[1] ?? ''))
+    ) {
+      return {
+        ok: false,
+        message: `The photo for ${name} is not a valid catalogue image. Upload it again.`,
+      };
+    }
+    items.push({
+      name,
+      description,
+      price_kes: price,
+      age_restricted: item.ageRestricted ?? false,
+      photo_path: photoPath,
+    });
+  }
 
   let sectionId = input.sectionId ?? null;
   if (!sectionId) {
@@ -251,21 +311,24 @@ export async function addMenuItem(input: {
       .insert({ merchant_id: input.merchantId, name: sectionName })
       .select('id')
       .single();
-    if (sectionError || !made) return { ok: false, message: sectionError?.message ?? 'Could not add the section.' };
+    if (sectionError || !made)
+      return { ok: false, message: sectionError?.message ?? 'Could not add the section.' };
     sectionId = (made as { id: string }).id;
   }
 
-  const { error } = await supabase.from('catalogue_item').insert({
-    merchant_id: input.merchantId,
-    section_id: sectionId,
-    name,
-    description: input.description?.trim() || null,
-    price_kes: price,
-    age_restricted: input.ageRestricted ?? false,
-  });
+  const { error } = await supabase.from('catalogue_item').insert(
+    items.map((item) => ({
+      ...item,
+      merchant_id: input.merchantId,
+      section_id: sectionId,
+    })),
+  );
   if (error) return { ok: false, message: error.message };
   revalidatePath('/merchant/menu');
-  return { ok: true, message: `${name} added to your menu.` };
+  return {
+    ok: true,
+    message: `${items.length} product${items.length === 1 ? '' : 's'} added to your catalogue.`,
+  };
 }
 
 export async function removeMenuItem(itemId: string): Promise<Outcome> {

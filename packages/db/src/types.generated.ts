@@ -14505,6 +14505,10 @@ export type Database = {
           created_at: string;
           credentials_sent_at: string | null;
           delisted_at: string | null;
+          deactivated_at: string | null;
+          deactivated_by: string | null;
+          deactivation_reason: string | null;
+          deactivation_state: Json | null;
           explore_visible: boolean;
           featured: boolean;
           fleet_delivery_pay_to_merchant: boolean;
@@ -14591,6 +14595,10 @@ export type Database = {
           created_at?: string;
           credentials_sent_at?: string | null;
           delisted_at?: string | null;
+          deactivated_at?: string | null;
+          deactivated_by?: string | null;
+          deactivation_reason?: string | null;
+          deactivation_state?: Json | null;
           explore_visible?: boolean;
           featured?: boolean;
           fleet_delivery_pay_to_merchant?: boolean;
@@ -14676,6 +14684,10 @@ export type Database = {
           created_at?: string;
           credentials_sent_at?: string | null;
           delisted_at?: string | null;
+          deactivated_at?: string | null;
+          deactivated_by?: string | null;
+          deactivation_reason?: string | null;
+          deactivation_state?: Json | null;
           explore_visible?: boolean;
           featured?: boolean;
           fleet_delivery_pay_to_merchant?: boolean;
@@ -48387,6 +48399,10 @@ export type Database = {
         Args: { p_merchant_id: string; p_preference?: string; p_riders: Json };
         Returns: Json;
       };
+      rpc_merchant_delete_draft: {
+        Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
+        Returns: Json;
+      };
       rpc_merchant_go_live: {
         Args: { p_merchant_id: string; p_reason?: string };
         Returns: {
@@ -48866,6 +48882,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_merchant_set_deactivated: {
+        Args: { p_deactivated: boolean; p_merchant_id: string; p_reason: string };
+        Returns: Json;
       };
       rpc_merchant_set_featured: {
         Args: { p_featured: boolean; p_merchant_id: string; p_reason?: string };

@@ -1,7 +1,7 @@
 import { OnboardingProvider } from '@/components/onboarding/store';
 import type { CategoryConfig, Draft, Readiness } from '@/components/onboarding/types';
 import { createClient } from '@/lib/supabase/server';
-import { getCategoryById, MERCHANT_TAXONOMY } from '@nexg/contracts';
+import { getCategoryById, getCatalogueExample, MERCHANT_TAXONOMY } from '@nexg/contracts';
 
 /**
  * Hydrates the draft once, on the server, for every step under /apply.
@@ -53,6 +53,8 @@ export default async function ApplyLayout({ children }: { children: React.ReactN
       description: taxonomyCategory.desc,
       card_kind: taxonomyCategory.cardKind,
       eta_style: taxonomyCategory.etaStyle,
+      prep_time_required: taxonomyCategory.prepTimeRequired ?? false,
+      catalogue_example: getCatalogueExample(taxonomyCategory.id),
       questions: requirements?.questions ?? [],
       subcategories: taxonomyCategory.subcategories,
       badge_rules:

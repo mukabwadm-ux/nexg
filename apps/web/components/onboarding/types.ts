@@ -27,6 +27,19 @@ export interface CategorySubcategory {
   fields?: string[];
   suggestedItemCount?: number;
   defaultWorkflow?: string;
+  workflow?: {
+    status: 'designed' | 'live';
+    groups: { title: string; steps: string[] }[];
+    policyNote?: string;
+  };
+  catalogueExample?: CatalogueExample;
+}
+
+export interface CatalogueExample {
+  name: string;
+  description: string;
+  pricePlaceholder: string;
+  photoHint: string;
 }
 
 export interface CategoryConfig {
@@ -38,6 +51,8 @@ export interface CategoryConfig {
   description?: string;
   card_kind: 'menu' | 'services' | 'products';
   eta_style: 'minutes' | 'turnaround';
+  prep_time_required: boolean;
+  catalogue_example?: CatalogueExample;
   questions: Question[];
   subcategories?: CategorySubcategory[];
   badge_rules: Record<string, Record<string, BadgeRule>>;
