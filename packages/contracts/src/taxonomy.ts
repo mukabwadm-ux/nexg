@@ -16,6 +16,26 @@ export const MerchantSubcategorySchema = z.object({
   fields: z.array(z.string()),
   suggestedItemCount: z.number().int().default(30),
   defaultWorkflow: z.string(),
+  catalogueExample: z
+    .object({
+      name: z.string(),
+      description: z.string(),
+      pricePlaceholder: z.string(),
+      photoHint: z.string(),
+    })
+    .optional(),
+  workflow: z
+    .object({
+      status: z.enum(['designed', 'live']),
+      groups: z.array(
+        z.object({
+          title: z.string(),
+          steps: z.array(z.string()),
+        }),
+      ),
+      policyNote: z.string().optional(),
+    })
+    .optional(),
 });
 export type MerchantSubcategory = z.infer<typeof MerchantSubcategorySchema>;
 
@@ -29,10 +49,201 @@ export const MerchantCategorySchema = z.object({
   image: z.string().optional(),
   cardKind: z.enum(['menu', 'services', 'products']),
   etaStyle: z.enum(['minutes', 'turnaround']),
+  prepTimeRequired: z.boolean().optional(),
   sort: z.number().int(),
   subcategories: z.array(MerchantSubcategorySchema),
 });
 export type MerchantCategory = z.infer<typeof MerchantCategorySchema>;
+
+export interface CatalogueExample {
+  name: string;
+  description: string;
+  pricePlaceholder: string;
+  photoHint: string;
+}
+
+const CATEGORY_CATALOGUE_EXAMPLES: Record<string, CatalogueExample> = {
+  adults_only: {
+    name: 'Discreet wellness product',
+    description: 'Add the product type, size, and useful details for the guest.',
+    pricePlaceholder: 'e.g. 2,500',
+    photoHint: 'Show the product and its packaging clearly.',
+  },
+  airport_transfers: {
+    name: 'Airport pickup · sedan',
+    description: 'Add the route, passenger capacity, and what the fare includes.',
+    pricePlaceholder: 'e.g. 3,500',
+    photoHint: 'Show the vehicle guests will ride in.',
+  },
+  alcohol_beverages: {
+    name: 'Red wine · 750 ml',
+    description: 'Add the beverage type, size, and brand or origin.',
+    pricePlaceholder: 'e.g. 1,800',
+    photoHint: 'Show the bottle and its label.',
+  },
+  fashion_apparel: {
+    name: 'Linen shirt · size M',
+    description: 'Add the material, size or fit, and available colours.',
+    pricePlaceholder: 'e.g. 2,200',
+    photoHint: 'Show the item clearly, including its fit or details.',
+  },
+  beauty: {
+    name: 'Shea face cream · 50 ml',
+    description: 'Add the product size, key ingredients, and intended use.',
+    pricePlaceholder: 'e.g. 1,400',
+    photoHint: 'Show the product and its label.',
+  },
+  vehicle_rentals: {
+    name: 'Compact sedan · per day',
+    description: 'Add the vehicle model, rental period, and included terms.',
+    pricePlaceholder: 'e.g. 6,500',
+    photoHint: 'Show the available vehicle.',
+  },
+  experiences: {
+    name: 'Sunset dhow cruise · 2 guests',
+    description: 'Add the duration, group size, and what is included.',
+    pricePlaceholder: 'e.g. 4,500',
+    photoHint: 'Show the activity or destination guests can expect.',
+  },
+  financial_services: {
+    name: 'Tax filing consultation',
+    description: 'Add the service scope, duration, and what the fee covers.',
+    pricePlaceholder: 'e.g. 2,000',
+    photoHint: 'Show your team, workspace, or service in action.',
+  },
+  flowers_gifts: {
+    name: 'Seasonal bouquet · 12 stems',
+    description: 'Add the flower types, size, and wrapping included.',
+    pricePlaceholder: 'e.g. 3,000',
+    photoHint: 'Show the finished arrangement.',
+  },
+  restaurants_food: {
+    name: 'Nyama choma · half kilo',
+    description: 'Goat, served with kachumbari and ugali.',
+    pricePlaceholder: 'e.g. 850',
+    photoHint: 'Show the prepared dish as it is served.',
+  },
+  groceries_essentials: {
+    name: 'Maize flour · 2 kg',
+    description: 'Add the brand, pack size, and any useful product details.',
+    pricePlaceholder: 'e.g. 180',
+    photoHint: 'Show the product packaging and size.',
+  },
+  laundry_cleaning: {
+    name: 'Wash and fold · 5 kg',
+    description: 'Add the service quantity, turnaround, and included care.',
+    pricePlaceholder: 'e.g. 700',
+    photoHint: 'Show your service or the finished result.',
+  },
+  marketplace: {
+    name: 'Handwoven market basket',
+    description: 'Add the material, dimensions, and how it is made.',
+    pricePlaceholder: 'e.g. 1,600',
+    photoHint: 'Show the item from a clear angle.',
+  },
+  pharmacy: {
+    name: 'Digital thermometer',
+    description: 'Add the product model, pack contents, and key details.',
+    pricePlaceholder: 'e.g. 950',
+    photoHint: 'Show the product and its packaging.',
+  },
+  health: {
+    name: 'Nutrition consultation',
+    description: 'Add the appointment length, focus, and delivery format.',
+    pricePlaceholder: 'e.g. 2,500',
+    photoHint: 'Show your practice or service setting.',
+  },
+  tech_electronics: {
+    name: 'Wireless headphones',
+    description: 'Add the model, compatibility, and what is in the box.',
+    pricePlaceholder: 'e.g. 4,900',
+    photoHint: 'Show the product and included accessories.',
+  },
+  travel_tours: {
+    name: 'Nairobi day tour · 1 guest',
+    description: 'Add the duration, itinerary highlights, and inclusions.',
+    pricePlaceholder: 'e.g. 5,500',
+    photoHint: 'Show the destination or tour experience.',
+  },
+  vehicle_services: {
+    name: 'Exterior car wash',
+    description: 'Add the vehicle type, service steps, and estimated duration.',
+    pricePlaceholder: 'e.g. 800',
+    photoHint: 'Show your service or a finished vehicle.',
+  },
+  wellness: {
+    name: 'Yoga session · 60 minutes',
+    description: 'Add the session style, duration, and what guests need.',
+    pricePlaceholder: 'e.g. 1,500',
+    photoHint: 'Show the class or wellness space.',
+  },
+  concierge_services: {
+    name: 'Same-day personal errand',
+    description: 'Add the service area, what is included, and any limits.',
+    pricePlaceholder: 'e.g. 1,200',
+    photoHint: 'Show your team or service in action.',
+  },
+  logistics_shipping: {
+    name: 'Nairobi parcel delivery · small',
+    description: 'Add the parcel size, service area, and delivery option.',
+    pricePlaceholder: 'e.g. 500',
+    photoHint: 'Show the parcel size or delivery service.',
+  },
+};
+
+const SUBCATEGORY_CATALOGUE_EXAMPLES: Record<string, CatalogueExample> = {
+  adult_products: {
+    name: 'Discreet personal wellness item',
+    description: 'Include the product type, material, and size.',
+    pricePlaceholder: 'e.g. 2,500',
+    photoHint: 'Show the product with neutral, discreet packaging.',
+  },
+  adult_wellness: {
+    name: 'Adult wellness kit',
+    description: 'Describe the contents and any product-use details.',
+    pricePlaceholder: 'e.g. 1,800',
+    photoHint: 'Show the kit contents and packaging.',
+  },
+  cigarettes: {
+    name: 'Cigarettes · 20-pack',
+    description: 'Include the exact pack size and required label details.',
+    pricePlaceholder: 'e.g. 350',
+    photoHint: 'Show the pack and its label clearly.',
+  },
+  cigars: {
+    name: 'Single cigar',
+    description: 'Include the cigar type and individual or pack quantity.',
+    pricePlaceholder: 'e.g. 900',
+    photoHint: 'Show the cigar and its packaging.',
+  },
+  vapes: {
+    name: 'Reusable vape device',
+    description: 'Include the device type and product-specific details.',
+    pricePlaceholder: 'e.g. 2,800',
+    photoHint: 'Show the device and packaging without promotional claims.',
+  },
+  adult_accessories: {
+    name: 'Adult accessory',
+    description: 'Name the actual item and include size or material details.',
+    pricePlaceholder: 'e.g. 1,200',
+    photoHint: 'Show the item clearly with discreet presentation.',
+  },
+};
+
+export function getCatalogueExample(
+  categoryId: string | null | undefined,
+  subcategoryId?: string | null,
+): CatalogueExample | undefined {
+  if (!categoryId) return undefined;
+  const category = getCategoryById(categoryId);
+  if (!category) return undefined;
+  const specialtyExample = subcategoryId
+    ? (SUBCATEGORY_CATALOGUE_EXAMPLES[subcategoryId] ??
+      category.subcategories.find((subcategory) => subcategory.id === subcategoryId)
+        ?.catalogueExample)
+    : undefined;
+  return specialtyExample ?? CATEGORY_CATALOGUE_EXAMPLES[category.id];
+}
 
 export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
   {
@@ -56,7 +267,42 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         fields: ['packaging_style', 'age_gate_method', 'signature_required', 'min_order'],
         suggestedItemCount: 30,
         defaultWorkflow:
-          'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
+          'Business review → product setup → discreet delivery preferences → guest eligibility check → payment → delivery or pickup → handover outcome',
+        workflow: {
+          status: 'designed',
+          groups: [
+            {
+              title: 'Merchant setup',
+              steps: [
+                'Complete business and document review',
+                'Enter product names, details, and prices',
+                'Set discreet packaging and handover preferences',
+                'Choose availability and delivery or pickup areas',
+              ],
+            },
+            {
+              title: 'Guest journey',
+              steps: [
+                'Browse adult products',
+                'Review product details and eligibility notice',
+                'Choose item and quantity',
+                'Enter delivery or pickup details',
+                'Complete eligibility checks at the point required by the verified policy',
+              ],
+            },
+            {
+              title: 'Order handling',
+              steps: [
+                'Merchant confirms item availability',
+                'Prepare the order using the selected packaging preference',
+                'Coordinate delivery or pickup',
+                'Record successful handover or route an exception to support',
+              ],
+            },
+          ],
+          policyNote:
+            'Eligibility, age-check, and handover rules need policy verification. Product options, stock tracking, and the eligibility flow are not yet implemented.',
+        },
       },
       {
         id: 'adult_wellness',
@@ -68,7 +314,42 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         fields: ['packaging_style', 'age_gate_method', 'booking_required', 'home_service'],
         suggestedItemCount: 30,
         defaultWorkflow:
-          'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
+          'Choose retail or appointment services → configure products or availability → guest selects product or service → confirmation → fulfilment or appointment',
+        workflow: {
+          status: 'designed',
+          groups: [
+            {
+              title: 'Merchant setup',
+              steps: [
+                'Choose whether you offer retail products, appointments, or both',
+                'Describe each product or wellness service',
+                'Set whether appointments or home service are available',
+                'Complete business and document review',
+              ],
+            },
+            {
+              title: 'Guest journey',
+              steps: [
+                'Choose a product or wellness service',
+                'For a service, request an available time and service location',
+                'Review service details and eligibility notice',
+                'Complete any eligibility steps required by the verified policy',
+                'Review the quote and payment method',
+              ],
+            },
+            {
+              title: 'Order handling',
+              steps: [
+                'Merchant confirms product availability or appointment request',
+                'Agree any service details before confirmation',
+                'Fulfil the order or appointment',
+                'Record completion or route a change request to support',
+              ],
+            },
+          ],
+          policyNote:
+            'Eligibility requirements and service-specific policies need verification. Appointment scheduling and home-service booking are not yet implemented.',
+        },
       },
       {
         id: 'cigarettes',
@@ -80,7 +361,41 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         fields: ['license_number', 'age_gate_method', 'brands_stocked_text', 'min_order'],
         suggestedItemCount: 30,
         defaultWorkflow:
-          'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
+          'Licence review → cigarette brand and pack setup → guest eligibility check → payment → delivery or pickup → recipient check',
+        workflow: {
+          status: 'designed',
+          groups: [
+            {
+              title: 'Merchant setup',
+              steps: [
+                'Provide business and licence details for verification',
+                'List the cigarette brands and pack details you stock',
+                'Set availability and minimum order details',
+                'Complete document review before listing',
+              ],
+            },
+            {
+              title: 'Guest journey',
+              steps: [
+                'Browse available cigarette products',
+                'Review pack details and eligibility notice',
+                'Choose an available item and quantity',
+                'Complete eligibility checks at the point required by the verified policy',
+              ],
+            },
+            {
+              title: 'Order handling',
+              steps: [
+                'Merchant confirms stock',
+                'Prepare the order for delivery or pickup',
+                'Complete the approved recipient check at handover',
+                'Record handover or route a failed check to support',
+              ],
+            },
+          ],
+          policyNote:
+            'Licence requirements, age-check rules, purchase limits, and handover procedures need verification. Restricted-item eligibility is not yet implemented.',
+        },
       },
       {
         id: 'cigars',
@@ -92,7 +407,41 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         fields: ['license_number', 'age_gate_method', 'brands_stocked_text', 'gift_packaging'],
         suggestedItemCount: 30,
         defaultWorkflow:
-          'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
+          'Licence review → cigar brand and format setup → gift-packaging choice → guest eligibility check → payment → handover',
+        workflow: {
+          status: 'designed',
+          groups: [
+            {
+              title: 'Merchant setup',
+              steps: [
+                'Provide business and licence details for verification',
+                'List cigar brands and the formats you offer',
+                'Set gift-packaging options and availability',
+                'Complete document review before listing',
+              ],
+            },
+            {
+              title: 'Guest journey',
+              steps: [
+                'Browse cigar brands and formats',
+                'Choose an item and any gift-packaging option',
+                'Review the eligibility notice and delivery or pickup details',
+                'Complete eligibility checks at the point required by the verified policy',
+              ],
+            },
+            {
+              title: 'Order handling',
+              steps: [
+                'Merchant confirms stock and gift details',
+                'Prepare the order using the selected packaging',
+                'Complete the approved recipient check at handover',
+                'Record handover or route an exception to support',
+              ],
+            },
+          ],
+          policyNote:
+            'Licence requirements, age-check rules, purchase limits, and handover procedures need verification. Restricted-item eligibility is not yet implemented.',
+        },
       },
       {
         id: 'vapes',
@@ -104,7 +453,41 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         fields: ['vape_device_types', 'age_gate_method', 'license_number', 'min_order'],
         suggestedItemCount: 30,
         defaultWorkflow:
-          'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
+          'Licence review → device-type setup → guest eligibility check → payment → delivery or pickup → recipient check',
+        workflow: {
+          status: 'designed',
+          groups: [
+            {
+              title: 'Merchant setup',
+              steps: [
+                'Provide business and licence details for verification',
+                'Describe the vape device types you offer',
+                'Set availability and minimum order details',
+                'Complete document review before listing',
+              ],
+            },
+            {
+              title: 'Guest journey',
+              steps: [
+                'Browse available device types and product details',
+                'Choose an available item and quantity',
+                'Review the eligibility notice and delivery or pickup details',
+                'Complete eligibility checks at the point required by the verified policy',
+              ],
+            },
+            {
+              title: 'Order handling',
+              steps: [
+                'Merchant confirms availability',
+                'Prepare the order for delivery or pickup',
+                'Complete the approved recipient check at handover',
+                'Record handover or route an exception to support',
+              ],
+            },
+          ],
+          policyNote:
+            'Licence requirements, age-check rules, product restrictions, and handover procedures need verification. Restricted-item eligibility is not yet implemented.',
+        },
       },
       {
         id: 'adult_accessories',
@@ -116,7 +499,42 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         fields: ['packaging_style', 'age_gate_method', 'signature_required'],
         suggestedItemCount: 30,
         defaultWorkflow:
-          'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
+          'Accessory details and packaging preferences → guest eligibility check → payment → delivery or pickup → configured handover',
+        workflow: {
+          status: 'designed',
+          groups: [
+            {
+              title: 'Merchant setup',
+              steps: [
+                'Describe accessories and relevant product details',
+                'Set discreet packaging and signature preferences',
+                'Choose availability and delivery or pickup areas',
+                'Complete business and document review',
+              ],
+            },
+            {
+              title: 'Guest journey',
+              steps: [
+                'Browse adult accessories',
+                'Review item details and eligibility notice',
+                'Choose an item and quantity',
+                'Enter delivery or pickup details',
+                'Complete eligibility checks at the point required by the verified policy',
+              ],
+            },
+            {
+              title: 'Order handling',
+              steps: [
+                'Merchant confirms item availability',
+                'Prepare the order using the selected packaging preference',
+                'Apply the configured signature preference where supported',
+                'Record handover or route an exception to support',
+              ],
+            },
+          ],
+          policyNote:
+            'Eligibility, age-check, and handover rules need policy verification. Product options, stock tracking, and the eligibility flow are not yet implemented.',
+        },
       },
     ],
   },
@@ -1024,6 +1442,7 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
     desc: 'Restaurants, fast food, cafés, cloud kitchens and catering',
     cardKind: 'menu',
     etaStyle: 'minutes',
+    prepTimeRequired: true,
     sort: 10,
     subcategories: [
       {

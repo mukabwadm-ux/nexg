@@ -1,13 +1,14 @@
 'use client';
 
 import { Button, Input, useToast } from '@nexg/ui';
-import { Building2, Plus, Shield, Smartphone, Store, X } from 'lucide-react';
+import { Building2, ImagePlus, Plus, Shield, Smartphone, Store, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
-import { getCategoryById } from '@nexg/contracts';
+import { getCatalogueExample, getCategoryById } from '@nexg/contracts';
 
+import { uploadCatalogueImage } from '@/lib/catalogue-images';
 import { Chip } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
@@ -18,6 +19,8 @@ interface Item {
   name: string;
   description: string;
   price_kes: number | null;
+  photo_path: string | null;
+  photo_url?: string | null;
   contains_alcohol: boolean;
 }
 
@@ -73,6 +76,7 @@ export function PayoutStep() {
       : config?.card_kind === 'menu'
         ? 'menu items'
         : 'products';
+  const example = getCatalogueExample(categoryId, draft?.subcategory) ?? config?.catalogue_example;
 
   const rail = draft?.payout_rail ?? 'mpesa_till';
   const account = draft?.payout_account ?? {};
@@ -81,6 +85,8 @@ export function PayoutStep() {
   const [email, setEmail] = React.useState(draft?.contact_email ?? '');
   const [submitting, setSubmitting] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = React.useState<number | null>(null);
+  const [photoError, setPhotoError] = React.useState<string | null>(null);
 
   const draftId = draft?.id ?? null;
 
@@ -91,14 +97,29 @@ export function PayoutStep() {
       const supabase = createClient();
       const { data } = await supabase
         .from('catalogue_item')
-        .select('id, name, description, price_kes')
+        .select('id, name, description, price_kes, photo_path')
         .eq('merchant_id', draftId)
         .order('sort');
       if (cancelled) return;
       const rows = (data as Item[] | null) ?? [];
+      const photoPaths = rows.flatMap((row) => (row.photo_path ? [row.photo_path] : []));
+      const { data: signedPhotos } = photoPaths.length
+        ? await supabase.storage.from('catalogue-images').createSignedUrls(photoPaths, 60 * 60)
+        : { data: [] };
+      if (cancelled) return;
+      const photoUrls = new Map(
+        (signedPhotos ?? []).flatMap((photo) =>
+          photo.signedUrl ? [[photo.path, photo.signedUrl]] : [],
+        ),
+      );
       setItems(
         rows.length > 0
-          ? rows.map((r) => ({ ...r, description: r.description ?? '', contains_alcohol: false }))
+          ? rows.map((r) => ({
+              ...r,
+              description: r.description ?? '',
+              photo_url: r.photo_path ? (photoUrls.get(r.photo_path) ?? null) : null,
+              contains_alcohol: false,
+            }))
           : [blankItem(), blankItem(), blankItem(), blankItem(), blankItem()],
       );
       setLoaded(true);
@@ -129,10 +150,10 @@ export function PayoutStep() {
   };
 
   /** Writes the named rows and drops the blank ones. */
-  const saveItems = async () => {
-    if (!draftId) return;
-    const named = items.filter((i) => i.name.trim());
-    if (named.length === 0) return;
+  const saveItems = async (rows: Item[] = items): Promise<boolean> => {
+    if (!draftId) return false;
+    const named = rows.filter((i) => i.name.trim());
+    if (named.length === 0) return true;
 
     const supabase = createClient();
 
@@ -144,7 +165,7 @@ export function PayoutStep() {
         : config?.card_kind === 'menu'
           ? 'Menu'
           : 'Products';
-    const { data: section } = await supabase
+    const { data: section, error: sectionError } = await supabase
       .from('catalogue_section')
       .upsert(
         { merchant_id: draftId, name: sectionName, sort: 0 },
@@ -154,28 +175,60 @@ export function PayoutStep() {
       .maybeSingle();
 
     const sectionId = (section as { id: string } | null)?.id;
-    if (!sectionId) return;
+    if (!sectionId || sectionError) {
+      toast({
+        title: 'We could not save your catalogue',
+        description: sectionError?.message ?? 'Try again in a moment.',
+        tone: 'danger',
+      });
+      return false;
+    }
 
-    await supabase.from('catalogue_item').delete().eq('merchant_id', draftId);
-    await supabase.from('catalogue_item').insert(
+    const { error: deleteError } = await supabase
+      .from('catalogue_item')
+      .delete()
+      .eq('merchant_id', draftId);
+    if (deleteError) {
+      toast({
+        title: 'We could not update your catalogue',
+        description: deleteError.message,
+        tone: 'danger',
+      });
+      return false;
+    }
+    const { error: insertError } = await supabase.from('catalogue_item').insert(
       named.map((item, index) => ({
         merchant_id: draftId,
         section_id: sectionId,
         name: item.name.trim(),
         description: item.description.trim() || null,
         price_kes: item.price_kes,
+        photo_path: item.photo_path,
         age_restricted: item.contains_alcohol,
         sort: index,
       })),
     );
+    if (insertError) {
+      toast({
+        title: 'We could not save your catalogue',
+        description: insertError.message,
+        tone: 'danger',
+      });
+      return false;
+    }
     await refresh();
+    return true;
   };
 
   const submit = async () => {
     if (!draftId) return;
     setSubmitting(true);
 
-    await saveItems();
+    const itemsSaved = await saveItems();
+    if (!itemsSaved) {
+      setSubmitting(false);
+      return;
+    }
     if (email && email !== draft?.contact_email) patch({ contact_email: email }, 6);
 
     const supabase = createClient();
@@ -188,6 +241,26 @@ export function PayoutStep() {
       return;
     }
     router.push('/merchants/status');
+  };
+
+  const addPhoto = async (index: number, file: File | undefined) => {
+    if (!draftId || !file) return;
+    setPhotoError(null);
+    setUploadingPhoto(index);
+    const uploaded = await uploadCatalogueImage(draftId, file);
+    setUploadingPhoto(null);
+    if (!uploaded.ok) {
+      setPhotoError(uploaded.message);
+      return;
+    }
+    const next = [...items];
+    next[index] = {
+      ...next[index]!,
+      photo_path: uploaded.path,
+      photo_url: uploaded.url,
+    };
+    setItems(next);
+    await saveItems(next);
   };
 
   if (!draftId)
@@ -344,7 +417,7 @@ export function PayoutStep() {
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-[0.9375rem] font-extrabold">Your first five {noun}</h2>
           <p className="text-muted-light text-xs font-semibold">
-            A price can wait — the name is what a guest searches for.
+            Examples are prompts only. Enter your actual details and price.
           </p>
         </div>
 
@@ -357,7 +430,7 @@ export function PayoutStep() {
               <Input
                 id={`item_name_${index}`}
                 label="Name"
-                placeholder="Nyama choma · half kilo"
+                placeholder={example?.name ?? 'Name guests will recognize'}
                 value={item.name}
                 onChange={(event) => {
                   const next = [...items];
@@ -374,7 +447,7 @@ export function PayoutStep() {
               <Input
                 id={`item_desc_${index}`}
                 label="Description"
-                placeholder="Goat · with kachumbari and ugali"
+                placeholder={example?.description ?? 'Useful details guests should know'}
                 value={item.description}
                 onChange={(event) => {
                   const next = [...items];
@@ -385,9 +458,9 @@ export function PayoutStep() {
               />
               <Input
                 id={`item_price_${index}`}
-                label="Price"
+                label="Price (KES)"
                 inputMode="numeric"
-                placeholder="KES [—]"
+                placeholder={example?.pricePlaceholder ?? 'e.g. 1,200'}
                 value={item.price_kes === null ? '' : String(item.price_kes)}
                 onChange={(event) => {
                   const digits = event.target.value.replace(/\D/g, '');
@@ -397,6 +470,46 @@ export function PayoutStep() {
                 }}
                 onBlur={() => void saveItems()}
               />
+              <div className="lg:col-span-3">
+                <label
+                  htmlFor={`item_photo_${index}`}
+                  className="border-border-strong text-ink hover:border-ink flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-xs font-bold"
+                >
+                  {uploadingPhoto === index ? (
+                    'Uploading photo…'
+                  ) : item.photo_path ? (
+                    'Replace product photo'
+                  ) : (
+                    <>
+                      <ImagePlus className="h-4 w-4" aria-hidden="true" />
+                      Add product photo
+                    </>
+                  )}
+                  <input
+                    id={`item_photo_${index}`}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    disabled={uploadingPhoto !== null || submitting}
+                    className="sr-only"
+                    onChange={(event) => {
+                      void addPhoto(index, event.target.files?.[0]);
+                      event.currentTarget.value = '';
+                    }}
+                  />
+                </label>
+                <p className="text-muted-light mt-1 text-[0.6875rem]">
+                  {example?.photoHint ?? 'Choose a clear product or service photo.'} JPEG, PNG, or
+                  WebP up to 5 MB.
+                </p>
+                {item.photo_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.photo_url}
+                    alt={item.name || `Catalogue item ${index + 1}`}
+                    className="mt-2 h-16 w-16 rounded-lg object-cover"
+                  />
+                )}
+              </div>
               <div className="flex items-center gap-2 pb-1">
                 {item.contains_alcohol && (
                   <Chip
@@ -422,6 +535,11 @@ export function PayoutStep() {
             </li>
           ))}
         </ul>
+        {photoError && (
+          <p role="alert" className="text-danger mt-2 text-xs font-semibold">
+            {photoError}
+          </p>
+        )}
 
         <div className="mt-3 flex flex-wrap gap-2">
           <Chip selected={false} onClick={() => setItems([...items, blankItem()])}>
@@ -468,5 +586,11 @@ export function PayoutStep() {
 }
 
 function blankItem(): Item {
-  return { name: '', description: '', price_kes: null, contains_alcohol: false };
+  return {
+    name: '',
+    description: '',
+    price_kes: null,
+    photo_path: null,
+    contains_alcohol: false,
+  };
 }

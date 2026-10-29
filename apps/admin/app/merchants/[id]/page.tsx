@@ -3,7 +3,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { goLive, rejectDocument, verifyDocument } from '@/app/merchants/actions';
+import {
+  deleteMerchantDraft,
+  goLive,
+  rejectDocument,
+  setMerchantDeactivated,
+  verifyDocument,
+} from '@/app/merchants/actions';
 import { fileDocumentFor, remindToUpload } from '@/app/documents/actions';
 import { sendFeaturedPitch, unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
@@ -11,6 +17,7 @@ import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { DocumentReview, type ReviewDocument } from '@/components/document-review';
 import { FeaturedNow } from '@/components/featured/place-merchant';
+import { MerchantLifecycleActions } from '@/components/merchant-lifecycle-actions';
 import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { requireStaff } from '@/lib/staff';
@@ -164,6 +171,12 @@ export default async function MerchantApplicationPage({ params }: { params: { id
   const outstanding = review.filter((d) => d.required && d.status !== 'verified');
   const city = merchant.city as { name: string } | null;
   const primary = branches?.[0];
+  const canManageLifecycle =
+    staff.isSuperAdmin || staff.roles.includes('merchant_ops');
+  const canDeleteDraft =
+    merchant.status === 'applied' &&
+    merchant.submitted_at === null &&
+    merchant.went_live_at === null;
 
   return (
     <ConsoleShell staff={staff} current="/merchants">
@@ -317,16 +330,46 @@ export default async function MerchantApplicationPage({ params }: { params: { id
               }}
             />
 
-            <ActivatePanel
-              kind="merchant"
-              disabled={merchant.status === 'live'}
-              outstanding={outstanding.length}
-              currentStatus={merchant.status}
-              onActivate={async (reason) => {
-                'use server';
-                return goLive(params.id, reason);
-              }}
-            />
+            {canManageLifecycle && (
+              <MerchantLifecycleActions
+                merchantId={params.id}
+                merchantName={merchant.trading_name ?? merchant.legal_name ?? 'this merchant'}
+                status={merchant.status}
+                isDeactivated={!!merchant.deactivated_at}
+                canDeleteDraft={canDeleteDraft}
+                onSetDeactivated={async (deactivated, reason) => {
+                  'use server';
+                  return setMerchantDeactivated(params.id, deactivated, reason);
+                }}
+                onDeleteDraft={async (confirmationName, reason) => {
+                  'use server';
+                  return deleteMerchantDraft(params.id, confirmationName, reason);
+                }}
+              />
+            )}
+
+            {merchant.deactivated_at ? (
+              <Card tone="muted" className="p-5">
+                <h2 className="text-sm font-extrabold uppercase tracking-wide">
+                  Activation paused
+                </h2>
+                <p className="text-muted mt-2 text-sm font-semibold leading-[1.7]">
+                  Reactivate this merchant from Merchant access before changing its listing
+                  status.
+                </p>
+              </Card>
+            ) : (
+              <ActivatePanel
+                kind="merchant"
+                disabled={merchant.status === 'live'}
+                outstanding={outstanding.length}
+                currentStatus={merchant.status}
+                onActivate={async (reason) => {
+                  'use server';
+                  return goLive(params.id, reason);
+                }}
+              />
+            )}
           </div>
         </div>
       </main>

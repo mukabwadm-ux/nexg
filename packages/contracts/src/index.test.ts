@@ -142,6 +142,50 @@ describe('merchant taxonomy', () => {
     expect(ALL_SUBCATEGORIES.length).toBe(128);
   });
 
+  it('gives each Adults Only specialty a distinct, staged workflow', async () => {
+    const { getCategoryById } = await import('./taxonomy');
+    const category = getCategoryById('adults_only');
+
+    expect(category?.subcategories).toHaveLength(6);
+    for (const subcategory of category?.subcategories ?? []) {
+      expect(subcategory.workflow?.status).toBe('designed');
+      expect(subcategory.workflow?.groups).toHaveLength(3);
+      expect(subcategory.defaultWorkflow).not.toContain('Browse → item → variant/quantity');
+      expect(subcategory.workflow?.policyNote).toMatch(/verification|not yet implemented/i);
+    }
+
+    const workflows = (category?.subcategories ?? []).map((subcategory) =>
+      subcategory.workflow?.groups.flatMap((group) => group.steps).join(' '),
+    );
+    expect(new Set(workflows).size).toBe(6);
+  });
+
+  it('only asks for preparation time where the business category needs it', async () => {
+    const { MERCHANT_TAXONOMY } = await import('./taxonomy');
+    const categoriesWithPrepTime = MERCHANT_TAXONOMY.filter(
+      (category) => category.prepTimeRequired,
+    ).map((category) => category.id);
+
+    expect(categoriesWithPrepTime).toEqual(['restaurants_food']);
+    for (const id of ['adults_only', 'beauty', 'fashion_apparel', 'vehicle_rentals']) {
+      expect(
+        MERCHANT_TAXONOMY.find((category) => category.id === id)?.prepTimeRequired,
+      ).toBeFalsy();
+    }
+  });
+
+  it('provides category and adult specialty-specific catalogue prompts', async () => {
+    const { getCatalogueExample, MERCHANT_TAXONOMY } = await import('./taxonomy');
+
+    expect(MERCHANT_TAXONOMY.every((category) => getCatalogueExample(category.id))).toBe(true);
+    expect(getCatalogueExample('fashion_apparel')?.name).toContain('Linen shirt');
+    expect(getCatalogueExample('adults_only', 'cigarettes')?.name).toContain('20-pack');
+    expect(getCatalogueExample('adults_only', 'adult_products')?.name).not.toBe(
+      getCatalogueExample('adults_only', 'cigarettes')?.name,
+    );
+    expect(getCatalogueExample('vehicle_rentals')?.photoHint).toContain('vehicle');
+  });
+
   it('resolves categories by id and legacy alias', async () => {
     const { getCategoryById } = await import('./taxonomy');
     expect(getCategoryById('restaurants_food')?.name).toBe('Restaurants & Food');

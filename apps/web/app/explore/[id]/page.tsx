@@ -70,7 +70,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
     supabase
       .from('catalogue_section')
       .select(
-        'id, name, blurb, sort, catalogue_item(id, name, description, price_kes, available, age_restricted, highlighted, sort)',
+        'id, name, blurb, sort, catalogue_item(id, name, description, price_kes, available, age_restricted, highlighted, sort, photo_path)',
       )
       .eq('merchant_id', params.id)
       .order('sort', { ascending: true }),
@@ -80,14 +80,29 @@ export default async function MerchantPage({ params }: { params: { id: string } 
       .eq('merchant_id', params.id),
   ]);
 
+  const catalogueItems = (sections ?? []).flatMap((section) => section.catalogue_item ?? []);
+  const photoPaths = catalogueItems.flatMap((item) => (item.photo_path ? [item.photo_path] : []));
+  const { data: signedPhotos } = photoPaths.length
+    ? await supabase.storage.from('catalogue-images').createSignedUrls(photoPaths, 2 * 60 * 60)
+    : { data: [] };
+  const photoUrls = new Map(
+    (signedPhotos ?? []).flatMap((photo) =>
+      photo.signedUrl ? [[photo.path, photo.signedUrl]] : [],
+    ),
+  );
   const menu: CatalogueSection[] = (sections ?? [])
     .map((section) => ({
       id: section.id,
       name: section.name,
       blurb: section.blurb,
-      items: [...((section.catalogue_item as CatalogueSection['items']) ?? [])].sort(
-        (a, b) => ((a as { sort?: number }).sort ?? 0) - ((b as { sort?: number }).sort ?? 0),
-      ),
+      items: [...((section.catalogue_item as CatalogueSection['items']) ?? [])]
+        .map((item) => ({
+          ...item,
+          photo_url: item.photo_path ? (photoUrls.get(item.photo_path) ?? null) : null,
+        }))
+        .sort(
+          (a, b) => ((a as { sort?: number }).sort ?? 0) - ((b as { sort?: number }).sort ?? 0),
+        ),
     }))
     // A section with nothing in it is a heading over blank space.
     .filter((section) => section.items.length > 0);
@@ -201,7 +216,11 @@ export default async function MerchantPage({ params }: { params: { id: string } 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
           <section aria-label="Catalogue">
             {menu.length > 0 ? (
-              <Catalogue merchantId={merchant.id} merchantName={merchant.trading_name} sections={menu} />
+              <Catalogue
+                merchantId={merchant.id}
+                merchantName={merchant.trading_name}
+                sections={menu}
+              />
             ) : (
               <div className="border-border bg-surface rounded-2xl border p-6 sm:p-8">
                 <span

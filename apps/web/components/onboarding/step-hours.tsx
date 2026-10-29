@@ -7,6 +7,7 @@ import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
+import { getCategoryById } from '@nexg/contracts';
 import { Chip } from './controls';
 import { ContinueButton, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
@@ -53,8 +54,15 @@ const VEHICLES = [
 export function HoursStep() {
   const router = useRouter();
   const { toast } = useToast();
-  const { draft, patch } = useOnboarding();
+  const { draft, categories, patch } = useOnboarding();
 
+  const categoryId = draft?.category
+    ? (getCategoryById(draft.category)?.id ?? draft.category)
+    : null;
+  const selectedCategory = categoryId
+    ? categories.find((category) => category.category === categoryId)
+    : undefined;
+  const showPrepTime = selectedCategory?.prep_time_required ?? false;
   const pattern = draft?.hours_pattern ?? null;
   const hours = (draft?.hours ?? {}) as WeekHours;
   const channels = draft?.order_channels ?? ['dashboard'];
@@ -148,7 +156,11 @@ export function HoursStep() {
     <OnboardingShell
       step={4}
       eyebrow="How you work"
-      title="When are you open, and how fast are you?"
+      title={
+        showPrepTime
+          ? 'When are you open, and how fast are you?'
+          : 'When are you open, and how do orders reach you?'
+      }
       intro="Choose a pattern instead of typing 14 times. Everything here is editable from your dashboard, any day."
       footer={
         <>
@@ -251,29 +263,31 @@ export function HoursStep() {
       </div>
 
       {/* ------------------------------------------------------ prep, channels */}
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <div className="border-border bg-surface rounded-2xl border p-5">
-          <p className="text-[0.9375rem] font-extrabold">How long to prepare a typical order?</p>
-          <input
-            type="range"
-            min={5}
-            max={60}
-            step={5}
-            value={draft?.prep_minutes ?? 20}
-            onChange={(event) => patch({ prep_minutes: Number(event.target.value) }, 4)}
-            aria-label="Preparation time in minutes"
-            className="accent-gold mt-5 w-full"
-          />
-          <div className="text-muted-light mt-2 flex justify-between text-xs font-bold">
-            <span>5 min</span>
-            <span className="text-ink text-sm">{draft?.prep_minutes ?? 20} minutes</span>
-            <span>60 min</span>
+      <div className={`mt-4 grid gap-4 ${showPrepTime ? 'lg:grid-cols-2' : ''}`}>
+        {showPrepTime && (
+          <div className="border-border bg-surface rounded-2xl border p-5">
+            <p className="text-[0.9375rem] font-extrabold">How long to prepare a typical order?</p>
+            <input
+              type="range"
+              min={5}
+              max={60}
+              step={5}
+              value={draft?.prep_minutes ?? 20}
+              onChange={(event) => patch({ prep_minutes: Number(event.target.value) }, 4)}
+              aria-label="Preparation time in minutes"
+              className="accent-gold mt-5 w-full"
+            />
+            <div className="text-muted-light mt-2 flex justify-between text-xs font-bold">
+              <span>5 min</span>
+              <span className="text-ink text-sm">{draft?.prep_minutes ?? 20} minutes</span>
+              <span>60 min</span>
+            </div>
+            <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
+              We tell the guest “ready in about {draft?.prep_minutes ?? 20} min” and send the rider
+              to arrive just as it is ready.
+            </p>
           </div>
-          <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
-            We tell the guest “ready in about {draft?.prep_minutes ?? 20} min” and send the rider to
-            arrive just as it is ready.
-          </p>
-        </div>
+        )}
 
         <div className="border-border bg-surface rounded-2xl border p-5">
           <p className="text-[0.9375rem] font-extrabold">How will you receive orders?</p>
@@ -312,15 +326,17 @@ export function HoursStep() {
         <div className="border-border bg-surface rounded-2xl border p-5">
           <p className="text-[0.9375rem] font-extrabold">When you are slammed</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {BUSY.map((option) => (
-              <Chip
-                key={option.value}
-                selected={draft?.when_busy === option.value}
-                onClick={() => patch({ when_busy: option.value }, 4)}
-              >
-                {option.label}
-              </Chip>
-            ))}
+            {BUSY.filter((option) => showPrepTime || option.value !== 'extend_prep').map(
+              (option) => (
+                <Chip
+                  key={option.value}
+                  selected={draft?.when_busy === option.value}
+                  onClick={() => patch({ when_busy: option.value }, 4)}
+                >
+                  {option.label}
+                </Chip>
+              ),
+            )}
           </div>
           <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
             You can change this any night from the dashboard.

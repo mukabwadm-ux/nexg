@@ -306,27 +306,64 @@ export function CategoryStep() {
           className="border-border bg-surface mt-4 rounded-2xl border p-4 sm:p-5"
         >
           <h2 id="setup-heading" className="text-ink text-sm font-bold">
-            Your {selectedSubcategory.name.toLowerCase()} setup
+            {selectedSubcategory.workflow
+              ? `How ${selectedSubcategory.name.toLowerCase()} will work`
+              : `Your ${selectedSubcategory.name.toLowerCase()} setup`}
           </h2>
           <p className="text-muted mt-1 text-xs leading-relaxed">
-            We’ll guide you through this process as you build your listing.
+            {selectedSubcategory.workflow
+              ? selectedSubcategory.workflow.status === 'live'
+                ? 'A workflow tailored to this specialty, from setup through order handling.'
+                : 'The intended journey from merchant setup through guest fulfilment. Some steps still need to be built.'
+              : 'We’ll guide you through this process as you build your listing.'}
           </p>
-          <ol className="mt-4 flex flex-wrap gap-2">
-            {(selectedSubcategory.defaultWorkflow ?? '')
-              .split(/\s*→\s*/)
-              .filter(Boolean)
-              .map((step, index) => (
-                <li
-                  key={`${step}-${index}`}
-                  className="border-border bg-bg text-ink flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold"
-                >
-                  <span className="bg-gold/20 text-gold-text flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-extrabold">
-                    {index + 1}
-                  </span>
-                  {step}
-                </li>
+          {selectedSubcategory.workflow ? (
+            <div className="mt-4 grid gap-5 md:grid-cols-3">
+              {selectedSubcategory.workflow.groups.map((group) => (
+                <section key={group.title} aria-label={group.title}>
+                  <h3 className="text-ink text-xs font-bold">{group.title}</h3>
+                  <ol className="mt-2 space-y-2">
+                    {group.steps.map((step, index) => (
+                      <li
+                        key={`${group.title}-${step}`}
+                        className="text-muted flex items-start gap-2 text-xs leading-relaxed"
+                      >
+                        <span className="bg-gold/20 text-gold-text flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-extrabold">
+                          {index + 1}
+                        </span>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                </section>
               ))}
-          </ol>
+            </div>
+          ) : (
+            <ol className="mt-4 flex flex-wrap gap-2">
+              {(selectedSubcategory.defaultWorkflow ?? '')
+                .split(/\s*→\s*/)
+                .filter(Boolean)
+                .map((step, index) => (
+                  <li
+                    key={`${step}-${index}`}
+                    className="border-border bg-bg text-ink flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold"
+                  >
+                    <span className="bg-gold/20 text-gold-text flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-extrabold">
+                      {index + 1}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+            </ol>
+          )}
+          {selectedSubcategory.workflow?.policyNote && (
+            <p
+              role="note"
+              className="border-warning/40 bg-warning-bg text-warning mt-4 rounded-xl border px-4 py-3 text-xs leading-relaxed"
+            >
+              {selectedSubcategory.workflow.policyNote}
+            </p>
+          )}
           {!!selectedSubcategory.fields?.length && (
             <p className="text-muted mt-4 text-xs leading-relaxed">
               Setup details include{' '}
