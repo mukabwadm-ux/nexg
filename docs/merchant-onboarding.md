@@ -139,7 +139,7 @@ The questions live in the database rather than in a TypeScript constant for
 one reason: the answers decide which documents we demand, and
 `fn_merchant_required_docs` cannot consult a web bundle.
 
-## Deactivation and draft deletion
+## Deactivation and deletion
 
 Merchant Ops and super admins can deactivate a merchant from its admin record.
 Deactivation is reversible, retains the merchant and its history, and records
@@ -147,12 +147,20 @@ the reason in the audit trail. A merchant that was live returns to its
 previous status when reactivated, but order intake remains off until staff
 review and enable it.
 
-Permanent deletion is limited to unsubmitted `applied` drafts. The database
-refuses deletion if it finds an order, payment or other financial/placement
-history, an approval, compliance documents or requests, or uploaded merchant
-images. Deactivate those records instead. The action rechecks these rules and
-the caller’s merchant/city authorization in the database; the admin UI is not
-the security boundary.
+Deleting a merchant immediately removes it from public listings and active
+operations, then moves it to the **Deleted** tab for a 90-day recovery window.
+Merchant Ops and super admins can restore it during that period; restored
+merchants remain paused, hidden, and unable to accept orders until staff review.
+Team membership is revoked while deleted and restored for users who still have
+an account; pending invitations must be sent again. The **Deactivated** tab
+separately lists reversible deactivations.
+
+The database checks the caller’s merchant/city authorization, requires a
+matching merchant name and reason, and records deletion and restoration in the
+audit trail. Financial and audit history is retained. After 90 days, a daily
+database job anonymizes eligible core merchant profile fields while leaving
+the merchant row available as a foreign-key target for retained transactions.
+The old immediate-delete draft RPC is no longer executable.
 
 ## How to add a document rule
 

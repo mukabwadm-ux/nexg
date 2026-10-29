@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(18);
+select plan(22);
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
@@ -101,6 +101,20 @@ select is(
   'deactivated merchant is no longer public'
 );
 
+select is(
+  (select count(*)::int from public.console_merchant_deactivated_v
+   where id = 'aaaa4444-0000-4000-8000-000000000001'),
+  1,
+  'deactivated merchant appears in the Deactivated tab'
+);
+
+select is(
+  (select count(*)::int from public.console_merchant_directory_v
+   where id = 'aaaa4444-0000-4000-8000-000000000001'),
+  0,
+  'deactivated merchant is removed from the active directory'
+);
+
 set local role authenticated;
 set local request.jwt.claims =
   '{"sub":"f4444444-4444-4444-4444-444444444444","role":"authenticated"}';
@@ -153,11 +167,11 @@ set local request.jwt.claims =
   '{"sub":"f4444444-4444-4444-4444-444444444444","role":"authenticated"}';
 
 select lives_ok(
-  $$select public.rpc_merchant_delete_draft(
+  $$select public.rpc_merchant_soft_delete(
     'aaaa4444-0000-4000-8000-000000000002',
     'Lifecycle Draft',
     'Duplicate application')$$,
-  'merchant operations can permanently delete an eligible unsubmitted draft'
+  'merchant operations can move an unsubmitted draft to Deleted'
 );
 
 reset role;
@@ -166,17 +180,23 @@ reset request.jwt.claims;
 select is(
   (select count(*)::int from public.merchant
    where id = 'aaaa4444-0000-4000-8000-000000000002'),
-  0,
-  'eligible draft is deleted'
+  1,
+  'deleted draft remains available during the retention window'
+);
+
+select ok(
+  (select deleted_at is not null and deleted_until > now()
+   from public.merchant where id = 'aaaa4444-0000-4000-8000-000000000002'),
+  'deleted draft has a 90-day recovery window'
 );
 
 select ok(
   exists (
     select 1 from audit.audit_event
-    where action = 'merchant.draft_deleted'
+    where action = 'merchant.deleted'
       and target_id = 'aaaa4444-0000-4000-8000-000000000002'
   ),
-  'draft deletion remains in the immutable audit log'
+  'deletion remains in the immutable audit log'
 );
 
 insert into public.merchant (
@@ -201,14 +221,12 @@ set local role authenticated;
 set local request.jwt.claims =
   '{"sub":"f4444444-4444-4444-4444-444444444444","role":"authenticated"}';
 
-select throws_ok(
-  $$select public.rpc_merchant_delete_draft(
+select lives_ok(
+  $$select public.rpc_merchant_soft_delete(
     'aaaa4444-0000-4000-8000-000000000003',
     'Submitted Draft',
     'No longer needed')$$,
-  '23514',
-  null,
-  'a submitted application cannot be permanently deleted'
+  'a submitted application can be moved to Deleted without removing its history'
 );
 
 reset role;
@@ -218,7 +236,7 @@ select is(
   (select count(*)::int from public.merchant
    where id = 'aaaa4444-0000-4000-8000-000000000003'),
   1,
-  'submitted application remains intact'
+  'submitted application remains available during retention'
 );
 
 insert into public.merchant (
@@ -255,14 +273,12 @@ set local role authenticated;
 set local request.jwt.claims =
   '{"sub":"f4444444-4444-4444-4444-444444444444","role":"authenticated"}';
 
-select throws_ok(
-  $$select public.rpc_merchant_delete_draft(
+select lives_ok(
+  $$select public.rpc_merchant_soft_delete(
     'aaaa4444-0000-4000-8000-000000000004',
     'Financial Draft',
     'No longer needed')$$,
-  '23514',
-  null,
-  'a financial account prevents permanent deletion'
+  'a merchant with financial history can be moved to Deleted'
 );
 
 reset role;
@@ -272,7 +288,16 @@ select is(
   (select count(*)::int from public.merchant
    where id = 'aaaa4444-0000-4000-8000-000000000004'),
   1,
-  'financially linked draft remains intact'
+  'financially linked merchant remains intact'
+);
+
+select ok(
+  exists (
+    select 1 from ledger.account
+    where party_type = 'merchant'
+      and party_id = 'aaaa4444-0000-4000-8000-000000000004'
+  ),
+  'financial history remains linked after deletion'
 );
 
 set local role authenticated;
