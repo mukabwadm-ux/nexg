@@ -7,7 +7,6 @@ import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
-import { getCategoryById } from '@nexg/contracts';
 import { Chip } from './controls';
 import { ContinueButton, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
@@ -56,9 +55,7 @@ export function HoursStep() {
   const { toast } = useToast();
   const { draft, categories, patch } = useOnboarding();
 
-  const categoryId = draft?.category
-    ? (getCategoryById(draft.category)?.id ?? draft.category)
-    : null;
+  const categoryId = draft?.category_key ?? draft?.category ?? null;
   const selectedCategory = categoryId
     ? categories.find((category) => category.category === categoryId)
     : undefined;

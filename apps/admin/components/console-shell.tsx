@@ -12,6 +12,7 @@ import {
   Sparkles,
   Star,
   Store,
+  Tags,
   Users,
   Wallet,
 } from 'lucide-react';
@@ -59,6 +60,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   users: Users,
   settings: Settings,
   'scroll-text': Scroll,
+  tags: Tags,
 };
 
 export function ConsoleShell({

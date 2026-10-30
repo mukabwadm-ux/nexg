@@ -214,8 +214,10 @@ export function OnboardingProvider({
           ? {
               ...c,
               category,
+              category_key: category,
               answers,
-              subcategory: c.category === category ? c.subcategory : null,
+              subcategory:
+                (c.category_key ?? c.category) === category ? c.subcategory : null,
             }
           : c,
       );

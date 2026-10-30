@@ -88,6 +88,28 @@ export const CATEGORY_ICON: Record<string, typeof Store> = {
   logistics_shipping: Truck,
 };
 
+export const CATEGORY_ICON_BY_NAME: Record<string, typeof Store> = {
+  Activity,
+  BellRing,
+  Car,
+  Compass,
+  DollarSign,
+  Flower2,
+  Heart,
+  Laptop,
+  Pill,
+  Plane,
+  ShieldAlert,
+  Shirt,
+  ShoppingCart,
+  Sparkles,
+  Store,
+  Truck,
+  UtensilsCrossed,
+  Wine,
+  Wrench,
+};
+
 /** What the button says depends on what the business actually does. */
 const CTA: Record<string, string> = {
   restaurant: 'View menu',
@@ -124,6 +146,9 @@ export interface ExploreMerchant {
   id: string;
   trading_name: string;
   category: string | null;
+  category_key?: string | null;
+  category_label?: string;
+  category_icon_name?: string;
   category_other: string | null;
   cover_photo_path: string | null;
   branch_name: string | null;
@@ -161,8 +186,9 @@ export const TAXONOMY_CATEGORIES = [
 ] as const;
 
 export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
-  const category = merchant.category ?? 'other';
-  const Icon = CATEGORY_ICON[category] ?? Store;
+  const category = merchant.category_key ?? merchant.category ?? 'other';
+  const Icon =
+    CATEGORY_ICON[category] ?? CATEGORY_ICON_BY_NAME[merchant.category_icon_name ?? ''] ?? Store;
   const open = merchant.accepting_orders !== false;
   const placeholder = merchant.placeholder === true;
   const Wrapper = placeholder ? 'div' : Link;
@@ -216,7 +242,10 @@ export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
         <div className="p-4">
           <p className="truncate text-[0.9375rem] font-extrabold">{merchant.trading_name}</p>
           <p className="text-muted-light mt-0.5 truncate text-xs font-semibold">
-            {merchant.category_other ?? CATEGORY_LABEL[category] ?? 'Merchant'}
+            {merchant.category_other ??
+              merchant.category_label ??
+              CATEGORY_LABEL[category] ??
+              category}
             {merchant.branch_name && ` Â· ${merchant.branch_name}`}
           </p>
         </div>

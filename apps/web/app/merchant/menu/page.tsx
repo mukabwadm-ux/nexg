@@ -24,7 +24,7 @@ export default async function MerchantMenu() {
       .eq('merchant_id', me.id)
       .order('sort'),
     supabase.from('catalogue_section').select('id, name').eq('merchant_id', me.id).order('sort'),
-    supabase.from('merchant').select('category, subcategory').eq('id', me.id).maybeSingle(),
+    supabase.from('merchant').select('category, category_key, subcategory').eq('id', me.id).maybeSingle(),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];
@@ -43,7 +43,38 @@ export default async function MerchantMenu() {
   }));
   const sections = (sectionData as SectionRow[] | null) ?? [];
   const on = items.filter((i) => i.available);
-  const catalogueExample = getCatalogueExample(merchantData?.category, merchantData?.subcategory);
+  const categoryId = merchantData?.category_key ?? merchantData?.category;
+  const { data: categoryConfig, error: categoryConfigError } = categoryId
+    ? await supabase
+        .from('category_config')
+        .select('catalogue_example, subcategories')
+        .eq('category', categoryId)
+        .maybeSingle()
+    : { data: null, error: null };
+  if (categoryConfigError) {
+    throw new Error(`Could not load catalogue guidance: ${categoryConfigError.message}`);
+  }
+  const configuredSubcategory = Array.isArray(categoryConfig?.subcategories)
+    ? categoryConfig.subcategories.find(
+        (subcategory) =>
+          subcategory &&
+          typeof subcategory === 'object' &&
+          !Array.isArray(subcategory) &&
+          subcategory.id === merchantData?.subcategory,
+      )
+    : null;
+  const configuredExample =
+    configuredSubcategory &&
+    typeof configuredSubcategory === 'object' &&
+    !Array.isArray(configuredSubcategory)
+      ? configuredSubcategory.catalogueExample
+      : null;
+  const categoryExample = categoryConfig?.catalogue_example;
+  const catalogueExample = isCatalogueExample(configuredExample)
+    ? configuredExample
+    : isCatalogueExample(categoryExample)
+      ? categoryExample
+      : getCatalogueExample(categoryId, merchantData?.subcategory);
 
   return (
     <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
@@ -64,5 +95,21 @@ export default async function MerchantMenu() {
         catalogueExample={catalogueExample}
       />
     </div>
+  );
+}
+
+function isCatalogueExample(value: unknown): value is {
+  name: string;
+  description: string;
+  pricePlaceholder: string;
+  photoHint: string;
+} {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const example = value as Record<string, unknown>;
+  return (
+    typeof example.name === 'string' &&
+    typeof example.description === 'string' &&
+    typeof example.pricePlaceholder === 'string' &&
+    typeof example.photoHint === 'string'
   );
 }

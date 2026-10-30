@@ -61,6 +61,21 @@ export async function HomePageContent({
 }) {
   const t = translate ?? translator(locale);
   const { cities: allCities, zones, featured } = await getHomeData();
+  const supabase = createPublicClient();
+  const { data: categoryRows, error: categoryError } = await supabase
+    .from('category_config')
+    .select('category, label, image_path')
+    .eq('is_active', true)
+    .order('sort');
+  if (categoryError) {
+    throw new Error(`Could not load homepage categories: ${categoryError.message}`);
+  }
+  const categories = (categoryRows ?? []).map((category) => ({
+    ...category,
+    image_url: category.image_path
+      ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data.publicUrl
+      : null,
+  }));
   const openCities = allCities.filter((c) => c.status !== 'waitlist');
   const zonesInOpenCities = zones.filter((zone) =>
     openCities.some((city) => city.id === zone.city_id),
@@ -102,7 +117,7 @@ export async function HomePageContent({
             heading={t('home.popular.heading')}
             sub={t('home.popular.sub')}
             allLabel={t('home.popular.all')}
-            items={categoryTiles(t)}
+            items={categoryTiles(t, categories)}
           />
         </section>
 

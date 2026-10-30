@@ -87,11 +87,11 @@ export default async function MerchantApplicationPage({ params }: { params: { id
       .eq('merchant_id', params.id)
       .order('is_primary', { ascending: false }),
     supabase.rpc('fn_merchant_readiness', { p_merchant_id: params.id }),
-    merchant.category
+    (merchant.category_key ?? merchant.category)
       ? supabase
           .from('category_config')
-          .select('label, questions, card_kind')
-          .eq('category', merchant.category)
+          .select('label, questions, subcategories, card_kind')
+          .eq('category', merchant.category_key ?? merchant.category!)
           .maybeSingle()
       : Promise.resolve({ data: null }),
     supabase
@@ -234,7 +234,12 @@ export default async function MerchantApplicationPage({ params }: { params: { id
             <OnboardingRecord
               merchant={merchant}
               config={
-                categoryConfig as { label: string; questions: unknown; card_kind: string } | null
+                categoryConfig as {
+                  label: string;
+                  questions: unknown;
+                  subcategories: unknown;
+                  card_kind: string;
+                } | null
               }
               branches={(branches as BranchRow[] | null) ?? []}
               fleet={(fleet as FleetRow[] | null) ?? []}
@@ -251,6 +256,7 @@ export default async function MerchantApplicationPage({ params }: { params: { id
                   [
                     'Category',
                     merchant.category_other ??
+                      categoryConfig?.label ??
                       merchant.category?.replace(/_/g, ' ') ??
                       '— not chosen',
                   ],

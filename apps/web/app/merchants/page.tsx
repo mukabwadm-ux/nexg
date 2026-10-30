@@ -1,21 +1,35 @@
 import { Button, Card, VALUE_PLACEHOLDER } from '@nexg/ui';
 import {
   ArrowRight,
+  Activity,
   Bike,
+  BellRing,
+  Car,
   Check,
+  Compass,
   CreditCard,
+  DollarSign,
   Flower2,
   Gift,
+  Heart,
+  Laptop,
   LayoutDashboard,
   Pill,
+  Plane,
+  ShieldAlert,
   Shirt,
+  Ship,
   ShoppingCart,
   Sparkles,
+  Store,
+  Truck,
   UtensilsCrossed,
   Wine,
+  Wrench,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { ComponentType } from 'react';
 
 import { DashboardPreview } from '@/components/merchants/dashboard-preview';
 import { FeaturedSlots } from '@/components/merchants/featured-slots';
@@ -33,16 +47,29 @@ export const metadata: Metadata = {
 
 /* Copy from the `Merchants` artboard, signed off (ground rule 6). */
 
-const CATEGORY_TILES = [
-  { label: 'Restaurants', icon: UtensilsCrossed },
-  { label: 'Bars & liquor stores', icon: Wine },
-  { label: 'Laundries', icon: Shirt },
-  { label: 'Florists', icon: Flower2 },
-  { label: 'Beauty & fashion', icon: Sparkles },
-  { label: 'Pharmacies', icon: Pill },
-  { label: 'Supermarkets', icon: ShoppingCart },
-  { label: 'Gift shops', icon: Gift },
-] as const;
+const CATEGORY_ICONS: Record<string, ComponentType<{ className?: string }>> = {
+  Activity,
+  BellRing,
+  Car,
+  Compass,
+  DollarSign,
+  Flower2,
+  Gift,
+  Heart,
+  Laptop,
+  Pill,
+  Plane,
+  ShieldAlert,
+  Shirt,
+  Ship,
+  ShoppingCart,
+  Sparkles,
+  Store,
+  Utensils: UtensilsCrossed,
+  Wine,
+  Truck,
+  Wrench,
+};
 
 const BENEFITS = [
   {
@@ -113,12 +140,17 @@ const FAQ = [
  * same for every visitor, so re-querying it per request bought nothing and
  * cost a round trip to the database on each one.
  */
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function MerchantsPage() {
   const supabase = createPublicClient();
 
-  const [{ data: cities }, { count: cityCount }, { data: commission }] = await Promise.all([
+  const [
+    { data: cities, error: citiesError },
+    { count: cityCount, error: cityCountError },
+    { data: commission, error: commissionError },
+    { data: categories, error: categoriesError },
+  ] = await Promise.all([
     supabase
       .from('city')
       .select('id, name, slug, status')
@@ -130,7 +162,20 @@ export default async function MerchantsPage() {
     // Ground rule 3: this row exists with a null value on purpose. The block
     // renders [—] until a real commission is configured and approved.
     supabase.from('setting').select('value').eq('key', 'commission_pct_by_category').maybeSingle(),
+    supabase
+      .from('category_config')
+      .select('category, label, icon')
+      .eq('is_active', true)
+      .order('sort'),
   ]);
+
+  if (citiesError) throw new Error(`Could not load merchant cities: ${citiesError.message}`);
+  if (cityCountError)
+    throw new Error(`Could not count merchant cities: ${cityCountError.message}`);
+  if (commissionError)
+    throw new Error(`Could not load merchant fees: ${commissionError.message}`);
+  if (categoriesError)
+    throw new Error(`Could not load merchant categories: ${categoriesError.message}`);
 
   const commissionValue = commission?.value ?? null;
   const allCities = cities ?? [];
@@ -216,11 +261,11 @@ export default async function MerchantsPage() {
             </div>
 
             <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-              {CATEGORY_TILES.map((category) => {
-                const Icon = category.icon;
+              {(categories ?? []).map((category) => {
+                const Icon = CATEGORY_ICONS[category.icon] ?? Store;
                 return (
                   <li
-                    key={category.label}
+                    key={category.category}
                     className="bg-bg flex flex-col items-center gap-3 rounded-xl px-2 py-6 text-center"
                   >
                     <span
@@ -229,9 +274,7 @@ export default async function MerchantsPage() {
                     >
                       <Icon className="h-6 w-6" />
                     </span>
-                    <span className="text-[0.6875rem] font-bold leading-tight">
-                      {category.label}
-                    </span>
+                    <span className="text-[0.6875rem] font-bold leading-tight">{category.label}</span>
                   </li>
                 );
               })}

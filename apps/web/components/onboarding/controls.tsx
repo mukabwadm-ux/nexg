@@ -110,6 +110,7 @@ export function CategoryTile({
   icon,
   label,
   description,
+  imageUrl,
   selected,
   onClick,
   disabled = false,
@@ -117,6 +118,7 @@ export function CategoryTile({
   icon: string;
   label: string;
   description?: string;
+  imageUrl?: string | null;
   selected: boolean;
   onClick: () => void;
   disabled?: boolean;
@@ -137,11 +139,20 @@ export function CategoryTile({
     >
       <span
         aria-hidden="true"
-        className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+        className={`flex h-14 w-full items-center justify-center overflow-hidden rounded-lg ${
           selected ? 'bg-gold/20 text-gold-text' : 'bg-bg text-ink'
         }`}
+        style={
+          imageUrl
+            ? {
+                backgroundImage: `linear-gradient(180deg, transparent 35%, rgba(10, 24, 28, .58)), url("${imageUrl}")`,
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+              }
+            : undefined
+        }
       >
-        <Icon className="h-[1.125rem] w-[1.125rem]" />
+        {!imageUrl && <Icon className="h-[1.125rem] w-[1.125rem]" />}
       </span>
       <span className="text-[0.8125rem] font-bold leading-tight">{label}</span>
       {description && (

@@ -19,6 +19,7 @@ export interface PopularCategory {
   key: string;
   label: string;
   image: string;
+  imageUrl?: string | null;
   /** A merchant category for Explore, or a fixed destination. */
   category?: string;
   href?: string;
@@ -91,11 +92,12 @@ export function PopularCategories({
             >
               <span className="shadow-card bg-surface relative block aspect-square overflow-hidden rounded-2xl">
                 <Image
-                  src={`/images/categories/${item.image}.jpg`}
+                  src={item.imageUrl || `/images/categories/${item.image}.jpg`}
                   alt=""
                   fill
                   sizes="(min-width: 1024px) 10vw, 8rem"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  unoptimized={!!item.imageUrl}
                 />
               </span>
               <span className="mt-2.5 block text-center text-[0.8125rem] font-bold leading-tight">

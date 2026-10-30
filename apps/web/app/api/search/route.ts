@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getCategoryById, searchTaxonomy } from '@nexg/contracts';
+import type { Json } from '@nexg/db';
 
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -29,65 +29,13 @@ export interface SearchGroup {
   items: SearchItem[];
 }
 
-/*
- * What people type, mapped to where it is served. Merchant categories go
- * to Explore filtered; the two things NexG arranges itself rather than
- * through a merchant go to the concierge request and to Stays.
- */
-const SERVICES: {
+/* Things NexG arranges itself rather than through a merchant. */
+const DESTINATION_SERVICES: {
   words: string[];
   title: string;
   subtitle: string;
   href: (city: string) => string;
 }[] = [
-  {
-    words: ['food', 'restaurant', 'eat', 'dinner', 'lunch', 'breakfast', 'meal'],
-    title: 'Restaurants',
-    subtitle: 'Food delivered to your door',
-    href: (c) => `/explore?city=${c}&category=restaurant`,
-  },
-  {
-    words: ['drink', 'bar', 'liquor', 'wine', 'beer', 'alcohol'],
-    title: 'Drinks',
-    subtitle: 'Bars and liquor stores',
-    href: (c) => `/explore?city=${c}&category=bar_liquor`,
-  },
-  {
-    words: ['laundry', 'dry clean', 'washing', 'ironing'],
-    title: 'Laundry',
-    subtitle: 'Collected and returned',
-    href: (c) => `/explore?city=${c}&category=laundry`,
-  },
-  {
-    words: ['flower', 'florist', 'bouquet', 'roses'],
-    title: 'Flowers',
-    subtitle: 'Florists',
-    href: (c) => `/explore?city=${c}&category=florist`,
-  },
-  {
-    words: ['massage', 'spa', 'salon', 'beauty', 'hair', 'nails', 'fashion', 'barber'],
-    title: 'Beauty, spa & fashion',
-    subtitle: 'Salons, spas and boutiques',
-    href: (c) => `/explore?city=${c}&category=beauty_fashion`,
-  },
-  {
-    words: ['pharmacy', 'chemist', 'medicine', 'pharmaceutical', 'drugs'],
-    title: 'Pharmaceuticals',
-    subtitle: 'Pharmacies and chemists',
-    href: (c) => `/explore?city=${c}&category=pharmacy`,
-  },
-  {
-    words: ['supermarket', 'grocer', 'groceries', 'shopping', 'shop'],
-    title: 'Groceries',
-    subtitle: 'Supermarkets',
-    href: (c) => `/explore?city=${c}&category=supermarket`,
-  },
-  {
-    words: ['gift', 'present', 'souvenir'],
-    title: 'Gifts',
-    subtitle: 'Gift shops',
-    href: (c) => `/explore?city=${c}&category=gift_shop`,
-  },
   {
     words: ['airport', 'pickup', 'pick up', 'transfer', 'taxi', 'ride', 'flight'],
     title: 'Airport pickup',
@@ -107,6 +55,76 @@ const SERVICES: {
     href: () => '/experience',
   },
 ];
+
+const CATEGORY_SEARCH_TERMS: Record<string, string[]> = {
+  restaurants_food: ['food', 'restaurant', 'eat', 'dinner', 'lunch', 'breakfast', 'meal'],
+  alcohol_beverages: ['drink', 'bar', 'liquor', 'wine', 'beer', 'alcohol'],
+  laundry_cleaning: ['laundry', 'dry clean', 'washing', 'ironing'],
+  flowers_gifts: ['flower', 'florist', 'bouquet', 'roses', 'gift', 'present', 'souvenir'],
+  beauty: ['massage', 'spa', 'salon', 'beauty', 'hair', 'nails', 'barber'],
+  fashion_apparel: ['fashion', 'clothing', 'clothes', 'boutique'],
+  pharmacy: ['pharmacy', 'chemist', 'medicine', 'pharmaceutical', 'drugs'],
+  health: ['pharmacy', 'chemist', 'medicine', 'health'],
+  groceries_essentials: ['supermarket', 'grocer', 'groceries', 'shopping', 'shop'],
+};
+
+type CategorySearchRow = {
+  category: string;
+  label: string;
+  description: string | null;
+  subcategories: Json;
+};
+
+function isJsonRecord(value: Json): value is { [key: string]: Json | undefined } {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function categorySearchServices(
+  categories: CategorySearchRow[],
+  lower: string,
+  city: string,
+): SearchItem[] {
+  const subcategories: SearchItem[] = [];
+  const matchedCategories: SearchItem[] = [];
+
+  for (const category of categories) {
+    if (
+      category.label.toLowerCase().includes(lower) ||
+      category.description?.toLowerCase().includes(lower) ||
+      CATEGORY_SEARCH_TERMS[category.category]?.some(
+        (term) => term.startsWith(lower) || lower.includes(term),
+      )
+    ) {
+      matchedCategories.push({
+        kind: 'service',
+        title: category.label,
+        subtitle: category.description,
+        href: `/explore?city=${city}&category=${encodeURIComponent(category.category)}`,
+      });
+    }
+
+    if (!Array.isArray(category.subcategories)) continue;
+    for (const subcategory of category.subcategories) {
+      if (
+        !isJsonRecord(subcategory) ||
+        typeof subcategory.id !== 'string' ||
+        typeof subcategory.name !== 'string' ||
+        !subcategory.name.toLowerCase().includes(lower)
+      ) {
+        continue;
+      }
+
+      subcategories.push({
+        kind: 'service',
+        title: subcategory.name,
+        subtitle: category.label,
+        href: `/explore?city=${city}&category=${encodeURIComponent(category.category)}&subcategory=${encodeURIComponent(subcategory.id)}`,
+      });
+    }
+  }
+
+  return [...subcategories.slice(0, 3), ...matchedCategories.slice(0, 2)];
+}
 
 /** PostgREST's `or=` filter is comma- and bracket-delimited; strip what would end a clause. */
 function safe(term: string): string {
@@ -130,23 +148,23 @@ export async function GET(request: Request) {
   const like = `%${q}%`;
   const supabase = createPublicClient();
 
-  const taxonomyMatch = searchTaxonomy(q);
-  const taxonomyServices: SearchItem[] = [
-    ...taxonomyMatch.subcategories.slice(0, 3).map((sub) => ({
-      kind: 'service' as const,
-      title: sub.name,
-      subtitle: getCategoryById(sub.categoryId)?.name ?? 'Merchant Category',
-      href: `/explore?city=${city}&category=${sub.categoryId}&subcategory=${sub.id}`,
-    })),
-    ...taxonomyMatch.categories.slice(0, 2).map((cat) => ({
-      kind: 'service' as const,
-      title: cat.name,
-      subtitle: cat.desc,
-      href: `/explore?city=${city}&category=${cat.id}`,
-    })),
-  ];
+  const { data: categoryRows, error: categoryError } = await supabase
+    .from('category_config')
+    .select('category, label, description, subcategories')
+    .eq('is_active', true)
+    .order('sort');
 
-  const hardcodedServices: SearchItem[] = SERVICES.filter(
+  if (categoryError) {
+    console.error('Failed to load category search suggestions:', categoryError);
+    return NextResponse.json({ error: 'Search is temporarily unavailable.' }, { status: 500 });
+  }
+
+  const categoryServices = categorySearchServices(
+    (categoryRows ?? []) as CategorySearchRow[],
+    lower,
+    city,
+  );
+  const destinationServices: SearchItem[] = DESTINATION_SERVICES.filter(
     (s) =>
       s.words.some((w) => w.startsWith(lower) || lower.includes(w)) ||
       s.title.toLowerCase().includes(lower),
@@ -156,7 +174,7 @@ export async function GET(request: Request) {
 
   const seenTitles = new Set<string>();
   const services: SearchItem[] = [];
-  for (const item of [...taxonomyServices, ...hardcodedServices]) {
+  for (const item of [...categoryServices, ...destinationServices]) {
     if (!seenTitles.has(item.title.toLowerCase())) {
       seenTitles.add(item.title.toLowerCase());
       services.push(item);

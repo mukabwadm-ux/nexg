@@ -49,6 +49,7 @@ interface MerchantRecord {
   fleet_dispatch_preference: string;
   onboarding_call_at: string | null;
   price_band: string | null;
+  subcategory?: string | null;
 }
 
 /* The bands as the merchant saw them: "2_3" read back as "2 3". */
@@ -76,13 +77,23 @@ export function OnboardingRecord({
   readiness,
 }: {
   merchant: MerchantRecord;
-  config: { label: string; questions: unknown; card_kind: string } | null;
+  config: {
+    label: string;
+    questions: unknown;
+    subcategories: unknown;
+    card_kind: string;
+  } | null;
   branches: BranchRow[];
   fleet: FleetRow[];
   readiness: Record<string, unknown> | null;
 }) {
   const answers = (merchant.answers ?? {}) as Record<string, string | string[]>;
-  const questions = (config?.questions ?? []) as Question[];
+  const categoryQuestions = (config?.questions ?? []) as Question[];
+  const subcategories = Array.isArray(config?.subcategories)
+    ? (config.subcategories as { id: string; name: string; questions?: Question[] }[])
+    : [];
+  const selectedSubcategory = subcategories.find((subcategory) => subcategory.id === merchant.subcategory);
+  const questions = [...categoryQuestions, ...(selectedSubcategory?.questions ?? [])];
   const payout = (merchant.payout_account ?? {}) as Record<string, string>;
   const lookup = merchant.payout_name_lookup as { matched: boolean | null; reason?: string } | null;
 
@@ -149,7 +160,8 @@ export function OnboardingRecord({
       {questions.length > 0 && (
         <Card className="mt-4 p-5">
           <h3 className="text-sm font-extrabold uppercase tracking-wide">
-            {config?.label} questions
+            {config?.label}
+            {selectedSubcategory ? ` · ${selectedSubcategory.name}` : ''} questions
           </h3>
           <dl className="mt-3 grid gap-3 sm:grid-cols-2">
             {questions.map((question) => (
