@@ -11,7 +11,12 @@ import { getCategoryById } from '@nexg/contracts';
 import { CategoryTile, Chip, DocumentsNote, QuestionCard } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
-import { needsRiderPickup, questionHasAnswer, questionIsVisible } from './question-logic';
+import {
+  needsRiderPickup,
+  questionHasAnswer,
+  questionIsVisible,
+  toggleMultiSelection,
+} from './question-logic';
 import { questionsForSubcategory } from './subcategory-questions';
 
 const PICKUP = [
@@ -91,7 +96,9 @@ export function CategoryStep() {
       questionsForSubcategory(subcategory as Parameters<typeof questionsForSubcategory>[0]),
   );
   const questions = [
-    ...(config?.questions ?? []).filter((question) => questionIsVisible(question, 2, answers)),
+    ...(config?.questions ?? [])
+      .filter((question) => question.key !== businessTypesQuestion?.key)
+      .filter((question) => questionIsVisible(question, 2, answers)),
     ...subcategoryQuestions.filter((question) => questionIsVisible(question, 2, answers)),
   ];
 
@@ -140,7 +147,12 @@ export function CategoryStep() {
     };
   }, [draftId, draft?.category, answersKey]);
 
-  const answered = !!config && questions.every((question) => questionHasAnswer(question, answers));
+  const answered =
+    !!config &&
+    (!businessTypesQuestion ||
+      businessTypesQuestion.required === false ||
+      selectedBusinessTypeIds.length > 0) &&
+    questions.every((question) => questionHasAnswer(question, answers));
   const canContinue =
     !!savedCategory &&
     (!config?.subcategories?.length || !!businessTypesQuestion || !!selectedSubcategory) &&
@@ -240,17 +252,38 @@ export function CategoryStep() {
   const changeBusinessTypes = async (nextValues: string[]) => {
     if (!savedCategory) return;
     const nextAnswers = { ...answers, business_types: nextValues };
-    setAnswers(nextAnswers);
     setSavingSubcategory(true);
+    setCategorySaveFailed(false);
     setSubcategorySaveFailed(false);
-    let saved = await setCategory(savedCategory, nextAnswers);
-    if (saved) saved = await setSubcategory(nextValues[0] ?? null);
-    setSavingSubcategory(false);
+    const nextSubcategories =
+      config?.subcategories?.filter((subcategory) => nextValues.includes(subcategory.id)) ?? [];
+    const retainedKeys = new Set([
+      ...(config?.questions.map((question) => question.key) ?? []),
+      ...nextSubcategories.flatMap((subcategory) =>
+        (
+          subcategory.questions ??
+          questionsForSubcategory(subcategory as Parameters<typeof questionsForSubcategory>[0])
+        ).map((question) => question.key),
+      ),
+    ]);
+    const retainedAnswers = Object.fromEntries(
+      Object.entries(nextAnswers).filter(([key]) => retainedKeys.has(key)),
+    );
+    setAnswers(retainedAnswers);
+    let saved = false;
+    let failureMessage: string | null = null;
+    try {
+      saved = await setCategory(savedCategory, retainedAnswers);
+    } catch (error) {
+      failureMessage = error instanceof Error ? error.message : 'Please try selecting them again.';
+    } finally {
+      setSavingSubcategory(false);
+    }
     setSubcategorySaveFailed(!saved);
     if (!saved) {
       toast({
         title: 'We could not save your business types',
-        description: 'Please try selecting them again.',
+        description: failureMessage ?? 'Please try selecting them again.',
         tone: 'danger',
       });
     }
@@ -308,29 +341,41 @@ export function CategoryStep() {
         ))}
       </div>
 
-      {config && !businessTypesQuestion && (
+      {config && !!config.subcategories?.length && (
         <section
           aria-labelledby="specialty-heading"
           className="border-border bg-surface mt-6 rounded-2xl border p-4 sm:p-5"
         >
           <div className="mb-3">
             <h2 id="specialty-heading" className="text-ink text-sm font-bold">
-              What kind of {config.label.toLowerCase()} business?
+              {businessTypesQuestion?.label ??
+                `What kind of ${config.label.toLowerCase()} business?`}
             </h2>
             <p className="text-muted mt-1 text-xs leading-relaxed">
-              Select the closest match to tailor your listing and setup.
+              {businessTypesQuestion?.hint ??
+                (businessTypesQuestion?.type === 'multi'
+                  ? 'Select all that apply to tailor your listing and setup.'
+                  : 'Select the closest match to tailor your listing and setup.')}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {config.subcategories?.map((subcategory) => {
-              const selected = draft?.subcategory === subcategory.id;
+              const selected = businessTypesQuestion
+                ? selectedBusinessTypeIds.includes(subcategory.id)
+                : draft?.subcategory === subcategory.id;
               return (
                 <button
                   key={subcategory.id}
                   type="button"
                   aria-pressed={selected}
                   disabled={savingSubcategory || savingCategory}
-                  onClick={() => void chooseSubcategory(subcategory.id)}
+                  onClick={() =>
+                    businessTypesQuestion?.type === 'multi'
+                      ? void changeBusinessTypes(
+                          toggleMultiSelection(selectedBusinessTypeIds, subcategory.id),
+                        )
+                      : void chooseSubcategory(subcategory.id)
+                  }
                   className={`focus-visible:ring-gold rounded-full px-3.5 py-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 ${
                     selected
                       ? 'bg-ink text-white'

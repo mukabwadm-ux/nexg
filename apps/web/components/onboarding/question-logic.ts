@@ -58,3 +58,9 @@ export function questionHasAnswer(
     ? answer.length > 0
     : typeof answer === 'string' && answer.trim() !== '';
 }
+
+export function toggleMultiSelection(selected: readonly string[], value: string): string[] {
+  return selected.includes(value)
+    ? selected.filter((item) => item !== value)
+    : [...selected, value];
+}
