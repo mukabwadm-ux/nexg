@@ -23,6 +23,9 @@ interface QuestionDraft extends JsonRecord {
   type: 'single' | 'multi' | 'text';
   options: QuestionOption[];
   hint: string;
+  step?: 2 | 4 | 5 | 6;
+  required?: boolean;
+  when?: JsonRecord;
 }
 
 interface SubcategoryDraft extends JsonRecord {
@@ -100,6 +103,9 @@ function readQuestions(value: Json): QuestionDraft[] {
         type,
         options: readOptions(raw.options),
         hint: typeof raw.hint === 'string' ? raw.hint : '',
+        step: raw.step === 4 || raw.step === 5 || raw.step === 6 ? raw.step : 2,
+        required: typeof raw.required === 'boolean' ? raw.required : true,
+        ...(isRecord(raw.when) ? { when: raw.when } : {}),
       },
     ];
   });
@@ -192,7 +198,7 @@ function newCategory(): CategoryDraft {
 }
 
 function makeQuestion(): QuestionDraft {
-  return { key: '', label: '', type: 'single', options: [], hint: '' };
+  return { key: '', label: '', type: 'single', options: [], hint: '', step: 2, required: true };
 }
 
 function makeSubcategory(): SubcategoryDraft {
@@ -224,7 +230,9 @@ export function CategoryManager({
   requirements: Requirement[];
 }) {
   const router = useRouter();
-  const [selectedId, setSelectedId] = React.useState<string | null>(categories[0]?.category ?? null);
+  const [selectedId, setSelectedId] = React.useState<string | null>(
+    categories[0]?.category ?? null,
+  );
   const [draft, setDraft] = React.useState<CategoryDraft | null>(
     categories[0] ? fromRow(categories[0]) : null,
   );
@@ -359,9 +367,11 @@ export function CategoryManager({
             New
           </Button>
         </div>
-        <div className="divide-border border-border overflow-hidden rounded-xl border bg-surface">
+        <div className="divide-border border-border bg-surface overflow-hidden rounded-xl border">
           {categories.length === 0 ? (
-            <p className="text-muted-light px-4 py-5 text-sm">No categories have been configured.</p>
+            <p className="text-muted-light px-4 py-5 text-sm">
+              No categories have been configured.
+            </p>
           ) : (
             categories.map((category) => (
               <button
@@ -397,7 +407,7 @@ export function CategoryManager({
         </p>
       </aside>
 
-      <section className="min-w-0 rounded-xl border border-border bg-surface">
+      <section className="border-border bg-surface min-w-0 rounded-xl border">
         <div className="border-border flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4">
           <div>
             <h2 className="text-base font-extrabold">{isNew ? 'Create category' : draft.label}</h2>
@@ -413,12 +423,18 @@ export function CategoryManager({
 
         <div className="space-y-8 p-5">
           {error && (
-            <p role="alert" className="rounded-lg border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger">
+            <p
+              role="alert"
+              className="border-danger/30 bg-danger-bg text-danger rounded-lg border px-4 py-3 text-sm"
+            >
               {error}
             </p>
           )}
           {message && (
-            <p role="status" className="rounded-lg border border-success/30 bg-success-bg px-4 py-3 text-sm text-success">
+            <p
+              role="status"
+              className="border-success/30 bg-success-bg text-success rounded-lg border px-4 py-3 text-sm"
+            >
               {message}
             </p>
           )}
@@ -558,10 +574,10 @@ export function CategoryManager({
                 <img
                   src={publicImage}
                   alt={`${draft.label || 'Category'} preview`}
-                  className="h-24 w-32 rounded-lg border border-border object-cover"
+                  className="border-border h-24 w-32 rounded-lg border object-cover"
                 />
               ) : (
-                <div className="flex h-24 w-32 items-center justify-center rounded-lg border border-dashed border-border text-muted-light">
+                <div className="border-border text-muted-light flex h-24 w-32 items-center justify-center rounded-lg border border-dashed">
                   <ImagePlus className="h-6 w-6" aria-hidden="true" />
                 </div>
               )}
@@ -577,11 +593,7 @@ export function CategoryManager({
                     event.currentTarget.value = '';
                   }}
                 />
-                <Button
-                  variant="outline"
-                  loading={busy}
-                  onClick={() => fileRef.current?.click()}
-                >
+                <Button variant="outline" loading={busy} onClick={() => fileRef.current?.click()}>
                   <ImagePlus className="mr-2 h-4 w-4" />
                   {draft.image_path ? 'Replace image' : 'Upload image'}
                 </Button>
@@ -793,13 +805,13 @@ function Toggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="inline-flex items-center gap-2 text-xs font-semibold text-ink">
+    <label className="text-ink inline-flex items-center gap-2 text-xs font-semibold">
       <input
         type="checkbox"
         checked={checked}
         disabled={disabled}
         onChange={(event) => onChange(event.target.checked)}
-        className="accent-gold h-4 w-4 rounded border-border"
+        className="accent-gold border-border h-4 w-4 rounded"
       />
       {label}
     </label>
@@ -820,91 +832,267 @@ function QuestionList({
   }
   return (
     <div className="divide-border border-border divide-y rounded-lg border">
-      {questions.map((question, index) => (
-        <fieldset key={`${question.key}-${index}`} className="grid gap-3 p-4 sm:grid-cols-2">
-          <legend className="sr-only">Question {index + 1}</legend>
-          <Field label="Answer key">
-            <input
-              className={inputClass}
-              value={question.key}
-              disabled={disabled}
-              onChange={(event) => onChange(updateAt(questions, index, { key: event.target.value }))}
-              placeholder="business_type"
-            />
-          </Field>
-          <Field label="Question text">
-            <input
-              className={inputClass}
-              value={question.label}
-              disabled={disabled}
-              onChange={(event) =>
-                onChange(updateAt(questions, index, { label: event.target.value }))
-              }
-              placeholder="What kind of business is this?"
-            />
-          </Field>
-          <Field label="Answer type">
-            <select
-              className={inputClass}
-              value={question.type}
-              disabled={disabled}
-              onChange={(event) =>
-                onChange(
-                  updateAt(questions, index, {
-                    type: event.target.value as QuestionDraft['type'],
-                    options: event.target.value === 'text' ? [] : question.options,
-                  }),
-                )
-              }
-            >
-              <option value="single">Choose one</option>
-              <option value="multi">Choose multiple</option>
-              <option value="text">Free text</option>
-            </select>
-          </Field>
-          <Field label="Helper text">
-            <input
-              className={inputClass}
-              value={question.hint}
-              disabled={disabled}
-              onChange={(event) => onChange(updateAt(questions, index, { hint: event.target.value }))}
-            />
-          </Field>
-          {question.type !== 'text' && (
-            <Field label="Options (one per line: value | label)">
-              <textarea
+      {questions.map((question, index) => {
+        const condition = question.when ?? {};
+        const prepTimeCondition = isRecord(question.prepTimeWhen) ? question.prepTimeWhen : {};
+        const conditionAnswer = typeof condition.answer === 'string' ? condition.answer : '';
+        const conditionValue =
+          typeof condition.includes === 'string'
+            ? condition.includes
+            : typeof condition.equals === 'string'
+              ? condition.equals
+              : '';
+        const conditionOperator = typeof condition.includes === 'string' ? 'includes' : 'equals';
+        const prepTimeAnswer =
+          typeof prepTimeCondition.answer === 'string' ? prepTimeCondition.answer : '';
+        const prepTimeValue =
+          typeof prepTimeCondition.includes === 'string'
+            ? prepTimeCondition.includes
+            : typeof prepTimeCondition.equals === 'string'
+              ? prepTimeCondition.equals
+              : '';
+        const prepTimeOperator =
+          typeof prepTimeCondition.includes === 'string' ? 'includes' : 'equals';
+
+        return (
+          <fieldset key={`${question.key}-${index}`} className="grid gap-3 p-4 sm:grid-cols-2">
+            <legend className="sr-only">Question {index + 1}</legend>
+            <Field label="Answer key">
+              <input
                 className={inputClass}
-                rows={3}
-                value={question.options.map((option) => `${option.value} | ${option.label}`).join('\n')}
+                value={question.key}
+                disabled={disabled}
+                onChange={(event) =>
+                  onChange(updateAt(questions, index, { key: event.target.value }))
+                }
+                placeholder="business_type"
+              />
+            </Field>
+            <Field label="Question text">
+              <input
+                className={inputClass}
+                value={question.label}
+                disabled={disabled}
+                onChange={(event) =>
+                  onChange(updateAt(questions, index, { label: event.target.value }))
+                }
+                placeholder="What kind of business is this?"
+              />
+            </Field>
+            <Field label="Answer type">
+              <select
+                className={inputClass}
+                value={question.type}
                 disabled={disabled}
                 onChange={(event) =>
                   onChange(
                     updateAt(questions, index, {
-                      options: event.target.value
-                        .split('\n')
-                        .map((line) => line.split('|').map((part) => part.trim()))
-                        .filter(([value, label]) => !!value && !!label)
-                        .map(([value, label]) => ({ value: value!, label: label! })),
+                      type: event.target.value as QuestionDraft['type'],
+                      options: event.target.value === 'text' ? [] : question.options,
                     }),
                   )
                 }
-                placeholder={'wash_fold | Wash and fold\nalterations | Alterations'}
+              >
+                <option value="single">Choose one</option>
+                <option value="multi">Choose multiple</option>
+                <option value="text">Free text</option>
+              </select>
+            </Field>
+            <Field label="Helper text">
+              <input
+                className={inputClass}
+                value={question.hint}
+                disabled={disabled}
+                onChange={(event) =>
+                  onChange(updateAt(questions, index, { hint: event.target.value }))
+                }
               />
             </Field>
-          )}
-          <div className="flex items-end justify-end">
-            <Button
-              size="sm"
-              variant="ghost"
-              disabled={disabled}
-              onClick={() => onChange(questions.filter((_, current) => current !== index))}
-            >
-              <Trash2 className="mr-1.5 h-4 w-4" />
-              Remove question
-            </Button>
-          </div>
-        </fieldset>
-      ))}
+            <Field label="Show on onboarding step">
+              <select
+                className={inputClass}
+                value={question.step ?? 2}
+                disabled={disabled}
+                onChange={(event) =>
+                  onChange(
+                    updateAt(questions, index, {
+                      step: Number(event.target.value) as QuestionDraft['step'],
+                    }),
+                  )
+                }
+              >
+                <option value={2}>Step 2 · Business type</option>
+                <option value={4}>Step 4 · Operations</option>
+                <option value={5}>Step 5 · Food-safety readiness</option>
+                <option value={6}>Step 6 · Menu and customer information</option>
+              </select>
+            </Field>
+            <label className="text-ink flex items-center gap-2 self-end pb-2 text-xs font-semibold">
+              <input
+                type="checkbox"
+                checked={question.required !== false}
+                disabled={disabled}
+                onChange={(event) =>
+                  onChange(updateAt(questions, index, { required: event.target.checked }))
+                }
+                className="accent-gold border-border h-4 w-4 rounded"
+              />
+              Required when shown
+            </label>
+            <Field label="Show only when answer key (optional)">
+              <input
+                className={inputClass}
+                value={conditionAnswer}
+                disabled={disabled}
+                onChange={(event) =>
+                  onChange(
+                    updateAt(questions, index, {
+                      when:
+                        event.target.value && conditionValue
+                          ? { answer: event.target.value, [conditionOperator]: conditionValue }
+                          : undefined,
+                    }),
+                  )
+                }
+                placeholder="business_types"
+              />
+            </Field>
+            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-2">
+              <Field label="Condition">
+                <select
+                  className={inputClass}
+                  value={conditionOperator}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    onChange(
+                      updateAt(questions, index, {
+                        when:
+                          conditionAnswer && conditionValue
+                            ? { answer: conditionAnswer, [event.target.value]: conditionValue }
+                            : undefined,
+                      }),
+                    )
+                  }
+                >
+                  <option value="includes">Includes</option>
+                  <option value="equals">Equals</option>
+                </select>
+              </Field>
+              <Field label="Answer value">
+                <input
+                  className={inputClass}
+                  value={conditionValue}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    onChange(
+                      updateAt(questions, index, {
+                        when:
+                          conditionAnswer && event.target.value
+                            ? { answer: conditionAnswer, [conditionOperator]: event.target.value }
+                            : undefined,
+                      }),
+                    )
+                  }
+                  placeholder="catering"
+                />
+              </Field>
+            </div>
+            <Field label="Preparation time applies when answer key (optional)">
+              <input
+                className={inputClass}
+                value={prepTimeAnswer}
+                disabled={disabled}
+                onChange={(event) =>
+                  onChange(
+                    updateAt(questions, index, {
+                      prepTimeWhen:
+                        event.target.value && prepTimeValue
+                          ? { answer: event.target.value, [prepTimeOperator]: prepTimeValue }
+                          : undefined,
+                    }),
+                  )
+                }
+                placeholder="order_models"
+              />
+            </Field>
+            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-2">
+              <Field label="Match">
+                <select
+                  className={inputClass}
+                  value={prepTimeOperator}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    onChange(
+                      updateAt(questions, index, {
+                        prepTimeWhen:
+                          prepTimeAnswer && prepTimeValue
+                            ? { answer: prepTimeAnswer, [event.target.value]: prepTimeValue }
+                            : undefined,
+                      }),
+                    )
+                  }
+                >
+                  <option value="includes">Includes</option>
+                  <option value="equals">Equals</option>
+                </select>
+              </Field>
+              <Field label="Answer value">
+                <input
+                  className={inputClass}
+                  value={prepTimeValue}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    onChange(
+                      updateAt(questions, index, {
+                        prepTimeWhen:
+                          prepTimeAnswer && event.target.value
+                            ? { answer: prepTimeAnswer, [prepTimeOperator]: event.target.value }
+                            : undefined,
+                      }),
+                    )
+                  }
+                  placeholder="made_to_order"
+                />
+              </Field>
+            </div>
+            {question.type !== 'text' && (
+              <Field label="Options (one per line: value | label)">
+                <textarea
+                  className={inputClass}
+                  rows={3}
+                  value={question.options
+                    .map((option) => `${option.value} | ${option.label}`)
+                    .join('\n')}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    onChange(
+                      updateAt(questions, index, {
+                        options: event.target.value
+                          .split('\n')
+                          .map((line) => line.split('|').map((part) => part.trim()))
+                          .filter(([value, label]) => !!value && !!label)
+                          .map(([value, label]) => ({ value: value!, label: label! })),
+                      }),
+                    )
+                  }
+                  placeholder={'wash_fold | Wash and fold\nalterations | Alterations'}
+                />
+              </Field>
+            )}
+            <div className="flex items-end justify-end">
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={disabled}
+                onClick={() => onChange(questions.filter((_, current) => current !== index))}
+              >
+                <Trash2 className="mr-1.5 h-4 w-4" />
+                Remove question
+              </Button>
+            </div>
+          </fieldset>
+        );
+      })}
     </div>
   );
 }
@@ -924,7 +1112,10 @@ function SubcategoryList({
   return (
     <div className="space-y-4">
       {subcategories.map((subcategory, index) => (
-        <fieldset key={`${subcategory.id}-${index}`} className="rounded-lg border border-border p-4">
+        <fieldset
+          key={`${subcategory.id}-${index}`}
+          className="border-border rounded-lg border p-4"
+        >
           <legend className="sr-only">Subcategory {index + 1}</legend>
           <div className="grid gap-3 sm:grid-cols-3">
             <Field label="Stable ID">
@@ -984,9 +1175,7 @@ function SubcategoryList({
                 value={subcategory.fulfillmentHint}
                 disabled={disabled}
                 onChange={(event) =>
-                  onChange(
-                    updateAt(subcategories, index, { fulfillmentHint: event.target.value }),
-                  )
+                  onChange(updateAt(subcategories, index, { fulfillmentHint: event.target.value }))
                 }
                 placeholder="Discreet handoff; age check where required"
               />
@@ -1048,9 +1237,7 @@ function SubcategoryList({
               <QuestionList
                 questions={subcategory.questions}
                 disabled={disabled}
-                onChange={(questions) =>
-                  onChange(updateAt(subcategories, index, { questions }))
-                }
+                onChange={(questions) => onChange(updateAt(subcategories, index, { questions }))}
               />
             ) : (
               <p className="text-muted-light text-xs">

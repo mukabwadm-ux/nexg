@@ -20,11 +20,17 @@ export default async function MerchantMenu() {
   const [{ data, error }, { data: sectionData }, { data: merchantData }] = await Promise.all([
     supabase
       .from('catalogue_item')
-      .select('id, name, description, price_kes, available, age_restricted, sort, photo_path')
+      .select(
+        'id, name, description, price_kes, available, age_restricted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes',
+      )
       .eq('merchant_id', me.id)
       .order('sort'),
     supabase.from('catalogue_section').select('id, name').eq('merchant_id', me.id).order('sort'),
-    supabase.from('merchant').select('category, category_key, subcategory').eq('id', me.id).maybeSingle(),
+    supabase
+      .from('merchant')
+      .select('category, category_key, subcategory')
+      .eq('id', me.id)
+      .maybeSingle(),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];

@@ -109,6 +109,33 @@ than treating a category question as enforcement.
   implemented; `policyNote` identifies requirements needing verification or
   additional platform work.
 
+## Food & Restaurant onboarding
+
+The Food & Restaurant category uses the same six-step journey as other
+merchants, with food-specific branches:
+
+- Step 2 allows merchants to select multiple specialties and fulfillment
+  methods. Catering, bakery preorders, and other operational questions appear
+  only when their answers make them relevant.
+- Step 4 asks for a typical preparation estimate only when the merchant
+  accepts made-to-order orders. Ready-to-sell businesses are not asked to
+  invent a preparation time. Holiday-hour and cancellation-process notes are
+  optional. Rider packaging questions appear only when platform delivery is
+  selected.
+- Step 5 collects food-safety readiness as merchant self-attestations and
+  uses the existing market-configured document checklist. These answers are
+  not certificates or independent verification.
+- Step 6 confirms the merchant will provide accurate allergen information
+  and captures item-level portion size, ingredients, allergens, dietary
+  labels, availability, handling, storage guidance, and exceptional item
+  preparation times. Available details are shown in the public catalogue.
+
+Reservations, scheduled/event checkout, item modifiers and paid add-ons,
+allergen confirmation at checkout, and preparation-aware rider dispatch are
+not implemented by this onboarding change. Specialty workflow descriptions
+remain `designed` until those platform capabilities are built. Do not present
+the onboarding answers as proof of food-safety compliance or verified claims.
+
 ## Deactivation and deletion
 
 Merchant Ops and super admins can deactivate a merchant from its admin record.

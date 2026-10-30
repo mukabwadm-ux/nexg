@@ -26,6 +26,14 @@ export interface ItemRow {
   sort: number;
   photo_path?: string | null;
   photo_url?: string | null;
+  portion_size?: string | null;
+  ingredients?: string | null;
+  allergens?: string[];
+  dietary_labels?: string[];
+  availability_notes?: string | null;
+  handling_notes?: string | null;
+  storage_guidance?: string | null;
+  prep_time_minutes?: number | null;
 }
 
 export interface SectionRow {
@@ -113,6 +121,29 @@ export function Menu({
                   {i.description && (
                     <p className="text-muted truncate text-[0.75rem] font-semibold">
                       {i.description}
+                    </p>
+                  )}
+                  {(i.portion_size ||
+                    i.ingredients ||
+                    i.allergens?.length ||
+                    i.dietary_labels?.length ||
+                    i.availability_notes ||
+                    i.handling_notes ||
+                    i.storage_guidance ||
+                    i.prep_time_minutes) && (
+                    <p className="text-muted-light mt-1 line-clamp-2 text-[0.6875rem] font-semibold">
+                      {[
+                        i.portion_size,
+                        i.ingredients,
+                        i.allergens?.length ? `Allergens: ${i.allergens.join(', ')}` : null,
+                        i.dietary_labels?.length ? `Dietary: ${i.dietary_labels.join(', ')}` : null,
+                        i.availability_notes,
+                        i.handling_notes,
+                        i.storage_guidance,
+                        i.prep_time_minutes ? `Item prep: ${i.prep_time_minutes} min` : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
                     </p>
                   )}
                 </div>
