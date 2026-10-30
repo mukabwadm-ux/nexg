@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { conditionMatches, questionHasAnswer, questionIsVisible } from './question-logic';
+import {
+  conditionMatches,
+  needsRiderPickup,
+  questionHasAnswer,
+  questionIsVisible,
+} from './question-logic';
 import type { Question } from './types';
 
 describe('onboarding question conditions', () => {
@@ -71,5 +76,14 @@ describe('onboarding question conditions', () => {
     expect(questionHasAnswer(required, {})).toBe(false);
     expect(questionHasAnswer(required, { food_style: 'Kenyan coastal' })).toBe(true);
     expect(questionHasAnswer(optional, {})).toBe(true);
+  });
+
+  it('requires pickup details only for rider delivery or collection', () => {
+    expect(needsRiderPickup({ fulfillment_methods: ['delivery'] })).toBe(true);
+    expect(needsRiderPickup({ collection: 'rider_collects' })).toBe(true);
+    expect(needsRiderPickup({ collection: 'either' })).toBe(true);
+    expect(needsRiderPickup({ fulfillment_methods: ['customer_pickup'] })).toBe(false);
+    expect(needsRiderPickup({ collection: 'guest_drops' })).toBe(false);
+    expect(needsRiderPickup({})).toBe(false);
   });
 });

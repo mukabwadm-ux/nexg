@@ -247,7 +247,7 @@ export function StartStep({
         tone: 'success',
       });
       setVerified(true);
-      if (result.resumed_step && result.resumed_step > 2) {
+      if (result.resumed_step && result.resumed_step > 1) {
         router.push(pathForStep(result.resumed_step));
       }
       return;
@@ -275,10 +275,10 @@ export function StartStep({
             disabled={!canContinue}
             onClick={() => {
               patch({}, 2);
-              router.push('/merchants/apply/category');
+              router.push('/merchants/apply/location');
             }}
           >
-            {method === 'link' ? 'Use these details' : 'Start · what do you sell?'}
+            {method === 'link' ? 'Use these details' : 'Start · add your location'}
           </ContinueButton>
           <FooterNote>
             {method === 'link'

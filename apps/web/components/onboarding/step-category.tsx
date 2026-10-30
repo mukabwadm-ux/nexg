@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, useToast } from '@nexg/ui';
+import { Button, Input, useToast } from '@nexg/ui';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -8,11 +8,24 @@ import { createClient } from '@/lib/supabase/client';
 
 import { getCategoryById } from '@nexg/contracts';
 
-import { CategoryTile, DocumentsNote, QuestionCard } from './controls';
+import { CategoryTile, Chip, DocumentsNote, QuestionCard } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
-import { questionHasAnswer, questionIsVisible } from './question-logic';
+import { needsRiderPickup, questionHasAnswer, questionIsVisible } from './question-logic';
 import { questionsForSubcategory } from './subcategory-questions';
+
+const PICKUP = [
+  { value: 'front_counter', label: 'Front counter' },
+  { value: 'side_kitchen', label: 'Side / kitchen door' },
+  { value: 'ask_security', label: 'Ask security' },
+  { value: 'call_on_arrival', label: 'Call on arrival' },
+];
+
+const PARKING = [
+  { value: 'easy', label: 'Easy' },
+  { value: 'tight', label: 'Tight — call ahead' },
+  { value: 'none', label: 'None' },
+];
 
 interface RequiredDocument {
   label: string;
@@ -20,7 +33,7 @@ interface RequiredDocument {
 }
 
 /**
- * Step 2 — choose a business type and the specialty-specific setup it needs.
+ * Step 3 — choose a business type and the specialty-specific setup it needs.
  * Existing questions and document rules remain database-driven; taxonomy
  * fields supply required setup questions for categories without existing forms.
  */
@@ -32,6 +45,7 @@ export function CategoryStep() {
     categories,
     categoryNotice,
     save,
+    patch,
     setCategory,
     setSubcategory,
     setAnswers,
@@ -51,6 +65,7 @@ export function CategoryStep() {
     : null;
   const config = categories.find((category) => category.category === selectedCategoryId);
   const answers = draft?.answers ?? {};
+  const riderPickupRequired = needsRiderPickup(answers);
   const draftId = draft?.id ?? null;
   const businessTypesQuestion = config?.questions.find(
     (question) => question.key === 'business_types' && question.type === 'multi',
@@ -133,7 +148,7 @@ export function CategoryStep() {
     !categorySaveFailed &&
     !subcategorySaveFailed;
 
-  const continueToLocation = async () => {
+  const continueToHours = async () => {
     if (!savedCategory || !canContinue) return;
     setSavingCategory(true);
     setCategorySaveFailed(false);
@@ -153,7 +168,7 @@ export function CategoryStep() {
         });
         return;
       }
-      router.push('/merchants/apply/location');
+      router.push('/merchants/apply/hours');
     } catch {
       setCategorySaveFailed(true);
       toast({
@@ -240,16 +255,20 @@ export function CategoryStep() {
 
   return (
     <OnboardingShell
-      step={2}
+      step={3}
       eyebrow="About your business"
       title="What do you sell?"
       intro="Choose the business types you run and how customers can order. We’ll tailor the follow-up questions to your selections."
       footer={
         <>
-          <Button variant="outline" size="lg" onClick={() => router.push('/merchants/apply/start')}>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => router.push('/merchants/apply/location')}
+          >
             Back
           </Button>
-          <ContinueButton disabled={!canContinue} onClick={() => void continueToLocation()}>
+          <ContinueButton disabled={!canContinue} onClick={() => void continueToHours()}>
             Continue
           </ContinueButton>
           <FooterNote>Your answers decide which documents we ask for</FooterNote>
@@ -415,6 +434,67 @@ export function CategoryStep() {
             />
           ))}
         </div>
+      )}
+
+      {riderPickupRequired && (
+        <section aria-labelledby="rider-pickup-heading" className="mt-6">
+          <div className="mb-3">
+            <h2 id="rider-pickup-heading" className="text-ink text-sm font-bold">
+              Rider collection details
+            </h2>
+            <p className="text-muted mt-1 text-xs leading-relaxed">
+              Help delivery riders find the right handoff point at your main branch.
+            </p>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div className="border-border bg-surface rounded-2xl border p-5">
+              <p className="text-[0.9375rem] font-extrabold">Pickup instructions · main branch</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {PICKUP.map((option) => (
+                  <Chip
+                    key={option.value}
+                    selected={draft?.pickup_instructions === option.value}
+                    onClick={() => patch({ pickup_instructions: option.value }, 3)}
+                  >
+                    {option.label}
+                  </Chip>
+                ))}
+              </div>
+              <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
+                Other branches copy this until you change it.
+              </p>
+            </div>
+
+            <div className="border-border bg-surface rounded-2xl border p-5">
+              <p className="text-[0.9375rem] font-extrabold">Rider parking</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {PARKING.map((option) => (
+                  <Chip
+                    key={option.value}
+                    selected={draft?.rider_parking === option.value}
+                    onClick={() => patch({ rider_parking: option.value }, 3)}
+                  >
+                    {option.label}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-border bg-surface rounded-2xl border p-5">
+              <p className="text-[0.9375rem] font-extrabold">Landmark riders know</p>
+              <div className="mt-4">
+                <Input
+                  id="landmark"
+                  label="Landmark"
+                  labelHidden
+                  placeholder="e.g. opposite Sarit Centre"
+                  defaultValue={draft?.landmark ?? ''}
+                  onBlur={(event) => patch({ landmark: event.target.value }, 3)}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
       )}
 
       {config && (
