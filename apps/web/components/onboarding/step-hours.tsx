@@ -9,7 +9,12 @@ import { createClient } from '@/lib/supabase/client';
 
 import { Chip, QuestionCard } from './controls';
 import { ContinueButton, OnboardingShell } from './shell';
-import { conditionMatches, questionHasAnswer, questionIsVisible } from './question-logic';
+import {
+  conditionMatches,
+  needsRiderPickup,
+  questionHasAnswer,
+  questionIsVisible,
+} from './question-logic';
 import { useOnboarding } from './store';
 import { questionsForSubcategory } from './subcategory-questions';
 import type { DraftFleetRider, WeekHours } from './types';
@@ -74,6 +79,10 @@ export function HoursStep() {
         ? answers.business_types.includes(subcategory.id)
         : subcategory.id === draft?.subcategory,
     ) ?? [];
+  const riderPickupRequired = needsRiderPickup(
+    answers,
+    selectedSubcategories.map((subcategory) => subcategory.fulfillmentHint ?? ''),
+  );
   const operationalQuestions = [
     ...(selectedCategory?.questions ?? []).filter((question) =>
       questionIsVisible(question, 4, answers),
@@ -366,7 +375,7 @@ export function HoursStep() {
       </div>
 
       {/* ------------------------------------------------------ busy, packaging */}
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className={`mt-4 grid gap-4 ${riderPickupRequired ? 'lg:grid-cols-2' : ''}`}>
         <div className="border-border bg-surface rounded-2xl border p-5">
           <p className="text-[0.9375rem] font-extrabold">When you are slammed</p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -387,23 +396,25 @@ export function HoursStep() {
           </p>
         </div>
 
-        <div className="border-border bg-surface rounded-2xl border p-5">
-          <p className="text-[0.9375rem] font-extrabold">Packaging</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {PACKAGING.map((option) => (
-              <Chip
-                key={option.value}
-                selected={draft?.packaging === option.value}
-                onClick={() => patch({ packaging: option.value }, 4)}
-              >
-                {option.label}
-              </Chip>
-            ))}
+        {riderPickupRequired && (
+          <div className="border-border bg-surface rounded-2xl border p-5">
+            <p className="text-[0.9375rem] font-extrabold">Packaging</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {PACKAGING.map((option) => (
+                <Chip
+                  key={option.value}
+                  selected={draft?.packaging === option.value}
+                  onClick={() => patch({ packaging: option.value }, 4)}
+                >
+                  {option.label}
+                </Chip>
+              ))}
+            </div>
+            <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
+              Branded bags and seals are optional and charged at cost.
+            </p>
           </div>
-          <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
-            Branded bags and seals are optional and charged at cost.
-          </p>
-        </div>
+        )}
       </div>
 
       {/* ------------------------------------------------------- own riders */}
