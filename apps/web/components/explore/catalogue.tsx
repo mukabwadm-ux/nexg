@@ -12,6 +12,14 @@ export interface CatalogueItem {
   highlighted: boolean;
   photo_url?: string | null;
   photo_path?: string | null;
+  portion_size?: string | null;
+  ingredients?: string | null;
+  allergens?: string[];
+  dietary_labels?: string[];
+  availability_notes?: string | null;
+  handling_notes?: string | null;
+  storage_guidance?: string | null;
+  prep_time_minutes?: number | null;
 }
 
 export interface CatalogueSection {
@@ -101,6 +109,65 @@ export function Catalogue({
                       <p className="text-muted-light mt-1 line-clamp-2 text-xs font-semibold leading-snug">
                         {item.description}
                       </p>
+                    )}
+                    {(item.portion_size ||
+                      item.ingredients ||
+                      item.allergens?.length ||
+                      item.dietary_labels?.length ||
+                      item.availability_notes ||
+                      item.handling_notes ||
+                      item.storage_guidance ||
+                      item.prep_time_minutes) && (
+                      <dl className="text-muted-light mt-2 space-y-1 text-[0.6875rem] font-semibold leading-snug">
+                        {item.portion_size && (
+                          <div>
+                            <dt className="inline font-extrabold">Portion: </dt>
+                            <dd className="inline">{item.portion_size}</dd>
+                          </div>
+                        )}
+                        {item.ingredients && (
+                          <div>
+                            <dt className="inline font-extrabold">Ingredients: </dt>
+                            <dd className="inline">{item.ingredients}</dd>
+                          </div>
+                        )}
+                        {!!item.allergens?.length && (
+                          <div>
+                            <dt className="inline font-extrabold">Allergens: </dt>
+                            <dd className="inline">{item.allergens.join(', ')}</dd>
+                          </div>
+                        )}
+                        {!!item.dietary_labels?.length && (
+                          <div>
+                            <dt className="inline font-extrabold">Dietary: </dt>
+                            <dd className="inline">{item.dietary_labels.join(', ')}</dd>
+                          </div>
+                        )}
+                        {item.availability_notes && (
+                          <div>
+                            <dt className="inline font-extrabold">Availability: </dt>
+                            <dd className="inline">{item.availability_notes}</dd>
+                          </div>
+                        )}
+                        {item.handling_notes && (
+                          <div>
+                            <dt className="inline font-extrabold">Handling: </dt>
+                            <dd className="inline">{item.handling_notes}</dd>
+                          </div>
+                        )}
+                        {item.storage_guidance && (
+                          <div>
+                            <dt className="inline font-extrabold">Storage: </dt>
+                            <dd className="inline">{item.storage_guidance}</dd>
+                          </div>
+                        )}
+                        {item.prep_time_minutes && (
+                          <div>
+                            <dt className="inline font-extrabold">Item prep: </dt>
+                            <dd className="inline">{item.prep_time_minutes} min</dd>
+                          </div>
+                        )}
+                      </dl>
                     )}
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2">

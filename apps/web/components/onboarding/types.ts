@@ -11,6 +11,18 @@ export interface Question {
   type: 'single' | 'multi' | 'text';
   options?: QuestionOption[];
   hint?: string;
+  step?: 2 | 4 | 5 | 6;
+  required?: boolean;
+  when?: QuestionCondition;
+  prepTimeWhen?: QuestionCondition;
+}
+
+export interface QuestionCondition {
+  answer?: string;
+  equals?: string;
+  includes?: string;
+  any?: QuestionCondition[];
+  all?: QuestionCondition[];
 }
 
 export interface BadgeRule {

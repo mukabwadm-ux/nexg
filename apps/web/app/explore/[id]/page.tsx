@@ -70,7 +70,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
     supabase
       .from('catalogue_section')
       .select(
-        'id, name, blurb, sort, catalogue_item(id, name, description, price_kes, available, age_restricted, highlighted, sort, photo_path)',
+        'id, name, blurb, sort, catalogue_item(id, name, description, price_kes, available, age_restricted, highlighted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes)',
       )
       .eq('merchant_id', params.id)
       .order('sort', { ascending: true }),

@@ -7,10 +7,12 @@ import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 import { uploadDocument } from '@/lib/uploads';
-import { DocumentsNote } from './controls';
+import { DocumentsNote, QuestionCard } from './controls';
 import { NoDraft } from './no-draft';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
+import { questionHasAnswer, questionIsVisible } from './question-logic';
+import { questionsForSubcategory } from './subcategory-questions';
 
 interface Requirement {
   id: string;
@@ -45,7 +47,7 @@ interface Existing {
 export function DocumentsStep() {
   const router = useRouter();
   const { toast } = useToast();
-  const { draft, categories, refresh } = useOnboarding();
+  const { draft, categories, refresh, setAnswers, flush } = useOnboarding();
 
   const [requirements, setRequirements] = React.useState<Requirement[]>([]);
   const [existing, setExisting] = React.useState<Record<string, Existing>>({});
@@ -58,6 +60,25 @@ export function DocumentsStep() {
   const draftId = draft?.id ?? null;
   const categoryId = draft?.category_key ?? draft?.category ?? null;
   const config = categories.find((category) => category.category === categoryId);
+  const answers = draft?.answers ?? {};
+  const selectedSubcategories =
+    config?.subcategories?.filter((subcategory) =>
+      Array.isArray(answers.business_types)
+        ? answers.business_types.includes(subcategory.id)
+        : subcategory.id === draft?.subcategory,
+    ) ?? [];
+  const foodSafetyQuestions = [
+    ...(config?.questions ?? []).filter((question) => questionIsVisible(question, 5, answers)),
+    ...selectedSubcategories.flatMap((subcategory) =>
+      (
+        subcategory.questions ??
+        questionsForSubcategory(subcategory as Parameters<typeof questionsForSubcategory>[0])
+      ).filter((question) => questionIsVisible(question, 5, answers)),
+    ),
+  ];
+  const foodSafetyAnswered = foodSafetyQuestions.every((question) =>
+    questionHasAnswer(question, answers),
+  );
 
   const load = React.useCallback(async () => {
     if (!draftId) return;
@@ -139,7 +160,7 @@ export function DocumentsStep() {
   const done = requirements.filter((r) => existing[r.id]).length;
   const missingEssential = requirements.filter((r) => r.essential && !existing[r.id]);
   const pendingOptional = requirements.filter((r) => !r.essential && !existing[r.id]);
-  const canContinue = missingEssential.length === 0;
+  const canContinue = missingEssential.length === 0 && foodSafetyAnswered;
 
   /* No application at all is a different thing from one still
      loading, and only the first is permanent. */
@@ -171,13 +192,18 @@ export function DocumentsStep() {
           </Button>
           <ContinueButton
             disabled={!canContinue}
-            onClick={() => router.push('/merchants/apply/payout')}
+            onClick={async () => {
+              await flush();
+              router.push('/merchants/apply/payout');
+            }}
           >
             {canContinue
               ? pendingOptional.length > 0
                 ? `Continue with ${pendingOptional.length} pending`
                 : 'Continue'
-              : `Add your ${missingEssential[0]?.label.toLowerCase()}`}
+              : missingEssential.length > 0
+                ? `Add your ${missingEssential[0]?.label.toLowerCase()}`
+                : 'Complete the food-safety questions'}
           </ContinueButton>
           <FooterNote>
             Policy assumption: 14-day grace for non-essential documents — confirm
@@ -185,13 +211,31 @@ export function DocumentsStep() {
         </>
       }
     >
+      {foodSafetyQuestions.length > 0 && (
+        <section aria-labelledby="food-safety-heading" className="mb-5">
+          <h2 id="food-safety-heading" className="text-ink text-sm font-bold">
+            Food-safety readiness
+          </h2>
+          <p className="text-muted mt-1 text-xs leading-relaxed">
+            Confirm the practices you currently use. Requirements and documents depend on your
+            operating market; these answers do not replace local inspections or certification.
+          </p>
+          <div className="mt-3 grid gap-4 lg:grid-cols-2">
+            {foodSafetyQuestions.map((question) => (
+              <QuestionCard
+                key={question.key}
+                question={question}
+                value={answers[question.key]}
+                onChange={(next) => setAnswers({ ...answers, [question.key]: next })}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       <DocumentsNote>
-        Because you are a{' '}
-        <strong>
-          {config?.label.toLowerCase()}
-          {draft?.answers?.['serves_alcohol'] === 'yes' ? ' that serves alcohol' : ''}
-        </strong>{' '}
-        in Nairobi, we need {requirements.length} documents. A laundry would need 3.
+        Based on your business type and answers, we need {requirements.length} documents. Check each
+        requirement and its status below; additional market-specific requirements may apply.
       </DocumentsNote>
 
       <ul className="mt-5 space-y-3">

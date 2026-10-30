@@ -6,6 +6,7 @@ import type {
   CategoryConfig,
   CategorySubcategory,
   Question,
+  QuestionCondition,
   QuestionOption,
 } from '@/components/onboarding/types';
 
@@ -20,10 +21,52 @@ function readOptions(value: Json | undefined, category: string, key: string): Qu
   if (!Array.isArray(value)) return [];
   return value.map((option, index) => {
     if (!isRecord(option) || typeof option.value !== 'string' || typeof option.label !== 'string') {
-      throw new Error(`Invalid option ${index + 1} in onboarding question "${key}" for ${category}.`);
+      throw new Error(
+        `Invalid option ${index + 1} in onboarding question "${key}" for ${category}.`,
+      );
     }
     return { value: option.value, label: option.label };
   });
+}
+
+function readCondition(
+  value: Json | undefined,
+  category: string,
+  key: string,
+  depth = 0,
+): QuestionCondition | undefined {
+  if (value === undefined) return undefined;
+  if (!isRecord(value) || depth > 4) {
+    throw new Error(`Invalid display condition for onboarding question "${key}" in ${category}.`);
+  }
+
+  if (value.any !== undefined || value.all !== undefined) {
+    const operator = value.any !== undefined ? 'any' : 'all';
+    const expressions = value[operator];
+    if (!Array.isArray(expressions) || expressions.length === 0) {
+      throw new Error(
+        `Invalid ${operator} condition for onboarding question "${key}" in ${category}.`,
+      );
+    }
+    return {
+      [operator]: expressions.map((expression) =>
+        readCondition(expression, category, key, depth + 1),
+      ) as QuestionCondition[],
+    };
+  }
+
+  if (
+    typeof value.answer !== 'string' ||
+    (typeof value.equals !== 'string' && typeof value.includes !== 'string') ||
+    (value.equals !== undefined && value.includes !== undefined)
+  ) {
+    throw new Error(`Invalid answer condition for onboarding question "${key}" in ${category}.`);
+  }
+  return {
+    answer: value.answer,
+    ...(typeof value.equals === 'string' ? { equals: value.equals } : {}),
+    ...(typeof value.includes === 'string' ? { includes: value.includes } : {}),
+  };
 }
 
 function readQuestions(value: Json, category: string): Question[] {
@@ -43,12 +86,36 @@ function readQuestions(value: Json, category: string): Question[] {
     if (question.type !== 'text' && options.length === 0) {
       throw new Error(`Onboarding question "${question.key}" for ${category} has no options.`);
     }
+    if (
+      question.step !== undefined &&
+      question.step !== 2 &&
+      question.step !== 4 &&
+      question.step !== 5 &&
+      question.step !== 6
+    ) {
+      throw new Error(`Invalid onboarding step for question "${question.key}" in ${category}.`);
+    }
+    if (question.required !== undefined && typeof question.required !== 'boolean') {
+      throw new Error(
+        `Invalid required flag for onboarding question "${question.key}" in ${category}.`,
+      );
+    }
     return {
       key: question.key,
       label: question.label,
       type: question.type,
       options,
       ...(typeof question.hint === 'string' ? { hint: question.hint } : {}),
+      ...(question.step === 2 || question.step === 4 || question.step === 5 || question.step === 6
+        ? { step: question.step }
+        : {}),
+      ...(typeof question.required === 'boolean' ? { required: question.required } : {}),
+      ...(question.when !== undefined
+        ? { when: readCondition(question.when, category, question.key) }
+        : {}),
+      ...(question.prepTimeWhen !== undefined
+        ? { prepTimeWhen: readCondition(question.prepTimeWhen, category, question.key) }
+        : {}),
     };
   });
 }
@@ -169,15 +236,8 @@ function readBadgeRules(value: Json): Record<string, Record<string, BadgeRule>> 
   return rules;
 }
 
-export function categoryConfigFromRow(
-  row: CategoryRow,
-  imageUrl: string | null,
-): CategoryConfig {
-  if (
-    row.card_kind !== 'menu' &&
-    row.card_kind !== 'services' &&
-    row.card_kind !== 'products'
-  ) {
+export function categoryConfigFromRow(row: CategoryRow, imageUrl: string | null): CategoryConfig {
+  if (row.card_kind !== 'menu' && row.card_kind !== 'services' && row.card_kind !== 'products') {
     throw new Error(`Invalid catalogue style for category "${row.category}".`);
   }
   if (row.eta_style !== 'minutes' && row.eta_style !== 'turnaround') {

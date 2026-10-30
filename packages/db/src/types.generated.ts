@@ -5353,48 +5353,72 @@ export type Database = {
       catalogue_item: {
         Row: {
           age_restricted: boolean;
+          allergens: string[];
+          availability_notes: string | null;
           available: boolean;
           created_at: string;
           description: string | null;
+          dietary_labels: string[];
+          handling_notes: string | null;
           highlighted: boolean;
           id: string;
+          ingredients: string | null;
           merchant_id: string;
           name: string;
           photo_path: string | null;
+          portion_size: string | null;
+          prep_time_minutes: number | null;
           price_kes: number | null;
           section_id: string;
           sort: number;
+          storage_guidance: string | null;
           updated_at: string;
         };
         ComputedFields: never;
         Insert: {
           age_restricted?: boolean;
+          allergens?: string[];
+          availability_notes?: string | null;
           available?: boolean;
           created_at?: string;
           description?: string | null;
+          dietary_labels?: string[];
+          handling_notes?: string | null;
           highlighted?: boolean;
           id?: string;
+          ingredients?: string | null;
           merchant_id: string;
           name: string;
           photo_path?: string | null;
+          portion_size?: string | null;
+          prep_time_minutes?: number | null;
           price_kes?: number | null;
           section_id: string;
           sort?: number;
+          storage_guidance?: string | null;
           updated_at?: string;
         };
         Update: {
           age_restricted?: boolean;
+          allergens?: string[];
+          availability_notes?: string | null;
           available?: boolean;
           created_at?: string;
           description?: string | null;
+          dietary_labels?: string[];
+          handling_notes?: string | null;
           highlighted?: boolean;
           id?: string;
+          ingredients?: string | null;
           merchant_id?: string;
           name?: string;
           photo_path?: string | null;
+          portion_size?: string | null;
+          prep_time_minutes?: number | null;
           price_kes?: number | null;
           section_id?: string;
           sort?: number;
+          storage_guidance?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -45846,6 +45870,10 @@ export type Database = {
       fn_cash_guard: { Args: { p_rider_id: string }; Returns: undefined };
       fn_catalogue_edit_needs_review: {
         Args: { p_current_price: number; p_kind: string; p_payload: Json };
+        Returns: boolean;
+      };
+      fn_category_condition_matches: {
+        Args: { p_answers: Json; p_condition: Json };
         Returns: boolean;
       };
       fn_city_for_point: {

@@ -11,6 +11,7 @@ import { getCategoryById } from '@nexg/contracts';
 import { CategoryTile, DocumentsNote, QuestionCard } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
+import { questionHasAnswer, questionIsVisible } from './question-logic';
 import { questionsForSubcategory } from './subcategory-questions';
 
 interface RequiredDocument {
@@ -51,14 +52,30 @@ export function CategoryStep() {
   const config = categories.find((category) => category.category === selectedCategoryId);
   const answers = draft?.answers ?? {};
   const draftId = draft?.id ?? null;
-  const selectedSubcategory = config?.subcategories?.find(
-    (subcategory) => subcategory.id === draft?.subcategory,
+  const businessTypesQuestion = config?.questions.find(
+    (question) => question.key === 'business_types' && question.type === 'multi',
   );
-  const subcategoryQuestions = selectedSubcategory
-    ? (selectedSubcategory.questions ??
-      questionsForSubcategory(selectedSubcategory as Parameters<typeof questionsForSubcategory>[0]))
-    : [];
-  const questions = [...(config?.questions ?? []), ...subcategoryQuestions];
+  const selectedBusinessTypeIds = Array.isArray(answers.business_types)
+    ? answers.business_types
+    : draft?.subcategory && businessTypesQuestion
+      ? [draft.subcategory]
+      : [];
+  const selectedSubcategories =
+    config?.subcategories?.filter((subcategory) =>
+      selectedBusinessTypeIds.includes(subcategory.id),
+    ) ?? [];
+  const selectedSubcategory =
+    selectedSubcategories[0] ??
+    config?.subcategories?.find((subcategory) => subcategory.id === draft?.subcategory);
+  const subcategoryQuestions = selectedSubcategories.flatMap(
+    (subcategory) =>
+      subcategory.questions ??
+      questionsForSubcategory(subcategory as Parameters<typeof questionsForSubcategory>[0]),
+  );
+  const questions = [
+    ...(config?.questions ?? []).filter((question) => questionIsVisible(question, 2, answers)),
+    ...subcategoryQuestions.filter((question) => questionIsVisible(question, 2, answers)),
+  ];
 
   /*
    * The document list is computed by the same database rules as the documents
@@ -105,15 +122,10 @@ export function CategoryStep() {
     };
   }, [draftId, draft?.category, answersKey]);
 
-  const answered = config
-    ? questions.every((question) => {
-        const value = answers[question.key];
-        return Array.isArray(value) ? value.length > 0 : !!value;
-      })
-    : false;
+  const answered = !!config && questions.every((question) => questionHasAnswer(question, answers));
   const canContinue =
     !!savedCategory &&
-    (!config?.subcategories?.length || !!selectedSubcategory) &&
+    (!config?.subcategories?.length || !!businessTypesQuestion || !!selectedSubcategory) &&
     answered &&
     !savingCategory &&
     !savingSubcategory &&
@@ -127,7 +139,11 @@ export function CategoryStep() {
     setCategorySaveFailed(false);
     try {
       const categorySaved = await setCategory(savedCategory, answers);
-      const setupSaved = categorySaved && (await flush());
+      const subcategorySaved =
+        categorySaved && businessTypesQuestion
+          ? await setSubcategory(selectedBusinessTypeIds[0] ?? null)
+          : categorySaved;
+      const setupSaved = subcategorySaved && (await flush());
       if (!setupSaved) {
         setCategorySaveFailed(true);
         toast({
@@ -181,10 +197,9 @@ export function CategoryStep() {
     if (nextSubcategory && categoryId) {
       const retainedKeys = new Set([
         ...(config?.questions.map((question) => question.key) ?? []),
-        ...(nextSubcategory.questions ??
-          questionsForSubcategory(
-            nextSubcategory as Parameters<typeof questionsForSubcategory>[0],
-          )
+        ...(
+          nextSubcategory.questions ??
+          questionsForSubcategory(nextSubcategory as Parameters<typeof questionsForSubcategory>[0])
         ).map((question) => question.key),
       ]);
       const retainedAnswers = Object.fromEntries(
@@ -204,12 +219,31 @@ export function CategoryStep() {
     }
   };
 
+  const changeBusinessTypes = async (nextValues: string[]) => {
+    if (!savedCategory) return;
+    const nextAnswers = { ...answers, business_types: nextValues };
+    setAnswers(nextAnswers);
+    setSavingSubcategory(true);
+    setSubcategorySaveFailed(false);
+    let saved = await setCategory(savedCategory, nextAnswers);
+    if (saved) saved = await setSubcategory(nextValues[0] ?? null);
+    setSavingSubcategory(false);
+    setSubcategorySaveFailed(!saved);
+    if (!saved) {
+      toast({
+        title: 'We could not save your business types',
+        description: 'Please try selecting them again.',
+        tone: 'danger',
+      });
+    }
+  };
+
   return (
     <OnboardingShell
       step={2}
       eyebrow="About your business"
       title="What do you sell?"
-      intro="Tap one. We’ll only ask follow-up questions for this kind of business, then show the setup steps for your specialty."
+      intro="Choose the business types you run and how customers can order. We’ll tailor the follow-up questions to your selections."
       footer={
         <>
           <Button variant="outline" size="lg" onClick={() => router.push('/merchants/apply/start')}>
@@ -252,7 +286,7 @@ export function CategoryStep() {
         ))}
       </div>
 
-      {config && (
+      {config && !businessTypesQuestion && (
         <section
           aria-labelledby="specialty-heading"
           className="border-border bg-surface mt-6 rounded-2xl border p-4 sm:p-5"
@@ -289,26 +323,27 @@ export function CategoryStep() {
         </section>
       )}
 
-      {selectedSubcategory && (
+      {selectedSubcategories.map((subcategory) => (
         <section
-          aria-labelledby="setup-heading"
+          key={subcategory.id}
+          aria-labelledby={`setup-heading-${subcategory.id}`}
           className="border-border bg-surface mt-4 rounded-2xl border p-4 sm:p-5"
         >
-          <h2 id="setup-heading" className="text-ink text-sm font-bold">
-            {selectedSubcategory.workflow
-              ? `How ${selectedSubcategory.name.toLowerCase()} will work`
-              : `Your ${selectedSubcategory.name.toLowerCase()} setup`}
+          <h2 id={`setup-heading-${subcategory.id}`} className="text-ink text-sm font-bold">
+            {subcategory.workflow
+              ? `How ${subcategory.name.toLowerCase()} will work`
+              : `Your ${subcategory.name.toLowerCase()} setup`}
           </h2>
           <p className="text-muted mt-1 text-xs leading-relaxed">
-            {selectedSubcategory.workflow
-              ? selectedSubcategory.workflow.status === 'live'
+            {subcategory.workflow
+              ? subcategory.workflow.status === 'live'
                 ? 'A workflow tailored to this specialty, from setup through order handling.'
                 : 'The intended journey from merchant setup through guest fulfilment. Some steps still need to be built.'
               : 'We’ll guide you through this process as you build your listing.'}
           </p>
-          {selectedSubcategory.workflow ? (
+          {subcategory.workflow ? (
             <div className="mt-4 grid gap-5 md:grid-cols-3">
-              {selectedSubcategory.workflow.groups.map((group) => (
+              {subcategory.workflow.groups.map((group) => (
                 <section key={group.title} aria-label={group.title}>
                   <h3 className="text-ink text-xs font-bold">{group.title}</h3>
                   <ol className="mt-2 space-y-2">
@@ -329,7 +364,7 @@ export function CategoryStep() {
             </div>
           ) : (
             <ol className="mt-4 flex flex-wrap gap-2">
-              {(selectedSubcategory.defaultWorkflow ?? '')
+              {(subcategory.defaultWorkflow ?? '')
                 .split(/\s*→\s*/)
                 .filter(Boolean)
                 .map((step, index) => (
@@ -345,25 +380,25 @@ export function CategoryStep() {
                 ))}
             </ol>
           )}
-          {selectedSubcategory.workflow?.policyNote && (
+          {subcategory.workflow?.policyNote && (
             <p
               role="note"
               className="border-warning/40 bg-warning-bg text-warning mt-4 rounded-xl border px-4 py-3 text-xs leading-relaxed"
             >
-              {selectedSubcategory.workflow.policyNote}
+              {subcategory.workflow.policyNote}
             </p>
           )}
-          {!!selectedSubcategory.fields?.length && (
+          {!!subcategory.fields?.length && (
             <p className="text-muted mt-4 text-xs leading-relaxed">
               Setup details include{' '}
               <span className="text-ink font-semibold">
-                {selectedSubcategory.fields.map(humanizeField).join(', ')}
+                {subcategory.fields.map(humanizeField).join(', ')}
               </span>
               .
             </p>
           )}
         </section>
-      )}
+      ))}
 
       {questions.length > 0 && (
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
@@ -372,7 +407,11 @@ export function CategoryStep() {
               key={question.key}
               question={question}
               value={answers[question.key]}
-              onChange={(next) => setAnswers({ ...answers, [question.key]: next })}
+              onChange={(next) =>
+                question.key === 'business_types' && Array.isArray(next)
+                  ? void changeBusinessTypes(next)
+                  : setAnswers({ ...answers, [question.key]: next })
+              }
             />
           ))}
         </div>

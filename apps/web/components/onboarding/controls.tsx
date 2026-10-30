@@ -251,7 +251,14 @@ export function QuestionCard({
     <div className="border-border bg-surface rounded-2xl border p-5">
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-[0.9375rem] font-extrabold leading-snug">{question.label}</h3>
-        {showTag && <BecauseTag />}
+        <div className="flex shrink-0 items-center gap-2">
+          {question.required === false && (
+            <span className="text-muted-light text-[0.625rem] font-bold uppercase tracking-wide">
+              Optional
+            </span>
+          )}
+          {showTag && <BecauseTag />}
+        </div>
       </div>
 
       {question.type === 'text' ? (

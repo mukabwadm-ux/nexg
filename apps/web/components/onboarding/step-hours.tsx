@@ -7,9 +7,11 @@ import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
-import { Chip } from './controls';
+import { Chip, QuestionCard } from './controls';
 import { ContinueButton, OnboardingShell } from './shell';
+import { conditionMatches, questionHasAnswer, questionIsVisible } from './question-logic';
 import { useOnboarding } from './store';
+import { questionsForSubcategory } from './subcategory-questions';
 import type { DraftFleetRider, WeekHours } from './types';
 
 const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
@@ -53,13 +55,39 @@ const VEHICLES = [
 export function HoursStep() {
   const router = useRouter();
   const { toast } = useToast();
-  const { draft, categories, patch } = useOnboarding();
+  const { draft, categories, patch, setAnswers, flush } = useOnboarding();
 
   const categoryId = draft?.category_key ?? draft?.category ?? null;
   const selectedCategory = categoryId
     ? categories.find((category) => category.category === categoryId)
     : undefined;
-  const showPrepTime = selectedCategory?.prep_time_required ?? false;
+  const answers = draft?.answers ?? {};
+  const configuredTimingQuestion = selectedCategory?.questions.find(
+    (question) => question.prepTimeWhen,
+  );
+  const showPrepTime =
+    (selectedCategory?.prep_time_required ?? false) &&
+    (!configuredTimingQuestion || conditionMatches(configuredTimingQuestion.prepTimeWhen, answers));
+  const selectedSubcategories =
+    selectedCategory?.subcategories?.filter((subcategory) =>
+      Array.isArray(answers.business_types)
+        ? answers.business_types.includes(subcategory.id)
+        : subcategory.id === draft?.subcategory,
+    ) ?? [];
+  const operationalQuestions = [
+    ...(selectedCategory?.questions ?? []).filter((question) =>
+      questionIsVisible(question, 4, answers),
+    ),
+    ...selectedSubcategories.flatMap((subcategory) =>
+      (
+        subcategory.questions ??
+        questionsForSubcategory(subcategory as Parameters<typeof questionsForSubcategory>[0])
+      ).filter((question) => questionIsVisible(question, 4, answers)),
+    ),
+  ];
+  const operationalQuestionsAnswered = operationalQuestions.every((question) =>
+    questionHasAnswer(question, answers),
+  );
   const pattern = draft?.hours_pattern ?? null;
   const hours = (draft?.hours ?? {}) as WeekHours;
   const channels = draft?.order_channels ?? ['dashboard'];
@@ -169,10 +197,11 @@ export function HoursStep() {
             Back
           </Button>
           <ContinueButton
-            disabled={!pattern}
+            disabled={!pattern || !operationalQuestionsAnswered}
             onClick={async () => {
               if (fleetOpen && riders.length > 0) await saveFleet();
               patch({}, 5);
+              await flush();
               router.push('/merchants/apply/documents');
             }}
           >
@@ -181,6 +210,24 @@ export function HoursStep() {
         </>
       }
     >
+      {operationalQuestions.length > 0 && (
+        <section aria-labelledby="operational-questions-heading" className="mb-5">
+          <h2 id="operational-questions-heading" className="text-ink mb-3 text-sm font-bold">
+            Details for your order types
+          </h2>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {operationalQuestions.map((question) => (
+              <QuestionCard
+                key={question.key}
+                question={question}
+                value={answers[question.key]}
+                onChange={(next) => setAnswers({ ...answers, [question.key]: next })}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ------------------------------------------------------- hours pattern */}
       <div className="grid gap-4 lg:grid-cols-3">
         <PatternCard

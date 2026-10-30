@@ -8,10 +8,13 @@ import * as React from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 import { uploadCatalogueImage } from '@/lib/catalogue-images';
-import { Chip } from './controls';
+import { Chip, QuestionCard } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
 import { NoDraft } from './no-draft';
+import { questionHasAnswer, questionIsVisible } from './question-logic';
+import { questionsForSubcategory } from './subcategory-questions';
+import type { CategorySubcategory } from './types';
 
 interface Item {
   id?: string;
@@ -21,6 +24,14 @@ interface Item {
   photo_path: string | null;
   photo_url?: string | null;
   contains_alcohol: boolean;
+  portion_size: string;
+  ingredients: string;
+  allergens: string;
+  dietary_labels: string;
+  availability_notes: string;
+  handling_notes: string;
+  storage_guidance: string;
+  prep_time_minutes: string;
 }
 
 /* Enough to catch what a merchant would actually type on a Nairobi menu. It
@@ -63,7 +74,7 @@ const RAILS = [
 export function PayoutStep() {
   const router = useRouter();
   const { toast } = useToast();
-  const { draft, categories, patch, refresh } = useOnboarding();
+  const { draft, categories, patch, refresh, setAnswers, setCategory, flush } = useOnboarding();
 
   const categoryId = draft?.category_key ?? draft?.category ?? null;
   const config = categories.find((category) => category.category === categoryId);
@@ -76,6 +87,25 @@ export function PayoutStep() {
   const example =
     config?.subcategories?.find((subcategory) => subcategory.id === draft?.subcategory)
       ?.catalogueExample ?? config?.catalogue_example;
+  const answers = draft?.answers ?? {};
+  const selectedSubcategories =
+    config?.subcategories?.filter((subcategory) =>
+      Array.isArray(answers.business_types)
+        ? answers.business_types.includes(subcategory.id)
+        : subcategory.id === draft?.subcategory,
+    ) ?? [];
+  const catalogueQuestions = [
+    ...(config?.questions ?? []).filter((question) => questionIsVisible(question, 6, answers)),
+    ...selectedSubcategories.flatMap((subcategory) =>
+      (subcategory.questions ?? questionsForSubcategory(subcategory as CategorySubcategory)).filter(
+        (question) => questionIsVisible(question, 6, answers),
+      ),
+    ),
+  ];
+  const catalogueQuestionsAnswered = catalogueQuestions.every((question) =>
+    questionHasAnswer(question, answers),
+  );
+  const isFoodCategory = categoryId === 'restaurants_food';
 
   const rail = draft?.payout_rail ?? 'mpesa_till';
   const account = draft?.payout_account ?? {};
@@ -86,6 +116,7 @@ export function PayoutStep() {
   const [loaded, setLoaded] = React.useState(false);
   const [uploadingPhoto, setUploadingPhoto] = React.useState<number | null>(null);
   const [photoError, setPhotoError] = React.useState<string | null>(null);
+  const savingItems = React.useRef<Promise<boolean> | null>(null);
 
   const draftId = draft?.id ?? null;
 
@@ -96,11 +127,13 @@ export function PayoutStep() {
       const supabase = createClient();
       const { data } = await supabase
         .from('catalogue_item')
-        .select('id, name, description, price_kes, photo_path')
+        .select(
+          'id, name, description, price_kes, photo_path, age_restricted, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes',
+        )
         .eq('merchant_id', draftId)
         .order('sort');
       if (cancelled) return;
-      const rows = (data as Item[] | null) ?? [];
+      const rows = data ?? [];
       const photoPaths = rows.flatMap((row) => (row.photo_path ? [row.photo_path] : []));
       const { data: signedPhotos } = photoPaths.length
         ? await supabase.storage.from('catalogue-images').createSignedUrls(photoPaths, 60 * 60)
@@ -117,7 +150,15 @@ export function PayoutStep() {
               ...r,
               description: r.description ?? '',
               photo_url: r.photo_path ? (photoUrls.get(r.photo_path) ?? null) : null,
-              contains_alcohol: false,
+              contains_alcohol: r.age_restricted,
+              portion_size: r.portion_size ?? '',
+              ingredients: r.ingredients ?? '',
+              allergens: r.allergens?.join(', ') ?? '',
+              dietary_labels: r.dietary_labels?.join(', ') ?? '',
+              availability_notes: r.availability_notes ?? '',
+              handling_notes: r.handling_notes ?? '',
+              storage_guidance: r.storage_guidance ?? '',
+              prep_time_minutes: r.prep_time_minutes ? String(r.prep_time_minutes) : '',
             }))
           : [blankItem(), blankItem(), blankItem(), blankItem(), blankItem()],
       );
@@ -148,13 +189,30 @@ export function PayoutStep() {
     patch({ payout_account: { ...account, [key]: value } }, 6);
   };
 
-  /** Writes the named rows and drops the blank ones. */
-  const saveItems = async (rows: Item[] = items): Promise<boolean> => {
+  const updateItem = (index: number, changes: Partial<Item>) => {
+    setItems((current) =>
+      current.map((item, itemIndex) => (itemIndex === index ? { ...item, ...changes } : item)),
+    );
+  };
+
+  const saveItemsNow = async (rows: Item[]): Promise<boolean> => {
     if (!draftId) return false;
     const named = rows.filter((i) => i.name.trim());
-    if (named.length === 0) return true;
 
     const supabase = createClient();
+    if (named.length === 0) {
+      const { error } = await supabase.from('catalogue_item').delete().eq('merchant_id', draftId);
+      if (error) {
+        toast({
+          title: 'We could not update your catalogue',
+          description: error.message,
+          tone: 'danger',
+        });
+        return false;
+      }
+      await refresh();
+      return true;
+    }
 
     /* One section, named for what this kind of business has. A merchant who
        wants headings builds them in the dashboard. */
@@ -205,6 +263,14 @@ export function PayoutStep() {
         photo_path: item.photo_path,
         age_restricted: item.contains_alcohol,
         sort: index,
+        portion_size: item.portion_size.trim() || null,
+        ingredients: item.ingredients.trim() || null,
+        allergens: csvValues(item.allergens),
+        dietary_labels: csvValues(item.dietary_labels),
+        availability_notes: item.availability_notes.trim() || null,
+        handling_notes: item.handling_notes.trim() || null,
+        storage_guidance: item.storage_guidance.trim() || null,
+        prep_time_minutes: item.prep_time_minutes ? Number(item.prep_time_minutes) : null,
       })),
     );
     if (insertError) {
@@ -219,6 +285,18 @@ export function PayoutStep() {
     return true;
   };
 
+  /** Writes the named rows and drops the blank ones. */
+  const saveItems = async (rows: Item[] = items): Promise<boolean> => {
+    if (savingItems.current && !(await savingItems.current)) return false;
+    const operation = saveItemsNow(rows);
+    savingItems.current = operation;
+    try {
+      return await operation;
+    } finally {
+      if (savingItems.current === operation) savingItems.current = null;
+    }
+  };
+
   const submit = async () => {
     if (!draftId) return;
     setSubmitting(true);
@@ -228,7 +306,25 @@ export function PayoutStep() {
       setSubmitting(false);
       return;
     }
+    if (categoryId && !(await setCategory(categoryId, answers))) {
+      setSubmitting(false);
+      toast({
+        title: 'We could not save your menu details',
+        description: 'Please try again before submitting your application.',
+        tone: 'danger',
+      });
+      return;
+    }
     if (email && email !== draft?.contact_email) patch({ contact_email: email }, 6);
+    if (!(await flush())) {
+      setSubmitting(false);
+      toast({
+        title: 'We could not save your menu details',
+        description: 'Please try again before submitting your application.',
+        tone: 'danger',
+      });
+      return;
+    }
 
     const supabase = createClient();
     await supabase.rpc('rpc_merchant_payout_name_check', { p_merchant_id: draftId });
@@ -288,7 +384,12 @@ export function PayoutStep() {
           >
             Back
           </Button>
-          <ContinueButton loading={submitting} loadingText="Sending…" onClick={() => void submit()}>
+          <ContinueButton
+            disabled={!catalogueQuestionsAnswered}
+            loading={submitting}
+            loadingText="Sending…"
+            onClick={() => void submit()}
+          >
             Submit for verification
           </ContinueButton>
         </>
@@ -411,6 +512,24 @@ export function PayoutStep() {
         </div>
       </div>
 
+      {catalogueQuestions.length > 0 && (
+        <section aria-labelledby="menu-readiness-heading" className="mt-6">
+          <h2 id="menu-readiness-heading" className="text-ink mb-3 text-sm font-bold">
+            Menu and customer information
+          </h2>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {catalogueQuestions.map((question) => (
+              <QuestionCard
+                key={question.key}
+                question={question}
+                value={answers[question.key]}
+                onChange={(next) => setAnswers({ ...answers, [question.key]: next })}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ------------------------------------------------------- first 5 items */}
       <div className="mt-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -509,6 +628,83 @@ export function PayoutStep() {
                   />
                 )}
               </div>
+              {isFoodCategory && (
+                <div className="grid gap-3 lg:col-span-3 lg:grid-cols-2">
+                  <Input
+                    id={`item_portion_${index}`}
+                    label="Portion or serving size"
+                    placeholder="e.g. 500 g, serves 2"
+                    value={item.portion_size}
+                    onChange={(event) => updateItem(index, { portion_size: event.target.value })}
+                    onBlur={() => void saveItems()}
+                  />
+                  <Input
+                    id={`item_ingredients_${index}`}
+                    label="Ingredients or key details"
+                    placeholder="Main ingredients, separated by commas"
+                    value={item.ingredients}
+                    onChange={(event) => updateItem(index, { ingredients: event.target.value })}
+                    onBlur={() => void saveItems()}
+                  />
+                  <Input
+                    id={`item_allergens_${index}`}
+                    label="Allergens"
+                    placeholder="e.g. milk, wheat, peanuts"
+                    value={item.allergens}
+                    onChange={(event) => updateItem(index, { allergens: event.target.value })}
+                    onBlur={() => void saveItems()}
+                  />
+                  <Input
+                    id={`item_dietary_${index}`}
+                    label="Dietary labels"
+                    placeholder="e.g. vegetarian, vegan"
+                    value={item.dietary_labels}
+                    onChange={(event) => updateItem(index, { dietary_labels: event.target.value })}
+                    onBlur={() => void saveItems()}
+                  />
+                  <Input
+                    id={`item_availability_${index}`}
+                    label="Availability"
+                    placeholder="e.g. weekdays only, until sold out"
+                    value={item.availability_notes}
+                    onChange={(event) =>
+                      updateItem(index, { availability_notes: event.target.value })
+                    }
+                    onBlur={() => void saveItems()}
+                  />
+                  <Input
+                    id={`item_handling_${index}`}
+                    label="Handling or delivery notes"
+                    placeholder="e.g. keep chilled, pack upright"
+                    value={item.handling_notes}
+                    onChange={(event) => updateItem(index, { handling_notes: event.target.value })}
+                    onBlur={() => void saveItems()}
+                  />
+                  <Input
+                    id={`item_storage_${index}`}
+                    label="Storage or reheating guidance"
+                    placeholder="Optional instructions for the customer"
+                    value={item.storage_guidance}
+                    onChange={(event) =>
+                      updateItem(index, { storage_guidance: event.target.value })
+                    }
+                    onBlur={() => void saveItems()}
+                  />
+                  <Input
+                    id={`item_prep_${index}`}
+                    label="Item-specific prep time (minutes)"
+                    inputMode="numeric"
+                    placeholder="Only if different from your usual prep time"
+                    value={item.prep_time_minutes}
+                    onChange={(event) =>
+                      updateItem(index, {
+                        prep_time_minutes: event.target.value.replace(/\D/g, ''),
+                      })
+                    }
+                    onBlur={() => void saveItems()}
+                  />
+                </div>
+              )}
               <div className="flex items-center gap-2 pb-1">
                 {item.contains_alcohol && (
                   <Chip
@@ -591,5 +787,24 @@ function blankItem(): Item {
     price_kes: null,
     photo_path: null,
     contains_alcohol: false,
+    portion_size: '',
+    ingredients: '',
+    allergens: '',
+    dietary_labels: '',
+    availability_notes: '',
+    handling_notes: '',
+    storage_guidance: '',
+    prep_time_minutes: '',
   };
+}
+
+function csvValues(value: string): string[] {
+  return [
+    ...new Set(
+      value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ),
+  ];
 }
