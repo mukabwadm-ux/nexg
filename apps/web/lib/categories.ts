@@ -20,12 +20,37 @@ export const POPULAR_CATEGORIES = [
   { key: 'home.pc.airport', image: 'airport', href: '/ask?need=Airport%20Transfer' },
 ] as const;
 
+const CONFIG_CATEGORY_BY_TILE: Record<string, string> = {
+  restaurant: 'restaurants_food',
+  supermarket: 'groceries_essentials',
+  pharmacy: 'health',
+  beauty_fashion: 'beauty',
+  bar_liquor: 'alcohol_beverages',
+  florist: 'flowers_gifts',
+  laundry: 'laundry_cleaning',
+  gift_shop: 'flowers_gifts',
+};
+
 /** The tiles with their labels translated, as PopularCategories takes them. */
-export function categoryTiles(t: (key: string) => string) {
+export function categoryTiles(
+  t: (key: string) => string,
+  configured: { category: string; label: string; image_path: string | null; image_url?: string | null }[] = [],
+) {
   return POPULAR_CATEGORIES.map((item) => ({
     key: item.key,
-    label: t(item.key),
+    label:
+      ('category' in item &&
+        configured.find(
+          (category) => category.category === CONFIG_CATEGORY_BY_TILE[item.category],
+        )?.label) ||
+      t(item.key),
     image: item.image,
+    imageUrl:
+      'category' in item
+        ? configured.find(
+            (category) => category.category === CONFIG_CATEGORY_BY_TILE[item.category],
+          )?.image_url
+        : null,
     ...('category' in item ? { category: item.category } : { href: item.href }),
   }));
 }

@@ -21,10 +21,11 @@ export interface BadgeRule {
 export interface CategorySubcategory {
   id: string;
   name: string;
-  icon: string;
+  icon?: string;
   fulfillmentHint?: string;
   workflowHint?: string;
   fields?: string[];
+  questions?: Question[];
   suggestedItemCount?: number;
   defaultWorkflow?: string;
   workflow?: {
@@ -44,6 +45,9 @@ export interface CatalogueExample {
 
 export interface CategoryConfig {
   category: string;
+  image_path?: string | null;
+  image_url?: string | null;
+  is_active?: boolean;
   label: string;
   icon: string;
   color?: string;
@@ -105,6 +109,7 @@ export interface Draft {
   contact_phone: string;
   contact_email: string | null;
   category: string | null;
+  category_key?: string | null;
   subcategory?: string | null;
   category_other: string | null;
   answers: Record<string, string | string[]>;

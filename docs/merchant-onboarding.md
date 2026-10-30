@@ -59,85 +59,55 @@ security-definer RPC. **It must not be `SECURITY DEFINER`** — that rewrites
 `current_user` to the function owner and the guard silently passes for
 everyone. `supabase/tests/06_rls_onboarding.sql` fails if someone does that.
 
-## How to add a category
+## Managing categories
 
-The onboarding chooser is built from `MERCHANT_TAXONOMY` in
-`packages/contracts/src/taxonomy.ts`. Add the category and its specialties
-there, including the customer workflow and the listing fields each specialty
-needs. Step 2 uses those entries for the category tiles and tailored setup
-preview.
+Merchant Ops and Super Admin can manage categories from **Admin → Categories**.
+Create or edit a category there instead of adding it to a TypeScript taxonomy
+or extending the legacy merchant enum. The database category configuration is
+the source used by onboarding, public category browsing, Explore, and search.
 
-Also add the matching `merchant_category` enum value and `category_config`
-row in Supabase migrations. The database row remains authoritative for
-category-specific questions, badges and document rules; the web taxonomy does
-not replace those server-side requirements.
+Keep category IDs stable after merchants or applications use them; merchants
+store the ID in `merchant.category_key`. Categories are archived rather than
+deleted. An archived category disappears from new applications and public
+category lists, while applicants already using it can finish onboarding.
+Changes to questions and requirements are reflected in in-progress
+applications.
 
-For example, the database row includes:
+The editor controls:
 
-```sql
-insert into public.category_config
-  (category, label, icon, card_kind, eta_style, sort, questions, badge_rules)
-values ('butchery', 'Butchery', 'Beef', 'products', 'minutes', 10, '[…]', '{…}');
-```
+- The customer-facing name, description, icon, colors, display order, image,
+  catalogue style (`menu`, `services`, or `products`), and timing style.
+- Whether a preparation estimate is needed. Enable it only for businesses
+  that genuinely prepare an order; delivery estimates are calculated separately
+  by the platform.
+- Category questions, specialties, specialty questions, and conditional
+  merchant document requirements. Questions use `single`, `multi`, or `text`;
+  single and multi questions need at least one option.
+- Category and specialty-specific catalogue examples: item name, description,
+  price placeholder, and image guidance. These are prompts, not enforced or
+  suggested prices.
 
-- Apply the enum migration before the category data migration. Do not add and
-  use a new enum value in the same migration transaction.
-- `category` must exist in both the canonical taxonomy and the
-  `merchant_category` enum.
-- `icon` is a lucide-react name; add it to the `ICONS` map in
-  `components/onboarding/controls.tsx` or the tile uses the store icon.
+Category images use the public `category-images` bucket. Product and service
+photos still use the private `catalogue-images` bucket. Catalogue uploads are
+scoped by merchant ID, and storefronts receive short-lived signed URLs only
+for live, guest-visible merchants. Accept JPEG, PNG or WebP up to 5 MB.
+
+The category manager validates configuration before saving. For configuration
+changes that require application code or platform behavior—for example new
+regulated-goods controls—implement and test that behavior separately rather
+than treating a category question as enforcement.
+
 - `card_kind` decides whether the merchant is asked for a menu, services or
-  products; `eta_style` whether their card says "delivers in 25 min" or
-  "back next day".
-- `prepTimeRequired` controls whether the onboarding asks for a per-order
-  preparation estimate. It is intentionally enabled for Restaurants & Food;
-  categories that sell stocked goods, services or bookings do not receive a
-  kitchen-style preparation slider. Delivery estimates remain platform
-  calculated.
-- `getCatalogueExample` supplies category-specific name, description, price
-  and photo prompts for the first catalogue entries and the merchant catalogue.
-  Adult specialties can override the category prompt individually. Examples
-  are prompts only, never suggested or enforced prices. Keep examples relevant
-  to the real thing sold, not a restaurant default.
-- Product and service photos use the private `catalogue-images` bucket.
-  Uploads are scoped by the merchant id in the storage path; only a member of
-  that merchant can upload. The storefront receives short-lived signed URLs
-  only for live, guest-visible merchants. Accept JPEG, PNG or WebP up to 5 MB.
-- `subcategories[].fields` drive the specialty-specific onboarding questions.
-  An optional `subcategories[].workflow` describes merchant setup, the guest
-  journey and order handling separately. Keep its status as `designed` until
-  those steps are implemented; `policyNote` identifies requirements needing
-  verification or additional platform work. The older `defaultWorkflow` string
-  remains the fallback preview for specialties without staged workflows.
-  Document requirements and conditional rules belong in the database as
-  described below.
-- The 13 categories with taxonomy-driven setup questions render every selected
-  specialty field as a required answer. `fn_merchant_readiness` checks those
-  same fields server-side against `category_config.subcategories`; keep the
-  taxonomy fields and database subcategory data aligned when adding or changing
-  a specialty.
-- Specialty selections are persisted through
-  `rpc_merchant_set_subcategory`, which checks that the selected specialty
-  belongs to the merchant's category. Keep the category's configured
-  `subcategories` JSON aligned with the taxonomy migration.
-
-## How to add a question
-
-Append to that category's `questions` array:
-
-```json
-{ "key": "does_catering", "label": "Do you cater for events?", "type": "single",
-  "options": [{"value":"yes","label":"Yes"},{"value":"no","label":"No"}],
-  "hint": "Shown to guests planning ahead." }
-```
-
-`type` is `single`, `multi` or `text`. The answer lands in `merchant.answers`
-under `key`. Nothing in the web app needs changing — step 2 renders whatever
-is there, and the admin console reads the same labels back.
-
-The questions live in the database rather than in a TypeScript constant for
-one reason: the answers decide which documents we demand, and
-`fn_merchant_required_docs` cannot consult a web bundle.
+  products; `eta_style` controls whether its customer card shows a minutes-based
+  estimate or a turnaround.
+- Configured specialty fields and questions drive onboarding, and server-side
+  readiness checks the same requirements.
+- Conditional document rules must reference an existing merchant document
+  requirement and valid answer keys. See [How to add a document rule](#how-to-add-a-document-rule).
+- `subcategories[].workflow` can describe merchant setup, guest journey, and
+  order handling separately. Keep its status `designed` until the steps are
+  implemented; `policyNote` identifies requirements needing verification or
+  additional platform work.
 
 ## Deactivation and deletion
 

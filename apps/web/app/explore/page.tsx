@@ -6,10 +6,10 @@ import Link from 'next/link';
 
 import {
   CATEGORY_ICON,
+  CATEGORY_ICON_BY_NAME,
   CATEGORY_LABEL,
   type ExploreMerchant,
   MerchantCard,
-  TAXONOMY_CATEGORIES,
 } from '@/components/explore/merchant-card';
 import { CategoryScroller } from '@/components/explore/category-scroller';
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
@@ -28,18 +28,6 @@ export const metadata: Metadata = {
 /** A merchant that went live a minute ago belongs here now. */
 export const dynamic = 'force-dynamic';
 
-/* Categories from before the current taxonomy; shown only while a merchant still uses one. */
-const LEGACY_CATEGORIES = [
-  'restaurant',
-  'bar_liquor',
-  'laundry',
-  'florist',
-  'beauty_fashion',
-  'pharmacy',
-  'supermarket',
-  'gift_shop',
-] as const;
-
 /*
  * The listing is dynamic because the filters live in the query string, so the
  * page itself cannot be cached — but the data behind it is the same for
@@ -53,7 +41,7 @@ const listingFor = unstable_cache(
       supabase
         .from('merchant_public')
         .select(
-          'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, zone_id, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
+          'id, trading_name, category, category_key, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, zone_id, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
         )
         .order('listed_at', { ascending: false }),
       supabase
@@ -63,6 +51,12 @@ const listingFor = unstable_cache(
         .order('sort', { ascending: true }),
       supabase.from('zone').select('id, city_id, name').eq('active', true),
     ]);
+    if (merchantResult.error) {
+      throw new Error(`Could not load Explore merchants: ${merchantResult.error.message}`);
+    }
+    if (cityResult.error) {
+      throw new Error(`Could not load Explore cities: ${cityResult.error.message}`);
+    }
     if (zoneResult.error) {
       throw new Error(`Could not load active delivery zones: ${zoneResult.error.message}`);
     }
@@ -125,6 +119,17 @@ export default async function ExplorePage({
   const { cities: allCities } = await listingFor();
   const citySlug = searchParams?.city ?? allCities[0]?.slug ?? 'nairobi';
   const { merchants: all, cities, zones } = await listingFor();
+  const categoryClient = createPublicClient();
+  const { data: categoriesRaw, error: categoriesError } = await categoryClient
+    .from('category_config')
+    .select('category, label, icon, is_active, sort')
+    .eq('is_active', true)
+    .order('sort');
+  if (categoriesError) {
+    throw new Error(`Could not load Explore categories: ${categoriesError.message}`);
+  }
+  const categories = categoriesRaw ?? [];
+  const categoriesById = new Map(categories.map((category) => [category.category, category]));
   const cityName = cities?.find((c) => c.slug === citySlug)?.name ?? 'your city';
   const cityId = cities?.find((c) => c.slug === citySlug)?.id;
   const selectedZone =
@@ -136,12 +141,22 @@ export default async function ExplorePage({
    * being served, so every live merchant is listed there regardless of the
    * city or `explore_visible` set on its record.
    */
-  const real = (all ?? []).filter(
-    (m): m is typeof m & { id: string; trading_name: string } =>
-      Boolean(m.id) &&
-      Boolean(m.trading_name) &&
-      (citySlug === 'nairobi' || m.city_slug === citySlug),
-  );
+  const real = (all ?? [])
+    .filter(
+      (m): m is typeof m & { id: string; trading_name: string } =>
+        Boolean(m.id) &&
+        Boolean(m.trading_name) &&
+        (citySlug === 'nairobi' || m.city_slug === citySlug),
+    )
+    .map((merchant) => {
+      const key = merchant.category_key ?? merchant.category ?? 'other';
+      const category = categoriesById.get(key);
+      return {
+        ...merchant,
+        category_label: category?.label,
+        category_icon_name: category?.icon,
+      };
+    });
 
   /*
    * Until a merchant is live in Nairobi, every category shows a labelled
@@ -151,10 +166,13 @@ export default async function ExplorePage({
   const cityZones = (zones ?? []).filter((zone) => zone.city_id === cityId);
   const placeholders =
     citySlug === 'nairobi' && real.length === 0
-      ? TAXONOMY_CATEGORIES.map((category, index) => ({
-          id: `placeholder-${category}`,
-          trading_name: `${CATEGORY_LABEL[category]} partner`,
-          category,
+      ? categories.map((category, index) => ({
+          id: `placeholder-${category.category}`,
+          trading_name: `${category.label} partner`,
+          category: null,
+          category_key: category.category,
+          category_label: category.label,
+          category_icon_name: category.icon,
           category_other: null,
           cover_photo_path: null,
           branch_name: cityZones.length ? cityZones[index % cityZones.length]!.name : null,
@@ -217,7 +235,9 @@ export default async function ExplorePage({
       const km = kmTo(merchant);
       if (km === null || km > NEAR_KM) return false;
     }
-    if (state.category && merchant.category !== state.category) return false;
+    if (state.category && (merchant.category_key ?? merchant.category) !== state.category) {
+      return false;
+    }
     if (state.area && merchant.branch_name !== state.area) return false;
     if (state.zone && merchant.zone_id !== state.zone) return false;
     if (state.openNow && merchant.accepting_orders === false) return false;
@@ -238,9 +258,16 @@ export default async function ExplorePage({
     .filter((m) => m.concierge_pick && (!state.zone || m.zone_id === state.zone))
     .slice(0, 3);
   const areas = [...new Set(listed.map((m) => m.branch_name).filter(Boolean))] as string[];
+  const listedCategoryKeys = [
+    ...new Set(
+      listed
+        .map((merchant) => merchant.category_key ?? merchant.category)
+        .filter((category): category is string => Boolean(category)),
+    ),
+  ];
   const usedCategories = [
-    ...TAXONOMY_CATEGORIES,
-    ...LEGACY_CATEGORIES.filter((c) => listed.some((m) => m.category === c)),
+    ...categories.map((category) => category.category),
+    ...listedCategoryKeys.filter((category) => !categoriesById.has(category)),
   ];
 
   return (
@@ -327,8 +354,11 @@ export default async function ExplorePage({
             .concat(
               usedCategories.map((category) => ({
                 key: category,
-                label: CATEGORY_LABEL[category] ?? category,
-                Icon: CATEGORY_ICON[category] ?? Store,
+                label: categoriesById.get(category)?.label ?? CATEGORY_LABEL[category] ?? category,
+                Icon:
+                  CATEGORY_ICON[category] ??
+                  CATEGORY_ICON_BY_NAME[categoriesById.get(category)?.icon ?? ''] ??
+                  Store,
               })),
             )
             .map(({ key, label, Icon }) => {
@@ -384,7 +414,11 @@ export default async function ExplorePage({
 
             <ul className="mt-5 grid gap-4 md:grid-cols-3">
               {picks.map((pick) => {
-                const Icon = CATEGORY_ICON[pick.category ?? 'other'] ?? Store;
+                const pickCategory = pick.category_key ?? pick.category ?? 'other';
+                const Icon =
+                  CATEGORY_ICON[pickCategory] ??
+                  CATEGORY_ICON_BY_NAME[pick.category_icon_name ?? ''] ??
+                  Store;
                 return (
                   <li key={pick.id}>
                     <Link
@@ -413,7 +447,9 @@ export default async function ExplorePage({
                           {pick.trading_name}
                         </span>
                         <span className="mt-1 block text-xs font-semibold text-white/60">
-                          {CATEGORY_LABEL[pick.category ?? 'other']}
+                          {pick.category_label ??
+                            CATEGORY_LABEL[pickCategory] ??
+                            pickCategory}
                           {pick.branch_name && ` · ${pick.branch_name}`}
                         </span>
                       </span>

@@ -13,22 +13,6 @@ import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
 import { questionsForSubcategory } from './subcategory-questions';
 
-const SUBCATEGORY_SETUP_CATEGORIES = new Set([
-  'adults_only',
-  'airport_transfers',
-  'fashion_apparel',
-  'vehicle_rentals',
-  'experiences',
-  'financial_services',
-  'marketplace',
-  'health',
-  'tech_electronics',
-  'travel_tours',
-  'vehicle_services',
-  'wellness',
-  'concierge_services',
-]);
-
 interface RequiredDocument {
   label: string;
   kind: string;
@@ -60,8 +44,9 @@ export function CategoryStep() {
   const [categorySaveFailed, setCategorySaveFailed] = React.useState(false);
   const [subcategorySaveFailed, setSubcategorySaveFailed] = React.useState(false);
 
-  const selectedCategoryId = draft?.category
-    ? (getCategoryById(draft.category)?.id ?? draft.category)
+  const savedCategory = draft?.category_key ?? draft?.category;
+  const selectedCategoryId = savedCategory
+    ? (getCategoryById(savedCategory)?.id ?? savedCategory)
     : null;
   const config = categories.find((category) => category.category === selectedCategoryId);
   const answers = draft?.answers ?? {};
@@ -69,10 +54,10 @@ export function CategoryStep() {
   const selectedSubcategory = config?.subcategories?.find(
     (subcategory) => subcategory.id === draft?.subcategory,
   );
-  const subcategoryQuestions =
-    selectedSubcategory && config && SUBCATEGORY_SETUP_CATEGORIES.has(config.category)
-      ? questionsForSubcategory(selectedSubcategory)
-      : [];
+  const subcategoryQuestions = selectedSubcategory
+    ? (selectedSubcategory.questions ??
+      questionsForSubcategory(selectedSubcategory as Parameters<typeof questionsForSubcategory>[0]))
+    : [];
   const questions = [...(config?.questions ?? []), ...subcategoryQuestions];
 
   /*
@@ -127,8 +112,8 @@ export function CategoryStep() {
       })
     : false;
   const canContinue =
-    !!draft?.category &&
-    !!selectedSubcategory &&
+    !!savedCategory &&
+    (!config?.subcategories?.length || !!selectedSubcategory) &&
     answered &&
     !savingCategory &&
     !savingSubcategory &&
@@ -137,11 +122,11 @@ export function CategoryStep() {
     !subcategorySaveFailed;
 
   const continueToLocation = async () => {
-    if (!draft?.category || !canContinue) return;
+    if (!savedCategory || !canContinue) return;
     setSavingCategory(true);
     setCategorySaveFailed(false);
     try {
-      const categorySaved = await setCategory(draft.category, answers);
+      const categorySaved = await setCategory(savedCategory, answers);
       const setupSaved = categorySaved && (await flush());
       if (!setupSaved) {
         setCategorySaveFailed(true);
@@ -166,8 +151,9 @@ export function CategoryStep() {
   };
 
   const selectCategory = async (category: (typeof categories)[number]) => {
-    const isRetry = category.category === draft?.category && categorySaveFailed;
-    if (category.category === draft?.category && !isRetry) return;
+    const currentCategory = draft?.category_key ?? draft?.category;
+    const isRetry = category.category === currentCategory && categorySaveFailed;
+    if (category.category === currentCategory && !isRetry) return;
 
     setCategorySaveFailed(false);
     setSavingCategory(true);
@@ -190,14 +176,16 @@ export function CategoryStep() {
     setSavingSubcategory(true);
     setSubcategorySaveFailed(false);
     const nextSubcategory = config?.subcategories?.find((item) => item.id === subcategoryId);
-    const categoryId = draft?.category;
+    const categoryId = draft?.category_key ?? draft?.category;
     let saved = !!nextSubcategory && !!categoryId;
     if (nextSubcategory && categoryId) {
       const retainedKeys = new Set([
         ...(config?.questions.map((question) => question.key) ?? []),
-        ...(SUBCATEGORY_SETUP_CATEGORIES.has(config?.category ?? '')
-          ? questionsForSubcategory(nextSubcategory).map((question) => question.key)
-          : []),
+        ...(nextSubcategory.questions ??
+          questionsForSubcategory(
+            nextSubcategory as Parameters<typeof questionsForSubcategory>[0],
+          )
+        ).map((question) => question.key),
       ]);
       const retainedAnswers = Object.fromEntries(
         Object.entries(answers).filter(([key]) => retainedKeys.has(key)),
@@ -256,6 +244,7 @@ export function CategoryStep() {
             icon={category.icon}
             label={category.label}
             description={category.description}
+            imageUrl={category.image_url}
             selected={selectedCategoryId === category.category}
             disabled={savingCategory || savingSubcategory}
             onClick={() => void selectCategory(category)}

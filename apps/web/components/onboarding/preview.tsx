@@ -3,8 +3,6 @@
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
-import { getCategoryById } from '@nexg/contracts';
-
 import { ReadyRing } from './shell-frame';
 import { useOnboarding } from './store';
 import { READINESS_CHECKS, type BadgeRule } from './types';
@@ -72,9 +70,7 @@ export function LivePreview() {
 
   if (!draft) return null;
 
-  const categoryId = draft.category
-    ? (getCategoryById(draft.category)?.id ?? draft.category)
-    : null;
+  const categoryId = draft.category_key ?? draft.category;
   const config = categoryId
     ? categories.find((category) => category.category === categoryId)
     : undefined;

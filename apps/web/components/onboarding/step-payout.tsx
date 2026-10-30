@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
-import { getCatalogueExample, getCategoryById } from '@nexg/contracts';
 
 import { uploadCatalogueImage } from '@/lib/catalogue-images';
 import { Chip } from './controls';
@@ -66,9 +65,7 @@ export function PayoutStep() {
   const { toast } = useToast();
   const { draft, categories, patch, refresh } = useOnboarding();
 
-  const categoryId = draft?.category
-    ? (getCategoryById(draft.category)?.id ?? draft.category)
-    : null;
+  const categoryId = draft?.category_key ?? draft?.category ?? null;
   const config = categories.find((category) => category.category === categoryId);
   const noun =
     config?.card_kind === 'services'
@@ -76,7 +73,9 @@ export function PayoutStep() {
       : config?.card_kind === 'menu'
         ? 'menu items'
         : 'products';
-  const example = getCatalogueExample(categoryId, draft?.subcategory) ?? config?.catalogue_example;
+  const example =
+    config?.subcategories?.find((subcategory) => subcategory.id === draft?.subcategory)
+      ?.catalogueExample ?? config?.catalogue_example;
 
   const rail = draft?.payout_rail ?? 'mpesa_till';
   const account = draft?.payout_account ?? {};

@@ -29,7 +29,25 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 
-import { ALL_CATEGORIES, getCategoryImage, type MerchantCategory } from '@nexg/contracts';
+import { getCategoryImage } from '@nexg/contracts';
+
+export interface ExplorerCategory {
+  id: string;
+  name: string;
+  desc: string;
+  icon: string;
+  cardKind: string;
+  sort: number;
+  color: string | null;
+  image?: string;
+  imageUrl?: string | null;
+  subcategories: {
+    id: string;
+    name: string;
+    fields?: string[];
+    fulfillmentHint?: string;
+  }[];
+}
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Utensils: UtensilsCrossed,
@@ -60,7 +78,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 
 type CardKindFilter = 'all' | 'products' | 'services' | 'menu';
 
-export function CategoryExplorer() {
+export function CategoryExplorer({ categories }: { categories: ExplorerCategory[] }) {
   const [query, setQuery] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
   const [kindFilter, setKindFilter] = React.useState<CardKindFilter>('all');
@@ -68,7 +86,7 @@ export function CategoryExplorer() {
   const trimmed = query.trim().toLowerCase();
 
   const filteredCategories = React.useMemo(() => {
-    let result = ALL_CATEGORIES;
+    let result = categories;
 
     // Filter by kind
     if (kindFilter !== 'all') {
@@ -90,15 +108,15 @@ export function CategoryExplorer() {
         const matchSub = c.subcategories.some(
           (s) =>
             s.name.toLowerCase().includes(trimmed) ||
-            s.fields.some((f) => f.toLowerCase().includes(trimmed)) ||
-            s.fulfillmentHint.toLowerCase().includes(trimmed),
+              s.fields?.some((f) => f.toLowerCase().includes(trimmed)) ||
+              s.fulfillmentHint?.toLowerCase().includes(trimmed),
         );
         return matchCat || matchSub;
       });
     }
 
     return result;
-  }, [trimmed, selectedCategory, kindFilter]);
+  }, [categories, trimmed, selectedCategory, kindFilter]);
 
   const totalSubcatsFound = React.useMemo(() => {
     return filteredCategories.reduce((acc, c) => acc + c.subcategories.length, 0);
@@ -140,7 +158,7 @@ export function CategoryExplorer() {
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {(
             [
-              { key: 'all', label: 'All Verticals (21)' },
+              { key: 'all', label: `All Verticals (${categories.length})` },
               { key: 'products', label: 'Products & Retail' },
               { key: 'services', label: 'Services & Rentals' },
               { key: 'menu', label: 'Food & Dining' },
@@ -168,7 +186,7 @@ export function CategoryExplorer() {
           <div className="mt-4 flex items-center justify-center gap-2">
             <span className="text-muted-light text-xs font-medium">Viewing vertical:</span>
             <span className="border-border bg-surface text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold">
-              {ALL_CATEGORIES.find((c) => c.id === selectedCategory)?.name}
+              {categories.find((c) => c.id === selectedCategory)?.name}
               <button
                 onClick={() => setSelectedCategory(null)}
                 className="text-muted-light hover:text-gold ml-1"
@@ -200,15 +218,15 @@ export function CategoryExplorer() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredCategories.map((cat: MerchantCategory) => {
+          {filteredCategories.map((cat) => {
             const Icon = ICON_MAP[cat.icon] || Store;
-            const imageSrc = cat.image || getCategoryImage(cat.id);
+            const imageSrc = cat.imageUrl || cat.image || getCategoryImage(cat.id);
             const matchingSubs = trimmed
               ? cat.subcategories.filter(
                   (s) =>
                     s.name.toLowerCase().includes(trimmed) ||
-                    s.fields.some((f) => f.toLowerCase().includes(trimmed)) ||
-                    s.fulfillmentHint.toLowerCase().includes(trimmed),
+                    s.fields?.some((f) => f.toLowerCase().includes(trimmed)) ||
+                    s.fulfillmentHint?.toLowerCase().includes(trimmed),
                 )
               : cat.subcategories;
 
@@ -227,6 +245,7 @@ export function CategoryExplorer() {
                       sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
                       className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                       priority={cat.sort <= 3}
+                      unoptimized={imageSrc.startsWith('http')}
                     />
 
                     {/* Gradient Overlay for high contrast */}
@@ -314,7 +333,7 @@ export function CategoryExplorer() {
       {/* Summary Footer */}
       <div className="border-border text-muted-light border-t pt-6 text-center text-xs font-medium">
         Showing {filteredCategories.length} categories · {totalSubcatsFound} subcategories available
-        across Nairobi · All images CC0 certified
+        across Nairobi · Category imagery is configured by NexG
       </div>
     </div>
   );

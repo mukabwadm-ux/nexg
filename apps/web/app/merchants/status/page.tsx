@@ -3,9 +3,10 @@ import { redirect } from 'next/navigation';
 
 import { OnboardingProvider } from '@/components/onboarding/store';
 import { StatusStep, type CallSlot, type StatusFacts } from '@/components/onboarding/step-status';
-import type { CategoryConfig, Draft, Readiness } from '@/components/onboarding/types';
+import type { Draft, Readiness } from '@/components/onboarding/types';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { categoryConfigFromRow } from '@/lib/category-config';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export default async function StatusPage() {
   const draft = merchant as Draft;
 
   const [
-    { data: categories },
+    { data: categoryRows, error: categoriesError },
     { data: readiness },
     { data: requirements },
     { data: documents },
@@ -40,9 +41,7 @@ export default async function StatusPage() {
   ] = await Promise.all([
     supabase
       .from('category_config')
-      .select(
-        'category, label, icon, card_kind, eta_style, questions, badge_rules, featured_eligible, requires_ops_mapping, sort',
-      )
+      .select('*')
       .order('sort'),
     supabase.rpc('fn_merchant_readiness', { p_merchant_id: draft.id }),
     supabase.rpc('fn_merchant_required_docs', { p_merchant_id: draft.id }),
@@ -67,6 +66,21 @@ export default async function StatusPage() {
       .eq('merchant_id', draft.id),
     supabase.from('setting').select('value').eq('key', 'onboarding_call_times').maybeSingle(),
   ]);
+
+  if (categoriesError) {
+    throw new Error(`Could not load merchant category setup: ${categoriesError.message}`);
+  }
+  const currentCategory = draft.category_key ?? draft.category;
+  const categories = (categoryRows ?? [])
+    .filter((category) => category.is_active || category.category === currentCategory)
+    .map((category) =>
+      categoryConfigFromRow(
+        category,
+        category.image_path
+          ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data.publicUrl
+          : null,
+      ),
+    );
 
   const reqs = (requirements as { id: string; label: string }[] | null) ?? [];
   const docs =
@@ -103,7 +117,7 @@ export default async function StatusPage() {
       <OnboardingProvider
         initialDraft={draft}
         initialReadiness={(readiness as Readiness | null) ?? null}
-        categories={(categories as CategoryConfig[] | null) ?? []}
+        categories={categories}
       >
         <StatusStep
           slots={nextCallSlots((callTimes?.value as string[] | null) ?? [])}
