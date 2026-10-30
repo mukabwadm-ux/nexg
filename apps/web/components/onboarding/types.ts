@@ -176,8 +176,8 @@ export const READINESS_CHECKS: { key: keyof Omit<Readiness, 'pct'>; label: strin
 /** Step number → the route that renders it, and what the top bar says. */
 export const STEPS = [
   { step: 1, path: '/merchants/apply/start', minutes: 8 },
-  { step: 2, path: '/merchants/apply/category', minutes: 6 },
-  { step: 3, path: '/merchants/apply/location', minutes: 5 },
+  { step: 2, path: '/merchants/apply/location', minutes: 5 },
+  { step: 3, path: '/merchants/apply/category', minutes: 6 },
   { step: 4, path: '/merchants/apply/hours', minutes: 3 },
   { step: 5, path: '/merchants/apply/documents', minutes: 2 },
   { step: 6, path: '/merchants/apply/payout', minutes: 1 },

@@ -192,7 +192,7 @@ export function HoursStep() {
           <Button
             variant="outline"
             size="lg"
-            onClick={() => router.push('/merchants/apply/location')}
+            onClick={() => router.push('/merchants/apply/category')}
           >
             Back
           </Button>

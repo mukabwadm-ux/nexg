@@ -32,21 +32,8 @@ const BRANCH_BANDS = [
   { value: 'more_than_10', label: 'More than 10' },
 ];
 
-const PICKUP = [
-  { value: 'front_counter', label: 'Front counter' },
-  { value: 'side_kitchen', label: 'Side / kitchen door' },
-  { value: 'ask_security', label: 'Ask security' },
-  { value: 'call_on_arrival', label: 'Call on arrival' },
-];
-
-const PARKING = [
-  { value: 'easy', label: 'Easy' },
-  { value: 'tight', label: 'Tight — call ahead' },
-  { value: 'none', label: 'None' },
-];
-
 /**
- * Step 3 — where a rider collects from.
+ * Step 2 — where the business is located.
  *
  * Where we deliver is the gate on this whole flow: a drawn zone, or anywhere
  * inside the radius of a city we trade in. A merchant beyond both cannot be
@@ -278,17 +265,17 @@ export function LocationStep() {
 
   return (
     <OnboardingShell
-      step={3}
+      step={2}
       eyebrow="Location"
-      title="Where do riders collect from?"
-      intro="One pin and three taps. Delivery time on your card comes from where you are, not from a promise you have to type."
+      title="Where is your business located?"
+      intro="Add your business address and area so we can place it correctly on the map."
       footer={
         outside && hasPin && !inZone ? (
           <>
             <Button
               variant="outline"
               size="lg"
-              onClick={() => router.push('/merchants/apply/category')}
+              onClick={() => router.push('/merchants/apply/start')}
             >
               Back
             </Button>
@@ -302,15 +289,15 @@ export function LocationStep() {
             <Button
               variant="outline"
               size="lg"
-              onClick={() => router.push('/merchants/apply/category')}
+              onClick={() => router.push('/merchants/apply/start')}
             >
               Back
             </Button>
             <ContinueButton
               disabled={!served}
               onClick={() => {
-                patch({}, 4);
-                router.push('/merchants/apply/hours');
+                patch({}, 3);
+                router.push('/merchants/apply/category');
               }}
             >
               Continue
@@ -318,7 +305,7 @@ export function LocationStep() {
             <FooterNote>
               {multi && branches.length > 1
                 ? `Branches 2${branches.length > 2 ? ` and ${branches.length}` : ''} inherit hours and menu until you edit them`
-                : 'Riders are matched to the branch nearest the guest'}
+                : 'Your location helps customers find and reach your business'}
             </FooterNote>
           </>
         )
@@ -399,7 +386,7 @@ export function LocationStep() {
               <Chip
                 key={option.value}
                 selected={band === option.value}
-                onClick={() => patch({ branch_count_band: option.value }, 3)}
+                onClick={() => patch({ branch_count_band: option.value }, 2)}
               >
                 {option.label}
               </Chip>
@@ -603,7 +590,7 @@ export function LocationStep() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    patch({ branch_count_band: '2_3' }, 3);
+                    patch({ branch_count_band: '2_3' }, 2);
                     setLocalBranches([...branches, blank()]);
                   }}
                 >
@@ -623,55 +610,6 @@ export function LocationStep() {
         </div>
       )}
 
-      {/* ------------------------------------------- pickup, parking, landmark */}
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <div className="border-border bg-surface rounded-2xl border p-5">
-          <p className="text-[0.9375rem] font-extrabold">Pickup instructions · main branch</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {PICKUP.map((option) => (
-              <Chip
-                key={option.value}
-                selected={draft?.pickup_instructions === option.value}
-                onClick={() => patch({ pickup_instructions: option.value }, 3)}
-              >
-                {option.label}
-              </Chip>
-            ))}
-          </div>
-          <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
-            Other branches copy this until you change it.
-          </p>
-        </div>
-
-        <div className="border-border bg-surface rounded-2xl border p-5">
-          <p className="text-[0.9375rem] font-extrabold">Rider parking</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {PARKING.map((option) => (
-              <Chip
-                key={option.value}
-                selected={draft?.rider_parking === option.value}
-                onClick={() => patch({ rider_parking: option.value }, 3)}
-              >
-                {option.label}
-              </Chip>
-            ))}
-          </div>
-        </div>
-
-        <div className="border-border bg-surface rounded-2xl border p-5">
-          <p className="text-[0.9375rem] font-extrabold">Landmark riders know</p>
-          <div className="mt-4">
-            <Input
-              id="landmark"
-              label="Landmark"
-              labelHidden
-              placeholder="e.g. opposite Sarit Centre"
-              defaultValue={draft?.landmark ?? ''}
-              onBlur={(event) => patch({ landmark: event.target.value }, 3)}
-            />
-          </div>
-        </div>
-      </div>
     </OnboardingShell>
   );
 }

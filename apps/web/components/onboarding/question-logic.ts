@@ -21,6 +21,19 @@ export function conditionMatches(
   return false;
 }
 
+export function needsRiderPickup(answers: Record<string, string | string[]>): boolean {
+  return conditionMatches(
+    {
+      any: [
+        { answer: 'fulfillment_methods', includes: 'delivery' },
+        { answer: 'collection', equals: 'rider_collects' },
+        { answer: 'collection', equals: 'either' },
+      ],
+    },
+    answers,
+  );
+}
+
 export function questionIsVisible(
   question: Question,
   step: 2 | 4 | 5 | 6,
