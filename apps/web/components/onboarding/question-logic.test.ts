@@ -5,6 +5,7 @@ import {
   needsRiderPickup,
   questionHasAnswer,
   questionIsVisible,
+  toggleMultiSelection,
 } from './question-logic';
 import type { Question } from './types';
 
@@ -20,6 +21,12 @@ describe('onboarding question conditions', () => {
     expect(conditionMatches({ answer: 'business_types', includes: 'restaurant' }, answers)).toBe(
       false,
     );
+  });
+
+  it('adds and removes values from multi-select business types', () => {
+    expect(toggleMultiSelection([], 'laundry')).toEqual(['laundry']);
+    expect(toggleMultiSelection(['laundry'], 'dry_cleaning')).toEqual(['laundry', 'dry_cleaning']);
+    expect(toggleMultiSelection(['laundry', 'dry_cleaning'], 'laundry')).toEqual(['dry_cleaning']);
   });
 
   it('supports any/all conditions for conditional questions', () => {

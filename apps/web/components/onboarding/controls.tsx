@@ -34,6 +34,7 @@ import {
 import * as React from 'react';
 
 import type { Question } from './types';
+import { toggleMultiSelection } from './question-logic';
 
 /**
  * The tiles and chips the whole flow is made of.
@@ -239,9 +240,7 @@ export function QuestionCard({
 
   const toggle = (option: string) => {
     if (question.type === 'multi') {
-      onChange(
-        selected.includes(option) ? selected.filter((v) => v !== option) : [...selected, option],
-      );
+      onChange(toggleMultiSelection(selected, option));
     } else {
       onChange(option);
     }
