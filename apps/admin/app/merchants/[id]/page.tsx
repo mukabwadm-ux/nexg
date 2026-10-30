@@ -30,12 +30,15 @@ export default async function MerchantApplicationPage({ params }: { params: { id
   const staff = await requireStaff();
   const supabase = createClient();
 
-  const { data: merchant } = await supabase
+  const { data: merchant, error: merchantError } = await supabase
     .from('merchant')
     .select('*, city(name)')
     .eq('id', params.id)
-    .is('deleted_at', null)
     .maybeSingle();
+
+  if (merchantError) {
+    throw new Error(`Could not load merchant: ${merchantError.message}`);
+  }
 
   /* What their placement actually is, if they have one. The boolean
      on the merchant row only says yes or no. */
@@ -45,7 +48,7 @@ export default async function MerchantApplicationPage({ params }: { params: { id
     .eq('merchant_id', params.id)
     .maybeSingle();
 
-  if (!merchant) notFound();
+  if (!merchant || merchant.deleted_at) notFound();
 
   /* After the null check, so `merchant` is actually narrowed. Only
      worth pitching to somebody who is trading and not already in a
