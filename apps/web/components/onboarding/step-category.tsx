@@ -58,7 +58,6 @@ export function CategoryStep() {
   const [savingSubcategory, setSavingSubcategory] = React.useState(false);
   const [categorySaveFailed, setCategorySaveFailed] = React.useState(false);
   const [subcategorySaveFailed, setSubcategorySaveFailed] = React.useState(false);
-  const [categoryPickerOpen, setCategoryPickerOpen] = React.useState(false);
 
   const savedCategory = draft?.category_key ?? draft?.category;
   const selectedCategoryId = savedCategory
@@ -190,7 +189,6 @@ export function CategoryStep() {
     const isRetry = category.category === currentCategory && categorySaveFailed;
     if (category.category === currentCategory && !isRetry) return;
 
-    setCategoryPickerOpen(true);
     setCategorySaveFailed(false);
     setSavingCategory(true);
     let saved = await setCategory(category.category, isRetry ? answers : {});
@@ -198,7 +196,6 @@ export function CategoryStep() {
     setSavingCategory(false);
     setCategorySaveFailed(!saved);
     setSubcategorySaveFailed(false);
-    if (saved) setCategoryPickerOpen(false);
     if (!saved) {
       toast({
         title: 'We could not save your business type',
@@ -291,57 +288,25 @@ export function CategoryStep() {
       )}
 
       <div className="mb-3 flex items-baseline justify-between gap-3">
-        <h2 className="text-ink text-sm font-bold">
-          {selectedCategoryId && !categoryPickerOpen
-            ? 'Selected business category'
-            : 'Choose a business category'}
-        </h2>
+        <h2 className="text-ink text-sm font-bold">Choose a business category</h2>
         <span className="text-muted-light text-xs font-semibold">
-          {selectedCategoryId && !categoryPickerOpen
-            ? 'Your questions are below'
-            : `${categories.length} business types`}
+          {categories.length} business types
         </span>
       </div>
-      {selectedCategoryId && !categoryPickerOpen ? (
-        <div className="flex flex-wrap items-start gap-3">
-          {config && (
-            <div className="w-full max-w-[13rem]">
-              <CategoryTile
-                icon={config.icon}
-                label={config.label}
-                description={config.description}
-                imageUrl={config.image_url}
-                selected
-                disabled
-                onClick={() => undefined}
-              />
-            </div>
-          )}
-          <button
-            type="button"
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {categories.map((category) => (
+          <CategoryTile
+            key={category.category}
+            icon={category.icon}
+            label={category.label}
+            description={category.description}
+            imageUrl={category.image_url}
+            selected={selectedCategoryId === category.category}
             disabled={savingCategory || savingSubcategory}
-            onClick={() => setCategoryPickerOpen(true)}
-            className="text-ink focus-visible:ring-gold rounded-lg px-3 py-2 text-sm font-bold underline underline-offset-4 focus:outline-none focus-visible:ring-2 disabled:opacity-60"
-          >
-            Change category
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {categories.map((category) => (
-            <CategoryTile
-              key={category.category}
-              icon={category.icon}
-              label={category.label}
-              description={category.description}
-              imageUrl={category.image_url}
-              selected={selectedCategoryId === category.category}
-              disabled={savingCategory || savingSubcategory}
-              onClick={() => void selectCategory(category)}
-            />
-          ))}
-        </div>
-      )}
+            onClick={() => void selectCategory(category)}
+          />
+        ))}
+      </div>
 
       {config && !businessTypesQuestion && (
         <section
