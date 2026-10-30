@@ -65,7 +65,6 @@ export function CategoryStep() {
     : null;
   const config = categories.find((category) => category.category === selectedCategoryId);
   const answers = draft?.answers ?? {};
-  const riderPickupRequired = needsRiderPickup(answers);
   const draftId = draft?.id ?? null;
   const businessTypesQuestion = config?.questions.find(
     (question) => question.key === 'business_types' && question.type === 'multi',
@@ -79,6 +78,10 @@ export function CategoryStep() {
     config?.subcategories?.filter((subcategory) =>
       selectedBusinessTypeIds.includes(subcategory.id),
     ) ?? [];
+  const riderPickupRequired = needsRiderPickup(
+    answers,
+    selectedSubcategories.map((subcategory) => subcategory.fulfillmentHint ?? ''),
+  );
   const selectedSubcategory =
     selectedSubcategories[0] ??
     config?.subcategories?.find((subcategory) => subcategory.id === draft?.subcategory);
