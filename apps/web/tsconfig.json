@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -11,7 +13,12 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next-dev/types/**/*.ts"
+    ".next-dev/types/**/*.ts",
+    ".next-booking/types/**/*.ts"
   ],
-  "exclude": ["node_modules", ".next", ".turbo"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    ".turbo"
+  ]
 }

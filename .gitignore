@@ -76,3 +76,10 @@ vapid-keys.txt
 .maps-check.json
 .maps-status.json
 e2e/.auth/
+
+# Dedicated local booking runtime
+.booking-local/
+apps/booking-engine/data/
+apps/booking-engine/.data/
+apps/booking-engine/.env
+apps/web/.next-booking/

@@ -1,0 +1,88 @@
+{
+  "clientDate": "2026-10-29",
+  "status": "EIGHT_FINAL_IMAGE_FILES_VERIFIED",
+  "count": 8,
+  "images": [
+    {
+      "screenId": "SC_WORK",
+      "file": "01-work.png",
+      "bytes": 1621743,
+      "width": 1586,
+      "height": 992,
+      "sha256": "2a64c2580201a57063bcec63e162bde35c57bec6dde7edec6050cba8c4464772",
+      "copiedSourceMatches": true,
+      "inspection": "Viewed generated pixels; selected final application-screen reference."
+    },
+    {
+      "screenId": "SC_OFFERINGS",
+      "file": "02-offerings.png",
+      "bytes": 1468003,
+      "width": 1586,
+      "height": 992,
+      "sha256": "6c3d90a9e0c75afa94c145729b02622f0b22037da4d4703344792dac7ddd3d01",
+      "copiedSourceMatches": true,
+      "inspection": "Viewed generated pixels; selected final application-screen reference."
+    },
+    {
+      "screenId": "SC_AVAILABILITY",
+      "file": "03-availability.png",
+      "bytes": 1656431,
+      "width": 1586,
+      "height": 992,
+      "sha256": "79065ac15a0febae17b360c42dd3c02204cc5053cb3cadf524959efe01c20c2e",
+      "copiedSourceMatches": true,
+      "inspection": "Viewed generated pixels; selected final application-screen reference."
+    },
+    {
+      "screenId": "SC_BUSINESS",
+      "file": "04-business.png",
+      "bytes": 1526023,
+      "width": 1586,
+      "height": 992,
+      "sha256": "b0e510a523feecc19c1d7266e752c2162cb994fbe9997f02a165fc3bb075e606",
+      "copiedSourceMatches": true,
+      "inspection": "Viewed generated pixels; selected final application-screen reference."
+    },
+    {
+      "screenId": "SC_MONEY",
+      "file": "05-money.png",
+      "bytes": 1651825,
+      "width": 1586,
+      "height": 992,
+      "sha256": "bb0e051ac6a6055345036285b7bd02d1f6c2e0a28e38a397c4e6b528dedf0fc5",
+      "copiedSourceMatches": true,
+      "inspection": "Viewed generated pixels; selected final application-screen reference."
+    },
+    {
+      "screenId": "SC_PROMOTIONS",
+      "file": "06-promotions.png",
+      "bytes": 1385637,
+      "width": 1586,
+      "height": 992,
+      "sha256": "85368b39a99eb866e3f877a1ee7b47d3224f0897c7f7cbefd44a3a35121882ea",
+      "copiedSourceMatches": true,
+      "inspection": "Viewed generated pixels; selected final application-screen reference."
+    },
+    {
+      "screenId": "SC_INSIGHTS",
+      "file": "07-insights.png",
+      "bytes": 1351944,
+      "width": 1586,
+      "height": 992,
+      "sha256": "ffddfb6a16c24bf816965d36291c465053dd1ca9310cf1d9e2ba49a279a45d66",
+      "copiedSourceMatches": true,
+      "inspection": "Viewed generated pixels; selected final application-screen reference."
+    },
+    {
+      "screenId": "SC_SETTINGS",
+      "file": "08-settings.png",
+      "bytes": 1547753,
+      "width": 1586,
+      "height": 992,
+      "sha256": "1e60fcdb0345e8947369f6a1bf1cd7478ede7ddeb3cf21c7cf2d78c7be801a15",
+      "copiedSourceMatches": true,
+      "inspection": "Viewed generated pixels; selected final application-screen reference."
+    }
+  ],
+  "scope": "PNG/file/source identity and visual inspection. No functional/accessibility compliance assertion."
+}

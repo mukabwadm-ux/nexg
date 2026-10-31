@@ -7,9 +7,17 @@ const nextConfig = {
    * chunks that server is still serving — the page then renders with no CSS
    * at all, which looks like a styling bug rather than a clobbered directory.
    */
-  distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
+  distDir:
+    process.env.NEXG_NEXT_DIST_DIR ??
+    (process.env.NODE_ENV === 'development' ? '.next-dev' : '.next'),
   // The workspace packages ship TypeScript source rather than a build output.
-  transpilePackages: ['@nexg/ui', '@nexg/db', '@nexg/location', '@nexg/contracts'],
+  transpilePackages: [
+    '@nexg/ui',
+    '@nexg/db',
+    '@nexg/location',
+    '@nexg/contracts',
+    '@nexg/booking-config',
+  ],
   eslint: {
     // `pnpm lint` runs ESLint as its own CI step; do not run it twice.
     ignoreDuringBuilds: true,

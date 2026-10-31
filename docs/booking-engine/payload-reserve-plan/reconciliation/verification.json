@@ -1,0 +1,569 @@
+{
+  "date": "2026-10-31",
+  "status": "RECONCILIATION_CHECKS_PASSED",
+  "runtimeStatus": "NOT_IMPLEMENTED_NOT_TESTED",
+  "counts": {
+    "categories": 21,
+    "subcategories": 128,
+    "preservedSourceQuestions": 300,
+    "canonicalQuestions": 323,
+    "BQInputsMapped": 31,
+    "workflowContracts": 18,
+    "workflowGuardCorrections": 23,
+    "workflowEdges": 355,
+    "typedPredicateLeaves": 987,
+    "readinessRejectionScenarios": 384,
+    "targetedBehaviorScenarios": 16,
+    "aliasAndInvalidValueChecks": 4,
+    "canonicalAuthorityDataClasses": 15,
+    "localLinksChecked": 24
+  },
+  "timezone": "Africa/Nairobi",
+  "sourceVerification": {
+    "workingSourceRoot": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE",
+    "taxonomyPath": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\packages\\contracts\\src\\taxonomy.ts",
+    "taxonomySha256": "957f877487f8638ac56865b73d4d7f74283e1b0c5560fa033251941ded86b2ad",
+    "questionGeneratorPath": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\apps\\web\\components\\onboarding\\subcategory-questions.ts",
+    "questionGeneratorSha256": "daa8f6f823c818af4ea9237fda02feb281b7bfb4b9ba054c73483cc0e02c30e5",
+    "savedAuditPath": "../../../audits/merchant-onboarding-128-taxonomy.json",
+    "savedAuditSha256": "6ddf4228e47c7e9d96399b1e96d7373c0024ca261e0caaac1893b4635c28777a",
+    "categoryCount": 21,
+    "subcategoryCount": 128,
+    "comparedProperties": [
+      "name",
+      "categoryId",
+      "fields",
+      "fulfillmentHint",
+      "workflowHint",
+      "defaultWorkflow",
+      "suggestedItemCount"
+    ],
+    "comparisonMethod": "Read-only TypeScript transpilation of Desktop MERCHANT_TAXONOMY followed by exact property comparison with saved audit rows.",
+    "comparisonResult": "NO_DIFFERENCES",
+    "differenceCount": 0
+  },
+  "scenarios": [
+    {
+      "id": "rental_driver_stays_rental",
+      "subcategoryId": "car_rental",
+      "result": {
+        "models": [
+          "ASSET_INTERVAL"
+        ],
+        "primaryModel": "ASSET_INTERVAL",
+        "status": "SETUP_REQUIRED",
+        "requiredQuestions": [
+          "BQ_BUFFERS",
+          "BQ_RANGE_POLICY",
+          "Q_RESOURCE_INVENTORY"
+        ],
+        "pendingRules": [],
+        "matchedRules": [
+          "PD_car_rental_DRIVER_OPTION"
+        ],
+        "attributes": {
+          "resourceBundle": "asset_and_eligible_driver",
+          "standaloneTransferEnabled": false
+        },
+        "workflows": [
+          {
+            "modelId": "ASSET_INTERVAL",
+            "workflowId": "WF_RENTAL",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "rental_self_drive_needs_no_driver",
+      "subcategoryId": "car_rental",
+      "result": {
+        "models": [
+          "ASSET_INTERVAL"
+        ],
+        "primaryModel": "ASSET_INTERVAL",
+        "status": "CONFIGURED_NOT_OPERATIONALLY_VERIFIED",
+        "requiredQuestions": [],
+        "pendingRules": [],
+        "matchedRules": [
+          "PD_car_rental_SELF_DRIVE_OPTION"
+        ],
+        "attributes": {
+          "driverAllocationRequired": false
+        },
+        "workflows": [
+          {
+            "modelId": "ASSET_INTERVAL",
+            "workflowId": "WF_RENTAL",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "clinic_no_appointments",
+      "subcategoryId": "clinics",
+      "result": {
+        "models": [],
+        "primaryModel": null,
+        "status": "CLARIFICATION_REQUIRED",
+        "requiredQuestions": [],
+        "pendingRules": [
+          "PD_clinics_PUBLIC_SCHEDULED_BOOKING_DISABLED"
+        ],
+        "matchedRules": [
+          "PD_clinics_NO_CLINIC_APPOINTMENTS"
+        ],
+        "attributes": {
+          "scheduledAppointmentClaims": false
+        },
+        "workflows": [],
+        "clarifications": [
+          "Use explicitly offered walk-in/admin enquiry intake. A home visit remains independently eligible only if selected and configured."
+        ],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "battery_workshop_replaces_dispatch",
+      "subcategoryId": "battery_service",
+      "result": {
+        "models": [
+          "SERVICE_JOB"
+        ],
+        "primaryModel": "SERVICE_JOB",
+        "status": "SETUP_REQUIRED",
+        "requiredQuestions": [
+          "BQ_INTAKE_MODE",
+          "Q_RESOURCE_INVENTORY"
+        ],
+        "pendingRules": [],
+        "matchedRules": [
+          "binding:1",
+          "PD_battery_service_WORKSHOP_REPLACES_MOBILE"
+        ],
+        "attributes": {
+          "dispatchRequired": false
+        },
+        "workflows": [
+          {
+            "modelId": "SERVICE_JOB",
+            "workflowId": "WF_SERVICE_JOB",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "optional_makeup_booking_retained",
+      "subcategoryId": "makeup",
+      "result": {
+        "models": [
+          "APPOINTMENT"
+        ],
+        "primaryModel": "APPOINTMENT",
+        "status": "CONFIGURED_NOT_OPERATIONALLY_VERIFIED",
+        "requiredQuestions": [],
+        "pendingRules": [],
+        "matchedRules": [
+          "PD_makeup_OPTIONAL_BOOKING_CLARIFICATION"
+        ],
+        "attributes": {},
+        "workflows": [
+          {
+            "modelId": "APPOINTMENT",
+            "workflowId": "WF_APPOINTMENT",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "contradictory_booking_intent_clarifies",
+      "subcategoryId": "makeup",
+      "result": {
+        "models": [
+          "APPOINTMENT"
+        ],
+        "primaryModel": "APPOINTMENT",
+        "status": "CLARIFICATION_REQUIRED",
+        "requiredQuestions": [],
+        "pendingRules": [],
+        "matchedRules": [
+          "PD_makeup_ADVANCE_REQUIREMENT",
+          "PD_makeup_CONTRADICTORY_BOOKING_INTENT",
+          "PD_makeup_PUBLIC_SCHEDULED_BOOKING_DISABLED"
+        ],
+        "attributes": {
+          "advanceBookingRequired": true,
+          "advanceBookingClaims": false
+        },
+        "workflows": [
+          {
+            "modelId": "APPOINTMENT",
+            "workflowId": "WF_APPOINTMENT",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [
+          "Advance booking cannot be mandatory when the same offering does not accept bookings. Resolve scoped answers before publishing."
+        ],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "retail_not_an_appointment",
+      "subcategoryId": "shoes",
+      "result": {
+        "models": [
+          "ORDER"
+        ],
+        "primaryModel": "ORDER",
+        "status": "CONFIGURED_NOT_OPERATIONALLY_VERIFIED",
+        "requiredQuestions": [],
+        "pendingRules": [
+          "PD_shoes_OPTIONAL_FULFILMENT_WINDOWS"
+        ],
+        "matchedRules": [],
+        "attributes": {},
+        "workflows": [
+          {
+            "modelId": "ORDER",
+            "workflowId": "WF_ORDER",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "makeup_product_has_no_base_appointment",
+      "subcategoryId": "makeup",
+      "result": {
+        "models": [
+          "ORDER"
+        ],
+        "primaryModel": "ORDER",
+        "status": "CONFIGURED_NOT_OPERATIONALLY_VERIFIED",
+        "requiredQuestions": [],
+        "pendingRules": [
+          "PD_makeup_ADVANCE_REQUIREMENT",
+          "PD_makeup_OPTIONAL_BOOKING_CLARIFICATION",
+          "PD_makeup_CONTRADICTORY_BOOKING_INTENT",
+          "PD_makeup_PUBLIC_SCHEDULED_BOOKING_DISABLED"
+        ],
+        "matchedRules": [
+          "binding:1"
+        ],
+        "attributes": {},
+        "workflows": [
+          {
+            "modelId": "ORDER",
+            "workflowId": "WF_ORDER",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "system_discovery_does_not_enable_table",
+      "subcategoryId": "restaurant",
+      "result": {
+        "models": [
+          "ORDER"
+        ],
+        "primaryModel": "ORDER",
+        "status": "CONFIGURED_NOT_OPERATIONALLY_VERIFIED",
+        "requiredQuestions": [],
+        "pendingRules": [
+          "PD_restaurant_OPTIONAL_FULFILMENT_WINDOWS"
+        ],
+        "matchedRules": [],
+        "attributes": {},
+        "workflows": [
+          {
+            "modelId": "ORDER",
+            "workflowId": "WF_ORDER",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "table_can_use_native_without_existing_system",
+      "subcategoryId": "restaurant",
+      "result": {
+        "models": [
+          "SPACE_RESERVATION"
+        ],
+        "primaryModel": "SPACE_RESERVATION",
+        "status": "SETUP_REQUIRED",
+        "requiredQuestions": [
+          "BQ_SPACE_POLICY",
+          "Q_APPOINTMENT_DURATION_MINUTES",
+          "Q_DATA_AUTHORITY"
+        ],
+        "pendingRules": [
+          "PD_restaurant_OPTIONAL_FULFILMENT_WINDOWS"
+        ],
+        "matchedRules": [
+          "binding:0"
+        ],
+        "attributes": {},
+        "workflows": [
+          {
+            "modelId": "SPACE_RESERVATION",
+            "workflowId": "WF_SPACE_RESERVATION_V1",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "class_recurring_not_membership",
+      "subcategoryId": "classes",
+      "result": {
+        "models": [
+          "SESSION_CAPACITY"
+        ],
+        "primaryModel": "SESSION_CAPACITY",
+        "status": "SETUP_REQUIRED",
+        "requiredQuestions": [
+          "BQ_RECURRENCE_RULE",
+          "BQ_RECURRING_SCHEDULE_ENABLED"
+        ],
+        "pendingRules": [
+          "PD_classes_ADVANCE_REQUIREMENT",
+          "PD_classes_OPTIONAL_BOOKING_CLARIFICATION",
+          "PD_classes_CONTRADICTORY_BOOKING_INTENT",
+          "PD_classes_PUBLIC_SCHEDULED_BOOKING_DISABLED",
+          "PD_classes_RECURRENCE_ACTIVE"
+        ],
+        "matchedRules": [
+          "PD_classes_RECURRENCE_DISCOVERY"
+        ],
+        "attributes": {
+          "membershipAutoEnabled": false,
+          "recurringDebitAutoEnabled": false
+        },
+        "workflows": [
+          {
+            "modelId": "SESSION_CAPACITY",
+            "workflowId": "WF_GROUP_ACTIVITY",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "sourcing_books_not_manufacture",
+      "subcategoryId": "books",
+      "result": {
+        "models": [
+          "ORDER",
+          "REQUEST_QUOTE"
+        ],
+        "primaryModel": "ORDER",
+        "status": "CONFIGURED_NOT_OPERATIONALLY_VERIFIED",
+        "requiredQuestions": [],
+        "pendingRules": [
+          "PD_books_OPTIONAL_FULFILMENT_WINDOWS"
+        ],
+        "matchedRules": [
+          "PD_books_BOOK_SOURCING"
+        ],
+        "attributes": {
+          "stockPromise": "supplier_authority_confirmed"
+        },
+        "workflows": [
+          {
+            "modelId": "ORDER",
+            "workflowId": "WF_ORDER",
+            "variantId": null,
+            "createsWork": false
+          },
+          {
+            "modelId": "REQUEST_QUOTE",
+            "workflowId": "WF_REQUEST_QUOTE",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "greeter_only_no_vehicle",
+      "subcategoryId": "meet_greet",
+      "result": {
+        "models": [
+          "TRANSFER"
+        ],
+        "primaryModel": "TRANSFER",
+        "status": "SETUP_REQUIRED",
+        "requiredQuestions": [
+          "Q_APPOINTMENT_DURATION_MINUTES",
+          "Q_RESOURCE_INVENTORY"
+        ],
+        "pendingRules": [],
+        "matchedRules": [
+          "PD_meet_greet_GREETER_ONLY"
+        ],
+        "attributes": {
+          "resourceBundle": "greeter",
+          "requiresVehicle": false,
+          "requiresDropoff": false,
+          "requiresPassengerLuggageCapacity": false
+        },
+        "workflows": [
+          {
+            "modelId": "TRANSFER",
+            "workflowId": "WF_TRANSFER",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "freight_cannot_use_generic_instant",
+      "subcategoryId": "road_freight",
+      "result": {
+        "models": [
+          "FREIGHT"
+        ],
+        "primaryModel": "FREIGHT",
+        "status": "CLARIFICATION_REQUIRED",
+        "requiredQuestions": [],
+        "pendingRules": [],
+        "matchedRules": [],
+        "attributes": {},
+        "workflows": [
+          {
+            "modelId": "FREIGHT",
+            "workflowId": "WF_FREIGHT",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [
+          "Intake mode is not supported for FREIGHT"
+        ],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "remote_therapy_uses_remote_workflow",
+      "subcategoryId": "mental_health",
+      "result": {
+        "models": [
+          "APPOINTMENT"
+        ],
+        "primaryModel": "APPOINTMENT",
+        "status": "SETUP_REQUIRED",
+        "requiredQuestions": [
+          "Q_FULFILLMENT_MODES"
+        ],
+        "pendingRules": [],
+        "matchedRules": [
+          "PD_mental_health_FORMAT_ONLINE"
+        ],
+        "attributes": {
+          "allowedMethods": [
+            "digital"
+          ]
+        },
+        "workflows": [
+          {
+            "modelId": "APPOINTMENT",
+            "workflowId": "WF_REMOTE_SESSION",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    },
+    {
+      "id": "bank_enquiry_preserves_provider_workflow",
+      "subcategoryId": "banking",
+      "result": {
+        "models": [
+          "REQUEST_QUOTE"
+        ],
+        "primaryModel": "REQUEST_QUOTE",
+        "status": "CONFIGURED_NOT_OPERATIONALLY_VERIFIED",
+        "requiredQuestions": [],
+        "pendingRules": [
+          "binding:0"
+        ],
+        "matchedRules": [],
+        "attributes": {},
+        "workflows": [
+          {
+            "modelId": "REQUEST_QUOTE",
+            "workflowId": "WF_REGULATED_ENQUIRY",
+            "variantId": null,
+            "createsWork": false
+          }
+        ],
+        "clarifications": [],
+        "createsWork": false
+      },
+      "status": "PLANNING_SEMANTICS_PASSED"
+    }
+  ],
+  "additionalChecks": [
+    "conflicting_alias_answers_require_clarification",
+    "invalid_Q_APPOINTMENT_DURATION_MINUTES",
+    "invalid_BQ_CAPACITY",
+    "invalid_BQ_SPACE_POLICY"
+  ],
+  "limitation": "Local planning compilation/schema and configuration-semantic checks only; no real merchant booking, allocation concurrency, access enforcement, Google or payment execution."
+}

@@ -2,6 +2,7 @@
 
 import { LocationBanner, LocationSheet } from '@nexg/location';
 import { usePathname } from 'next/navigation';
+import { isBookingPage } from '@/lib/booking/routes';
 
 /**
  * The precision banner and the first-visit sheet, everywhere but the
@@ -14,9 +15,13 @@ import { usePathname } from 'next/navigation';
  * question instead of the site.
  */
 export function LocationBannerSlot() {
-  return <LocationBanner hidden={usePathname() === '/'} />;
+  const pathname = usePathname();
+  if (isBookingPage(pathname)) return null;
+  return <LocationBanner hidden={pathname === '/'} />;
 }
 
 export function LocationSheetSlot() {
-  return <LocationSheet autoOpen={usePathname() !== '/'} />;
+  const pathname = usePathname();
+  if (isBookingPage(pathname)) return null;
+  return <LocationSheet autoOpen={pathname !== '/'} />;
 }

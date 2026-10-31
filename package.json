@@ -23,7 +23,16 @@
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local --schema public,hr,audit,settings > packages/db/src/types.generated.ts && prettier --write packages/db/src/types.generated.ts",
     "db:lint": "supabase db lint --local --level warning",
-    "wiring:check": "node scripts/wiring-check.mjs"
+    "wiring:check": "node scripts/wiring-check.mjs",
+    "booking:dev": "node scripts/dev-booking.mjs",
+    "booking:test": "node scripts/verify-booking.mjs --tests",
+    "booking:typecheck": "node scripts/verify-booking.mjs --types",
+    "booking:verify": "node scripts/verify-booking.mjs",
+    "booking:smoke": "node scripts/smoke-booking.mjs",
+    "booking:lint": "node scripts/lint-booking.mjs",
+    "booking:smoke:spaces": "node scripts/smoke-booking-spaces.mjs",
+    "booking:smoke:workflows": "node scripts/smoke-booking-workflows.mjs",
+    "booking:acceptance": "node scripts/verify-booking-browser.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.49.1",

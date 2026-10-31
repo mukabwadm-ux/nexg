@@ -1,0 +1,107 @@
+{
+  "clientDate": "2026-10-29",
+  "status": "EIGHT_SELECTED_FINAL_REFERENCE_IMAGES",
+  "tool": "built-in imagegen",
+  "scope": "Illustrative raster references, not interactive prototypes or functional verification.",
+  "planGate": "FOUNDATION_EIGHT_SCREEN_SPECS_AND_REFERENCE_CHECKS_COMPLETE",
+  "finalImages": [
+    {
+      "screenId": "SC_WORK",
+      "title": "Work",
+      "file": "01-work.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a185d8-ce3b-7ac0-a1cf-cd4b29276262\\exec-758668a1-aafb-43b0-b98d-2ae4a52a5761.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\images\\01-work.png",
+      "tool": "built-in imagegen",
+      "status": "generated_inspected",
+      "note": "Removed unsupported customer contact fields in a targeted edit; one selected final Work image."
+    },
+    {
+      "screenId": "SC_OFFERINGS",
+      "title": "Offerings",
+      "file": "02-offerings.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a185d8-ce3b-7ac0-a1cf-cd4b29276262\\exec-8d2487c6-203e-4d11-9eec-bab0b2353896.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\images\\02-offerings.png",
+      "tool": "built-in imagegen",
+      "status": "generated_inspected",
+      "note": "One selected populated reference; written specification defines authoritative behaviour."
+    },
+    {
+      "screenId": "SC_AVAILABILITY",
+      "title": "Availability",
+      "file": "03-availability.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a185d8-ce3b-7ac0-a1cf-cd4b29276262\\exec-882e19bf-dd11-4acf-80d4-8aae0ea533df.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\images\\03-availability.png",
+      "tool": "built-in imagegen",
+      "status": "generated_inspected",
+      "note": "Corrected past/future sample-state labels and protected customer contact."
+    },
+    {
+      "screenId": "SC_BUSINESS",
+      "title": "Business",
+      "file": "04-business.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a185d8-ce3b-7ac0-a1cf-cd4b29276262\\exec-e367c4bd-b437-4c0e-bd82-d5b4533aafd8.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\images\\04-business.png",
+      "tool": "built-in imagegen",
+      "status": "generated_inspected",
+      "note": "One selected populated reference; written specification defines authoritative behaviour."
+    },
+    {
+      "screenId": "SC_MONEY",
+      "title": "Money",
+      "file": "05-money.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a185d8-ce3b-7ac0-a1cf-cd4b29276262\\exec-53375c54-d618-43dc-9a49-2dc9b051cd72.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\images\\05-money.png",
+      "tool": "built-in imagegen",
+      "status": "generated_inspected",
+      "note": "Corrected list coverage to distinguish visible sample rows from overview totals."
+    },
+    {
+      "screenId": "SC_PROMOTIONS",
+      "title": "Promotions",
+      "file": "06-promotions.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a185d8-ce3b-7ac0-a1cf-cd4b29276262\\exec-27c044bc-4027-4895-a2e5-7d9a4108a2bd.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\images\\06-promotions.png",
+      "tool": "built-in imagegen",
+      "status": "generated_inspected",
+      "note": "One selected populated reference; written specification defines authoritative behaviour."
+    },
+    {
+      "screenId": "SC_INSIGHTS",
+      "title": "Insights",
+      "file": "07-insights.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a185d8-ce3b-7ac0-a1cf-cd4b29276262\\exec-c9395ffa-7319-4418-89ed-fcd1a3b7cb88.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\images\\07-insights.png",
+      "tool": "built-in imagegen",
+      "status": "generated_inspected",
+      "note": "One selected populated reference; written specification defines authoritative behaviour."
+    },
+    {
+      "screenId": "SC_SETTINGS",
+      "title": "Settings",
+      "file": "08-settings.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a185d8-ce3b-7ac0-a1cf-cd4b29276262\\exec-f2cfea1c-42eb-4853-abfa-9a64f1819c7b.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\images\\08-settings.png",
+      "tool": "built-in imagegen",
+      "status": "generated_inspected",
+      "note": "Corrected external source descriptions so NEXG retains pricing/bookings/availability ownership."
+    }
+  ],
+  "corrections": [
+    {
+      "screenId": "SC_WORK",
+      "change": "Removed generated phone/email contact rows; contact through secure message only."
+    },
+    {
+      "screenId": "SC_AVAILABILITY",
+      "change": "Corrected past rentals to Returned, future rental to Reserved, and selected customer display identity."
+    },
+    {
+      "screenId": "SC_MONEY",
+      "prompt": "Edit this Money screen. Preserve all layout, typography, colours, navigation, financial figures and all other content. Correct only the table pagination so overview totals cover a larger list: replace bottom-left 'Showing 5 of 5 transactions' with 'Showing 5 of 48 transactions', and bottom-right '1–5 of 5' with '1–5 of 48'. Keep rows per page 10, all 5 visible transaction rows, Preview data badge and the selected breakdown unchanged. No extra explanations or images."
+    },
+    {
+      "screenId": "SC_SETTINGS",
+      "prompt": "Edit this Settings screen. Preserve layout, navigation, fonts, colours, statuses, controls and all other content. Correct source ownership wording: Fleet catalogue supplies ONLY read-only vehicle descriptions/specifications/images/asset identifiers. NEXG owns rental rates, bookings and availability. Change subtitle under Fleet catalogue to 'Provides vehicle descriptions for your rental fleet.' In About this connection say 'Your external fleet catalogue supplies vehicle specifications, images and descriptions. Rental rates, bookings and availability are managed by NEXG.' In the Data managed table replace row 'Rates and availability' with 'Vehicle specifications', Source External authority, Permissions Read, Used for 'Offering details'. Replace row 'Vehicle locations' with 'Asset references', Source External authority, Permissions Read, Used for 'Vehicle identifier matching'. Keep Vehicles and Images and descriptions rows. Keep blue banner 'Bookings and availability · Managed by NEXG' and its current NEXG pricing explanation. Do not show externally owned rates or availability anywhere. No secrets, no additional panels or external annotations."
+    }
+  ]
+}

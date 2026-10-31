@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:nexg:portal:category-manifest:1.0.0",
+  "title": "Proposed NEXG category manifest structure",
+  "description": "Structural design schema only. Registry resolution, implementation readiness, typed conditions, permissions, dependency cycles and publication safety require separate semantic validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "manifestId", "version", "status", "category", "subcategories", "questionBindings", "capabilities", "workflowBindings", "offeringSchemas", "availability", "fulfillment", "readiness", "discovery", "vocabulary", "screens", "metrics", "promotionEligibility", "migration", "verification"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "manifestId": { "$ref": "#/$defs/stableId" },
+    "version": { "$ref": "#/$defs/version" },
+    "status": { "enum": ["DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED", "DEPRECATED"] },
+    "category": { "$ref": "#/$defs/namedCategory" },
+    "subcategories": {
+      "type": "array", "minItems": 1, "maxItems": 256, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/namedCategory" }
+    },
+    "questionBindings": {
+      "type": "array", "maxItems": 256, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/questionBinding" }
+    },
+    "capabilities": {
+      "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/capabilityBinding" }
+    },
+    "workflowBindings": {
+      "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/workflowBinding" }
+    },
+    "offeringSchemas": {
+      "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/modelBinding" }
+    },
+    "availability": {
+      "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/modelBinding" }
+    },
+    "fulfillment": {
+      "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/modelBinding" }
+    },
+    "readiness": {
+      "type": "array", "minItems": 1, "maxItems": 128, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/readinessBinding" }
+    },
+    "discovery": { "$ref": "#/$defs/discovery" },
+    "vocabulary": { "$ref": "#/$defs/vocabulary" },
+    "screens": {
+      "type": "array", "minItems": 8, "maxItems": 8, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/screenBinding" }
+    },
+    "metrics": { "$ref": "#/$defs/referenceList" },
+    "promotionEligibility": {
+      "type": "array", "maxItems": 32, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/promotionBinding" }
+    },
+    "migration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["preserveStartedWork", "upgradePolicy", "rollbackPolicy"],
+      "properties": {
+        "preserveStartedWork": { "const": true },
+        "upgradePolicy": { "$ref": "#/$defs/reference" },
+        "rollbackPolicy": { "$ref": "#/$defs/reference" }
+      }
+    },
+    "verification": { "$ref": "#/$defs/verification" }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,99}$", "maxLength": 100 },
+    "registryId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_:-]{1,119}$", "maxLength": 120 },
+    "questionId": { "type": "string", "pattern": "^Q_[A-Z][A-Z0-9_]{0,99}$", "maxLength": 102 },
+    "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$", "maxLength": 32 },
+    "label": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "reference": {
+      "type": "object", "additionalProperties": false, "required": ["id", "version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/registryId" },
+        "version": { "$ref": "#/$defs/version" }
+      }
+    },
+    "referenceList": {
+      "type": "array", "maxItems": 128, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/reference" }
+    },
+    "namedCategory": {
+      "type": "object", "additionalProperties": false, "required": ["id", "label", "description"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "label": { "$ref": "#/$defs/label" },
+        "description": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "scalar": {
+      "oneOf": [
+        { "type": "string", "maxLength": 2000 },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "null" }
+      ]
+    },
+    "answer": {
+      "oneOf": [
+        { "$ref": "#/$defs/scalar" },
+        { "type": "array", "maxItems": 128, "items": { "$ref": "#/$defs/answer" } },
+        {
+          "type": "object", "maxProperties": 64, "additionalProperties": false,
+          "patternProperties": { "^[A-Za-z][A-Za-z0-9_]{0,99}$": { "$ref": "#/$defs/answer" } }
+        }
+      ]
+    },
+    "condition": {
+      "description": "Closed declarative expression. Separate semantic validation enforces registry types, valid operators, references, maximum depth and total evaluation budget; no scripts are accepted.",
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["always"],
+          "properties": { "always": { "const": true } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["questionRef", "operator", "value"],
+          "properties": {
+            "questionRef": { "$ref": "#/$defs/questionId" },
+            "operator": { "enum": ["eq", "neq", "in", "contains", "intersects", "exists", "nonempty"] },
+            "value": { "$ref": "#/$defs/answer" }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "operator": { "enum": ["exists", "nonempty"] } }, "required": ["operator"] },
+              "then": { "properties": { "value": { "const": true } } }
+            },
+            {
+              "if": { "properties": { "operator": { "enum": ["in", "intersects"] } }, "required": ["operator"] },
+              "then": { "properties": { "value": { "type": "array", "minItems": 1 } } }
+            }
+          ]
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["all"],
+          "properties": {
+            "all": { "type": "array", "minItems": 1, "maxItems": 32, "items": { "$ref": "#/$defs/condition" } }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["any"],
+          "properties": {
+            "any": { "type": "array", "minItems": 1, "maxItems": 32, "items": { "$ref": "#/$defs/condition" } }
+          }
+        }
+      ]
+    },
+    "subcategoryScope": {
+      "type": "array", "minItems": 1, "maxItems": 256, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stableId" }
+    },
+    "questionBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["question", "scope", "visibleWhen", "requiredWhen", "appliesToSubcategories"],
+      "properties": {
+        "question": {
+          "type": "object", "additionalProperties": false, "required": ["id", "version"],
+          "properties": { "id": { "$ref": "#/$defs/questionId" }, "version": { "$ref": "#/$defs/version" } }
+        },
+        "scope": { "enum": ["MERCHANT", "LOCATION", "CAPABILITY", "OFFERING"] },
+        "visibleWhen": { "$ref": "#/$defs/condition" },
+        "requiredWhen": { "$ref": "#/$defs/condition" },
+        "appliesToSubcategories": { "$ref": "#/$defs/subcategoryScope" },
+        "allowedValues": { "type": "array", "minItems": 1, "maxItems": 128, "uniqueItems": true, "items": { "$ref": "#/$defs/scalar" } }
+      }
+    },
+    "capabilityBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["capability", "enabledWhen", "appliesToSubcategories"],
+      "properties": {
+        "capability": { "$ref": "#/$defs/reference" },
+        "enabledWhen": { "$ref": "#/$defs/condition" },
+        "appliesToSubcategories": { "$ref": "#/$defs/subcategoryScope" }
+      }
+    },
+    "workflowBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "workflow", "role", "enabledWhen", "capabilityRef", "offeringSchemaRef", "availabilityRef", "fulfillmentRef", "appliesToSubcategories"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "workflow": {
+          "type": "object", "additionalProperties": false, "required": ["id", "version"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^WF_[A-Z][A-Z0-9_]{1,99}$" },
+            "version": { "$ref": "#/$defs/version" }
+          }
+        },
+        "role": { "enum": ["PRIMARY", "CHILD_EXECUTION"] },
+        "parentBindingRef": { "$ref": "#/$defs/stableId" },
+        "executionRule": { "$ref": "#/$defs/reference" },
+        "enabledWhen": { "$ref": "#/$defs/condition" },
+        "capabilityRef": { "$ref": "#/$defs/registryId" },
+        "offeringSchemaRef": { "$ref": "#/$defs/stableId" },
+        "availabilityRef": { "$ref": "#/$defs/stableId" },
+        "fulfillmentRef": { "$ref": "#/$defs/stableId" },
+        "appliesToSubcategories": { "$ref": "#/$defs/subcategoryScope" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "role": { "const": "CHILD_EXECUTION" } }, "required": ["role"] },
+          "then": { "required": ["parentBindingRef", "executionRule"] },
+          "else": { "not": { "anyOf": [ { "required": ["parentBindingRef"] }, { "required": ["executionRule"] } ] } }
+        }
+      ]
+    },
+    "modelBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "model", "enabledWhen", "appliesToSubcategories"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "model": { "$ref": "#/$defs/reference" },
+        "enabledWhen": { "$ref": "#/$defs/condition" },
+        "appliesToSubcategories": { "$ref": "#/$defs/subcategoryScope" }
+      }
+    },
+    "readinessBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "check", "requiredWhen", "scope", "appliesToSubcategories"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "check": { "$ref": "#/$defs/reference" },
+        "requiredWhen": { "$ref": "#/$defs/condition" },
+        "scope": { "enum": ["MERCHANT", "LOCATION", "OFFERING", "CAPABILITY"] },
+        "appliesToSubcategories": { "$ref": "#/$defs/subcategoryScope" }
+      }
+    },
+    "discovery": {
+      "type": "object", "additionalProperties": false,
+      "required": ["cardTemplate", "customerFields", "filters", "publicationRule"],
+      "properties": {
+        "cardTemplate": { "$ref": "#/$defs/reference" },
+        "customerFields": { "$ref": "#/$defs/referenceList" },
+        "filters": { "$ref": "#/$defs/referenceList" },
+        "publicationRule": { "$ref": "#/$defs/reference" }
+      }
+    },
+    "vocabulary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workSingular", "workPlural", "offeringSingular", "offeringPlural", "availabilityLabel", "fulfillmentLabel"],
+      "properties": {
+        "workSingular": { "$ref": "#/$defs/label" },
+        "workPlural": { "$ref": "#/$defs/label" },
+        "offeringSingular": { "$ref": "#/$defs/label" },
+        "offeringPlural": { "$ref": "#/$defs/label" },
+        "availabilityLabel": { "$ref": "#/$defs/label" },
+        "fulfillmentLabel": { "$ref": "#/$defs/label" }
+      }
+    },
+    "screenBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["screenId", "components", "capabilityRefs"],
+      "properties": {
+        "screenId": { "enum": ["SC_WORK", "SC_OFFERINGS", "SC_AVAILABILITY", "SC_BUSINESS", "SC_MONEY", "SC_PROMOTIONS", "SC_INSIGHTS", "SC_SETTINGS"] },
+        "components": {
+          "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+          "items": { "$ref": "#/$defs/reference" }
+        },
+        "capabilityRefs": {
+          "type": "array", "maxItems": 64, "uniqueItems": true,
+          "items": { "$ref": "#/$defs/registryId" }
+        }
+      }
+    },
+    "promotionBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["promotionType", "eligibilityRule"],
+      "properties": {
+        "promotionType": { "$ref": "#/$defs/reference" },
+        "eligibilityRule": { "$ref": "#/$defs/reference" }
+      }
+    },
+    "verification": {
+      "type": "object", "additionalProperties": false, "required": ["testRefs", "fixtures"],
+      "properties": {
+        "testRefs": { "$ref": "#/$defs/referenceList" },
+        "fixtures": {
+          "type": "array", "minItems": 1, "maxItems": 256, "uniqueItems": true,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "subcategoryId", "answers", "expectedWorkflowBindings", "expectedSetupChecks", "expectedRejectedActions"],
+            "properties": {
+              "id": { "$ref": "#/$defs/stableId" },
+              "subcategoryId": { "$ref": "#/$defs/stableId" },
+              "answers": {
+                "type": "object", "maxProperties": 256, "additionalProperties": false,
+                "patternProperties": { "^Q_[A-Z][A-Z0-9_]{0,99}$": { "$ref": "#/$defs/answer" } }
+              },
+              "expectedWorkflowBindings": { "$ref": "#/$defs/localIdList" },
+              "expectedSetupChecks": { "$ref": "#/$defs/localIdList" },
+              "expectedRejectedActions": {
+                "type": "array", "maxItems": 128, "uniqueItems": true,
+                "items": { "$ref": "#/$defs/registryId" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "localIdList": {
+      "type": "array", "maxItems": 128, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stableId" }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-31",
+  "status": "STATIC_PLAN_CHECKS_PASSED",
+  "runtimeStatus": "NOT_IMPLEMENTED_NOT_TESTED",
+  "categoryCount": 21,
+  "subcategoryCount": 128,
+  "modelCount": 15,
+  "extensionCount": 21,
+  "questionAdditionCount": 31,
+  "conditionalBindings": 65,
+  "plannedAcceptanceCases": 1156,
+  "localLinksChecked": 146,
+  "timezone": "Africa/Nairobi",
+  "timezonePicker": false,
+  "warning": "Checks prove planning IDs, coverage and references only. They do not execute booking, access, concurrency, payment or Google behavior.",
+  "sourceSha256": {
+    "coverage-128.json": "723bd326ae6b20c6b84fc0a224297f1b2a162f295e7b030c9d0c57149ebf9c02",
+    "models.json": "e4800f98ddb2314bc3f3d174159f3e70f2d1c2b449df94d1ade7b32db52fd9c8",
+    "extensions.json": "8970c9ea588d714a1fafc26ec8e28f39010f4bd2a0a74dcb9911d3e1098b1271",
+    "question-additions.json": "cfe9eace6b9950528bce1619adec5c4e14505caffed81506c438eda1a70a42ab"
+  }
+}

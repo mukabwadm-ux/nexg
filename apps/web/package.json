@@ -13,6 +13,7 @@
     "clean": "rimraf .turbo .next node_modules"
   },
   "dependencies": {
+    "@nexg/booking-config": "workspace:*",
     "@hookform/resolvers": "3.10.0",
     "@nexg/contracts": "workspace:*",
     "@nexg/db": "workspace:*",

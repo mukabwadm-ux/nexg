@@ -1,0 +1,13 @@
+{
+  "source": "Reconciled merchant onboarding and Payload Reserve booking contracts",
+  "revision": "nexg-booking-2026-10-31.1",
+  "copiedOn": "2026-10-31",
+  "sha256": {
+    "reconciliation/effective-question-registry.json": "8381f6d88bbd4bd7b24d7e0865e138fad421f62c8921151d61f3a043d3cbe6ac",
+    "reconciliation/effective-profiles-128.json": "4a831d5a4f3392369153a6c5e2b37445ea760b8d6787fcd73b679bc47ac9714b",
+    "models.json": "e4800f98ddb2314bc3f3d174159f3e70f2d1c2b449df94d1ade7b32db52fd9c8",
+    "reconciliation/workflow-bindings.json": "1c1d5735ee5378999ec34f22a8b6f59733753f1105cfc2571c55021bd9f61a05",
+    "../profiles-128.json": "45050cee7f24255fbaab4b83bb72df9a935f01d8465fca80ab03e238da8a75dd",
+    "../../audits/merchant-onboarding-128-taxonomy.json": "6ddf4228e47c7e9d96399b1e96d7373c0024ca261e0caaac1893b4635c28777a"
+  }
+}

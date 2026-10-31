@@ -1,9 +1,11 @@
 'use client';
 
 import * as React from 'react';
+import { usePathname } from 'next/navigation';
 
 import { WhatsAppButton } from '@/components/chat/whatsapp-button';
 import { isLocaleTag } from '@/lib/i18n/dictionaries';
+import { isBookingPage } from '@/lib/booking/routes';
 
 const PREFERENCES_UPDATED = 'nexg:preferences-updated';
 
@@ -21,6 +23,7 @@ export function notifyPreferencesUpdated(): void {
 }
 
 export function PersonalizedChrome() {
+  const pathname = usePathname();
   React.useEffect(() => {
     const update = () => {
       const locale = readCookie('nexg_locale');
@@ -32,5 +35,5 @@ export function PersonalizedChrome() {
     return () => window.removeEventListener(PREFERENCES_UPDATED, update);
   }, []);
 
-  return <WhatsAppButton />;
+  return isBookingPage(pathname) ? null : <WhatsAppButton />;
 }

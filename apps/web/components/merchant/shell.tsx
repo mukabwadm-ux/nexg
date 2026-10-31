@@ -2,6 +2,7 @@ import {
   BarChart3,
   Bell,
   Building2,
+  CalendarDays,
   Clock,
   CreditCard,
   FileText,
@@ -80,6 +81,7 @@ export function merchantNav({
       label: 'Catalogue',
       icon: i(<UtensilsCrossed className="h-4 w-4" />),
     },
+    { href: '/merchant/calendar', label: 'Calendar', icon: i(<CalendarDays className="h-4 w-4" />) },
     { href: '/merchant/hours', label: 'Hours', icon: i(<Clock className="h-4 w-4" />) },
     { href: '/merchant/stores', label: 'Branches', icon: i(<Building2 className="h-4 w-4" />) },
     { href: '/merchant/money', label: 'Money', icon: i(<CreditCard className="h-4 w-4" />) },
@@ -131,6 +133,7 @@ export function MerchantShell({
   branchName,
   unreadCount,
   nav,
+  guestPreview = false,
   children,
 }: {
   businessName: string;
@@ -141,6 +144,7 @@ export function MerchantShell({
   branchName: string | null;
   unreadCount: number;
   nav: MerchantNavItem[];
+  guestPreview?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -217,12 +221,26 @@ export function MerchantShell({
               <HelpCircle className="h-4 w-4" aria-hidden="true" />
             </Link>
 
-            <AccountMenu
-              personName={personName}
-              role={role}
-              businessName={businessName}
-              live={live}
-            />
+            {guestPreview ? (
+              <div className="border-border flex items-center gap-2 border-l pl-3">
+                <span className="bg-gold-soft text-gold-text rounded-full px-2.5 py-1 text-[0.6875rem] font-extrabold">
+                  Guest preview
+                </span>
+                <Link
+                  href="/sign-in"
+                  className="text-muted hover:text-ink text-[0.75rem] font-extrabold"
+                >
+                  Exit
+                </Link>
+              </div>
+            ) : (
+              <AccountMenu
+                personName={personName}
+                role={role}
+                businessName={businessName}
+                live={live}
+              />
+            )}
           </div>
         </header>
 
