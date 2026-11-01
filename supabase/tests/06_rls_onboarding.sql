@@ -157,7 +157,7 @@ select is(
 );
 
 update public.merchant
-set answers = '{"packaging_style":"discreet","age_gate_method":"both","signature_required":"yes","min_order":"500"}'::jsonb
+set answers = '{"packaging_style":"discreet","age_gate_method":"both","signature_required":"yes","min_order":"500","business_types":["adult_products"],"adult_fulfillment_methods":["delivery"],"adult_handover_process":"id_at_handover","adult_packaging_presentation":"plain"}'::jsonb
 where id = 'cccccccc-0000-0000-0000-000000000001';
 
 select is(
