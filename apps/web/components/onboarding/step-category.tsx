@@ -71,12 +71,13 @@ export function CategoryStep() {
   const config = categories.find((category) => category.category === selectedCategoryId);
   const answers = draft?.answers ?? {};
   const draftId = draft?.id ?? null;
+  const hasSubcategories = (config?.subcategories?.length ?? 0) > 0;
   const businessTypesQuestion = config?.questions.find(
     (question) => question.key === 'business_types' && question.type === 'multi',
   );
   const selectedBusinessTypeIds = Array.isArray(answers.business_types)
     ? answers.business_types
-    : draft?.subcategory && businessTypesQuestion
+    : draft?.subcategory && hasSubcategories
       ? [draft.subcategory]
       : [];
   const selectedSubcategories =
@@ -87,9 +88,6 @@ export function CategoryStep() {
     answers,
     selectedSubcategories.map((subcategory) => subcategory.fulfillmentHint ?? ''),
   );
-  const selectedSubcategory =
-    selectedSubcategories[0] ??
-    config?.subcategories?.find((subcategory) => subcategory.id === draft?.subcategory);
   const subcategoryQuestions = selectedSubcategories.flatMap(
     (subcategory) =>
       subcategory.questions ??
@@ -149,13 +147,11 @@ export function CategoryStep() {
 
   const answered =
     !!config &&
-    (!businessTypesQuestion ||
-      businessTypesQuestion.required === false ||
-      selectedBusinessTypeIds.length > 0) &&
+    (!hasSubcategories || selectedBusinessTypeIds.length > 0) &&
     questions.every((question) => questionHasAnswer(question, answers));
   const canContinue =
     !!savedCategory &&
-    (!config?.subcategories?.length || !!businessTypesQuestion || !!selectedSubcategory) &&
+    (!hasSubcategories || selectedBusinessTypeIds.length > 0) &&
     answered &&
     !savingCategory &&
     !savingSubcategory &&
@@ -170,7 +166,7 @@ export function CategoryStep() {
     try {
       const categorySaved = await setCategory(savedCategory, answers);
       const subcategorySaved =
-        categorySaved && businessTypesQuestion
+        categorySaved && hasSubcategories
           ? await setSubcategory(selectedBusinessTypeIds[0] ?? null)
           : categorySaved;
       const setupSaved = subcategorySaved && (await flush());
@@ -211,38 +207,6 @@ export function CategoryStep() {
     if (!saved) {
       toast({
         title: 'We could not save your business type',
-        description: 'Please try selecting it again.',
-        tone: 'danger',
-      });
-    }
-  };
-
-  const chooseSubcategory = async (subcategoryId: string) => {
-    if (draft?.subcategory === subcategoryId && !subcategorySaveFailed) return;
-    setSavingSubcategory(true);
-    setSubcategorySaveFailed(false);
-    const nextSubcategory = config?.subcategories?.find((item) => item.id === subcategoryId);
-    const categoryId = draft?.category_key ?? draft?.category;
-    let saved = !!nextSubcategory && !!categoryId;
-    if (nextSubcategory && categoryId) {
-      const retainedKeys = new Set([
-        ...(config?.questions.map((question) => question.key) ?? []),
-        ...(
-          nextSubcategory.questions ??
-          questionsForSubcategory(nextSubcategory as Parameters<typeof questionsForSubcategory>[0])
-        ).map((question) => question.key),
-      ]);
-      const retainedAnswers = Object.fromEntries(
-        Object.entries(answers).filter(([key]) => retainedKeys.has(key)),
-      );
-      saved = await setCategory(categoryId, retainedAnswers);
-    }
-    if (saved) saved = await setSubcategory(subcategoryId);
-    setSavingSubcategory(false);
-    setSubcategorySaveFailed(!saved);
-    if (!saved) {
-      toast({
-        title: 'We could not save your specialty',
         description: 'Please try selecting it again.',
         tone: 'danger',
       });
@@ -341,7 +305,7 @@ export function CategoryStep() {
         ))}
       </div>
 
-      {config && !!config.subcategories?.length && (
+      {config && hasSubcategories && (
         <section
           aria-labelledby="specialty-heading"
           className="border-border bg-surface mt-6 rounded-2xl border p-4 sm:p-5"
@@ -360,9 +324,7 @@ export function CategoryStep() {
           </div>
           <div className="flex flex-wrap gap-2">
             {config.subcategories?.map((subcategory) => {
-              const selected = businessTypesQuestion
-                ? selectedBusinessTypeIds.includes(subcategory.id)
-                : draft?.subcategory === subcategory.id;
+              const selected = selectedBusinessTypeIds.includes(subcategory.id);
               return (
                 <button
                   key={subcategory.id}
@@ -370,11 +332,9 @@ export function CategoryStep() {
                   aria-pressed={selected}
                   disabled={savingSubcategory || savingCategory}
                   onClick={() =>
-                    businessTypesQuestion?.type === 'multi'
-                      ? void changeBusinessTypes(
-                          toggleMultiSelection(selectedBusinessTypeIds, subcategory.id),
-                        )
-                      : void chooseSubcategory(subcategory.id)
+                    void changeBusinessTypes(
+                      toggleMultiSelection(selectedBusinessTypeIds, subcategory.id),
+                    )
                   }
                   className={`focus-visible:ring-gold rounded-full px-3.5 py-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 ${
                     selected
