@@ -83,6 +83,9 @@ export function HoursStep() {
     answers,
     selectedSubcategories.map((subcategory) => subcategory.fulfillmentHint ?? ''),
   );
+  // Order-based = prepares or hands goods to a rider. Bookings, rentals and
+  // appointments have neither, so rush, late-night fees and riders do not apply.
+  const orderBased = showPrepTime || riderPickupRequired;
   const operationalQuestions = [
     ...(selectedCategory?.questions ?? []).filter((question) =>
       questionIsVisible(question, 4, answers),
@@ -193,7 +196,9 @@ export function HoursStep() {
       title={
         showPrepTime
           ? 'When are you open, and how fast are you?'
-          : 'When are you open, and how do orders reach you?'
+          : orderBased
+            ? 'When are you open, and how do orders reach you?'
+            : 'When are you available?'
       }
       intro="Choose a pattern instead of typing 14 times. Everything here is editable from your dashboard, any day."
       footer={
@@ -292,28 +297,30 @@ export function HoursStep() {
       </div>
 
       {/* ---------------------------------------------------------- late night */}
-      <div className="border-border bg-surface mt-4 rounded-2xl border p-5">
-        <p className="text-[0.9375rem] font-extrabold">Open late for guests?</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {[
-            { value: '23:00', label: 'We close by 23:00' },
-            { value: '02:00', label: 'Until 02:00' },
-            { value: '23:59', label: '24 hours' },
-          ].map((option) => (
-            <Chip
-              key={option.value}
-              selected={draft?.late_night_until?.slice(0, 5) === option.value}
-              onClick={() => patch({ late_night_until: option.value }, 4)}
-            >
-              {option.label}
-            </Chip>
-          ))}
+      {orderBased && (
+        <div className="border-border bg-surface mt-4 rounded-2xl border p-5">
+          <p className="text-[0.9375rem] font-extrabold">Open late for guests?</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {[
+              { value: '23:00', label: 'We close by 23:00' },
+              { value: '02:00', label: 'Until 02:00' },
+              { value: '23:59', label: '24 hours' },
+            ].map((option) => (
+              <Chip
+                key={option.value}
+                selected={draft?.late_night_until?.slice(0, 5) === option.value}
+                onClick={() => patch({ late_night_until: option.value }, 4)}
+              >
+                {option.label}
+              </Chip>
+            ))}
+          </div>
+          <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
+            Late-night is where guests order most. Late orders carry a night fee paid by the guest,
+            not by you.
+          </p>
         </div>
-        <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
-          Late-night is where guests order most. Late orders carry a night fee paid by the guest,
-          not by you.
-        </p>
-      </div>
+      )}
 
       {/* ------------------------------------------------------ prep, channels */}
       <div className={`mt-4 grid gap-4 ${showPrepTime ? 'lg:grid-cols-2' : ''}`}>
@@ -343,7 +350,9 @@ export function HoursStep() {
         )}
 
         <div className="border-border bg-surface rounded-2xl border p-5">
-          <p className="text-[0.9375rem] font-extrabold">How will you receive orders?</p>
+          <p className="text-[0.9375rem] font-extrabold">
+            {orderBased ? 'How will you receive orders?' : 'How will you receive bookings?'}
+          </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {CHANNELS.map((channel) => (
               <Chip
@@ -376,25 +385,27 @@ export function HoursStep() {
 
       {/* ------------------------------------------------------ busy, packaging */}
       <div className={`mt-4 grid gap-4 ${riderPickupRequired ? 'lg:grid-cols-2' : ''}`}>
-        <div className="border-border bg-surface rounded-2xl border p-5">
-          <p className="text-[0.9375rem] font-extrabold">When you are slammed</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {BUSY.filter((option) => showPrepTime || option.value !== 'extend_prep').map(
-              (option) => (
-                <Chip
-                  key={option.value}
-                  selected={draft?.when_busy === option.value}
-                  onClick={() => patch({ when_busy: option.value }, 4)}
-                >
-                  {option.label}
-                </Chip>
-              ),
-            )}
+        {orderBased && (
+          <div className="border-border bg-surface rounded-2xl border p-5">
+            <p className="text-[0.9375rem] font-extrabold">When you are slammed</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {BUSY.filter((option) => showPrepTime || option.value !== 'extend_prep').map(
+                (option) => (
+                  <Chip
+                    key={option.value}
+                    selected={draft?.when_busy === option.value}
+                    onClick={() => patch({ when_busy: option.value }, 4)}
+                  >
+                    {option.label}
+                  </Chip>
+                ),
+              )}
+            </div>
+            <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
+              You can change this any night from the dashboard.
+            </p>
           </div>
-          <p className="text-muted-light mt-4 text-xs font-semibold leading-[1.7]">
-            You can change this any night from the dashboard.
-          </p>
-        </div>
+        )}
 
         {riderPickupRequired && (
           <div className="border-border bg-surface rounded-2xl border p-5">
@@ -418,156 +429,158 @@ export function HoursStep() {
       </div>
 
       {/* ------------------------------------------------------- own riders */}
-      <div className="border-border bg-surface mt-4 rounded-2xl border p-5">
-        <p className="text-[0.9375rem] font-extrabold">Do you have your own delivery riders?</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Chip
-            selected={!fleetOpen}
-            onClick={() => {
-              setFleetOpen(false);
-              patch({ has_own_riders: false }, 4);
-            }}
-          >
-            No — use NexG riders
-          </Chip>
-          <Chip
-            selected={fleetOpen}
-            onClick={() => {
-              setFleetOpen(true);
-              patch({ has_own_riders: true }, 4);
-              if (riders.length === 0) setRiders([blankRider()]);
-            }}
-          >
-            Yes, I have my own
-          </Chip>
-        </div>
+      {riderPickupRequired && (
+        <div className="border-border bg-surface mt-4 rounded-2xl border p-5">
+          <p className="text-[0.9375rem] font-extrabold">Do you have your own delivery riders?</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Chip
+              selected={!fleetOpen}
+              onClick={() => {
+                setFleetOpen(false);
+                patch({ has_own_riders: false }, 4);
+              }}
+            >
+              No — use NexG riders
+            </Chip>
+            <Chip
+              selected={fleetOpen}
+              onClick={() => {
+                setFleetOpen(true);
+                patch({ has_own_riders: true }, 4);
+                if (riders.length === 0) setRiders([blankRider()]);
+              }}
+            >
+              Yes, I have my own
+            </Chip>
+          </div>
 
-        {fleetOpen && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 mt-5 duration-200">
-            <ul className="space-y-3">
-              {riders.map((rider, index) => (
-                <li
-                  key={index}
-                  className="border-border bg-bg grid gap-3 rounded-xl border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
-                >
-                  <Input
-                    id={`rider_name_${index}`}
-                    label="Name"
-                    value={rider.name}
-                    onChange={(event) => {
-                      const next = [...riders];
-                      next[index] = { ...rider, name: event.target.value };
-                      setRiders(next);
-                    }}
-                  />
-                  <PhoneInput
-                    id={`rider_phone_${index}`}
-                    label="Phone"
-                    value={rider.phone}
-                    onChange={(value) => {
-                      const next = [...riders];
-                      next[index] = { ...rider, phone: value };
-                      setRiders(next);
-                    }}
-                  />
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      aria-label={`Remove ${rider.name || 'this rider'}`}
-                      onClick={() => setRiders(riders.filter((_, i) => i !== index))}
-                      className="text-muted hover:text-danger p-2.5"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
+          {fleetOpen && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 mt-5 duration-200">
+              <ul className="space-y-3">
+                {riders.map((rider, index) => (
+                  <li
+                    key={index}
+                    className="border-border bg-bg grid gap-3 rounded-xl border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
+                  >
+                    <Input
+                      id={`rider_name_${index}`}
+                      label="Name"
+                      value={rider.name}
+                      onChange={(event) => {
+                        const next = [...riders];
+                        next[index] = { ...rider, name: event.target.value };
+                        setRiders(next);
+                      }}
+                    />
+                    <PhoneInput
+                      id={`rider_phone_${index}`}
+                      label="Phone"
+                      value={rider.phone}
+                      onChange={(value) => {
+                        const next = [...riders];
+                        next[index] = { ...rider, phone: value };
+                        setRiders(next);
+                      }}
+                    />
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        aria-label={`Remove ${rider.name || 'this rider'}`}
+                        onClick={() => setRiders(riders.filter((_, i) => i !== index))}
+                        className="text-muted hover:text-danger p-2.5"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
 
-                  <div className="lg:col-span-3">
-                    <div className="flex flex-wrap gap-2">
-                      {VEHICLES.map((vehicle) => (
-                        <Chip
-                          key={vehicle.value}
-                          selected={rider.vehicle === vehicle.value}
-                          onClick={() => {
+                    <div className="lg:col-span-3">
+                      <div className="flex flex-wrap gap-2">
+                        {VEHICLES.map((vehicle) => (
+                          <Chip
+                            key={vehicle.value}
+                            selected={rider.vehicle === vehicle.value}
+                            onClick={() => {
+                              const next = [...riders];
+                              next[index] = { ...rider, vehicle: vehicle.value };
+                              setRiders(next);
+                            }}
+                          >
+                            {vehicle.label}
+                          </Chip>
+                        ))}
+                      </div>
+                    </div>
+
+                    {rider.vehicle !== 'bicycle' && (
+                      <div className="lg:col-span-2">
+                        <Input
+                          id={`rider_plate_${index}`}
+                          label="Number plate"
+                          hint="Guests see this on the rider card and check it at the door."
+                          value={rider.plate_no}
+                          onChange={(event) => {
                             const next = [...riders];
-                            next[index] = { ...rider, vehicle: vehicle.value };
+                            next[index] = { ...rider, plate_no: event.target.value };
                             setRiders(next);
                           }}
-                        >
-                          {vehicle.label}
-                        </Chip>
-                      ))}
-                    </div>
-                  </div>
-
-                  {rider.vehicle !== 'bicycle' && (
-                    <div className="lg:col-span-2">
-                      <Input
-                        id={`rider_plate_${index}`}
-                        label="Number plate"
-                        hint="Guests see this on the rider card and check it at the door."
-                        value={rider.plate_no}
-                        onChange={(event) => {
-                          const next = [...riders];
-                          next[index] = { ...rider, plate_no: event.target.value };
-                          setRiders(next);
-                        }}
-                      />
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-
-            <button
-              type="button"
-              onClick={() => setRiders([...riders, blankRider()])}
-              className="border-border-strong text-muted hover:border-ink hover:text-ink mt-3 flex w-full items-center gap-3 rounded-xl border border-dashed p-3.5 text-left text-[0.875rem] font-bold transition-colors"
-            >
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              Add another rider
-            </button>
-
-            <div className="border-border bg-bg mt-4 rounded-xl border p-4">
-              <p className="text-[0.875rem] font-extrabold">When an order comes in</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {[
-                  { value: 'own_first', label: 'Offer my riders first, then NexG riders' },
-                  { value: 'pool_only', label: 'Only my riders' },
-                  { value: 'mixed', label: 'Whoever is closest' },
-                ].map((option) => (
-                  <Chip
-                    key={option.value}
-                    selected={draft?.fleet_dispatch_preference === option.value}
-                    onClick={() => patch({ fleet_dispatch_preference: option.value }, 4)}
-                  >
-                    {option.label}
-                  </Chip>
+                        />
+                      </div>
+                    )}
+                  </li>
                 ))}
+              </ul>
+
+              <button
+                type="button"
+                onClick={() => setRiders([...riders, blankRider()])}
+                className="border-border-strong text-muted hover:border-ink hover:text-ink mt-3 flex w-full items-center gap-3 rounded-xl border border-dashed p-3.5 text-left text-[0.875rem] font-bold transition-colors"
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                Add another rider
+              </button>
+
+              <div className="border-border bg-bg mt-4 rounded-xl border p-4">
+                <p className="text-[0.875rem] font-extrabold">When an order comes in</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[
+                    { value: 'own_first', label: 'Offer my riders first, then NexG riders' },
+                    { value: 'pool_only', label: 'Only my riders' },
+                    { value: 'mixed', label: 'Whoever is closest' },
+                  ].map((option) => (
+                    <Chip
+                      key={option.value}
+                      selected={draft?.fleet_dispatch_preference === option.value}
+                      onClick={() => patch({ fleet_dispatch_preference: option.value }, 4)}
+                    >
+                      {option.label}
+                    </Chip>
+                  ))}
+                </div>
+                <p className="text-muted-light mt-3 text-xs font-semibold leading-[1.7]">
+                  Your riders still go through NexG verification — ID, licence, plate and a short
+                  onboarding — so guests see the same plate-verified rider card. We text each one an
+                  invite.
+                </p>
               </div>
-              <p className="text-muted-light mt-3 text-xs font-semibold leading-[1.7]">
-                Your riders still go through NexG verification — ID, licence, plate and a short
-                onboarding — so guests see the same plate-verified rider card. We text each one an
-                invite.
+
+              <p className="border-warning/40 bg-warning-bg text-warning mt-3 rounded-xl border p-3 text-xs font-bold leading-[1.7]">
+                Delivery pay for your own riders is credited to your Friday settlement; you pay your
+                staff — policy assumption, confirm.
               </p>
+
+              <Button
+                variant="outline"
+                className="mt-3"
+                loading={savingFleet}
+                loadingText="Saving…"
+                onClick={() => void saveFleet()}
+              >
+                Save my riders
+              </Button>
             </div>
-
-            <p className="border-warning/40 bg-warning-bg text-warning mt-3 rounded-xl border p-3 text-xs font-bold leading-[1.7]">
-              Delivery pay for your own riders is credited to your Friday settlement; you pay your
-              staff — policy assumption, confirm.
-            </p>
-
-            <Button
-              variant="outline"
-              className="mt-3"
-              loading={savingFleet}
-              loadingText="Saving…"
-              onClick={() => void saveFleet()}
-            >
-              Save my riders
-            </Button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </OnboardingShell>
   );
 }
