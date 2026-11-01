@@ -3,7 +3,6 @@
 import * as React from 'react';
 
 import { LivePreview } from './preview';
-import { ResumeButton } from './resume-button';
 import { ShellFrame } from './shell-frame';
 import { useOnboarding } from './store';
 import { STEPS } from './types';
@@ -46,7 +45,7 @@ export function OnboardingShell({
       minutesLeft={STEPS.find((s) => s.step === step)?.minutes ?? 0}
       save={save}
       preview={<LivePreview />}
-      resume={<ResumeButton />}
+      resume={null}
       collapsedSummary={
         draft ? (
           <>
