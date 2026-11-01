@@ -4,9 +4,11 @@ select plan(12);
 
 select is(
   (
-    select jsonb_array_length(questions)
-    from public.category_config
-    where category = 'adults_only'
+    select count(*)::int
+    from public.category_config c
+    cross join lateral jsonb_array_elements(c.questions) q(value)
+    where c.category = 'adults_only'
+      and q.value ->> 'key' <> 'business_types'
   ),
   3,
   'adult onboarding asks about fulfillment, handover checks, and packaging'
