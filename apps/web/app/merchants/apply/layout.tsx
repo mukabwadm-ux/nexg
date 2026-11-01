@@ -15,19 +15,22 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApplyLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
+  // Signed-out visitors have no table access at all; step 1 creates their draft.
   const [{ data: categoriesRaw, error: categoryError }, { data: drafts, error: draftError }] =
     await Promise.all([
-      supabase
-        .from('category_config')
-        .select('*')
-        .order('sort'),
-      supabase
-        .from('merchant')
-        .select('*')
-        .is('submitted_at', null)
-        .order('updated_at', { ascending: false })
-        .limit(1),
+      supabase.from('category_config').select('*').order('sort'),
+      user
+        ? supabase
+            .from('merchant')
+            .select('*')
+            .is('submitted_at', null)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+        : Promise.resolve({ data: null, error: null }),
     ]);
 
   if (categoryError) {
@@ -44,7 +47,8 @@ export default async function ApplyLayout({ children }: { children: React.ReactN
       categoryConfigFromRow(
         category,
         category.image_path
-          ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data.publicUrl
+          ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data
+              .publicUrl
           : null,
       ),
     );
@@ -58,11 +62,7 @@ export default async function ApplyLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <OnboardingProvider
-      initialDraft={draft}
-      initialReadiness={readiness}
-      categories={categories}
-    >
+    <OnboardingProvider initialDraft={draft} initialReadiness={readiness} categories={categories}>
       {children}
     </OnboardingProvider>
   );

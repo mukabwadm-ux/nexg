@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Input, PhoneInput, useToast } from '@nexg/ui';
-import { Check, Clock, Link2, MessageCircle, Pencil, Shield } from 'lucide-react';
+import { Check, Clock, Link2, Pencil, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -56,7 +56,7 @@ export function StartStep({
     draft?.contact_phone ?? prefill?.phone ?? null,
   );
   const [email, setEmail] = React.useState(draft?.contact_email ?? prefill?.email ?? '');
-  const [emailChoice, setEmailChoice] = React.useState<'add' | 'whatsapp' | 'skip' | null>(
+  const [emailChoice, setEmailChoice] = React.useState<'add' | 'skip' | null>(
     draft?.contact_email || prefill?.email ? 'add' : null,
   );
 
@@ -547,19 +547,6 @@ export function StartStep({
                 Add an email
               </Chip>
               <Chip
-                selected={emailChoice === 'whatsapp'}
-                onClick={() => {
-                  setEmailChoice('whatsapp');
-                  setEmail('');
-                  if (started) patch({ contact_email: null });
-                }}
-              >
-                <span className="flex items-center gap-2">
-                  <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                  Use WhatsApp for everything
-                </span>
-              </Chip>
-              <Chip
                 selected={emailChoice === 'skip'}
                 onClick={() => {
                   setEmailChoice('skip');
@@ -608,7 +595,7 @@ export function StartStep({
                 ? 'About 8 minutes · 6 short steps'
                 : 'Stop any time — we save as you go',
           },
-          { icon: MessageCircle, text: 'Finish on WhatsApp if that is easier' },
+          { icon: Check, text: 'Finish everything here in the app, at your own pace' },
         ].map((item) => (
           <li key={item.text} className="flex items-start gap-2.5">
             <item.icon className="text-gold-text mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />

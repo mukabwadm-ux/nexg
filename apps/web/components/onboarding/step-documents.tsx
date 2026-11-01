@@ -11,7 +11,7 @@ import { DocumentsNote, QuestionCard } from './controls';
 import { NoDraft } from './no-draft';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
-import { questionHasAnswer, questionIsVisible } from './question-logic';
+import { questionIsVisible } from './question-logic';
 import { questionsForSubcategory } from './subcategory-questions';
 
 interface Requirement {
@@ -51,7 +51,6 @@ export function DocumentsStep() {
 
   const [requirements, setRequirements] = React.useState<Requirement[]>([]);
   const [existing, setExisting] = React.useState<Record<string, Existing>>({});
-  const [requested, setRequested] = React.useState<Set<string>>(new Set());
   const [busy, setBusy] = React.useState<string | null>(null);
   const [active, setActive] = React.useState<string | null>(null);
   const [expiry, setExpiry] = React.useState<Record<string, string>>({});
@@ -76,34 +75,21 @@ export function DocumentsStep() {
       ).filter((question) => questionIsVisible(question, 5, answers)),
     ),
   ];
-  const foodSafetyAnswered = foodSafetyQuestions.every((question) =>
-    questionHasAnswer(question, answers),
-  );
-
   const load = React.useCallback(async () => {
     if (!draftId) return;
     const supabase = createClient();
-    const [{ data: reqs }, { data: docs }, { data: chases }] = await Promise.all([
+    const [{ data: reqs }, { data: docs }] = await Promise.all([
       supabase.rpc('fn_merchant_required_docs', { p_merchant_id: draftId }),
       supabase
         .from('document')
         .select('requirement_id, status, expires_at, size_bytes, rejection_reason')
         .eq('owner_type', 'merchant')
         .eq('owner_id', draftId),
-      supabase
-        .from('document_request')
-        .select('requirement_id')
-        .eq('owner_type', 'merchant')
-        .eq('owner_id', draftId)
-        .is('fulfilled_document_id', null),
     ]);
 
     setRequirements((reqs as Requirement[] | null) ?? []);
     setExisting(
       Object.fromEntries(((docs as Existing[] | null) ?? []).map((d) => [d.requirement_id, d])),
-    );
-    setRequested(
-      new Set(((chases as { requirement_id: string }[] | null) ?? []).map((c) => c.requirement_id)),
     );
     setLoaded(true);
   }, [draftId]);
@@ -134,33 +120,9 @@ export function DocumentsStep() {
     await refresh();
   };
 
-  const chase = async (requirement: Requirement) => {
-    if (!draftId) return;
-    setBusy(requirement.kind);
-    const supabase = createClient();
-    const { error } = await supabase.rpc('rpc_document_request_via_whatsapp', {
-      p_merchant_id: draftId,
-      p_requirement_kind: requirement.kind,
-    });
-    setBusy(null);
-
-    if (error) {
-      toast({ title: 'We could not note that', description: error.message, tone: 'danger' });
-      return;
-    }
-    setRequested(new Set([...requested, requirement.id]));
-    toast({
-      title: 'Noted',
-      description:
-        'It is on your list and the merchant team can see it. We cannot message you on WhatsApp yet, so bring it to the onboarding call.',
-      tone: 'success',
-    });
-  };
-
   const done = requirements.filter((r) => existing[r.id]).length;
-  const missingEssential = requirements.filter((r) => r.essential && !existing[r.id]);
-  const pendingOptional = requirements.filter((r) => !r.essential && !existing[r.id]);
-  const canContinue = missingEssential.length === 0 && foodSafetyAnswered;
+  // Documents never block the flow; they can be added later from the dashboard.
+  const pendingAll = requirements.filter((r) => !existing[r.id]);
 
   /* No application at all is a different thing from one still
      loading, and only the first is permanent. */
@@ -184,30 +146,21 @@ export function DocumentsStep() {
           ? `${requirements.length} documents. ${done} ${done === 1 ? 'is' : 'are'} already done.`
           : `${requirements.length} documents, and we tell you exactly why.`
       }
-      intro="Our team checks each one and tells you exactly what, if anything, needs fixing. You can go live with the essentials and send the rest within 14 days."
+      intro="Add what you have now and skip the rest. You can upload documents any time from your dashboard, and nothing goes live until our team has checked them."
       footer={
         <>
           <Button variant="outline" size="lg" onClick={() => router.push('/merchants/apply/hours')}>
             Back
           </Button>
           <ContinueButton
-            disabled={!canContinue}
             onClick={async () => {
               await flush();
               router.push('/merchants/apply/payout');
             }}
           >
-            {canContinue
-              ? pendingOptional.length > 0
-                ? `Continue with ${pendingOptional.length} pending`
-                : 'Continue'
-              : missingEssential.length > 0
-                ? `Add your ${missingEssential[0]?.label.toLowerCase()}`
-                : 'Complete the food-safety questions'}
+            {pendingAll.length > 0 ? `Continue, ${pendingAll.length} to add later` : 'Continue'}
           </ContinueButton>
-          <FooterNote>
-            Policy assumption: 14-day grace for non-essential documents — confirm
-          </FooterNote>
+          <FooterNote>Documents are optional for now</FooterNote>
         </>
       }
     >
@@ -241,7 +194,6 @@ export function DocumentsStep() {
       <ul className="mt-5 space-y-3">
         {requirements.map((requirement) => {
           const saved = existing[requirement.id];
-          const chasing = requested.has(requirement.id);
           const isActive = active === requirement.kind && !saved;
 
           return (
@@ -264,9 +216,9 @@ export function DocumentsStep() {
                 <div className="min-w-0 flex-1">
                   <p className="text-[0.9375rem] font-extrabold">
                     {requirement.label}
-                    {!requirement.essential && (
+                    {!saved && (
                       <span className="text-muted-light ml-2 text-[0.6875rem] font-bold uppercase tracking-wide">
-                        · can follow
+                        · optional for now
                       </span>
                     )}
                   </p>
@@ -283,11 +235,6 @@ export function DocumentsStep() {
                     Uploaded
                     {saved.expires_at ? ` · expires ${saved.expires_at}` : ''}
                     {saved.size_bytes ? ` · ${formatBytes(saved.size_bytes)}` : ''}
-                  </p>
-                ) : chasing ? (
-                  <p className="text-warning shrink-0 text-[0.8125rem] font-bold">
-                    <MessageCircle className="mr-1 inline h-4 w-4" aria-hidden="true" />
-                    Sending on WhatsApp
                   </p>
                 ) : (
                   <div className="flex shrink-0 flex-wrap gap-2">
@@ -306,17 +253,6 @@ export function DocumentsStep() {
                       onPick={(file) => void send(requirement, file)}
                       onFocus={() => setActive(requirement.kind)}
                     />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={busy === requirement.kind}
-                      onClick={() => void chase(requirement)}
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                        Send later on WhatsApp
-                      </span>
-                    </Button>
                   </div>
                 )}
               </div>

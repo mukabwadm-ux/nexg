@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { DashboardLive } from '@/components/merchant/dashboard-live';
 import { DashboardSetup } from '@/components/merchant/dashboard-setup';
 import { firstName, merchantContext } from '@/components/merchant/frame';
@@ -50,6 +52,23 @@ export default async function MerchantDashboard() {
   const branches = (branchRes.data as BranchCard[] | null) ?? [];
   const attention = (attentionRes.data as AttentionRow[] | null) ?? [];
 
+  /* Documents are optional while onboarding, so the dashboard is where
+     they get chased. Nothing goes live until they are verified. */
+  const [reqRes, docRes] = await Promise.all([
+    supabase.rpc('fn_merchant_required_docs', { p_merchant_id: me.id }),
+    supabase
+      .from('document')
+      .select('requirement_id')
+      .eq('owner_type', 'merchant')
+      .eq('owner_id', me.id),
+  ]);
+  const have = new Set(
+    ((docRes.data as { requirement_id: string }[] | null) ?? []).map((d) => d.requirement_id),
+  );
+  const missingDocs = ((reqRes.data as { id: string }[] | null) ?? []).filter(
+    (r) => !have.has(r.id),
+  ).length;
+
   /* The live half reads three more things. A merchant still in
      setup pays for none of them. */
   const [orderRes, moneyRes, barRes] = live
@@ -68,6 +87,24 @@ export default async function MerchantDashboard() {
 
   return (
     <>
+      {missingDocs > 0 && (
+        <div className="mx-auto max-w-[90rem] px-4 pt-6 sm:px-8">
+          <div className="border-gold/50 bg-surface flex flex-wrap items-center gap-3 rounded-2xl border p-4">
+            <p className="min-w-0 flex-1 text-[0.9375rem] font-extrabold">
+              {missingDocs} {missingDocs === 1 ? 'document' : 'documents'} still to add
+              <span className="text-muted block text-[0.8125rem] font-semibold">
+                You can keep setting up. Nothing goes live until our team has checked them.
+              </span>
+            </p>
+            <Link
+              href="/merchant/documents"
+              className="bg-gold text-ink rounded-full px-5 py-2.5 text-sm font-extrabold"
+            >
+              Add documents
+            </Link>
+          </div>
+        </div>
+      )}{' '}
       {live ? (
         <DashboardLive
           m={m}

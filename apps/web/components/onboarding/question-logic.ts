@@ -26,7 +26,9 @@ export function needsRiderPickup(
   fulfillmentHints: readonly string[] = [],
 ): boolean {
   return (
-    fulfillmentHints.some((hint) => hint.includes('last_mile') || hint.includes('delivery')) ||
+    fulfillmentHints.some(
+      (hint) => hint !== 'ticket_delivery' && (hint.includes('last_mile') || hint.includes('delivery')),
+    ) ||
     conditionMatches(
       {
         any: [

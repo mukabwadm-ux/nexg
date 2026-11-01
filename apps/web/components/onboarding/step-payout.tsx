@@ -690,19 +690,21 @@ export function PayoutStep() {
                     }
                     onBlur={() => void saveItems()}
                   />
-                  <Input
-                    id={`item_prep_${index}`}
-                    label="Item-specific prep time (minutes)"
-                    inputMode="numeric"
-                    placeholder="Only if different from your usual prep time"
-                    value={item.prep_time_minutes}
-                    onChange={(event) =>
-                      updateItem(index, {
-                        prep_time_minutes: event.target.value.replace(/\D/g, ''),
-                      })
-                    }
-                    onBlur={() => void saveItems()}
-                  />
+                  {config?.prep_time_required && (
+                    <Input
+                      id={`item_prep_${index}`}
+                      label="Item-specific prep time (minutes)"
+                      inputMode="numeric"
+                      placeholder="Only if different from your usual prep time"
+                      value={item.prep_time_minutes}
+                      onChange={(event) =>
+                        updateItem(index, {
+                          prep_time_minutes: event.target.value.replace(/\D/g, ''),
+                        })
+                      }
+                      onBlur={() => void saveItems()}
+                    />
+                  )}
                 </div>
               )}
               <div className="flex items-center gap-2 pb-1">

@@ -3,10 +3,11 @@
 import * as React from 'react';
 
 import { LivePreview } from './preview';
-import { ResumeButton } from './resume-button';
 import { ShellFrame } from './shell-frame';
 import { useOnboarding } from './store';
 import { STEPS } from './types';
+
+const MERCHANT_STEP_NAMES = ['You', 'Location', 'Your offer', 'How you work', 'Documents', 'Payout'];
 
 /**
  * The merchant flow's shell: the shared frame, wired to the merchant store.
@@ -37,10 +38,14 @@ export function OnboardingShell({
       label="Merchant onboarding"
       step={step}
       totalSteps={6}
+      steps={MERCHANT_STEP_NAMES.map((label, i) => ({
+        label,
+        href: STEPS[i]?.path ?? '/merchants/apply/start',
+      }))}
       minutesLeft={STEPS.find((s) => s.step === step)?.minutes ?? 0}
       save={save}
       preview={<LivePreview />}
-      resume={<ResumeButton />}
+      resume={null}
       collapsedSummary={
         draft ? (
           <>
