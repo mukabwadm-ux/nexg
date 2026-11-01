@@ -95,5 +95,6 @@ describe('onboarding question conditions', () => {
     expect(needsRiderPickup({}, ['last_mile_food_hot'])).toBe(true);
     expect(needsRiderPickup({}, ['scheduled_bulk_delivery'])).toBe(true);
     expect(needsRiderPickup({}, ['customer_pickup'])).toBe(false);
+    expect(needsRiderPickup({}, ['ticket_delivery'])).toBe(false);
   });
 });
