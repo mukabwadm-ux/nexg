@@ -1,0 +1,579 @@
+{
+  "schemaVersion": "1.0.0",
+  "manifestId": "category_pet_care",
+  "version": "1.0.0",
+  "status": "DRAFT",
+  "category": {
+    "id": "pet_care",
+    "label": "Pet care",
+    "description": "Proposed future category using existing appointment and field-service design families. This file does not register or enable a live category."
+  },
+  "subcategories": [
+    {
+      "id": "pet_grooming",
+      "label": "Pet grooming",
+      "description": "Scheduled grooming at a merchant venue, with optional visits to a customer's location."
+    }
+  ],
+  "questionBindings": [
+    {
+      "question": {
+        "id": "Q_LOCATION_TIMEZONE",
+        "version": "1.0.0"
+      },
+      "scope": "LOCATION",
+      "visibleWhen": {
+        "always": true
+      },
+      "requiredWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "question": {
+        "id": "Q_SERVICE_LOCATION_MODE",
+        "version": "1.0.0"
+      },
+      "scope": "MERCHANT",
+      "visibleWhen": {
+        "always": true
+      },
+      "requiredWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ],
+      "allowedValues": [
+        "merchant_venue",
+        "mixed"
+      ]
+    },
+    {
+      "question": {
+        "id": "Q_APPOINTMENT_DURATION_MINUTES",
+        "version": "1.0.0"
+      },
+      "scope": "OFFERING",
+      "visibleWhen": {
+        "always": true
+      },
+      "requiredWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "question": {
+        "id": "Q_BOOKING_LEAD_TIME_MINUTES",
+        "version": "1.0.0"
+      },
+      "scope": "LOCATION",
+      "visibleWhen": {
+        "always": true
+      },
+      "requiredWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "question": {
+        "id": "Q_RESOURCE_SELECTION_MODE",
+        "version": "1.0.0"
+      },
+      "scope": "MERCHANT",
+      "visibleWhen": {
+        "always": true
+      },
+      "requiredWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "question": {
+        "id": "Q_SERVICE_AREA",
+        "version": "1.0.0"
+      },
+      "scope": "LOCATION",
+      "visibleWhen": {
+        "questionRef": "Q_SERVICE_LOCATION_MODE",
+        "operator": "eq",
+        "value": "mixed"
+      },
+      "requiredWhen": {
+        "questionRef": "Q_SERVICE_LOCATION_MODE",
+        "operator": "eq",
+        "value": "mixed"
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    }
+  ],
+  "capabilities": [
+    {
+      "capability": {
+        "id": "appointments",
+        "version": "1.0.0"
+      },
+      "enabledWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "capability": {
+        "id": "field_service",
+        "version": "1.0.0"
+      },
+      "enabledWhen": {
+        "questionRef": "Q_SERVICE_LOCATION_MODE",
+        "operator": "eq",
+        "value": "mixed"
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    }
+  ],
+  "workflowBindings": [
+    {
+      "id": "grooming_appointment",
+      "workflow": {
+        "id": "WF_APPOINTMENT",
+        "version": "1.0.0"
+      },
+      "role": "PRIMARY",
+      "enabledWhen": {
+        "always": true
+      },
+      "capabilityRef": "appointments",
+      "offeringSchemaRef": "grooming_services",
+      "availabilityRef": "groomer_slots",
+      "fulfillmentRef": "venue_service",
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "id": "grooming_home_visit",
+      "workflow": {
+        "id": "WF_FIELD_SERVICE",
+        "version": "1.0.0"
+      },
+      "role": "CHILD_EXECUTION",
+      "parentBindingRef": "grooming_appointment",
+      "executionRule": {
+        "id": "RULE_WORK_CUSTOMER_LOCATION_V1",
+        "version": "1.0.0"
+      },
+      "enabledWhen": {
+        "questionRef": "Q_SERVICE_LOCATION_MODE",
+        "operator": "eq",
+        "value": "mixed"
+      },
+      "capabilityRef": "field_service",
+      "offeringSchemaRef": "grooming_services",
+      "availabilityRef": "groomer_slots",
+      "fulfillmentRef": "home_service",
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    }
+  ],
+  "offeringSchemas": [
+    {
+      "id": "grooming_services",
+      "model": {
+        "id": "SERVICE_APPOINTMENT_V1",
+        "version": "1.0.0"
+      },
+      "enabledWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    }
+  ],
+  "availability": [
+    {
+      "id": "groomer_slots",
+      "model": {
+        "id": "AVAIL_RESOURCE_SLOTS_V1",
+        "version": "1.0.0"
+      },
+      "enabledWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    }
+  ],
+  "fulfillment": [
+    {
+      "id": "venue_service",
+      "model": {
+        "id": "FULFILL_AT_VENUE_V1",
+        "version": "1.0.0"
+      },
+      "enabledWhen": {
+        "always": true
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "id": "home_service",
+      "model": {
+        "id": "FULFILL_CUSTOMER_VISIT_V1",
+        "version": "1.0.0"
+      },
+      "enabledWhen": {
+        "questionRef": "Q_SERVICE_LOCATION_MODE",
+        "operator": "eq",
+        "value": "mixed"
+      },
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    }
+  ],
+  "readiness": [
+    {
+      "id": "business_verified",
+      "check": {
+        "id": "READY_BUSINESS_VERIFIED_V1",
+        "version": "1.0.0"
+      },
+      "requiredWhen": {
+        "always": true
+      },
+      "scope": "MERCHANT",
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "id": "service_records",
+      "check": {
+        "id": "READY_SERVICE_OFFERINGS_V1",
+        "version": "1.0.0"
+      },
+      "requiredWhen": {
+        "always": true
+      },
+      "scope": "OFFERING",
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "id": "groomer_resources",
+      "check": {
+        "id": "READY_RESOURCE_SCHEDULE_V1",
+        "version": "1.0.0"
+      },
+      "requiredWhen": {
+        "always": true
+      },
+      "scope": "LOCATION",
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    },
+    {
+      "id": "home_coverage",
+      "check": {
+        "id": "READY_SERVICE_AREA_V1",
+        "version": "1.0.0"
+      },
+      "requiredWhen": {
+        "questionRef": "Q_SERVICE_LOCATION_MODE",
+        "operator": "eq",
+        "value": "mixed"
+      },
+      "scope": "LOCATION",
+      "appliesToSubcategories": [
+        "pet_grooming"
+      ]
+    }
+  ],
+  "discovery": {
+    "cardTemplate": {
+      "id": "DISCOVERY_SERVICE_BOOKING_V1",
+      "version": "1.0.0"
+    },
+    "customerFields": [
+      {
+        "id": "FIELD_SERVICE_DURATION_V1",
+        "version": "1.0.0"
+      },
+      {
+        "id": "FIELD_SERVICE_LOCATION_V1",
+        "version": "1.0.0"
+      }
+    ],
+    "filters": [
+      {
+        "id": "FILTER_SERVICE_LOCATION_V1",
+        "version": "1.0.0"
+      }
+    ],
+    "publicationRule": {
+      "id": "RULE_VERIFIED_READY_PUBLICATION_V1",
+      "version": "1.0.0"
+    }
+  },
+  "vocabulary": {
+    "workSingular": "Appointment",
+    "workPlural": "Appointments",
+    "offeringSingular": "Grooming service",
+    "offeringPlural": "Grooming services",
+    "availabilityLabel": "Groomers and appointment slots",
+    "fulfillmentLabel": "Service location"
+  },
+  "screens": [
+    {
+      "screenId": "SC_WORK",
+      "components": [
+        {
+          "id": "CMP_WORK_QUEUE",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_WORK_DETAIL",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_TRANSITION_BAR",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_FULFILMENT",
+          "version": "1.0.0"
+        }
+      ],
+      "capabilityRefs": [
+        "appointments",
+        "field_service"
+      ]
+    },
+    {
+      "screenId": "SC_OFFERINGS",
+      "components": [
+        {
+          "id": "CMP_OFFERING_EDITOR",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_PRICE_EDITOR",
+          "version": "1.0.0"
+        }
+      ],
+      "capabilityRefs": [
+        "appointments"
+      ]
+    },
+    {
+      "screenId": "SC_AVAILABILITY",
+      "components": [
+        {
+          "id": "CMP_CALENDAR",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_AVAILABILITY_RULES",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_RESOURCE_PICKER",
+          "version": "1.0.0"
+        }
+      ],
+      "capabilityRefs": [
+        "appointments",
+        "field_service"
+      ]
+    },
+    {
+      "screenId": "SC_BUSINESS",
+      "components": [
+        {
+          "id": "CMP_BUSINESS_RECORD",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_REQUIREMENTS",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_TEAM_ACCESS",
+          "version": "1.0.0"
+        }
+      ],
+      "capabilityRefs": []
+    },
+    {
+      "screenId": "SC_MONEY",
+      "components": [
+        {
+          "id": "CMP_TRANSACTION_BREAKDOWN",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_STATEMENT",
+          "version": "1.0.0"
+        }
+      ],
+      "capabilityRefs": []
+    },
+    {
+      "screenId": "SC_PROMOTIONS",
+      "components": [
+        {
+          "id": "CMP_PROMOTION_EDITOR",
+          "version": "1.0.0"
+        }
+      ],
+      "capabilityRefs": []
+    },
+    {
+      "screenId": "SC_INSIGHTS",
+      "components": [
+        {
+          "id": "CMP_REPORT",
+          "version": "1.0.0"
+        }
+      ],
+      "capabilityRefs": []
+    },
+    {
+      "screenId": "SC_SETTINGS",
+      "components": [
+        {
+          "id": "CMP_CONNECTION",
+          "version": "1.0.0"
+        },
+        {
+          "id": "CMP_PREFERENCES",
+          "version": "1.0.0"
+        }
+      ],
+      "capabilityRefs": []
+    }
+  ],
+  "metrics": [
+    {
+      "id": "METRIC_WORK_COMPLETED_V1",
+      "version": "1.0.0"
+    }
+  ],
+  "promotionEligibility": [
+    {
+      "promotionType": {
+        "id": "PROMOTION_FEATURED_PLACEMENT_V1",
+        "version": "1.0.0"
+      },
+      "eligibilityRule": {
+        "id": "RULE_FEATURED_ELIGIBILITY_V1",
+        "version": "1.0.0"
+      }
+    }
+  ],
+  "migration": {
+    "preserveStartedWork": true,
+    "upgradePolicy": {
+      "id": "MIGRATION_EXPLICIT_ANSWER_UPGRADE_V1",
+      "version": "1.0.0"
+    },
+    "rollbackPolicy": {
+      "id": "ROLLBACK_COMPATIBLE_RELEASE_V1",
+      "version": "1.0.0"
+    }
+  },
+  "verification": {
+    "testRefs": [
+      {
+        "id": "TEST_CATEGORY_FORM_PORTAL_ATOMIC_V1",
+        "version": "1.0.0"
+      },
+      {
+        "id": "TEST_READONLY_CONNECTION_DENIES_WRITE_V1",
+        "version": "1.0.0"
+      },
+      {
+        "id": "TEST_STARTED_WORK_VERSION_PRESERVED_V1",
+        "version": "1.0.0"
+      }
+    ],
+    "fixtures": [
+      {
+        "id": "venue_only",
+        "subcategoryId": "pet_grooming",
+        "answers": {
+          "Q_LOCATION_TIMEZONE": "Africa/Nairobi",
+          "Q_APPOINTMENT_DURATION_MINUTES": 45,
+          "Q_BOOKING_LEAD_TIME_MINUTES": 120,
+          "Q_RESOURCE_SELECTION_MODE": "any_qualified_resource",
+          "Q_SERVICE_LOCATION_MODE": "merchant_venue"
+        },
+        "expectedWorkflowBindings": [
+          "grooming_appointment"
+        ],
+        "expectedSetupChecks": [
+          "business_verified",
+          "service_records",
+          "groomer_resources"
+        ],
+        "expectedRejectedActions": [
+          "NEXG:WORKFLOW:START_FIELD_VISIT"
+        ]
+      },
+      {
+        "id": "venue_and_home",
+        "subcategoryId": "pet_grooming",
+        "answers": {
+          "Q_LOCATION_TIMEZONE": "Africa/Nairobi",
+          "Q_APPOINTMENT_DURATION_MINUTES": 45,
+          "Q_BOOKING_LEAD_TIME_MINUTES": 120,
+          "Q_RESOURCE_SELECTION_MODE": "any_qualified_resource",
+          "Q_SERVICE_AREA": {
+            "coverage_type": "zones",
+            "coverage": [
+              "zone_fixture_nairobi"
+            ],
+            "location_id": "location_fixture_nairobi"
+          },
+          "Q_SERVICE_LOCATION_MODE": "mixed"
+        },
+        "expectedWorkflowBindings": [
+          "grooming_appointment",
+          "grooming_home_visit"
+        ],
+        "expectedSetupChecks": [
+          "business_verified",
+          "service_records",
+          "groomer_resources",
+          "home_coverage"
+        ],
+        "expectedRejectedActions": []
+      }
+    ]
+  }
+}

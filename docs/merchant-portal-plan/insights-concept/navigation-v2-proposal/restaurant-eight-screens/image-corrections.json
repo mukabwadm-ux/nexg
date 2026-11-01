@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-01",
+  "tool": "built-in image_gen",
+  "corrections": [
+    {
+      "id": "RST_03",
+      "reason": "Use a distinct-item label so the count of eight cannot be confused with fulfilled unit quantity.",
+      "prompt": "Use case: precise-object-edit. In this restaurant Menu Insights screenshot, change only the middle summary card label from 'Items ordered' to 'Distinct menu items'. Keep the value 8. Preserve all other text, numbers, charts, tables, exact sidebar/header/filter/eight-tab navigation and selected Menu underline. No other changes.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-71add6f0-18c7-4f51-a394-a6fd640a812a.png"
+    },
+    {
+      "id": "RST_04",
+      "reason": "Use merchant-friendly cohort copy and remove an internal design note from product UI.",
+      "prompt": "Use case: precise-object-edit. In this restaurant Customers Insights screenshot make only two text changes. Replace the basis line below 'Customer activity' with 'Customers with completed orders in this period.' In the bottom blue definition strip, keep the definitions of First time and Returning and the sentence about confirmed prior history, but remove only the final sentence 'No demographic inference.' Preserve all values, chart labels, table references, 28.6%,840,600,240,792,384, exact shell/header/filter/eight tabs and selected Customers underline. No other changes.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-a8d0c79d-46fa-43af-a91b-5aa19356c5c5.png"
+    },
+    {
+      "id": "RST_06",
+      "reason": "Remove generation constraints accidentally rendered as in-app copy.",
+      "prompt": "Use case: precise-object-edit. In this restaurant Promotions Insights screenshot remove only the small gray second line in the blue Attributed value strip that reads 'No revenue, ROI, ROAS, discount or fee-policy figures. Counts are synthetic review evidence.' It is an internal generation note and must not appear in product UI. Keep the first line 'Attributed value: Unavailable. Value and refund measurement are not connected.' and all links. Preserve every metric, chart, table, campaign/date, exact sidebar/header/filter/eight-tab navigation and selected Promotions underline. Do not add any new copy or other changes.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-87db2ea4-36fe-4326-b9e1-1aa571120c78.png"
+    },
+    {
+      "id": "RST_08",
+      "reason": "Keep the shared Insights heading and one authoritative set of scope controls.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-3eedb576-3d87-42f0-9264-daf1a4ec5ab7.png",
+      "prompt": "Use case: precise-object-edit. Make only these corrections to this restaurant Reports-library screenshot. Restore the shared page heading above the filters to 'Insights' and its subtitle to 'Track your restaurant\\'s performance', exactly as on the other restaurant tabs. Keep Reports selected in the eight peer tabs. In the right Order outcomes preview, remove the duplicate date dropdown, Compare toggle, Activity selector and Filters control. Replace that duplicated control area with one small read-only scope line '4–31 Oct 2026 · Karen branch · Menu orders'. Keep all four preview counts 1,248/1,176/54/18, observation cutoff, buttons, library rows, selected first row and Library/Saved views/Exports navigation unchanged. The search/library area identifies Reports. Preserve exact sidebar, merchant header, original global filter row, all eight peer labels, colors, type, canvas size and all remaining content. No new metric or extra control."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "fictional": true,
+  "merchant": "Nairobi Collective",
+  "location": "Westlands",
+  "currency": "KES",
+  "actorInitials": "ZM",
+  "statementId": "STM-1103",
+  "statementPeriod": "1–3 Nov 2026",
+  "statementRevision": 0,
+  "postings": 36,
+  "finding": {
+    "id": "FND-1103-01",
+    "detectedAt": "2026-11-03T09:44:00+03:00",
+    "classification": "Possible duplicate fee",
+    "status": "Needs review",
+    "supportCaseId": null,
+    "rule": "Two distinct active debit postings reference the same canonical charge component, in the same business/location/currency scope.",
+    "newSourceExtension": true,
+    "scopeLimit": "Possible issue, pending Finance validation of accepted terms; does not claim a production detector."
+  },
+  "sourceDetail": {
+    "aggregatePosting": "TX-6400",
+    "aggregateDebitMinor": 680000,
+    "matchedChargeReference": "CHG-5821",
+    "matchedComponentMinor": 120000,
+    "otherComponentsMinor": 560000,
+    "separatePosting": "TX-6116",
+    "separateDebitMinor": 120000,
+    "reversalInSelectedRecords": false
+  },
+  "unchanged": {
+    "postedSalesMinor": 20000000,
+    "confirmedRefundsMinor": 1000000,
+    "postedFeesMinor": 800000,
+    "netPayableMinor": 18200000
+  },
+  "flow": [
+    "Select STM-1103",
+    "Review finding",
+    "Inspect FND-1103-01 and matched charge-component evidence",
+    "Report an issue",
+    "Existing editable report form with statement/evidence attached",
+    "Send to Finance support",
+    "Only confirmed creation produces FIN-1103",
+    "Existing Finance resolution after owner confirmation"
+  ],
+  "existingCaseBehavior": "Reuse an existing financial case rather than creating a duplicate; this illustrated branch has no case yet.",
+  "totals": "A finding and component drill-down create no financial posting. Totals change only after the confirmed reversal in the existing resolution image."
+}

@@ -1,0 +1,317 @@
+{
+  "date": "2026-11-01",
+  "timezone": "Africa/Nairobi",
+  "generation_tool": "built-in image_gen",
+  "planned_total": 18,
+  "generated_selected": 11,
+  "remaining_not_generated": 7,
+  "status": "eleven_selected_images_complete_including_system_detection",
+  "images": [
+    {
+      "id": "DA01",
+      "file": "01-home-needs-attention.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-d1293e88-49c3-479e-a922-b3fc85842cc6.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1390070,
+      "sha256": "22d2981b04c996d081b9b00c67f5c47ad7400a9c87cf4380e11dde5e08f5bf47",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA02",
+      "file": "02-work-evidence-and-action.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-9be1ec4f-fd95-4b94-b3d3-740a9b01ff92.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1648251,
+      "sha256": "4e051f34b2834977ca8a3623f43397d2467c9f4224b47161d94826ba562b0ff8",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA03",
+      "file": "03-home-confirmed-result.png",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-72410429-2ea6-4e0f-9953-34512c6b4262.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1627539,
+      "sha256": "5ecb9842642dfd25f30b0fcf1ff4f5d3f6988b51f132bd24d84024aee17c659f",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA04",
+      "file": "04-insights-explained-finding.png",
+      "batch": "insight-to-decision",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-1091529b-4c68-4f7f-affe-e69e1b453e11.png",
+      "derived_from": "01-home-needs-attention.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1493942,
+      "sha256": "268d6cdcbbadf46c1134a9ef96e34e860d8e265d3882369458a3c90dd1ffb069",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA05",
+      "file": "05-insights-contributing-records.png",
+      "batch": "insight-to-decision",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-20fd7440-e28c-4a17-a64a-1f39d0177775.png",
+      "derived_from": "04-insights-explained-finding.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1491497,
+      "sha256": "da7186b1d9ed0af8810033f988cbfb1a4146544d1cb39c7b27435b096b5a3b0f",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA06",
+      "file": "06-availability-confirmed-trial.png",
+      "batch": "insight-to-decision",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-d4ef8a23-3562-475a-8840-17ddbb218ee6.png",
+      "derived_from": "01-home-needs-attention.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1469323,
+      "sha256": "3637cb6212a5fbb1927ad5825c702e1b4ff2f1c7de47afbd7654b90e5aea653b",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA07",
+      "file": "07-money-statement-discrepancy.png",
+      "batch": "money-investigation",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-83b953f7-6573-4a92-a4e5-c55389a5e53a.png",
+      "derived_from": "references/current-money-statements.png",
+      "width": 1782,
+      "height": 883,
+      "bytes": 1396048,
+      "sha256": "b181e3040655d1ed0dc719688d0e843b91c42ee67e9095c7a2fa3e34f1cc2929",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA08",
+      "file": "08-money-report-issue-form.png",
+      "batch": "money-investigation",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-b5ed6b32-03a6-4a32-9209-9463c7e19d4d.png",
+      "derived_from": "08-money-contextual-support.png",
+      "width": 1780,
+      "height": 883,
+      "bytes": 1573403,
+      "sha256": "aeb93dce215aebe211ba3a9ce61a307535934d3339818b596f0f5a00140c3f98",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true,
+      "state": "Draft opened from selected statement, before sending",
+      "prompt_override": "money-investigation-transition-correction.json"
+    },
+    {
+      "id": "DA09",
+      "file": "09-money-visible-resolution.png",
+      "batch": "money-investigation",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-e40de22f-a20c-42d7-937e-d0f6b44d714b.png",
+      "derived_from": "07-money-statement-discrepancy.png",
+      "width": 1781,
+      "height": 883,
+      "bytes": 1569465,
+      "sha256": "64c465c850e07479f4cbdeaaa30697a74a590213cd8ba4ab66e09f47f68062b8",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA10",
+      "file": "10-money-system-detected-finding.png",
+      "batch": "money-system-detection",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-d1f3b799-2a05-4521-819d-ff6af5370fcd.png",
+      "derived_from": "07-money-statement-discrepancy.png",
+      "width": 1780,
+      "height": 883,
+      "bytes": 1631779,
+      "sha256": "0ff38f20a29c370c633c765968a7e1b076c30270ad4ad42f2764ab5b00462c79",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    },
+    {
+      "id": "DA11",
+      "file": "11-money-finding-evidence.png",
+      "batch": "money-system-detection",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-fef5c95c-5cd3-45b0-8cfd-f4401c54c184.png",
+      "derived_from": "10-money-system-detected-finding.png",
+      "width": 1780,
+      "height": 883,
+      "bytes": 1555124,
+      "sha256": "51a1ac6bef8d6ba32bd1b1449dd63382beae50f0a7ce8d51852c01dd6e3f90ac",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true
+    }
+  ],
+  "prompts": "prompts.json",
+  "targeted_corrections": "corrections.json",
+  "scenario": "scenario.json",
+  "visual_review": {
+    "method": "Root and independent agent inspected all three selected images",
+    "result": "passed",
+    "checks": [
+      "Merchant/location/owner/customer/order continuity",
+      "10:04,10:05,10:06 timeline and unchanged10:00 promise",
+      "Four lines/five sale units/KES1280 merchandise subtotal",
+      "Pre-action readiness Pending",
+      "Final0attention4active2ready8completed",
+      "Collection pending; no payment/payout/completion assertion",
+      "Visible concept labels"
+    ],
+    "scope": "All eleven selected images; detailed checks in batch_reviews"
+  },
+  "verification_limits": [
+    "PNG integrity and scenario arithmetic checked programmatically",
+    "Text and state continuity checked visually, not by OCR",
+    "No application runtime, integration or merchant adoption claim"
+  ],
+  "prompt_sets": [
+    "prompts.json",
+    "insight-decision-prompts.json",
+    "money-investigation-prompts.json",
+    "money-investigation-transition-correction.json",
+    "money-system-detection-prompts.json"
+  ],
+  "scenarios": [
+    "scenario.json",
+    "insight-decision-scenario.json",
+    "money-investigation-scenario.json",
+    "money-system-detection-scenario.json"
+  ],
+  "batch_reviews": [
+    {
+      "batch": "daily-work",
+      "images": [
+        "DA01",
+        "DA02",
+        "DA03"
+      ],
+      "result": "passed; retained selected images unchanged"
+    },
+    {
+      "batch": "insight-to-decision",
+      "images": [
+        "DA04",
+        "DA05",
+        "DA06"
+      ],
+      "method": "Root and independent agent inspected all three final images",
+      "result": "passed",
+      "checks": [
+        "Same merchant/location/owner/design",
+        "50due8late0missing and exact timeband counts",
+        "20selected6late14ontime30percent",
+        "All six order references/dates/promises/readiness/delays",
+        "Current planned roster distinguished from historical evidence",
+        "Trial confirmed1Nov10:12, effectiveMonday2Nov10–12",
+        "MayaT and JohnM; availability checked; historical metric unchanged",
+        "Future performance not yet measured; commitments unchanged"
+      ]
+    },
+    {
+      "batch": "money-investigation",
+      "images": [
+        "DA07",
+        "DA08",
+        "DA09"
+      ],
+      "method": "Root and independent agent visual review against actual Money baseline",
+      "result": "passed",
+      "checks": [
+        "Existing sidebar/header/tabs/list/right inspector retained",
+        "NairobiCollective/Westlands/ZM and STM1103/FIN1103 continuous",
+        "Underreview totals unchanged",
+        "Original fee retained plus confirmed RV6116 reversal",
+        "36to37postings; fees8000to6800; periodnet182000to183200",
+        "Sales/refunds unchanged; payout separate",
+        "3Novsamplefixture and sample labels retained"
+      ],
+      "transition_coverage_correction": "Original visual review did not cover statement-to-form submission. DA08 corrected after user feedback; see following review."
+    },
+    {
+      "batch": "money-investigation-transition-correction",
+      "images": [
+        "DA07",
+        "DA08",
+        "DA09"
+      ],
+      "method": "Root and independent reviewer inspected revised form and trigger continuity",
+      "result": "passed",
+      "checks": [
+        "Report an issue trigger in selected statement inspector opens matching modal title",
+        "Statement/period/Westlands/KES/revision/evidence automatically attached",
+        "Editable type/posting/message and Cancel/Send controls visible",
+        "No FINcaseID or Under review before successful submit",
+        "Background statement36postings and figures unchanged",
+        "Confirmed creation precedes FIN1103 and the later resolution"
+      ]
+    },
+    {
+      "batch": "money-system-detection",
+      "images": [
+        "DA10",
+        "DA11"
+      ],
+      "method": "Root and independent agent visual inspection against actual-Money-based images",
+      "result": "passed",
+      "checks": [
+        "Current Money design and STM1103 context retained",
+        "Possible duplicate and Needs review distinguish finding from error/case",
+        "CHG5821 component1200 inside TX6400 aggregate6800 and TX6116 separate1200",
+        "Aggregate6800 equals1200matched plus5600other",
+        "36postings and financial totals unchanged",
+        "Review finding matches modal title",
+        "Report an issue explicitly opens existing editable form before sending",
+        "No automatic correction, FINcase or payout claim"
+      ]
+    }
+  ],
+  "design_references": [
+    {
+      "batch": "money-investigation",
+      "file": "references/current-money-statements.png",
+      "original": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\docs\\merchant-portal-plan\\money-concept\\implementation\\statements-refined.png",
+      "dimensions": [
+        1920,
+        950
+      ],
+      "sha256": "2c6bc8c0a5b3dee44f9f1a219f5d02c096ba1d054495d09812a3574f5e182f73",
+      "type": "actual implemented Money screenshot",
+      "fidelity": "Existing UI structure visually retained; generated edits are not pixel-identical runtime captures.",
+      "proposed_additions": [
+        "Fee evidence panel",
+        "Contextual Report an issue action",
+        "Prefilled editable issue form in existing Money modal style",
+        "Confirmed case creation and persistent View case action",
+        "Finance response, reversal and statement revision"
+      ]
+    }
+  ],
+  "superseded_images": [
+    {
+      "id": "DA08",
+      "file": "08-money-contextual-support.png",
+      "batch": "money-investigation",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1961a-2264-7f03-8cd7-8793c8485254\\exec-63488a34-44c7-4b58-ab29-c73140290d4f.png",
+      "derived_from": "07-money-statement-discrepancy.png",
+      "width": 1781,
+      "height": 883,
+      "bytes": 1520960,
+      "sha256": "3deb3c1acdd24a94de2c8334dab06496ee612368954c14a324e6444deaed2ed7",
+      "png_integrity": "passed",
+      "copy_matches_generated_source": true,
+      "status": "superseded",
+      "reason": "Post-submit acknowledgment skipped the form opened by Report an issue. Original retained."
+    }
+  ],
+  "plan_amendment": {
+    "original_total": 16,
+    "added_system_detection_images": 2,
+    "updated_total": 18,
+    "reason": "User requested generation after the two-additional-image proposal."
+  }
+}

@@ -1,0 +1,460 @@
+{
+  "report": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\audits\\merchant-decision-and-action-gap-audit-2026-11-01.md",
+  "report_sha256": "c9b300ba0b53cca62faad46bb7c9db9bce8134be2a747bd84f58480520640494",
+  "finding_count": 40,
+  "priorities": {
+    "P2": 23,
+    "P1": 15,
+    "P3": 2
+  },
+  "references_checked": 74,
+  "unique_source_files": 41,
+  "errors": [],
+  "method": "Static source/reference validation only; no application runtime or merchant validation performed.",
+  "sources": [
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/docs/merchant-portal-plan/implementation-plan.md",
+      "line": 22,
+      "line_text": "| P13 Migration and pilot | Existing merchant import, unresolved-answer review, source ownership, staged rollout | Dry-run diffs, historical references unchanged, profile-by-profile review, measured user tasks and explicit recovery/rollback. |",
+      "sha256": "43e013c5c561983bdc73d9dc3cefe64cbfb243568d6a9fd66d24a12467a76fcf"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/metric-registry.json",
+      "line": 14,
+      "line_text": "  \"requiredMetricFields\": [",
+      "sha256": "dd6fcefbc0e1248270a92692690728aa90e0ed81173d43d1e89694227129d71d"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/screen-design.md",
+      "line": 151,
+      "line_text": "## End-to-end review journeys",
+      "sha256": "7d562eaed2f60301a2c331e697619795fa6e563808d3f6ddd1199b4a2ae6f044"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/screen-design.md",
+      "line": 121,
+      "line_text": "Scheduled delivery is deferred because there is no confirmed reporting/notification subscription owner. Do not put an active Schedule button in the concept. A future feature needs explicit recipients, supported channel, visibility, consent, delivery status and revocation behavior.",
+      "sha256": "7d562eaed2f60301a2c331e697619795fa6e563808d3f6ddd1199b4a2ae6f044"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/docs/merchant-portal-plan/stats/collection-contract.md",
+      "line": 13,
+      "line_text": "## Source families",
+      "sha256": "6952b4116061d0b8d6e0274460dcbb2aac75b80dfc9b6554b62edada51bfe236"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/scripts/smoke-work-preview.cjs",
+      "line": 15,
+      "line_text": "  check(await queueRows.count() >= 12, 'Fewer than 12 in-progress records are available');",
+      "sha256": "87464af56597010f8ca56abd8cc8d4965e2508c9edbeb29d425f59801bb9d226"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/docs/merchant-portal-plan/stats/frontend-and-acceptance.md",
+      "line": 59,
+      "line_text": "## Acceptance records",
+      "sha256": "d3df9cd51b978eb9006d147cf37a9b841d3707c9e2b9949192d0e3b6757a4dfb"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/screen-design.md",
+      "line": 79,
+      "line_text": "An observation says, for example, `18 of 60 cancellations have no recorded reason` with `View 18 records`. It states its calculation and period. It must not say `Customers dislike your price` without evidence. Lower activity is not inherently poor performance, and a note beside a trend is not a verified cause. Merchant notes are labelled notes.",
+      "sha256": "7d562eaed2f60301a2c331e697619795fa6e563808d3f6ddd1199b4a2ae6f044"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant-live-preview/work/page.tsx",
+      "line": 9,
+      "line_text": "  if (process.env.NODE_ENV !== 'development') notFound();",
+      "sha256": "7f8fef204c990ebfd5ccddfb16f8ad5102c22ad61455aa7a1ed836b935d73732"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/money/README.md",
+      "line": 7,
+      "line_text": "`MoneySource` in `source.ts` is a browser-local simulation. Its scoped storage, revisions, simulated roles, source states and fixture-owner statement refresh are not production authorization or financial authority. Money amounts use exact integer minor units with explicit KES metadata. A sample action never sends a charge, refund, payout or message. The Work link preserves the selected reference and returns to Money; its operational Work source is explicitly not connected. Offerings uses the existing local Offerings source and preserves the return context.",
+      "sha256": "594d4a45b31aa8e407388040542a0723ec5fad2f54fee462e7b6ee420cf4a0a6"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/business/README.md",
+      "line": 20,
+      "line_text": "`BusinessSource` supplies load/save/reset through a replaceable typed adapter. This implementation uses no Business API, Supabase write, real invitation, document upload, public publication or external message. Frontend checks are not production authorization. A future source must enforce actual identities, permissions, field ownership, review decisions, revision transactions and approved requirements through their domain owners.",
+      "sha256": "3e35c21bba359c8e68f9c431c9ab612783b529a48f8a8875740102d72dcc5caa"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/business/source.ts",
+      "line": 100,
+      "line_text": "      if (typeof window !== 'undefined')",
+      "sha256": "c550c7d8e44370121726ef5e7519b4b540d3897d5cd1a3ccfe481296246cbcc1"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/business/README.md",
+      "line": 22,
+      "line_text": "Business emits `nexg:business-preview-changed` with the saved specialty/revision. It does not silently rewrite the independent Offerings, Availability or Work preview stores. Their eventual shared-configuration adapter must consume confirmed scoped changes. Existing work retains its accepted terms.",
+      "sha256": "3e35c21bba359c8e68f9c431c9ab612783b529a48f8a8875740102d72dcc5caa"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/layout.tsx",
+      "line": 78,
+      "line_text": "    <MerchantShell",
+      "sha256": "66f1af21fbeac3bd3bbaa8b42b35a81f63dc5d89de19045f62d8c30c03d51c0b"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/live-preview-shell.tsx",
+      "line": 133,
+      "line_text": "            {locationControl ?? (",
+      "sha256": "9f7122c67bc9796880e4fcb51976f3c74ee9b241150adc4e3b8deda20971a296"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/workspace.tsx",
+      "line": 18,
+      "line_text": "  const [profileId, setProfileId] = useState(initialProfile.subcategoryId);",
+      "sha256": "8d59f1003108bf08fa0ad15e9ce06e5704987e365375706974c48e7719f97895"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/live-preview-shell.tsx",
+      "line": 19,
+      "line_text": "const nav = [",
+      "sha256": "9f7122c67bc9796880e4fcb51976f3c74ee9b241150adc4e3b8deda20971a296"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant-preview/layout.tsx",
+      "line": 20,
+      "line_text": "    <MerchantShell",
+      "sha256": "8f5f416042a5c250ba826066481b782dc94ecfbd67c5b400793c8b4c3dde6bf2"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/home-setup.tsx",
+      "line": 12,
+      "line_text": "const steps: Array<{ key: StepKey; title: string; description: string; action: string; section: string; icon: typeof Store }> = [",
+      "sha256": "6238d93a1eb64addacc8532f48b24a8e637438d63051a881d2cfa6c088545e48"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/docs/merchant-portal-plan/stats/frontend-and-acceptance.md",
+      "line": 17,
+      "line_text": "| ST03 Setup Home | Build its requirement list from the resolved business, selected capabilities and confirmed demo requirement states | No test-order requirement for an enquiry-only business. No stock task for a service-only spa. A submitted document remains awaiting review. Progress uses one applicable required list. |",
+      "sha256": "d3df9cd51b978eb9006d147cf37a9b841d3707c9e2b9949192d0e3b6757a4dfb"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/home-performance.tsx",
+      "line": 33,
+      "line_text": "  const hasBookings = !!demo?.bookingSeries && demo.bookingSeries.length === bars.length;",
+      "sha256": "ee135768f2298c7e352082479eb054ec321e278627eac66c477dd68d4a1e75ae"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/docs/merchant-portal-plan/stats/frontend-and-acceptance.md",
+      "line": 7,
+      "line_text": "`apps/web/components/merchant/home-setup.tsx` currently has a fixed seven-step checklist, including a test-order step. `home-performance.tsx` offers orders/sales and an optional demo booking series. `home-live.tsx` uses fixed order, booking and sales examples. The existing Analytics page is order/delivery based. These are useful starting components, not proof of adaptation.",
+      "sha256": "d3df9cd51b978eb9006d147cf37a9b841d3707c9e2b9949192d0e3b6757a4dfb"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/home-live.tsx",
+      "line": 185,
+      "line_text": "                      samplePanel={demo ? 'order' : undefined}",
+      "sha256": "b964946c4a28b9c2919078cb816ff7fc0ef103d0084216a514ec02945e31f999"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/home-sample-panel.tsx",
+      "line": 8,
+      "line_text": "  order: { title: 'Order #4612', description: 'Sample order · Westlands', details: ['New', '2 items', 'Item details are not available in this example.'] },",
+      "sha256": "850a2773bdf2f0d443a003acd23c418dbbf5d0abcf40019750e7f014cf87db6d"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/page.tsx",
+      "line": 94,
+      "line_text": "          .from('merchant_orders_v')",
+      "sha256": "6166c0195b68afbbbc2aed024ab0f1494c3e7cb6e122d104fc97ae8d3c2b5748"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/home-live.tsx",
+      "line": 76,
+      "line_text": "  const actionable = orders.filter(",
+      "sha256": "b964946c4a28b9c2919078cb816ff7fc0ef103d0084216a514ec02945e31f999"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/workspace.tsx",
+      "line": 18,
+      "line_text": "  const [profileId, setProfileId] = useState(initialProfile.subcategoryId);",
+      "sha256": "8d59f1003108bf08fa0ad15e9ce06e5704987e365375706974c48e7719f97895"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/README.md",
+      "line": 7,
+      "line_text": "`workActivitiesFromBooking` is a typed boundary for the booking engine's resolved selected-offering configuration: it only returns ready and active bindings, carries the offering and configuration revision, preserves linked execution, and reports unknown workflows. It does not create work, read onboarding, enable activities, authorize actions, or connect the screen to a live booking service. The preview currently selects its own samples and does not call this mapping. Real integration needs a source adapter and merchant-scoped configuration/records, with source-specific permissions, confirmation and error handling. Normal stock-confirmed orders must continue automatically; a merchant-review step is permitted only for a specific configured exception.",
+      "sha256": "6b96839856e4e4e4c38bc957c7c201495f30939293ab2b1b8d06da44f2554c58"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/model.ts",
+      "line": 8,
+      "line_text": "export type WorkRecord = { id: string; workflowId: WorkflowId; customer: string; item: string; context: string; milestone: string; operator: string; stage: number; attention: boolean; upcoming: boolean; history: string[]; confirmation: string; sourceLabel: string; nextAction?: { id: string; label: string }; lines?: { name: string; quantity: number; amount: string }[]; readOnly?: boolean };",
+      "sha256": "26aaa111ad6d6d53643eefd8286e5bc208f7633797ebe3a69360cf042a158719"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/model.ts",
+      "line": 130,
+      "line_text": "  async advance(record, actionId) {",
+      "sha256": "26aaa111ad6d6d53643eefd8286e5bc208f7633797ebe3a69360cf042a158719"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/model.ts",
+      "line": 11,
+      "line_text": "export interface WorkSource {",
+      "sha256": "26aaa111ad6d6d53643eefd8286e5bc208f7633797ebe3a69360cf042a158719"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/workspace.tsx",
+      "line": 65,
+      "line_text": "  async function advance() {",
+      "sha256": "8d59f1003108bf08fa0ad15e9ce06e5704987e365375706974c48e7719f97895"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/model.ts",
+      "line": 122,
+      "line_text": "      stage, attention: false, upcoming,",
+      "sha256": "26aaa111ad6d6d53643eefd8286e5bc208f7633797ebe3a69360cf042a158719"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/offerings/source.ts",
+      "line": 179,
+      "line_text": "    async save(profile, item, publication) {",
+      "sha256": "85ba02a04323042f5e94117a2a9b70de87c4bfc9c07a2302cbc90ead6eab789a"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/offerings/source.ts",
+      "line": 159,
+      "line_text": "  const replace = (profile: OfferingProfile, catalogue: Catalogue) => {",
+      "sha256": "85ba02a04323042f5e94117a2a9b70de87c4bfc9c07a2302cbc90ead6eab789a"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/offerings/workspace.tsx",
+      "line": 1018,
+      "line_text": "                void persistCatalogue(",
+      "sha256": "3474940c77156feee976f93cdb60c0166ab8a2f69ee4bef3257434ab93e7c25b"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/offerings/workspace.tsx",
+      "line": 1193,
+      "line_text": "                  void persistCatalogue(",
+      "sha256": "3474940c77156feee976f93cdb60c0166ab8a2f69ee4bef3257434ab93e7c25b"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/availability/work-entry.tsx",
+      "line": 119,
+      "line_text": "  const canEdit =",
+      "sha256": "54bca1be4f18ad9a05cac3d5e1f993c64145bc0d01259f7d8cb24256544262c6"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/availability/work-entry.tsx",
+      "line": 294,
+      "line_text": "              <button",
+      "sha256": "54bca1be4f18ad9a05cac3d5e1f993c64145bc0d01259f7d8cb24256544262c6"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/home-sample-panel.tsx",
+      "line": 10,
+      "line_text": "  booking: { title: 'Booking request', description: 'Sample request · Kilimani', details: ['Catering for 20 people', 'Sat, 15 Jun', 'Request awaiting review'] },",
+      "sha256": "850a2773bdf2f0d443a003acd23c418dbbf5d0abcf40019750e7f014cf87db6d"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/availability/model.ts",
+      "line": 6,
+      "line_text": "export const DEMO_NOW = '2026-11-03T09:40';",
+      "sha256": "13081211ab504e65ca01bce68a7ccf91986b4fc78c537041ee53fdb1c3d55517"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/work/workspace.tsx",
+      "line": 71,
+      "line_text": "      setNotice(`Preview updated: ${templates[updated.workflowId].stages[updated.stage]}. Changes are not saved.`);",
+      "sha256": "8d59f1003108bf08fa0ad15e9ce06e5704987e365375706974c48e7719f97895"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/business/workspace.tsx",
+      "line": 821,
+      "line_text": "        {dialog === 'request' && data && (",
+      "sha256": "7134ac3776c8ae62c7f8c2b2dc140db51d4f01043666aaf257217e2bae49ba35"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/business/README.md",
+      "line": 13,
+      "line_text": "- Document replacement retains the current evidence and its verification state, adds replacement metadata/version history and shows review pending. Document bytes are not uploaded or retained. The sample requirements are owner-supplied illustrations, not an exhaustive legal checklist for every category.",
+      "sha256": "3e35c21bba359c8e68f9c431c9ab612783b529a48f8a8875740102d72dcc5caa"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/money/work-entry.tsx",
+      "line": 24,
+      "line_text": "      const view = resolveMoneyView(profile, offering, catalogue.configuration.enabledSchemas);",
+      "sha256": "e64a8f0023711c1cb681d2c94578147d165ec228eb929089bfc2255a3407273d"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/money/work-entry.tsx",
+      "line": 39,
+      "line_text": "    {loading ? <p role=\"status\">Loading sample reference…</p> : error ? <p role=\"alert\" className=\"mo-note mo-note-error\">{error}</p> : <section className=\"mo-inspector\" style={{ maxWidth: 720, minHeight: 260 }}><div className=\"mo-inspector-head\"><h2>{work}</h2><span className=\"mo-badge mo-badge-neutral\">Sample reference</span></div><div className=\"mo-inspector-content\"><p>{context?.offering.name} · {context?.location} · {context?.method}</p><p>This is the same reference selected in the Money sample. Its operational source is not linked to this preview yet.</p>{security && <p className=\"mo-note\">The Money sample has a security record for this reference. Work completion, refund outcome and payment remain separate.</p>}<p className=\"mo-muted\">No customer, booking or financial data has been sent to another system.</p></div><div className=\"mo-inspector-actions\"><a className=\"mo-button mo-primary\" href={back}>Return to the selected Money record</a></div></section>}",
+      "sha256": "e64a8f0023711c1cb681d2c94578147d165ec228eb929089bfc2255a3407273d"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/money/README.md",
+      "line": 17,
+      "line_text": "This is not a complete production Finance implementation or complete acceptance of MC01–MC24. Real merchant-specific transactions, ERP lineage/deduplication, policy ownership, grants, arbitrary report periods, secure account management, payout or payment integrations, operational Work integration and fiscal documents need their respective later work. The sample data and example projections are not authoritative merchant financial information.",
+      "sha256": "594d4a45b31aa8e407388040542a0723ec5fad2f54fee462e7b6ee420cf4a0a6"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/money/workspace.tsx",
+      "line": 201,
+      "line_text": "        {['Overview', 'Transactions'].includes(tab) && <label><span className=\"mo-sr\">Reporting period</span><select aria-label=\"Reporting period\" value={period} onChange={(e) => { setPeriod(e.target.value as Period); setSelected(tab === 'Transactions' ? 'TX-6112' : ''); }}><option value=\"range\">1–3 Nov 2026</option><option value=\"today\">Today · 3 Nov</option></select></label>}",
+      "sha256": "fa3b18c59fdce789dde7c603d036303b38ed9542e608b3356433e62e0768dbb5"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/money/page.tsx",
+      "line": 113,
+      "line_text": "                {s.status === 'sent' && (",
+      "sha256": "d0fa167fe89a0293854c0c72b8dab8ad61dc8a8b835f5312b991e95f50cf24ee"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/analytics/page.tsx",
+      "line": 30,
+      "line_text": "  const [branchRes, orderRes] = await Promise.all([",
+      "sha256": "78a19c1a02685145778269a328a7892569c5e2a4a40d4795c2907bc23ac6ce1c"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/analytics/page.tsx",
+      "line": 39,
+      "line_text": "  const branches = (branchRes.data as BranchCard[] | null) ?? [];",
+      "sha256": "78a19c1a02685145778269a328a7892569c5e2a4a40d4795c2907bc23ac6ce1c"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/analytics/page.tsx",
+      "line": 53,
+      "line_text": "  const delivered = orders.filter((o) => o.stage === 'delivered');",
+      "sha256": "78a19c1a02685145778269a328a7892569c5e2a4a40d4795c2907bc23ac6ce1c"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/supabase/migrations/20260101013100_orders.sql",
+      "line": 128,
+      "line_text": "  constraint order_total_is_the_sum check (",
+      "sha256": "5c690988a76fb30ec5c5734863a44dd9f47f94a3ff1e71a9e14133924fd95a46"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/supabase/migrations/20261026000000_finance_rules_compliance.sql",
+      "line": 239,
+      "line_text": "  return jsonb_build_object(",
+      "sha256": "59fb2a610e9b52aa53e7fce2df103fa9b22207ac77e5e753a53628ae2789423a"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/analytics/page.tsx",
+      "line": 95,
+      "line_text": "        lead=\"All branches combined, with each one side by side. Every number here comes from the same views as your statements and order history, so it will always match them.\"",
+      "sha256": "78a19c1a02685145778269a328a7892569c5e2a4a40d4795c2907bc23ac6ce1c"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/analytics/page.tsx",
+      "line": 28,
+      "line_text": "  const since = new Date(Date.now() - 30 * 86400000).toISOString();",
+      "sha256": "78a19c1a02685145778269a328a7892569c5e2a4a40d4795c2907bc23ac6ce1c"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/analytics/page.tsx",
+      "line": 53,
+      "line_text": "  const delivered = orders.filter((o) => o.stage === 'delivered');",
+      "sha256": "78a19c1a02685145778269a328a7892569c5e2a4a40d4795c2907bc23ac6ce1c"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/validation-plan.md",
+      "line": 9,
+      "line_text": "| Current Analytics | The [current route](../../../apps/web/app/merchant/analytics/page.tsx#L28), lines 28–89, queries orders and branches for a rolling 30 days, filters the current delivered stage, and groups placement hours in Nairobi time. The [navigation](../../../apps/web/components/merchant/shell.tsx#L91), line 91, calls it Analytics. | A limited delivered-order report exists. Adaptive filters, historical cohorts, model-specific reporting, definition views and source-quality contracts remain proposed. |",
+      "sha256": "f03de9387ba030217cff521f7f4f98a999225e0bbe3d9885ee45621a11d513f0"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/validation-plan.md",
+      "line": 31,
+      "line_text": "1. **Approve definitions and policy.** Confirm report IDs/versions, units, event/date basis, cohorts, exclusions, allowed dimensions, finance projection, source ownership and role capabilities. Resolve the unknowns below. Preserve the reconciled profiles and approved offering routes once, without replaying historical resolvers.",
+      "sha256": "f03de9387ba030217cff521f7f4f98a999225e0bbe3d9885ee45621a11d513f0"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/validation-plan.md",
+      "line": 88,
+      "line_text": "| Minimum sample and suppression policy | Identity/privacy and reporting owners must define group, differencing, retention and role rules. The current [Analytics constant](../../../apps/web/app/merchant/analytics/page.tsx#L89), line 89, is not an approved universal threshold. Suppress the dependent breakdown/trend claim until policy exists. |",
+      "sha256": "f03de9387ba030217cff521f7f4f98a999225e0bbe3d9885ee45621a11d513f0"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/promotions/README.md",
+      "line": 7,
+      "line_text": "The sample shares browser-stored discounts with the Offerings preview. It checks revisions and does not silently replace an external or changed discount. Sample data is kept per specialty, only in this browser. No payment, customer order, booking or real placement request is created. Browser Web Locks coordinate promotion commands when available, but do not make independent Offerings editor operations transactional across tabs.",
+      "sha256": "3f8d6e64e5cac73f1678aaa820d99e243b2c1b8a4807d4b61482df0b3a78c2f4"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/supabase/migrations/20260101008700_featured_slots_rpcs.sql",
+      "line": 851,
+      "line_text": "  select",
+      "sha256": "64a9cafa240bc97267f7578284c98c4009ce7240f6fe30a5be795b8e7fa0bc19"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/home-sample-panel.tsx",
+      "line": 16,
+      "line_text": "  help: { title: 'How can we help?', description: 'Sample support topics', details: ['Orders', 'Offerings', 'Money', 'Account', 'Contact support'] },",
+      "sha256": "850a2773bdf2f0d443a003acd23c418dbbf5d0abcf40019750e7f014cf87db6d"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/home-sample-panel.tsx",
+      "line": 24,
+      "line_text": "  return <HomePanel title={panel.title} description={panel.description} trigger={trigger}>",
+      "sha256": "850a2773bdf2f0d443a003acd23c418dbbf5d0abcf40019750e7f014cf87db6d"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/notifications/bell.tsx",
+      "line": 306,
+      "line_text": "      const json = sub.toJSON() as { endpoint?: string; keys?: { p256dh: string; auth: string } };",
+      "sha256": "42f79f316451024a71aff2c4194800387528eaf0f619aed9900d20cd57844164"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/merchant/board-client.tsx",
+      "line": 239,
+      "line_text": "const EVENTS = [",
+      "sha256": "9dc4a83808d38583d1a7fd9364a4dfc8eea34b156cff3d5ddec835b3c7b7556a"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/messages/page.tsx",
+      "line": 77,
+      "line_text": "      <Panel title=\"Reaching a person\">",
+      "sha256": "a159001789e05ef75398e7335fc09da9b2a238ef67f9b7c39c46b4d69f10af92"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/support/page.tsx",
+      "line": 115,
+      "line_text": "          <Panel title=\"Your tickets\" action={<ReportProblem page=\"Merchant portal\" />}>",
+      "sha256": "80d0727d6d0035eaf802a4a62675c3c9d79dc422fa35242b7e1a33fd88f40fff"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/settings/page.tsx",
+      "line": 46,
+      "line_text": "  const { data } = await createClient()",
+      "sha256": "f935730bc3f0410fcbe38035a01671ebbb4558f7c250b9ddbcd34b4234338625"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/app/merchant/support/page.tsx",
+      "line": 49,
+      "line_text": "  const { data } = await createClient()",
+      "sha256": "80d0727d6d0035eaf802a4a62675c3c9d79dc422fa35242b7e1a33fd88f40fff"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/apps/web/components/notifications/bell.tsx",
+      "line": 68,
+      "line_text": "      const { data } = await supabase",
+      "sha256": "42f79f316451024a71aff2c4194800387528eaf0f619aed9900d20cd57844164"
+    },
+    {
+      "path": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/docs/handoff/merchant-statistics-2026-10-31.md",
+      "line": 5,
+      "line_text": "The current design package is in `docs/merchant-portal-plan` in the existing Desktop MERCHANT WORKSPACE. It was copied from the earlier Documents checkout before adding this amendment; that checkout remains historical. Existing frontend setup/Home work remains intact.",
+      "sha256": "c2a4b44e49c977fb0be8414f386edc44fa208931978591bc55dbd100d9c73de6"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/validation-plan.md",
+      "line": 14,
+      "line_text": "| Promotions | The [Featured schema](../../../supabase/migrations/20260101008500_featured_slots_schema.sql#L276), lines 276–320, defines view/tap/order events, deduplication and daily metrics; line 402 has a configurable attribution window. The [rollup](../../../supabase/migrations/20260101008700_featured_slots_rpcs.sql#L848), lines 848–869, inserts zero for order value. A static search found no Featured event-ingestion caller in the current web app or migration RPCs. | Schema presence does not prove measurement delivery. Keep dependent outcomes unavailable until ingestion, attribution, value, refund treatment and coverage are verified. The concept's synthetic 7-day window is a proposed example, not the existing Featured rule. |",
+      "sha256": "f03de9387ba030217cff521f7f4f98a999225e0bbe3d9885ee45621a11d513f0"
+    },
+    {
+      "path": "C:/Users/limta/Documents/ChatGPT/NEXG MERCHANT PORTA/docs/merchant-portal-plan/insights-concept/screen-design.md",
+      "line": 109,
+      "line_text": "The promotion scene uses synthetic complete attribution evidence: 12,000 qualified impressions, 600 qualified taps and 36 attributed accepted orders. The 5% rate is taps divided by impressions, explicitly an event ratio. The 6% rate is attributed accepted orders divided by those qualified taps within the same eligible cohort. The fixture uses the existing configurable 30-minute tap window, observed through 1 November at 00:30 EAT for the 4–31 October tap cohort. A closed observation window is required. This is synthetic future instrumentation, not a claim that current event ingestion works. Campaign transaction date and actual service/use date remain separate. Charges open Money and retain independent permission checks. Attributed value is Unavailable. No ROAS or uplift is inferred.",
+      "sha256": "7d562eaed2f60301a2c331e697619795fa6e563808d3f6ddd1199b4a2ae6f044"
+    }
+  ]
+}

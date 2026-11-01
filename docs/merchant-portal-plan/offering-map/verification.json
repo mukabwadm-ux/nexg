@@ -1,0 +1,226 @@
+{
+  "date": "2026-10-31",
+  "status": "DESIGN_CHECKS_PASSED",
+  "command": "python -X utf8 docs/merchant-portal-plan/offering-map/verify.py",
+  "counts": {
+    "categories": 21,
+    "subcategories": 128,
+    "offeringTemplates": 189,
+    "fieldGroups": 151,
+    "fieldDefinitions": 559,
+    "specialtyOfferingMappings": 390,
+    "additionalModelRoutes": 21,
+    "approvedAdditionalModelRoutes": 21,
+    "unapprovedAdditionalModelRoutes": 0
+  },
+  "sourceHashes": {
+    "taxonomy": {
+      "path": "packages/contracts/src/taxonomy.ts",
+      "sha256": "957f877487f8638ac56865b73d4d7f74283e1b0c5560fa033251941ded86b2ad"
+    },
+    "audit": {
+      "path": "docs/audits/merchant-onboarding-128-taxonomy.json",
+      "sha256": "6ddf4228e47c7e9d96399b1e96d7373c0024ca261e0caaac1893b4635c28777a"
+    },
+    "profiles": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-profiles-128.json",
+      "sha256": "4a831d5a4f3392369153a6c5e2b37445ea760b8d6787fcd73b679bc47ac9714b"
+    },
+    "questions": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-question-registry.json",
+      "sha256": "8381f6d88bbd4bd7b24d7e0865e138fad421f62c8921151d61f3a043d3cbe6ac"
+    },
+    "domains": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-domain-registry.json",
+      "sha256": "6ab91de44e853f06b2606ebfc03a123d150650658355b53558778dfbe1578a5b"
+    },
+    "models": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/models.json",
+      "sha256": "e4800f98ddb2314bc3f3d174159f3e70f2d1c2b449df94d1ade7b32db52fd9c8"
+    },
+    "definitions": {
+      "path": "docs/merchant-portal-plan/offering-map/definitions.py",
+      "sha256": "f7d2e6c3de2471968e6258b0691efb6c659590d44ac28b76281123c318649c66"
+    },
+    "builder": {
+      "path": "docs/merchant-portal-plan/offering-map/build.py",
+      "sha256": "cacb32ed4956c95e73848e5f92cfeb5f3057f54d37f868d736dffb00fc5e5006"
+    },
+    "verifier": {
+      "path": "docs/merchant-portal-plan/offering-map/verify.py",
+      "sha256": "68ab97b6dc570241c6e65a0271c5b056241078bbc8693bab3dd549cca9389c04"
+    },
+    "customerDisplay": {
+      "path": "docs/merchant-portal-plan/offering-map/customer-display.md",
+      "sha256": "afe554d590ad15e64410eeb0f06e8c2685631984efcb92f76c4b9abf80664629"
+    },
+    "fashionDefinitions": {
+      "path": "docs/merchant-portal-plan/offering-map/fashion.py",
+      "sha256": "be752f48ed513d35b4c66d75eda0fc8d05f38976fee7dfe1c5212acd32b22216"
+    },
+    "approvals": {
+      "path": "docs/merchant-portal-plan/offering-map/approvals.json",
+      "sha256": "83a0c447f155496be21c49a5f5b746f2fd0bcf2a66afea7a3d8ac2c940d8af9f"
+    },
+    "workflows": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-workflows.json",
+      "sha256": "684ed4db68bdf27df6281da106eece1780c4c2e2b0e7a36daae0dc95ef6cc210"
+    },
+    "specificationDefinitions": {
+      "path": "docs/merchant-portal-plan/offering-map/specifications.py",
+      "sha256": "7cf67cc44303efe24fd47da26de31ce219159a1afec693feddaaed6bd6170187"
+    },
+    "experienceDefinitions": {
+      "path": "docs/merchant-portal-plan/offering-map/experiences.py",
+      "sha256": "df1a25ac0a140c91e2ea25b79441140ca3b6476b01c6b27002424b3a97067841"
+    },
+    "specificationContract": {
+      "path": "docs/merchant-portal-plan/offering-map/product-specification-contract.md",
+      "sha256": "762e1ec3fd5e23592e1adfd262634b9aa24a69cfd320fa4546beba819aea5a13"
+    }
+  },
+  "generatedFilesChecked": 252,
+  "localLinksChecked": 4378,
+  "screenWorkflowCounts": {
+    "categories": 21,
+    "subcategories": 128,
+    "offeringTypes": 189,
+    "merchantScreenDefinitions": 8,
+    "customerScreenDefinitions": 11,
+    "categoryMerchantScreenCompositions": 168,
+    "specialtyMerchantScreenBindings": 1024,
+    "offeringModelBindings": 208,
+    "registeredWorkflowContracts": 18
+  },
+  "designScenarios": [
+    {
+      "name": "Dress size-specific measurement and basis routes",
+      "status": "PASS"
+    },
+    {
+      "name": "Trouser waist requirement uses shared measurement meaning",
+      "status": "PASS"
+    },
+    {
+      "name": "Skirt does not ask for leg-only measurements",
+      "status": "PASS"
+    },
+    {
+      "name": "Mixed clothing forms scope their piece measurements",
+      "status": "PASS"
+    },
+    {
+      "name": "Underwear can capture actual band/cup fit",
+      "status": "PASS"
+    },
+    {
+      "name": "Rental terms, selected interval and private trip input",
+      "status": "PASS"
+    },
+    {
+      "name": "Standalone network hardware has no unconditional plan allowance",
+      "status": "PASS"
+    },
+    {
+      "name": "Ready cake is separate from production due acceptance",
+      "status": "PASS"
+    },
+    {
+      "name": "Non-alcoholic mixer does not inherit alcohol eligibility",
+      "status": "PASS"
+    },
+    {
+      "name": "Health intake is private while public service remains descriptive",
+      "status": "PASS"
+    },
+    {
+      "name": "Customer-entered customization is not a public response",
+      "status": "PASS"
+    },
+    {
+      "name": "Cable and charger specifications have distinct controls",
+      "status": "PASS"
+    },
+    {
+      "name": "Dairy has specific product, form and contents fields",
+      "status": "PASS"
+    },
+    {
+      "name": "Rental and transfer promise actual vehicle and capacity facts",
+      "status": "PASS"
+    },
+    {
+      "name": "Pharmacy label facts remain distinct from private administration",
+      "status": "PASS"
+    },
+    {
+      "name": "Shopping requests capture actual item specifications and budget privately",
+      "status": "PASS"
+    },
+    {
+      "name": "Freight constraints and actual per-piece declarations are separate",
+      "status": "PASS"
+    },
+    {
+      "name": "Each current category and specialty composes every merchant screen",
+      "status": "PASS"
+    },
+    {
+      "name": "Regulated enquiry illustrations retain their specific workflow",
+      "status": "PASS"
+    }
+  ],
+  "validatorRejectionCases": [
+    {
+      "name": "Missing specialty is rejected",
+      "status": "PASS",
+      "observedDiagnostic": "SUBCATEGORY_COVERAGE"
+    },
+    {
+      "name": "Private field in public projection is rejected",
+      "status": "PASS",
+      "observedDiagnostic": "PRIVATE_FIELD_EXPOSED:health_intake.contact"
+    },
+    {
+      "name": "Unknown input type is rejected",
+      "status": "PASS",
+      "observedDiagnostic": "VALUE_TYPE:dress.waist"
+    },
+    {
+      "name": "Approved extension cannot be misrepresented as historical support",
+      "status": "PASS",
+      "observedDiagnostic": "MODEL_COMPATIBILITY:festivals:session_pass:ENTITLEMENT"
+    },
+    {
+      "name": "Missing approval reference is rejected",
+      "status": "PASS",
+      "observedDiagnostic": "APPROVAL_REFERENCE:festivals:session_pass:ENTITLEMENT"
+    },
+    {
+      "name": "Missing category screen is rejected",
+      "status": "PASS",
+      "observedDiagnostic": "CATEGORY_MERCHANT_SCREENS:adults_only"
+    },
+    {
+      "name": "Private field on public detail is rejected",
+      "status": "PASS",
+      "observedDiagnostic": "PRIVATE_IN_PUBLIC_CUSTOMER_SCREEN:clinic:health_intake.contact"
+    },
+    {
+      "name": "Missing product-specific capture field is rejected",
+      "status": "PASS",
+      "observedDiagnostic": "CAPTURE_FIELD_MISSING:dairy_eggs"
+    },
+    {
+      "name": "Changed registered workflow transition is rejected",
+      "status": "PASS",
+      "observedDiagnostic": "WORKFLOW_TRANSITION_DRIFT:WF_RENTAL"
+    }
+  ],
+  "errors": [],
+  "limitations": [
+    "Design coverage/reference/selected semantic checks only.",
+    "Not merchant validation, legal/clinical/financial policy approval or actual customer usability testing.",
+    "No runtime schema, form, API, stock, pricing, booking, permissions or provider behavior has been implemented or verified by this package."
+  ]
+}

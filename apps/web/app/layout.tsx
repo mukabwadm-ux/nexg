@@ -5,12 +5,11 @@ import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 
 import { CartBar } from '@/components/cart/add-to-cart';
-import { CartProvider } from '@/components/cart/cart-provider';
 import { PersonalizedChrome } from '@/components/consent/personalized-chrome';
 import { WelcomeGate } from '@/components/consent/welcome-gate';
 import { LocationBannerSlot, LocationSheetSlot } from '@/components/location/chrome';
-import { SiteLocationProvider } from '@/components/location/provider';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
+import { SettingsPublicChromeBoundary, SettingsPublicProviders } from '@/components/merchant/settings/chrome';
 import { DEFAULT_LOCALE } from '@/lib/i18n/dictionaries';
 import { canMachineTranslate } from '@/lib/i18n/translate';
 
@@ -55,21 +54,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={manrope.variable}>
       <body className="bg-bg text-ink min-h-dvh font-sans">
         <ToastProvider>
-          <SiteLocationProvider initial={null}>
-            <CartProvider>
-            {/* Under the nav on every page, and only when there is
+          <SettingsPublicProviders>
+              {/* Under the nav on every page, and only when there is
                 something honest to say about precision. */}
-            <LocationBannerSlot />
-            {children}
-            <CartBar />
-            {/* Once per visit, over a rendered page, on the first
+              <SettingsPublicChromeBoundary>
+                <LocationBannerSlot />
+              </SettingsPublicChromeBoundary>
+              {children}
+              <SettingsPublicChromeBoundary>
+                <CartBar />
+              </SettingsPublicChromeBoundary>
+              {/* Once per visit, over a rendered page, on the first
                 page that needs a place. */}
-            <LocationSheetSlot />
+              <SettingsPublicChromeBoundary>
+                <LocationSheetSlot />
+              </SettingsPublicChromeBoundary>
 
-            <RegisterServiceWorker />
-            <PersonalizedChrome />
+              <RegisterServiceWorker />
+              <SettingsPublicChromeBoundary>
+                <PersonalizedChrome />
+              </SettingsPublicChromeBoundary>
 
-            {/* Real support: what somebody types here becomes a
+              {/* Real support: what somebody types here becomes a
                 conversation on the concierge desk, routed to a
                 person.
 
@@ -79,9 +85,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 together puts a button on screen that cannot be
                 pressed — which reads as broken rather than as
                 "answer this first". */}
-            <WelcomeGate locale={DEFAULT_LOCALE} canTranslate={canMachineTranslate()} />
-            </CartProvider>
-          </SiteLocationProvider>
+              <SettingsPublicChromeBoundary>
+                <WelcomeGate locale={DEFAULT_LOCALE} canTranslate={canMachineTranslate()} />
+              </SettingsPublicChromeBoundary>
+          </SettingsPublicProviders>
         </ToastProvider>
       </body>
     </html>

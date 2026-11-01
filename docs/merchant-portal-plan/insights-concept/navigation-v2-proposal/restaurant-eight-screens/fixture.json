@@ -1,0 +1,345 @@
+{
+  "status": "FICTIONAL_REVIEW_FIXTURE",
+  "runtimeVerified": false,
+  "date": "2026-11-01",
+  "merchant": {
+    "name": "Karibu Kitchen",
+    "location": "Karen branch",
+    "city": "Nairobi",
+    "avatar": "KK",
+    "enabledModel": "ORDER",
+    "fulfilmentMethods": [
+      "Dine-in",
+      "Pickup",
+      "Delivery"
+    ]
+  },
+  "scope": {
+    "periodStart": "2026-10-04",
+    "periodEndInclusive": "2026-10-31",
+    "timezone": "Africa/Nairobi",
+    "asOf": "2026-11-01 08:00 EAT",
+    "comparison": "Off",
+    "currency": "KES"
+  },
+  "navigation": {
+    "sidebar": [
+      "Home",
+      "Work",
+      "Offerings",
+      "Availability",
+      "Business",
+      "Money",
+      "Promotions",
+      "Insights",
+      "Settings"
+    ],
+    "selectedSidebar": "Insights",
+    "peerTabs": [
+      "Overview",
+      "Orders",
+      "Menu",
+      "Customers",
+      "Operations",
+      "Promotions",
+      "Finance",
+      "Reports"
+    ],
+    "reportsSecondary": [
+      "Library",
+      "Saved views",
+      "Exports"
+    ]
+  },
+  "orders": {
+    "dateBasis": "Requests received in period, observed through 1 Nov 08:00 EAT. All completed members also completed in period for this synthetic fixture.",
+    "requests": 1248,
+    "completed": 1176,
+    "cancelled": 54,
+    "open": 18,
+    "refundOutcome": "Independent financial outcome; refunds do not erase completion events.",
+    "weeklyCompleted": [
+      252,
+      280,
+      308,
+      336
+    ],
+    "weeklyUnits": [
+      378,
+      420,
+      462,
+      504
+    ],
+    "weeklyItemSales": [
+      252000,
+      280000,
+      308000,
+      336000
+    ],
+    "itemSalesBeforeRefundsKES": 1176000,
+    "averageItemSalesPerCompletedOrderKES": 1000,
+    "fulfilledItemUnits": 1764,
+    "units": "each",
+    "completedByFulfilment": {
+      "Delivery": 588,
+      "Pickup": 353,
+      "Dine-in": 235
+    },
+    "recentSubset": [
+      {
+        "ref": "ORD-1248",
+        "method": "Delivery",
+        "itemAmountKES": 1000,
+        "outcome": "Completed"
+      },
+      {
+        "ref": "ORD-1247",
+        "method": "Pickup",
+        "itemAmountKES": 800,
+        "outcome": "Completed"
+      },
+      {
+        "ref": "ORD-1246",
+        "method": "Dine-in",
+        "itemAmountKES": 1200,
+        "outcome": "Completed"
+      },
+      {
+        "ref": "ORD-1245",
+        "method": "Delivery",
+        "itemAmountKES": 600,
+        "outcome": "Cancelled"
+      },
+      {
+        "ref": "ORD-1244",
+        "method": "Pickup",
+        "itemAmountKES": 900,
+        "outcome": "Open"
+      }
+    ]
+  },
+  "menu": {
+    "itemCount": 8,
+    "items": [
+      {
+        "name": "Beef burger",
+        "units": 420,
+        "itemSalesKES": 420000
+      },
+      {
+        "name": "Chicken pilau",
+        "units": 360,
+        "itemSalesKES": 288000
+      },
+      {
+        "name": "Veggie wrap",
+        "units": 300,
+        "itemSalesKES": 180000
+      },
+      {
+        "name": "Chips",
+        "units": 240,
+        "itemSalesKES": 96000
+      },
+      {
+        "name": "Fruit juice",
+        "units": 180,
+        "itemSalesKES": 54000
+      },
+      {
+        "name": "Grilled chicken",
+        "units": 120,
+        "itemSalesKES": 96000
+      },
+      {
+        "name": "Garden salad",
+        "units": 96,
+        "itemSalesKES": 28800
+      },
+      {
+        "name": "Tea",
+        "units": 48,
+        "itemSalesKES": 13200
+      }
+    ],
+    "itemSalesDefinition": "Accepted historical item amounts for completed work. Excludes delivery/service fees and tips. Before refunds. Real implementation requires Finance ownership.",
+    "variantCoverage": "Accepted item/options snapshot; unavailable variant stays Unknown."
+  },
+  "customers": {
+    "dateBasis": "Merchant-scoped identities with at least one completed order in the cohort",
+    "identityPolicy": "Synthetic approved pseudonymous identity and complete pre-period history, not live tracking",
+    "identifiedCustomers": 840,
+    "firstTimeCustomers": 600,
+    "returningCustomers": 240,
+    "returningSharePercent": 28.6,
+    "newDefinition": "First-ever completed order is in period",
+    "returningDefinition": "Completed before 4 Oct and at least once in this cohort",
+    "completedOrdersFromFirstTimeCohort": 792,
+    "completedOrdersFromReturningCohort": 384,
+    "rows": [
+      {
+        "id": "C-0101",
+        "cohort": "Returning",
+        "orders": 8,
+        "itemSalesKES": 8000
+      },
+      {
+        "id": "C-0102",
+        "cohort": "Returning",
+        "orders": 7,
+        "itemSalesKES": 7000
+      },
+      {
+        "id": "C-0103",
+        "cohort": "Returning",
+        "orders": 6,
+        "itemSalesKES": 6000
+      },
+      {
+        "id": "C-0104",
+        "cohort": "First time",
+        "orders": 6,
+        "itemSalesKES": 6000
+      },
+      {
+        "id": "C-0105",
+        "cohort": "First time",
+        "orders": 5,
+        "itemSalesKES": 5000
+      }
+    ]
+  },
+  "operations": {
+    "dateBasis": "Completed cohort. Eligible ready promises due in period. Cancelled/open requests separately reported.",
+    "readyEligible": 1168,
+    "readyOnTime": 1098,
+    "readyLate": 70,
+    "missingReadyPromise": 8,
+    "readyOnTimePercent": 94,
+    "preparationMedianMinutes": 28,
+    "preparationSample": 1176,
+    "preparationDefinition": "Actual kitchen-start to actual ready. Both paired events exist for all 1176 completed orders in fixture.",
+    "cancelledBeforePreparation": 54,
+    "cancellationReasons": {
+      "Changed plans": 24,
+      "Item unavailable": 18,
+      "Other recorded": 6,
+      "Unknown": 6
+    },
+    "byFulfilment": [
+      {
+        "method": "Dine-in",
+        "eligible": 234,
+        "onTime": 222,
+        "late": 12,
+        "missingPromise": 1
+      },
+      {
+        "method": "Pickup",
+        "eligible": 350,
+        "onTime": 329,
+        "late": 21,
+        "missingPromise": 3
+      },
+      {
+        "method": "Delivery",
+        "eligible": 584,
+        "onTime": 547,
+        "late": 37,
+        "missingPromise": 4
+      }
+    ]
+  },
+  "promotion": {
+    "campaign": "Dinner discovery",
+    "type": "Featured placement",
+    "state": "Ended",
+    "dateBasis": "Qualified tap cohort in period",
+    "qualifiedImpressions": 12000,
+    "qualifiedTaps": 600,
+    "tapImpressionEventRatioPercent": 5,
+    "attributedAcceptedOrders": 36,
+    "ordersPerTapEventRatioPercent": 6,
+    "attributionWindowMinutes": 30,
+    "observationCutoff": "2026-11-01 00:30 EAT",
+    "attributedValue": "Unavailable",
+    "unavailableReason": "Value and refund measurement not connected",
+    "causalLift": "Not inferred",
+    "dataStatus": "Synthetic connected event evidence; existing runtime ingestion remains unproven"
+  },
+  "finance": {
+    "dateBasis": "Posted in period. Approved synthetic Money posting set. Matches cohort item gross by construction, not a general reconciliation claim.",
+    "postedMerchantCreditsKES": 1176000,
+    "refundDebitsKES": 17640,
+    "recordedFeeDebitsKES": 58800,
+    "netPostedCreditKES": 1099560,
+    "payouts": "Excluded",
+    "holdsPending": "Separate",
+    "profit": "Not represented",
+    "feePolicy": "No tariff established",
+    "unknownAmounts": "Never coerced to zero"
+  },
+  "reports": {
+    "libraryCount": 8,
+    "savedViewCount": 2,
+    "exportHistoryState": "No exports yet",
+    "rows": [
+      {
+        "id": "RPT_ORDER_OUTCOMES",
+        "name": "Order outcomes",
+        "area": "Orders",
+        "basis": "Request cohort"
+      },
+      {
+        "id": "RPT_ORDER_VARIANTS",
+        "name": "Menu item performance",
+        "area": "Menu",
+        "basis": "Completed cohort"
+      },
+      {
+        "id": "RPT_ORDER_READINESS",
+        "name": "Ready promise timing",
+        "area": "Operations",
+        "basis": "Promise due"
+      },
+      {
+        "id": "RPT_REPEAT_ACTIVITY",
+        "name": "Returning customer activity",
+        "area": "Customers",
+        "basis": "Completed cohort"
+      },
+      {
+        "id": "RPT_PUBLISHED_FEEDBACK",
+        "name": "Published feedback",
+        "area": "Customers",
+        "basis": "Published in period"
+      },
+      {
+        "id": "RPT_CAMPAIGN_MEASUREMENT",
+        "name": "Campaign measurement",
+        "area": "Promotions",
+        "basis": "Tap cohort"
+      },
+      {
+        "id": "RPT_POSTED_MERCHANT_ACTIVITY",
+        "name": "Posted merchant activity",
+        "area": "Finance",
+        "basis": "Posted in period"
+      },
+      {
+        "id": "RPT_SOURCE_COVERAGE",
+        "name": "Source coverage",
+        "area": "All areas",
+        "basis": "Coverage intervals"
+      }
+    ],
+    "selectedReport": "RPT_ORDER_OUTCOMES",
+    "reportPreview": {
+      "requests": 1248,
+      "completed": 1176,
+      "cancelled": 54,
+      "open": 18
+    },
+    "sourceStatus": "Illustrative permitted sources with per-measure gaps"
+  }
+}

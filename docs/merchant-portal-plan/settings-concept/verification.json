@@ -1,0 +1,101 @@
+{
+  "status": "PASSED",
+  "runtimeEnabled": false,
+  "checkedAtUtc": "2026-11-01T12:02:33.698Z",
+  "command": "node docs/merchant-portal-plan/settings-concept/verify-coverage.mjs",
+  "coverageMeaning": "Independent structural comparison against canonical taxonomy, reconciled profiles, complete offering routes and approved design additions. No runtime activation is performed.",
+  "counts": {
+    "categories": 21,
+    "subcategories": 128,
+    "sharedGroups": 6,
+    "possibleOperationalModels": 15,
+    "approvedAdditionalRoutes": 21,
+    "subcategoriesWithApprovedAdditions": 17,
+    "specialtyOfferingMappings": 390,
+    "fullOfferingModelRoutes": 411
+  },
+  "checks": [
+    {
+      "name": "Source identity and SHA-256 parity",
+      "status": "PASSED"
+    },
+    {
+      "name": "Canonical scope and declared counts",
+      "status": "PASSED"
+    },
+    {
+      "name": "Unique exact category and subcategory identities",
+      "status": "PASSED"
+    },
+    {
+      "name": "Baseline profile guards, alternative bindings, rules and policies",
+      "status": "PASSED"
+    },
+    {
+      "name": "Exact source references resolve to the correct guarded row",
+      "status": "PASSED"
+    },
+    {
+      "name": "Full per-offering model, workflow, intake and approval route parity",
+      "status": "PASSED"
+    },
+    {
+      "name": "Separate approved additions and offering-specific attribution",
+      "status": "PASSED"
+    },
+    {
+      "name": "Shared labels and known model/data-class references",
+      "status": "PASSED"
+    },
+    {
+      "name": "No coverage runtime activation",
+      "status": "PASSED"
+    }
+  ],
+  "sourceHashes": {
+    "taxonomy": {
+      "path": "packages/contracts/src/taxonomy.ts",
+      "sha256": "957f877487f8638ac56865b73d4d7f74283e1b0c5560fa033251941ded86b2ad"
+    },
+    "profiles": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-profiles-128.json",
+      "sha256": "4a831d5a4f3392369153a6c5e2b37445ea760b8d6787fcd73b679bc47ac9714b"
+    },
+    "screens": {
+      "path": "docs/merchant-portal-plan/offering-map/all-screens-and-workflows.json",
+      "sha256": "bc20727100ff574beca4f0956e388b689c6b9d4a9f0a7bbbdbd31dd1d7c95dbe"
+    },
+    "approvedAdditions": {
+      "path": "docs/merchant-portal-plan/offering-map/approved-profile-additions.json",
+      "sha256": "57650a23febe1bf08ddf57a2a385b580bff1c05ae1ec02b6386ddc16fcf1c96f"
+    },
+    "offeringCatalogue": {
+      "path": "docs/merchant-portal-plan/offering-map/catalogue.json",
+      "sha256": "0638938f213486ce06a261ea4cc7764d80cfe62f993703860c2a2bdeac2f1fcf"
+    },
+    "models": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/models.json",
+      "sha256": "e4800f98ddb2314bc3f3d174159f3e70f2d1c2b449df94d1ade7b32db52fd9c8"
+    },
+    "workflows": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-workflows.json",
+      "sha256": "684ed4db68bdf27df6281da106eece1780c4c2e2b0e7a36daae0dc95ef6cc210"
+    },
+    "domains": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-domain-registry.json",
+      "sha256": "6ab91de44e853f06b2606ebfc03a123d150650658355b53558778dfbe1578a5b"
+    },
+    "questions": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-question-registry.json",
+      "sha256": "8381f6d88bbd4bd7b24d7e0865e138fad421f62c8921151d61f3a043d3cbe6ac"
+    }
+  },
+  "limits": [
+    "Does not execute a settings resolver, save operation, identity flow, provider connection or message delivery.",
+    "Does not prove authorization enforcement, accessibility conformance, usability or complete combinations of states.",
+    "Operational model concerns and alert topics are proposed design decisions; source parity does not approve or implement them.",
+    "Does not grant permissions, activate approved routes or prove provider/native/manual operation support.",
+    "Rerun after source edits; a changed source hash requires explicit coverage review rather than automatic acceptance.",
+    "Requires the existing project TypeScript development dependency; no dependencies are installed."
+  ]
+}

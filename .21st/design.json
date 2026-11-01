@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "project": {
+    "name": "nexg",
+    "productType": "Merchant portal Settings",
+    "stack": ["Next.js 14", "React 18", "TypeScript", "NEXG UI", "CSS modules"]
+  },
+  "sources": {
+    "tokens": ["packages/ui/src/tokens.css"],
+    "components": [
+      "packages/ui/src/components/button.tsx",
+      "apps/web/components/merchant/settings"
+    ],
+    "assets": [],
+    "instructions": ["PRODUCT.md"]
+  },
+  "design": {
+    "colorMode": "unknown",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": ["NEXG Button", "Radix Dialog"],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [
+      "Settings only. Preserve the rest of the merchant portal.",
+      "Match the approved Settings screenshots: six sections, ink sidebar, cream canvas, white panels, gold selection.",
+      "Run all verification after the complete Settings build, per user instruction.",
+      "Keep real authenticated actions separate from clearly labelled synthetic preview behavior."
+    ],
+    "avoid": []
+  },
+  "decisions": [
+    {
+      "date": "2026-11-01",
+      "decision": "Implement Settings at screenshot fidelity; preserve existing portal routes and shell outside Settings."
+    }
+  ],
+  "evidence": [
+    {
+      "fact": "project.instructions",
+      "source": "PRODUCT.md"
+    }
+  ],
+  "generatedAt": "2026-11-01T12:15:15.498Z"
+}

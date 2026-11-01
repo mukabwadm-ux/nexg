@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { merchantContext } from '@/components/merchant/frame';
+import { SettingsLayoutBoundary } from '@/components/merchant/settings/chrome';
 import { MerchantShell, StateControl } from '@/components/merchant/shell';
 
 export const metadata: Metadata = {
@@ -75,24 +76,32 @@ export default async function MerchantLayout({ children }: { children: React.Rea
   if (!m) redirect('/merchants/apply');
 
   return (
-    <MerchantShell
+    <SettingsLayoutBoundary
       businessName={m.name}
       personName={firstName(m.contact_name, m.name)}
-      role="Owner"
-      live={live}
-      branchName={null}
-      unreadCount={m.unread_messages ?? 0}
-      nav={nav}
-      stateControl={
-        <StateControl
+      fallback={
+        <MerchantShell
+          businessName={m.name}
+          personName={firstName(m.contact_name, m.name)}
+          role="Owner"
           live={live}
-          accepting={m.accepting_orders ?? false}
-          busyUntil={m.busy_mode_until}
-        />
+          branchName={null}
+          unreadCount={m.unread_messages ?? 0}
+          nav={nav}
+          stateControl={
+            <StateControl
+              live={live}
+              accepting={m.accepting_orders ?? false}
+              busyUntil={m.busy_mode_until}
+            />
+          }
+        >
+          {children}
+        </MerchantShell>
       }
     >
       {children}
-    </MerchantShell>
+    </SettingsLayoutBoundary>
   );
 }
 
