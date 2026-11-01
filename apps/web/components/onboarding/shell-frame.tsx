@@ -42,7 +42,10 @@ export function ShellFrame({
   intro,
   children,
   footer,
+  steps,
 }: {
+  /** Named steps; finished ones become links back. Omit for plain bars. */
+  steps?: { label: string; href: string }[];
   /** "Merchant onboarding", "Rider application". */
   label: string;
   step: number;
@@ -74,16 +77,45 @@ export function ShellFrame({
           </Link>
 
           <div className="flex flex-1 items-center justify-center gap-4">
-            <ol className="flex items-center gap-1.5" aria-label={`Step ${step} of ${totalSteps}`}>
-              {segments.map((n) => (
-                <li
-                  key={n}
-                  aria-current={n === step ? 'step' : undefined}
-                  className={`h-1.5 w-8 rounded-full transition-colors sm:w-14 ${
-                    n <= step ? 'bg-gold' : 'bg-border-strong'
-                  }`}
-                />
-              ))}
+            <ol className="flex items-start gap-1.5" aria-label={`Step ${step} of ${totalSteps}`}>
+              {segments.map((n) => {
+                const named = steps?.[n - 1];
+                const bar = (
+                  <span
+                    className={`block h-1.5 w-8 rounded-full transition-colors sm:w-14 ${
+                      n <= step ? 'bg-gold' : 'bg-border-strong'
+                    }`}
+                  />
+                );
+                const caption = named ? (
+                  <span
+                    className={`mt-1.5 hidden text-center text-[0.6875rem] font-bold leading-tight sm:block ${
+                      n === step ? 'text-ink' : 'text-muted-light'
+                    }`}
+                  >
+                    {named.label}
+                  </span>
+                ) : null;
+                return (
+                  <li key={n} aria-current={n === step ? 'step' : undefined} className="w-8 sm:w-14">
+                    {named && n < step ? (
+                      <Link
+                        href={named.href}
+                        aria-label={`Back to ${named.label}`}
+                        className="block hover:opacity-80"
+                      >
+                        {bar}
+                        {caption}
+                      </Link>
+                    ) : (
+                      <>
+                        {bar}
+                        {caption}
+                      </>
+                    )}
+                  </li>
+                );
+              })}
             </ol>
             <p className="text-muted hidden whitespace-nowrap text-[0.8125rem] font-semibold lg:block">
               {step} of {totalSteps} · ~{minutesLeft} min left
