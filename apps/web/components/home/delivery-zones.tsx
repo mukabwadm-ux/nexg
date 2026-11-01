@@ -2,6 +2,7 @@
 
 import { cn } from '@nexg/ui';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -22,6 +23,50 @@ const PLACEHOLDER_BACKGROUNDS = [
   'linear-gradient(150deg, #D4A72C, #5A4212)',
 ] as const;
 
+const ZONE_IMAGES: Record<string, string> = {
+  'athi river': 'athi-river.webp',
+  'banana hill': 'ndenderu.jpg',
+  ndenderu: 'ndenderu.jpg',
+  buruburu: 'donholm.webp',
+  donholm: 'donholm.webp',
+  cbd: 'cbd.webp',
+  eastleigh: 'eastleigh.jpeg',
+  embakasi: 'embakasi.jpg',
+  gigiri: 'gigiri.jpg',
+  kahawa: 'kahawa.webp',
+  kangemi: 'kangemi.jpg',
+  karen: 'karen.webp',
+  kariobangi: 'dandora.webp',
+  dandora: 'dandora.webp',
+  kikuyu: 'kikuyu.webp',
+  kilimani: 'kilimani.webp',
+  kitengela: 'kitengela.jpg',
+  langata: 'langata.jpg',
+  muthaiga: 'muthaiga.webp',
+  ngong: 'ngong.webp',
+  ridgeways: 'ridgeways.jpg',
+  rongai: 'rongai.webp',
+  roysambu: 'roysambu.jpg',
+  ruiru: 'ruiru.jpg',
+  runda: 'runda.webp',
+  'south b': 'south-b.webp',
+  'spring valley': 'spring-valley.webp',
+  syokimau: 'syokimau.webp',
+  utawala: 'utawala.webp',
+  westlands: 'westlands.png',
+};
+
+/** Zones are often named for two areas ("Kangemi & Uthiru"); the first one names the photo. */
+function zoneImage(name: string): string | null {
+  const key =
+    name
+      .toLowerCase()
+      .split(/\s*(?:&|,|\/)\s*/)[0]
+      ?.trim() ?? '';
+  const file = ZONE_IMAGES[key];
+  return file ? `/zones/${file}` : null;
+}
+
 function ZoneCard({
   zone,
   position,
@@ -31,6 +76,7 @@ function ZoneCard({
   position: number;
   className: string;
 }) {
+  const image = zoneImage(zone.name);
   return (
     <li className={className}>
       <Link
@@ -45,10 +91,22 @@ function ZoneCard({
             background: PLACEHOLDER_BACKGROUNDS[position % PLACEHOLDER_BACKGROUNDS.length],
           }}
         >
-          <span className="absolute inset-2 rounded-full border border-white/15" />
-          <span className="text-2xl font-black tracking-[0.18em] text-white/55 sm:text-3xl">
-            {zone.name.slice(0, 3).toUpperCase()}
-          </span>
+          {image ? (
+            <Image
+              src={image}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 168px, (min-width: 640px) 144px, 112px"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <>
+              <span className="absolute inset-2 rounded-full border border-white/15" />
+              <span className="text-2xl font-black tracking-[0.18em] text-white/55 sm:text-3xl">
+                {zone.name.slice(0, 3).toUpperCase()}
+              </span>
+            </>
+          )}
           <ArrowUpRight
             aria-hidden="true"
             className="absolute right-4 top-4 h-4 w-4 text-white/65 opacity-0 transition-opacity group-hover:opacity-100"
@@ -60,9 +118,11 @@ function ZoneCard({
           <ArrowUpRight aria-hidden="true" className="text-gold h-3.5 w-3.5" />
         </span>
       </Link>
-      <span className="text-muted-light mt-1.5 text-[0.625rem] font-semibold uppercase tracking-wide">
-        Temporary image
-      </span>
+      {image ? null : (
+        <span className="text-muted-light mt-1.5 text-[0.625rem] font-semibold uppercase tracking-wide">
+          Temporary image
+        </span>
+      )}
     </li>
   );
 }
