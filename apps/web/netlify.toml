@@ -1,0 +1,10 @@
+# Netlify site "nexg-web". Set the site's base directory to apps/web.
+[build]
+  command = "pnpm --dir ../.. turbo run build --filter=@nexg/web"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

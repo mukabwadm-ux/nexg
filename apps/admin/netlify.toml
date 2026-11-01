@@ -1,0 +1,10 @@
+# Netlify site "nexg-admin". Set the site's base directory to apps/admin.
+[build]
+  command = "pnpm --dir ../.. turbo run build --filter=@nexg/admin"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
