@@ -18,6 +18,7 @@ const categoriesWithTailoredSetup = new Set([
   'vehicle_services',
   'wellness',
   'concierge_services',
+  'laundry_cleaning',
 ]);
 
 describe('subcategory setup questions', () => {
