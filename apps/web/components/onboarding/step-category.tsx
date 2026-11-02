@@ -12,7 +12,10 @@ import { CategoryTile, Chip, DocumentsNote, QuestionCard } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
 import {
+  deduplicateQuestions,
   needsRiderPickup,
+  questionAnswerPatch,
+  questionAnswerValue,
   questionHasAnswer,
   questionIsVisible,
   toggleMultiSelection,
@@ -93,12 +96,12 @@ export function CategoryStep() {
       subcategory.questions ??
       questionsForSubcategory(subcategory as Parameters<typeof questionsForSubcategory>[0]),
   );
-  const questions = [
+  const questions = deduplicateQuestions([
     ...(config?.questions ?? [])
       .filter((question) => question.key !== businessTypesQuestion?.key)
       .filter((question) => questionIsVisible(question, 2, answers)),
     ...subcategoryQuestions.filter((question) => questionIsVisible(question, 2, answers)),
-  ];
+  ]);
 
   /*
    * The document list is computed by the same database rules as the documents
@@ -356,11 +359,11 @@ export function CategoryStep() {
             <QuestionCard
               key={question.key}
               question={question}
-              value={answers[question.key]}
+              value={questionAnswerValue(question, answers)}
               onChange={(next) =>
                 question.key === 'business_types' && Array.isArray(next)
                   ? void changeBusinessTypes(next)
-                  : setAnswers({ ...answers, [question.key]: next })
+                  : setAnswers({ ...answers, ...questionAnswerPatch(question, next) })
               }
             />
           ))}

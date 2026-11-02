@@ -11,7 +11,12 @@ import { DocumentsNote, QuestionCard } from './controls';
 import { NoDraft } from './no-draft';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
-import { questionIsVisible } from './question-logic';
+import {
+  deduplicateQuestions,
+  questionAnswerPatch,
+  questionAnswerValue,
+  questionIsVisible,
+} from './question-logic';
 import { questionsForSubcategory } from './subcategory-questions';
 
 interface Requirement {
@@ -66,7 +71,7 @@ export function DocumentsStep() {
         ? answers.business_types.includes(subcategory.id)
         : subcategory.id === draft?.subcategory,
     ) ?? [];
-  const foodSafetyQuestions = [
+  const foodSafetyQuestions = deduplicateQuestions([
     ...(config?.questions ?? []).filter((question) => questionIsVisible(question, 5, answers)),
     ...selectedSubcategories.flatMap((subcategory) =>
       (
@@ -74,7 +79,7 @@ export function DocumentsStep() {
         questionsForSubcategory(subcategory as Parameters<typeof questionsForSubcategory>[0])
       ).filter((question) => questionIsVisible(question, 5, answers)),
     ),
-  ];
+  ]);
   const load = React.useCallback(async () => {
     if (!draftId) return;
     const supabase = createClient();
@@ -178,8 +183,10 @@ export function DocumentsStep() {
               <QuestionCard
                 key={question.key}
                 question={question}
-                value={answers[question.key]}
-                onChange={(next) => setAnswers({ ...answers, [question.key]: next })}
+                value={questionAnswerValue(question, answers)}
+                onChange={(next) =>
+                  setAnswers({ ...answers, ...questionAnswerPatch(question, next) })
+                }
               />
             ))}
           </div>

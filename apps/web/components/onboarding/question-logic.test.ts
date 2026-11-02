@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import {
   conditionMatches,
+  deduplicateQuestions,
   needsRiderPickup,
+  questionAnswerPatch,
+  questionAnswerValue,
   questionHasAnswer,
   questionIsVisible,
   toggleMultiSelection,
@@ -83,6 +86,31 @@ describe('onboarding question conditions', () => {
     expect(questionHasAnswer(required, {})).toBe(false);
     expect(questionHasAnswer(required, { food_style: 'Kenyan coastal' })).toBe(true);
     expect(questionHasAnswer(optional, {})).toBe(true);
+  });
+
+  it('merges repeated prompts with separate keys and keeps their answers in sync', () => {
+    const questions = deduplicateQuestions([
+      {
+        key: 'booking_notice',
+        label: 'How much notice do you need?',
+        type: 'single',
+        options: [{ value: '24h', label: '24 hours' }],
+      },
+      {
+        key: 'advance_booking',
+        label: 'How much notice do you need',
+        type: 'single',
+        options: [{ value: '48h', label: '48 hours' }],
+      },
+    ]);
+
+    expect(questions).toHaveLength(1);
+    expect(questions[0]?.options?.map((option) => option.value)).toEqual(['24h', '48h']);
+    expect(questionAnswerPatch(questions[0]!, '48h')).toEqual({
+      booking_notice: '48h',
+      advance_booking: '48h',
+    });
+    expect(questionAnswerValue(questions[0]!, { advance_booking: '24h' })).toBe('24h');
   });
 
   it('requires pickup details only for rider delivery or collection', () => {

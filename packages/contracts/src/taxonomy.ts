@@ -647,7 +647,14 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         categoryId: 'alcohol_beverages',
         fulfillmentHint: 'age_verified_last_mile',
         workflowHint: 'age_gate_required',
-        fields: ['liquor_license', 'wine_origins', 'cold_delivery', 'gift_wrapping', 'min_order'],
+        fields: [
+          'liquor_license',
+          'wine_origins',
+          'cold_delivery',
+          'gift_wrapping',
+          'min_order',
+          'age_gate_method',
+        ],
         suggestedItemCount: 30,
         defaultWorkflow:
           'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
@@ -659,7 +666,13 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         categoryId: 'alcohol_beverages',
         fulfillmentHint: 'age_verified_last_mile',
         workflowHint: 'age_gate_required',
-        fields: ['liquor_license', 'brands_stocked_text', 'gift_wrapping', 'min_order'],
+        fields: [
+          'liquor_license',
+          'brands_stocked_text',
+          'gift_wrapping',
+          'min_order',
+          'age_gate_method',
+        ],
         suggestedItemCount: 30,
         defaultWorkflow:
           'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
@@ -677,6 +690,7 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
           'returnable_bottles',
           'brands_stocked_text',
           'min_order',
+          'age_gate_method',
         ],
         suggestedItemCount: 30,
         defaultWorkflow:
@@ -689,7 +703,13 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         categoryId: 'alcohol_beverages',
         fulfillmentHint: 'age_verified_last_mile',
         workflowHint: 'age_gate_required',
-        fields: ['liquor_license', 'occasions_spec', 'cold_delivery', 'gift_wrapping'],
+        fields: [
+          'liquor_license',
+          'occasions_spec',
+          'cold_delivery',
+          'gift_wrapping',
+          'age_gate_method',
+        ],
         suggestedItemCount: 30,
         defaultWorkflow:
           'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
@@ -701,7 +721,7 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         categoryId: 'alcohol_beverages',
         fulfillmentHint: 'standard_last_mile',
         workflowHint: 'age_gate_required',
-        fields: ['liquor_license', 'gift_packaging', 'min_order'],
+        fields: ['liquor_license', 'gift_packaging', 'min_order', 'age_gate_method'],
         suggestedItemCount: 30,
         defaultWorkflow:
           'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',
@@ -713,7 +733,13 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
         categoryId: 'alcohol_beverages',
         fulfillmentHint: 'age_verified_last_mile',
         workflowHint: 'age_gate_required',
-        fields: ['liquor_license', 'cold_delivery', 'min_order', 'corporate_billing'],
+        fields: [
+          'liquor_license',
+          'cold_delivery',
+          'min_order',
+          'corporate_billing',
+          'age_gate_method',
+        ],
         suggestedItemCount: 30,
         defaultWorkflow:
           'Browse → item → variant/quantity → delivery or pickup → eligibility checks where required → cart → payment → dispatch → delivery',

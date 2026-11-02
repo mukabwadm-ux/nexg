@@ -13,6 +13,15 @@ import type {
 type CategoryRow = Database['public']['Tables']['category_config']['Row'];
 type JsonRecord = { [key: string]: Json | undefined };
 
+const airportTransferExcludedQuestions = new Set(['packaging_style', 'min_order']);
+const ageRestrictedCategories = new Set(['adults_only', 'alcohol_beverages']);
+
+function isQuestionAllowed(category: string, key: string): boolean {
+  const categoryId = category.split('/')[0] ?? '';
+  if (key === 'age_gate_method' && !ageRestrictedCategories.has(categoryId)) return false;
+  return categoryId !== 'airport_transfers' || !airportTransferExcludedQuestions.has(key);
+}
+
 function isRecord(value: Json | undefined): value is JsonRecord {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -73,7 +82,7 @@ function readQuestions(value: Json, category: string): Question[] {
   if (!Array.isArray(value)) {
     throw new Error(`The onboarding questions for ${category} must be a list.`);
   }
-  return value.map((question, index) => {
+  const questions: Question[] = value.map((question, index) => {
     if (
       !isRecord(question) ||
       typeof question.key !== 'string' ||
@@ -118,6 +127,7 @@ function readQuestions(value: Json, category: string): Question[] {
         : {}),
     };
   });
+  return questions.filter((question) => isQuestionAllowed(category, question.key));
 }
 
 function readExample(value: Json | undefined): CatalogueExample | undefined {
@@ -180,10 +190,11 @@ function readSubcategories(value: Json, category: string): CategorySubcategory[]
     if (!Array.isArray(rawFields)) {
       throw new Error(`Invalid setup fields for ${category}/${subcategory.id}.`);
     }
-    const fields = rawFields.filter((field): field is string => typeof field === 'string');
-    if (fields.length !== rawFields.length) {
+    const stringFields = rawFields.filter((field): field is string => typeof field === 'string');
+    if (stringFields.length !== rawFields.length) {
       throw new Error(`Invalid setup fields for ${category}/${subcategory.id}.`);
     }
+    const fields = stringFields.filter((field) => isQuestionAllowed(category, field));
     const questions =
       subcategory.questions === undefined
         ? undefined

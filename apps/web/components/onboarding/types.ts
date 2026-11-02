@@ -13,6 +13,7 @@ export interface Question {
   hint?: string;
   step?: 2 | 4 | 5 | 6;
   required?: boolean;
+  answerKeys?: string[];
   when?: QuestionCondition;
   prepTimeWhen?: QuestionCondition;
 }

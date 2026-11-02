@@ -12,7 +12,13 @@ import { Chip, QuestionCard } from './controls';
 import { ContinueButton, FooterNote, OnboardingShell } from './shell';
 import { useOnboarding } from './store';
 import { NoDraft } from './no-draft';
-import { questionHasAnswer, questionIsVisible } from './question-logic';
+import {
+  deduplicateQuestions,
+  questionAnswerPatch,
+  questionAnswerValue,
+  questionHasAnswer,
+  questionIsVisible,
+} from './question-logic';
 import { questionsForSubcategory } from './subcategory-questions';
 import type { CategorySubcategory } from './types';
 
@@ -94,14 +100,14 @@ export function PayoutStep() {
         ? answers.business_types.includes(subcategory.id)
         : subcategory.id === draft?.subcategory,
     ) ?? [];
-  const catalogueQuestions = [
+  const catalogueQuestions = deduplicateQuestions([
     ...(config?.questions ?? []).filter((question) => questionIsVisible(question, 6, answers)),
     ...selectedSubcategories.flatMap((subcategory) =>
       (subcategory.questions ?? questionsForSubcategory(subcategory as CategorySubcategory)).filter(
         (question) => questionIsVisible(question, 6, answers),
       ),
     ),
-  ];
+  ]);
   const catalogueQuestionsAnswered = catalogueQuestions.every((question) =>
     questionHasAnswer(question, answers),
   );
@@ -522,8 +528,10 @@ export function PayoutStep() {
               <QuestionCard
                 key={question.key}
                 question={question}
-                value={answers[question.key]}
-                onChange={(next) => setAnswers({ ...answers, [question.key]: next })}
+                value={questionAnswerValue(question, answers)}
+                onChange={(next) =>
+                  setAnswers({ ...answers, ...questionAnswerPatch(question, next) })
+                }
               />
             ))}
           </div>

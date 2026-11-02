@@ -11,7 +11,10 @@ import { Chip, QuestionCard } from './controls';
 import { ContinueButton, OnboardingShell } from './shell';
 import {
   conditionMatches,
+  deduplicateQuestions,
   needsRiderPickup,
+  questionAnswerPatch,
+  questionAnswerValue,
   questionHasAnswer,
   questionIsVisible,
 } from './question-logic';
@@ -86,7 +89,7 @@ export function HoursStep() {
   // Order-based = prepares or hands goods to a rider. Bookings, rentals and
   // appointments have neither, so rush, late-night fees and riders do not apply.
   const orderBased = showPrepTime || riderPickupRequired;
-  const operationalQuestions = [
+  const operationalQuestions = deduplicateQuestions([
     ...(selectedCategory?.questions ?? []).filter((question) =>
       questionIsVisible(question, 4, answers),
     ),
@@ -96,7 +99,7 @@ export function HoursStep() {
         questionsForSubcategory(subcategory as Parameters<typeof questionsForSubcategory>[0])
       ).filter((question) => questionIsVisible(question, 4, answers)),
     ),
-  ];
+  ]);
   const operationalQuestionsAnswered = operationalQuestions.every((question) =>
     questionHasAnswer(question, answers),
   );
@@ -234,8 +237,10 @@ export function HoursStep() {
               <QuestionCard
                 key={question.key}
                 question={question}
-                value={answers[question.key]}
-                onChange={(next) => setAnswers({ ...answers, [question.key]: next })}
+                value={questionAnswerValue(question, answers)}
+                onChange={(next) =>
+                  setAnswers({ ...answers, ...questionAnswerPatch(question, next) })
+                }
               />
             ))}
           </div>
