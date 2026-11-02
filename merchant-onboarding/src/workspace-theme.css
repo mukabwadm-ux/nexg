@@ -1,0 +1,31 @@
+@import '../../packages/ui/src/globals.css';
+
+@font-face {
+  font-family: Manrope;
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('../../apps/web/public/fonts/manrope/v1/manrope-latin.woff2') format('woff2');
+}
+
+:root { --font-manrope: Manrope, Arial, sans-serif; }
+
+.onboarding-workspace-nav {
+  width: 100%; border: 0; text-align: left; font: inherit; cursor: pointer;
+}
+.onboarding-workspace-lock-label { margin-left: auto; font-size: 10px; opacity: .7; }
+.onboarding-mobile-nav { position: relative; }
+.onboarding-mobile-nav > summary { cursor: pointer; list-style: none; }
+.onboarding-mobile-nav[open] > nav {
+  position: absolute; z-index: 40; left: 0; top: 44px; min-width: 235px;
+  border: 1px solid #ffffff20; background: #141414; color: white;
+  border-radius: 10px; padding: 10px; box-shadow: 0 12px 35px #14141422;
+}
+.onboarding-mobile-nav button { min-height: 44px; }
+.onboarding-frame-button {
+  min-height: 44px; padding: 8px 12px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 12px; font-weight: 600; background: var(--surface);
+}
+.onboarding-preview-note { font-size: 11px; line-height: 1.5; color: var(--muted); }
+@media (min-width: 1024px) { .onboarding-mobile-nav { display: none; } }
+@media (max-width: 640px) { .onboarding-header-note { display: none; } }

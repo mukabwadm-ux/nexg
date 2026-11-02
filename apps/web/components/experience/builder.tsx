@@ -12,7 +12,7 @@ import {
   sendPlan,
   swapBlock,
   type PlanPatch,
-} from '@/app/experience/actions';
+} from '@/app/(customer)/experience/actions';
 import { BudgetCard, DayTimeline } from './day-timeline';
 import { keslabel, type EventCard, type MoodChip, type Mood, type PlanView } from './types';
 import type { Json } from '@nexg/db';

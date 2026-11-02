@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
@@ -29,7 +30,7 @@ export const dynamic = 'force-dynamic';
 /**
  * Grow → Partners → Merchants.
  *
- * Twelve tabs over one domain. Each loads only its own data — the page
+ * Tabs over one domain. Each loads only its own data — the page
  * is dynamic and a staff member looking at Disputes has no reason to
  * pay for the document expiry query.
  *
@@ -43,6 +44,7 @@ export default async function MerchantsPage({
 }) {
   const staff = await requireStaff();
   requireModule(staff, 'merchants');
+  if (searchParams?.tab === 'applications') redirect('/merchants/applications');
   const supabase = createClient();
 
   const tab = MERCHANT_TABS.some((t) => t.key === searchParams?.tab && t.built)

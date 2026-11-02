@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-31",
+  "status": "PASS_DESIGN_CHECKS_ONLY",
+  "scope": "Planning coverage, reference integrity and independent sample arithmetic. No runtime/financial-provider/UI acceptance claimed.",
+  "counts": {
+    "profiles": 128,
+    "categories": 21,
+    "modelBindings": 193,
+    "models": 15,
+    "schemas": 18
+  },
+  "existingMetrics": 7,
+  "proposedMetrics": 20,
+  "checks": [
+    {
+      "name": "All128 unique subcategories,21 parents and193 eligible model bindings",
+      "pass": true
+    },
+    {
+      "name": "Exact current registry specialty set",
+      "pass": true
+    },
+    {
+      "name": "All15 models and18 editor descriptors",
+      "pass": true
+    },
+    {
+      "name": "Every descriptor has actual registered workflow IDs",
+      "pass": true
+    },
+    {
+      "name": "Table reservations use current space workflow",
+      "pass": true
+    },
+    {
+      "name": "Metric references resolve without duplicate definitions",
+      "pass": true
+    },
+    {
+      "name": "Every profile has exact questions/rules, specialty context and valid descriptors",
+      "pass": true
+    },
+    {
+      "name": "Candidate lists never activate money or runtime",
+      "pass": true
+    },
+    {
+      "name": "Optional headlines have explicit applicability/fallback policy",
+      "pass": true
+    },
+    {
+      "name": "Existing metrics are owner measures, proposed metrics stay proposed",
+      "pass": true
+    },
+    {
+      "name": "Retail sales count and amount",
+      "pass": true
+    },
+    {
+      "name": "Retail confirmed refunds and fees",
+      "pass": true
+    },
+    {
+      "name": "Retail declared sample net sales/payable",
+      "pass": true
+    },
+    {
+      "name": "Retail current eligibility uses opening/reserve/payout separately",
+      "pass": true
+    },
+    {
+      "name": "Retail movement rows count36",
+      "pass": true
+    },
+    {
+      "name": "Security deposit cohort sums100000",
+      "pass": true
+    },
+    {
+      "name": "Security confirmed returns sum34000",
+      "pass": true
+    },
+    {
+      "name": "Security zero-opening recorded obligation64000",
+      "pass": true
+    },
+    {
+      "name": "Unknown refund remains in recorded security balance",
+      "pass": true
+    },
+    {
+      "name": "Security allocation confirmed posted, not approval-only",
+      "pass": true
+    },
+    {
+      "name": "Every workshop invoice balance reconciles",
+      "pass": true
+    },
+    {
+      "name": "Workshop invoice and applied/credit totals",
+      "pass": true
+    },
+    {
+      "name": "Workshop customer debt50000, overdue12000 subset",
+      "pass": true
+    },
+    {
+      "name": "Selected workshop parts/labour invoice counted once",
+      "pass": true
+    },
+    {
+      "name": "Customer credit/unaccepted quote excluded from debt arithmetic",
+      "pass": true
+    },
+    {
+      "name": "Future category can reuse registered definition",
+      "pass": true
+    },
+    {
+      "name": "Unknown new money handler stays unsupported",
+      "pass": true
+    },
+    {
+      "name": "Unknown metric stays unsupported",
+      "pass": true
+    },
+    {
+      "name": "Missing authority cannot be enabled by category",
+      "pass": true
+    },
+    {
+      "name": "Source snapshot hashes are current",
+      "pass": true
+    }
+  ],
+  "imageCount": 3,
+  "images": "Three images generated with built-in image_gen, copied into the workspace, and visually inspected. Image review does not establish runtime acceptance.",
+  "reviewedGapsResolved": [
+    "Current space workflow replaces empty legacy descriptor workflow list.",
+    "Metric priorities are independently applicability-gated with useful supported fallbacks.",
+    "Security obligation falls only after owner-confirmed posted reclassification, not approval alone.",
+    "Security100k/34k/2k/64k arithmetic uses one zero-opening cumulative cohort.",
+    "Admin invoice aging has opposite receivable direction and is not the proposed merchant source."
+  ],
+  "reservationPolicyAmendment": {
+    "status": "PASS_DESIGN_ARITHMETIC_ONLY",
+    "runtimeImplemented": false,
+    "caseRefs": [
+      "RM01",
+      "RM02",
+      "RM03",
+      "RM04",
+      "RM05",
+      "RM06",
+      "RM07",
+      "RM08",
+      "RM09",
+      "RM10"
+    ],
+    "checks": [
+      {
+        "name": "Advance500 equals posted cancellation allocation300 plus eligible remainder200",
+        "pass": true
+      },
+      {
+        "name": "The cancellation allocation does not require a second collection",
+        "pass": true
+      },
+      {
+        "name": "Composite components reconcile without consuming independent guarantee or separate fee twice",
+        "pass": true
+      },
+      {
+        "name": "Composite collections equal their three original independent receipts",
+        "pass": true
+      }
+    ]
+  }
+}

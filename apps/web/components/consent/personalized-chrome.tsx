@@ -35,5 +35,9 @@ export function PersonalizedChrome() {
     return () => window.removeEventListener(PREFERENCES_UPDATED, update);
   }, []);
 
-  return isBookingPage(pathname) ? null : <WhatsAppButton />;
+  return pathname === '/merchant-live-preview' ||
+    pathname.startsWith('/merchant-live-preview/') ||
+    isBookingPage(pathname) ? null : (
+    <WhatsAppButton />
+  );
 }

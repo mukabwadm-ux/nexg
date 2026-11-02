@@ -1,3 +1,5 @@
+import { protectedBrowserFetch, registerProtectedBrowserCleanup } from '../../../lib/supabase/protected-request';
+
 export class BookingApiError extends Error {
   constructor(
     message: string,
@@ -12,7 +14,8 @@ export async function bookingRequest<T>(
   init: RequestInit = {},
   base = '/api/merchant/booking',
 ): Promise<T> {
-  const response = await fetch(`${base}${path}`, {
+  const request = base.startsWith('/api/merchant/') ? protectedBrowserFetch : fetch;
+  const response = await request(`${base}${path}`, {
     ...init,
     credentials: 'same-origin',
     cache: 'no-store',
@@ -39,6 +42,7 @@ export async function bookingRequest<T>(
 }
 
 const pendingOperations = new Map<string, string>();
+registerProtectedBrowserCleanup(() => pendingOperations.clear());
 
 export async function command<T>(
   path: string,

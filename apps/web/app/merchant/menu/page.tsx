@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * from the same row, so an edit is live for the next order.
  */
 export default async function MerchantMenu() {
-  const me = await requireMerchant();
+  const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 
   const [{ data, error }, { data: sectionData }] = await Promise.all([

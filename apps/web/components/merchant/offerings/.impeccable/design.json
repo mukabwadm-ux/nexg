@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T13:52:20Z",
+  "title": "Design System: NEXG merchant Offerings",
+  "extensions": {
+    "colorMeta": {
+      "workspace": {
+        "role": "neutral",
+        "displayName": "Workspace cream"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Editor and table white"
+      },
+      "shell": {
+        "role": "neutral",
+        "displayName": "Inherited shell dark"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Scoped Offerings ink"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Scoped supporting text"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Scoped fine rule"
+      },
+      "field-line": {
+        "role": "neutral",
+        "displayName": "Field border"
+      },
+      "gold": {
+        "role": "primary",
+        "displayName": "NEXG action gold"
+      },
+      "gold-text": {
+        "role": "primary",
+        "displayName": "Scoped gold link text"
+      },
+      "gold-hover": {
+        "role": "primary",
+        "displayName": "Primary hover gold"
+      },
+      "selected": {
+        "role": "neutral",
+        "displayName": "Selected row wash"
+      },
+      "status-surface": {
+        "role": "neutral",
+        "displayName": "Publication pill fill"
+      },
+      "draft": {
+        "role": "neutral",
+        "displayName": "Draft dot"
+      },
+      "published": {
+        "role": "status",
+        "displayName": "Published dot"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Offerings heading",
+        "purpose": "Georgia page title; responsive sizes are documented in DESIGN.md."
+      },
+      "title": {
+        "displayName": "Selected offering title",
+        "purpose": "Compact Manrope editor heading; records the CSS weight request."
+      },
+      "body": {
+        "displayName": "Workspace body",
+        "purpose": "Inherited Manrope for operational content."
+      },
+      "label": {
+        "displayName": "Field label",
+        "purpose": "Compact labels above fields."
+      },
+      "table": {
+        "displayName": "Catalogue text",
+        "purpose": "Prices, names and capacity/source information."
+      },
+      "status": {
+        "displayName": "Publication label",
+        "purpose": "Written Draft, Published or Archived state beside a dot."
+      }
+    },
+    "shadows": [
+      {
+        "name": "dialog",
+        "value": "0 14px 60px rgb(20 20 20 / 0.18)",
+        "purpose": "Offerings dialogs above the dimmed workspace. Resting table/editor frames have no drop shadow."
+      }
+    ],
+    "motion": [],
+    "breakpoints": [
+      {
+        "name": "compact-workspace",
+        "value": "1279px",
+        "query": "(max-width: 1279px)"
+      },
+      {
+        "name": "single-pane",
+        "value": "1023px",
+        "query": "(max-width: 1023px)"
+      },
+      {
+        "name": "phone",
+        "value": "599px",
+        "query": "(max-width: 599px)"
+      },
+      {
+        "name": "short-desktop",
+        "value": "700px",
+        "query": "(max-height: 700px) and (min-width: 1024px)"
+      }
+    ],
+    "interactionNotes": [
+      "Editor header shortcuts open offering creation and discount pricing.",
+      "Closed editor gives its reserved width to catalogue and controls.",
+      "Discounted price and original price use separate lines; publication remains explicit."
+    ],
+    "catalogueDensity": {
+      "targetVisibleRows": 10,
+      "testedViewport": {
+        "width": 1280,
+        "height": 633,
+        "deviceScaleFactor": 1.5
+      },
+      "thumbnail": 32,
+      "normalRowHeight": 41,
+      "shortDesktopRowHeight": 37,
+      "primaryText": 12,
+      "metadataText": 10
+    }
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Gold creation or publication action with dark text.",
+      "html": "<button class=\"ds-primary\" type=\"button\">Publish offering</button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;border:1px solid var(--gold,#d4a72c);padding:7px 12px;border-radius:5px;background:var(--gold,#d4a72c);color:#171b24;font:600 13px/1.5 Manrope,system-ui,sans-serif;white-space:nowrap;cursor:pointer}.ds-primary:hover:not(:disabled){background:#c89a22;border-color:#a49b88}.ds-primary:focus-visible{outline:2px solid #98701a;outline-offset:3px}.ds-primary:disabled{cursor:not-allowed;opacity:.55}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "White bordered action for imports or draft saves.",
+      "html": "<button class=\"ds-secondary\" type=\"button\">Save draft</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;border:1px solid #cbd0d8;padding:7px 12px;border-radius:5px;background:var(--surface,#ffffff);color:#171b24;font:600 13px/1.5 Manrope,system-ui,sans-serif;white-space:nowrap;cursor:pointer}.ds-secondary:hover:not(:disabled){background:#f8f5ed;border-color:#a49b88}.ds-secondary:focus-visible{outline:2px solid #98701a;outline-offset:3px}.ds-secondary:disabled{cursor:not-allowed;opacity:.55}"
+    },
+    {
+      "name": "Labelled field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Compact editor field with visible focus, disabled and invalid treatments.",
+      "html": "<label class=\"ds-field\"><span>Name *</span><input value=\"Occasion makeup\" /></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:4px;min-width:0;color:#171b24;font:400 12px/1.5 Manrope,system-ui,sans-serif}.ds-field>span{font-weight:600}.ds-field input{width:100%;min-width:0;border:1px solid #cdd0d7;border-radius:5px;background:var(--surface,#ffffff);padding:7px 10px;color:#171b24;font:inherit;caret-color:#775617}.ds-field input:focus-visible{outline:2px solid #98701a;outline-offset:3px}.ds-field input:disabled{background:#f3f3f1;color:#5a6170;cursor:not-allowed}.ds-field input[aria-invalid=true]{border-color:#ac332a}@media(max-width:599px){.ds-field input{font-size:16px}}"
+    },
+    {
+      "name": "Editor tabs",
+      "kind": "nav",
+      "refersTo": "editor-tabs",
+      "description": "Five sections with a gold active underline. Application code supplies selection and keyboard behavior.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\" aria-label=\"Offering editor\"><button role=\"tab\" aria-selected=\"true\" tabindex=\"0\">Details</button><button role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Pricing</button><button role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Availability</button><button role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Preview</button><button role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">History</button></div>",
+      "css": ".ds-tabs{display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid #e3e1dc;font:400 12px/1.5 Manrope,system-ui,sans-serif}.ds-tabs button{flex-shrink:0;border:0;border-bottom:3px solid transparent;padding:12px 8px 10px;white-space:nowrap;background:none;color:#171b24;font:inherit;cursor:pointer}.ds-tabs button[aria-selected=true]{border-bottom-color:var(--gold,#d4a72c);color:#775617;font-weight:700}.ds-tabs button:focus-visible{outline:2px solid #98701a;outline-offset:3px}"
+    },
+    {
+      "name": "Publication pill",
+      "kind": "chip",
+      "refersTo": "publication-pill",
+      "description": "The selected editor labels publication explicitly beside its status dot.",
+      "html": "<span class=\"ds-publication\"><span aria-hidden=\"true\"></span>Draft</span>",
+      "css": ".ds-publication{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;padding:2px 7px;border-radius:14px;background:#f0f1f4;color:#171b24;font:400 11px/1.5 Manrope,system-ui,sans-serif}.ds-publication>span{width:8px;height:8px;border-radius:50%;background:#969ca8}.ds-publication[data-state=published]>span{background:#278047}.ds-publication[data-state=archived]>span{background:#7c7060}"
+    },
+    {
+      "name": "Selected catalogue row",
+      "kind": "custom",
+      "refersTo": "selected-row",
+      "description": "Pale selection and inset gold rules connect the catalogue record to its editor.",
+      "html": "<table class=\"ds-catalogue\"><tbody><tr data-selected=\"true\"><td><button class=\"ds-row-name\" type=\"button\"><span><strong>Occasion makeup</strong><small>Service · 60 min</small></span></button></td><td>KES 3,500 / appointment</td></tr></tbody></table>",
+      "css": ".ds-catalogue{width:100%;border-collapse:separate;border-spacing:0;color:#171b24;font:400 12px/1.5 Manrope,system-ui,sans-serif}.ds-catalogue td{padding:4px 8px;border-bottom:1px solid #e3e1dc;vertical-align:middle}.ds-catalogue td:first-child{min-width:190px}.ds-catalogue tr[data-selected=true] td{background:#fcf6e9;box-shadow:inset 0 1px #d4a72c,inset 0 -1px #d4a72c}.ds-catalogue tr[data-selected=true] td:first-child{box-shadow:inset 1px 0 #d4a72c,inset 0 1px #d4a72c,inset 0 -1px #d4a72c}.ds-catalogue tr[data-selected=true] td:last-child{box-shadow:inset -1px 0 #d4a72c,inset 0 1px #d4a72c,inset 0 -1px #d4a72c}.ds-catalogue tr:hover td{background:#faf8f2}.ds-row-name{display:flex;align-items:center;width:100%;min-width:0;text-align:left;border:0;padding:0;background:transparent;color:inherit;font:inherit;cursor:pointer}.ds-row-name strong{display:block;font-size:12px;line-height:1.25;font-weight:750;overflow-wrap:anywhere}.ds-row-name small{display:block;color:#586071;font-size:10px;line-height:1.2;margin-top:1px}.ds-row-name:focus-visible{outline:2px solid #98701a;outline-offset:3px}"
+    },
+    {
+      "name": "Editor frame",
+      "kind": "card",
+      "refersTo": "editor",
+      "description": "A bordered white frame keeps the heading and action footer outside its scrolling body.",
+      "html": "<section class=\"ds-editor\" aria-label=\"Selected offering\"><header><h2>Occasion makeup</h2><p>Service · Managed in NEXG</p></header><div class=\"ds-editor-body\"><p>Details, pricing and availability remain inside the scrolling editor body.</p></div><footer>Saved in this browser only</footer></section>",
+      "css": ".ds-editor{display:flex;flex-direction:column;min-height:0;height:260px;overflow:hidden;border:1px solid #e3e1dc;border-radius:9px;background:var(--surface,#ffffff);color:#171b24;font:400 13px/1.5 Manrope,system-ui,sans-serif}.ds-editor header{padding:16px 17px 5px;flex-shrink:0}.ds-editor h2{margin:0;font-size:19px;line-height:1.25;font-weight:750;letter-spacing:-.025em}.ds-editor header p{color:#586071;margin:5px 0;font-size:11px}.ds-editor-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px 17px;scrollbar-gutter:stable}.ds-editor footer{flex-shrink:0;border-top:1px solid #e3e1dc;padding:13px 17px;background:var(--surface,#ffffff);font-size:11px}.ds-editor :focus-visible{outline:2px solid #98701a;outline-offset:3px}"
+    },
+    {
+      "name": "Availability summary",
+      "kind": "custom",
+      "refersTo": "availability-summary",
+      "description": "Written capacity state stays separate from publication, with source ownership explained nearby.",
+      "html": "<div class=\"ds-availability\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 2v4m8-4v4M3 10h18\"/><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/></svg><div><strong>Stock unknown</strong><p>Publication and current availability are separate.</p></div></div>",
+      "css": ".ds-availability{display:flex;align-items:flex-start;gap:10px;background:#f5f5f4;padding:11px;border:1px solid #e8e7e4;border-radius:5px;color:#171b24;font:400 11px/1.5 Manrope,system-ui,sans-serif}.ds-availability>svg{margin-top:3px;flex-shrink:0}.ds-availability p{font-size:10px;line-height:1.6;color:#586071;margin:3px 0 0}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Existing NEXG merchant workspace",
+    "overview": "This file records Offerings as an ordinary extension of the existing NEXG merchant workspace. It is scoped to this folder and does not replace global product or design guidance. The approved general concept fixes the catalogue/editor composition. The implementation retains the dark shell, cream workspace, white editor and gold actions.\n\nThe merchant scans a catalogue, selects an offering and edits the applicable contract. One composition adapts to 128 specialty bindings and 18 editor contracts. Compact controls and internal scrolling keep long records usable without reducing the whole form to one static view.",
+    "keyCharacteristics": [
+      "A larger catalogue column beside a selected editor.",
+      "A serif page title above compact Manrope controls and table text.",
+      "Fine rules, explicit selection and visible editor actions.",
+      "Text that distinguishes publication, source ownership and preview state."
+    ],
+    "rules": [],
+    "dos": [
+      "Do preserve the existing merchant shell and the catalogue/editor relationship.",
+      "Do keep long content reachable through internal scrolling, tabs and disclosures.",
+      "Do keep preview scope, source ownership and current capacity explicit in text."
+    ],
+    "donts": [
+      "Don't turn this scoped record into a replacement global visual identity.",
+      "Don't equate Published with available stock or confirmed resource readiness.",
+      "Don't treat reused demo imagery or browser captures as real merchant listing evidence."
+    ]
+  }
+}

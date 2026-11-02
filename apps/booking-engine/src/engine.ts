@@ -359,11 +359,21 @@ export class BookingEngine {
       req,
     );
   }
+  private async readBusiness(identity: Identity): Promise<Doc> {
+    const business = (await this.all('businesses', identity))[0];
+    if (!business)
+      throw new BookingError(
+        409,
+        'Initialize this booking workspace before reading its setup.',
+        'initialization_required',
+      );
+    return business;
+  }
   async profiles() {
     return { profiles: listBookingProfiles() };
   }
   async questions(identity: Identity, subcategoryId: string, offeringModel?: string) {
-    const b = await this.business(identity);
+    const b = await this.readBusiness(identity);
     return {
       questions: getApplicableBookingQuestions({
         ...b.configuration,
@@ -410,8 +420,7 @@ export class BookingEngine {
   }
   async workspace(identity: Identity) {
     requireManager(identity);
-    await this.expireHolds(identity);
-    const business = await this.business(identity);
+    const business = await this.readBusiness(identity);
     const [offerings, resources, reservations, requests] = await Promise.all(
       ['services', 'resources', 'reservations', 'booking-requests'].map((c) =>
         this.all(c, identity),
@@ -607,6 +616,7 @@ export class BookingEngine {
   }
   bookingView(d: Doc) {
     const n = d.nexg ?? {};
+    const holdExpired = this.isExpiredHold(d);
     const {
       customerTokenHash: _,
       acceptedConfiguration: _acceptedConfiguration,
@@ -622,7 +632,8 @@ export class BookingEngine {
       specialist: specialistBookingView(n),
       id: d.publicId,
       occupancyOverdue: n.custodyState === 'in_use' && Date.parse(n.endTime) <= this.clock(),
-      status: d.status ?? n.status,
+      status: holdExpired ? 'expired' : (d.status ?? n.status),
+      ...(holdExpired ? { holdExpired: true, persistedStatus: 'held' } : {}),
       startTime: d.startTime ?? n.startTime,
       endTime: d.endTime ?? n.endTime,
       quantity: n.quantity ?? d.guestCount,
@@ -1534,14 +1545,41 @@ export class BookingEngine {
         'turnover_required',
       );
   }
+  private isExpiredHold(d: Doc, now = this.clock()): boolean {
+    return !!(d.status === 'held' && d.nexg?.expiresAt && Date.parse(d.nexg.expiresAt) <= now);
+  }
+  private availabilityReader(reservations: Doc[], sessions: Doc[], now: number): Payload {
+    const blocks = (d: Doc) => BLOCKING.has(d.status) && !this.isExpiredHold(d, now);
+    const excludedIds = reservations.filter((d) => this.isExpiredHold(d, now)).map((d) => d.id);
+    // Match command cleanup for unpublished sessions without changing their anchor rows.
+    for (const session of sessions) {
+      if (
+        session.published === true ||
+        reservations.some((d) => String(d.nexg?.sessionId) === String(session.id) && blocks(d))
+      )
+        continue;
+      const anchor = reservations.find((d) => String(d.id) === String(session.reservationId));
+      if (anchor?.status === 'confirmed') excludedIds.push(anchor.id);
+    }
+    if (!excludedIds.length) return this.payload;
+    // Reserve owns overlap, item buffers and capacity. Only its reservation query
+    // receives this read-local exclusion; the Payload instance and stored rows stay intact.
+    const reader: Payload = Object.create(this.payload);
+    reader.find = ((options: any) =>
+      this.payload.find(
+        options.collection === 'reservations'
+          ? {
+              ...options,
+              where: { and: [options.where ?? {}, { id: { not_in: excludedIds } }] },
+            }
+          : options,
+      )) as Payload['find'];
+    return reader;
+  }
   private async expiredInTransaction(identity: Identity, req: any) {
     const docs = await this.all('reservations', identity, req);
     for (const d of docs)
-      if (
-        d.status === 'held' &&
-        d.nexg?.expiresAt &&
-        Date.parse(d.nexg.expiresAt) <= this.clock()
-      ) {
+      if (this.isExpiredHold(d)) {
         await this.update(
           'reservations',
           d.id,
@@ -1646,10 +1684,9 @@ export class BookingEngine {
       resourceIds?: string[];
     } = {},
   ) {
-    await this.expireHolds(identity);
+    const b = publicOnly ? await this.assertPublished(identity) : await this.readBusiness(identity);
     const service = await this.own('services', offeringId, identity);
     if (publicOnly) await this.assertPublished(identity, service);
-    const b = await this.business(identity);
     if (this.externalOwnership(b.configuration ?? {}, ['pricing', 'finance.payment']))
       return { slots: [], reason: 'Authoritative pricing or collection confirmation is required.' };
     if (this.externalReservations(b.configuration ?? {}))
@@ -1693,8 +1730,13 @@ export class BookingEngine {
             reason: 'Complete this offering setup before displaying reservable times.',
             readiness,
           };
-    const sessions =
-      service.nexg.model === 'SESSION_CAPACITY' ? await this.all('booking-sessions', identity) : [];
+    const [reservations, allSessions] = await Promise.all([
+      this.all('reservations', identity),
+      this.all('booking-sessions', identity),
+    ]);
+    const readTime = this.clock();
+    const reader = this.availabilityReader(reservations, allSessions, readTime);
+    const sessions = service.nexg.model === 'SESSION_CAPACITY' ? allSessions : [];
     const slots: Array<{
         occurrenceId?: string;
         start: string;
@@ -1750,7 +1792,7 @@ export class BookingEngine {
           : undefined;
       for (const resource of resources) {
         const result = await checkAvailability({
-          payload: this.payload,
+          payload: reader,
           req,
           resourceId: resource.id,
           resourceSlug: 'resources',
@@ -1773,11 +1815,12 @@ export class BookingEngine {
           remaining = Math.min(remaining, result.totalCapacity - result.currentCount);
       }
       if (available && pool && session) {
-        const attendees = (await this.all('reservations', identity)).filter(
+        const attendees = reservations.filter(
           (r) =>
             String(r.nexg?.sessionId) === String(session.id) &&
             r.nexg?.recordRole !== 'session_allocation' &&
-            BLOCKING.has(r.status),
+            BLOCKING.has(r.status) &&
+            !this.isExpiredHold(r, readTime),
         );
         remaining = Math.min(
           remaining,

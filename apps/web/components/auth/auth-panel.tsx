@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { type AccountRole, createAccount, signIn } from '@/app/sign-in/actions';
+import { type AccountRole, createAccount, signIn } from '@/app/(customer)/sign-in/actions';
+import { authDestination } from '@/lib/auth-navigation';
 
 const ROLES: { value: AccountRole; label: string; hint: string; icon: React.ReactNode }[] = [
   {
@@ -48,16 +49,20 @@ const ROLES: { value: AccountRole; label: string; hint: string; icon: React.Reac
  */
 export function AuthPanel({
   initialTab = 'signin',
+  initialRole = 'guest',
   next,
+  emailOtpEnabled = false,
 }: {
   initialTab?: 'signin' | 'create';
+  initialRole?: AccountRole;
   next?: string;
+  emailOtpEnabled?: boolean;
 }) {
   const { toast } = useToast();
   const router = useRouter();
 
   const [tab, setTab] = React.useState<'signin' | 'create'>(initialTab);
-  const [role, setRole] = React.useState<AccountRole>('guest');
+  const [role, setRole] = React.useState<AccountRole>(initialRole);
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [phone, setPhone] = React.useState<string | null>(null);
@@ -80,7 +85,7 @@ export function AuthPanel({
     }
 
     toast({ title: 'Welcome', description: result.message, tone: 'success' });
-    router.push(next ?? result.redirectTo ?? '/');
+    router.push(authDestination(role, next, result.redirectTo));
     router.refresh();
   };
 
@@ -118,7 +123,9 @@ export function AuthPanel({
         <p className="text-muted mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
           {tab === 'signin'
             ? 'Sign in with your email and password.'
-            : 'For guests. You can order without an account — this just saves you time next visit.'}
+            : role === 'merchant'
+              ? 'Create your merchant account, then continue your saved registration.'
+              : 'For guests. You can order without an account — this just saves you time next visit.'}
         </p>
 
         <form onSubmit={submit} className="mt-6">
@@ -213,6 +220,12 @@ export function AuthPanel({
             </Link>
           )}
 
+          {tab === 'signin' && role === 'merchant' && emailOtpEnabled ? (
+            <Link href="/merchants/sign-in/email" className="text-ink ml-4 mt-3 inline-block text-sm font-bold underline underline-offset-4">
+              Sign in with an email code
+            </Link>
+          ) : null}
+
           {tab === 'create' && (
             <div className="mt-4">
               <PhoneInput
@@ -275,8 +288,8 @@ export function AuthPanel({
         <Card tone="muted" className="mt-5 p-4">
           <p className="text-muted text-xs leading-[1.7]">
             <span className="text-ink font-bold">One-time codes by SMS</span>, and Google and Apple
-            sign-in, arrive once those accounts are set up. Until then email and password is the way
-            in — and it works on any device.
+            sign-in, arrive once those accounts are set up.{' '}
+            {emailOtpEnabled ? 'Merchants can also sign in with an email code.' : 'Until then email and password is the way in — and it works on any device.'}
           </p>
         </Card>
 
@@ -324,7 +337,7 @@ export function AuthPanel({
             asChild
             className="border-gold/50 text-gold hover:bg-gold/10"
           >
-            <Link href="/merchants/apply">Register Your Business</Link>
+            <Link href="/merchants/register">Register Your Business</Link>
           </Button>
           <Button
             variant="outline"

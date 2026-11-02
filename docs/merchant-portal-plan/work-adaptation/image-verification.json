@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-31",
+  "status": "TWO_IMAGES_PRESENT_AND_VISUALLY_REVIEWED",
+  "selectedCount": 2,
+  "images": [
+    {
+      "file": "images/01-retail-work.png",
+      "width": 1589,
+      "height": 990,
+      "sha256": "a0463ba97ddf6d8b6580d2077d459e6b37155cc3ea8a3cb03a106aeb67dc5fa2"
+    },
+    {
+      "file": "images/02-rental-work.png",
+      "width": 1589,
+      "height": 990,
+      "sha256": "e9b15b372fbf9002aaa1f5cb2e9ab089decc442f9ca41136df1be19dc902a9c6"
+    }
+  ],
+  "review": {
+    "retail": "6 queue rows; ORD-2048 Picking matches detail, stock allocated, automatic confirmation, KES1210 and Mark ready for pickup. No Accept/Decline.",
+    "rental": "5 active queue rows; 2 overdue exceptions; RNT-1038 remains Active and Self-drive, future return11:00 and Record return. No driver/transfer/acceptance controls.",
+    "shared": "Nine-item navigation with Work selected, queue/detail structure, ink/cream/gold visual language and persistent Preview data.",
+    "limits": "Concept images demonstrate visual adaptation. They do not prove working actions, accessibility compliance or live runtime configuration."
+  }
+}

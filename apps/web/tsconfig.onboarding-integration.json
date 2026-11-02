@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": [
+    "next-env.d.ts",
+    "lib/merchant-application*.ts",
+    "components/onboarding/connected-application.tsx",
+    "app/api/merchant/application/route.ts",
+    "app/(customer)/merchants/register/page.tsx",
+    "app/merchant/page.tsx"
+  ]
+}

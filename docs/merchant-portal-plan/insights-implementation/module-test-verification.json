@@ -1,0 +1,108 @@
+{
+  "generatedAt": "2026-11-01T11:40:43.871Z",
+  "scope": "Existing frontend model tests. No production backend, provider integration or live financial correctness claim.",
+  "workspaceModels": {
+    "label": "Adaptive Insights and existing workspace models",
+    "command": "pnpm --filter @nexg/web exec vitest run components/merchant/insights/model.test.ts components/merchant/work/model.test.ts components/merchant/offerings/model.test.ts components/merchant/availability/model.test.ts components/merchant/business/model.test.ts components/merchant/money/model.test.ts components/merchant/money/payouts.test.ts components/merchant/money/transactions.test.ts components/merchant/promotions/model.test.ts",
+    "status": "PASSED",
+    "exitCode": 0,
+    "testFiles": 9,
+    "total": 120,
+    "passed": 120,
+    "failed": 0,
+    "files": [
+      {
+        "file": "apps\\web\\components\\merchant\\availability\\model.test.ts",
+        "status": "passed",
+        "passed": 31,
+        "failed": 0,
+        "failures": []
+      },
+      {
+        "file": "apps\\web\\components\\merchant\\business\\model.test.ts",
+        "status": "passed",
+        "passed": 10,
+        "failed": 0,
+        "failures": []
+      },
+      {
+        "file": "apps\\web\\components\\merchant\\insights\\model.test.ts",
+        "status": "passed",
+        "passed": 17,
+        "failed": 0,
+        "failures": []
+      },
+      {
+        "file": "apps\\web\\components\\merchant\\money\\model.test.ts",
+        "status": "passed",
+        "passed": 16,
+        "failed": 0,
+        "failures": []
+      },
+      {
+        "file": "apps\\web\\components\\merchant\\money\\payouts.test.ts",
+        "status": "passed",
+        "passed": 5,
+        "failed": 0,
+        "failures": []
+      },
+      {
+        "file": "apps\\web\\components\\merchant\\money\\transactions.test.ts",
+        "status": "passed",
+        "passed": 4,
+        "failed": 0,
+        "failures": []
+      },
+      {
+        "file": "apps\\web\\components\\merchant\\offerings\\model.test.ts",
+        "status": "passed",
+        "passed": 19,
+        "failed": 0,
+        "failures": []
+      },
+      {
+        "file": "apps\\web\\components\\merchant\\promotions\\model.test.ts",
+        "status": "passed",
+        "passed": 11,
+        "failed": 0,
+        "failures": []
+      },
+      {
+        "file": "apps\\web\\components\\merchant\\work\\model.test.ts",
+        "status": "passed",
+        "passed": 7,
+        "failed": 0,
+        "failures": []
+      }
+    ]
+  },
+  "homeBaseline": {
+    "label": "Existing Home baseline; compare stale copy/chart expectations separately",
+    "command": "pnpm --filter @nexg/web exec vitest run components/merchant/home-live.test.tsx",
+    "status": "FAILED",
+    "exitCode": 1,
+    "testFiles": 1,
+    "total": 5,
+    "passed": 3,
+    "failed": 2,
+    "files": [
+      {
+        "file": "apps\\web\\components\\merchant\\home-live.test.tsx",
+        "status": "failed",
+        "passed": 3,
+        "failed": 2,
+        "failures": [
+          {
+            "name": "live merchant Home shows an honest empty queue and names the earnings measure",
+            "message": "AssertionError: expected '<main class=\"mx-auto w-full max-w-[10…' to contain 'Delivered sales after fees today'\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\apps\\web\\components\\merchant\\home-live.test.tsx:39:18\n    at file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at runSuite (file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:1205:15)\n    at runSuite (file:///C:/User"
+          },
+          {
+            "name": "Home performance provides the real daily figures as text as well as a chart",
+            "message": "AssertionError: expected '<div class=\"mt-2\"><div class=\"flex fl…' to contain 'Show daily figures'\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\apps\\web\\components\\merchant\\home-live.test.tsx:66:18\n    at file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at runSuite (file:///C:/Users/limta/Desktop/MERCHANT%20WORKSPACE/node_modules/.pnpm/@vitest+runner@2.1.8/node_modules/@vitest/runner/dist/index.js:1205:15)\n    at runSuite (file:///C:/Users/limta/Deskto"
+          }
+        ]
+      }
+    ]
+  },
+  "status": "WORKSPACE_MODELS_PASSED_HOME_BASELINE_FAILED"
+}

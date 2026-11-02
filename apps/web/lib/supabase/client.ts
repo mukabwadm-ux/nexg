@@ -3,6 +3,9 @@
 import type { Database } from '@nexg/db';
 import { createBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { stopProtectedBrowserRequests } from './protected-request';
+
+let browserClient: SupabaseClient<Database> | undefined;
 
 /** Supabase client for the browser. Anon key only; RLS does the rest. */
 /*
@@ -16,8 +19,16 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  * every time a table is added.
  */
 export function createClient(): SupabaseClient<Database> {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
+  if (!browserClient) {
+    browserClient = createBrowserClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
+    // The installed SDK refreshes and broadcasts across tabs. Its event only
+    // cancels browser work; server/database checks still grant every capability.
+    browserClient.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') stopProtectedBrowserRequests();
+    });
+  }
+  return browserClient;
 }

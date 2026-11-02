@@ -14,7 +14,14 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next-dev/types/**/*.ts",
-    ".next-booking/types/**/*.ts"
+    ".next-booking/types/**/*.ts",
+    ".next-offerings-preview/types/**/*.ts",
+    ".next-availability-preview/types/**/*.ts",
+    ".next-money-preview/types/**/*.ts",
+    ".next-insights-preview/types/**/*.ts",
+    ".next-merchant-layout-preview/types/**/*.ts",
+    ".next-dev-3141/types/**/*.ts",
+    ".next-dev-3002/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

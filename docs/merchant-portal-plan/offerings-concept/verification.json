@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-31",
+  "status": "OFFERINGS_COMPONENT_DESIGN_AUDIT_PASSED",
+  "scope": "Local reference/field/schema/mapping checks. Not frontend runtime coverage.",
+  "counts": {
+    "categories": 21,
+    "subcategories": 128,
+    "primaryEditorSchemas": 17,
+    "registeredEditorSchemas": 18,
+    "effectiveBookingModels": 15,
+    "scopedFieldReferences": 558,
+    "effectiveRules": 174,
+    "effectiveConditionalBindings": 65
+  },
+  "familyCounts": {
+    "PRODUCT_CATALOG_V1": 58,
+    "TRANSFER_ROUTE_V1": 4,
+    "SERVICE_APPOINTMENT_V1": 11,
+    "RENTAL_ASSET_V1": 5,
+    "EVENT_TICKET_V1": 3,
+    "REQUEST_QUOTE_V1": 12,
+    "GROUP_SESSION_V1": 4,
+    "REGULATED_ENQUIRY_V1": 7,
+    "MADE_TO_ORDER_V1": 2,
+    "PICKUP_RETURN_V1": 3,
+    "FIELD_SERVICE_V1": 4,
+    "REMOTE_SESSION_V1": 1,
+    "SERVICE_JOB_V1": 3,
+    "TOUR_PACKAGE_V1": 6,
+    "MEMBERSHIP_PLAN_V1": 1,
+    "FREIGHT_SHIPMENT_V1": 3,
+    "STORAGE_SPACE_V1": 1
+  },
+  "additionalRegisteredSchema": {
+    "id": "SPACE_RESERVATION_V1",
+    "purpose": "Conditional tables/spaces/coworking; selected offering/method and exact shared capacity required."
+  },
+  "sources": {
+    "primaryEditorReferences": "../profiles-128.json",
+    "effectiveManifest": "../../booking-engine/payload-reserve-plan/reconciliation/manifest.json",
+    "latestUserConfirmationPolicy": "../order-confirmation.md"
+  },
+  "precedence": "Effective snapshot used together. Older primary refs establish editor coverage only; no older conditional-rule replay. User automatic-confirmation instruction governs conflicting inherited intake metadata.",
+  "runtimeStatus": "NOT_BUILT_NOT_VERIFIED",
+  "artifacts": {
+    "docs/merchant-portal-plan/profiles-128.json": "49f1acbac8c5afe225efd8cc5ed9c1056f3e77e2474db4c2d2ac7b54d5006277",
+    "docs/booking-engine/payload-reserve-plan/reconciliation/effective-profiles-128.json": "4a831d5a4f3392369153a6c5e2b37445ea760b8d6787fcd73b679bc47ac9714b",
+    "docs/booking-engine/payload-reserve-plan/reconciliation/effective-question-registry.json": "8381f6d88bbd4bd7b24d7e0865e138fad421f62c8921151d61f3a043d3cbe6ac",
+    "docs/booking-engine/payload-reserve-plan/reconciliation/effective-domain-registry.json": "6ab91de44e853f06b2606ebfc03a123d150650658355b53558778dfbe1578a5b",
+    "docs/merchant-portal-plan/order-confirmation.md": "59044555dadb9efe567095050b15d6cb52c5f65716b065d6b220543a2fab0a38",
+    "README.md": "c772abcd296533a24c8815bc2be441c23be8ed310358b8cec36c113436d48a96",
+    "coverage-128.json": "e61ded4d29290bcab58b260da50c7f001a616a493ddfacdaae912d7674f39629",
+    "coverage-128.md": "09f9a4ecbe09f211ccb970dfe18aef85d0c6b7a7e183c84c20faede46d57ebd7",
+    "audit-offerings.mjs": "965ef3201cbe708e49cb3be19a556c90943964fd25454d5672c91402e951f919"
+  }
+}

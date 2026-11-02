@@ -300,6 +300,20 @@ export function MerchantBookingWorkspace({
   );
   const disabled = busy || !online;
 
+  async function importOnboarding() {
+    setBusy(true);
+    setError(null);
+    try {
+      await command('/bootstrap', {}, 'POST', apiBase);
+      setSuccess('Your saved business details have been imported.');
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Your business details could not be imported.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (loading)
     return (
       <main className="space-y-5 px-4 py-7 sm:px-6 lg:px-8" aria-busy="true">
@@ -320,6 +334,9 @@ export function MerchantBookingWorkspace({
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           Try again
         </button>
+        {!apiBase || apiBase === '/api/merchant/booking' ? <button type="button" className={buttonClass} disabled={disabled} onClick={() => void importOnboarding()}>
+          Import saved business details
+        </button> : null}
       </main>
     );
 
@@ -345,6 +362,9 @@ export function MerchantBookingWorkspace({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {!apiBase || apiBase === '/api/merchant/booking' ? <button type="button" className={buttonClass} disabled={disabled} onClick={() => void importOnboarding()}>
+            Import saved business details
+          </button> : null}
           <button
             type="button"
             className={buttonClass}

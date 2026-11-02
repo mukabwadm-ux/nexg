@@ -10,6 +10,15 @@ const nextConfig = {
   distDir:
     process.env.NEXG_NEXT_DIST_DIR ??
     (process.env.NODE_ENV === 'development' ? '.next-dev' : '.next'),
+  ...(process.env.NODE_ENV === 'development'
+    ? {
+        // Retain the portal's nine sections between background loading and use.
+        onDemandEntries: {
+          maxInactiveAge: 30 * 60 * 1000,
+          pagesBufferLength: 16,
+        },
+      }
+    : {}),
   // The workspace packages ship TypeScript source rather than a build output.
   transpilePackages: [
     '@nexg/ui',

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { createRequest, escalateRequest, resolveRequest, updateRequest } from '@/app/host/actions';
+import { createRequest, escalateRequest, resolveRequest, updateRequest } from '@/app/(customer)/host/actions';
 
 import { Actions, Area, Drawer, Field, Grid, Said, Select, Submit, Text, useAction } from './form';
 

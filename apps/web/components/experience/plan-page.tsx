@@ -3,7 +3,7 @@
 import { Button, Card, useToast } from '@nexg/ui';
 import * as React from 'react';
 
-import { approvePlan, requestChanges, sendGuestMessage } from '@/app/experience/actions';
+import { approvePlan, requestChanges, sendGuestMessage } from '@/app/(customer)/experience/actions';
 
 import { DayTimeline } from './day-timeline';
 import { keslabel, type PlanView } from './types';

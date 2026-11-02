@@ -12,9 +12,8 @@ export default function HomePage() {
     <main className="max-w-3xl mx-auto px-6 py-16">
       <h1 className="text-4xl font-extrabold tracking-tight mb-4">NexG API</h1>
       <p className="text-lg text-ink/70 mb-8">
-        Read-only catalog, and a write path for merchants who book our
-        services. Every list is cursor-paginated, every response is
-        versioned, and every write takes an idempotency key.
+        Read the public catalog and, with an authorized merchant key,
+        your merchant's orders. Responses use API version v1.
       </p>
 
       <div className="flex flex-wrap gap-4 text-sm">
@@ -40,8 +39,8 @@ export default function HomePage() {
             ['GET', '/v1/catalog/merchants/{id}', 'One merchant and its catalogue'],
             ['GET', '/v1/zones', 'Delivery zones and their bounds'],
             ['GET', '/v1/experiences', 'Upcoming events'],
-            ['GET', '/v1/services', 'What a merchant can book'],
-            ['POST', '/v1/orders', 'Book a service (merchant scope)'],
+            ['GET', '/v1/services', 'Configured service descriptions'],
+            ['GET', '/v1/orders', 'Your merchant orders (merchant_read scope)'],
           ].map(([method, path, note]) => (
             <li key={path} className="flex gap-3 items-baseline">
               <span className="text-xs font-extrabold uppercase tracking-wider text-ink/50 w-14 shrink-0">

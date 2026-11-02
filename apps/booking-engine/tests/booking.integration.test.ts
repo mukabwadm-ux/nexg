@@ -12,6 +12,423 @@ import { runSpecialistFixtures } from './specialist-fixtures.js';
 import { createBookingServer } from '../src/server.js';
 import type { Identity, OfferingInput } from '../src/types.js';
 
+test('booking GET reads preserve persisted business state', async (t) => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'nexg-read-only-'));
+  const sqliteUrl = 'file:' + path.join(directory, 'test.db').replaceAll('\\', '/');
+  const payloadOptions = {
+    sqliteUrl,
+    secret: 'read-only-test-secret-is-not-production-123456789',
+  };
+  let now = Date.parse('2030-01-01T00:00:00Z');
+  let payload = await createPayload({ ...payloadOptions, cacheKey: randomUUID() });
+  let engine = new BookingEngine(payload, true, () => now);
+  const owner: Identity = {
+    businessId: 'phase4-read-owner',
+    userId: 'read-owner',
+    role: 'owner',
+    expiresAt: Date.now() + 60000,
+  };
+  const guest = { ...owner, role: 'customer', userId: 'public-reader' };
+  const secret = 'read-only-bridge-test-secret-123456789';
+  let server = createBookingServer(engine, secret);
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  let base = 'http://127.0.0.1:' + (server.address() as any).port;
+  const request = async (route: string, identity = owner, options: RequestInit = {}) => {
+    const context = Buffer.from(
+      JSON.stringify({ ...identity, expiresAt: Date.now() + 60000 }),
+    ).toString('base64url');
+    const response = await fetch(base + route, {
+      ...options,
+      headers: {
+        'x-nexg-booking-context': context,
+        'x-nexg-booking-signature': createHmac('sha256', secret).update(context).digest('hex'),
+        ...options.headers,
+      },
+    });
+    return { status: response.status, value: await response.json() };
+  };
+  const snapshot = async () => {
+    const collections = [
+      'businesses',
+      'services',
+      'resources',
+      'schedules',
+      'customers',
+      'reservations',
+      'booking-requests',
+      'booking-sessions',
+      'booking-operations',
+      'booking-audit',
+      'booking-outbox',
+    ];
+    return Object.fromEntries(
+      await Promise.all(
+        collections.map(async (collection) => {
+          const result = await payload.find({
+            collection,
+            depth: 0,
+            limit: 0,
+            sort: 'id',
+            overrideAccess: true,
+          } as any);
+          return [collection, result.docs];
+        }),
+      ),
+    );
+  };
+  const schedule = { days: [0, 1, 2, 3, 4, 5, 6], start: '08:00', end: '20:00' };
+  const customer = { name: 'Read test customer', email: 'reader@example.test' };
+  const offeringInput: OfferingInput = {
+    name: 'Read test appointment',
+    model: 'APPOINTMENT',
+    durationMinutes: 60,
+    resourceIds: [],
+    priceMinor: 10000,
+    currency: 'KES',
+    intakeMode: 'instant_after_requirements',
+    active: true,
+    bookingEnabled: true,
+    leadTimeMinutes: 0,
+    horizonDays: 3650,
+    paymentPolicyId: 'NO_PREPAYMENT_V1',
+    changePolicyId: 'CHANGE_BEFORE_START_V1',
+    policyVersion: 1,
+  };
+  let offering: any;
+  let expiredBookingId: string;
+  let expiredBookingVersion: number;
+  let expirySnapshot: Awaited<ReturnType<typeof snapshot>>;
+  try {
+    await t.test(
+      'missing workspace reads require explicit initialization and store nothing',
+      async () => {
+        const before = await snapshot();
+        for (const route of [
+          '/v1/workspace',
+          '/v1/questions?subcategoryId=haircare',
+          '/v1/availability?offeringId=missing&date=2030-01-02',
+        ]) {
+          const response = await request(route);
+          assert.equal(response.status, 409);
+          assert.equal(response.value.type, 'urn:nexg:booking:initialization_required');
+        }
+        for (const route of ['/catalog', '/availability?offeringId=missing&date=2030-01-02']) {
+          const response = await request('/v1/public/' + owner.businessId + route, guest);
+          assert.equal(response.status, 404);
+          assert.equal(response.value.type, 'urn:nexg:booking:not_published');
+        }
+        const profiles = await request('/v1/profiles');
+        assert.equal(profiles.status, 200);
+        assert.ok(
+          profiles.value.profiles.some((profile: any) => profile.subcategoryId === 'haircare'),
+        );
+        assert.deepEqual(await snapshot(), before);
+
+        const configured = await request('/v1/configuration', owner, {
+          method: 'PUT',
+          headers: { 'idempotency-key': randomUUID() },
+          body: JSON.stringify({ subcategoryId: 'haircare', published: true }),
+        });
+        assert.equal(configured.status, 200);
+        assert.equal((await engine.workspace(owner)).configuration.subcategoryId, 'haircare');
+        const bootstrapOwner = { ...owner, businessId: 'phase4-explicit-bootstrap' };
+        const bootstrap = await request('/v1/bootstrap', bootstrapOwner, {
+          method: 'POST',
+          body: JSON.stringify({ subcategoryId: 'haircare', businessName: 'Explicit setup' }),
+        });
+        assert.equal(bootstrap.status, 200);
+        assert.equal((await engine.workspace(bootstrapOwner)).business.name, 'Explicit setup');
+      },
+    );
+    await t.test(
+      'configured GET routes preserve configuration, reservations and command records',
+      async () => {
+        const resource = (await engine.addResource(
+          owner,
+          {
+            name: 'Read test stylist',
+            kind: 'staff',
+            quantity: 1,
+            schedule,
+          },
+          randomUUID(),
+        )) as any;
+        offering = await engine.addOffering(
+          owner,
+          {
+            ...offeringInput,
+            resourceIds: [resource.id],
+            bufferAfterMinutes: 15,
+          },
+          randomUUID(),
+        );
+        const before = await snapshot();
+        for (let repeat = 0; repeat < 2; repeat++) {
+          assert.equal((await request('/v1/workspace')).value.offerings[0].id, offering.id);
+          const questions = await request('/v1/questions?subcategoryId=haircare');
+          assert.equal(questions.status, 200);
+          assert.ok(Array.isArray(questions.value.questions));
+          const catalog = await request('/v1/public/' + owner.businessId + '/catalog', guest);
+          assert.equal(catalog.status, 200);
+          assert.equal(catalog.value.offerings[0].id, offering.id);
+        }
+        assert.deepEqual(await snapshot(), before);
+      },
+    );
+    await t.test(
+      'expired holds free GET capacity and show derived expiry without stored transitions',
+      async () => {
+        const held = (await engine.createBooking(
+          guest,
+          {
+            offeringId: offering.id,
+            startTime: '2030-01-02T09:00:00+03:00',
+            customer,
+            hold: true,
+          },
+          randomUUID(),
+          true,
+        )) as any;
+        expiredBookingId = held.booking.id;
+        expiredBookingVersion = held.booking.version;
+        assert.equal(held.booking.status, 'held');
+        await engine.createBooking(
+          owner,
+          {
+            offeringId: offering.id,
+            startTime: '2030-01-02T11:00:00+03:00',
+            customer,
+          },
+          randomUUID(),
+        );
+        const route =
+          '/availability?' +
+          new URLSearchParams({
+            offeringId: offering.id,
+            date: '2030-01-02',
+            startTime: '2030-01-02T09:00:00+03:00',
+          });
+        const activeSnapshot = await snapshot();
+        assert.deepEqual((await request('/v1' + route)).value.slots, []);
+        assert.deepEqual(await snapshot(), activeSnapshot);
+        now += 10 * 60000;
+        expirySnapshot = await snapshot();
+        for (const [prefix, identity] of [
+          ['/v1', owner],
+          ['/v1/public/' + owner.businessId, guest],
+        ] as const) {
+          const available = await request(prefix + route, identity);
+          assert.equal(available.status, 200);
+          assert.deepEqual(available.value.slots, [
+            {
+              start: '2030-01-02T06:00:00.000Z',
+              end: '2030-01-02T07:00:00.000Z',
+              remainingCapacity: 1,
+            },
+          ]);
+        }
+        const workspace = await request('/v1/workspace');
+        const expired = workspace.value.bookings.find(
+          (booking: any) => booking.id === expiredBookingId,
+        );
+        assert.equal(expired.status, 'expired');
+        assert.equal(expired.persistedStatus, 'held');
+        assert.equal(expired.version, expiredBookingVersion);
+        const privateRead = await request(
+          '/v1/public/' + owner.businessId + '/bookings/' + expiredBookingId,
+          guest,
+          {
+            headers: { 'x-booking-customer-token': held.customerToken },
+          },
+        );
+        assert.equal(privateRead.status, 200);
+        assert.equal(privateRead.value.status, 'expired');
+        assert.equal(privateRead.value.holdExpired, true);
+        const buffered = await request(
+          '/v1/availability?' +
+            new URLSearchParams({
+              offeringId: offering.id,
+              date: '2030-01-02',
+              startTime: '2030-01-02T12:00:00+03:00',
+            }),
+        );
+        assert.equal(buffered.status, 200);
+        assert.deepEqual(buffered.value.slots, []);
+        assert.deepEqual(await snapshot(), expirySnapshot);
+        assert.equal(expirySnapshot.reservations[0].status, 'held');
+
+        await new Promise<void>((resolve) => server.close(() => resolve()));
+        await payload.destroy();
+        globalThis.gc?.();
+        await new Promise<void>((resolve) => setImmediate(resolve));
+        payload = await createPayload({ ...payloadOptions, cacheKey: randomUUID() });
+        engine = new BookingEngine(payload, true, () => now);
+        server = createBookingServer(engine, secret);
+        await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+        base = 'http://127.0.0.1:' + (server.address() as any).port;
+        assert.deepEqual(await snapshot(), expirySnapshot);
+        assert.equal(
+          (await engine.workspace(owner)).bookings.find(
+            (booking: any) => booking.id === expiredBookingId,
+          )?.status,
+          'expired',
+        );
+        assert.deepEqual(await snapshot(), expirySnapshot);
+        const confirmed = (await engine.createBooking(
+          owner,
+          {
+            offeringId: offering.id,
+            startTime: '2030-01-02T09:00:00+03:00',
+            customer,
+          },
+          randomUUID(),
+        )) as any;
+        assert.equal(confirmed.status, 'confirmed');
+        const afterCommand = await snapshot();
+        const storedExpired = afterCommand.reservations.find(
+          (row: any) => row.publicId === expiredBookingId,
+        );
+        assert.equal(storedExpired.status, 'expired');
+        assert.equal(storedExpired.nexg.version, expiredBookingVersion + 1);
+        assert.equal(
+          afterCommand['booking-audit'].filter(
+            (row: any) => row.operation === 'booking.hold.expired',
+          ).length,
+          1,
+        );
+        assert.deepEqual(
+          (
+            await engine.availability(owner, offering.id, '2030-01-02', false, {
+              startTime: '2030-01-02T10:00:00+03:00',
+            })
+          ).slots,
+          [],
+        );
+        assert.deepEqual(await snapshot(), afterCommand);
+        await assert.rejects(
+          () =>
+            engine.changeBooking(
+              owner,
+              expiredBookingId,
+              'confirm',
+              {
+                expectedVersion: storedExpired.nexg.version,
+              },
+              randomUUID(),
+            ),
+          (error: any) => error.code === 'invalid_transition',
+        );
+      },
+    );
+    await t.test(
+      'session GET capacity excludes expired attendees and retains active holds',
+      async () => {
+        const classes = { ...owner, businessId: 'phase4-session-read' };
+        await engine.configure(classes, { subcategoryId: 'workshops' }, randomUUID());
+        const pool = (await engine.addResource(
+          classes,
+          {
+            name: 'Read test places',
+            kind: 'capacity_pool',
+            quantity: 3,
+            capacityUnit: 'place',
+            quantityScale: 0,
+            capacityMode: 'per-guest',
+            schedule,
+          },
+          randomUUID(),
+        )) as any;
+        const teacher = (await engine.addResource(
+          classes,
+          {
+            name: 'Read test teacher',
+            kind: 'staff',
+            quantity: 1,
+            schedule,
+          },
+          randomUUID(),
+        )) as any;
+        const service = (await engine.addOffering(
+          classes,
+          {
+            ...offeringInput,
+            name: 'Read test session',
+            model: 'SESSION_CAPACITY',
+            resourceIds: [pool.id, teacher.id],
+            capacity: 2,
+            capacityUnit: 'place',
+          },
+          randomUUID(),
+        )) as any;
+        const startTime = '2030-01-03T09:00:00+03:00';
+        const occurrence = await addOccurrence(
+          engine,
+          classes,
+          service.id,
+          {
+            expectedVersion: 1,
+            startTime,
+            endTime: '2030-01-03T10:00:00+03:00',
+            capacity: 2,
+            published: true,
+          },
+          randomUUID(),
+        );
+        const input = {
+          offeringId: service.id,
+          occurrenceId: occurrence.id,
+          startTime,
+          customer,
+          hold: true,
+        };
+        const first = (await engine.createBooking(classes, input, randomUUID())) as any;
+        now += 5 * 60000;
+        const second = (await engine.createBooking(classes, input, randomUUID())) as any;
+        now += 5 * 60000;
+        const before = await snapshot();
+        const available = await request(
+          '/v1/availability?' +
+            new URLSearchParams({
+              offeringId: service.id,
+              date: '2030-01-03',
+            }),
+          classes,
+        );
+        assert.equal(available.status, 200);
+        assert.equal(available.value.slots.length, 1);
+        assert.equal(available.value.slots[0].remainingCapacity, 1);
+        const workspace = (await request('/v1/workspace', classes)).value;
+        assert.equal(
+          workspace.bookings.find((booking: any) => booking.id === first.id)?.status,
+          'expired',
+        );
+        assert.equal(
+          workspace.bookings.find((booking: any) => booking.id === second.id)?.status,
+          'held',
+        );
+        assert.equal(workspace.occurrences[0].id, occurrence.id);
+        assert.deepEqual(await snapshot(), before);
+      },
+    );
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await payload.destroy();
+    globalThis.gc?.();
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    const resolvedDirectory = path.resolve(directory);
+    assert.equal(path.dirname(resolvedDirectory), path.resolve(tmpdir()));
+    assert.ok(path.basename(resolvedDirectory).startsWith('nexg-read-only-'));
+    await rm(resolvedDirectory, {
+      recursive: true,
+      force: true,
+      maxRetries: 1,
+      retryDelay: 25,
+    }).catch((error: any) => {
+      if (error.code !== 'EBUSY') throw error;
+    });
+  }
+});
+
 // These assertions use a real Payload Reserve plugin and durable SQLite database.
 // They check user outcomes, transaction rollback and tenant boundaries.
 test('native booking lifecycle, concurrency, scope and durable storage', async (t) => {

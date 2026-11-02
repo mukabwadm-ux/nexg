@@ -23,9 +23,79 @@ interface MerchantContext {
   nav: MerchantNavItem[];
 }
 
-export async function merchantContext(): Promise<MerchantContext> {
-  const me = await requireMerchant();
+export async function merchantContext(
+  options: { setup?: boolean; draft?: boolean } = {},
+): Promise<MerchantContext> {
+  const me = await requireMerchant({
+    access: options.draft ? 'setup' : options.setup ? 'shell' : 'operations',
+  });
   const supabase = createClient();
+
+  if (!me.access.operations || ((options.setup || options.draft) && me.access.state !== 'legacy')) {
+    // This is a safe shell summary, not an operational view with hidden data.
+    const { data, error } = await supabase
+      .from('merchant')
+      .select('id,trading_name,status,contact_name')
+      .eq('id', me.id)
+      .maybeSingle();
+    if (error) throw new Error('Your business setup could not be loaded. Please retry.');
+    const m = data
+      ? ({
+          merchant_id: data.id,
+          name: data.trading_name,
+          status: data.status,
+          contact_name: data.contact_name,
+          city: '',
+          accepting_orders: false,
+          busy_mode_until: null,
+          readiness_pct: 0,
+          readiness: {},
+          stores: 0,
+          items_available: 0,
+          unread_messages: 0,
+          documents_missing: 0,
+          documents_to_fix: 0,
+          documents_expiring: 0,
+          documents_asked_for: 0,
+          orders_today: 0,
+          orders_open: 0,
+          earned_today_cents: 0,
+          terms_to_accept: false,
+          featured_state: null,
+          health_band: null,
+          health_score: null,
+          prep_minutes: null,
+          pay_on_delivery: false,
+          pay_on_delivery_cap_kes: null,
+          contact_phone: null,
+          contact_email: null,
+          payout_rail: null,
+          went_live_at: null,
+          status_reason: null,
+        } satisfies MerchantHome)
+      : null;
+    const safeDestinations = new Set([
+      '/merchant',
+      '/merchant/support',
+      '/merchant/stores',
+      '/merchant/hours',
+      '/merchant/documents',
+      '/merchant/menu',
+    ]);
+    return {
+      me,
+      supabase,
+      m,
+      live: false,
+      nav: merchantNav({
+        live: false,
+        ordersOpen: 0,
+        unreadMessages: 0,
+        documentsToDo: 0,
+        openDisputes: 0,
+      }).map((item) => ({ ...item, locked: !safeDestinations.has(item.href), badge: null })),
+    };
+  }
 
   const { data } = await supabase
     .from('merchant_home_v')
@@ -78,14 +148,8 @@ export function PageHead({
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="font-serif text-[1.875rem] font-extrabold leading-tight tracking-tight">
-          {title}
-        </h1>
-        {lead ? (
-          <p className="text-muted mt-2 max-w-3xl text-[0.9375rem] font-semibold leading-[1.7]">
-            {lead}
-          </p>
-        ) : null}
+        <h1 className="font-sans text-[1.75rem] font-bold leading-tight tracking-tight">{title}</h1>
+        {lead ? <p className="text-muted mt-2 max-w-3xl text-sm leading-relaxed">{lead}</p> : null}
       </div>
       {actions ? <div className="flex shrink-0 flex-wrap gap-2">{actions}</div> : null}
     </div>
@@ -96,7 +160,7 @@ export function PageHead({
  * The padding a board sits in. Full width, with a gutter.
  */
 export function Board({ children }: { children: React.ReactNode }) {
-  return <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">{children}</div>;
+  return <div className="space-y-6 px-4 py-6 sm:px-6 lg:px-7">{children}</div>;
 }
 
 /**

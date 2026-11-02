@@ -1,4 +1,5 @@
 import { bookingCustomerSession, forwardBookingRequest, problem } from '@/lib/booking/bridge';
+import { publicMerchantBookingAccess } from '@/lib/booking/public-access';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,6 +11,10 @@ async function route(
   const businessId = context.params.businessId;
   if (!/^[a-zA-Z0-9_-]{1,128}$/.test(businessId))
     return problem(404, 'This booking page does not exist.', 'not_found');
+  const access = await publicMerchantBookingAccess(request, businessId);
+  if (access === 'not_found') return problem(404, 'This booking page does not exist.', 'not_found');
+  if (access !== 'available')
+    return problem(503, 'This merchant booking page could not be checked.', 'publication_unavailable');
   const secret = process.env.BOOKING_BRIDGE_SECRET;
   if (!secret || secret.length < 32)
     return problem(

@@ -1,0 +1,11 @@
+{
+  "clientDate": "2026-11-02",
+  "status": "PASS",
+  "scope": "Targeted checks after RegistryQuestions, payload and Home draft handling changed.",
+  "checks": [
+    "Clearing the last optional choice removes the answer and permits continuing.",
+    "Unassigned and inactive captured listings survive the submit callback without zero-priced defaults.",
+    "Home shows retained drafts that still need activity selection."
+  ],
+  "pageErrors": []
+}

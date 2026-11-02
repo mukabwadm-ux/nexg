@@ -194,8 +194,12 @@ export async function bootstrapMerchantBooking(identity: BookingIdentity) {
   if (!identity.answers && !identity.subcategoryId) return;
   const secret = process.env.BOOKING_BRIDGE_SECRET;
   const service = process.env.BOOKING_ENGINE_URL;
-  if (!secret || secret.length < 32 || !service) return;
-  const target = new URL('/v1/bootstrap', service);
+  if (!secret || secret.length < 32 || !service)
+    throw new Error('The booking connection has not been configured.');
+  const base = new URL(service);
+  if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password)
+    throw new Error('The booking connection is invalid.');
+  const target = new URL('/v1/bootstrap', base);
   const response = await fetch(target, {
     method: 'POST',
     headers: { ...bookingHeaders(identity, secret), 'content-type': 'application/json' },

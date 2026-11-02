@@ -1,0 +1,787 @@
+{
+  "date": "2026-10-31",
+  "scope": "All six baseline Business tabs, including banner controls, desktop default state and recovered-profile notice. Overflow is measured, not hidden. Mobile and unbounded lists use their own responsive behavior.",
+  "checks": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "section": "profile",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 430,
+          "contentHeight": 430,
+          "availableWidth": 688,
+          "contentWidth": 688,
+          "bottom": 623
+        },
+        {
+          "region": "bu-card",
+          "availableHeight": 317,
+          "contentHeight": 317,
+          "availableWidth": 360,
+          "contentWidth": 360,
+          "bottom": 511
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "section": "activities",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 430,
+          "contentHeight": 430,
+          "availableWidth": 643,
+          "contentWidth": 643,
+          "bottom": 623
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 300,
+          "contentHeight": 300,
+          "availableWidth": 405,
+          "contentWidth": 405,
+          "bottom": 575
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "section": "locations",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 430,
+          "contentHeight": 430,
+          "availableWidth": 643,
+          "contentWidth": 643,
+          "bottom": 623
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 300,
+          "contentHeight": 301,
+          "availableWidth": 405,
+          "contentWidth": 405,
+          "bottom": 575
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "section": "team",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 430,
+          "contentHeight": 430,
+          "availableWidth": 643,
+          "contentWidth": 643,
+          "bottom": 623
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 321,
+          "contentHeight": 321,
+          "availableWidth": 405,
+          "contentWidth": 405,
+          "bottom": 576
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "section": "documents",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 430,
+          "contentHeight": 430,
+          "availableWidth": 643,
+          "contentWidth": 643,
+          "bottom": 623
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 323,
+          "contentHeight": 323,
+          "availableWidth": 405,
+          "contentWidth": 405,
+          "bottom": 575
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "section": "feedback",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 430,
+          "contentHeight": 430,
+          "availableWidth": 643,
+          "contentWidth": 643,
+          "bottom": 623
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 324,
+          "contentHeight": 324,
+          "availableWidth": 405,
+          "contentWidth": 405,
+          "bottom": 576
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 800
+      },
+      "section": "profile",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 587,
+          "contentHeight": 587,
+          "availableWidth": 793,
+          "contentWidth": 793,
+          "bottom": 790
+        },
+        {
+          "region": "bu-card",
+          "availableHeight": 317,
+          "contentHeight": 317,
+          "availableWidth": 415,
+          "contentWidth": 415,
+          "bottom": 522
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 800
+      },
+      "section": "activities",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 587,
+          "contentHeight": 587,
+          "availableWidth": 741,
+          "contentWidth": 741,
+          "bottom": 790
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 457,
+          "contentHeight": 457,
+          "availableWidth": 467,
+          "contentWidth": 467,
+          "bottom": 742
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 800
+      },
+      "section": "locations",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 587,
+          "contentHeight": 587,
+          "availableWidth": 741,
+          "contentWidth": 741,
+          "bottom": 790
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 457,
+          "contentHeight": 457,
+          "availableWidth": 467,
+          "contentWidth": 467,
+          "bottom": 742
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 800
+      },
+      "section": "team",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 587,
+          "contentHeight": 587,
+          "availableWidth": 741,
+          "contentWidth": 741,
+          "bottom": 790
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 478,
+          "contentHeight": 478,
+          "availableWidth": 467,
+          "contentWidth": 467,
+          "bottom": 743
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 800
+      },
+      "section": "documents",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 587,
+          "contentHeight": 587,
+          "availableWidth": 741,
+          "contentWidth": 741,
+          "bottom": 790
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 479,
+          "contentHeight": 479,
+          "availableWidth": 467,
+          "contentWidth": 467,
+          "bottom": 742
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 800
+      },
+      "section": "feedback",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 587,
+          "contentHeight": 587,
+          "availableWidth": 741,
+          "contentWidth": 741,
+          "bottom": 790
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 481,
+          "contentHeight": 481,
+          "availableWidth": 467,
+          "contentWidth": 467,
+          "bottom": 743
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1536,
+        "height": 864
+      },
+      "section": "profile",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 651,
+          "contentHeight": 651,
+          "availableWidth": 856,
+          "contentWidth": 856,
+          "bottom": 854
+        },
+        {
+          "region": "bu-card",
+          "availableHeight": 317,
+          "contentHeight": 317,
+          "availableWidth": 448,
+          "contentWidth": 448,
+          "bottom": 522
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1536,
+        "height": 864
+      },
+      "section": "activities",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 651,
+          "contentHeight": 651,
+          "availableWidth": 800,
+          "contentWidth": 800,
+          "bottom": 854
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 521,
+          "contentHeight": 521,
+          "availableWidth": 504,
+          "contentWidth": 504,
+          "bottom": 806
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1536,
+        "height": 864
+      },
+      "section": "locations",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 651,
+          "contentHeight": 651,
+          "availableWidth": 800,
+          "contentWidth": 800,
+          "bottom": 854
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 521,
+          "contentHeight": 521,
+          "availableWidth": 504,
+          "contentWidth": 504,
+          "bottom": 806
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1536,
+        "height": 864
+      },
+      "section": "team",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 651,
+          "contentHeight": 651,
+          "availableWidth": 800,
+          "contentWidth": 800,
+          "bottom": 854
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 542,
+          "contentHeight": 542,
+          "availableWidth": 504,
+          "contentWidth": 504,
+          "bottom": 807
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1536,
+        "height": 864
+      },
+      "section": "documents",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 651,
+          "contentHeight": 651,
+          "availableWidth": 800,
+          "contentWidth": 800,
+          "bottom": 854
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 543,
+          "contentHeight": 543,
+          "availableWidth": 504,
+          "contentWidth": 504,
+          "bottom": 806
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1536,
+        "height": 864
+      },
+      "section": "feedback",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 651,
+          "contentHeight": 651,
+          "availableWidth": 800,
+          "contentWidth": 800,
+          "bottom": 854
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 545,
+          "contentHeight": 545,
+          "availableWidth": 504,
+          "contentWidth": 504,
+          "bottom": 807
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "section": "profile",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 680,
+          "contentHeight": 680,
+          "availableWidth": 936,
+          "contentWidth": 936,
+          "bottom": 929
+        },
+        {
+          "region": "bu-card",
+          "availableHeight": 389,
+          "contentHeight": 389,
+          "availableWidth": 490,
+          "contentWidth": 490,
+          "bottom": 640
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "section": "activities",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 680,
+          "contentHeight": 680,
+          "availableWidth": 875,
+          "contentWidth": 875,
+          "bottom": 929
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 521,
+          "contentHeight": 521,
+          "availableWidth": 552,
+          "contentWidth": 552,
+          "bottom": 871
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "section": "locations",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 680,
+          "contentHeight": 680,
+          "availableWidth": 875,
+          "contentWidth": 875,
+          "bottom": 929
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 521,
+          "contentHeight": 521,
+          "availableWidth": 552,
+          "contentWidth": 552,
+          "bottom": 871
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "section": "team",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 680,
+          "contentHeight": 680,
+          "availableWidth": 875,
+          "contentWidth": 875,
+          "bottom": 929
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 543,
+          "contentHeight": 543,
+          "availableWidth": 552,
+          "contentWidth": 552,
+          "bottom": 871
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "section": "documents",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 680,
+          "contentHeight": 680,
+          "availableWidth": 875,
+          "contentWidth": 875,
+          "bottom": 929
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 552,
+          "contentHeight": 552,
+          "availableWidth": 552,
+          "contentWidth": 552,
+          "bottom": 871
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "section": "feedback",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 680,
+          "contentHeight": 680,
+          "availableWidth": 875,
+          "contentWidth": 875,
+          "bottom": 929
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 552,
+          "contentHeight": 552,
+          "availableWidth": 552,
+          "contentWidth": 552,
+          "bottom": 871
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 950
+      },
+      "section": "profile",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 689,
+          "contentHeight": 689,
+          "availableWidth": 1098,
+          "contentWidth": 1098,
+          "bottom": 938
+        },
+        {
+          "region": "bu-card",
+          "availableHeight": 389,
+          "contentHeight": 389,
+          "availableWidth": 576,
+          "contentWidth": 576,
+          "bottom": 640
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 950
+      },
+      "section": "activities",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 689,
+          "contentHeight": 689,
+          "availableWidth": 1026,
+          "contentWidth": 1026,
+          "bottom": 938
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 530,
+          "contentHeight": 530,
+          "availableWidth": 648,
+          "contentWidth": 648,
+          "bottom": 880
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 950
+      },
+      "section": "locations",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 689,
+          "contentHeight": 689,
+          "availableWidth": 1026,
+          "contentWidth": 1026,
+          "bottom": 938
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 530,
+          "contentHeight": 530,
+          "availableWidth": 648,
+          "contentWidth": 648,
+          "bottom": 880
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 950
+      },
+      "section": "team",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 689,
+          "contentHeight": 689,
+          "availableWidth": 1026,
+          "contentWidth": 1026,
+          "bottom": 938
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 552,
+          "contentHeight": 552,
+          "availableWidth": 648,
+          "contentWidth": 648,
+          "bottom": 880
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 950
+      },
+      "section": "documents",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 689,
+          "contentHeight": 689,
+          "availableWidth": 1026,
+          "contentWidth": 1026,
+          "bottom": 938
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 561,
+          "contentHeight": 561,
+          "availableWidth": 648,
+          "contentWidth": 648,
+          "bottom": 880
+        }
+      ],
+      "passed": true
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 950
+      },
+      "section": "feedback",
+      "regions": [
+        {
+          "region": "bu-left",
+          "availableHeight": 689,
+          "contentHeight": 689,
+          "availableWidth": 1026,
+          "contentWidth": 1026,
+          "bottom": 938
+        },
+        {
+          "region": "bu-detail-body",
+          "availableHeight": 561,
+          "contentHeight": 561,
+          "availableWidth": 648,
+          "contentWidth": 648,
+          "bottom": 880
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "recoveredProfile": true
+}

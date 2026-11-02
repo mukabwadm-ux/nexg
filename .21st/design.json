@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "project": {
+    "name": "nexg",
+    "productType": null,
+    "stack": []
+  },
+  "sources": {
+    "tokens": [],
+    "components": [],
+    "assets": [],
+    "instructions": ["PRODUCT.md"]
+  },
+  "design": {
+    "colorMode": "unknown",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [
+    {
+      "id": "merchant-compact-reference-layout",
+      "decision": "Preserve sidebar menu styling. Replace only the NEXG wordmark area with the existing Merchant workspace / Business workspace identity and remove its duplicate block. Desktop Insights must fit its metrics, charts and summary table in one viewport. Work scrolls only its queue. Shared table scrollbars reveal on interaction and fade when idle.",
+      "createdAt": "2026-11-01T13:00:00.000Z",
+      "source": "User's compact screenshot reference and explicit sidebar/scrolling corrections"
+    },
+    {
+      "id": "adaptive-insights-shared-workspace",
+      "decision": "Use the user's NEXG black, cream and gold Insights references with Nellavio-informed workspace navigation, spacing and responsive controls. Overview and Reports stay visible; merchant-specific peers follow configured activities and evidence. Retain existing UI primitives and operational behavior.",
+      "createdAt": "2026-11-01T12:00:00.000Z",
+      "source": "User-requested adaptive Insights and shared workspace implementation"
+    },
+    {
+      "id": "merchant-promotions-two-tabs",
+      "decision": "Promotions uses Campaigns and History only; Featured placement is a campaign type and customer preview stays within the shared workspace. Preserve the black, cream and gold merchant shell and omit the top status summary strip.",
+      "createdAt": "2026-10-31T20:18:28.217Z",
+      "source": "User-selected Promotions design"
+    }
+  ],
+  "evidence": [
+    {
+      "fact": "project.instructions",
+      "source": "PRODUCT.md"
+    }
+  ],
+  "generatedAt": "2026-10-31T20:22:41.459Z"
+}

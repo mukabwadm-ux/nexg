@@ -19,10 +19,21 @@ The specification lives in [`docs/`](docs/) and governs everything here
 
 ## Status
 
-**M1 — repository and design system.** The monorepo, the design tokens and all fifteen shared
-components are in place, reviewable at [`/ui-kit`](http://localhost:3001/ui-kit). The database
-(M2), homepage (M3), application flows (M4–M5) and admin review (M6) are not built yet, so both
-apps currently show a placeholder at `/`.
+As of 2 November 2026, merchant onboarding includes the short registration flow, saved merchant
+Home journey and a Phase 6 queue in the existing admin portal for reviewing new applications.
+Reviewers can approve portal access, request changes or reject against the submitted version;
+approval remains separate from publication and accepting work. The sample demo starts from
+onboarding.
+
+Local focused checks pass. The existing Next endpoint on port 3000 responds, and its
+`/merchants/register` page currently shows real registration as temporarily unavailable because
+the feature gate remains disabled. Configured Auth/PostgREST and deployment acceptance remain
+open. The local end-to-end code path through staff review is implemented and focused tests pass.
+Configured real Auth, the deployed schema and admin grants remain unverified; connected
+registration is therefore still feature-disabled. Activation/source connections and final email
+OTP follow. See [Phase 6 acceptance](docs/merchant-portal-plan/onboarding-integration/phase-6-acceptance.md),
+[Phase 5 limits](docs/merchant-portal-plan/onboarding-integration/phase-5-acceptance.md) and the
+[current handoff](docs/handoff/HANDOFF.md).
 
 ## Prerequisites
 

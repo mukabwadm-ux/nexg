@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { updateProfile, type Outcome } from '@/app/rider/actions';
+import { updateProfile, type Outcome } from '@/app/(customer)/rider/actions';
 
 import { Panel } from './bits';
 

@@ -1,0 +1,102 @@
+{
+  "startedAt": "2026-11-01T12:01:04.384Z",
+  "base": "http://127.0.0.1:3141",
+  "scope": "Local sample frontend; no live reporting correctness, authorization or accessibility certification claim.",
+  "screenshots": false,
+  "cases": [
+    {
+      "name": "Restaurant overview, eight peers and distinct request/finance bases",
+      "status": "passed",
+      "durationMs": 14340,
+      "evidence": {
+        "tabs": [
+          "Overview",
+          "Orders",
+          "Menu",
+          "Customers",
+          "Operations",
+          "Promotions",
+          "Finance",
+          "Reports"
+        ],
+        "completed": 1176,
+        "requested": 1248,
+        "netPostedCreditKES": 1099560
+      }
+    },
+    {
+      "name": "Branch and date scope recompute from evidence",
+      "status": "passed",
+      "durationMs": 10670,
+      "evidence": {
+        "westlandsCompleted": 3,
+        "lastWeekKarenCompleted": 336
+      }
+    },
+    {
+      "name": "Chart table exposes the same full-period values",
+      "status": "passed",
+      "durationMs": 6546,
+      "evidence": {
+        "values": [
+          "252",
+          "280",
+          "308",
+          "336"
+        ],
+        "sum": 1176
+      }
+    },
+    {
+      "name": "Definition opens exact contributors and Back restores scoped origin",
+      "status": "passed",
+      "durationMs": 21719,
+      "evidence": {
+        "contributor": "WEST-3",
+        "exportedRows": 1,
+        "restoredLocation": "westlands",
+        "restoredFrom": "2026-10-25"
+      }
+    },
+    {
+      "name": "Exact metric CSV exports every matching row, beyond table pagination",
+      "status": "passed",
+      "durationMs": 14599,
+      "evidence": {
+        "rows": 1176,
+        "uniqueReferences": 1176,
+        "excludedCancelledOpenAndOtherBranch": true
+      }
+    },
+    {
+      "name": "Keyword filter updates totals and CSV with the exact matching record",
+      "status": "passed",
+      "durationMs": 19632,
+      "evidence": {
+        "keyword": "ORD-1248",
+        "exportedReferences": [
+          "ORD-1248"
+        ],
+        "clearRestores": 1248
+      }
+    },
+    {
+      "name": "Reports library search, selection and complete workspace",
+      "status": "passed",
+      "durationMs": 16052,
+      "evidence": {
+        "search": "ready",
+        "matchingReports": 1,
+        "reportOpened": true
+      }
+    }
+  ],
+  "runtimeErrors": [],
+  "forbiddenRequests": [],
+  "mutations": [],
+  "passed": 7,
+  "failed": 0,
+  "status": "INTERRUPTED_BY_USER",
+  "reason": "Stopped immediately when the user directed that unchanged passing tests must not be repeated.",
+  "stoppedAt": "2026-11-01T12:03:45.2920995Z"
+}

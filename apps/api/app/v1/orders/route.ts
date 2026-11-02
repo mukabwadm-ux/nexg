@@ -1,11 +1,9 @@
 /**
  * GET /v1/orders
- * GET /v1/orders/{id}
  *
  * A merchant reads their bookings through the API.
  *
- * Without a path param: a cursor-paginated list of orders, newest first.
- * With a path param: a single order by ID.
+ * A cursor-paginated list of orders, newest first.
  *
  * The key decides the merchant. The caller never names one, so a key
  * cannot read another merchant's orders by guessing a UUID.
@@ -37,10 +35,10 @@ export async function GET(
   try {
     credential = await authenticate(request);
     requireScope(credential, API_SCOPES.merchant_read);
-    await enforceRateLimit(credential);
+    await enforceRateLimit(credential, request, 'merchant_read');
   } catch (e) {
     if (e instanceof ApiAuthError) {
-      return jsonError(e.code, e.message, { status: e.status });
+      return jsonError(e.code, e.message, { status: e.status, retryAfter: e.retryAfter });
     }
     return jsonError('internal_error', 'Something went wrong on our side.', { status: 500 });
   }
@@ -77,7 +75,7 @@ export async function GET(
 
       return jsonError(
         refused ? 'not_found' : badRequest ? 'invalid_request' : 'internal_error',
-        error.message,
+        refused ? 'This credential cannot read that order.' : 'The order could not be read.',
         { status: refused ? 403 : badRequest ? 400 : 500 },
       );
     }
@@ -100,7 +98,7 @@ export async function GET(
       },
       {
         headers: {
-          'Cache-Control': 'private, max-age=60, stale-while-revalidate=300',
+          'Cache-Control': 'no-store',
         },
       },
     );
@@ -151,7 +149,7 @@ export async function GET(
     const refused = (error as { code?: string }).code === '42501';
     return jsonError(
       refused ? 'not_found' : 'internal_error',
-      error.message,
+      refused ? 'This credential cannot read orders.' : 'The orders could not be read.',
       { status: refused ? 403 : 500 },
     );
   }
@@ -185,7 +183,7 @@ export async function GET(
     },
     {
       headers: {
-        'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+        'Cache-Control': 'no-store',
       },
     },
   );

@@ -1,0 +1,1154 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "name": "1920x1080 hours",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "document": {
+        "width": 1920,
+        "height": 1080
+      },
+      "card": {
+        "top": 402.25,
+        "right": 1542,
+        "bottom": 1022,
+        "height": 619.75,
+        "width": 1244,
+        "clientH": 618,
+        "scrollH": 618,
+        "clientW": 1242,
+        "scrollW": 1242
+      },
+      "content": {
+        "top": 463.25,
+        "right": 1541,
+        "bottom": 989.5,
+        "height": 526.25,
+        "width": 1242,
+        "clientH": 526,
+        "scrollH": 526,
+        "clientW": 1242,
+        "scrollW": 1242
+      },
+      "inspector": null,
+      "action": null,
+      "footer": {
+        "top": 1022,
+        "right": 1898,
+        "bottom": 1070,
+        "height": 48,
+        "width": 1600,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1600,
+        "scrollW": 1600
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1920x1080 rental selected",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "document": {
+        "width": 1920,
+        "height": 1080
+      },
+      "card": {
+        "top": 406.25,
+        "right": 1542,
+        "bottom": 1022,
+        "height": 615.75,
+        "width": 1244,
+        "clientH": 614,
+        "scrollH": 614,
+        "clientW": 1242,
+        "scrollW": 1242
+      },
+      "content": {
+        "top": 407.25,
+        "right": 1541,
+        "bottom": 958.5,
+        "height": 551.25,
+        "width": 1242,
+        "clientH": 551,
+        "scrollH": 551,
+        "clientW": 1242,
+        "scrollW": 1242
+      },
+      "inspector": {
+        "top": 278.75,
+        "right": 1898,
+        "bottom": 1022,
+        "height": 743.25,
+        "width": 340,
+        "clientH": 741,
+        "scrollH": 741,
+        "clientW": 338,
+        "scrollW": 338
+      },
+      "action": {
+        "top": 896,
+        "right": 1882,
+        "bottom": 934,
+        "height": 38,
+        "width": 308,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 306,
+        "scrollW": 306
+      },
+      "footer": {
+        "top": 1022,
+        "right": 1898,
+        "bottom": 1070,
+        "height": 48,
+        "width": 1600,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1600,
+        "scrollW": 1600
+      },
+      "days": 7,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1920x1080 appointments selected",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "document": {
+        "width": 1920,
+        "height": 1080
+      },
+      "card": {
+        "top": 383.75,
+        "right": 1542,
+        "bottom": 1022,
+        "height": 638.25,
+        "width": 1244,
+        "clientH": 636,
+        "scrollH": 636,
+        "clientW": 1242,
+        "scrollW": 1242
+      },
+      "content": {
+        "top": 384.75,
+        "right": 1541,
+        "bottom": 958.5,
+        "height": 573.75,
+        "width": 1242,
+        "clientH": 574,
+        "scrollH": 574,
+        "clientW": 1242,
+        "scrollW": 1242
+      },
+      "inspector": {
+        "top": 278.75,
+        "right": 1898,
+        "bottom": 1022,
+        "height": 743.25,
+        "width": 340,
+        "clientH": 741,
+        "scrollH": 741,
+        "clientW": 338,
+        "scrollW": 338
+      },
+      "action": {
+        "top": 896,
+        "right": 1882,
+        "bottom": 934,
+        "height": 38,
+        "width": 308,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 306,
+        "scrollW": 306
+      },
+      "footer": {
+        "top": 1022,
+        "right": 1898,
+        "bottom": 1070,
+        "height": 48,
+        "width": 1600,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1600,
+        "scrollW": 1600
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1672x941 hours",
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "document": {
+        "width": 1672,
+        "height": 941
+      },
+      "card": {
+        "top": 402.25,
+        "right": 1294,
+        "bottom": 883,
+        "height": 480.75,
+        "width": 1029.5625,
+        "clientH": 479,
+        "scrollH": 479,
+        "clientW": 1028,
+        "scrollW": 1028
+      },
+      "content": {
+        "top": 463.25,
+        "right": 1293,
+        "bottom": 850.5,
+        "height": 387.25,
+        "width": 1027.5625,
+        "clientH": 387,
+        "scrollH": 387,
+        "clientW": 1028,
+        "scrollW": 1028
+      },
+      "inspector": null,
+      "action": null,
+      "footer": {
+        "top": 883,
+        "right": 1650,
+        "bottom": 931,
+        "height": 48,
+        "width": 1385.5625,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1386,
+        "scrollW": 1386
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1672x941 rental selected",
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "document": {
+        "width": 1672,
+        "height": 941
+      },
+      "card": {
+        "top": 406.25,
+        "right": 1294,
+        "bottom": 883,
+        "height": 476.75,
+        "width": 1029.5625,
+        "clientH": 475,
+        "scrollH": 475,
+        "clientW": 1028,
+        "scrollW": 1028
+      },
+      "content": {
+        "top": 407.25,
+        "right": 1293,
+        "bottom": 819.5,
+        "height": 412.25,
+        "width": 1027.5625,
+        "clientH": 412,
+        "scrollH": 412,
+        "clientW": 1028,
+        "scrollW": 1028
+      },
+      "inspector": {
+        "top": 278.75,
+        "right": 1650,
+        "bottom": 883,
+        "height": 604.25,
+        "width": 340,
+        "clientH": 602,
+        "scrollH": 602,
+        "clientW": 338,
+        "scrollW": 338
+      },
+      "action": {
+        "top": 757,
+        "right": 1634,
+        "bottom": 795,
+        "height": 38,
+        "width": 308,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 306,
+        "scrollW": 306
+      },
+      "footer": {
+        "top": 883,
+        "right": 1650,
+        "bottom": 931,
+        "height": 48,
+        "width": 1385.5625,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1386,
+        "scrollW": 1386
+      },
+      "days": 7,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1672x941 appointments selected",
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "document": {
+        "width": 1672,
+        "height": 941
+      },
+      "card": {
+        "top": 383.75,
+        "right": 1294,
+        "bottom": 883,
+        "height": 499.25,
+        "width": 1029.5625,
+        "clientH": 497,
+        "scrollH": 497,
+        "clientW": 1028,
+        "scrollW": 1028
+      },
+      "content": {
+        "top": 384.75,
+        "right": 1293,
+        "bottom": 819.5,
+        "height": 434.75,
+        "width": 1027.5625,
+        "clientH": 435,
+        "scrollH": 435,
+        "clientW": 1028,
+        "scrollW": 1028
+      },
+      "inspector": {
+        "top": 278.75,
+        "right": 1650,
+        "bottom": 883,
+        "height": 604.25,
+        "width": 340,
+        "clientH": 602,
+        "scrollH": 602,
+        "clientW": 338,
+        "scrollW": 338
+      },
+      "action": {
+        "top": 757,
+        "right": 1634,
+        "bottom": 795,
+        "height": 38,
+        "width": 308,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 306,
+        "scrollW": 306
+      },
+      "footer": {
+        "top": 883,
+        "right": 1650,
+        "bottom": 931,
+        "height": 48,
+        "width": 1385.5625,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1386,
+        "scrollW": 1386
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1672x941 docked maintenance",
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "document": {
+        "width": 1672,
+        "height": 941
+      },
+      "card": {
+        "top": 406.25,
+        "right": 1256,
+        "bottom": 883,
+        "height": 476.75,
+        "width": 991.5625,
+        "clientH": 475,
+        "scrollH": 475,
+        "clientW": 990,
+        "scrollW": 990
+      },
+      "content": {
+        "top": 407.25,
+        "right": 1255,
+        "bottom": 819.5,
+        "height": 412.25,
+        "width": 989.5625,
+        "clientH": 412,
+        "scrollH": 412,
+        "clientW": 990,
+        "scrollW": 990
+      },
+      "inspector": null,
+      "action": null,
+      "footer": {
+        "top": 883,
+        "right": 1256,
+        "bottom": 931,
+        "height": 48,
+        "width": 991.5625,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 992,
+        "scrollW": 992
+      },
+      "days": 7,
+      "drawer": {
+        "top": 72,
+        "right": 1656,
+        "bottom": 925,
+        "height": 853,
+        "width": 380,
+        "clientH": 851,
+        "scrollH": 851,
+        "clientW": 378,
+        "scrollW": 378
+      },
+      "impact": {
+        "top": 494.6875,
+        "right": 1639,
+        "bottom": 667.109375,
+        "height": 172.421875,
+        "width": 346,
+        "clientH": 170,
+        "scrollH": 170,
+        "clientW": 344,
+        "scrollW": 344
+      },
+      "dialogBody": {
+        "top": 167.1875,
+        "right": 1655,
+        "bottom": 720.609375,
+        "height": 553.421875,
+        "width": 378,
+        "clientH": 553,
+        "scrollH": 553,
+        "clientW": 378,
+        "scrollW": 378
+      },
+      "lastAffected": {
+        "top": 604.3125,
+        "right": 1626,
+        "bottom": 655.109375,
+        "height": 50.796875,
+        "width": 320,
+        "clientH": 50,
+        "scrollH": 50,
+        "clientW": 320,
+        "scrollW": 320
+      }
+    },
+    {
+      "name": "1440x900 hours",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "document": {
+        "width": 1440,
+        "height": 900
+      },
+      "card": {
+        "top": 402.25,
+        "right": 1062,
+        "bottom": 842,
+        "height": 439.75,
+        "width": 831.203125,
+        "clientH": 438,
+        "scrollH": 438,
+        "clientW": 829,
+        "scrollW": 829
+      },
+      "content": {
+        "top": 463.25,
+        "right": 1061,
+        "bottom": 809.5,
+        "height": 346.25,
+        "width": 829.203125,
+        "clientH": 346,
+        "scrollH": 346,
+        "clientW": 829,
+        "scrollW": 829
+      },
+      "inspector": null,
+      "action": null,
+      "footer": {
+        "top": 842,
+        "right": 1418,
+        "bottom": 890,
+        "height": 48,
+        "width": 1187.203125,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1187,
+        "scrollW": 1187
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1440x900 rental selected",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "document": {
+        "width": 1440,
+        "height": 900
+      },
+      "card": {
+        "top": 406.25,
+        "right": 1062,
+        "bottom": 842,
+        "height": 435.75,
+        "width": 831.203125,
+        "clientH": 434,
+        "scrollH": 434,
+        "clientW": 829,
+        "scrollW": 829
+      },
+      "content": {
+        "top": 407.25,
+        "right": 1061,
+        "bottom": 778.5,
+        "height": 371.25,
+        "width": 829.203125,
+        "clientH": 371,
+        "scrollH": 371,
+        "clientW": 829,
+        "scrollW": 829
+      },
+      "inspector": {
+        "top": 278.75,
+        "right": 1418,
+        "bottom": 842,
+        "height": 563.25,
+        "width": 340,
+        "clientH": 561,
+        "scrollH": 561,
+        "clientW": 338,
+        "scrollW": 338
+      },
+      "action": {
+        "top": 716,
+        "right": 1402,
+        "bottom": 754,
+        "height": 38,
+        "width": 308,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 306,
+        "scrollW": 306
+      },
+      "footer": {
+        "top": 842,
+        "right": 1418,
+        "bottom": 890,
+        "height": 48,
+        "width": 1187.203125,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1187,
+        "scrollW": 1187
+      },
+      "days": 7,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1440x900 appointments selected",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "document": {
+        "width": 1440,
+        "height": 900
+      },
+      "card": {
+        "top": 383.75,
+        "right": 1062,
+        "bottom": 842,
+        "height": 458.25,
+        "width": 831.203125,
+        "clientH": 456,
+        "scrollH": 456,
+        "clientW": 829,
+        "scrollW": 829
+      },
+      "content": {
+        "top": 384.75,
+        "right": 1061,
+        "bottom": 778.5,
+        "height": 393.75,
+        "width": 829.203125,
+        "clientH": 394,
+        "scrollH": 394,
+        "clientW": 829,
+        "scrollW": 829
+      },
+      "inspector": {
+        "top": 278.75,
+        "right": 1418,
+        "bottom": 842,
+        "height": 563.25,
+        "width": 340,
+        "clientH": 561,
+        "scrollH": 561,
+        "clientW": 338,
+        "scrollW": 338
+      },
+      "action": {
+        "top": 716,
+        "right": 1402,
+        "bottom": 754,
+        "height": 38,
+        "width": 308,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 306,
+        "scrollW": 306
+      },
+      "footer": {
+        "top": 842,
+        "right": 1418,
+        "bottom": 890,
+        "height": 48,
+        "width": 1187.203125,
+        "clientH": 48,
+        "scrollH": 48,
+        "clientW": 1187,
+        "scrollW": 1187
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1280x720 hours",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "document": {
+        "width": 1280,
+        "height": 720
+      },
+      "card": {
+        "top": 292.546875,
+        "right": 970,
+        "bottom": 676,
+        "height": 383.453125,
+        "width": 766.40625,
+        "clientH": 381,
+        "scrollH": 381,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "content": {
+        "top": 328.546875,
+        "right": 969,
+        "bottom": 658.3125,
+        "height": 329.765625,
+        "width": 764.40625,
+        "clientH": 330,
+        "scrollH": 330,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "inspector": null,
+      "action": null,
+      "footer": {
+        "top": 676,
+        "right": 1262,
+        "bottom": 712,
+        "height": 36,
+        "width": 1058.40625,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 1058,
+        "scrollW": 1058
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1280x720 rental selected",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "document": {
+        "width": 1280,
+        "height": 720
+      },
+      "card": {
+        "top": 289.796875,
+        "right": 970,
+        "bottom": 676,
+        "height": 386.203125,
+        "width": 766.40625,
+        "clientH": 384,
+        "scrollH": 384,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "content": {
+        "top": 290.796875,
+        "right": 969,
+        "bottom": 633.3125,
+        "height": 342.515625,
+        "width": 764.40625,
+        "clientH": 343,
+        "scrollH": 343,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "inspector": {
+        "top": 198.796875,
+        "right": 1262,
+        "bottom": 676,
+        "height": 477.203125,
+        "width": 280,
+        "clientH": 475,
+        "scrollH": 475,
+        "clientW": 278,
+        "scrollW": 278
+      },
+      "action": {
+        "top": 553,
+        "right": 1249,
+        "bottom": 591,
+        "height": 38,
+        "width": 254,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 252,
+        "scrollW": 252
+      },
+      "footer": {
+        "top": 676,
+        "right": 1262,
+        "bottom": 712,
+        "height": 36,
+        "width": 1058.40625,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 1058,
+        "scrollW": 1058
+      },
+      "days": 7,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1280x720 appointments selected",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "document": {
+        "width": 1280,
+        "height": 720
+      },
+      "card": {
+        "top": 274.796875,
+        "right": 970,
+        "bottom": 676,
+        "height": 401.203125,
+        "width": 766.40625,
+        "clientH": 399,
+        "scrollH": 399,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "content": {
+        "top": 275.796875,
+        "right": 969,
+        "bottom": 633.3125,
+        "height": 357.515625,
+        "width": 764.40625,
+        "clientH": 358,
+        "scrollH": 358,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "inspector": {
+        "top": 198.796875,
+        "right": 1262,
+        "bottom": 676,
+        "height": 477.203125,
+        "width": 280,
+        "clientH": 475,
+        "scrollH": 475,
+        "clientW": 278,
+        "scrollW": 278
+      },
+      "action": {
+        "top": 553,
+        "right": 1249,
+        "bottom": 591,
+        "height": 38,
+        "width": 254,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 252,
+        "scrollW": 252
+      },
+      "footer": {
+        "top": 676,
+        "right": 1262,
+        "bottom": 712,
+        "height": 36,
+        "width": 1058.40625,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 1058,
+        "scrollW": 1058
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1280x633 hours",
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "document": {
+        "width": 1280,
+        "height": 633
+      },
+      "card": {
+        "top": 292.546875,
+        "right": 970,
+        "bottom": 589,
+        "height": 296.453125,
+        "width": 766.40625,
+        "clientH": 294,
+        "scrollH": 294,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "content": {
+        "top": 328.546875,
+        "right": 969,
+        "bottom": 571.3125,
+        "height": 242.765625,
+        "width": 764.40625,
+        "clientH": 243,
+        "scrollH": 243,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "inspector": null,
+      "action": null,
+      "footer": {
+        "top": 589,
+        "right": 1262,
+        "bottom": 625,
+        "height": 36,
+        "width": 1058.40625,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 1058,
+        "scrollW": 1058
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1280x633 rental selected",
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "document": {
+        "width": 1280,
+        "height": 633
+      },
+      "card": {
+        "top": 289.796875,
+        "right": 970,
+        "bottom": 589,
+        "height": 299.203125,
+        "width": 766.40625,
+        "clientH": 297,
+        "scrollH": 297,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "content": {
+        "top": 290.796875,
+        "right": 969,
+        "bottom": 546.3125,
+        "height": 255.515625,
+        "width": 764.40625,
+        "clientH": 256,
+        "scrollH": 256,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "inspector": {
+        "top": 198.796875,
+        "right": 1262,
+        "bottom": 589,
+        "height": 390.203125,
+        "width": 280,
+        "clientH": 388,
+        "scrollH": 388,
+        "clientW": 278,
+        "scrollW": 278
+      },
+      "action": {
+        "top": 466,
+        "right": 1249,
+        "bottom": 504,
+        "height": 38,
+        "width": 254,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 252,
+        "scrollW": 252
+      },
+      "footer": {
+        "top": 589,
+        "right": 1262,
+        "bottom": 625,
+        "height": 36,
+        "width": 1058.40625,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 1058,
+        "scrollW": 1058
+      },
+      "days": 7,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1280x633 appointments selected",
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "document": {
+        "width": 1280,
+        "height": 633
+      },
+      "card": {
+        "top": 274.796875,
+        "right": 970,
+        "bottom": 589,
+        "height": 314.203125,
+        "width": 766.40625,
+        "clientH": 312,
+        "scrollH": 312,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "content": {
+        "top": 275.796875,
+        "right": 969,
+        "bottom": 546.3125,
+        "height": 270.515625,
+        "width": 764.40625,
+        "clientH": 271,
+        "scrollH": 271,
+        "clientW": 764,
+        "scrollW": 764
+      },
+      "inspector": {
+        "top": 198.796875,
+        "right": 1262,
+        "bottom": 589,
+        "height": 390.203125,
+        "width": 280,
+        "clientH": 388,
+        "scrollH": 388,
+        "clientW": 278,
+        "scrollW": 278
+      },
+      "action": {
+        "top": 466,
+        "right": 1249,
+        "bottom": 504,
+        "height": 38,
+        "width": 254,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 252,
+        "scrollW": 252
+      },
+      "footer": {
+        "top": 589,
+        "right": 1262,
+        "bottom": 625,
+        "height": 36,
+        "width": 1058.40625,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 1058,
+        "scrollW": 1058
+      },
+      "days": 0,
+      "drawer": null,
+      "impact": null,
+      "dialogBody": null,
+      "lastAffected": null
+    },
+    {
+      "name": "1280x633 docked maintenance",
+      "viewport": {
+        "width": 1280,
+        "height": 633
+      },
+      "document": {
+        "width": 1280,
+        "height": 633
+      },
+      "card": {
+        "top": 289.796875,
+        "right": 944,
+        "bottom": 589,
+        "height": 299.203125,
+        "width": 740.40625,
+        "clientH": 297,
+        "scrollH": 297,
+        "clientW": 738,
+        "scrollW": 738
+      },
+      "content": {
+        "top": 290.796875,
+        "right": 943,
+        "bottom": 546.3125,
+        "height": 255.515625,
+        "width": 738.40625,
+        "clientH": 256,
+        "scrollH": 256,
+        "clientW": 738,
+        "scrollW": 738
+      },
+      "inspector": null,
+      "action": null,
+      "footer": {
+        "top": 589,
+        "right": 944,
+        "bottom": 625,
+        "height": 36,
+        "width": 740.40625,
+        "clientH": 36,
+        "scrollH": 36,
+        "clientW": 740,
+        "scrollW": 740
+      },
+      "days": 7,
+      "drawer": {
+        "top": 54,
+        "right": 1264,
+        "bottom": 621,
+        "height": 567,
+        "width": 300,
+        "clientH": 565,
+        "scrollH": 565,
+        "clientW": 298,
+        "scrollW": 298
+      },
+      "impact": {
+        "top": 394,
+        "right": 1251,
+        "bottom": 581.8125,
+        "height": 187.8125,
+        "width": 274,
+        "clientH": 186,
+        "scrollH": 186,
+        "clientW": 272,
+        "scrollW": 272
+      },
+      "dialogBody": {
+        "top": 116,
+        "right": 1263,
+        "bottom": 573,
+        "height": 457,
+        "width": 298,
+        "clientH": 457,
+        "scrollH": 502,
+        "clientW": 298,
+        "scrollW": 298
+      },
+      "lastAffected": {
+        "top": 519.015625,
+        "right": 1238,
+        "bottom": 569.8125,
+        "height": 50.796875,
+        "width": 248,
+        "clientH": 50,
+        "scrollH": 50,
+        "clientW": 248,
+        "scrollW": 248
+      }
+    }
+  ],
+  "errors": [],
+  "writes": []
+}

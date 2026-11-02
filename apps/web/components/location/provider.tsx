@@ -105,7 +105,16 @@ export function SiteLocationProvider({
   );
 
   return (
-    <LocationProvider actions={actions} initial={initial} maps={MAPS} passive={isBookingPage(pathname)}>
+    <LocationProvider
+      actions={actions}
+      initial={initial}
+      maps={MAPS}
+      passive={
+        isBookingPage(pathname) ||
+        pathname === '/merchant-live-preview' ||
+        pathname.startsWith('/merchant-live-preview/')
+      }
+    >
       {children}
     </LocationProvider>
   );

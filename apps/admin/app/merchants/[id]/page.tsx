@@ -1,7 +1,7 @@
 import { Card, StatusBadge, type StatusKey } from '@nexg/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { goLive, rejectDocument, verifyDocument } from '@/app/merchants/actions';
 import { fileDocumentFor, remindToUpload } from '@/app/documents/actions';
@@ -13,7 +13,9 @@ import { DocumentReview, type ReviewDocument } from '@/components/document-revie
 import { FeaturedNow } from '@/components/featured/place-merchant';
 import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
-import { requireStaff } from '@/lib/staff';
+import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
+import { isManagedMerchantApplication, ReviewSourceError } from '@/lib/merchant-application-review';
+import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Merchant application' };
@@ -21,6 +23,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function MerchantApplicationPage({ params }: { params: { id: string } }) {
   const staff = await requireStaff();
+  requireModule(staff, 'merchants');
+  let managed: boolean;
+  try { managed = await isManagedMerchantApplication(params.id); }
+  catch (error) {
+    return <ConsoleShell staff={staff} current="/merchants"><ConsoleHeader title="Merchant application" breadcrumb="Merchants / Application" /><main className="px-4 py-6 sm:px-8"><ApplicationReviewUnavailable status={error instanceof ReviewSourceError ? error.status : 503} /></main></ConsoleShell>;
+  }
+  if (managed) redirect(`/merchants/applications/${encodeURIComponent(params.id)}`);
   const supabase = createClient();
 
   const { data: merchant } = await supabase

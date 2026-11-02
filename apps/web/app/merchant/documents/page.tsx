@@ -12,7 +12,7 @@ export const metadata = { title: 'Documents' };
 export const dynamic = 'force-dynamic';
 
 export default async function MerchantDocuments() {
-  const me = await requireMerchant();
+  const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 
   const [{ data: reqs, error }, { data: docs }, { data: asked }] = await Promise.all([

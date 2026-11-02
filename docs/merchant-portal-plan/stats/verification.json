@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-31",
+  "status": "STATISTICS_DESIGN_CHECKS_PASSED",
+  "scope": "Static registry/profile/predicate/source references and independent design arithmetic examples. No frontend, live collector, provider connection or production calculation executed.",
+  "counts": {
+    "categories": 21,
+    "homeProfiles": 128,
+    "workflowFamilies": 17,
+    "predicates": 88,
+    "metricDefinitions": 71,
+    "sourceFamilies": 8,
+    "scenarioExpectations": 1291,
+    "independentCalculationCases": 29,
+    "futureCategoryStatisticsExamples": 1,
+    "invalidStatisticsReferencesRejected": 3
+  },
+  "runtimeStatus": "NOT_IMPLEMENTED_NOT_VERIFIED",
+  "artifacts": {
+    "domain-registry.json": "66bbba0d6ee28b1bde04e666b57a8b289949d581fcd8c54cd550f7d3b8023227",
+    "profiles-128.json": "49f1acbac8c5afe225efd8cc5ed9c1056f3e77e2474db4c2d2ac7b54d5006277",
+    "category-manifest.schema.json": "d73cbabc69c3d78c35952db05ef792a76eec54b98f8a1c22c8ff146ca06f7fd0",
+    "example-new-category.json": "c58a868cb4bcdeaf601b5b10270b1a24f378fabb572a2bcb11e4205d8b77aa3b",
+    "stats/README.md": "df6aff8d974d0d2d84b218089467b01bc1af3844eb390282eeac34657f423c22",
+    "stats/collection-contract.md": "6952b4116061d0b8d6e0274460dcbb2aac75b80dfc9b6554b62edada51bfe236",
+    "stats/frontend-and-acceptance.md": "d3df9cd51b978eb9006d147cf37a9b841d3707c9e2b9949192d0e3b6757a4dfb",
+    "stats/sources.json": "5c35997341f28ae5cb1849e6993cfad4cfc52c098bb267955f4048c01d632ee3",
+    "stats/workflow-stats.json": "dc52899e47eaacb43c6f6c0e72be0dade906d10507deb2b65d3d8fc1b518e18b",
+    "stats/profiles-128.json": "c9a7c1a8d2c5ce946b2e19007ea6bc7df49500874cc1324b12ba85543bee5e5f",
+    "stats/profiles-128.md": "de76fddc49fec64b336ec256eea57236fb4a8fc31c3d0b349f97660eebc3356e",
+    "stats/scenario-coverage.json": "7881c8af100b1f60b221447da1c408afa8195be4e53d9aff16a3b616c3341248",
+    "stats/calculation-cases.json": "50bae204dfc0d0d1c136e093b9c7b77edca12fa2c473f453a6e82d59eb7fc8d1",
+    "stats/build-statistics.mjs": "699c20c0d741c8f717e0bdcf23f206516198dba63f3e2ea3d8c5cfd95f6a7846",
+    "stats/verify-stats.mjs": "d86f2192d0e8464aaf9c8becdefd7b80afdedc5a20a93310233e813c8eb0c14c"
+  }
+}

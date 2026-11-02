@@ -1,0 +1,56 @@
+{
+  "status": "STRUCTURAL_DESIGN_VERIFICATION_ONLY",
+  "date": "2026-10-31",
+  "checks": {
+    "uniqueProfiles": 128,
+    "categories": 21,
+    "candidateBindings": 193,
+    "primitiveDescriptors": 15,
+    "editorBridges": 18,
+    "defaultEditorModelAgreement": true,
+    "profileOfferingsWorkCandidateAgreement": true,
+    "everyCandidateHasWorkflowReference": true,
+    "everyProfileHasSpecialtyNeeds": true,
+    "everyProfileHasStateReference": true
+  },
+  "countsByDefault": {
+    "ORDER": 58,
+    "APPOINTMENT": 12,
+    "FIELD_VISIT": 4,
+    "ASSET_INTERVAL": 5,
+    "TRANSFER": 4,
+    "SESSION_CAPACITY": 7,
+    "SPACE_RESERVATION": 0,
+    "TOUR": 6,
+    "PRODUCTION_DUE": 2,
+    "REQUEST_QUOTE": 19,
+    "LINKED_WINDOWS": 3,
+    "SERVICE_JOB": 3,
+    "ENTITLEMENT": 1,
+    "FREIGHT": 3,
+    "STORAGE": 1
+  },
+  "interactiveFrontendTested": false,
+  "applicationChanged": false,
+  "onboardingChanged": false,
+  "backendChanged": false,
+  "images": {
+    "status": "GENERATED_AND_VISUALLY_REVIEWED",
+    "count": 3,
+    "manifest": "image-manifest.json",
+    "geometryIsIllustrative": true
+  },
+  "documentChecks": {
+    "allLocalLinksResolve": true,
+    "brokenLinks": [],
+    "featureIDs": 24,
+    "jsonFilesParse": 6,
+    "pngCount": 3,
+    "sourceChangesSinceSnapshot": []
+  },
+  "review": {
+    "scope": "PASS: frontend only, onboarding last",
+    "resourceAssociationOwnership": "Clarified: Offerings owns offering-resource links; Availability owns declared schedule constraints.",
+    "promptConsistency": "PASS after clarifying separate45-minute consultation and inventory ownership."
+  }
+}

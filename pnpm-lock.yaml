@@ -32,6 +32,12 @@ importers:
 
   apps/admin:
     dependencies:
+      '@nexg/booking-config':
+        specifier: workspace:*
+        version: link:../../packages/booking-config
+      '@nexg/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@nexg/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -59,6 +65,9 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
+      zod:
+        specifier: 3.24.1
+        version: 3.24.1
     devDependencies:
       '@nexg/config':
         specifier: workspace:*

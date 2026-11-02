@@ -2,7 +2,7 @@ import { Clock, FileText, Monitor, Phone, QrCode } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
-import type { Attention, HostHome, SetupProgress } from '@/app/host/layout';
+import type { Attention, HostHome, SetupProgress } from '@/app/(customer)/host/layout';
 
 import {
   Attention as AttentionCard,

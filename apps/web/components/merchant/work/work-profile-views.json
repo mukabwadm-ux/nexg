@@ -1,0 +1,1911 @@
+[
+  {
+    "subcategoryId": "adult_products",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "adult_wellness",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cigarettes",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cigars",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "vapes",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "adult_accessories",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "airport_pickup",
+    "views": [
+      {
+        "modelId": "TRANSFER",
+        "workflowIds": [
+          "WF_TRANSFER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "airport_dropoff",
+    "views": [
+      {
+        "modelId": "TRANSFER",
+        "workflowIds": [
+          "WF_TRANSFER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "meet_greet",
+    "views": [
+      {
+        "modelId": "TRANSFER",
+        "workflowIds": [
+          "WF_TRANSFER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "executive_transfer",
+    "views": [
+      {
+        "modelId": "TRANSFER",
+        "workflowIds": [
+          "WF_TRANSFER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "wine",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "spirits",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "beer",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "champagne",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cocktail_mixers",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "liquor_stores",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "mens_fashion",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "PRODUCTION_DUE",
+        "workflowIds": [
+          "WF_MADE_TO_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "womens_fashion",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "PRODUCTION_DUE",
+        "workflowIds": [
+          "WF_MADE_TO_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "kids_fashion",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "shoes",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "bags",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "watches",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "accessories",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "makeup",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "skincare",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "haircare",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "fragrances",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cosmetics_stores",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "car_rental",
+    "views": [
+      {
+        "modelId": "ASSET_INTERVAL",
+        "workflowIds": [
+          "WF_RENTAL"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "self_drive",
+    "views": [
+      {
+        "modelId": "ASSET_INTERVAL",
+        "workflowIds": [
+          "WF_RENTAL"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "corporate_rental",
+    "views": [
+      {
+        "modelId": "ASSET_INTERVAL",
+        "workflowIds": [
+          "WF_RENTAL"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "long_term_rental",
+    "views": [
+      {
+        "modelId": "ASSET_INTERVAL",
+        "workflowIds": [
+          "WF_RENTAL"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "bike_rental",
+    "views": [
+      {
+        "modelId": "ASSET_INTERVAL",
+        "workflowIds": [
+          "WF_RENTAL"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "concerts",
+    "views": [
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "festivals",
+    "views": [
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "conferences",
+    "views": [
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "private_events",
+    "views": [
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "photography",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "workshops",
+    "views": [
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "classes",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "sports_activities",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "recreation",
+    "views": [
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "banking",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "forex",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "insurance",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "payments",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "remittance",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "sacco_services",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "business_services",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "flowers",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "gift_hampers",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "PRODUCTION_DUE",
+        "workflowIds": [
+          "WF_MADE_TO_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cakes",
+    "views": [
+      {
+        "modelId": "PRODUCTION_DUE",
+        "workflowIds": [
+          "WF_MADE_TO_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "chocolates",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "personalized_gifts",
+    "views": [
+      {
+        "modelId": "PRODUCTION_DUE",
+        "workflowIds": [
+          "WF_MADE_TO_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "occasion_gifts",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "restaurant",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "SPACE_RESERVATION",
+        "workflowIds": [
+          "WF_SPACE_RESERVATION_V1"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "fast_food",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cafe",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "bakery",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "PRODUCTION_DUE",
+        "workflowIds": [
+          "WF_MADE_TO_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "desserts",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "PRODUCTION_DUE",
+        "workflowIds": [
+          "WF_MADE_TO_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "juice_bar",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cloud_kitchen",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "catering",
+    "views": [
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "supermarket",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "convenience_store",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "fresh_produce",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "butchery",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "seafood",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "organic_store",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "laundry",
+    "views": [
+      {
+        "modelId": "LINKED_WINDOWS",
+        "workflowIds": [
+          "WF_PICKUP_RETURN"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "dry_cleaning",
+    "views": [
+      {
+        "modelId": "LINKED_WINDOWS",
+        "workflowIds": [
+          "WF_PICKUP_RETURN"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "ironing",
+    "views": [
+      {
+        "modelId": "LINKED_WINDOWS",
+        "workflowIds": [
+          "WF_PICKUP_RETURN"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "home_cleaning",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "office_cleaning",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "home_living",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "furniture",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "appliances",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "decor",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "kitchenware",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "books",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "PRODUCTION_DUE",
+        "workflowIds": [
+          "WF_MADE_TO_ORDER"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "stationery",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "office_supplies",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "general_retail",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "pharmacy_retail",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "medical_supplies",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "baby_products",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "supplements",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "clinics",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "telemedicine",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "labs",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "mental_health",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "coaching",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "smartphones",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "SERVICE_JOB",
+        "workflowIds": [
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "tech_accessories",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "computers",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "SERVICE_JOB",
+        "workflowIds": [
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "gaming",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "audio",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "telecom_services",
+    "views": [
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      },
+      {
+        "modelId": "SERVICE_JOB",
+        "workflowIds": [
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "smart_devices",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "ORDER",
+        "workflowIds": [
+          "WF_ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "safaris",
+    "views": [
+      {
+        "modelId": "TOUR",
+        "workflowIds": [
+          "WF_TOUR"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "game_drives",
+    "views": [
+      {
+        "modelId": "TOUR",
+        "workflowIds": [
+          "WF_TOUR"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "luxury_safaris",
+    "views": [
+      {
+        "modelId": "TOUR",
+        "workflowIds": [
+          "WF_TOUR"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "city_tours",
+    "views": [
+      {
+        "modelId": "TOUR",
+        "workflowIds": [
+          "WF_TOUR"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cultural_tours",
+    "views": [
+      {
+        "modelId": "TOUR",
+        "workflowIds": [
+          "WF_TOUR"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "adventure_tours",
+    "views": [
+      {
+        "modelId": "TOUR",
+        "workflowIds": [
+          "WF_TOUR"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "travel_packages",
+    "views": [
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "car_wash",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "SERVICE_JOB",
+        "workflowIds": [
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "tire_service",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "SERVICE_JOB",
+        "workflowIds": [
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "battery_service",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "SERVICE_JOB",
+        "workflowIds": [
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "vehicle_assistance",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "vehicle_inspection",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "spa",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "massage",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "gym",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "personal_training",
+    "views": [
+      {
+        "modelId": "APPOINTMENT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_REMOTE_SESSION"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "SESSION_CAPACITY",
+        "workflowIds": [
+          "WF_EVENT_SESSION",
+          "WF_GROUP_ACTIVITY"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "reservations",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "personal_assistance",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "shopping_assistance",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "gift_sourcing",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "travel_planning",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "property_coordination",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "moving_assistance",
+    "views": [
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "cleaning_coordination",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "vip_assistance",
+    "views": [
+      {
+        "modelId": "ENTITLEMENT",
+        "workflowIds": [
+          "WF_MEMBERSHIP"
+        ]
+      },
+      {
+        "modelId": "FIELD_VISIT",
+        "workflowIds": [
+          "WF_APPOINTMENT",
+          "WF_FIELD_SERVICE",
+          "WF_SERVICE_JOB"
+        ]
+      },
+      {
+        "modelId": "REQUEST_QUOTE",
+        "workflowIds": [
+          "WF_REGULATED_ENQUIRY",
+          "WF_REQUEST_QUOTE"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "sea_freight",
+    "views": [
+      {
+        "modelId": "FREIGHT",
+        "workflowIds": [
+          "WF_FREIGHT"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "air_freight",
+    "views": [
+      {
+        "modelId": "FREIGHT",
+        "workflowIds": [
+          "WF_FREIGHT"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "road_freight",
+    "views": [
+      {
+        "modelId": "FREIGHT",
+        "workflowIds": [
+          "WF_FREIGHT"
+        ]
+      }
+    ]
+  },
+  {
+    "subcategoryId": "warehousing",
+    "views": [
+      {
+        "modelId": "STORAGE",
+        "workflowIds": [
+          "WF_STORAGE"
+        ]
+      }
+    ]
+  }
+]

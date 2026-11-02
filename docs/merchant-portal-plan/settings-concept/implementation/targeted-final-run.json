@@ -1,0 +1,375 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\playwright.settings-artboard.config.ts",
+    "rootDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/e2e/web",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/settings-artboard-report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 15000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "settings-desktop",
+        "name": "settings-desktop",
+        "testDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/e2e/web",
+        "testIgnore": [],
+        "testMatch": [
+          "merchant-settings-artboard.spec.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "settings-mobile",
+        "name": "settings-mobile",
+        "testDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/e2e/web",
+        "testIgnore": [],
+        "testMatch": [
+          "merchant-settings-artboard.spec.ts"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "version": "1.49.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "merchant-settings-artboard.spec.ts",
+      "file": "merchant-settings-artboard.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "every section is reachable and the intended selected state is preserved",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "status": "passed",
+                  "duration": 68421,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:22:51.744Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-fccfc1f0dbf0ddd639af",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 11,
+          "column": 5
+        },
+        {
+          "title": "credential creation requires review and revocation affects only that credential",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "status": "passed",
+                  "duration": 18251,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:24:00.859Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-4cb20956c43b929d47ce",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 118,
+          "column": 5
+        },
+        {
+          "title": "webhook validation rejects unsafe endpoints and new signing is pending",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "status": "failed",
+                  "duration": 8788,
+                  "error": {
+                    "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('heading', { name: 'Personal profile', exact: true })\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })\u001b[22m\n",
+                    "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('heading', { name: 'Personal profile', exact: true })\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })\u001b[22m\n\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:8:86",
+                    "matcherResult": {
+                      "message": "\u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('heading', { name: 'Personal profile', exact: true })\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })\u001b[22m\n",
+                      "pass": false,
+                      "actual": "hidden",
+                      "name": "toBeVisible",
+                      "expected": "visible",
+                      "log": [
+                        "  - expect.toBeVisible with timeout 5000ms",
+                        "  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })"
+                      ],
+                      "timeout": 5000
+                    },
+                    "location": {
+                      "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                      "column": 86,
+                      "line": 8
+                    },
+                    "snippet": "   6 |   await page.evaluate(() => localStorage.removeItem('nexg.settings.sample.v1'));\n   7 |   await page.reload({ waitUntil: 'domcontentloaded' });\n>  8 |   await expect(page.getByRole('heading', { name: 'Personal profile', exact: true })).toBeVisible();\n     |                                                                                      ^\n   9 | });\n  10 |\n  11 | test('every section is reachable and the intended selected state is preserved', async ({"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                        "column": 86,
+                        "line": 8
+                      },
+                      "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('heading', { name: 'Personal profile', exact: true })\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })\u001b[22m\n\n\n   6 |   await page.evaluate(() => localStorage.removeItem('nexg.settings.sample.v1'));\n   7 |   await page.reload({ waitUntil: 'domcontentloaded' });\n>  8 |   await expect(page.getByRole('heading', { name: 'Personal profile', exact: true })).toBeVisible();\n     |                                                                                      ^\n   9 | });\n  10 |\n  11 | test('every section is reachable and the intended selected state is preserved', async ({\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:8:86"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:24:19.184Z",
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-2edcb--and-new-signing-is-pending-settings-desktop\\test-failed-1.png"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-2edcb--and-new-signing-is-pending-settings-desktop\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                    "column": 86,
+                    "line": 8
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-64fb35f612ae2e79a40c",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 138,
+          "column": 5
+        },
+        {
+          "title": "every section is reachable and the intended selected state is preserved",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "failed",
+                  "duration": 18432,
+                  "error": {
+                    "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('heading', { name: 'Personal profile', exact: true })\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })\u001b[22m\n",
+                    "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('heading', { name: 'Personal profile', exact: true })\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })\u001b[22m\n\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:8:86",
+                    "matcherResult": {
+                      "message": "\u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('heading', { name: 'Personal profile', exact: true })\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })\u001b[22m\n",
+                      "pass": false,
+                      "actual": "hidden",
+                      "name": "toBeVisible",
+                      "expected": "visible",
+                      "log": [
+                        "  - expect.toBeVisible with timeout 5000ms",
+                        "  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })"
+                      ],
+                      "timeout": 5000
+                    },
+                    "location": {
+                      "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                      "column": 86,
+                      "line": 8
+                    },
+                    "snippet": "   6 |   await page.evaluate(() => localStorage.removeItem('nexg.settings.sample.v1'));\n   7 |   await page.reload({ waitUntil: 'domcontentloaded' });\n>  8 |   await expect(page.getByRole('heading', { name: 'Personal profile', exact: true })).toBeVisible();\n     |                                                                                      ^\n   9 | });\n  10 |\n  11 | test('every section is reachable and the intended selected state is preserved', async ({"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                        "column": 86,
+                        "line": 8
+                      },
+                      "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('heading', { name: 'Personal profile', exact: true })\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Personal profile', exact: true })\u001b[22m\n\n\n   6 |   await page.evaluate(() => localStorage.removeItem('nexg.settings.sample.v1'));\n   7 |   await page.reload({ waitUntil: 'domcontentloaded' });\n>  8 |   await expect(page.getByRole('heading', { name: 'Personal profile', exact: true })).toBeVisible();\n     |                                                                                      ^\n   9 | });\n  10 |\n  11 | test('every section is reachable and the intended selected state is preserved', async ({\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:8:86"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:24:50.686Z",
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-277c1-selected-state-is-preserved-settings-mobile\\test-failed-1.png"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-277c1-selected-state-is-preserved-settings-mobile\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                    "column": 86,
+                    "line": 8
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-b25bc4a822b1115cb764",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 11,
+          "column": 5
+        },
+        {
+          "title": "credential creation requires review and revocation affects only that credential",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "status": "passed",
+                  "duration": 13234,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:25:25.038Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-ebc2e8a0e3c6748bd7cb",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 118,
+          "column": 5
+        },
+        {
+          "title": "webhook validation rejects unsafe endpoints and new signing is pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "status": "passed",
+                  "duration": 14951,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:25:39.182Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-1ea5b7a1b537cbbe7dfc",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 138,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-01T13:22:48.002Z",
+    "duration": 186586.963,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

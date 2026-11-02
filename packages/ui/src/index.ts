@@ -82,6 +82,7 @@ export { EmptyState, type EmptyStateProps } from './components/empty-state';
 
 // Composite
 export { DataTable, type ColumnDef, type DataTableProps } from './components/data-table';
+export { TableViewport, type TableViewportProps } from './components/table-viewport';
 export { DetailPanel, DetailRow, type DetailPanelProps } from './components/detail-panel';
 export {
   Toast,

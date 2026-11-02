@@ -1,12 +1,7 @@
 import { Card, CardContent } from '@nexg/ui';
 
 /**
- * Quick-start snippets: curl, JavaScript, Python, Go, Ruby.
- *
- * Updated with the booking (POST /v1/orders) example that shows the
- * idempotency key, the service code, and the receipt. The booking is
- * the reason a merchant connects through the API -- a tour company
- * books airport transfers for visitors and pays from the account.
+ * Quick-start snippets for implemented read routes.
  */
 export default function QuickstartPage() {
   const snippets = [
@@ -16,19 +11,9 @@ export default function QuickstartPage() {
   https://api.nexgapp.com/v1/catalog/merchants?city=nairobi&limit=5`,
     },
     {
-      lang: 'curl (book)',
-      code: `curl -X POST https://api.nexgapp.com/v1/orders \\
-  -H "X-Api-Key: your_key" \\
-  -H "Idempotency-Key: tour-visit-2030-01" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "service":"airport_transfer","quantity":2,
-    "pickup_label":"JKIA Terminal 1",
-    "pickup_lat":-1.3192,"pickup_lng":36.9278,
-    "dropoff_label":"Serena Hotel","dropoff_lat":-1.2833,"dropoff_lng":36.8176,
-    "scheduled_for":"2030-06-01T09:00:00+03:00",
-    "payment_method":"on_account"
-  }'`,
+      lang: 'curl (merchant orders)',
+      code: `curl -H "X-Api-Key: your_merchant_read_key" \\
+  'https://api.nexgapp.com/v1/orders?limit=5'`,
     },
     {
       lang: 'JavaScript (read)',
@@ -52,7 +37,7 @@ print(res.json()['data']['items'])`,
   return (
     <div className="space-y-8">
       <h2 className="text-3xl font-extrabold">Quick Start</h2>
-      <p className="text-ink/70">Every snippet uses the public read scope, except the booking which needs merchant_write. Replace <code className="font-mono text-xs">your_key</code> with an actual API key from <a href="/docs/auth" className="underline">/docs/auth</a>.</p>
+      <p className="text-ink/70">Public catalog examples use public_read. Merchant orders require a merchant_read key bound to your approved merchant. Issue keys at <a href="/developers" className="underline">/developers</a>.</p>
       {snippets.map((s) => (
         <Card key={s.lang}>
           <CardContent className="pt-4">
@@ -61,7 +46,7 @@ print(res.json()['data']['items'])`,
           </CardContent>
         </Card>
       ))}
-      <p className="text-xs text-ink/40">The idempotency key prevents duplicate orders when retrying. Same key + same payload = same order_id and reference. A retry returns 201 with the same receipt, never a second booking.</p>
+      <p className="text-xs text-ink/40">HTTP 429 includes Retry-After in seconds. Order creation, individual order routes, OAuth and ERP connections are unavailable in this release.</p>
     </div>
   );
 }

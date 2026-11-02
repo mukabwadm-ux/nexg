@@ -22,7 +22,9 @@ import * as React from 'react';
 import { Logo } from '@/components/logo';
 
 import { AccountMenu } from './account-menu';
-import { MerchantPhoneNav, MerchantSideNav } from './nav-links';
+import { MerchantSideNav } from './nav-links';
+import { WorkspaceMobileNavigation } from './workspace/mobile-navigation';
+import workspaceStyles from './workspace/workspace.module.css';
 
 /**
  * The merchant dashboard frame.
@@ -81,7 +83,11 @@ export function merchantNav({
       label: 'Catalogue',
       icon: i(<UtensilsCrossed className="h-4 w-4" />),
     },
-    { href: '/merchant/calendar', label: 'Calendar', icon: i(<CalendarDays className="h-4 w-4" />) },
+    {
+      href: '/merchant/calendar',
+      label: 'Calendar',
+      icon: i(<CalendarDays className="h-4 w-4" />),
+    },
     { href: '/merchant/hours', label: 'Hours', icon: i(<Clock className="h-4 w-4" />) },
     { href: '/merchant/stores', label: 'Branches', icon: i(<Building2 className="h-4 w-4" />) },
     { href: '/merchant/money', label: 'Money', icon: i(<CreditCard className="h-4 w-4" />) },
@@ -90,7 +96,7 @@ export function merchantNav({
       label: 'Transactions',
       icon: i(<CreditCard className="h-4 w-4" />),
     },
-    { href: '/merchant/analytics', label: 'Analytics', icon: i(<BarChart3 className="h-4 w-4" />) },
+    { href: '/merchant/analytics', label: 'Insights', icon: i(<BarChart3 className="h-4 w-4" />) },
     {
       href: '/merchant/featured',
       label: 'Featured',
@@ -134,6 +140,7 @@ export function MerchantShell({
   unreadCount,
   nav,
   guestPreview = false,
+  operationsAllowed = true,
   children,
 }: {
   businessName: string;
@@ -145,13 +152,18 @@ export function MerchantShell({
   unreadCount: number;
   nav: MerchantNavItem[];
   guestPreview?: boolean;
+  operationsAllowed?: boolean;
   children: React.ReactNode;
 }) {
+  const homeHref = guestPreview ? '/merchant-preview/dashboard' : '/merchant';
+  const sectionHref = (section: string) =>
+    guestPreview ? `/merchant-preview/${section}` : `/merchant/${section}`;
+
   return (
-    <div className="bg-bg min-h-dvh lg:flex">
+    <div className={`${workspaceStyles.liveShell} bg-bg min-h-dvh lg:flex`}>
       {/* ═══════════════════════════════════ the dark sidebar */}
-      <aside className="bg-ink hidden w-[13rem] shrink-0 flex-col text-white lg:flex">
-        <Link href="/merchant" className="block px-5 py-5">
+      <aside className="bg-ink hidden w-[13.5rem] shrink-0 flex-col text-white lg:flex">
+        <Link href={homeHref} className="block px-5 py-5">
           <Logo className="h-16 w-auto" onDark priority />
         </Link>
 
@@ -172,12 +184,13 @@ export function MerchantShell({
           <p className="mt-1.5 text-[0.6875rem] font-semibold leading-[1.6] text-white/50">
             Featured slots put your business at the top of Explore in your zone for a week.
           </p>
-          <Link
-            href="/merchant/featured"
+          {operationsAllowed ? <Link
+            href={sectionHref('featured')}
             className="bg-gold text-ink mt-3 block rounded-lg px-3 py-2 text-center text-[0.75rem] font-extrabold"
           >
             See featured slots →
           </Link>
+          : <p className="mt-3 text-[0.75rem] text-white/60">Available after workspace approval.</p>}
         </div>
       </aside>
 
@@ -185,7 +198,10 @@ export function MerchantShell({
         {/* ═══════════════════════════════════════ the top bar */}
         <header className="border-border bg-surface sticky top-0 z-30 border-b">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-5">
-            <Link href="/merchant" className="lg:hidden">
+            <WorkspaceMobileNavigation homeHref={homeHref}>
+              <MerchantSideNav nav={nav} />
+            </WorkspaceMobileNavigation>
+            <Link href={homeHref} className="lg:hidden">
               <Logo className="h-10 w-auto" />
             </Link>
 
@@ -199,9 +215,9 @@ export function MerchantShell({
 
             <span className="flex-1" />
 
-            <Link
-              href="/merchant/messages"
-              className="text-muted hover:text-ink relative p-2"
+            {operationsAllowed ? <Link
+              href={sectionHref('messages')}
+              className="text-muted hover:text-ink relative inline-flex h-11 w-11 items-center justify-center rounded-lg p-2"
               aria-label={
                 unreadCount > 0 ? `Messages, ${unreadCount} unread` : 'Messages, nothing new'
               }
@@ -213,9 +229,10 @@ export function MerchantShell({
                 </span>
               ) : null}
             </Link>
+            : null}
             <Link
-              href="/merchant/support"
-              className="text-muted hover:text-ink p-2"
+              href={sectionHref('support')}
+              className="text-muted hover:text-ink inline-flex h-11 w-11 items-center justify-center rounded-lg p-2"
               aria-label="Help"
             >
               <HelpCircle className="h-4 w-4" aria-hidden="true" />
@@ -239,17 +256,13 @@ export function MerchantShell({
                 role={role}
                 businessName={businessName}
                 live={live}
+                operationsAllowed={operationsAllowed}
               />
             )}
           </div>
         </header>
 
-        {/* On a phone the sidebar becomes a scrolling strip at the
-            foot — a merchant on a counter phone navigates with a
-            thumb, not a hamburger. */}
-        <MerchantPhoneNav nav={nav} />
-
-        <main className="pb-24 lg:pb-0">{children}</main>
+        <main>{children}</main>
       </div>
     </div>
   );

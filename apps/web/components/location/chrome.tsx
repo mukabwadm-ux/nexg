@@ -16,12 +16,22 @@ import { isBookingPage } from '@/lib/booking/routes';
  */
 export function LocationBannerSlot() {
   const pathname = usePathname();
-  if (isBookingPage(pathname)) return null;
-  return <LocationBanner hidden={pathname === '/'} />;
+  if (
+    isBookingPage(pathname) ||
+    pathname === '/merchant-live-preview' ||
+    pathname.startsWith('/merchant-live-preview/')
+  )
+    return null;
+  return <LocationBanner hidden={pathname === '/' || pathname === '/merchant-live-preview'} />;
 }
 
 export function LocationSheetSlot() {
   const pathname = usePathname();
-  if (isBookingPage(pathname)) return null;
-  return <LocationSheet autoOpen={pathname !== '/'} />;
+  if (
+    isBookingPage(pathname) ||
+    pathname === '/merchant-live-preview' ||
+    pathname.startsWith('/merchant-live-preview/')
+  )
+    return null;
+  return <LocationSheet autoOpen={pathname !== '/' && pathname !== '/merchant-live-preview'} />;
 }

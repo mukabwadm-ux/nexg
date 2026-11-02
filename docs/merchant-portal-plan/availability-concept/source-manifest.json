@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-31",
+  "status": "READ_ONLY_INPUT_SNAPSHOT",
+  "registryRevision": "nexg-booking-2026-10-31.1",
+  "offeringsRevision": "2026-10-31-offerings-v1",
+  "scope": "Availability frontend design only; onboarding last; no application/backend/provider/discovery changes.",
+  "sources": [
+    {
+      "name": "profiles",
+      "path": "packages/booking-config/src/data/profiles.json",
+      "sha256": "5c35e33ef0aa02cc06598578a2ad3bd3014e6e8a8830250c279833553ed93627"
+    },
+    {
+      "name": "registry",
+      "path": "packages/booking-config/src/data/registry.json",
+      "sha256": "3f356e648c4dc49f32d408e623fcff23bf29b434a8bd8dfcd708de6a04148c7a"
+    },
+    {
+      "name": "offerings",
+      "path": "apps/web/components/merchant/offerings/config.json",
+      "sha256": "9e46c7786ab0b051037e3e3b96d89af95ed9862be6379d6c92e513867d2f0bbe"
+    },
+    {
+      "name": "schemas",
+      "path": "apps/web/components/merchant/offerings/schemas.ts",
+      "sha256": "8ba063edbd2fff59ddfc2fe206764fb0fcdfcececfe28261cf007e40b957a53c"
+    },
+    {
+      "name": "workProfiles",
+      "path": "docs/merchant-portal-plan/work-adaptation/profiles-128.json",
+      "sha256": "bf27cd51ee94a9ad91b150b39317ebff02f75737d1443dcfddab52e1e63f5a7b"
+    },
+    {
+      "name": "workViews",
+      "path": "docs/merchant-portal-plan/work-adaptation/workflow-view-catalog.json",
+      "sha256": "0258a135cff822cca97715d171286b6e8bca2e79b0d3ef721061892e105eaa47"
+    },
+    {
+      "name": "confirmation",
+      "path": "docs/merchant-portal-plan/order-confirmation.md",
+      "sha256": "59044555dadb9efe567095050b15d6cb52c5f65716b065d6b220543a2fab0a38"
+    },
+    {
+      "name": "shell",
+      "path": "apps/web/components/merchant/live-preview-shell.tsx",
+      "sha256": "cf343fa692516dbb4a2509770eb4c60a5407ab581a34dff12dc28b14f5fe7ef3"
+    },
+    {
+      "name": "oldAvailability",
+      "path": "docs/merchant-portal-plan/screens/03-availability.md",
+      "sha256": "34b076144c5c3b16a3f0763d79d75b87daaa2d3c94e2d5096e06644c8abc241c"
+    }
+  ]
+}

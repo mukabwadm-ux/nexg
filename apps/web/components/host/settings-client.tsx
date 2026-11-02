@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { saveSettings, saveTheme } from '@/app/host/actions';
+import { saveSettings, saveTheme } from '@/app/(customer)/host/actions';
 
 import { Actions, Field, Grid, Said, Select, Submit, Text, useAction } from './form';
 

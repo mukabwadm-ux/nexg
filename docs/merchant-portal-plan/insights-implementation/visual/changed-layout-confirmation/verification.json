@@ -1,0 +1,67 @@
+{
+  "capturedAt": "2026-11-01T12:08:55.226Z",
+  "base": "http://127.0.0.1:3141",
+  "results": [
+    {
+      "device": "mobile",
+      "name": "insights-overview",
+      "route": "/merchant-live-preview/insights?tab=overview",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "documentHeight": 2111,
+      "viewportHeight": 844,
+      "scrolling": {
+        "before": 0,
+        "after": 1588,
+        "clientHeight": 732,
+        "scrollHeight": 2320
+      },
+      "errors": [],
+      "file": "mobile-insights-overview.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-finance",
+      "route": "/merchant-live-preview/insights?tab=finance",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "documentHeight": 1643,
+      "viewportHeight": 844,
+      "scrolling": {
+        "before": 0,
+        "after": 1255,
+        "clientHeight": 732,
+        "scrollHeight": 1987
+      },
+      "errors": [],
+      "file": "mobile-insights-finance.png"
+    },
+    {
+      "device": "mobile",
+      "name": "availability",
+      "route": "/merchant-live-preview/availability",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Availability"
+      ],
+      "dialogs": 0,
+      "documentHeight": 844,
+      "viewportHeight": 844,
+      "scrolling": null,
+      "errors": [],
+      "file": "mobile-availability.png"
+    }
+  ]
+}

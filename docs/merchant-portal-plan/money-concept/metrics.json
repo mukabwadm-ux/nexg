@@ -1,0 +1,483 @@
+{
+  "status": "DESIGN_ONLY",
+  "existing": [
+    {
+      "id": "finance_gross_sales",
+      "label": "Gross sales",
+      "definitionRef": "../domain-registry.json#finance_gross_sales",
+      "aggregation": "OWNER_DEFINED_MEASURE",
+      "calculationOwner": "SRC_FINANCE",
+      "runtimeAuthorityCreated": false
+    },
+    {
+      "id": "finance_refunds",
+      "label": "Confirmed refunds",
+      "definitionRef": "../domain-registry.json#finance_refunds",
+      "aggregation": "OWNER_DEFINED_MEASURE",
+      "calculationOwner": "SRC_FINANCE",
+      "runtimeAuthorityCreated": false
+    },
+    {
+      "id": "finance_net_sales",
+      "label": "Net sales",
+      "definitionRef": "../domain-registry.json#finance_net_sales",
+      "aggregation": "OWNER_DEFINED_MEASURE",
+      "calculationOwner": "SRC_FINANCE",
+      "runtimeAuthorityCreated": false
+    },
+    {
+      "id": "finance_fees",
+      "label": "Confirmed fees",
+      "definitionRef": "../domain-registry.json#finance_fees",
+      "aggregation": "OWNER_DEFINED_MEASURE",
+      "calculationOwner": "SRC_FINANCE",
+      "runtimeAuthorityCreated": false
+    },
+    {
+      "id": "finance_net_payable",
+      "label": "Net payable",
+      "definitionRef": "../domain-registry.json#finance_net_payable",
+      "aggregation": "OWNER_DEFINED_MEASURE",
+      "calculationOwner": "SRC_FINANCE",
+      "runtimeAuthorityCreated": false
+    },
+    {
+      "id": "finance_payouts_paid",
+      "label": "Payouts confirmed paid",
+      "definitionRef": "../domain-registry.json#finance_payouts_paid",
+      "aggregation": "OWNER_DEFINED_MEASURE",
+      "calculationOwner": "SRC_FINANCE",
+      "runtimeAuthorityCreated": false
+    },
+    {
+      "id": "contribution_margin",
+      "label": "Contribution margin",
+      "definitionRef": "../domain-registry.json#contribution_margin",
+      "aggregation": "OWNER_DEFINED_MEASURE",
+      "calculationOwner": "SRC_FINANCE",
+      "runtimeAuthorityCreated": false
+    }
+  ],
+  "proposed": [
+    {
+      "id": "money_confirmed_collections_v1",
+      "label": "Confirmed customer collections",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "confirmed receipt/movement",
+      "dateBasis": "Collection event time",
+      "definition": "Confirmed accepted collections less source-defined reversals; security and advances remain separately classified, not sales.",
+      "ownerContract": "finance.payment",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_applied_payments_v1",
+      "label": "Payments applied",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "payment-to-invoice allocation",
+      "dateBasis": "Selected invoice cohort at cutoff",
+      "definition": "Sum confirmed current allocations to selected invoices, net of reversed allocations. Receipt date may lie outside invoice period.",
+      "ownerContract": "receivables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_customer_due_v1",
+      "label": "Customer balances",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "issued invoice remainder",
+      "dateBasis": "As-of cutoff",
+      "definition": "Owner-confirmed positive invoice balances after confirmed credits/debits and allocations. Do not net unrelated customer credit silently.",
+      "ownerContract": "receivables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_overdue_due_v1",
+      "label": "Overdue customer balances",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "invoice remainder with due date",
+      "dateBasis": "As-of cutoff and due-date policy",
+      "definition": "Subset of positive balances overdue under the issuer basis. Missing due date stays No due date.",
+      "ownerContract": "receivables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_unapplied_credit_v1",
+      "label": "Unapplied customer credit",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "customer credit/receipt balance",
+      "dateBasis": "As-of cutoff",
+      "definition": "Owner-confirmed available credit not yet allocated. This is not negative debt or earned revenue.",
+      "ownerContract": "receivables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_security_collected_v1",
+      "label": "Security collected",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "confirmed collected deposit movement",
+      "dateBasis": "Collection event period",
+      "definition": "Collected refundable security only; exclude authorizations, rental charges and reservation fees.",
+      "ownerContract": "security",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_security_recorded_obligation_v1",
+      "label": "Recorded security balance",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "security obligation",
+      "dateBasis": "As-of cutoff",
+      "definition": "Owner-recorded obligation after confirmed returns/owner-confirmed posted charge allocations; unknown refund outcomes remain unresolved with quality overlay.",
+      "ownerContract": "security",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_security_refunds_v1",
+      "label": "Security refunds confirmed",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "confirmed security refund",
+      "dateBasis": "Execution event period",
+      "definition": "Owner-confirmed money returned from collected security; exclude authorization release and requested/unknown refunds.",
+      "ownerContract": "security",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_booking_advances_v1",
+      "label": "Booking advances collected",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "classified confirmed advance receipt",
+      "dateBasis": "Collection event period",
+      "definition": "Only accepted advances intended to credit a later bill; separate agreed fees have their own classification.",
+      "ownerContract": "finance.payment",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_unapplied_advances_v1",
+      "label": "Advances awaiting allocation",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "accepted advance balance",
+      "dateBasis": "As-of cutoff",
+      "definition": "Remaining classified customer advance not yet allocated/confirmed refunded. Never automatically recognized revenue.",
+      "ownerContract": "receivables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_recognized_revenue_v1",
+      "label": "Recognized revenue",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "recognition posting",
+      "dateBasis": "Owner accounting period",
+      "definition": "Owner-defined recognized amount and revisions under accepted policy; no browser recognition calculation.",
+      "ownerContract": "recognition",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_billed_work_v1",
+      "label": "Invoice total",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "issued invoice",
+      "dateBasis": "Selected issued-invoice cohort/version",
+      "definition": "Owner-issued invoice total with separately identified credit amendments; exclude quote, draft and void states as defined by issuer.",
+      "ownerContract": "receivables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_confirmed_credit_notes_v1",
+      "label": "Credit notes",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "confirmed invoice amendment",
+      "dateBasis": "Selected invoice cohort at cutoff",
+      "definition": "Current confirmed credit-note allocation. A credit note is not proof of a cash refund.",
+      "ownerContract": "receivables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_settlement_eligible_v1",
+      "label": "Ready for payout",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "merchant settlement entitlement",
+      "dateBasis": "As-of settlement cutoff",
+      "definition": "Owner-supplied eligible value after its holds/reserves and prior disbursements; not reconstructed from sales cards.",
+      "ownerContract": "finance.settlement",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_settlement_reserve_v1",
+      "label": "Settlement reserve",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "merchant payable reserve/hold",
+      "dateBasis": "As-of settlement cutoff",
+      "definition": "Owner-defined reserve and reason; release date only if confirmed. Excludes separately owned customer security.",
+      "ownerContract": "finance.settlement",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_unknown_movement_exposure_v1",
+      "label": "Money movement being checked",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "uncertain operation",
+      "dateBasis": "As-of observation",
+      "definition": "Distinct unresolved money operation amounts in their currencies; not a confirmed loss, refund or payout.",
+      "ownerContract": "operation-owner",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_quote_accepted_value_v1",
+      "label": "Accepted contract value",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "accepted commercial agreement",
+      "dateBasis": "Acceptance period or current cohort, explicitly selected",
+      "definition": "Versioned accepted scope value; not invoice debt, cash or recognized revenue.",
+      "ownerContract": "commerce/workflow",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_unbilled_milestones_v1",
+      "label": "Billable milestones",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "approved billable milestone",
+      "dateBasis": "As-of cutoff",
+      "definition": "Only owner-confirmed billable unissued milestones. Not an invoice or collected money.",
+      "ownerContract": "receivables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_customer_funds_v1",
+      "label": "Customer procurement funds",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "customer-money obligation",
+      "dateBasis": "As-of cutoff",
+      "definition": "Owner-classified procurement/pass-through budget, separate from merchant service fee.",
+      "ownerContract": "customer-funds",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    },
+    {
+      "id": "money_supplier_payable_v1",
+      "label": "Supplier amount due",
+      "status": "PROPOSED_MONEY_DEFINITION_NOT_REGISTERED_RUNTIME",
+      "grain": "supplier obligation",
+      "dateBasis": "Owner due/as-of basis",
+      "definition": "Owner-confirmed supplier obligation under accepted principal/agent role; not NEXG merchant payout.",
+      "ownerContract": "supplier-payables",
+      "commonEvidence": [
+        "canonical_fact_identity",
+        "merchant/location scope",
+        "amount_minor and currency",
+        "accepted policy/version",
+        "source and record version",
+        "observed_at/effective_at",
+        "coverage and quality",
+        "reversal/allocation identities"
+      ],
+      "qualityGate": "Missing owner/grant/required facts is unavailable, never zero.",
+      "rounding": "Display precision and rounding come from currency metadata and approved owner policy."
+    }
+  ]
+}

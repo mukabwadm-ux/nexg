@@ -1,0 +1,39 @@
+# Phase 4 integration support and configuration
+
+This is the implemented support boundary for the source checkout on 2 November 2026. It does not certify a deployed database, hosting configuration, or provider connection. Apply the application migration `20261102000100` before integration migration `20261102000200`.
+
+| Integration / version | Data owner and permitted operation | Current support |
+| --- | --- | --- |
+| Public REST v1 | NEXG catalog owns public merchant/catalog, zone, experience and service descriptions. External consumers read. | `GET /v1/catalog/merchants`, `GET /v1/catalog/merchants/{id}`, `GET /v1/zones`, `GET /v1/experiences`, `GET /v1/services`. The latter describes configured services and does not create bookings. |
+| Merchant REST v1 | Existing NEXG order owner. The API key resolves exactly one merchant. External consumers read. | `GET /v1/orders` with `merchant_read`, cursor and bounded limit. No implemented POST or `/v1/orders/{id}` route. |
+| Native booking | Existing booking configuration/runtime and durable booking delivery owner. | Existing merchant booking integration remains its owner. No duplicate reservation, queue or ERP booking adapter is introduced here. |
+| OAuth | Existing registry tables only. | Unavailable. No authorization/token endpoints or active client registration contract. |
+| ERP / accounting | Authority, vendor contract and credential owner are not selected. | Unavailable and unactivated. No two-way catalog, order, inventory, invoice, tax, payout or settlement synchronization. A declared ERP category or saved business answer does not activate a connector. |
+| External inventory | No selected provider or agreed units/mapping/authority. | Unavailable and unactivated. No stock reservation or reconciliation claims. |
+| Webhooks / notifications | Existing notification outbox and booking outbox own durable delivery. | No new external inbound/outbound provider, webhook endpoint or queue. Provider rollout requires selected credentials, signature/replay contract, idempotent consumers, bounded retry/dead-letter and reconciliation acceptance through the existing owners. |
+
+## Credential authority
+
+`fn_api_key_issue` keeps its existing signature. The database checks the current verified human session, derives creator IDs and refuses supplied IDs belonging to another person. Merchant keys require the current owner or a current merchant-operations/super-admin grant in that merchant's city. Internal scopes require a live global super-admin grant. Authenticated direct table writes cannot bypass issuance. Issuance rates are 10–600 tokens/minute; optional expiry must be in the next 366 days. The raw secret appears once. Logs and audit receive key IDs, scopes and policy, never the raw secret.
+
+Existing hashes are retained. Key use is independent of human session cookies, login refresh or sign-out. Lookup and rate spending recheck active state, expiry and merchant authorization. A legacy merchant without a new application row retains its existing operational policy. A merchant with a new application needs current revision approval. Suspension, pause and delisting deny machine use. Internal keys also require their issuing staff member's current global administration grant.
+
+## Fleet limits and hosting
+
+Every implemented v1 route checks a PostgreSQL token bucket before its data read. The row lock serializes spending across server instances. Public reads cost 1 token, merchant order reads cost 3, and the reserved merchant-write cost is 5. A stored write scope does not activate a write route. Refill is continuous at the principal's effective tokens/minute, capped at 600. Burst capacity equals the effective rate, with a minimum capacity of 5 for older low-rate keys.
+
+All merchant keys share `merchant:<id>`, including staff-issued keys and replacements. Platform keys share the issuing user or staff principal. Old platform keys without a recorded issuer use one shared legacy bucket. The lowest active unexpired key rate applies to its principal, so adding a higher-rate sibling does not multiply quota. Rotation and browser sessions do not create a fresh bucket. Issuers can change their configured rate within the documented ceiling by retiring older credentials; this is policy configuration, not a per-key quota multiplication.
+
+Anonymous requests use one fleet-wide bucket of 120 tokens/minute by default. Incoming `Forwarded`, `X-Forwarded-For`, `X-Real-IP` and similar headers are ignored. Set `API_TRUSTED_PROXY_IP_HEADER` only after the hosting ingress demonstrably strips that incoming header and overwrites it with one verified client address. The configured name must be lowercase. A missing, malformed or multiple-address value falls back to the shared bucket. A validated ingress IP gets 60 tokens/minute. The database stores its canonical-address hash as the bucket identity. Different instances need identical ingress configuration. Stale buckets are removed in batches of at most 20 after one day of inactivity.
+
+The API server needs `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and server-only `SUPABASE_SERVICE_ROLE_KEY`. The service credential is used only to call the guarded rate-spend RPC and existing private order reader. Ordinary browser issuance uses the end-user anon-key SSR client. The rate RPC is service-role-only, preventing direct public callers from inventing an anonymous identity or limit. Missing configuration, lookup failure, limiter error and malformed limiter output fail closed. Database failure is HTTP 503; denied or expired machine credentials are indistinguishable HTTP 401 responses. HTTP 429 includes integer `Retry-After` seconds. All errors and private orders are `no-store`; errors carry `X-Request-Id`. Existing v1 error JSON is retained for client compatibility.
+
+## Migration, verification and recovery
+
+Rehearse migrations and the API code together on an isolated staging copy. Migration 002 disables the old caller-selected key-id/minute-counter function. Old API code calling that function will fail until the new API version is deployed, so use a maintenance window or controlled traffic switch. Never restore broad authenticated table writes or the old public spend grant as a rollback shortcut. Disable entry or route traffic back to a compatible build while retaining stored keys, applications and buckets. No source migration should be assumed to have run remotely.
+
+Focused API checks passed locally: `pnpm --filter @nexg/api exec vitest run tests/integration-security.test.ts` passed 12 tests; `pnpm --filter @nexg/api typecheck` passed. The isolated SQL check is `node scripts/test-merchant-integration-security.mjs` with `PHASE4_PGLITE_PATH` set to a temporary installed PGlite `dist/index.js`. It passed 49 assertions against the actual migration 002, including forged issuer/tenant/internal scopes, scoped staff grants, owner success, anonymous denial, revoked/expired keys, current merchant-state refusal, shared principals across merchant and platform-key rotation, weighted depletion/refill, non-negative balances, clock-rewind protection, denied direct table/RPC access and retry-after.
+
+The SQL fixture substitutes session and merchant-state helper boundaries. Migration 001 must separately prove their current session, approval-revision and suspension rules. PGlite does not certify production Supabase roles/extensions/session schema, concurrent independent connections, hosting proxy rewriting or deployed routing. Those remain staging acceptance checks.
+
+Before any provider activation, select the actual vendor and credentials, record authority and version for every data class, define complete mappings/units/currencies and idempotency, then verify delivery and reconciliation through the existing durable owner. This increment does not supply those missing contracts.

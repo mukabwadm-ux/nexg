@@ -9,7 +9,7 @@ import {
   respondToOffer,
   setTalentPool,
   withdrawApplication,
-} from '@/app/careers/status/[token]/actions';
+} from '@/app/(customer)/careers/status/[token]/actions';
 
 /**
  * Everything a candidate can actually do from their own page.
