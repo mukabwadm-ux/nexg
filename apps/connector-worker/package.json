@@ -1,0 +1,26 @@
+{
+  "name": "@nexg/connector-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --experimental-strip-types src/main.ts",
+    "build": "echo \"Connector worker runs as a Node service\"",
+    "lint": "eslint src --ext .ts --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rimraf .turbo node_modules"
+  },
+  "dependencies": {
+    "@nexg/connectors": "workspace:*",
+    "@supabase/supabase-js": "2.47.10"
+  },
+  "devDependencies": {
+    "@nexg/config": "workspace:*",
+    "@types/node": "20.17.10",
+    "eslint": "8.57.1",
+    "rimraf": "6.0.1",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
+  }
+}

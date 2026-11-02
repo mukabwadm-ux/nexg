@@ -8,10 +8,8 @@ import Link from 'next/link';
  * shape. Uses @nexg/ui design tokens (Manrope, bg-bg, ink) for consistency
  * with the marketing site and staff console.
  *
- * Updated to include the merchant-booking endpoint (POST /v1/orders),
- * which is the second stage of the API and the reason a merchant can
- * connect through it: they book airport transfers and other services
- * for their visitors and pay from the merchant account.
+ * Lists implemented endpoints only. Planned writes and bank transfers
+ * are documented separately until their routes and financial controls ship.
  */
 
 const endpoints = [
@@ -50,18 +48,18 @@ const endpoints = [
   {
     method: 'GET',
     path: '/v1/services',
-    title: 'List bookable services',
-    desc: 'What a merchant can request through the booking endpoint: airport transfers, intercity, courier, venue bookings. Configured as rows, not new endpoints.',
+    title: 'List available service types',
+    desc: 'Browse active service types and their labels. This endpoint is informational; creating a booking is not currently supported.',
     params: [],
     response: '{ ok: true, data: { items: ApiService[] }, meta: { api_version: "v1" } }',
   },
   {
-    method: 'POST',
+    method: 'GET',
     path: '/v1/orders',
-    title: 'Book a service',
-    desc: 'A merchant books a service on behalf of their visitors (e.g. airport transfer for a tour group). Requires merchant_write scope and an Idempotency-Key header. The caller never states a price.',
-    params: ['Idempotency-Key (header, 16-128 chars)', 'X-Api-Key (header)', 'body: ServiceBooking'],
-    response: '{ ok: true, data: BookingReceipt, meta: { api_version: "v1" } }',
+    title: 'Read your merchant orders',
+    desc: 'Read a cursor-paginated list of orders for the merchant bound to your API key. Requires the merchant_read scope.',
+    params: ['X-Api-Key (merchant-bound key)', 'cursor (optional)', 'limit (1-100, default 25)'],
+    response: '{ ok: true, data: { items: MerchantOrder[], next_cursor: string|null }, meta: { api_version: "v1", limit: number } }',
   },
 ];
 
@@ -70,7 +68,20 @@ export default function DocsPage() {
     <div className="space-y-8">
       <section className="mb-8">
         <h2 className="text-2xl font-bold mb-2">Endpoints</h2>
-        <p className="text-ink/70">Every endpoint is versioned. Read endpoints (stage one) work with a public-read key. Write endpoints (stage two) need merchant_write and an idempotency key. Configuring a new vertical is adding a row to /v1/services, not a new route.</p>
+        <p className="text-ink/70">Use the NexG API to connect a merchant website or back-office system to public catalogue data and, with a merchant-bound key, read that merchant&apos;s orders. Bank collections, payouts, and write operations are not available yet.</p>
+      </section>
+
+      <section className="grid gap-8 border-y py-6 md:grid-cols-2" aria-label="Integration guides">
+        <div className="space-y-2">
+          <h3 className="text-lg font-bold">For merchants and developers</h3>
+          <p className="text-sm text-ink/70">Connect a website, point-of-sale system, or back office to NexG&apos;s published data and your merchant&apos;s order feed.</p>
+          <Link href="/docs/merchants" className="text-sm font-semibold underline underline-offset-4">Merchant integration guide</Link>
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-lg font-bold">For banks and payment providers</h3>
+          <p className="text-sm text-ink/70">Review the intended collection and settlement flows and the controls required before a provider integration can go live.</p>
+          <Link href="/docs/bank-transfers" className="text-sm font-semibold underline underline-offset-4">Bank and payment partner guide</Link>
+        </div>
       </section>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -115,7 +126,7 @@ export default function DocsPage() {
             </CardHeader>
             <CardContent className="text-sm text-ink/80 space-y-2">
               <p>Send the key in the <code className="font-mono bg-surface px-1 rounded text-xs">X-Api-Key</code> header. The server validates the SHA-256 hash (never the raw key) and checks scopes, rate limits, and expiry.</p>
-              <p>Scopes: <code className="font-mono text-xs">public_read</code>, <code className="font-mono text-xs">merchant_read</code>, <code className="font-mono text-xs">merchant_write</code>, <code className="font-mono text-xs">internal_read</code>, <code className="font-mono text-xs">internal_write</code>.</p>
+              <p>For integrations, use <code className="font-mono text-xs">public_read</code> for public data or <code className="font-mono text-xs">merchant_read</code> for the bound merchant&apos;s orders. Other scopes are defined, but no write endpoints are currently available.</p>
               <p>Rate limit per key (default 60/min). Manage at <Link href="/developers" className="underline">/developers</Link>.</p>
             </CardContent>
           </Card>
@@ -124,14 +135,16 @@ export default function DocsPage() {
               <CardTitle>OAuth 2.0</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-ink/80 space-y-2">
-              <p>Full authorization code flow with scopes. For partner apps that act on behalf of merchants or guests. Tables exist (migration 22900); endpoints are phase 4.</p>
-              <p>Clients are registered per partner. Redirect URIs must be pre-registered.</p>
+              <p>OAuth client storage is present, but authorization and token endpoints are not implemented. Use an API key for the implemented routes.</p>
+              <p>Do not build an integration against the planned OAuth flow until its endpoints are published here.</p>
             </CardContent>
           </Card>
         </div>
         <div className="mt-6 flex flex-wrap gap-4 text-sm">
           <Link href="/docs/auth" className="underline text-ink/80 hover:text-ink">Authentication guide →</Link>
           <Link href="/docs/quickstart" className="underline text-ink/80 hover:text-ink">Quick start →</Link>
+          <Link href="/docs/merchants" className="underline text-ink/80 hover:text-ink">Merchant integration →</Link>
+          <Link href="/docs/bank-transfers" className="underline text-ink/80 hover:text-ink">Bank &amp; payment partners →</Link>
           <Link href="/developers" className="underline text-ink/80 hover:text-ink">Issue a key →</Link>
         </div>
       </section>

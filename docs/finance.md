@@ -113,6 +113,8 @@ Five of the seven tabs. They are shown greyed in the console rather than hidden 
 
 Also outstanding: statement generation (PDF/CSV, hashed, immutable once sent), payout batch execution, and the transition buttons on the settlement tab.
 
+Bank transfers are not connected. The agreed API direction is platform-account collections and payouts limited to finance-approved merchant/rider settlement balances. Provider selection is deferred; no bank-transfer endpoints, sandbox adapter, or live execution path is available. The finance approval and invariant gates must remain authoritative when provider execution is added.
+
 Deliberately out of scope, and declared as such: Temporal workers, provider simulators, the 85% mutation gate, chaos drills, and the ten cross-surface Playwright scenarios.
 
 ---

@@ -18,8 +18,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <header className="mb-12">
         <h1 className="text-4xl font-extrabold tracking-tight mb-3">NexG API</h1>
         <p className="text-lg text-ink/70 max-w-2xl">
-          Read-only endpoints for the public, partner, and internal surfaces.
-          Every list is cursor-paginated and every response is versioned.
+          Integration guides for merchants, software developers, banks, and
+          payment providers. See what works today and what is still being built.
         </p>
         <div className="mt-6 flex gap-3 text-sm">
           <span className="px-3 py-1 rounded-full bg-surface border text-ink/80 font-medium">
@@ -37,8 +37,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <a href="/docs/quickstart" className="hover:underline">
           Quick start
         </a>
+        <a href="/docs/merchants" className="hover:underline">
+          For merchants
+        </a>
         <a href="/docs/auth" className="hover:underline">
           Authentication
+        </a>
+        <a href="/docs/bank-transfers" className="hover:underline">
+          For bank partners
         </a>
         <a href="/developers" className="hover:underline">
           Issue a key

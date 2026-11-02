@@ -167,6 +167,34 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(@types/node@20.17.10)(jsdom@25.0.1)
 
+  apps/connector-worker:
+    dependencies:
+      '@nexg/connectors':
+        specifier: workspace:*
+        version: link:../../packages/connectors
+      '@supabase/supabase-js':
+        specifier: 2.47.10
+        version: 2.47.10
+    devDependencies:
+      '@nexg/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@types/node':
+        specifier: 20.17.10
+        version: 20.17.10
+      eslint:
+        specifier: 8.57.1
+        version: 8.57.1
+      rimraf:
+        specifier: 6.0.1
+        version: 6.0.1
+      typescript:
+        specifier: 5.7.2
+        version: 5.7.2
+      vitest:
+        specifier: 2.1.8
+        version: 2.1.8(@types/node@20.17.10)(jsdom@25.0.1)
+
   apps/web:
     dependencies:
       '@hookform/resolvers':
@@ -294,6 +322,28 @@ importers:
       rimraf:
         specifier: 6.0.1
         version: 6.0.1
+
+  packages/connectors:
+    dependencies:
+      zod:
+        specifier: 3.24.1
+        version: 3.24.1
+    devDependencies:
+      '@nexg/config':
+        specifier: workspace:*
+        version: link:../config
+      eslint:
+        specifier: 8.57.1
+        version: 8.57.1
+      rimraf:
+        specifier: 6.0.1
+        version: 6.0.1
+      typescript:
+        specifier: 5.7.2
+        version: 5.7.2
+      vitest:
+        specifier: 2.1.8
+        version: 2.1.8(@types/node@20.17.10)(jsdom@25.0.1)
 
   packages/contracts:
     dependencies:
