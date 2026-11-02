@@ -44,7 +44,10 @@ const booleanFields = new Set([
   'mobile_inspection',
   'mobile_service',
   'on_site_processing',
+  'one_time_bookings',
   'operations_24hr',
+  'per_item_pricing',
+  'per_kg_pricing',
   'personal_training_available',
   'pickup_available',
   'pre_owned_games',
@@ -83,9 +86,21 @@ const textFields = new Set([
   'retainer_ksh',
   'tire_brands_text',
   'vip_services_text',
+  'weight_limit',
 ]);
 
 const singleChoiceFields: Record<string, QuestionOption[]> = {
+  pickup_delivery: [
+    option('both', 'We collect and deliver'),
+    option('pickup_only', 'We collect, customers return to pick up'),
+    option('drop_off', 'Customers drop off and collect'),
+  ],
+  turnaround_time: [
+    option('same_day', 'Same day'),
+    option('next_day', 'Next day'),
+    option('48h', '48 hours'),
+    option('3_plus', '3 or more days'),
+  ],
   age_gate_method: [
     option('checkout', 'Age confirmation at checkout'),
     option('delivery_id', 'Rider checks ID at handover'),
@@ -353,6 +368,15 @@ const singleChoiceFields: Record<string, QuestionOption[]> = {
 };
 
 const multiChoiceFields: Record<string, QuestionOption[]> = {
+  garment_types: [
+    option('everyday', 'Everyday wear'),
+    option('suits', 'Suits and formal wear'),
+    option('uniforms', 'Uniforms'),
+    option('bedding', 'Bedding and duvets'),
+    option('curtains', 'Curtains'),
+    option('leather', 'Leather and suede'),
+    option('wedding', 'Wedding dresses and gowns'),
+  ],
   biz_services_offered: [
     option('registration', 'Business registration'),
     option('tax', 'Tax and compliance support'),
@@ -644,7 +668,14 @@ const labels: Record<string, string> = {
   has_physical_store: 'Do you have a physical store?',
   home_service: 'Do you visit customers at home?',
   license_number: 'What licence or registration should we verify?',
+  garment_types: 'Which items do you clean?',
   min_order: 'What is your minimum order?',
+  one_time_bookings: 'Do you take one-time bookings?',
+  per_item_pricing: 'Do you charge per item?',
+  per_kg_pricing: 'Do you charge per kg?',
+  pickup_delivery: 'How do customers hand over and get their items back?',
+  turnaround_time: 'How long does a standard job take?',
+  weight_limit: 'Is there a weight limit per bag? (leave blank if none)',
   operating_hours_text: 'What are your operating hours?',
   product_description: 'What should customers know about your products?',
   retainer_ksh: 'What retainer amount do you offer?',
@@ -665,10 +696,12 @@ export function questionsForSubcategory(
 ): Question[] {
   return (subcategory.fields ?? []).map((key) => {
     const label = labels[key] ?? humanizeField(key);
+    const asQuestion = label.endsWith('?') ? label : `${label}?`;
     if (booleanFields.has(key)) {
-      return { key, label: `${label}?`, type: 'single', options: yesNo };
+      return { key, label: asQuestion, type: 'single', options: yesNo };
     }
-    if (textFields.has(key)) {
+    // A field with no hand-written choices becomes a free-text question rather than crashing the page.
+    if (textFields.has(key) || !(key in singleChoiceFields || key in multiChoiceFields)) {
       return {
         key,
         label,
