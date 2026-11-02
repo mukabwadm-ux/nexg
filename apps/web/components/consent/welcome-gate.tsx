@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import * as React from 'react';
+import { usePathname } from 'next/navigation';
 
 import { useLocation } from '@nexg/location';
 
@@ -17,6 +18,7 @@ function hasAnswered(): boolean {
 }
 
 export function WelcomeGate({ locale, canTranslate }: { locale: Locale; canTranslate: boolean }) {
+  const pathname = usePathname();
   const { ready, sheetOpen, asked, place } = useLocation();
   const [showConsent, setShowConsent] = React.useState(false);
   const settled = ready && !sheetOpen && (asked || place !== null);
@@ -25,6 +27,12 @@ export function WelcomeGate({ locale, canTranslate }: { locale: Locale; canTrans
     setShowConsent(!hasAnswered());
   }, []);
 
-  if (!settled || !showConsent) return null;
+  if (
+    pathname === '/merchant-live-preview' ||
+    pathname.startsWith('/merchant-live-preview/') ||
+    !settled ||
+    !showConsent
+  )
+    return null;
   return <WelcomeConsent locale={locale} canTranslate={canTranslate} />;
 }

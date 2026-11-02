@@ -8,10 +8,7 @@ import Link from 'next/link';
  * shape. Uses @nexg/ui design tokens (Manrope, bg-bg, ink) for consistency
  * with the marketing site and staff console.
  *
- * Updated to include the merchant-booking endpoint (POST /v1/orders),
- * which is the second stage of the API and the reason a merchant can
- * connect through it: they book airport transfers and other services
- * for their visitors and pay from the merchant account.
+ * Documents routes implemented in this API app.
  */
 
 const endpoints = [
@@ -51,17 +48,17 @@ const endpoints = [
     method: 'GET',
     path: '/v1/services',
     title: 'List bookable services',
-    desc: 'What a merchant can request through the booking endpoint: airport transfers, intercity, courier, venue bookings. Configured as rows, not new endpoints.',
+    desc: 'Configured active service descriptions. This list does not enable API booking.',
     params: [],
     response: '{ ok: true, data: { items: ApiService[] }, meta: { api_version: "v1" } }',
   },
   {
-    method: 'POST',
+    method: 'GET',
     path: '/v1/orders',
-    title: 'Book a service',
-    desc: 'A merchant books a service on behalf of their visitors (e.g. airport transfer for a tour group). Requires merchant_write scope and an Idempotency-Key header. The caller never states a price.',
-    params: ['Idempotency-Key (header, 16-128 chars)', 'X-Api-Key (header)', 'body: ServiceBooking'],
-    response: '{ ok: true, data: BookingReceipt, meta: { api_version: "v1" } }',
+    title: 'List merchant orders',
+    desc: 'Read orders belonging to the merchant resolved from the key. Requires merchant_read and current merchant access approval. Orders are never selected by a caller-supplied merchant id.',
+    params: ['X-Api-Key (header)', 'cursor', 'limit (1-100, default 25)'],
+    response: '{ ok: true, data: { items: Order[], next_cursor: string|null }, meta: { api_version: "v1", limit: number } }',
   },
 ];
 
@@ -70,7 +67,7 @@ export default function DocsPage() {
     <div className="space-y-8">
       <section className="mb-8">
         <h2 className="text-2xl font-bold mb-2">Endpoints</h2>
-        <p className="text-ink/70">Every endpoint is versioned. Read endpoints (stage one) work with a public-read key. Write endpoints (stage two) need merchant_write and an idempotency key. Configuring a new vertical is adding a row to /v1/services, not a new route.</p>
+        <p className="text-ink/70">Public reads work without a key and are rate limited. Merchant orders require a merchant_read key. Order creation, individual order routes, OAuth, and ERP connectors are unavailable in this release.</p>
       </section>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -115,8 +112,8 @@ export default function DocsPage() {
             </CardHeader>
             <CardContent className="text-sm text-ink/80 space-y-2">
               <p>Send the key in the <code className="font-mono bg-surface px-1 rounded text-xs">X-Api-Key</code> header. The server validates the SHA-256 hash (never the raw key) and checks scopes, rate limits, and expiry.</p>
-              <p>Scopes: <code className="font-mono text-xs">public_read</code>, <code className="font-mono text-xs">merchant_read</code>, <code className="font-mono text-xs">merchant_write</code>, <code className="font-mono text-xs">internal_read</code>, <code className="font-mono text-xs">internal_write</code>.</p>
-              <p>Rate limit per key (default 60/min). Manage at <Link href="/developers" className="underline">/developers</Link>.</p>
+              <p>Use <code className="font-mono text-xs">public_read</code> for public data and <code className="font-mono text-xs">merchant_read</code> for your merchant's orders. Other stored scopes do not enable unimplemented routes.</p>
+              <p>Keys share a PostgreSQL token bucket per merchant or developer. Public reads cost one token; merchant order reads cost three. A 429 response includes Retry-After in seconds. Manage keys at <Link href="/developers" className="underline">/developers</Link>.</p>
             </CardContent>
           </Card>
           <Card>
@@ -124,8 +121,8 @@ export default function DocsPage() {
               <CardTitle>OAuth 2.0</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-ink/80 space-y-2">
-              <p>Full authorization code flow with scopes. For partner apps that act on behalf of merchants or guests. Tables exist (migration 22900); endpoints are phase 4.</p>
-              <p>Clients are registered per partner. Redirect URIs must be pre-registered.</p>
+              <p>Unavailable. Existing database tables do not provide an authorization or token endpoint.</p>
+              <p>Use API keys for the supported read operations.</p>
             </CardContent>
           </Card>
         </div>

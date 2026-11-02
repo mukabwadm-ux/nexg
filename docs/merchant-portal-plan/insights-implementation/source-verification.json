@@ -1,0 +1,29 @@
+{
+  "verifiedOn": "2026-11-01",
+  "scope": "Independent source and reporting-model verification; no live credentials or production writes",
+  "command": "cd apps/web && node node_modules/vitest/vitest.mjs run lib/merchant-insights.test.ts components/merchant/insights/model.test.ts",
+  "result": {
+    "exitCode": 0,
+    "testFilesPassed": 2,
+    "testsPassed": 35,
+    "liveSourceTests": 18,
+    "reportingModelTests": 17,
+    "durationSeconds": 91.71
+  },
+  "reviewed": [
+    "Authenticated ordinary RLS client; no service-role source",
+    "Server-resolved merchant identity and owner membership",
+    "Explicit membership location restrictions, including empty scope",
+    "Nairobi inclusive dates, matched prior period, bounded range and source pages",
+    "Actual lifecycle timestamps and merchant item subtotal, excluding total customer charge",
+    "Failed reads, confirmed zero, incomplete evidence and unavailable fields remain distinct",
+    "No fixtures used as a live fallback",
+    "Private no-store API responses; sanitized source errors"
+  ],
+  "changesRequired": false,
+  "limitations": [
+    "Actual Supabase credentials and an authenticated merchant session were not available for a database integration run",
+    "The existing live adapter supplies ORDER work, historical item and readiness evidence only",
+    "Customer identity, posted Finance activity, campaign attribution, capacity and other operational-model sources remain explicitly unavailable until connected"
+  ]
+}

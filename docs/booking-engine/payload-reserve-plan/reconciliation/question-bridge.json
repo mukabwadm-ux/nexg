@@ -1,0 +1,1868 @@
+{
+  "schemaVersion": "1.0.0-reconciled-planning",
+  "date": "2026-10-31",
+  "status": "PLANNED_NOT_IMPLEMENTED",
+  "source": "../question-additions.json",
+  "registry": "effective-question-registry.json",
+  "counts": {
+    "sourceBQQuestions": 31,
+    "reusedBQAliases": 8,
+    "newCanonicalDefinitions": 23
+  },
+  "inputNamespacePolicy": "answers.<legacy key>, operationalAnswers.<UPPERCASE key> and bookingSetup.<booking key> are raw provenance spellings only. Resolve question identity and explicit business/activity/offering/location/resource/session/pool scope, normalize, validate and store one canonical fact. Never evaluate raw namespace strings as a second predicate language.",
+  "aliases": [
+    {
+      "sourceQuestionId": "BQ_BOOKING_ENABLED",
+      "sourceKey": "booking_enabled",
+      "inputPath": "bookingSetup.booking_enabled",
+      "targetQuestionId": "BQ_BOOKING_ENABLED",
+      "canonicalTarget": "booking.accepts_scheduled_bookings",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_ACCEPTS_SCHEDULED_BOOKINGS",
+      "sourceKey": "accepts_scheduled_bookings",
+      "inputPath": "bookingSetup.accepts_scheduled_bookings",
+      "targetQuestionId": "BQ_BOOKING_ENABLED",
+      "canonicalTarget": "booking.accepts_scheduled_bookings",
+      "mode": "EXACT_SEMANTIC_ALIAS",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Same offering-scoped fact as booking_enabled; render one question and use its shared answer.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_REQUIRES_ADVANCE_BOOKING",
+      "sourceKey": "requires_advance_booking",
+      "inputPath": "bookingSetup.requires_advance_booking",
+      "targetQuestionId": "Q_BOOKING_REQUIRED",
+      "canonicalTarget": "workflow.booking_required",
+      "mode": "EXACT_SEMANTIC_ALIAS",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Reuse the advance-booking-required fact; false leaves optional appointments and walk-ins independently configured.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_OPTIONAL_SERVICE_BOOKING_ENABLED",
+      "sourceKey": "optional_service_booking_enabled",
+      "inputPath": "bookingSetup.optional_service_booking_enabled",
+      "targetQuestionId": "BQ_BOOKING_ENABLED",
+      "canonicalTarget": "booking.accepts_scheduled_bookings",
+      "mode": "EXACT_SEMANTIC_ALIAS",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Same booking-enabled fact scoped to the optional service offering. Link selection is a later command, never another copied boolean.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_INTAKE_MODE",
+      "sourceKey": "intake_mode",
+      "inputPath": "bookingSetup.intake_mode",
+      "targetQuestionId": "BQ_INTAKE_MODE",
+      "canonicalTarget": "workflow.intake_mode",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "string",
+        "enum": [
+          "instant_after_requirements",
+          "merchant_approval",
+          "request_quote",
+          "walk_in_only"
+        ]
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_EXACT_DURATION_MINUTES",
+      "sourceKey": "exact_duration_minutes",
+      "inputPath": "bookingSetup.exact_duration_minutes",
+      "targetQuestionId": "Q_APPOINTMENT_DURATION_MINUTES",
+      "canonicalTarget": "availability.appointment_duration_minutes",
+      "mode": "EXACT_SEMANTIC_ALIAS",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "integer",
+        "minimum": 1,
+        "unit": "minute",
+        "finite": true
+      },
+      "normalization": "Exact minutes populate the existing duration fact; broader legacy bands remain context, not midpoint conversions.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_RANGE_POLICY",
+      "sourceKey": "range_policy",
+      "inputPath": "bookingSetup.range_policy",
+      "targetQuestionId": "BQ_RANGE_POLICY",
+      "canonicalTarget": "availability.range_policy",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "minimum": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "minute",
+                  "hour",
+                  "day",
+                  "week",
+                  "month",
+                  "night"
+                ]
+              }
+            },
+            "required": [
+              "value",
+              "unit"
+            ],
+            "additionalProperties": false
+          },
+          "maximum": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "minute",
+                  "hour",
+                  "day",
+                  "week",
+                  "month",
+                  "night"
+                ]
+              }
+            },
+            "required": [
+              "value",
+              "unit"
+            ],
+            "additionalProperties": false
+          },
+          "calendar_basis": {
+            "type": "string",
+            "enum": [
+              "elapsed",
+              "local_calendar"
+            ]
+          },
+          "billing_policy_ref": {
+            "type": "object",
+            "properties": {
+              "policy_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "policy_id",
+              "version"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "minimum",
+          "maximum",
+          "calendar_basis",
+          "billing_policy_ref"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_RESOURCE_LIST",
+      "sourceKey": "resource_list",
+      "inputPath": "bookingSetup.resource_list",
+      "targetQuestionId": "Q_RESOURCE_INVENTORY",
+      "canonicalTarget": "availability.resources",
+      "mode": "SCOPED_EDITOR_ALIAS_WITH_VALIDATED_PROJECTION",
+      "scope": "offering_location",
+      "inputSchema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "resource_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "staff",
+                "asset",
+                "vehicle",
+                "room",
+                "space",
+                "equipment",
+                "capacity_pool"
+              ]
+            },
+            "location_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "capacity": {
+              "type": "object",
+              "properties": {
+                "quantity_minor": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "scale": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": [
+                    "person",
+                    "place",
+                    "item",
+                    "job",
+                    "visit",
+                    "asset",
+                    "kg",
+                    "g",
+                    "cbm",
+                    "container",
+                    "sqm",
+                    "sqft",
+                    "pallet",
+                    "unit",
+                    "minute"
+                  ]
+                }
+              },
+              "required": [
+                "quantity_minor",
+                "scale",
+                "unit"
+              ],
+              "additionalProperties": false
+            },
+            "role_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "minItems": 0,
+              "maxItems": 10000
+            },
+            "active": {
+              "type": "boolean"
+            },
+            "authority_binding_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          },
+          "required": [
+            "resource_id",
+            "kind",
+            "location_id",
+            "capacity",
+            "active",
+            "authority_binding_id"
+          ],
+          "additionalProperties": false
+        },
+        "minItems": 1,
+        "maxItems": 10000
+      },
+      "normalization": "Use the strengthened resource descriptor schema. Bare resource IDs resolve through the authorized owner; original integer capacity requires explicit unit before normalization.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_RESOURCE_SCHEDULES",
+      "sourceKey": "resource_schedules",
+      "inputPath": "bookingSetup.resource_schedules",
+      "targetQuestionId": "Q_WEEKLY_SCHEDULE",
+      "canonicalTarget": "availability.weekly_schedule",
+      "mode": "SCOPED_EDITOR_ALIAS_WITH_VALIDATED_PROJECTION",
+      "scope": "resource_location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "timezone": {
+            "type": "string",
+            "const": "Africa/Nairobi",
+            "default": "Africa/Nairobi"
+          },
+          "weekly": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "day": {
+                  "type": "string",
+                  "enum": [
+                    "mon",
+                    "tue",
+                    "wed",
+                    "thu",
+                    "fri",
+                    "sat",
+                    "sun"
+                  ]
+                },
+                "intervals": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "opens": {
+                        "type": "string",
+                        "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                      },
+                      "closes": {
+                        "type": "string",
+                        "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                      },
+                      "closes_next_day": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "opens",
+                      "closes",
+                      "closes_next_day"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 0,
+                  "maxItems": 24
+                }
+              },
+              "required": [
+                "day",
+                "intervals"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 7
+          },
+          "exceptions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "end_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "closed": {
+                  "type": "boolean"
+                },
+                "intervals": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "opens": {
+                        "type": "string",
+                        "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                      },
+                      "closes": {
+                        "type": "string",
+                        "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                      },
+                      "closes_next_day": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "opens",
+                      "closes",
+                      "closes_next_day"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 0,
+                  "maxItems": 24
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                }
+              },
+              "required": [
+                "date",
+                "closed",
+                "intervals"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 3660
+          }
+        },
+        "required": [
+          "timezone",
+          "weekly",
+          "exceptions"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture weekly intervals once per resource/location scope with platform-injected Africa/Nairobi. The original single global schedule may serve as an explicit inherited template, never overwrite every resource silently.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_CAPACITY",
+      "sourceKey": "capacity",
+      "inputPath": "bookingSetup.capacity",
+      "targetQuestionId": "BQ_CAPACITY",
+      "canonicalTarget": "availability.capacity_policy",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "session_or_pool",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pool_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "capacity": {
+            "type": "object",
+            "properties": {
+              "quantity_minor": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "scale": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "person",
+                  "place",
+                  "item",
+                  "job",
+                  "visit",
+                  "asset",
+                  "kg",
+                  "g",
+                  "cbm",
+                  "container",
+                  "sqm",
+                  "sqft",
+                  "pallet",
+                  "unit",
+                  "minute"
+                ]
+              }
+            },
+            "required": [
+              "quantity_minor",
+              "scale",
+              "unit"
+            ],
+            "additionalProperties": false
+          },
+          "authority_binding_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effective_until": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "pool_id",
+          "capacity",
+          "authority_binding_id"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_BUFFERS",
+      "sourceKey": "buffers",
+      "inputPath": "bookingSetup.buffers",
+      "targetQuestionId": "BQ_BUFFERS",
+      "canonicalTarget": "availability.buffers",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "before_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "after_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "turnaround_minutes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "before_minutes",
+          "after_minutes",
+          "turnaround_minutes"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_BOOKING_WINDOW",
+      "sourceKey": "booking_window",
+      "inputPath": "bookingSetup.booking_window",
+      "targetQuestionId": "BQ_BOOKING_WINDOW",
+      "canonicalTarget": "availability.booking_window",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "minimum_lead_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "maximum_horizon_days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3650
+          },
+          "same_day_cutoff": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "minimum_lead_minutes",
+          "maximum_horizon_days",
+          "same_day_cutoff"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_METHODS",
+      "sourceKey": "service_methods",
+      "inputPath": "bookingSetup.service_methods",
+      "targetQuestionId": "Q_FULFILLMENT_MODES",
+      "canonicalTarget": "fulfillment.enabled_modes",
+      "mode": "EXACT_SEMANTIC_ALIAS",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "NEXG_DELIVERY",
+            "MERCHANT_DELIVERY",
+            "CUSTOMER_PICKUP",
+            "CUSTOMER_DROPOFF",
+            "MERCHANT_VENUE",
+            "CUSTOMER_LOCATION",
+            "DIGITAL",
+            "PICKUP_RETURN",
+            "PASSENGER_TRANSFER",
+            "FREIGHT"
+          ]
+        },
+        "uniqueItems": true,
+        "minItems": 1
+      },
+      "normalization": "Use the Q_FULFILLMENT_MODES enum; map declared UI labels explicitly to these tokens, never arbitrary strings.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_TRAVEL_POLICY",
+      "sourceKey": "travel_policy",
+      "inputPath": "bookingSetup.travel_policy",
+      "targetQuestionId": "BQ_TRAVEL_POLICY",
+      "canonicalTarget": "fulfillment.travel_policy",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "service_area_question_id": {
+            "const": "Q_SERVICE_AREA"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "fixed_allowance",
+              "approved_route_matrix"
+            ]
+          },
+          "travel_before_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "travel_after_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "route_matrix_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "service_area_question_id",
+          "mode",
+          "travel_before_minutes",
+          "travel_after_minutes"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_GREETER_TRANSPORT_INCLUDED",
+      "sourceKey": "greeter_transport_included",
+      "inputPath": "bookingSetup.greeter_transport_included",
+      "targetQuestionId": "BQ_GREETER_TRANSPORT_INCLUDED",
+      "canonicalTarget": "fulfillment.greeter_transport_included",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "meet_greet_offering",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_SCHEDULED_FULFILMENT_ENABLED",
+      "sourceKey": "scheduled_fulfilment_enabled",
+      "inputPath": "bookingSetup.scheduled_fulfilment_enabled",
+      "targetQuestionId": "BQ_SCHEDULED_FULFILMENT_ENABLED",
+      "canonicalTarget": "fulfillment.scheduled_window_enabled",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_method",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_FULFILMENT_WINDOWS",
+      "sourceKey": "fulfilment_windows",
+      "inputPath": "bookingSetup.fulfilment_windows",
+      "targetQuestionId": "BQ_FULFILMENT_WINDOWS",
+      "canonicalTarget": "fulfillment.window_rules",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_method_location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": [
+              "NEXG_DELIVERY",
+              "MERCHANT_DELIVERY",
+              "CUSTOMER_PICKUP",
+              "CUSTOMER_DROPOFF"
+            ]
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rule_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "day": {
+                  "type": "string",
+                  "enum": [
+                    "mon",
+                    "tue",
+                    "wed",
+                    "thu",
+                    "fri",
+                    "sat",
+                    "sun"
+                  ]
+                },
+                "interval": {
+                  "type": "object",
+                  "properties": {
+                    "opens": {
+                      "type": "string",
+                      "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                    },
+                    "closes": {
+                      "type": "string",
+                      "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                    },
+                    "closes_next_day": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "opens",
+                    "closes",
+                    "closes_next_day"
+                  ],
+                  "additionalProperties": false
+                },
+                "capacity_policy_ref": {
+                  "type": "object",
+                  "properties": {
+                    "rule_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "rule_id",
+                    "version"
+                  ],
+                  "additionalProperties": false
+                },
+                "cutoff_lead_minutes": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "rule_id",
+                "day",
+                "interval",
+                "capacity_policy_ref",
+                "cutoff_lead_minutes"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "method",
+          "rules"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_RECURRING_SCHEDULE_ENABLED",
+      "sourceKey": "recurring_schedule_enabled",
+      "inputPath": "bookingSetup.recurring_schedule_enabled",
+      "targetQuestionId": "BQ_RECURRING_SCHEDULE_ENABLED",
+      "canonicalTarget": "availability.recurring_schedule_enabled",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_or_series",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_RECURRENCE_RULE",
+      "sourceKey": "recurrence_rule",
+      "inputPath": "bookingSetup.recurrence_rule",
+      "targetQuestionId": "BQ_RECURRENCE_RULE",
+      "canonicalTarget": "availability.recurrence_rule",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "series",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly"
+            ]
+          },
+          "interval": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365
+          },
+          "weekdays": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mon",
+                "tue",
+                "wed",
+                "thu",
+                "fri",
+                "sat",
+                "sun"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 7
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "exception_dates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "frequency",
+          "interval",
+          "start_date",
+          "exception_dates"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_MEMBERSHIP_PLAN_ENABLED",
+      "sourceKey": "membership_plan_enabled",
+      "inputPath": "bookingSetup.membership_plan_enabled",
+      "targetQuestionId": "BQ_MEMBERSHIP_PLAN_ENABLED",
+      "canonicalTarget": "commerce.membership_plan_enabled",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "activity_or_offering",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_ENTITLEMENT_POLICY",
+      "sourceKey": "entitlement_policy",
+      "inputPath": "bookingSetup.entitlement_policy",
+      "targetQuestionId": "BQ_ENTITLEMENT_POLICY",
+      "canonicalTarget": "commerce.entitlement_policy",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "plan",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scope_offering_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "minItems": 1,
+            "maxItems": 10000
+          },
+          "validity": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "const": "absolute_dates"
+                  },
+                  "starts": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "ends": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "required": [
+                  "mode",
+                  "starts",
+                  "ends"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "const": "relative_to_activation"
+                  },
+                  "duration": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "unit": {
+                        "type": "string",
+                        "enum": [
+                          "day",
+                          "week",
+                          "month"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "value",
+                      "unit"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "mode",
+                  "duration"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "credits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "credit_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "quantity": {
+                  "type": "object",
+                  "properties": {
+                    "quantity_minor": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "scale": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9
+                    },
+                    "unit": {
+                      "type": "string",
+                      "enum": [
+                        "person",
+                        "place",
+                        "item",
+                        "job",
+                        "visit",
+                        "asset",
+                        "kg",
+                        "g",
+                        "cbm",
+                        "container",
+                        "sqm",
+                        "sqft",
+                        "pallet",
+                        "unit",
+                        "minute"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "quantity_minor",
+                    "scale",
+                    "unit"
+                  ],
+                  "additionalProperties": false
+                },
+                "offering_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "minItems": 1,
+                  "maxItems": 10000
+                }
+              },
+              "required": [
+                "credit_id",
+                "quantity",
+                "offering_ids"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 10000
+          },
+          "usage_policy_ref": {
+            "type": "object",
+            "properties": {
+              "policy_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "policy_id",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "renewal": {
+            "type": "string",
+            "enum": [
+              "none",
+              "manual",
+              "separately_authorized"
+            ]
+          }
+        },
+        "required": [
+          "plan_id",
+          "version",
+          "scope_offering_ids",
+          "validity",
+          "credits",
+          "usage_policy_ref",
+          "renewal"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_OFFERS_TABLE_RESERVATIONS",
+      "sourceKey": "offers_table_reservations",
+      "inputPath": "bookingSetup.offers_table_reservations",
+      "targetQuestionId": "BQ_OFFERS_TABLE_RESERVATIONS",
+      "canonicalTarget": "booking.offers_table_reservations",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "restaurant_or_space_offering",
+      "inputSchema": {
+        "type": "boolean"
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_SPACE_POLICY",
+      "sourceKey": "space_policy",
+      "inputPath": "bookingSetup.space_policy",
+      "targetQuestionId": "BQ_SPACE_POLICY",
+      "canonicalTarget": "availability.space_policy",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaces": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minimum_party_size": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "maximum_party_size": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "active": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "resource_id",
+                "minimum_party_size",
+                "maximum_party_size",
+                "active"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 10000
+          },
+          "combinations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "combination_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "resource_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "minItems": 2,
+                  "maxItems": 10000
+                },
+                "minimum_party_size": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "maximum_party_size": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "combination_id",
+                "resource_ids",
+                "minimum_party_size",
+                "maximum_party_size"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 10000
+          },
+          "turnover_minutes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "spaces",
+          "combinations",
+          "turnover_minutes"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_CUSTOM_ORDER_KIND",
+      "sourceKey": "custom_order_kind",
+      "inputPath": "bookingSetup.custom_order_kind",
+      "targetQuestionId": "BQ_CUSTOM_ORDER_KIND",
+      "canonicalTarget": "workflow.custom_order_kind",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "string",
+        "enum": [
+          "made_to_specification",
+          "special_sourcing",
+          "standard_product"
+        ]
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_PRODUCTION_POLICY",
+      "sourceKey": "production_policy",
+      "inputPath": "bookingSetup.production_policy",
+      "targetQuestionId": "BQ_PRODUCTION_POLICY",
+      "canonicalTarget": "workflow.production_policy",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "capacity_pool_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "capacity_unit": {
+            "type": "string",
+            "enum": [
+              "person",
+              "place",
+              "item",
+              "job",
+              "visit",
+              "asset",
+              "kg",
+              "g",
+              "cbm",
+              "container",
+              "sqm",
+              "sqft",
+              "pallet",
+              "unit",
+              "minute"
+            ]
+          },
+          "preparation_lead_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "cutoff_local_time": {
+            "type": "string",
+            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+          },
+          "working_days": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mon",
+                "tue",
+                "wed",
+                "thu",
+                "fri",
+                "sat",
+                "sun"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 7
+          },
+          "approval_mode": {
+            "type": "string",
+            "enum": [
+              "required",
+              "not_required_for_fixed_specification"
+            ]
+          },
+          "change_policy_ref": {
+            "type": "object",
+            "properties": {
+              "policy_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "policy_id",
+              "version"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "capacity_pool_id",
+          "capacity_unit",
+          "preparation_lead_minutes",
+          "cutoff_local_time",
+          "working_days",
+          "approval_mode",
+          "change_policy_ref"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_PICKUP_RETURN_POLICY",
+      "sourceKey": "pickup_return_policy",
+      "inputPath": "bookingSetup.pickup_return_policy",
+      "targetQuestionId": "BQ_PICKUP_RETURN_POLICY",
+      "canonicalTarget": "fulfillment.pickup_return_policy",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_rule_ref": {
+            "type": "object",
+            "properties": {
+              "rule_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "rule_id",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "return_rule_ref": {
+            "type": "object",
+            "properties": {
+              "rule_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "rule_id",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "minimum_processing_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "maximum_processing_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "processing_capacity_ref": {
+            "type": "object",
+            "properties": {
+              "rule_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "rule_id",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "calendar_basis": {
+            "type": "string",
+            "enum": [
+              "elapsed",
+              "business_calendar"
+            ]
+          },
+          "collection_mode": {
+            "type": "string",
+            "enum": [
+              "NEXG_COLLECTION",
+              "MERCHANT_COLLECTION",
+              "CUSTOMER_DROPOFF",
+              "PARTNER_COLLECTION"
+            ]
+          },
+          "return_mode": {
+            "type": "string",
+            "enum": [
+              "NEXG_RETURN",
+              "MERCHANT_RETURN",
+              "CUSTOMER_COLLECTION",
+              "PARTNER_RETURN"
+            ]
+          }
+        },
+        "required": [
+          "collection_rule_ref",
+          "return_rule_ref",
+          "minimum_processing_minutes",
+          "maximum_processing_minutes",
+          "processing_capacity_ref",
+          "calendar_basis",
+          "collection_mode",
+          "return_mode"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_SUPPLIER_POLICY",
+      "sourceKey": "supplier_policy",
+      "inputPath": "bookingSetup.supplier_policy",
+      "targetQuestionId": "BQ_SUPPLIER_POLICY",
+      "canonicalTarget": "integration.supplier_policy",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering_or_quote",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "component_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                },
+                "owner_reference": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "authority_binding_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "confirmation_required": {
+                  "type": "boolean"
+                },
+                "confirmation_evidence_kind": {
+                  "type": "string",
+                  "enum": [
+                    "provider_api",
+                    "authorized_manual_reference"
+                  ]
+                }
+              },
+              "required": [
+                "component_id",
+                "description",
+                "owner_reference",
+                "authority_binding_id",
+                "confirmation_required",
+                "confirmation_evidence_kind"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 10000
+          },
+          "commitment_rule": {
+            "type": "string",
+            "enum": [
+              "all_required_confirmed",
+              "explicit_partial_scope_acceptance"
+            ]
+          }
+        },
+        "required": [
+          "components",
+          "commitment_rule"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_SOURCE_RESERVATION_AUTHORITY",
+      "sourceKey": "source_reservation_authority",
+      "inputPath": "bookingSetup.source_reservation_authority",
+      "targetQuestionId": "Q_DATA_AUTHORITY",
+      "canonicalTarget": "integration.data_authority",
+      "mode": "SCOPED_EDITOR_ALIAS_WITH_VALIDATED_PROJECTION",
+      "scope": "business_location_data_class",
+      "inputSchema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "data_class": {
+              "type": "string",
+              "enum": [
+                "offerings",
+                "pricing",
+                "stock",
+                "availability",
+                "resources",
+                "reservations",
+                "work_items",
+                "fulfillment",
+                "business_identity",
+                "verification",
+                "service_areas",
+                "finance.payment",
+                "finance.refund",
+                "finance.settlement",
+                "finance.payout"
+              ]
+            },
+            "authority": {
+              "type": "string",
+              "enum": [
+                "NEXG_AUTHORITATIVE",
+                "EXTERNAL_AUTHORITATIVE",
+                "SHARED_WITH_RULES",
+                "READ_ONLY_EXTERNAL"
+              ]
+            },
+            "owner_reference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "scope": {
+              "type": "object",
+              "properties": {
+                "business_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "activity_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "offering_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "location_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "resource_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "session_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "pool_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              },
+              "required": [
+                "business_id"
+              ],
+              "additionalProperties": false
+            },
+            "shared_rule_reference": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "data_class",
+            "authority",
+            "owner_reference",
+            "scope"
+          ],
+          "additionalProperties": false
+        },
+        "minItems": 1,
+        "maxItems": 10000
+      },
+      "normalization": "Use structured per-data-class bindings, not an unscoped scalar enum. Scalar preference remains incomplete until trusted business/data-class/owner scope is provided.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_PAYMENT_POLICY",
+      "sourceKey": "payment_policy",
+      "inputPath": "bookingSetup.payment_policy",
+      "targetQuestionId": "BQ_PAYMENT_POLICY",
+      "canonicalTarget": "commerce.booking_payment_policy_ref",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "policy_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "policy_id",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_CHANGE_POLICY",
+      "sourceKey": "change_policy",
+      "inputPath": "bookingSetup.change_policy",
+      "targetQuestionId": "BQ_CHANGE_POLICY",
+      "canonicalTarget": "workflow.change_policy_ref",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "offering",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "policy_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "policy_id",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    },
+    {
+      "sourceQuestionId": "BQ_GOOGLE_CONNECTION",
+      "sourceKey": "google_connection",
+      "inputPath": "bookingSetup.google_connection",
+      "targetQuestionId": "BQ_GOOGLE_CONNECTION",
+      "canonicalTarget": "integration.google_connection_preference",
+      "mode": "CANONICAL_NEW_DEFINITION",
+      "scope": "business_or_staff",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "not_connected",
+              "create_secondary_business_calendar",
+              "select_existing_business_calendar"
+            ]
+          },
+          "selected_business_calendar_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "use_busy_calendar_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "minItems": 0,
+            "maxItems": 50
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "additionalProperties": false
+      },
+      "normalization": "Capture against the explicit typed schema in the declared scope; preserve raw input provenance.",
+      "conflictPolicy": "If old and new aliases in the same scope disagree, retain both raw sources and require clarification. Never last-write-wins or silently overwrite."
+    }
+  ],
+  "dataClassRegistrySource": "../../domain-registry.json#/dataClasses",
+  "canonicalDataClasses": [
+    "offerings",
+    "pricing",
+    "stock",
+    "availability",
+    "resources",
+    "reservations",
+    "work_items",
+    "fulfillment",
+    "business_identity",
+    "verification",
+    "service_areas",
+    "finance.payment",
+    "finance.refund",
+    "finance.settlement",
+    "finance.payout"
+  ],
+  "dataClassInputAliases": {
+    "payments": {
+      "outcome": "CANONICAL_ALIAS",
+      "canonicalId": "finance.payment",
+      "policy": "Legacy UI payments means payment collection only. It grants no ownership of refund, settlement or payout facts."
+    },
+    "capacity": {
+      "outcome": "NEEDS_CLARIFICATION",
+      "candidateCanonicalIds": [
+        "resources",
+        "availability",
+        "reservations",
+        "stock"
+      ],
+      "policy": "Capacity is a grouping, not one authority leaf. Ask which qualified-resource records, schedule constraints, actual reservations or stock facts are covered and bind each selected canonical leaf explicitly. Do not automatically copy one authority to all candidates."
+    },
+    "finance": {
+      "outcome": "NEEDS_CLARIFICATION",
+      "candidateCanonicalIds": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "policy": "Finance is a grouping. Payment, refund, settlement and payout have independently confirmed owners and outcomes."
+    }
+  },
+  "componentBridges": [
+    {
+      "sourceQuestionId": "Q_BOOKING_LEAD_TIME_MINUTES",
+      "targetQuestionId": "BQ_BOOKING_WINDOW",
+      "canonicalTarget": "availability.booking_window.minimum_lead_minutes",
+      "componentPath": "minimum_lead_minutes",
+      "rule": "A lead value fills only that component; horizon/cutoff remain unresolved. Zero is valid."
+    },
+    {
+      "sourceQuestionId": "Q_MINIMUM_RENTAL_DURATION",
+      "targetQuestionId": "BQ_RANGE_POLICY",
+      "canonicalTarget": "availability.range_policy.minimum",
+      "componentPath": "minimum",
+      "rule": "Legacy minimum value/unit fills only minimum; calendar basis, maximum and billing policy require explicit setup."
+    },
+    {
+      "sourceQuestionId": "Q_CAPACITY_LIMIT",
+      "targetQuestionId": "BQ_CAPACITY",
+      "canonicalTarget": "availability.capacity_policy.capacity",
+      "componentPath": "capacity",
+      "rule": "Person-only integer normalizes to quantity_minor=N, scale=0, unit=person in an explicit pool/occurrence context. It cannot fill area/volume/weight."
+    }
+  ],
+  "compositeLegacyBridge": {
+    "sourceQuestionId": "Q_BOOKING_CONFIRMATION_MODE",
+    "targetQuestionIds": [
+      "BQ_INTAKE_MODE",
+      "Q_DATA_AUTHORITY"
+    ],
+    "policy": "instant_authority_confirmed maps to intake instant_after_requirements; merchant_accepts maps to merchant_approval. external_system_confirms identifies external ownership only and leaves intake unresolved. Never infer source authority or approval from a single mixed token."
+  },
+  "compatibilityRules": [
+    "BQ_BUFFERS is not an alias for Q_PREPARATION_MINUTES: production preparation workload is not necessarily occupied resource buffer.",
+    "BQ_TRAVEL_POLICY reuses Q_SERVICE_AREA through a reference and adds travel rules; capture coverage only once.",
+    "BQ_RANGE_POLICY retains Q_MINIMUM_RENTAL_DURATION as a minimum component, with separate maximum/calendar basis/billing policy.",
+    "BQ_BOOKING_WINDOW retains exact lead as a component and adds horizon/cutoff; do not ask both component and compound editor for the same scope.",
+    "BQ_CAPACITY is typed pool/occurrence capacity, while Q_CAPACITY_LIMIT is a person-only component compatibility view; no generalized unit conversion is implied.",
+    "BQ_PAYMENT_POLICY is an approved policy reference, not a second deposit amount. Existing price/deposit/amount answers can draft policy inputs, with finance-owner validation before publication."
+  ]
+}

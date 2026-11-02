@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { createClient } from '@/lib/supabase/server';
+import { merchantActionClient, requireMerchantActionObject } from '@/lib/merchant-action-access';
 
 /**
  * What a merchant can do from their own dashboard.
@@ -56,7 +56,8 @@ export async function setAcceptingOrders(
   accepting: boolean,
   reason: string,
 ): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_control', {
+  const { client } = await merchantActionClient({ merchantId: merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_control', {
     p_merchant_id: merchantId,
     p_control: 'accepting_orders',
     p_value: accepting as never,
@@ -78,7 +79,8 @@ export async function setBusyMode(
   minutes: number | null,
   reason: string,
 ): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_control', {
+  const { client } = await merchantActionClient({ merchantId: merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_control', {
     p_merchant_id: merchantId,
     p_control: 'busy_mode_until',
     p_value: (minutes === null
@@ -95,7 +97,8 @@ export async function setPrep(
   minutes: number,
   capacity: number | null,
 ): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_set_prep', {
+  const { client } = await merchantActionClient({ merchantId: merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_set_prep', {
     p_merchant_id: merchantId,
     p_minutes: minutes,
     p_capacity: capacity ?? undefined,
@@ -113,7 +116,8 @@ export async function addStore(input: {
   lng: number;
   makePrimary: boolean;
 }): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_add_store', {
+  const { client } = await merchantActionClient({ access: 'setup', merchantId: input.merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_add_store', {
     p_merchant_id: input.merchantId,
     p_name: input.name,
     p_address: input.address,
@@ -129,7 +133,9 @@ export async function renameStore(
   name: string,
   address: string,
 ): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_rename_store', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup' });
+  await requireMerchantActionObject(client, 'merchant_branch', branchId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_merchant_rename_store', {
     p_branch_id: branchId,
     p_name: name,
     p_address: address || undefined,
@@ -138,7 +144,9 @@ export async function renameStore(
 }
 
 export async function closeStore(branchId: string, reason: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_close_store', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'merchant_branch', branchId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_merchant_close_store', {
     p_branch_id: branchId,
     p_reason: reason,
   });
@@ -154,7 +162,8 @@ export async function requestFeatured(input: {
   weeks: number;
   note: string;
 }): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_request_featured', {
+  const { client } = await merchantActionClient({ merchantId: input.merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_request_featured', {
     p_merchant_id: input.merchantId,
     p_placement_id: input.placementId,
     p_week_start: input.weekStart,
@@ -165,7 +174,9 @@ export async function requestFeatured(input: {
 }
 
 export async function withdrawFeatured(bookingId: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_withdraw_featured', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'featured_booking', bookingId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_merchant_withdraw_featured', {
     p_booking_id: bookingId,
   });
   return unwrap(data, error, ['/merchant', '/merchant/featured']);
@@ -181,7 +192,8 @@ export async function withdrawFeatured(bookingId: string): Promise<Outcome> {
  * something is a badge people learn to ignore.
  */
 export async function markMessagesRead(merchantId: string): Promise<void> {
-  const supabase = createClient();
+  const { client } = await merchantActionClient({ merchantId: merchantId });
+  const supabase = client;
   await supabase
     .from('merchant_message')
     .update({ read_at: new Date().toISOString() })
@@ -193,11 +205,13 @@ export async function markMessagesRead(merchantId: string): Promise<void> {
 }
 
 export async function setItemAvailable(itemId: string, available: boolean): Promise<Outcome> {
-  const { error } = await createClient()
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup' });
+  const { data, error } = await client
     .from('catalogue_item')
     .update({ available })
-    .eq('id', itemId);
+    .eq('id', itemId).eq('merchant_id', authorizedMerchantId).select('id').maybeSingle();
   if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
   revalidatePath('/merchant/menu');
   return {
     ok: true,
@@ -216,13 +230,15 @@ function cleanPrice(value: number): number | null {
 }
 
 export async function setItemPrice(itemId: string, priceKes: number): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup' });
   const price = cleanPrice(priceKes);
   if (price === null) return { ok: false, message: 'Enter a price between KES 1 and 1,000,000.' };
-  const { error } = await createClient()
+  const { data, error } = await client
     .from('catalogue_item')
     .update({ price_kes: price })
-    .eq('id', itemId);
+    .eq('id', itemId).eq('merchant_id', authorizedMerchantId).select('id').maybeSingle();
   if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
   revalidatePath('/merchant/menu');
   revalidatePath('/explore', 'layout');
   return { ok: true, message: 'Price updated. New orders use it straight away.' };
@@ -240,6 +256,9 @@ export async function addMenuItems(input: {
     photoPath?: string | null;
   }[];
 }): Promise<Outcome> {
+  const { client: supabase, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup', merchantId: input?.merchantId,
+  });
   if (!input || !Array.isArray(input.items) || input.items.length < 1 || input.items.length > 50) {
     return { ok: false, message: 'Add between 1 and 50 products at a time.' };
   }
@@ -250,7 +269,6 @@ export async function addMenuItems(input: {
     };
   }
 
-  const supabase = createClient();
   const items: {
     name: string;
     description: string | null;
@@ -286,7 +304,7 @@ export async function addMenuItems(input: {
       photoPath !== null &&
       (typeof photoPath !== 'string' ||
         photoPath.split('/').length !== 2 ||
-        photoPath.split('/')[0] !== input.merchantId ||
+        photoPath.split('/')[0] !== authorizedMerchantId ||
         !/^[0-9a-f-]{36}\.(jpg|png|webp)$/i.test(photoPath.split('/')[1] ?? ''))
     ) {
       return {
@@ -302,13 +320,17 @@ export async function addMenuItems(input: {
       photo_path: photoPath,
     });
   }
-
   let sectionId = input.sectionId ?? null;
+  if (sectionId) {
+    const { data: section, error: sectionError } = await supabase.from('catalogue_section')
+      .select('id').eq('id', sectionId).eq('merchant_id', authorizedMerchantId).maybeSingle();
+    if (sectionError || !section) return { ok: false, message: 'Choose a section from this business.' };
+  }
   if (!sectionId) {
     const sectionName = (input.newSection ?? '').trim() || 'Menu';
     const { data: made, error: sectionError } = await supabase
       .from('catalogue_section')
-      .insert({ merchant_id: input.merchantId, name: sectionName })
+      .insert({ merchant_id: authorizedMerchantId, name: sectionName })
       .select('id')
       .single();
     if (sectionError || !made)
@@ -319,7 +341,7 @@ export async function addMenuItems(input: {
   const { error } = await supabase.from('catalogue_item').insert(
     items.map((item) => ({
       ...item,
-      merchant_id: input.merchantId,
+      merchant_id: authorizedMerchantId,
       section_id: sectionId,
     })),
   );
@@ -332,8 +354,11 @@ export async function addMenuItems(input: {
 }
 
 export async function removeMenuItem(itemId: string): Promise<Outcome> {
-  const { error } = await createClient().from('catalogue_item').delete().eq('id', itemId);
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup' });
+  const { data, error } = await client.from('catalogue_item').delete().eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId).select('id').maybeSingle();
   if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
   revalidatePath('/merchant/menu');
   return { ok: true, message: 'Item removed.' };
 }
@@ -358,7 +383,9 @@ export async function saveBranch(input: {
   latitude?: string;
   longitude?: string;
 }): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_branch_upsert', {
+  const { client, merchantId } = await merchantActionClient({ access: 'setup', merchantId: input.merchantId });
+  if (input.branchId) await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
+  const { data, error } = await client.rpc('rpc_branch_upsert', {
     p_merchant_id: input.merchantId,
     p_branch_id: input.branchId ?? undefined,
     p_branch: {
@@ -381,7 +408,9 @@ export async function saveBranch(input: {
 }
 
 export async function pauseBranch(branchId: string, reason: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_branch_pause', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'merchant_branch', branchId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_branch_pause', {
     p_branch_id: branchId,
     p_reason: reason,
   });
@@ -394,12 +423,16 @@ export async function pauseBranch(branchId: string, reason: string): Promise<Out
 }
 
 export async function resumeBranch(branchId: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_branch_resume', { p_branch_id: branchId });
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'merchant_branch', branchId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_branch_resume', { p_branch_id: branchId });
   return unwrap(data, error, ALL, 'Open again.');
 }
 
 export async function deleteBranch(branchId: string, confirmName: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_branch_delete', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'merchant_branch', branchId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_branch_delete', {
     p_branch_id: branchId,
     p_confirm_name: confirmName,
   });
@@ -415,7 +448,8 @@ export async function inviteMember(input: {
   branches: string[];
   caps: Record<string, boolean>;
 }): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_invite_member', {
+  const { client } = await merchantActionClient({ merchantId: input.merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_invite_member', {
     p_merchant_id: input.merchantId,
     p_contact: input.contact,
     p_role: input.role,
@@ -432,7 +466,8 @@ export async function updateMember(input: {
   branches: string[];
   caps: Record<string, boolean>;
 }): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_membership_update', {
+  const { client } = await merchantActionClient({ merchantId: input.merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_membership_update', {
     p_merchant_id: input.merchantId,
     p_user_id: input.userId,
     p_role: input.role,
@@ -443,7 +478,8 @@ export async function updateMember(input: {
 }
 
 export async function removeMember(merchantId: string, userId: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_membership_remove', {
+  const { client } = await merchantActionClient({ merchantId: merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_membership_remove', {
     p_merchant_id: merchantId,
     p_user_id: userId,
   });
@@ -451,7 +487,9 @@ export async function removeMember(merchantId: string, userId: string): Promise<
 }
 
 export async function revokeInvite(inviteId: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_invite_revoke', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'merchant_invite', inviteId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_merchant_invite_revoke', {
     p_invite_id: inviteId,
   });
   return unwrap(data, error, ALL);
@@ -468,7 +506,9 @@ export async function setHours(input: {
   closed: boolean;
   branchId?: string | null;
 }): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_hours_set', {
+  const { client, merchantId } = await merchantActionClient({ access: 'setup', merchantId: input.merchantId });
+  if (input.branchId) await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
+  const { data, error } = await client.rpc('rpc_hours_set', {
     p_merchant_id: input.merchantId,
     p_day: input.day,
     p_service: input.service,
@@ -485,7 +525,10 @@ export async function copyHours(
   fromBranch: string | null,
   toBranch: string,
 ): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_hours_copy', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup', merchantId });
+  await requireMerchantActionObject(client, 'merchant_branch', toBranch, authorizedMerchantId);
+  if (fromBranch) await requireMerchantActionObject(client, 'merchant_branch', fromBranch, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_hours_copy', {
     p_merchant_id: merchantId,
     p_to_branch: toBranch,
     p_from_branch: fromBranch ?? undefined,
@@ -502,7 +545,9 @@ export async function setOverride(input: {
   reason: string;
   branchId?: string | null;
 }): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_hours_override', {
+  const { client, merchantId } = await merchantActionClient({ merchantId: input.merchantId });
+  if (input.branchId) await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
+  const { data, error } = await client.rpc('rpc_merchant_hours_override', {
     p_merchant_id: input.merchantId,
     p_date: input.date,
     p_opens: undefined,
@@ -523,7 +568,9 @@ export async function setOverride(input: {
 // ──────────────────────────────────────────────────── reviews
 
 export async function replyToReview(ratingId: string, body: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_review_reply', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'order_rating', ratingId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_review_reply', {
     p_rating_id: ratingId,
     p_body: body,
   });
@@ -538,7 +585,9 @@ export async function replyToReview(ratingId: string, body: string): Promise<Out
 // ─────────────────────────────────────────────────── disputes
 
 export async function replyToDispute(disputeId: string, reply: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_dispute_merchant_reply', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'dispute', disputeId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_dispute_merchant_reply', {
     p_dispute_id: disputeId,
     p_reply: reply,
   });
@@ -551,7 +600,9 @@ export async function replyToDispute(disputeId: string, reply: string): Promise<
 }
 
 export async function acceptDispute(disputeId: string): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_dispute_accept', {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'dispute', disputeId, authorizedMerchantId);
+  const { data, error } = await client.rpc('rpc_dispute_accept', {
     p_dispute_id: disputeId,
   });
   return unwrap(data, error, ALL, 'Accepted. It appears on Friday’s statement with the reason.');
@@ -563,7 +614,8 @@ export async function saveMerchantSettings(
   merchantId: string,
   patch: Record<string, unknown>,
 ): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_merchant_settings_update', {
+  const { client } = await merchantActionClient({ merchantId: merchantId });
+  const { data, error } = await client.rpc('rpc_merchant_settings_update', {
     p_merchant_id: merchantId,
     p_patch: patch as never,
   });
@@ -577,7 +629,8 @@ export async function openTicket(input: {
   body: string;
   page: string;
 }): Promise<Outcome> {
-  const { data, error } = await createClient().rpc('rpc_support_ticket_create', {
+  const { client } = await merchantActionClient({ access: 'support' });
+  const { data, error } = await client.rpc('rpc_support_ticket_create', {
     p_topic: input.topic as never,
     p_body: `${input.body}\n\n— from ${input.page}`,
     p_source_form: 'merchant_portal',

@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-01",
+  "tool": "built-in image_gen",
+  "corrections": [
+    {
+      "id": "INS_01",
+      "prompt": "Use case: precise-object-edit. Edit this NEXG Insights screenshot. Change only the comparison setting and chart legends. Set the comparison selector to 'Compare: off'. Delete both previous-period legend entries and their dates from the Products and Appointments chart footers. Keep only 'Fulfilled product orders (4–31 Oct 2026)' under Products and 'Completed appointments (4–31 Oct 2026)' under Appointments. Preserve all numbers, dates elsewhere, chart values, sidebar, layout, merchant, scope and design. No additional series or other changes.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-c16c22c4-1fd3-483a-9a32-07145d01961e.png"
+    },
+    {
+      "id": "INS_03",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-0edce40e-9957-4da1-90a1-279c67c288ec.png",
+      "prompt": "Use case: precise-object-edit. Change only the first metric card text in this NEXG appointment Insights screen. Its title must read 'Requests confirmed', its secondary basis label 'Request cohort', main value '90%' and evidence line '216 of 240 requests'. Keep every other number, service table, chart, sidebar, layout, palette and all surrounding content exactly unchanged. Do not add a comparison."
+    },
+    {
+      "id": "INS_06",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-9861ab78-9f1d-40eb-9491-2a3507981381.png",
+      "prompt": "Use case: precise-object-edit. Make three specific text corrections in this NEXG Insights screen and preserve the rest. In the request cohort section replace 'Quote acceptance' with 'Requests with accepted quote', retaining 60% and 36 of 60 requests. In the production section replace the subtitle '30 jobs with accepted quotes due 4–31 Oct 2026' with '30 accepted production jobs due 4–31 Oct 2026'. In the bottom table change the 'Open work' column values from No/No/Yes to three blue 'View' links. Keep all charts, their values, all other text, 30 due jobs, rates, row references, accepted due dates, sidebar and design unchanged. Quote acceptance is separate from production acceptance."
+    }
+  ]
+}

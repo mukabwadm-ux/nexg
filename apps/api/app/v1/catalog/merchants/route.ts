@@ -30,10 +30,10 @@ export async function GET(request: Request) {
   try {
     credential = await authenticate(request);
     requireScope(credential, API_SCOPES.public_read);
-    await enforceRateLimit(credential);
+    await enforceRateLimit(credential, request);
   } catch (e) {
     if (e instanceof ApiAuthError) {
-      return jsonError(e.code, e.message, { status: e.status });
+      return jsonError(e.code, e.message, { status: e.status, retryAfter: e.retryAfter });
     }
     return jsonError('internal_error', 'Something went wrong on our side.', { status: 500 });
   }

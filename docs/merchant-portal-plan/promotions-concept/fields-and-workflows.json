@@ -1,0 +1,1025 @@
+{
+  "version": "1.2.0-design",
+  "status": "PROMOTIONS_CONCEPT_NOT_IMPLEMENTED",
+  "runtimeEnabled": false,
+  "proposedPromotionTypes": [
+    {
+      "id": "FEATURED",
+      "name": "Featured placement",
+      "registryRef": "PROMOTION_FEATURED_PLACEMENT_V1",
+      "stage": "EXISTING_BASELINE_CONCEPT",
+      "purpose": "Request actual discovery placement inventory with confirmed cost, timing and review; no ranking or result guarantee."
+    },
+    {
+      "id": "AUTO_OFFER",
+      "name": "Automatic offer",
+      "registryRef": null,
+      "stage": "PROPOSED_CONTRACT",
+      "purpose": "An approved percentage/fixed benefit on actual eligible priced components; use the existing rule/price owner, not a second price editor."
+    },
+    {
+      "id": "CODE_OFFER",
+      "name": "Code-based offer",
+      "registryRef": null,
+      "stage": "PROPOSED_CONTRACT",
+      "purpose": "An approved benefit with explicit code, redemption scope and limits, validated by its authoritative owner."
+    },
+    {
+      "id": "PACKAGE_PLAN",
+      "name": "Bundle or plan offer",
+      "registryRef": null,
+      "stage": "PROPOSED_CONTRACT",
+      "purpose": "A benefit on a real published bundle/plan, with contents, first-term versus renewal scope and redemption/booking terms."
+    },
+    {
+      "id": "ENQUIRY_VISIBILITY",
+      "name": "Enquiry campaign",
+      "registryRef": null,
+      "stage": "PROPOSED_PRESENTATION_OF_FEATURED",
+      "purpose": "Promote an actual quoted/provider/coordination service with its real request CTA; never invent a final checkout price."
+    }
+  ],
+  "fields": [
+    {
+      "id": "PR_identity_name",
+      "group": "identity",
+      "label": "Promotion name",
+      "inputType": "text",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Campaign list and internal organization",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_identity_type",
+      "group": "identity",
+      "label": "Promotion type",
+      "inputType": "registered_type_reference",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Correct creation flow and customer presentation",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_identity_objective",
+      "group": "identity",
+      "label": "Objective",
+      "inputType": "enum",
+      "requiredWhen": "When supported",
+      "purposeAndDisplay": "Internal goal; no guaranteed growth claim",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_identity_revision",
+      "group": "identity",
+      "label": "Campaign and rule revision",
+      "inputType": "reference",
+      "requiredWhen": "System-owned",
+      "purposeAndDisplay": "Internal accepted-version reference",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_scope_offerings",
+      "group": "scope",
+      "label": "Actual offering selection",
+      "inputType": "offering_reference_list",
+      "requiredWhen": "For offering campaigns",
+      "purposeAndDisplay": "Customer card, detail and actual order/book/request CTA",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_scope_variants",
+      "group": "scope",
+      "label": "Qualifying variants/options/tiers",
+      "inputType": "reference_list",
+      "requiredWhen": "When choices affect eligibility",
+      "purposeAndDisplay": "Actual selected options, image, price and availability",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_scope_locations",
+      "group": "scope",
+      "label": "Branches and supported service areas",
+      "inputType": "scoped_reference_list",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Where the offer is valid",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_scope_channels",
+      "group": "scope",
+      "label": "Eligible channels or placement",
+      "inputType": "enum_list",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Actual permitted discovery/storefront placement",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_scope_price_components",
+      "group": "scope",
+      "label": "Qualifying price components and unit",
+      "inputType": "pricing_component_reference_list",
+      "requiredWhen": "For monetary offers",
+      "purposeAndDisplay": "Correct item/period/person/fee benefit basis",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_benefit_rule",
+      "group": "benefit",
+      "label": "Existing approved benefit/rule reference",
+      "inputType": "rule_reference",
+      "requiredWhen": "For monetary offers",
+      "purposeAndDisplay": "One authoritative benefit definition, shared with Offerings",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_benefit_kind",
+      "group": "benefit",
+      "label": "Percentage or fixed benefit",
+      "inputType": "enum",
+      "requiredWhen": "For supported monetary rules",
+      "purposeAndDisplay": "Clear customer saving",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_benefit_value",
+      "group": "benefit",
+      "label": "Benefit amount or percentage",
+      "inputType": "money_or_basis_points",
+      "requiredWhen": "For supported monetary rules",
+      "purposeAndDisplay": "Saving and selected price",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_benefit_maximum",
+      "group": "benefit",
+      "label": "Maximum saving",
+      "inputType": "money",
+      "requiredWhen": "When capped",
+      "purposeAndDisplay": "Visible cap near the offer",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_benefit_minimum",
+      "group": "benefit",
+      "label": "Minimum qualifying value/quantity/duration",
+      "inputType": "typed_qualification",
+      "requiredWhen": "When applicable",
+      "purposeAndDisplay": "Visible qualification in actual units",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_benefit_code",
+      "group": "benefit",
+      "label": "Code and application method",
+      "inputType": "code_rule",
+      "requiredWhen": "For code offers",
+      "purposeAndDisplay": "Customer code field or automatic-applied label",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_benefit_stacking",
+      "group": "benefit",
+      "label": "Combination and priority policy",
+      "inputType": "policy_reference",
+      "requiredWhen": "Before enabling a monetary rule",
+      "purposeAndDisplay": "Whether other offers can combine",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_benefit_exclusions",
+      "group": "benefit",
+      "label": "Excluded components and items",
+      "inputType": "reference_list",
+      "requiredWhen": "When applicable",
+      "purposeAndDisplay": "Clear exclusions before commitment",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_timing_publish",
+      "group": "timing",
+      "label": "Campaign start/end",
+      "inputType": "offset_instants",
+      "requiredWhen": "For timed campaigns",
+      "purposeAndDisplay": "Accurate public validity in Africa/Nairobi",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_timing_booking",
+      "group": "timing",
+      "label": "Book/order/enrol-by window",
+      "inputType": "date_or_instant_window",
+      "requiredWhen": "When transaction timing qualifies",
+      "purposeAndDisplay": "When the customer must transact",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_timing_service",
+      "group": "timing",
+      "label": "Service/pickup/departure/occupancy window",
+      "inputType": "typed_window",
+      "requiredWhen": "When fulfilment timing qualifies",
+      "purposeAndDisplay": "When the benefit can actually be used",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_timing_weekdays",
+      "group": "timing",
+      "label": "Eligible weekdays and time bands",
+      "inputType": "local_schedule",
+      "requiredWhen": "When restricted",
+      "purposeAndDisplay": "Actual valid times with timezone",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_timing_blackouts",
+      "group": "timing",
+      "label": "Excluded dates or occurrences",
+      "inputType": "reference_or_date_list",
+      "requiredWhen": "When applicable",
+      "purposeAndDisplay": "Visible excluded dates/occurrences",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_audience_eligibility",
+      "group": "audience",
+      "label": "Approved customer eligibility rule",
+      "inputType": "policy_reference",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Actual applicable conditions without sensitive inference",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_audience_usage",
+      "group": "audience",
+      "label": "Per-customer and campaign redemption limits",
+      "inputType": "limit_policy",
+      "requiredWhen": "When limited",
+      "purposeAndDisplay": "Relevant customer usage conditions",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_audience_consent",
+      "group": "audience",
+      "label": "Channel consent and permitted targeting",
+      "inputType": "consent_policy_reference",
+      "requiredWhen": "For marketing delivery",
+      "purposeAndDisplay": "Only authorized delivery/audience scope",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_creative_headline",
+      "group": "creative",
+      "label": "Customer headline",
+      "inputType": "text",
+      "requiredWhen": "When the channel needs creative",
+      "purposeAndDisplay": "Offer card/title",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_creative_media",
+      "group": "creative",
+      "label": "Actual offering/variant media",
+      "inputType": "media_reference",
+      "requiredWhen": "When the channel uses imagery",
+      "purposeAndDisplay": "Accurate product/service image",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_creative_copy",
+      "group": "creative",
+      "label": "Benefit description and terms summary",
+      "inputType": "text",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Plain customer explanation and conditions",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_creative_terms",
+      "group": "creative",
+      "label": "Full applicable terms version",
+      "inputType": "policy_reference",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Detail/review terms before commitment",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_creative_cta",
+      "group": "creative",
+      "label": "Order, book, reserve, enroll or enquire action",
+      "inputType": "actual_model_action_reference",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Supported actual customer journey",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_funding_funder",
+      "group": "funding",
+      "label": "Who funds the benefit",
+      "inputType": "owner_reference",
+      "requiredWhen": "For monetary offers",
+      "purposeAndDisplay": "Merchant cost and applicable customer disclosure",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_funding_budget",
+      "group": "funding",
+      "label": "Enforceable spending/redemption envelope",
+      "inputType": "money_and_count_limits",
+      "requiredWhen": "When capped",
+      "purposeAndDisplay": "Internal cost controls; no false enforceability claim",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_funding_charge",
+      "group": "funding",
+      "label": "Placement or campaign charge basis",
+      "inputType": "confirmed_quote_reference",
+      "requiredWhen": "For paid placements",
+      "purposeAndDisplay": "Merchant review before accepting a charge",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_funding_reservation",
+      "group": "funding",
+      "label": "Budget/redemption hold and release policy",
+      "inputType": "owner_policy_reference",
+      "requiredWhen": "Where enforcement requires holds",
+      "purposeAndDisplay": "Internal authoritative limit enforcement",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_placement_inventory",
+      "group": "placement",
+      "label": "Actual placement/date/location inventory",
+      "inputType": "inventory_reference",
+      "requiredWhen": "For Featured placements",
+      "purposeAndDisplay": "Actual requested placement; no guaranteed ranking",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_placement_hold",
+      "group": "placement",
+      "label": "Placement hold and expiry",
+      "inputType": "hold_reference",
+      "requiredWhen": "If supported",
+      "purposeAndDisplay": "Merchant pending/confirmed placement state",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_operations_review",
+      "group": "operations",
+      "label": "Content/policy review outcome",
+      "inputType": "owner_review_state",
+      "requiredWhen": "When review is required",
+      "purposeAndDisplay": "Merchant changes requested or approved state",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_operations_delivery",
+      "group": "operations",
+      "label": "Eligibility and delivery status/reasons",
+      "inputType": "owner_projection",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Actual active/limited/blocked availability",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_operations_history",
+      "group": "operations",
+      "label": "Actor, changes, versions and effective time",
+      "inputType": "audit_reference",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Authorized change history",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_operations_source",
+      "group": "operations",
+      "label": "Source freshness and edit authority",
+      "inputType": "source_reference",
+      "requiredWhen": "Always",
+      "purposeAndDisplay": "Merchant conflict/recovery state",
+      "status": "DESIGN_DEFINITION"
+    },
+    {
+      "id": "PR_operations_results",
+      "group": "operations",
+      "label": "Measured campaign results and definitions",
+      "inputType": "measurement_reference",
+      "requiredWhen": "When data exists",
+      "purposeAndDisplay": "Actual period/coverage; unknown is not zero",
+      "status": "DESIGN_DEFINITION"
+    }
+  ],
+  "flow": [
+    {
+      "id": "PR_SCOPE",
+      "title": "Choose objective and promotion type",
+      "outcome": "Only capability/policy-supported types can continue; retain draft context."
+    },
+    {
+      "id": "PR_ELIGIBILITY",
+      "title": "Choose actual offerings and locations",
+      "outcome": "Show eligible, excluded and unresolved candidates with reasons and links to their owner."
+    },
+    {
+      "id": "PR_RULE",
+      "title": "Configure the approved benefit or placement",
+      "outcome": "Reference actual priced components, units, limits, stacking and source authority; no base-price duplication."
+    },
+    {
+      "id": "PR_TIME",
+      "title": "Set timing and customer conditions",
+      "outcome": "Separate transaction window from actual service/pickup/departure/redemption dates and show material terms."
+    },
+    {
+      "id": "PR_FUNDING",
+      "title": "Review funding, inventory and cost",
+      "outcome": "Known authorized fee/benefit owner and enforceable caps; unsupported or unknown terms remain unresolved."
+    },
+    {
+      "id": "PR_PREVIEW",
+      "title": "Preview the actual customer journey",
+      "outcome": "Correct media/specification/price/terms/CTA for the selected offering, variant and date context."
+    },
+    {
+      "id": "PR_SUBMIT",
+      "title": "Save, validate and submit",
+      "outcome": "Versioned owner command with required review; pending remains pending and timeout remains unknown."
+    },
+    {
+      "id": "PR_DELIVER",
+      "title": "Schedule, activate and manage",
+      "outcome": "Owner-confirmed states, permitted edit/pause/resume/end actions and explicit eligibility loss behavior."
+    },
+    {
+      "id": "PR_REDEEM",
+      "title": "Validate at transaction acceptance",
+      "outcome": "Owner rechecks actual selected item/time/quantity, price, eligibility and limits; accepted terms are snapshotted."
+    },
+    {
+      "id": "PR_RESULTS",
+      "title": "Inspect measured results and recover",
+      "outcome": "Actual confirmed redemptions, funded amounts and source-defined metrics with coverage; reconcile failures without duplicate spend."
+    }
+  ],
+  "modelRules": {
+    "ORDER": {
+      "label": "Products, food and retail",
+      "unit": "Actual item/variant, pack, weight or volume",
+      "qualifiers": [
+        "published actual item and compatible variants",
+        "declared unit and authoritative price/stock",
+        "applicable branch/channel/fulfilment",
+        "optional approved minimum spend/quantity and limits"
+      ],
+      "dateMeaning": "Purchase/redemption window; fulfilment windows only if the service actually supports them.",
+      "benefit": "Approved priced item/component benefit; optional supported fulfilment benefit stays with its owner.",
+      "customer": "Actual item/variant with relevant specification, original/selected price, saving and nearby terms.",
+      "cta": "Choose eligible item and options",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER",
+        "PACKAGE_PLAN"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "APPOINTMENT": {
+      "label": "Appointments",
+      "unit": "Actual service, duration, provider and location",
+      "qualifiers": [
+        "eligible service/provider/method",
+        "booking window distinct from service dates",
+        "selected weekdays/time ranges",
+        "actual shared resource availability"
+      ],
+      "dateMeaning": "Book-by dates and service dates/times are independent; display both in Africa/Nairobi.",
+      "benefit": "Approved service-price component; no capacity is created by a campaign.",
+      "customer": "Service scope/duration, eligible date/time/location, selected price and actual available times.",
+      "cta": "Choose an eligible appointment time",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER",
+        "PACKAGE_PLAN"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "FIELD_VISIT": {
+      "label": "Customer-location visits",
+      "unit": "Actual scoped package/workload, team time and service area",
+      "qualifiers": [
+        "actual coverage and travel feasibility",
+        "known priced package or accepted assessment",
+        "service window and resource eligibility",
+        "private exact service address"
+      ],
+      "dateMeaning": "Booking window and actual visit window/coverage are separate.",
+      "benefit": "Only a known approved package/fee component; unknown workload uses a request offer.",
+      "customer": "Scope, actual coverage, included supplies, price/estimate and supported request/visit action.",
+      "cta": "Check coverage and choose or request a visit",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER",
+        "ENQUIRY_VISIBILITY"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "ASSET_INTERVAL": {
+      "label": "Vehicle or asset rentals",
+      "unit": "Actual asset/class and exact rental charge period",
+      "qualifiers": [
+        "guaranteed asset versus class",
+        "minimum/maximum duration and eligible rate component",
+        "pickup dates distinct from booking dates",
+        "handover locations and joint driver allocation where needed"
+      ],
+      "dateMeaning": "Book-by dates, qualifying pickup dates and rental start/end are separate; exact local-date/instant semantics remain intact.",
+      "benefit": "Approved rental-rate component; deposits, cover, fuel or extras are treated according to explicit component rules, not blanket defaults.",
+      "customer": "Vehicle/class specifications, duration qualification, selected interval total, saving, deposit and terms separately.",
+      "cta": "Choose rental dates and options",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "TRANSFER": {
+      "label": "Transfers and greetings",
+      "unit": "Actual route/service, party, vehicle or greeter",
+      "qualifiers": [
+        "eligible route and party capacity",
+        "travel time and actual resource confirmation",
+        "waiting/stops/parking inclusions",
+        "greeter-only distinct from transport"
+      ],
+      "dateMeaning": "Book-by window and actual trip/greeting dates are separate.",
+      "benefit": "Known approved trip/greeting component; no fake final price for an unquoted route.",
+      "customer": "Actual route/scope, seats/luggage or greeting terms, waiting, selected fare and extras.",
+      "cta": "Choose the actual trip or greeting",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER",
+        "ENQUIRY_VISIBILITY"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "SESSION_CAPACITY": {
+      "label": "Events, classes and sessions",
+      "unit": "Actual dated occurrence, tier and place quantity",
+      "qualifiers": [
+        "specific occurrence and eligible tiers",
+        "real shared place capacity",
+        "quantity/admission constraints",
+        "ticket issuance separate from reservation"
+      ],
+      "dateMeaning": "Purchase window and actual session/admission dates are distinct.",
+      "benefit": "Approved ticket/place-price component and real quantity limits.",
+      "customer": "Actual event/class, occurrence, included admission, tier/quantity, selected price and entry terms.",
+      "cta": "Choose an eligible occurrence and places",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER",
+        "PACKAGE_PLAN"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "SPACE_RESERVATION": {
+      "label": "Tables and venue spaces",
+      "unit": "Compatible space, party and occupancy",
+      "qualifiers": [
+        "explicit enabled space activity",
+        "actual compatible party/space/time",
+        "fee/minimum-spend scope",
+        "occupancy and turnover constraints"
+      ],
+      "dateMeaning": "Booking window and actual occupancy dates/times are separate.",
+      "benefit": "Approved known fee/benefit only; a space reservation does not create a food order or unknown event quote.",
+      "customer": "Space/party limits, actual time, fee/minimum spend and clear conditions.",
+      "cta": "Choose a compatible space and time",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER",
+        "ENQUIRY_VISIBILITY"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "TOUR": {
+      "label": "Tours and safari departures",
+      "unit": "Actual departure, party format and supplier-confirmed inclusions",
+      "qualifiers": [
+        "published actual itinerary/departure",
+        "private/shared party and supplier capacity",
+        "named included/excluded components",
+        "supplier price/confirmation and policy"
+      ],
+      "dateMeaning": "Book-by dates and departure/travel dates are separate.",
+      "benefit": "Approved priced departure/package component; supplier enquiry never becomes instant inventory.",
+      "customer": "Itinerary, duration, party model, inclusions, selected price and supplier/cancellation terms.",
+      "cta": "Choose an eligible departure or request confirmation",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER",
+        "ENQUIRY_VISIBILITY"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "PRODUCTION_DUE": {
+      "label": "Custom production",
+      "unit": "Accepted product specification and production commitment",
+      "qualifiers": [
+        "actual custom product/options and proof process",
+        "scope and price agreement",
+        "feasible due date/lead time",
+        "accepted specification/policy version"
+      ],
+      "dateMeaning": "Order-by window, proof/acceptance deadline and production due date are distinct.",
+      "benefit": "A known approved component may be promoted; an unknown final custom quote cannot be advertised as a guaranteed discount total.",
+      "customer": "Actual customizable item, allowed options, lead time, approval process and quote/known-fee benefit.",
+      "cta": "Specify the work and request or obtain acceptance",
+      "types": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY",
+        "AUTO_OFFER",
+        "CODE_OFFER"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote.",
+      "defaultForUnknownPrice": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY"
+      ]
+    },
+    "REQUEST_QUOTE": {
+      "label": "Quoted, professional and provider enquiries",
+      "unit": "Actual enquiry/coordination scope and known fees only",
+      "qualifiers": [
+        "published supported service scope",
+        "real provider or supplier authority",
+        "approved content and applicable promotion policy",
+        "no invented transaction/quote acceptance"
+      ],
+      "dateMeaning": "Campaign/request period and requested work/travel dates are separate.",
+      "benefit": "Discoverability/enquiry offer, or a separately approved known fee component. Never invent the final service price.",
+      "customer": "Actual provider/service scope, known fee if any, terms and accurate enquiry CTA.",
+      "cta": "Request a quote or contact the authorized provider",
+      "types": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY",
+        "AUTO_OFFER",
+        "CODE_OFFER"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote.",
+      "defaultForUnknownPrice": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY"
+      ]
+    },
+    "LINKED_WINDOWS": {
+      "label": "Laundry and collection/return work",
+      "unit": "Actual items/kg/workload and compatible paired promises",
+      "qualifiers": [
+        "declared processing unit and actual rate",
+        "assessment/weight adjustment policy",
+        "feasible collection and return",
+        "care restrictions and scope acceptance"
+      ],
+      "dateMeaning": "Campaign order window, collection window and feasible return promise remain distinct.",
+      "benefit": "Approved unit/package component, revalidated after any accepted assessment adjustment.",
+      "customer": "Accepted item/care scope, unit rate, offer, collection/return information and assessment terms.",
+      "cta": "Choose processing and feasible collection/return",
+      "types": [
+        "FEATURED",
+        "AUTO_OFFER",
+        "CODE_OFFER"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "SERVICE_JOB": {
+      "label": "Workshop, diagnostics and repair",
+      "unit": "Actual diagnostic or accepted job/parts/labour scope",
+      "qualifiers": [
+        "actual supported equipment/vehicle",
+        "diagnostic fee distinct from final repair",
+        "explicit parts/labour benefit component",
+        "quote and additional-work acceptance"
+      ],
+      "dateMeaning": "Campaign intake window and actual assessed work/turnaround are separate.",
+      "benefit": "Known diagnostic or accepted work component only; no made-up final repair discount.",
+      "customer": "Compatibility, diagnostic/job scope, known offer, exclusions and actual intake/assessment action.",
+      "cta": "Request intake or accept the actual job quote",
+      "types": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY",
+        "AUTO_OFFER",
+        "CODE_OFFER"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote.",
+      "defaultForUnknownPrice": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY"
+      ]
+    },
+    "ENTITLEMENT": {
+      "label": "Memberships, passes and supply plans",
+      "unit": "Actual plan benefits, quantity, validity and redemption",
+      "qualifiers": [
+        "real plan and included benefits",
+        "new enrolment versus renewal scope",
+        "explicit recurring charge consent",
+        "actual redemption/booking/fulfilment remains separate"
+      ],
+      "dateMeaning": "Enrol-by window, benefit validity and each redemption/service date are distinct.",
+      "benefit": "Approved first-term/enrolment or explicitly supported renewal component; no silent perpetual renewal discount.",
+      "customer": "Included credits/access/deliveries, validity, selected term price, renewal and separate booking terms.",
+      "cta": "Review the plan and enroll",
+      "types": [
+        "FEATURED",
+        "PACKAGE_PLAN",
+        "AUTO_OFFER",
+        "CODE_OFFER"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote."
+    },
+    "FREIGHT": {
+      "label": "Sea, air and road freight",
+      "unit": "Actual route, kg/m3/container/load and accepted cargo",
+      "qualifiers": [
+        "actual carrier route/load constraints",
+        "per-piece dimensions/mass and approved calculation",
+        "quote validity and actual accepted charges",
+        "carrier/clearance/cover inclusions"
+      ],
+      "dateMeaning": "Quote/campaign validity and actual cargo/shipping dates are separate.",
+      "benefit": "Discovery or approved known/accepted tariff component; no universal cart minimum or invented volumetric divisor.",
+      "customer": "Route/mode, charge basis, applicable benefit/quote, inclusions and private declaration path.",
+      "cta": "Declare the shipment and request a carrier quote",
+      "types": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY",
+        "AUTO_OFFER",
+        "CODE_OFFER"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote.",
+      "defaultForUnknownPrice": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY"
+      ]
+    },
+    "STORAGE": {
+      "label": "Warehouse storage",
+      "unit": "Actual compatible unit/area/volume/pallet and occupancy period",
+      "qualifiers": [
+        "typed accepted goods and compatible environment",
+        "actual capacity and custody acceptance",
+        "period/minimum term and charge basis",
+        "receiving/picking/release scope"
+      ],
+      "dateMeaning": "Enrol/request window, occupancy dates and billing periods remain distinct.",
+      "benefit": "Discovery or an approved known storage/handling component; actual unit capacity still requires acceptance.",
+      "customer": "Unit fit, accepted goods, period, price/quote basis, handling and access terms.",
+      "cta": "Choose the storage scope and request capacity acceptance",
+      "types": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY",
+        "AUTO_OFFER",
+        "CODE_OFFER"
+      ],
+      "monetaryScopeCondition": "An actual known approved price component, benefit contract, funding/stacking policy and current authority are required. Never discount an unknown final quote.",
+      "defaultForUnknownPrice": [
+        "FEATURED",
+        "ENQUIRY_VISIBILITY"
+      ]
+    }
+  },
+  "stateDimensions": {
+    "publication": [
+      "draft",
+      "pending_publish",
+      "scheduled",
+      "active",
+      "paused",
+      "ended",
+      "cancelled"
+    ],
+    "review": [
+      "not_required",
+      "not_submitted",
+      "pending",
+      "approved",
+      "changes_requested",
+      "rejected"
+    ],
+    "delivery": [
+      "eligible",
+      "limited",
+      "blocked",
+      "unknown"
+    ],
+    "measurement": [
+      "current",
+      "partial",
+      "unavailable"
+    ],
+    "placement_or_charge": [
+      "not_applicable",
+      "requested",
+      "held",
+      "confirmed",
+      "unknown",
+      "failed"
+    ]
+  },
+  "surfaceContracts": {
+    "campaigns": {
+      "purpose": "One campaign directory for offers and Featured placement campaigns.",
+      "tabs": [
+        "Campaigns",
+        "History"
+      ],
+      "filters": [
+        "campaign type",
+        "status",
+        "location",
+        "date"
+      ],
+      "typeSource": "proposedPromotionTypes",
+      "featuredTypeId": "FEATURED",
+      "creation": "Create promotion opens one flow; select a supported type before its relevant fields. There is no separate Featured placements tab or directory.",
+      "details": "The selected type supplies its benefit or placement fields within the same detail/editor shell. Preview in app remains available in the selected campaign.",
+      "runtimeEnabled": false
+    },
+    "featuredPlacements": {
+      "purpose": "Type-specific fields for a Featured placement campaign inside Campaigns; placement alone does not create a discount.",
+      "container": "campaigns",
+      "separateNavigation": false,
+      "displayFields": [
+        "placement name and surface",
+        "actual offering/storefront and location scope",
+        "delivery dates",
+        "review/delivery state",
+        "confirmed fee/quote and separate charge state",
+        "optional linked benefit/rule reference"
+      ],
+      "actions": [
+        "Submit the selected campaign's placement request through the common creation flow",
+        "Preview in app",
+        "View charges",
+        "Inspect review or pending-confirmation reason"
+      ],
+      "confirmation": "A request, review approval, inventory hold, charge and confirmed placement are separate facts; only the actual owner can confirm each.",
+      "previewMode": "Use the selected public revision and channel/location/date context, including any independently eligible linked offer.",
+      "runtimeEnabled": false
+    },
+    "history": {
+      "purpose": "Inspect ended/cancelled/rejected campaigns, their actual changes and saved public presentation.",
+      "displayFields": [
+        "campaign/type",
+        "actual period or requested period",
+        "terminal publication/review outcome",
+        "saved revision and terms",
+        "actor/time/change/reason",
+        "source-defined financial/results links"
+      ],
+      "actions": [
+        "Preview in app",
+        "Choose saved revision",
+        "Duplicate as draft",
+        "View results or charges where supported"
+      ],
+      "previewMode": "Archived presentation uses the saved public revision and historical date context. It is not current eligibility or a live offer.",
+      "reuse": "Duplication creates a new draft with new identity and current validation; it never restarts the archived campaign or copies a paid placement booking.",
+      "runtimeEnabled": false
+    },
+    "customerAppPreview": {
+      "purpose": "Let a merchant inspect how the selected promotion/placement appears in the customer app before or after publication.",
+      "entryPoints": [
+        "campaign selected detail, including Featured placement type",
+        "creation/review",
+        "History selected revision"
+      ],
+      "modes": [
+        "current",
+        "draft",
+        "scheduled",
+        "archived"
+      ],
+      "contextFields": [
+        "actual offering/variant/options",
+        "app channel",
+        "location/service area",
+        "transaction and use dates where relevant",
+        "selected public revision and mode"
+      ],
+      "surfaces": [
+        "discovery",
+        "offering_detail",
+        "transaction_review"
+      ],
+      "modelRuleSource": "modelRules",
+      "publicProjectionOnly": true,
+      "allowsCommitment": false,
+      "rule": "Use actual public renderer, selected price/benefit/terms and model CTA. Navigation inside preview switches preview surfaces; it cannot order, book, pay, reserve, redeem or publish.",
+      "archive": "Archived mode uses the saved public representation and clearly states that the offer has ended; never substitute today's price or availability for historical values.",
+      "failure": "Unknown current source or incomplete saved representation produces an explicit unavailable/partial preview, not fabricated content or stale data presented as current.",
+      "exit": "Back returns to the originating tab, selection, filters and draft/revision context.",
+      "runtimeEnabled": false
+    }
+  },
+  "imageBriefs": [
+    {
+      "id": "PROMO_01",
+      "file": "01-campaign-overview.png",
+      "title": "Unified campaigns",
+      "model": "ORDER",
+      "state": "All campaign types in one list; active product campaign selected",
+      "requirements": [
+        "reference shell with Promotions selected",
+        "only Campaigns and History page tabs",
+        "single list for offers and Featured placement campaigns",
+        "type and status filters",
+        "actual product/variant scope",
+        "clear benefit, funding and terms",
+        "customer card and Preview in app",
+        "an actionable eligibility issue",
+        "no page-level status totals",
+        "sample-data label"
+      ]
+    },
+    {
+      "id": "PROMO_02",
+      "file": "02-service-offer-creation.png",
+      "title": "Create a service offer",
+      "model": "APPOINTMENT",
+      "state": "Draft before review",
+      "requirements": [
+        "same reference shell",
+        "service/duration/location and actual rate",
+        "booking window distinct from service window",
+        "weekday/time restrictions and source capacity",
+        "customer price/terms preview",
+        "merchant-funded cost and redemption limit",
+        "Save draft and Review promotion",
+        "sample-data label"
+      ]
+    },
+    {
+      "id": "PROMO_03",
+      "file": "03-rental-campaign-results.png",
+      "title": "Rental campaign management",
+      "model": "ASSET_INTERVAL",
+      "state": "Active rental campaign and actual result definitions",
+      "requirements": [
+        "same reference shell",
+        "vehicle/class, rental-day basis and minimum duration",
+        "booking dates distinct from pickup dates",
+        "accurate selected interval price breakdown",
+        "deposit separate from discount",
+        "eligible/excluded scope and reasons",
+        "confirmed redemption/cost results",
+        "pause/edit and history",
+        "sample-data label"
+      ]
+    },
+    {
+      "id": "PROMO_05",
+      "file": "05-promotion-history.png",
+      "title": "Promotion history",
+      "model": "ORDER",
+      "state": "Ended campaign and saved public revision",
+      "requirements": [
+        "only Campaigns and History page tabs",
+        "same revised shell without page-level status summary",
+        "History tab selected",
+        "search and ended/cancelled/rejected filters",
+        "archived campaign terms and revision",
+        "actor/time/change timeline",
+        "Preview in app opens historical mode",
+        "Duplicate as draft revalidates current scope",
+        "sample-data label"
+      ]
+    },
+    {
+      "id": "PROMO_06",
+      "file": "06-customer-app-preview.png",
+      "title": "Preview in the customer app",
+      "model": "ORDER",
+      "state": "Merchant preview showing discovery and offering detail",
+      "requirements": [
+        "same revised merchant shell",
+        "Preview in app destination with Back to Campaigns for a current campaign",
+        "current/draft/scheduled/archived context is explicit",
+        "location/channel/date and revision context",
+        "discovery sponsored card and offering detail",
+        "actual public specification/price/terms/CTA",
+        "no real order, publication or allocation",
+        "sample-data label"
+      ]
+    }
+  ]
+}

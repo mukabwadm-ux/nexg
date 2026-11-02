@@ -1,0 +1,47 @@
+{
+  "clientDate": "2026-11-01",
+  "status": "PASS",
+  "scope": "Written planning artifacts only; no runtime, identity-provider, database or production acceptance",
+  "filesChecked": [
+    "docs/merchant-portal-plan/onboarding-integration/README.md",
+    "docs/merchant-portal-plan/onboarding-integration/evidence.md",
+    "docs/merchant-portal-plan/onboarding-integration/phase-0-rules.md",
+    "docs/handoff/sessions/2026-11-01-onboarding-home-approval-plan.md",
+    "docs/handoff/sessions/2026-11-01-onboarding-phase-0.md"
+  ],
+  "localLinksChecked": 56,
+  "missingLinks": [],
+  "phasePlanSections": 34,
+  "buildPhases": [
+    "P0",
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "P7",
+    "P8"
+  ],
+  "phase0DirectionChecks": {
+    "mainCategoryRequired": true,
+    "categoryParentRule": true,
+    "categoryGuidesInitialPortal": true,
+    "operationalDetailsDeferred": true,
+    "allReferenceFields": true,
+    "pendingHomeEditable": true,
+    "approvalSeparateFromGoLive": true,
+    "noHiddenLiveData": true,
+    "identityPresentationDeferred": true,
+    "securityNotDeferred": true,
+    "marketingNotRequired": true,
+    "legacyContactMappingExplicit": true,
+    "noExtraCategoryEntry": true,
+    "noExtraPrimaryQuestion": true,
+    "existingIdentityPolicy": true,
+    "noOldOptionalEntryModel": true
+  },
+  "phase0Status": "SPECIFIED",
+  "implementationStatus": "P1-P8 NOT_STARTED",
+  "independentReview": "Read-only review completed; extra entry control, verification wording and stale optional-entry wording corrected."
+}

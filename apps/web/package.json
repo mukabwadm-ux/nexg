@@ -5,6 +5,7 @@
   "description": "NexG public site: homepage, riders and merchants",
   "scripts": {
     "dev": "next dev --port 3000",
+    "dev:lan": "next dev --hostname 0.0.0.0 --port 3000",
     "build": "next build",
     "start": "next start --port 3000",
     "lint": "next lint --max-warnings 0",
@@ -13,6 +14,7 @@
     "clean": "rimraf .turbo .next node_modules"
   },
   "dependencies": {
+    "@nexg/booking-config": "workspace:*",
     "@hookform/resolvers": "3.10.0",
     "@nexg/contracts": "workspace:*",
     "@nexg/db": "workspace:*",

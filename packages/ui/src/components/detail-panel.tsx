@@ -101,7 +101,7 @@ export function DetailPanel({
             <Dialog.Close
               aria-label="Close panel"
               className={cn(
-                'text-muted-light flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
+                'text-muted-light flex h-11 w-11 shrink-0 items-center justify-center rounded-lg',
                 'hover:bg-bg hover:text-ink transition-colors',
                 'focus-visible:ring-gold focus-visible:outline-none focus-visible:ring-2',
               )}

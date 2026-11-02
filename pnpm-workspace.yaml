@@ -7,4 +7,5 @@ packages:
 # (pnpm 11 renamed this from `onlyBuiltDependencies`.)
 allowBuilds:
   esbuild: true # Vitest's bundler
+  sharp: true # Payload image processor; pinned by the isolated booking runtime
   unrs-resolver: true # ESLint import resolution

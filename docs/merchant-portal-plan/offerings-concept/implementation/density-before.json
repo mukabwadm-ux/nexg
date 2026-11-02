@@ -1,0 +1,129 @@
+{
+  "viewport": {
+    "width": 1280,
+    "height": 633
+  },
+  "port": {
+    "x": 208,
+    "y": 246.59375,
+    "width": 1048,
+    "height": 349.40625,
+    "bottom": 596
+  },
+  "head": {
+    "x": 209,
+    "y": 247.59375,
+    "width": 1046,
+    "height": 46.5,
+    "bottom": 294.09375
+  },
+  "visibleRows": 4,
+  "rows": [
+    {
+      "height": 75,
+      "top": 294.09375,
+      "bottom": 369.09375
+    },
+    {
+      "height": 75,
+      "top": 369.09375,
+      "bottom": 444.09375
+    },
+    {
+      "height": 75,
+      "top": 444.09375,
+      "bottom": 519.09375
+    },
+    {
+      "height": 75,
+      "top": 519.09375,
+      "bottom": 594.09375
+    },
+    {
+      "height": 75,
+      "top": 594.09375,
+      "bottom": 669.09375
+    },
+    {
+      "height": 75,
+      "top": 669.09375,
+      "bottom": 744.09375
+    },
+    {
+      "height": 75,
+      "top": 744.09375,
+      "bottom": 819.09375
+    },
+    {
+      "height": 75,
+      "top": 819.09375,
+      "bottom": 894.09375
+    },
+    {
+      "height": 75,
+      "top": 894.09375,
+      "bottom": 969.09375
+    },
+    {
+      "height": 75,
+      "top": 969.09375,
+      "bottom": 1044.09375
+    },
+    {
+      "height": 75,
+      "top": 1044.09375,
+      "bottom": 1119.09375
+    },
+    {
+      "height": 74,
+      "top": 1119.09375,
+      "bottom": 1193.09375
+    }
+  ],
+  "documentOverflows": false,
+  "textSize": "12px",
+  "chrome": {
+    "workspace": {
+      "x": 184,
+      "y": 49,
+      "width": 1096,
+      "height": 584,
+      "bottom": 633
+    },
+    "heading": {
+      "x": 208,
+      "y": 61,
+      "width": 1048,
+      "height": 60.09375,
+      "bottom": 121.09375
+    },
+    "content": {
+      "x": 208,
+      "y": 135.09375,
+      "width": 1048,
+      "height": 485.90625,
+      "bottom": 621
+    },
+    "tabs": {
+      "x": 208,
+      "y": 135.09375,
+      "width": 1048,
+      "height": 43.5,
+      "bottom": 178.59375
+    },
+    "toolbar": {
+      "x": 208,
+      "y": 194.59375,
+      "width": 1048,
+      "height": 36,
+      "bottom": 230.59375
+    },
+    "footer": {
+      "x": 208,
+      "y": 596,
+      "width": 1048,
+      "height": 25,
+      "bottom": 621
+    }
+  }
+}

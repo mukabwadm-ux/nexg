@@ -29,7 +29,7 @@ interface OverrideRow {
  * shown as open right now".
  */
 export default async function HoursPage({ searchParams }: { searchParams?: { branch?: string } }) {
-  const { m } = await merchantContext();
+  const { m } = await merchantContext({ draft: true });
   if (!m) return null;
 
   const supabase = createClient();

@@ -9,7 +9,7 @@ import {
   testScan,
   voidCard,
   type Outcome,
-} from '@/app/host/actions';
+} from '@/app/(customer)/host/actions';
 
 import { Actions, Area, Drawer, Field, Said, Select, Submit, useAction } from './form';
 import { SPOTS, spotLabel } from './vocab';

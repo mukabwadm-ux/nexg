@@ -1,0 +1,13 @@
+{
+  "clientDate": "2026-11-02",
+  "status": "PASS",
+  "scope": "Isolated preview UI only; connected Supabase browser acceptance remains open.",
+  "checks": [
+    "Preview draft save explicitly confirms no account persistence; short registration still opens shared Home.",
+    "PayBill retains a separate business number, leading zeros and an alphanumeric reference.",
+    "Till has no PayBill reference; invalid supplied digits retain the editor and corrected leading zeros survive.",
+    "Bank remains separate; supplied payout data does not become verification or inflate required progress."
+  ],
+  "pageErrors": [],
+  "serverWrites": []
+}

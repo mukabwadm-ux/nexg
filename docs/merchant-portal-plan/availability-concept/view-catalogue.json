@@ -1,0 +1,514 @@
+{
+  "status": "FRONTEND_DESIGN_ONLY",
+  "schemaBridge": [
+    {
+      "schemaId": "PRODUCT_CATALOG_V1",
+      "modelId": "ORDER"
+    },
+    {
+      "schemaId": "SERVICE_APPOINTMENT_V1",
+      "modelId": "APPOINTMENT"
+    },
+    {
+      "schemaId": "REMOTE_SESSION_V1",
+      "modelId": "APPOINTMENT"
+    },
+    {
+      "schemaId": "FIELD_SERVICE_V1",
+      "modelId": "FIELD_VISIT"
+    },
+    {
+      "schemaId": "RENTAL_ASSET_V1",
+      "modelId": "ASSET_INTERVAL"
+    },
+    {
+      "schemaId": "TRANSFER_ROUTE_V1",
+      "modelId": "TRANSFER"
+    },
+    {
+      "schemaId": "EVENT_TICKET_V1",
+      "modelId": "SESSION_CAPACITY"
+    },
+    {
+      "schemaId": "GROUP_SESSION_V1",
+      "modelId": "SESSION_CAPACITY"
+    },
+    {
+      "schemaId": "SPACE_RESERVATION_V1",
+      "modelId": "SPACE_RESERVATION"
+    },
+    {
+      "schemaId": "TOUR_PACKAGE_V1",
+      "modelId": "TOUR"
+    },
+    {
+      "schemaId": "REQUEST_QUOTE_V1",
+      "modelId": "REQUEST_QUOTE"
+    },
+    {
+      "schemaId": "MADE_TO_ORDER_V1",
+      "modelId": "PRODUCTION_DUE"
+    },
+    {
+      "schemaId": "PICKUP_RETURN_V1",
+      "modelId": "LINKED_WINDOWS"
+    },
+    {
+      "schemaId": "MEMBERSHIP_PLAN_V1",
+      "modelId": "ENTITLEMENT"
+    },
+    {
+      "schemaId": "FREIGHT_SHIPMENT_V1",
+      "modelId": "FREIGHT"
+    },
+    {
+      "schemaId": "STORAGE_SPACE_V1",
+      "modelId": "STORAGE"
+    },
+    {
+      "schemaId": "REGULATED_ENQUIRY_V1",
+      "modelId": "REQUEST_QUOTE"
+    },
+    {
+      "schemaId": "SERVICE_JOB_V1",
+      "modelId": "SERVICE_JOB"
+    }
+  ],
+  "views": {
+    "ORDER": {
+      "renderer": "hours-intake",
+      "title": "Operating and order intake",
+      "primaryFields": [
+        "operating intervals",
+        "new-order intake by enabled method",
+        "scheduled fulfilment window when configured",
+        "last-order cutoff when configured",
+        "stock/source status (read-only)"
+      ],
+      "constraints": [
+        "Explicit inventory owner; publication is not stock",
+        "Future scheduled intake independent of doors-open state",
+        "No generic merchant acceptance"
+      ],
+      "units": "Stock units stay with inventory; fulfilment-window capacity is a separate typed pool.",
+      "variants": [
+        "delivery",
+        "customer collection",
+        "immediate vs scheduled intake"
+      ],
+      "components": [
+        "IntervalTable",
+        "IntakeStatus",
+        "MethodWindowList",
+        "SourceState"
+      ]
+    },
+    "APPOINTMENT": {
+      "renderer": "resource-calendar",
+      "title": "Appointments and joint resources",
+      "primaryFields": [
+        "exact service span",
+        "eligible staff/provider",
+        "actual room/equipment",
+        "buffer before/after",
+        "notice/step/horizon",
+        "breaks and shared busy constraints"
+      ],
+      "constraints": [
+        "All required resource claims must fit",
+        "Filtered-out dependency still blocks",
+        "Remote access details are private",
+        "One root booking counted once"
+      ],
+      "units": "Exclusive resource time; virtual/group capacity only when explicitly declared.",
+      "variants": [
+        "on-site",
+        "remote provider",
+        "private service"
+      ],
+      "components": [
+        "ResourceCalendar",
+        "Agenda",
+        "EligibilityList",
+        "ReservationInspector"
+      ]
+    },
+    "FIELD_VISIT": {
+      "renderer": "visit-agenda",
+      "title": "Field visits",
+      "primaryFields": [
+        "visit span",
+        "team",
+        "coverage/address",
+        "travel/setup windows",
+        "actual vehicle dependency",
+        "location and shared staff constraints"
+      ],
+      "constraints": [
+        "Coverage does not guarantee a free team",
+        "No invented emergency arrival guarantee",
+        "Required travel uses actual configured rule"
+      ],
+      "units": "Time per required team/vehicle; distance/coverage is eligibility, not capacity.",
+      "variants": [
+        "customer-location service",
+        "mobile service job"
+      ],
+      "components": [
+        "ResourceCalendar",
+        "Agenda",
+        "CoverageContext",
+        "RoleWindowList"
+      ]
+    },
+    "ASSET_INTERVAL": {
+      "renderer": "asset-timeline",
+      "title": "Asset reservations and custody",
+      "primaryFields": [
+        "asset identity",
+        "full reserved interval",
+        "handover/return",
+        "turnaround",
+        "in-use/overdue actual custody",
+        "maintenance",
+        "optional qualified driver"
+      ],
+      "constraints": [
+        "Planned end does not release actual custody",
+        "Listing is not individual asset",
+        "Open-ended custody renders as ongoing",
+        "Unknown source is never free"
+      ],
+      "units": "Exclusive identified asset interval; typed rental billing unit is not occupancy proof.",
+      "variants": [
+        "self-drive",
+        "with qualified driver",
+        "equipment rental"
+      ],
+      "components": [
+        "AssetTimeline",
+        "CustodyState",
+        "ImpactReview",
+        "ReservationInspector"
+      ]
+    },
+    "TRANSFER": {
+      "renderer": "trip-agenda",
+      "title": "Transfers and meeting services",
+      "primaryFields": [
+        "pickup/drop-off",
+        "trip or greeter window",
+        "passenger/luggage fit",
+        "actual driver/vehicle",
+        "travel/reposition buffer"
+      ],
+      "constraints": [
+        "Meet-and-greet can exclude transport",
+        "No airline inventory inferred",
+        "Joint driver/vehicle only if required"
+      ],
+      "units": "Passengers/luggage eligibility separately from exclusive time allocation.",
+      "variants": [
+        "pickup",
+        "drop-off",
+        "meet-and-greet without transport"
+      ],
+      "components": [
+        "Agenda",
+        "ResourceCalendar",
+        "FitSummary",
+        "RoleWindowList"
+      ]
+    },
+    "SESSION_CAPACITY": {
+      "renderer": "dated-occurrences",
+      "title": "Dated sessions and places",
+      "primaryFields": [
+        "published occurrence date/time",
+        "typed place pool",
+        "reserved",
+        "valid held",
+        "remaining",
+        "shared instructor/room anchor",
+        "booking window"
+      ],
+      "constraints": [
+        "One pool snapshot: reserved + valid held + remaining = total",
+        "Anchor claims don't multiply places",
+        "No invented undated sessions"
+      ],
+      "units": "Participant places or explicit seat IDs; booking count differs from participants.",
+      "variants": [
+        "event ticket",
+        "group activity",
+        "reserved seats"
+      ],
+      "components": [
+        "OccurrenceList",
+        "CapacityBreakdown",
+        "ResourceAnchor",
+        "SeriesEditor"
+      ]
+    },
+    "SPACE_RESERVATION": {
+      "renderer": "space-timeline",
+      "title": "Tables and reservable spaces",
+      "primaryFields": [
+        "actual table/space IDs",
+        "party size",
+        "compatible combinations",
+        "exclusive/shared mode",
+        "reservation span",
+        "turnover"
+      ],
+      "constraints": [
+        "Only explicitly enabled activity",
+        "Combined party claims every physical table",
+        "No double allocation through individual and combined views"
+      ],
+      "units": "Party fit and physical-space exclusivity, or explicitly defined shared places.",
+      "variants": [
+        "single table",
+        "approved combination",
+        "exclusive room",
+        "shared space"
+      ],
+      "components": [
+        "SpaceTimeline",
+        "PartyFit",
+        "CombinationInspector",
+        "CapacityBreakdown"
+      ]
+    },
+    "TOUR": {
+      "renderer": "departure-itinerary",
+      "title": "Departures and tour resources",
+      "primaryFields": [
+        "dated departure",
+        "shared places or private interval",
+        "guide/vehicle/equipment roles",
+        "multi-day leg windows",
+        "supplier/source state"
+      ],
+      "constraints": [
+        "Private resources and shared places differ",
+        "No assumed transport inclusion",
+        "Supplier unknown remains visible"
+      ],
+      "units": "Shared participant places; private exclusive role intervals kept separate.",
+      "variants": [
+        "shared departure",
+        "private itinerary",
+        "multi-day"
+      ],
+      "components": [
+        "OccurrenceList",
+        "RoleWindowList",
+        "CapacityBreakdown",
+        "SupplierState"
+      ]
+    },
+    "PRODUCTION_DUE": {
+      "renderer": "workload-due",
+      "title": "Production workload and due promises",
+      "primaryFields": [
+        "due date",
+        "production-unit load",
+        "lead time",
+        "cutoff",
+        "working-day calendar",
+        "handoff window if enabled",
+        "accepted scope"
+      ],
+      "constraints": [
+        "Due date is not appointment",
+        "Configured standard cases follow automatic confirmation simulation",
+        "Bespoke quote/customer decision remains separate"
+      ],
+      "units": "Declared production units/workload per time bucket; no sum of incompatible products.",
+      "variants": [
+        "standard made-to-order",
+        "bespoke quoted production"
+      ],
+      "components": [
+        "WorkloadSchedule",
+        "CutoffSummary",
+        "CapacityBreakdown",
+        "Agenda"
+      ]
+    },
+    "REQUEST_QUOTE": {
+      "renderer": "response-coverage",
+      "title": "Enquiry intake and response coverage",
+      "primaryFields": [
+        "intake hours",
+        "response coverage/estimate",
+        "responsible responder",
+        "tentative milestones",
+        "source status"
+      ],
+      "constraints": [
+        "Enquiry consumes no guaranteed service capacity",
+        "Regulated enquiry is not approval",
+        "Actual site visit uses separate configured activity"
+      ],
+      "units": "Response workload only if explicitly modelled; never invented reservable places.",
+      "variants": [
+        "ordinary quote",
+        "regulated enquiry",
+        "concierge request"
+      ],
+      "components": [
+        "IntervalTable",
+        "ResponseCoverage",
+        "TentativeMilestoneList",
+        "SourceState"
+      ]
+    },
+    "LINKED_WINDOWS": {
+      "renderer": "linked-role-windows",
+      "title": "Incoming, processing and outgoing windows",
+      "primaryFields": [
+        "incoming method/window",
+        "processing span/capacity",
+        "outgoing method/window",
+        "turnaround",
+        "firm vs assessment",
+        "actual transport roles"
+      ],
+      "constraints": [
+        "Firm promise checks all required roles together",
+        "Assessment commits incoming only",
+        "Customer drop-off/collection creates no transport"
+      ],
+      "units": "Measured intake/processing units plus independent time-window claims.",
+      "variants": [
+        "drop-off/collection",
+        "merchant pickup/return",
+        "assessment incoming only"
+      ],
+      "components": [
+        "RoleWindowList",
+        "CapacityBreakdown",
+        "MethodWindowList",
+        "ImpactReview"
+      ]
+    },
+    "SERVICE_JOB": {
+      "renderer": "job-queue-schedule",
+      "title": "Job queue and actual work schedule",
+      "primaryFields": [
+        "queue vs scheduled intake/work",
+        "bay/team window",
+        "diagnostic/parts gate if applicable",
+        "completion estimate",
+        "item/vehicle holding occupancy",
+        "mobile variant"
+      ],
+      "constraints": [
+        "Queue isn't fixed start time",
+        "Completion estimate is independent",
+        "Custody doesn't automatically occupy worker/bay",
+        "Field execution needs actual travel constraints"
+      ],
+      "units": "Jobs, exclusive bay/team time and physical holding capacity are separate.",
+      "variants": [
+        "walk-in queue",
+        "scheduled intake",
+        "scheduled work",
+        "mobile job"
+      ],
+      "components": [
+        "JobQueue",
+        "ResourceCalendar",
+        "RoleWindowList",
+        "CustodyState"
+      ]
+    },
+    "ENTITLEMENT": {
+      "renderer": "access-context",
+      "title": "Access hours and covered bookings",
+      "primaryFields": [
+        "access hours",
+        "plan validity",
+        "credits context",
+        "actual linked child bookings",
+        "covered services"
+      ],
+      "constraints": [
+        "Credits aren't places",
+        "Plan purchase creates no calendar reservation",
+        "Preserve accepted child rights"
+      ],
+      "units": "Credits/validity separately from child-service time/place capacity.",
+      "variants": [
+        "membership access",
+        "covered trainer/class booking"
+      ],
+      "components": [
+        "IntervalTable",
+        "EntitlementContext",
+        "ChildBookingList"
+      ]
+    },
+    "FREIGHT": {
+      "renderer": "cargo-leg-schedule",
+      "title": "Cargo, leg and loading availability",
+      "primaryFields": [
+        "cargo/leg dates",
+        "loading/handling slots",
+        "weight",
+        "volume",
+        "pallet/container dimensions",
+        "carrier/source",
+        "document/clearance milestones"
+      ],
+      "constraints": [
+        "Separate capacity dimensions",
+        "Transit estimate isn't reserved carrier leg",
+        "Unknown carrier capacity cannot be confirmed"
+      ],
+      "units": "kg, cbm, pallet and container tracked independently with declared precision.",
+      "variants": [
+        "carrier leg",
+        "request-only transport",
+        "loading appointment"
+      ],
+      "components": [
+        "RoleWindowList",
+        "CapacityBreakdown",
+        "Agenda",
+        "SupplierState"
+      ]
+    },
+    "STORAGE": {
+      "renderer": "occupancy-timeline",
+      "title": "Storage occupancy and access",
+      "primaryFields": [
+        "typed occupied quantity",
+        "occupancy period",
+        "actual release/custody",
+        "access/handling slots",
+        "unit precision/conversion",
+        "capacity source"
+      ],
+      "constraints": [
+        "Area/volume/handling time stay separate",
+        "Explicit sqm/sqft conversion only",
+        "Planned end doesn't prove actual release"
+      ],
+      "units": "Declared sqm/sqft/cbm/pallet etc; conversion factor/rounding shown where configured.",
+      "variants": [
+        "fixed period",
+        "ongoing custody",
+        "handling/access appointment"
+      ],
+      "components": [
+        "OccupancyTimeline",
+        "CapacityBreakdown",
+        "CustodyState",
+        "Agenda"
+      ]
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "version": "1.0.0-proposed",
+  "status": "PROPOSED_DESIGN_NOT_IMPLEMENTED",
+  "sourceFamilies": [
+    {
+      "id": "SRC_WORKFLOW",
+      "label": "Confirmed work and milestones",
+      "owner": "Workflow owner for the selected work family",
+      "observations": [
+        "confirmed transition",
+        "current work snapshot",
+        "accepted promise",
+        "actual milestone",
+        "quote decision",
+        "attendance finalization",
+        "root completion"
+      ],
+      "runtimeConnected": false
+    },
+    {
+      "id": "SRC_AVAILABILITY",
+      "label": "Schedules, resources and capacity",
+      "owner": "Declared resource/capacity owner",
+      "observations": [
+        "published schedule",
+        "closure/maintenance",
+        "reservation/hold/release",
+        "actual occupation interval",
+        "published session capacity"
+      ],
+      "runtimeConnected": false
+    },
+    {
+      "id": "SRC_INVENTORY",
+      "label": "Saleable stock and thresholds",
+      "owner": "Inventory owner",
+      "observations": [
+        "available-to-promise balance",
+        "unit",
+        "reservation",
+        "measured adjustment",
+        "configured low-stock threshold"
+      ],
+      "runtimeConnected": false
+    },
+    {
+      "id": "SRC_FINANCE",
+      "label": "Finance-defined measures",
+      "owner": "Finance owner per measure/data class",
+      "observations": [
+        "confirmed posting",
+        "refund/reversal",
+        "fee",
+        "settlement",
+        "payout",
+        "approved attributed cost"
+      ],
+      "runtimeConnected": false
+    },
+    {
+      "id": "SRC_DISCOVERY",
+      "label": "Permitted discovery activity",
+      "owner": "First-party discovery measurement owner",
+      "observations": [
+        "qualified visible offering view",
+        "explicit customer action",
+        "privacy-safe session cohort",
+        "bot/duplicate filtering result"
+      ],
+      "runtimeConnected": false
+    },
+    {
+      "id": "SRC_PROMOTIONS",
+      "label": "Campaign delivery and attribution",
+      "owner": "Approved promotion/reporting owner",
+      "observations": [
+        "campaign delivery",
+        "attribution revision",
+        "declared window/model",
+        "eligible conversion reference"
+      ],
+      "runtimeConnected": false
+    },
+    {
+      "id": "SRC_FEEDBACK",
+      "label": "Published feedback",
+      "owner": "Review publication owner",
+      "observations": [
+        "rating scale",
+        "published review",
+        "moderation result",
+        "withdrawal/correction"
+      ],
+      "runtimeConnected": false
+    },
+    {
+      "id": "SRC_REQUIREMENTS",
+      "label": "Applicable setup requirements",
+      "owner": "Merchant readiness/document owner",
+      "observations": [
+        "applicable required list",
+        "requirement status",
+        "review result",
+        "expiry",
+        "waiver where authorized"
+      ],
+      "runtimeConnected": false
+    }
+  ],
+  "ingestionModes": [
+    "NATIVE_CONFIRMED",
+    "EXTERNAL_CONFIRMED",
+    "IMPORTED",
+    "MERCHANT_REPORTED",
+    "DEMO"
+  ],
+  "qualityStates": [
+    "DEMO",
+    "COMPLETE",
+    "PARTIAL",
+    "STALE",
+    "UNAVAILABLE",
+    "NOT_COLLECTED",
+    "INSUFFICIENT_HISTORY",
+    "SUPPRESSED",
+    "UNMAPPED",
+    "CONFLICT"
+  ],
+  "authorityRule": "Exactly one authoritative fact per class/scope; imported/manual provenance does not upgrade authority. Unknown authority produces CONFLICT/UNAVAILABLE, never last-write-wins.",
+  "symbolicEventPolicy": "Existing sourceEvents are semantic design references, not deployed event subscriptions. A future adapter binds each to an approved event/version or snapshot with equivalent evidence; missing mappings remain NOT_COLLECTED."
+}

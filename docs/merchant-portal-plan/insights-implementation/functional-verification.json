@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-11-01T11:39:45.879Z",
+  "finishedAt": "2026-11-01T11:42:57.256Z",
+  "base": "http://127.0.0.1:3141",
+  "scope": "Local sample frontend; no live reporting correctness, authorization or accessibility certification claim.",
+  "status": "PASSED",
+  "passed": 15,
+  "failed": 0,
+  "runtimeErrors": [],
+  "forbiddenRequests": [],
+  "mutations": [],
+  "evidenceKind": "Historical aggregate result directly read from the original completed artifact before the interrupted recheck.",
+  "evidenceAvailability": "The original per-case detail was overwritten by incremental writes from the interrupted recheck. The observed aggregate result and original timestamps are preserved here; detailed records are not reconstructed.",
+  "interruptedRecheckArtifact": "functional-verification-interrupted.json",
+  "repeatedRunStopped": true
+}

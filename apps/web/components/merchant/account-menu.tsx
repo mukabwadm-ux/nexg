@@ -2,10 +2,9 @@
 
 import { ChevronDown, LogOut, Settings as SettingsIcon, User } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { signOut } from '@/app/sign-in/actions';
+import { signOutBrowser } from '@/lib/supabase/logout';
 
 /**
  * The account button, and the way out.
@@ -25,15 +24,17 @@ export function AccountMenu({
   role,
   businessName,
   live,
+  operationsAllowed = true,
 }: {
   personName: string;
   role: string;
   businessName: string;
   live: boolean;
+  operationsAllowed?: boolean;
 }) {
-  const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [going, setGoing] = React.useState(false);
+  const [error, setError] = React.useState('');
   const box = React.useRef<HTMLDivElement>(null);
 
   const initials =
@@ -101,7 +102,7 @@ export function AccountMenu({
             </p>
           </div>
 
-          <Link
+          {operationsAllowed ? <><Link
             href="/merchant/settings"
             role="menuitem"
             onClick={() => setOpen(false)}
@@ -119,6 +120,7 @@ export function AccountMenu({
             <User className="h-4 w-4" aria-hidden="true" />
             Your team
           </Link>
+          </> : null}
 
           <button
             type="button"
@@ -126,15 +128,20 @@ export function AccountMenu({
             disabled={going}
             onClick={async () => {
               setGoing(true);
-              await signOut();
-              router.push('/sign-in');
-              router.refresh();
+              setError('');
+              try {
+                await signOutBrowser();
+              } catch (cause) {
+                setError(cause instanceof Error ? cause.message : 'Sign out could not be completed.');
+                setGoing(false);
+              }
             }}
             className="border-border text-danger hover:bg-danger-bg flex w-full items-center gap-2.5 border-t px-4 py-2.5 text-left text-[0.8125rem] font-extrabold disabled:opacity-50"
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />
             {going ? 'Signing out…' : 'Sign out'}
           </button>
+          {error ? <p role="alert" className="px-4 py-3 text-xs text-danger">{error}</p> : null}
         </div>
       ) : null}
     </div>

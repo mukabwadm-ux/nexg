@@ -1,0 +1,1943 @@
+{
+  "version": 1,
+  "descriptors": [
+    {
+      "schemaId": "PRODUCT_CATALOG_V1",
+      "modelId": "ORDER",
+      "workflowIds": [
+        "WF_ORDER"
+      ],
+      "title": "Product and menu orders",
+      "billingBasis": "items, variants and approved adjustments",
+      "invariant": "No stock-confirmed-order-to-paid inference; no direct cash in NEXG payout.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_fees",
+        "money_confirmed_collections_v1"
+      ]
+    },
+    {
+      "schemaId": "SERVICE_APPOINTMENT_V1",
+      "modelId": "APPOINTMENT",
+      "workflowIds": [
+        "WF_APPOINTMENT"
+      ],
+      "title": "On-site services",
+      "billingBasis": "accepted service and separately classified booking payment",
+      "invariant": "Advance is credited once; completion does not prove payment.",
+      "headlineMetricIds": [
+        "money_booking_advances_v1",
+        "money_customer_due_v1",
+        "money_confirmed_collections_v1"
+      ]
+    },
+    {
+      "schemaId": "REMOTE_SESSION_V1",
+      "modelId": "APPOINTMENT",
+      "workflowIds": [
+        "WF_REMOTE_SESSION"
+      ],
+      "title": "Remote services",
+      "billingBasis": "provider service charge and actual remaining balance",
+      "invariant": "No venue, travel or vehicle lines without an actual contract.",
+      "headlineMetricIds": [
+        "money_booking_advances_v1",
+        "money_customer_due_v1",
+        "money_confirmed_collections_v1"
+      ]
+    },
+    {
+      "schemaId": "FIELD_SERVICE_V1",
+      "modelId": "FIELD_VISIT",
+      "workflowIds": [
+        "WF_FIELD_SERVICE"
+      ],
+      "title": "Field service",
+      "billingBasis": "agreed visit/scope and approved changes",
+      "invariant": "No automatic travel/call-out tariff.",
+      "headlineMetricIds": [
+        "money_billed_work_v1",
+        "money_customer_due_v1",
+        "money_confirmed_collections_v1"
+      ]
+    },
+    {
+      "schemaId": "RENTAL_ASSET_V1",
+      "modelId": "ASSET_INTERVAL",
+      "workflowIds": [
+        "WF_RENTAL"
+      ],
+      "title": "Rentals and security",
+      "billingBasis": "rental unit/contract period, extensions, independent security",
+      "invariant": "Physical return does not release money; refundable security is not rental sales.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_security_collected_v1",
+        "money_security_recorded_obligation_v1",
+        "money_security_refunds_v1"
+      ]
+    },
+    {
+      "schemaId": "TRANSFER_ROUTE_V1",
+      "modelId": "TRANSFER",
+      "workflowIds": [
+        "WF_TRANSFER"
+      ],
+      "title": "Trips and greeters",
+      "billingBasis": "one root trip/greeting price and actual inclusions",
+      "invariant": "Driver and vehicle do not create another sale; greeter-only has no car income.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ]
+    },
+    {
+      "schemaId": "EVENT_TICKET_V1",
+      "modelId": "SESSION_CAPACITY",
+      "workflowIds": [
+        "WF_EVENT_SESSION"
+      ],
+      "title": "Event tickets",
+      "billingBasis": "actual ticket/party/pass price and occurrence",
+      "invariant": "Ticket/participant count is not payment count; cancelled event is not a refund.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_booking_advances_v1",
+        "finance_refunds"
+      ]
+    },
+    {
+      "schemaId": "GROUP_SESSION_V1",
+      "modelId": "SESSION_CAPACITY",
+      "workflowIds": [
+        "WF_GROUP_ACTIVITY"
+      ],
+      "title": "Group sessions",
+      "billingBasis": "accepted participant/place price and occurrence",
+      "invariant": "Included membership places are not resold; joint resources do not duplicate bills.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_booking_advances_v1",
+        "finance_refunds"
+      ]
+    },
+    {
+      "schemaId": "SPACE_RESERVATION_V1",
+      "modelId": "SPACE_RESERVATION",
+      "workflowIds": [
+        "WF_SPACE_RESERVATION_V1"
+      ],
+      "title": "Tables and spaces",
+      "billingBasis": "reservation charge/credited advance, minimum spend and final bill",
+      "invariant": "Minimum spend is a commitment until the owner charges it; credit advance once.",
+      "headlineMetricIds": [
+        "money_booking_advances_v1",
+        "money_unapplied_advances_v1",
+        "money_customer_due_v1"
+      ]
+    },
+    {
+      "schemaId": "TOUR_PACKAGE_V1",
+      "modelId": "TOUR",
+      "workflowIds": [
+        "WF_TOUR"
+      ],
+      "title": "Tours and itineraries",
+      "billingBasis": "shared departure or private accepted itinerary; principal/agent basis",
+      "invariant": "Supplier/customer pass-through is not automatically merchant revenue.",
+      "headlineMetricIds": [
+        "money_quote_accepted_value_v1",
+        "money_customer_due_v1",
+        "money_supplier_payable_v1"
+      ]
+    },
+    {
+      "schemaId": "REQUEST_QUOTE_V1",
+      "modelId": "REQUEST_QUOTE",
+      "workflowIds": [
+        "WF_REQUEST_QUOTE"
+      ],
+      "title": "Quoted work",
+      "billingBasis": "accepted scope, milestones, invoices and collections",
+      "invariant": "Requested/accepted quote is not cash, invoice debt or recognized revenue.",
+      "headlineMetricIds": [
+        "money_quote_accepted_value_v1",
+        "money_unbilled_milestones_v1",
+        "money_customer_due_v1"
+      ]
+    },
+    {
+      "schemaId": "MADE_TO_ORDER_V1",
+      "modelId": "PRODUCTION_DUE",
+      "workflowIds": [
+        "WF_MADE_TO_ORDER"
+      ],
+      "title": "Custom production",
+      "billingBasis": "accepted specification, approved change and progress/final bill",
+      "invariant": "Unaccepted change and production deadline do not create payment.",
+      "headlineMetricIds": [
+        "money_quote_accepted_value_v1",
+        "money_billed_work_v1",
+        "money_customer_due_v1"
+      ]
+    },
+    {
+      "schemaId": "PICKUP_RETURN_V1",
+      "modelId": "LINKED_WINDOWS",
+      "workflowIds": [
+        "WF_PICKUP_RETURN"
+      ],
+      "title": "Measured linked services",
+      "billingBasis": "accepted rate and confirmed measured quantity on one commercial root",
+      "invariant": "Collection/processing/return legs do not each create revenue.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ]
+    },
+    {
+      "schemaId": "SERVICE_JOB_V1",
+      "modelId": "SERVICE_JOB",
+      "workflowIds": [
+        "WF_SERVICE_JOB"
+      ],
+      "title": "Workshop and service jobs",
+      "billingBasis": "approved assessment, parts/labour and staged/final invoice",
+      "invariant": "Queue estimate is not invoice debt; approved changes already included are not added again.",
+      "headlineMetricIds": [
+        "money_billed_work_v1",
+        "money_applied_payments_v1",
+        "money_customer_due_v1",
+        "money_overdue_due_v1"
+      ]
+    },
+    {
+      "schemaId": "MEMBERSHIP_PLAN_V1",
+      "modelId": "ENTITLEMENT",
+      "workflowIds": [
+        "WF_MEMBERSHIP"
+      ],
+      "title": "Memberships and retainers",
+      "billingBasis": "contracted billing period, credits and renewal",
+      "invariant": "Cash collection is not automatically earned revenue; included redemption is not a sale.",
+      "headlineMetricIds": [
+        "money_confirmed_collections_v1",
+        "money_unapplied_credit_v1",
+        "money_recognized_revenue_v1"
+      ]
+    },
+    {
+      "schemaId": "FREIGHT_SHIPMENT_V1",
+      "modelId": "FREIGHT",
+      "workflowIds": [
+        "WF_FREIGHT"
+      ],
+      "title": "Freight",
+      "billingBasis": "agreed chargeable measure and authorized separate service lines",
+      "invariant": "No guessed dimensional conversion; carrier/customs funds classified by contract.",
+      "headlineMetricIds": [
+        "money_billed_work_v1",
+        "money_customer_due_v1",
+        "money_supplier_payable_v1"
+      ]
+    },
+    {
+      "schemaId": "STORAGE_SPACE_V1",
+      "modelId": "STORAGE",
+      "workflowIds": [
+        "WF_STORAGE"
+      ],
+      "title": "Storage",
+      "billingBasis": "declared space unit and billing period",
+      "invariant": "No assumed proration; custody end and money settlement remain independent.",
+      "headlineMetricIds": [
+        "money_billed_work_v1",
+        "money_customer_due_v1",
+        "money_overdue_due_v1"
+      ]
+    },
+    {
+      "schemaId": "REGULATED_ENQUIRY_V1",
+      "modelId": "REQUEST_QUOTE",
+      "workflowIds": [
+        "WF_REGULATED_ENQUIRY"
+      ],
+      "title": "Regulated enquiry/referral",
+      "billingBasis": "permitted merchant service/referral fees only",
+      "invariant": "No customer banking, loan, FX, remittance or wallet balances or executable rails.",
+      "headlineMetricIds": [
+        "money_confirmed_collections_v1",
+        "finance_refunds"
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "subcategoryId": "adult_products",
+      "categoryId": "adults_only",
+      "categoryName": "Adults Only",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "product",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Discreet packaged goods with age-check and signature policy; product selection and delivery are orders, not appointments.",
+      "categoryRefinement": "Discreet customer-facing billing; no sensitive item names in notification previews."
+    },
+    {
+      "subcategoryId": "adult_wellness",
+      "categoryId": "adults_only",
+      "categoryName": "Adults Only",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "wellness offering",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Clarify whether each offering is a product, a booked wellness service or a home visit; preserve discreet event summaries.",
+      "categoryRefinement": "Discreet customer-facing billing; no sensitive item names in notification previews."
+    },
+    {
+      "subcategoryId": "cigarettes",
+      "categoryId": "adults_only",
+      "categoryName": "Adults Only",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "tobacco product",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Licensed age-restricted tobacco orders with declared brands and minimum order; do not expose product detail in unrelated calendar views.",
+      "categoryRefinement": "Discreet customer-facing billing; no sensitive item names in notification previews."
+    },
+    {
+      "subcategoryId": "cigars",
+      "categoryId": "adults_only",
+      "categoryName": "Adults Only",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "cigar",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Licensed age-restricted cigar orders with gift packaging; packaging does not create a bookable service.",
+      "categoryRefinement": "Discreet customer-facing billing; no sensitive item names in notification previews."
+    },
+    {
+      "subcategoryId": "vapes",
+      "categoryId": "adults_only",
+      "categoryName": "Adults Only",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "vape product",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Device-type variants, license and age-check policy; order availability comes from inventory rather than empty calendar slots.",
+      "categoryRefinement": "Discreet customer-facing billing; no sensitive item names in notification previews."
+    },
+    {
+      "subcategoryId": "adult_accessories",
+      "categoryId": "adults_only",
+      "categoryName": "Adults Only",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "accessory",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Discreet accessory orders with signature policy; generic delivery milestones need no personal appointment.",
+      "categoryRefinement": "Discreet customer-facing billing; no sensitive item names in notification previews."
+    },
+    {
+      "subcategoryId": "airport_pickup",
+      "categoryId": "airport_transfers",
+      "categoryName": "Airport Transfers",
+      "vocabulary": {
+        "workSingular": "transfer",
+        "offeringSingular": "airport pickup",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Scheduled airport arrival pickup, passenger/luggage fit, flight-change policy and joint vehicle/driver occupancy.",
+      "categoryRefinement": "One trip or greeting charge; preserve actual driver/vehicle inclusions."
+    },
+    {
+      "subcategoryId": "airport_dropoff",
+      "categoryId": "airport_transfers",
+      "categoryName": "Airport Transfers",
+      "vocabulary": {
+        "workSingular": "transfer",
+        "offeringSingular": "airport drop-off",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Scheduled airport drop-off with passenger pickup address, airport arrival target and feasible vehicle/driver interval.",
+      "categoryRefinement": "One trip or greeting charge; preserve actual driver/vehicle inclusions."
+    },
+    {
+      "subcategoryId": "meet_greet",
+      "categoryId": "airport_transfers",
+      "categoryName": "Airport Transfers",
+      "vocabulary": {
+        "workSingular": "arrival",
+        "offeringSingular": "meet-and-greet service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Greeter, signage and waiting interval; explicitly distinguish greeter-only assistance from an included vehicle transfer.",
+      "categoryRefinement": "One trip or greeting charge; preserve actual driver/vehicle inclusions."
+    },
+    {
+      "subcategoryId": "executive_transfer",
+      "categoryId": "airport_transfers",
+      "categoryName": "Airport Transfers",
+      "vocabulary": {
+        "workSingular": "transfer",
+        "offeringSingular": "executive transfer",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Executive-class vehicle eligibility, driver, pickup, waiting and corporate billing; flight tracking only where enabled.",
+      "categoryRefinement": "One trip or greeting charge; preserve actual driver/vehicle inclusions."
+    },
+    {
+      "subcategoryId": "wine",
+      "categoryId": "alcohol_beverages",
+      "categoryName": "Alcohol & Beverages",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "wine",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Wine origin, age/license eligibility and cold/gift handling; scheduled delivery is explicitly offered, not automatic.",
+      "categoryRefinement": "Eligibility and handover do not prove payment; approved returns keep their actual unit."
+    },
+    {
+      "subcategoryId": "spirits",
+      "categoryId": "alcohol_beverages",
+      "categoryName": "Alcohol & Beverages",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "spirit",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Brand variants, licensed age-eligible order and gift wrapping; no appointment is inferred from corporate or gift demand.",
+      "categoryRefinement": "Eligibility and handover do not prove payment; approved returns keep their actual unit."
+    },
+    {
+      "subcategoryId": "beer",
+      "categoryId": "alcohol_beverages",
+      "categoryName": "Alcohol & Beverages",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "beer",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Cold delivery and returnable-bottle handling attached to an order; bottle return does not become asset rental.",
+      "categoryRefinement": "Eligibility and handover do not prove payment; approved returns keep their actual unit."
+    },
+    {
+      "subcategoryId": "champagne",
+      "categoryId": "alcohol_beverages",
+      "categoryName": "Alcohol & Beverages",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "champagne",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Occasion-specific cold/gift handling and dated delivery promise only when the merchant accepts that promise.",
+      "categoryRefinement": "Eligibility and handover do not prove payment; approved returns keep their actual unit."
+    },
+    {
+      "subcategoryId": "cocktail_mixers",
+      "categoryId": "alcohol_beverages",
+      "categoryName": "Alcohol & Beverages",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "mixer",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Packaged mixer orders and minimum quantity with configured eligibility and gift packaging.",
+      "categoryRefinement": "Eligibility and handover do not prove payment; approved returns keep their actual unit."
+    },
+    {
+      "subcategoryId": "liquor_stores",
+      "categoryId": "alcohol_beverages",
+      "categoryName": "Alcohol & Beverages",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "beverage",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Retail alcohol order, cold handling and corporate billing; store opening hours do not guarantee stock or delivery capacity.",
+      "categoryRefinement": "Eligibility and handover do not prove payment; approved returns keep their actual unit."
+    },
+    {
+      "subcategoryId": "mens_fashion",
+      "categoryId": "fashion_apparel",
+      "categoryName": "Fashion & Apparel",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "garment",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Size/brand retail with separately enabled tailoring production and style consultation appointments.",
+      "categoryRefinement": "Separate product sales, fittings and custom tailoring when configured."
+    },
+    {
+      "subcategoryId": "womens_fashion",
+      "categoryId": "fashion_apparel",
+      "categoryName": "Fashion & Apparel",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "garment",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Size/brand retail, custom tailoring and style consultations as distinct activities sharing configured staff where relevant.",
+      "categoryRefinement": "Separate product sales, fittings and custom tailoring when configured."
+    },
+    {
+      "subcategoryId": "kids_fashion",
+      "categoryId": "fashion_apparel",
+      "categoryName": "Fashion & Apparel",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "childrens garment",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Age/size retail and school uniform offering details; uniforms do not automatically imply custom production or fittings.",
+      "categoryRefinement": "Separate product sales, fittings and custom tailoring when configured."
+    },
+    {
+      "subcategoryId": "shoes",
+      "categoryId": "fashion_apparel",
+      "categoryName": "Fashion & Apparel",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "shoe",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Shoe-size-system variants and retail returns; no fitting appointment unless an actual bookable service is added.",
+      "categoryRefinement": "Separate product sales, fittings and custom tailoring when configured."
+    },
+    {
+      "subcategoryId": "bags",
+      "categoryId": "fashion_apparel",
+      "categoryName": "Fashion & Apparel",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "bag",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Authenticity/warranty declarations and bag inventory; product checks are not staff-time reservations.",
+      "categoryRefinement": "Separate product sales, fittings and custom tailoring when configured."
+    },
+    {
+      "subcategoryId": "watches",
+      "categoryId": "fashion_apparel",
+      "categoryName": "Fashion & Apparel",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "watch",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Watch inventory and declared warranty/authenticity; repair or valuation services require a separately configured activity.",
+      "categoryRefinement": "Separate product sales, fittings and custom tailoring when configured."
+    },
+    {
+      "subcategoryId": "accessories",
+      "categoryId": "fashion_apparel",
+      "categoryName": "Fashion & Apparel",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "fashion accessory",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Fashion accessory inventory, physical-store collection if offered and return policies; no default appointment calendar.",
+      "categoryRefinement": "Separate product sales, fittings and custom tailoring when configured."
+    },
+    {
+      "subcategoryId": "makeup",
+      "categoryId": "beauty",
+      "categoryName": "Beauty",
+      "vocabulary": {
+        "workSingular": "appointment",
+        "offeringSingular": "makeup service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Artist eligibility, exact makeup duration, bridal/event package resources and home travel; product sales remain a separate order activity.",
+      "categoryRefinement": "Separate retail, venue appointment and customer-location services."
+    },
+    {
+      "subcategoryId": "skincare",
+      "categoryId": "beauty",
+      "categoryName": "Beauty",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "skincare product",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Distinguish skincare products from routine consultations and home services; merchant-declared skin suitability is not clinical verification.",
+      "categoryRefinement": "Separate retail, venue appointment and customer-location services."
+    },
+    {
+      "subcategoryId": "haircare",
+      "categoryId": "beauty",
+      "categoryName": "Beauty",
+      "vocabulary": {
+        "workSingular": "appointment",
+        "offeringSingular": "hair service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Stylist/chair/service-duration resources, walk-in versus booked intake and home visits; product retail can coexist.",
+      "categoryRefinement": "Separate retail, venue appointment and customer-location services."
+    },
+    {
+      "subcategoryId": "fragrances",
+      "categoryId": "beauty",
+      "categoryName": "Beauty",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "fragrance",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Fragrance-family retail with gift wrapping; products_for_sale=no requires offering clarification rather than an invented appointment.",
+      "categoryRefinement": "Separate retail, venue appointment and customer-location services."
+    },
+    {
+      "subcategoryId": "cosmetics_stores",
+      "categoryId": "beauty",
+      "categoryName": "Beauty",
+      "vocabulary": {
+        "workSingular": "order",
+        "offeringSingular": "cosmetic",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Own/multiple brands, physical store and minimum-order retail; cosmetics inventory is separate from appointment capacity.",
+      "categoryRefinement": "Separate retail, venue appointment and customer-location services."
+    },
+    {
+      "subcategoryId": "car_rental",
+      "categoryId": "vehicle_rentals",
+      "categoryName": "Vehicle Rentals",
+      "vocabulary": {
+        "workSingular": "rental",
+        "offeringSingular": "rental vehicle",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Individual rental asset, exact start/end and return condition, fuel/deposit/insurance policy and optional qualified driver allocation.",
+      "categoryRefinement": "Rental income and security are separate; corporate/long-term billing uses agreed periods."
+    },
+    {
+      "subcategoryId": "self_drive",
+      "categoryId": "vehicle_rentals",
+      "categoryName": "Vehicle Rentals",
+      "vocabulary": {
+        "workSingular": "rental",
+        "offeringSingular": "self-drive vehicle",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Exclusive self-drive vehicle interval with age eligibility, fuel/deposit terms, handover, return and maintenance blocks.",
+      "categoryRefinement": "Rental income and security are separate; corporate/long-term billing uses agreed periods."
+    },
+    {
+      "subcategoryId": "corporate_rental",
+      "categoryId": "vehicle_rentals",
+      "categoryName": "Vehicle Rentals",
+      "vocabulary": {
+        "workSingular": "rental",
+        "offeringSingular": "corporate vehicle allocation",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Corporate vehicle occupancy independent of billing cycle; dedicated account manager is not automatically a bookable driver.",
+      "categoryRefinement": "Rental income and security are separate; corporate/long-term billing uses agreed periods."
+    },
+    {
+      "subcategoryId": "long_term_rental",
+      "categoryId": "vehicle_rentals",
+      "categoryName": "Vehicle Rentals",
+      "vocabulary": {
+        "workSingular": "rental",
+        "offeringSingular": "long-term vehicle",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Long occupancy intervals, extension conflict checks, maintenance and agreed return; billing periods do not reset vehicle capacity.",
+      "categoryRefinement": "Rental income and security are separate; corporate/long-term billing uses agreed periods."
+    },
+    {
+      "subcategoryId": "bike_rental",
+      "categoryId": "vehicle_rentals",
+      "categoryName": "Vehicle Rentals",
+      "vocabulary": {
+        "workSingular": "rental",
+        "offeringSingular": "rental bike",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Bike-type/asset interval and return; if driver service is genuinely offered, allocate its qualified rider without creating an airport transfer.",
+      "categoryRefinement": "Rental income and security are separate; corporate/long-term billing uses agreed periods."
+    },
+    {
+      "subcategoryId": "concerts",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "ticket booking",
+        "offeringSingular": "concert ticket",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated ticket/session places, VIP inventory where configured and ticket delivery; attendee bands are not actual remaining seats.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "festivals",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "festival booking",
+        "offeringSingular": "festival pass",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated festival admission inventory and optional multi-day passes; a pass entitlement and each controlled session's capacity stay explicit.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "conferences",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "registration",
+        "offeringSingular": "conference place",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Conference session/admission capacity plus venue, AV and catering dependencies under their actual owners.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "private_events",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "event request",
+        "offeringSingular": "private event package",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Requested date/headcount and venue/planning scope; bind actual venue/team capacity only after quote and supplier acceptance.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "photography",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "photo session",
+        "offeringSingular": "photography service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Photographer/equipment interval, exact session duration and group limit; travel/home location only when selected.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "workshops",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "workshop booking",
+        "offeringSingular": "workshop session",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated workshop capacity, facilitator/equipment and duration; walk-in admissions still consume the same session pool.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "classes",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "class booking",
+        "offeringSingular": "class session",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated class places and recurring occurrences; recurrence does not create a paid membership or renewal contract.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "sports_activities",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "activity booking",
+        "offeringSingular": "sports session",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Session participant capacity and required instructor/equipment/space; repeated sessions and membership are distinct.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "recreation",
+      "categoryId": "experiences",
+      "categoryName": "Experiences",
+      "vocabulary": {
+        "workSingular": "activity booking",
+        "offeringSingular": "recreation session",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated recreation activity capacity and equipment with booking window; walk-ins require a live capacity check.",
+      "categoryRefinement": "Separate ticket/place, private event, photography and membership price bases."
+    },
+    {
+      "subcategoryId": "banking",
+      "categoryId": "financial_services",
+      "categoryName": "Financial Services",
+      "vocabulary": {
+        "workSingular": "banking enquiry",
+        "offeringSingular": "banking service enquiry",
+        "memberOrCustomer": "enquirer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Administrative banking enquiry or explicitly offered consultation; calendar confirmation does not approve an account, loan or funds movement.",
+      "categoryRefinement": "Only permitted merchant service/referral fees; no customer financial accounts or rails."
+    },
+    {
+      "subcategoryId": "forex",
+      "categoryId": "financial_services",
+      "categoryName": "Financial Services",
+      "vocabulary": {
+        "workSingular": "forex enquiry",
+        "offeringSingular": "exchange enquiry",
+        "memberOrCustomer": "enquirer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Currency-service enquiry and optional staff consultation; a time reservation never locks an exchange rate or currency inventory.",
+      "categoryRefinement": "Only permitted merchant service/referral fees; no customer financial accounts or rails."
+    },
+    {
+      "subcategoryId": "insurance",
+      "categoryId": "financial_services",
+      "categoryName": "Financial Services",
+      "vocabulary": {
+        "workSingular": "insurance enquiry",
+        "offeringSingular": "insurance enquiry",
+        "memberOrCustomer": "enquirer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Insurance enquiry/provider appointment where offered; no calendar event binds cover or underwriting approval.",
+      "categoryRefinement": "Only permitted merchant service/referral fees; no customer financial accounts or rails."
+    },
+    {
+      "subcategoryId": "payments",
+      "categoryId": "financial_services",
+      "categoryName": "Financial Services",
+      "vocabulary": {
+        "workSingular": "payment-service enquiry",
+        "offeringSingular": "provider service enquiry",
+        "memberOrCustomer": "enquirer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Payment-service enquiry or handoff; this booking module does not reserve financial balances or operate payment rails.",
+      "categoryRefinement": "Only permitted merchant service/referral fees; no customer financial accounts or rails."
+    },
+    {
+      "subcategoryId": "remittance",
+      "categoryId": "financial_services",
+      "categoryName": "Financial Services",
+      "vocabulary": {
+        "workSingular": "remittance enquiry",
+        "offeringSingular": "remittance service enquiry",
+        "memberOrCustomer": "enquirer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Corridor/provider enquiry and optional appointment; transfer acceptance and compliance remain with the authorized provider.",
+      "categoryRefinement": "Only permitted merchant service/referral fees; no customer financial accounts or rails."
+    },
+    {
+      "subcategoryId": "sacco_services",
+      "categoryId": "financial_services",
+      "categoryName": "Financial Services",
+      "vocabulary": {
+        "workSingular": "member-service enquiry",
+        "offeringSingular": "Sacco service enquiry",
+        "memberOrCustomer": "enquirer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "SACCO-service administrative request and optional local office consultation; financial entitlement is not calendar capacity.",
+      "categoryRefinement": "Only permitted merchant service/referral fees; no customer financial accounts or rails."
+    },
+    {
+      "subcategoryId": "business_services",
+      "categoryId": "financial_services",
+      "categoryName": "Financial Services",
+      "vocabulary": {
+        "workSingular": "business-service enquiry",
+        "offeringSingular": "business service enquiry",
+        "memberOrCustomer": "enquirer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Declared financial/business-service enquiry; classify an actual offered consultation explicitly before booking staff time.",
+      "categoryRefinement": "Only permitted merchant service/referral fees; no customer financial accounts or rails."
+    },
+    {
+      "subcategoryId": "flowers",
+      "categoryId": "flowers_gifts",
+      "categoryName": "Flowers & Gifts",
+      "vocabulary": {
+        "workSingular": "flower order",
+        "offeringSingular": "flower arrangement",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Fresh/preserved bouquets, custom message and accepted delivery date; recurring bouquet orders do not imply membership billing.",
+      "categoryRefinement": "Goods, custom production and recurring flower plans use their actual pricing basis."
+    },
+    {
+      "subcategoryId": "gift_hampers",
+      "categoryId": "flowers_gifts",
+      "categoryName": "Flowers & Gifts",
+      "vocabulary": {
+        "workSingular": "hamper order",
+        "offeringSingular": "gift hamper",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Hamper order and gift message; custom curation can require approved specification and production lead time.",
+      "categoryRefinement": "Goods, custom production and recurring flower plans use their actual pricing basis."
+    },
+    {
+      "subcategoryId": "cakes",
+      "categoryId": "flowers_gifts",
+      "categoryName": "Flowers & Gifts",
+      "vocabulary": {
+        "workSingular": "cake order",
+        "offeringSingular": "cake design",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Accepted cake design, dietary specification, exact advance cutoff and production/delivery promise; design approval precedes commitment where required.",
+      "categoryRefinement": "Goods, custom production and recurring flower plans use their actual pricing basis."
+    },
+    {
+      "subcategoryId": "chocolates",
+      "categoryId": "flowers_gifts",
+      "categoryName": "Flowers & Gifts",
+      "vocabulary": {
+        "workSingular": "chocolate order",
+        "offeringSingular": "chocolate gift",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Gift-wrapped chocolate order, message and delivery promise if offered; no appointment resource is allocated.",
+      "categoryRefinement": "Goods, custom production and recurring flower plans use their actual pricing basis."
+    },
+    {
+      "subcategoryId": "personalized_gifts",
+      "categoryId": "flowers_gifts",
+      "categoryName": "Flowers & Gifts",
+      "vocabulary": {
+        "workSingular": "personalisation job",
+        "offeringSingular": "personalised gift",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Approved personalization and due date with production capacity and corporate quantity; preserve specification revisions.",
+      "categoryRefinement": "Goods, custom production and recurring flower plans use their actual pricing basis."
+    },
+    {
+      "subcategoryId": "occasion_gifts",
+      "categoryId": "flowers_gifts",
+      "categoryName": "Flowers & Gifts",
+      "vocabulary": {
+        "workSingular": "gift order",
+        "offeringSingular": "occasion gift",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Occasion/message/gift wrapping order with optional promised delivery date; occasion alone is not a reservation.",
+      "categoryRefinement": "Goods, custom production and recurring flower plans use their actual pricing basis."
+    },
+    {
+      "subcategoryId": "restaurant",
+      "categoryId": "restaurants_food",
+      "categoryName": "Restaurants & Food",
+      "vocabulary": {
+        "workSingular": "food order",
+        "offeringSingular": "menu item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Food orders plus separately enabled table reservations with party size, table compatibility, dining interval and turnover.",
+      "categoryRefinement": "Order bill, table advance/minimum spend and catering contract remain distinct."
+    },
+    {
+      "subcategoryId": "fast_food",
+      "categoryId": "restaurants_food",
+      "categoryName": "Restaurants & Food",
+      "vocabulary": {
+        "workSingular": "food order",
+        "offeringSingular": "menu item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Food preparation/collection/delivery promise with drive-through or family-meal variants; no table reservation is inferred.",
+      "categoryRefinement": "Order bill, table advance/minimum spend and catering contract remain distinct."
+    },
+    {
+      "subcategoryId": "cafe",
+      "categoryId": "restaurants_food",
+      "categoryName": "Restaurants & Food",
+      "vocabulary": {
+        "workSingular": "cafe order",
+        "offeringSingular": "cafe item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Food/drink order; seated_capacity or coworking_space does not enable a seat/desk booking without an explicit offering.",
+      "categoryRefinement": "Order bill, table advance/minimum spend and catering contract remain distinct."
+    },
+    {
+      "subcategoryId": "bakery",
+      "categoryId": "restaurants_food",
+      "categoryName": "Restaurants & Food",
+      "vocabulary": {
+        "workSingular": "bakery order",
+        "offeringSingular": "bakery item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Standard bakery orders and explicitly custom production with exact advance cutoff and fulfilment promise.",
+      "categoryRefinement": "Order bill, table advance/minimum spend and catering contract remain distinct."
+    },
+    {
+      "subcategoryId": "desserts",
+      "categoryId": "restaurants_food",
+      "categoryName": "Restaurants & Food",
+      "vocabulary": {
+        "workSingular": "dessert order",
+        "offeringSingular": "dessert",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dessert inventory or custom accepted specification, dietary detail and production promise; distinguish stock from made-to-order.",
+      "categoryRefinement": "Order bill, table advance/minimum spend and catering contract remain distinct."
+    },
+    {
+      "subcategoryId": "juice_bar",
+      "categoryId": "restaurants_food",
+      "categoryName": "Restaurants & Food",
+      "vocabulary": {
+        "workSingular": "drink order",
+        "offeringSingular": "drink",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Drink/food orders; detox_programs describes an offering and does not automatically create clinical sessions or subscriptions.",
+      "categoryRefinement": "Order bill, table advance/minimum spend and catering contract remain distinct."
+    },
+    {
+      "subcategoryId": "cloud_kitchen",
+      "categoryId": "restaurants_food",
+      "categoryName": "Restaurants & Food",
+      "vocabulary": {
+        "workSingular": "kitchen order",
+        "offeringSingular": "menu item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Brand/menu preparation and delivery; collection windows apply only when pickup is offered and exact capacity is configured.",
+      "categoryRefinement": "Order bill, table advance/minimum spend and catering contract remain distinct."
+    },
+    {
+      "subcategoryId": "catering",
+      "categoryId": "restaurants_food",
+      "categoryName": "Restaurants & Food",
+      "vocabulary": {
+        "workSingular": "catering request",
+        "offeringSingular": "catering package",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Requested headcount/menu/date, staffing and equipment scope; quote approval links production and event resources without duplicate charges.",
+      "categoryRefinement": "Order bill, table advance/minimum spend and catering contract remain distinct."
+    },
+    {
+      "subcategoryId": "supermarket",
+      "categoryId": "groceries_essentials",
+      "categoryName": "Groceries & Essentials",
+      "vocabulary": {
+        "workSingular": "basket order",
+        "offeringSingular": "grocery item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Stock-owned grocery orders; delivery/collection windows and express cutoffs only when explicitly configured.",
+      "categoryRefinement": "Measured goods, approved substitutions and subscription periods preserve accepted prices."
+    },
+    {
+      "subcategoryId": "convenience_store",
+      "categoryId": "groceries_essentials",
+      "categoryName": "Groceries & Essentials",
+      "vocabulary": {
+        "workSingular": "basket order",
+        "offeringSingular": "convenience item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Retail essentials and optional express fulfilment; 24-hour opening does not mean continuous free delivery capacity.",
+      "categoryRefinement": "Measured goods, approved substitutions and subscription periods preserve accepted prices."
+    },
+    {
+      "subcategoryId": "fresh_produce",
+      "categoryId": "groceries_essentials",
+      "categoryName": "Groceries & Essentials",
+      "vocabulary": {
+        "workSingular": "produce order",
+        "offeringSingular": "produce item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Perishable quantity orders, market dates and optionally recurring boxes; recurring fulfilment and membership are separate.",
+      "categoryRefinement": "Measured goods, approved substitutions and subscription periods preserve accepted prices."
+    },
+    {
+      "subcategoryId": "butchery",
+      "categoryId": "groceries_essentials",
+      "categoryName": "Groceries & Essentials",
+      "vocabulary": {
+        "workSingular": "butchery order",
+        "offeringSingular": "cut",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Measured cut order and advance preparation cutoff; custom cuts require accepted quantity/specification, not a customer appointment.",
+      "categoryRefinement": "Measured goods, approved substitutions and subscription periods preserve accepted prices."
+    },
+    {
+      "subcategoryId": "seafood",
+      "categoryId": "groceries_essentials",
+      "categoryName": "Groceries & Essentials",
+      "vocabulary": {
+        "workSingular": "seafood order",
+        "offeringSingular": "seafood item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Measured seafood inventory and processing/handling promise; live or onsite processing facts do not establish free processing capacity.",
+      "categoryRefinement": "Measured goods, approved substitutions and subscription periods preserve accepted prices."
+    },
+    {
+      "subcategoryId": "organic_store",
+      "categoryId": "groceries_essentials",
+      "categoryName": "Groceries & Essentials",
+      "vocabulary": {
+        "workSingular": "grocery order",
+        "offeringSingular": "organic grocery item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Retail organic/store packaging attributes and optional configured fulfilment windows; no booking activity is inferred.",
+      "categoryRefinement": "Measured goods, approved substitutions and subscription periods preserve accepted prices."
+    },
+    {
+      "subcategoryId": "laundry",
+      "categoryId": "laundry_cleaning",
+      "categoryName": "Laundry & Cleaning",
+      "vocabulary": {
+        "workSingular": "laundry job",
+        "offeringSingular": "laundry service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Measured laundry intake, collection or customer drop-off, processing turnaround and independently feasible return window.",
+      "categoryRefinement": "Measured linked work, field cleaning and recurring plans do not duplicate commercial roots."
+    },
+    {
+      "subcategoryId": "dry_cleaning",
+      "categoryId": "laundry_cleaning",
+      "categoryName": "Laundry & Cleaning",
+      "vocabulary": {
+        "workSingular": "cleaning job",
+        "offeringSingular": "garment service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Garment-type/item intake, processing turnaround and linked collection/return commitments under their actual capacity owners.",
+      "categoryRefinement": "Measured linked work, field cleaning and recurring plans do not duplicate commercial roots."
+    },
+    {
+      "subcategoryId": "ironing",
+      "categoryId": "laundry_cleaning",
+      "categoryName": "Laundry & Cleaning",
+      "vocabulary": {
+        "workSingular": "ironing job",
+        "offeringSingular": "ironing service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Item-based ironing intake and processing promise; transport legs only when pickup/delivery is offered.",
+      "categoryRefinement": "Measured linked work, field cleaning and recurring plans do not duplicate commercial roots."
+    },
+    {
+      "subcategoryId": "home_cleaning",
+      "categoryId": "laundry_cleaning",
+      "categoryName": "Laundry & Cleaning",
+      "vocabulary": {
+        "workSingular": "cleaning visit",
+        "offeringSingular": "home cleaning service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Household visit duration, eligible crew/equipment, customer address/service area and travel; recurrence separate from paid subscription.",
+      "categoryRefinement": "Measured linked work, field cleaning and recurring plans do not duplicate commercial roots."
+    },
+    {
+      "subcategoryId": "office_cleaning",
+      "categoryId": "laundry_cleaning",
+      "categoryName": "Laundry & Cleaning",
+      "vocabulary": {
+        "workSingular": "cleaning visit",
+        "offeringSingular": "office cleaning service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Office visit crew/hours and site constraints, equipment and travel; recurring schedules remain actual dated commitments.",
+      "categoryRefinement": "Measured linked work, field cleaning and recurring plans do not duplicate commercial roots."
+    },
+    {
+      "subcategoryId": "home_living",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "home item order",
+        "offeringSingular": "home item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "New/used household retail with fragile handling and return policy; delivery promises require actual owner acceptance.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "furniture",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "furniture order",
+        "offeringSingular": "furniture item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Furniture retail and optional installation visit linked to selected order/method; installer time is not implied for every product.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "appliances",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "appliance order",
+        "offeringSingular": "appliance",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Appliance inventory and warranty with optional installer/equipment visit; delivery and installation have distinct feasible times.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "decor",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "decor order",
+        "offeringSingular": "decor item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Decor retail, condition and fragile/gift handling; no venue/styling appointment is inferred from category name.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "kitchenware",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "kitchenware order",
+        "offeringSingular": "kitchenware item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "New/used kitchenware order and return policy, with optional configured fulfilment window.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "books",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "book order",
+        "offeringSingular": "book",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Book inventory and special sourcing/custom request; clarify whether custom_orders means sourcing or genuine production.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "stationery",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "stationery order",
+        "offeringSingular": "stationery item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Stationery retail, minimum quantity and corporate billing; corporate account status does not allocate time capacity.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "office_supplies",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "supply order",
+        "offeringSingular": "office supply",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Office supply quantities, minimum order and corporate billing; scheduled replenishment needs explicit configuration.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "general_retail",
+      "categoryId": "marketplace",
+      "categoryName": "Marketplace",
+      "vocabulary": {
+        "workSingular": "retail order",
+        "offeringSingular": "retail product",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Declared product, condition and stock authority with optional delivery/collection promise; no generic appointment fallback.",
+      "categoryRefinement": "Goods, installation/assembly and custom printing/quoted work use actual enabled variants."
+    },
+    {
+      "subcategoryId": "pharmacy_retail",
+      "categoryId": "pharmacy",
+      "categoryName": "Pharmacy",
+      "vocabulary": {
+        "workSingular": "pharmacy order",
+        "offeringSingular": "pharmacy item",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Pharmacy order and declared pharmacist/cold-chain/prescription fulfilment gates; do not put prescription details in calendar titles.",
+      "categoryRefinement": "Discreet item references and subscription periods; no inferred insurer settlement."
+    },
+    {
+      "subcategoryId": "medical_supplies",
+      "categoryId": "pharmacy",
+      "categoryName": "Pharmacy",
+      "vocabulary": {
+        "workSingular": "supply order",
+        "offeringSingular": "medical supply",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Medical supply quantities and corporate order terms; supply sales do not create patient appointments.",
+      "categoryRefinement": "Discreet item references and subscription periods; no inferred insurer settlement."
+    },
+    {
+      "subcategoryId": "baby_products",
+      "categoryId": "pharmacy",
+      "categoryName": "Pharmacy",
+      "vocabulary": {
+        "workSingular": "product order",
+        "offeringSingular": "baby product",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Baby-product retail and optional recurring order plan; entitlement/billing is distinct from recurring delivery.",
+      "categoryRefinement": "Discreet item references and subscription periods; no inferred insurer settlement."
+    },
+    {
+      "subcategoryId": "supplements",
+      "categoryId": "pharmacy",
+      "categoryName": "Pharmacy",
+      "vocabulary": {
+        "workSingular": "product order",
+        "offeringSingular": "supplement",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Supplement inventory and authenticity declarations; no clinical consultation is inferred.",
+      "categoryRefinement": "Discreet item references and subscription periods; no inferred insurer settlement."
+    },
+    {
+      "subcategoryId": "clinics",
+      "categoryId": "health",
+      "categoryName": "Health",
+      "vocabulary": {
+        "workSingular": "appointment",
+        "offeringSingular": "clinic service",
+        "memberOrCustomer": "client/patient administrative reference",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Administrative clinic slot with eligible staff/room; explicitly distinguish appointment booking, walk-in queue and home visit.",
+      "categoryRefinement": "Billing references without clinical diagnosis/details; no inferred insurance reimbursement."
+    },
+    {
+      "subcategoryId": "telemedicine",
+      "categoryId": "health",
+      "categoryName": "Health",
+      "vocabulary": {
+        "workSingular": "remote appointment",
+        "offeringSingular": "remote consultation slot",
+        "memberOrCustomer": "client/patient administrative reference",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Eligible remote provider/time interval and session access readiness; no clinical record or clinical outcome in booking/calendar data.",
+      "categoryRefinement": "Billing references without clinical diagnosis/details; no inferred insurance reimbursement."
+    },
+    {
+      "subcategoryId": "labs",
+      "categoryId": "health",
+      "categoryName": "Health",
+      "vocabulary": {
+        "workSingular": "lab appointment",
+        "offeringSingular": "laboratory service slot",
+        "memberOrCustomer": "client/patient administrative reference",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Administrative lab/sample collection appointment or home collection; result turnaround is a separate administrative milestone, not a reserved session.",
+      "categoryRefinement": "Billing references without clinical diagnosis/details; no inferred insurance reimbursement."
+    },
+    {
+      "subcategoryId": "mental_health",
+      "categoryId": "health",
+      "categoryName": "Health",
+      "vocabulary": {
+        "workSingular": "session booking",
+        "offeringSingular": "therapy session slot",
+        "memberOrCustomer": "client/patient administrative reference",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Private administrative therapy slot with exact duration and selected online/in-person method; minimize sensitive calendar summaries.",
+      "categoryRefinement": "Billing references without clinical diagnosis/details; no inferred insurance reimbursement."
+    },
+    {
+      "subcategoryId": "coaching",
+      "categoryId": "health",
+      "categoryName": "Health",
+      "vocabulary": {
+        "workSingular": "coaching session",
+        "offeringSingular": "coaching service",
+        "memberOrCustomer": "client/patient administrative reference",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Coach duration and online/in-person method, with separately configured group session capacity where offered.",
+      "categoryRefinement": "Billing references without clinical diagnosis/details; no inferred insurance reimbursement."
+    },
+    {
+      "subcategoryId": "smartphones",
+      "categoryId": "tech_electronics",
+      "categoryName": "Tech & Electronics",
+      "vocabulary": {
+        "workSingular": "device order",
+        "offeringSingular": "smartphone",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Device retail plus explicitly selected repair intake or trade-in assessment with separate quote/approval and device privacy policy.",
+      "categoryRefinement": "Product, repair and installation amounts remain typed components of actual work."
+    },
+    {
+      "subcategoryId": "tech_accessories",
+      "categoryId": "tech_electronics",
+      "categoryName": "Tech & Electronics",
+      "vocabulary": {
+        "workSingular": "accessory order",
+        "offeringSingular": "technology accessory",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Tech accessory inventory, warranty and minimum quantity; no installation/repair booking unless separately offered.",
+      "categoryRefinement": "Product, repair and installation amounts remain typed components of actual work."
+    },
+    {
+      "subcategoryId": "computers",
+      "categoryId": "tech_electronics",
+      "categoryName": "Tech & Electronics",
+      "vocabulary": {
+        "workSingular": "computer order",
+        "offeringSingular": "computer",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Computer inventory plus selected repair intake/assessment, exact workshop or appointment policy and device access consent.",
+      "categoryRefinement": "Product, repair and installation amounts remain typed components of actual work."
+    },
+    {
+      "subcategoryId": "gaming",
+      "categoryId": "tech_electronics",
+      "categoryName": "Tech & Electronics",
+      "vocabulary": {
+        "workSingular": "gaming order",
+        "offeringSingular": "gaming product",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Console/game/accessory inventory including pre-owned condition; category does not imply gaming-seat sessions.",
+      "categoryRefinement": "Product, repair and installation amounts remain typed components of actual work."
+    },
+    {
+      "subcategoryId": "audio",
+      "categoryId": "tech_electronics",
+      "categoryName": "Tech & Electronics",
+      "vocabulary": {
+        "workSingular": "audio order",
+        "offeringSingular": "audio product",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Audio product inventory, warranty and return policy; demonstration or installation requires an explicit extra service.",
+      "categoryRefinement": "Product, repair and installation amounts remain typed components of actual work."
+    },
+    {
+      "subcategoryId": "telecom_services",
+      "categoryId": "tech_electronics",
+      "categoryName": "Tech & Electronics",
+      "vocabulary": {
+        "workSingular": "service request",
+        "offeringSingular": "telecom service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Service intake and provider job requirements; device/accessory sales can coexist without becoming service appointments.",
+      "categoryRefinement": "Product, repair and installation amounts remain typed components of actual work."
+    },
+    {
+      "subcategoryId": "smart_devices",
+      "categoryId": "tech_electronics",
+      "categoryName": "Tech & Electronics",
+      "vocabulary": {
+        "workSingular": "device order",
+        "offeringSingular": "smart device",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Smart-device retail and optional selected installer visit with eligible staff/equipment and service area.",
+      "categoryRefinement": "Product, repair and installation amounts remain typed components of actual work."
+    },
+    {
+      "subcategoryId": "safaris",
+      "categoryId": "travel_tours",
+      "categoryName": "Travel & Tours",
+      "vocabulary": {
+        "workSingular": "safari booking",
+        "offeringSingular": "safari itinerary",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated departure or private multi-day itinerary, guest places and guide/vehicle allocations; accommodation confirmations remain with supplier owner.",
+      "categoryRefinement": "Shared departure/private itinerary and agent/supplier roles determine merchant share."
+    },
+    {
+      "subcategoryId": "game_drives",
+      "categoryId": "travel_tours",
+      "categoryName": "Travel & Tours",
+      "vocabulary": {
+        "workSingular": "game-drive booking",
+        "offeringSingular": "game drive",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated drive departure/occupancy, guest capacity, guide and private/shared vehicle policy with exact booking window.",
+      "categoryRefinement": "Shared departure/private itinerary and agent/supplier roles determine merchant share."
+    },
+    {
+      "subcategoryId": "luxury_safaris",
+      "categoryId": "travel_tours",
+      "categoryName": "Travel & Tours",
+      "vocabulary": {
+        "workSingular": "safari booking",
+        "offeringSingular": "luxury safari itinerary",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Multi-day private/shared itinerary and guest/resource capacity; luxury/accommodation claims do not prove supplier availability.",
+      "categoryRefinement": "Shared departure/private itinerary and agent/supplier roles determine merchant share."
+    },
+    {
+      "subcategoryId": "city_tours",
+      "categoryId": "travel_tours",
+      "categoryName": "Travel & Tours",
+      "vocabulary": {
+        "workSingular": "tour booking",
+        "offeringSingular": "city tour",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Tour mode, language-capable guide, exact duration and dated guest places; resources depend on walking/cycling/vehicle offering.",
+      "categoryRefinement": "Shared departure/private itinerary and agent/supplier roles determine merchant share."
+    },
+    {
+      "subcategoryId": "cultural_tours",
+      "categoryId": "travel_tours",
+      "categoryName": "Travel & Tours",
+      "vocabulary": {
+        "workSingular": "tour booking",
+        "offeringSingular": "cultural tour",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated guide/language/mode and guest group capacity; third-party access or venue confirmation is explicit.",
+      "categoryRefinement": "Shared departure/private itinerary and agent/supplier roles determine merchant share."
+    },
+    {
+      "subcategoryId": "adventure_tours",
+      "categoryId": "travel_tours",
+      "categoryName": "Travel & Tours",
+      "vocabulary": {
+        "workSingular": "adventure booking",
+        "offeringSingular": "adventure itinerary",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Dated guest capacity and eligible guide/equipment/mode; equipment_provided does not identify actual available equipment.",
+      "categoryRefinement": "Shared departure/private itinerary and agent/supplier roles determine merchant share."
+    },
+    {
+      "subcategoryId": "travel_packages",
+      "categoryId": "travel_tours",
+      "categoryName": "Travel & Tours",
+      "vocabulary": {
+        "workSingular": "travel request",
+        "offeringSingular": "travel package",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Accepted itinerary/quote and third-party flight/accommodation confirmations; included flight never implies NEXG seat inventory.",
+      "categoryRefinement": "Shared departure/private itinerary and agent/supplier roles determine merchant share."
+    },
+    {
+      "subcategoryId": "car_wash",
+      "categoryId": "vehicle_services",
+      "categoryName": "Vehicle Services",
+      "vocabulary": {
+        "workSingular": "wash job",
+        "offeringSingular": "wash service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Selected wash duration, bay/team and queue or appointment; mobile wash adds travel, and plan entitlement does not reserve a wash slot.",
+      "categoryRefinement": "Assessment, approved parts/labour, mobile work and membership credits remain distinct."
+    },
+    {
+      "subcategoryId": "tire_service",
+      "categoryId": "vehicle_services",
+      "categoryName": "Vehicle Services",
+      "vocabulary": {
+        "workSingular": "tire job",
+        "offeringSingular": "tire service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Workshop bay/technician job or mobile callout, with emergency response policy and compatible tire inventory kept separate.",
+      "categoryRefinement": "Assessment, approved parts/labour, mobile work and membership credits remain distinct."
+    },
+    {
+      "subcategoryId": "battery_service",
+      "categoryId": "vehicle_services",
+      "categoryName": "Vehicle Services",
+      "vocabulary": {
+        "workSingular": "battery job",
+        "offeringSingular": "battery service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Mobile team/callout or merchant-location workshop selected explicitly; battery stock and staff dispatch are separate owners.",
+      "categoryRefinement": "Assessment, approved parts/labour, mobile work and membership credits remain distinct."
+    },
+    {
+      "subcategoryId": "vehicle_assistance",
+      "categoryId": "vehicle_services",
+      "categoryName": "Vehicle Services",
+      "vocabulary": {
+        "workSingular": "assistance request",
+        "offeringSingular": "assistance service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Assistance type, response area and dispatched crew/vehicle; estimated arrival is not a guaranteed future appointment slot.",
+      "categoryRefinement": "Assessment, approved parts/labour, mobile work and membership credits remain distinct."
+    },
+    {
+      "subcategoryId": "vehicle_inspection",
+      "categoryId": "vehicle_services",
+      "categoryName": "Vehicle Services",
+      "vocabulary": {
+        "workSingular": "inspection booking",
+        "offeringSingular": "inspection service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Exact inspection duration and eligible inspector/bay/equipment; mobile inspection adds customer location and travel.",
+      "categoryRefinement": "Assessment, approved parts/labour, mobile work and membership credits remain distinct."
+    },
+    {
+      "subcategoryId": "spa",
+      "categoryId": "wellness",
+      "categoryName": "Wellness",
+      "vocabulary": {
+        "workSingular": "spa appointment",
+        "offeringSingular": "spa service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Service duration and compatible practitioner/room; couples package may require simultaneous linked resources and membership is separate.",
+      "categoryRefinement": "Appointments, classes and membership receipts/recognition remain separate."
+    },
+    {
+      "subcategoryId": "massage",
+      "categoryId": "wellness",
+      "categoryName": "Wellness",
+      "vocabulary": {
+        "workSingular": "massage appointment",
+        "offeringSingular": "massage service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Therapist/room duration and home travel where selected; couples treatment must allocate every required practitioner together.",
+      "categoryRefinement": "Appointments, classes and membership receipts/recognition remain separate."
+    },
+    {
+      "subcategoryId": "gym",
+      "categoryId": "wellness",
+      "categoryName": "Wellness",
+      "vocabulary": {
+        "workSingular": "membership",
+        "offeringSingular": "gym plan",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Membership validity and usage rules; opening hours do not reserve trainer/equipment, and personal training sessions are separately booked.",
+      "categoryRefinement": "Appointments, classes and membership receipts/recognition remain separate."
+    },
+    {
+      "subcategoryId": "personal_training",
+      "categoryId": "wellness",
+      "categoryName": "Wellness",
+      "vocabulary": {
+        "workSingular": "training session",
+        "offeringSingular": "training service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Trainer duration and chosen gym/client/online location; group places and travel dependencies only for enabled methods.",
+      "categoryRefinement": "Appointments, classes and membership receipts/recognition remain separate."
+    },
+    {
+      "subcategoryId": "reservations",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "reservation request",
+        "offeringSingular": "reservation assistance",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Concierge request for a venue reservation; external venue acceptance/reference is needed before confirming it to the customer.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "personal_assistance",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "assistance request",
+        "offeringSingular": "assistance service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Accepted assistance scope and response commitment; account manager or retainer does not reserve unlimited staff time.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "shopping_assistance",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "shopping request",
+        "offeringSingular": "shopping assistance",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Accepted shopping scope, provider/runner and completion promise; purchased-goods inventory is not NEXG calendar capacity.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "gift_sourcing",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "sourcing request",
+        "offeringSingular": "gift sourcing service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Gift specification, supplier sourcing and accepted due date; wrapping and corporate scope do not guarantee supplier stock.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "travel_planning",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "planning request",
+        "offeringSingular": "travel planning service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Travel-planning enquiry, agreed itinerary work and supplier handoffs; visa/insurance assistance does not mean approval.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "property_coordination",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "property request",
+        "offeringSingular": "property coordination",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Accepted coordination scope and planned visits/provider confirmations; coverage and 24-hour response do not guarantee free staff.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "moving_assistance",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "moving request",
+        "offeringSingular": "moving assistance",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Accepted move volume/date/address, crew/vehicle/equipment and travel; actual allocations follow quote acceptance.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "cleaning_coordination",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "coordination request",
+        "offeringSingular": "cleaning coordination",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Accepted cleaning scope and third-party or own-team confirmation; recurring requests need actual provider capacity per occurrence.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "vip_assistance",
+      "categoryId": "concierge_services",
+      "categoryName": "App Services",
+      "vocabulary": {
+        "workSingular": "priority request",
+        "offeringSingular": "VIP assistance",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Accepted VIP scope, responsible provider and retainer rules; priority/24-hour availability is not unlimited bookable capacity.",
+      "categoryRefinement": "Customer procurement budget is separate from merchant fees and retainers."
+    },
+    {
+      "subcategoryId": "sea_freight",
+      "categoryId": "logistics_shipping",
+      "categoryName": "Logistics & Shipping",
+      "vocabulary": {
+        "workSingular": "shipment",
+        "offeringSingular": "sea freight service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Shipment quantity/container/CBM/weight, carrier leg, port/cutoff and optional road transport; carrier acceptance owns vessel capacity.",
+      "categoryRefinement": "Freight dimensions and storage units/periods stay contract-specific."
+    },
+    {
+      "subcategoryId": "air_freight",
+      "categoryId": "logistics_shipping",
+      "categoryName": "Logistics & Shipping",
+      "vocabulary": {
+        "workSingular": "shipment",
+        "offeringSingular": "air freight service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Weight/volume shipment, carrier acceptance, customs and airport/warehouse legs; do not confuse quoted transit duration with a reserved flight.",
+      "categoryRefinement": "Freight dimensions and storage units/periods stay contract-specific."
+    },
+    {
+      "subcategoryId": "road_freight",
+      "categoryId": "logistics_shipping",
+      "categoryName": "Logistics & Shipping",
+      "vocabulary": {
+        "workSingular": "shipment",
+        "offeringSingular": "road freight service",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Measured load, compatible truck/driver and accepted pickup/delivery windows; fleet-size bands are not individual truck capacity.",
+      "categoryRefinement": "Freight dimensions and storage units/periods stay contract-specific."
+    },
+    {
+      "subcategoryId": "warehousing",
+      "categoryId": "logistics_shipping",
+      "categoryName": "Logistics & Shipping",
+      "vocabulary": {
+        "workSingular": "storage allocation",
+        "offeringSingular": "storage space",
+        "memberOrCustomer": "customer",
+        "terminologyRule": "Status labels follow the enabled workflow; never inherit cooking or rider labels outside applicable delivery work."
+      },
+      "specialtyNeeds": "Unit/area/volume occupancy across dates, compatible goods and access windows; explicit sqm/sqft conversion and owner-confirmed remaining capacity.",
+      "categoryRefinement": "Freight dimensions and storage units/periods stay contract-specific."
+    }
+  ]
+}

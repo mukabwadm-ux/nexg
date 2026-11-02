@@ -1,0 +1,14 @@
+{
+  "clientDate": "2026-11-02",
+  "status": "PASS",
+  "scope": "Standalone frontend preview only. No real OTP, account, backend or admin decision.",
+  "journeys": [
+    "Basic registration reaches Home with operational details entirely omitted; no fake authentication or approval.",
+    "Operational section shows a safe approval lock and returns to Home.",
+    "Captured listing, false specialty answer, location and private in-memory file survive navigation and category restoration.",
+    "Home reflects captured drafts; phone layout remains within viewport.",
+    "Pre-auth optional sections have no required markers; no API writes, browser persistence or runtime errors; refresh clears the preview."
+  ],
+  "networkWrites": [],
+  "pageErrors": []
+}

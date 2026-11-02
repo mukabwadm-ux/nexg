@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { deleteProperty, saveProperty } from '@/app/host/actions';
+import { deleteProperty, saveProperty } from '@/app/(customer)/host/actions';
 
 import {
   Actions,

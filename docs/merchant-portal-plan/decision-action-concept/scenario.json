@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-01",
+  "timezone": "Africa/Nairobi",
+  "fictional": true,
+  "merchant": "Nairobi Collective",
+  "location": "Westlands",
+  "actor": {
+    "role": "Owner",
+    "initials": "ZM"
+  },
+  "order": {
+    "id": "ORD-2048",
+    "customer": "Amina K.",
+    "fulfilment": "Customer pickup",
+    "confirmedAt": "09:42",
+    "confirmation": "automatic; stock allocated",
+    "promisedReadyAt": "10:00",
+    "readinessRecordedAt": "10:06",
+    "lateMinutes": 6,
+    "collection": "pending",
+    "completed": false
+  },
+  "items": [
+    {
+      "name": "Maize flour 2 kg",
+      "quantity": 1,
+      "unitKes": 240,
+      "lineKes": 240
+    },
+    {
+      "name": "Cooking oil 1 L",
+      "quantity": 1,
+      "unitKes": 320,
+      "lineKes": 320
+    },
+    {
+      "name": "Milk 1 L",
+      "quantity": 2,
+      "unitKes": 120,
+      "lineKes": 240
+    },
+    {
+      "name": "Eggs tray",
+      "quantity": 1,
+      "unitKes": 480,
+      "lineKes": 480
+    }
+  ],
+  "itemsSubtotalKes": 1280,
+  "countsBefore": {
+    "at": "10:04",
+    "needsAttention": 1,
+    "activeOrders": 4,
+    "readyForPickup": 1,
+    "completedToday": 8
+  },
+  "countsAfter": {
+    "at": "10:06",
+    "needsAttention": 0,
+    "activeOrders": 4,
+    "readyForPickup": 2,
+    "completedToday": 8
+  },
+  "activeIncludesReady": true,
+  "otherOrders": [
+    {
+      "id": "ORD-2047",
+      "customer": "Brian M.",
+      "readyBy": "10:15",
+      "status": "Picking"
+    },
+    {
+      "id": "ORD-2046",
+      "customer": "Grace W.",
+      "readyBy": "10:10",
+      "status": "Ready for pickup"
+    },
+    {
+      "id": "ORD-2045",
+      "customer": "Peter O.",
+      "readyBy": "10:20",
+      "status": "Picking"
+    }
+  ],
+  "unasserted": [
+    "payment confirmation",
+    "customer collection",
+    "order completion",
+    "settlement",
+    "payout",
+    "live implementation",
+    "merchant adoption"
+  ]
+}

@@ -1,0 +1,7 @@
+# Merchant email verification design
+
+The development preview is `/merchant-email-verification-preview`. It displays the current owner's saved application email when the existing owner read succeeds, and an example address otherwise. The card is in `apps/web/components/onboarding/email-verification-card.tsx` and accepts verification/resend callbacks for a later integration. Its preview actions never send or validate a code.
+
+The existing connected form still saves and submits the application under the current session, then opens `/merchant`. Email OTP and its post-submission handoff remain deferred. Future integration must preserve the existing anonymous user's identity and merchant ownership when upgrading the account; a new unrelated user would not automatically own the application. The current document upload and payout guards require a non-anonymous account, while other setup actions can have separate authorization or wiring requirements. A displayed email alone does not prove verification.
+
+The focused browser check loaded the preview, pasted `123-456` as six digits, exercised the preview verify/resend messages and found no horizontal overflow at 390px. Web typechecking reported existing errors in `components/merchant/settings-artboard/connections.tsx` (unused `Badge`) and `lib/partner.ts` (optional boolean); no errors were reported in the new preview files. No email, account change, new application or backend write was made by the preview.

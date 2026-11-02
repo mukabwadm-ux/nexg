@@ -1,0 +1,15 @@
+{
+  "tool": "built-in image_gen",
+  "corrections": [
+    {
+      "id": "DA02",
+      "target": "C:/Users/limta/.codex/generated_images/01a1961a-2264-7f03-8cd7-8793c8485254/exec-257c6726-c775-4135-bb5b-8ff8385bc659.png",
+      "prompt": "Edit this existing NEXG Work screenshot with exactly ONE narrowly targeted text correction. Preserve every other pixel, all layout, colors, navigation, merchant Nairobi Collective, Westlands, avatar ZM/Owner, ORD-2048, customer Amina K., time 10:05, the current Packing state, all item quantities/prices and KES 1,280 subtotal, packing checklist, buttons and history. In the horizontal progress strip, beneath the NOT-YET-COMPLETED \"Ready for pickup\" step, replace the small \"10:00\" text with \"Pending\". The promised 10:00 readiness and 5 min overdue remain correctly shown near the top of the order; do not change them. Keep the future readiness circle unfilled, Packing current and Collected pending. This edit prevents a promised time being mistaken for an actual completed milestone. Do not change any other text, crop, geometry or styling. Output one screenshot with identical dimensions."
+    },
+    {
+      "id": "DA03",
+      "target": "C:/Users/limta/.codex/generated_images/01a1961a-2264-7f03-8cd7-8793c8485254/exec-e020182c-3035-485f-89e2-0fb15025702a.png",
+      "prompt": "Edit this existing NEXG Home confirmed-result screenshot with exactly ONE narrowly targeted copy correction. Preserve the entire screenshot layout, shell, navigation, colors, typography, merchant Nairobi Collective, Westlands, ZM Owner, clock 1 Nov 2026 10:06 EAT, all order IDs/customer names, all counts 0 attention/4 active/2 ready/8 completed, ready-time10:06, promised-time10:00, Recorded6minlate and customer-collection-pending. In the right-hand explanatory column of the green success panel under \"Confirmed result\", keep \"This order’s readiness has been updated in Work.\" Replace ONLY the sentence \"Payment and collection are not yet recorded.\" with \"Only readiness changed. Collection remains pending.\" Fit it neatly in the same column using the existing font and spacing. Make no assertion that payment is unpaid or unrecorded. Do not change any other pixel, text, action, status, table, geometry or crop. Output one screenshot with identical dimensions."
+    }
+  ]
+}

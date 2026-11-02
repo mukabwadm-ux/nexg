@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "checks": [
+    "percentage-discount-publish-reload",
+    "fixed-discount-publish",
+    "invalid-discount-blocked",
+    "closed-editor-expands-catalogue",
+    "reopen-editor",
+    "add-from-expanded-component",
+    "quantity-rules",
+    "option-groups",
+    "visibility-window",
+    "bundle-reference",
+    "archive-restore",
+    "discount-to-quote-disables-discount-and-publishes"
+  ],
+  "browserErrors": []
+}

@@ -1,0 +1,70 @@
+{
+  "status": "THREE_GENERATED_STATIC_CONCEPTS_REVIEWED",
+  "generator": "built-in image_gen",
+  "promptFile": "concept-prompts.json",
+  "count": 3,
+  "applicationImplemented": false,
+  "images": [
+    {
+      "id": "01-hours-intake",
+      "source": "C:/Users/limta/.codex/generated_images/01a1912b-45ed-7400-88d8-d3ddc7fcdd8e/exec-879649a8-b69a-4fbd-b60c-b988b683191b.png",
+      "review": {
+        "matches": [
+          "shared NEXG shell",
+          "separate location/delivery/collection states",
+          "split hours and dated exception",
+          "local preview labels"
+        ],
+        "limitations": [
+          "Future-day Open labels mean scheduled hours, not current opening."
+        ]
+      },
+      "file": "images/01-hours-intake.png",
+      "width": 1672,
+      "height": 940,
+      "bytes": 1399179,
+      "sha256": "0768743fac307f04a1e260e2e68bbe39376c85b5efdda808ed2e6a87700d89a0"
+    },
+    {
+      "id": "02-appointments-resources",
+      "source": "C:/Users/limta/.codex/generated_images/01a1912b-45ed-7400-88d8-d3ddc7fcdd8e/exec-33f360d7-bd6e-4806-bcd0-63baf2912134.png",
+      "review": {
+        "matches": [
+          "joint claims share booking IDs",
+          "45-minute consultation is named",
+          "selected 60-minute service and 15-minute buffers",
+          "fee prerequisite and source-confirmed expiry"
+        ],
+        "limitations": [
+          "Static screen; layout and accessibility require frontend verification."
+        ]
+      },
+      "file": "images/02-appointments-resources.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1425140,
+      "sha256": "54837aa5f5e38e9dc9440e5de40735a1764b454ff3c9d776f3960fe72f06080d"
+    },
+    {
+      "id": "03-assets-exceptions",
+      "source": "C:/Users/limta/.codex/generated_images/01a1912b-45ed-7400-88d8-d3ddc7fcdd8e/exec-4b3b7a9d-b90c-4ccc-b0d4-2caf9abaf23d.png",
+      "review": {
+        "matches": [
+          "overdue custody remains blocking",
+          "unknown source distinct from available",
+          "maintenance impact identifies booking",
+          "existing work retained and Apply unavailable"
+        ],
+        "limitations": [
+          "Illustrative timeline: the solid overdue segment extends beyond the now marker. Frontend must end actual observations at the snapshot and begin uncertain continuation there, as specified.",
+          "Vehicle thumbnails are generic generated illustrations."
+        ]
+      },
+      "file": "images/03-assets-exceptions.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1483564,
+      "sha256": "c3111001c58c8e508a768bbed7c31dae3d8e4ab366530ab9a57d445dbb34787f"
+    }
+  ]
+}

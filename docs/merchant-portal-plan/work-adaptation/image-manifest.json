@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-31",
+  "status": "TWO_SELECTED_WORK_CONCEPTS",
+  "planningGate": "WORK_ADAPTATION_DESIGN_CHECKS_PASSED",
+  "planningCounts": {
+    "categories": 21,
+    "subcategories": 128,
+    "effectiveWorkflowViews": 18,
+    "candidateWorkflowReferences": 304,
+    "effectiveBindings": 65,
+    "effectiveRules": 174,
+    "ruleModelReferences": 9,
+    "displayNameDiscrepancies": 1
+  },
+  "promptSha256": "0040c4ca459d67191ce51312bf382e72d25ca7624b503442417013e7593becfa",
+  "images": [
+    {
+      "concept": "retail",
+      "file": "images/01-retail-work.png",
+      "source": "C:/Users/limta/.codex/generated_images/01a19196-ef7e-7273-be30-92d8b50d9eb6/exec-276669ad-e63b-4cda-a7b5-b8e40a7afb14.png",
+      "width": 1589,
+      "height": 990,
+      "bytes": 1433253,
+      "sha256": "a0463ba97ddf6d8b6580d2077d459e6b37155cc3ea8a3cb03a106aeb67dc5fa2",
+      "generationTool": "image_gen.imagegen",
+      "promptRef": "image-prompts.json#retail"
+    },
+    {
+      "concept": "rental",
+      "file": "images/02-rental-work.png",
+      "source": "C:/Users/limta/.codex/generated_images/01a19196-ef7e-7273-be30-92d8b50d9eb6/exec-ad7ed592-5ea0-4ae9-8ae8-8086c2110e42.png",
+      "width": 1589,
+      "height": 990,
+      "bytes": 1391870,
+      "sha256": "e9b15b372fbf9002aaa1f5cb2e9ab089decc442f9ca41136df1be19dc902a9c6",
+      "generationTool": "image_gen.imagegen",
+      "promptRef": "image-prompts.json#rental"
+    }
+  ],
+  "visualReview": {
+    "retail": "6 queue rows; ORD-2048 Picking matches detail, stock allocated, automatic confirmation, KES1210 and Mark ready for pickup. No Accept/Decline.",
+    "rental": "5 active queue rows; 2 overdue exceptions; RNT-1038 remains Active and Self-drive, future return11:00 and Record return. No driver/transfer/acceptance controls.",
+    "shared": "Nine-item navigation with Work selected, queue/detail structure, ink/cream/gold visual language and persistent Preview data.",
+    "limits": "Concept images demonstrate visual adaptation. They do not prove working actions, accessibility compliance or live runtime configuration."
+  }
+}

@@ -1,6 +1,8 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
+import { loadMerchantWorkspaceAccess } from './merchant-access';
+import { assertProtectedBrowserRequestVersion, protectedBrowserRequestVersion } from './supabase/protected-request';
 
 /**
  * Applicant identity and document uploads — spec sections 3.2, 4.2 and 4.3.
@@ -64,7 +66,22 @@ export async function uploadDocument({
 }): Promise<UploadOutcome> {
   const supabase = createClient();
 
-  const userId = await ensureApplicantSession();
+  let version: number | undefined;
+  let userId: string | null;
+  if (ownerType === 'merchant') {
+    try {
+      version = protectedBrowserRequestVersion();
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user || data.user.is_anonymous)
+        return { ok: false, message: 'Sign in with your verified account to upload documents.' };
+      const access = await loadMerchantWorkspaceAccess(supabase, ownerId);
+      if (!access.setup) return { ok: false, message: 'Only the application owner can upload documents.' };
+      assertProtectedBrowserRequestVersion(version);
+      userId = data.user.id;
+    } catch {
+      return { ok: false, message: 'Your document permissions could not be checked. Sign in and retry.' };
+    }
+  } else userId = await ensureApplicantSession();
   if (!userId) {
     return { ok: false, message: 'We could not start a secure session. Reload and try again.' };
   }
@@ -83,6 +100,11 @@ export async function uploadDocument({
 
   if (storageError) {
     return { ok: false, message: storageError.message };
+  }
+
+  if (version !== undefined) {
+    try { assertProtectedBrowserRequestVersion(version); }
+    catch { return { ok: false, message: 'Your session ended before the upload was recorded. Sign in and retry.' }; }
   }
 
   const { data, error } = await supabase.rpc('rpc_document_submit', {
@@ -104,6 +126,11 @@ export async function uploadDocument({
      * than opening that door for one error path.
      */
     return { ok: false, message: error.message };
+  }
+
+  if (version !== undefined) {
+    try { assertProtectedBrowserRequestVersion(version); }
+    catch { return { ok: false, message: 'Your session ended. Sign in to check whether the document was recorded.' }; }
   }
 
   return { ok: true, documentId: data as unknown as string };

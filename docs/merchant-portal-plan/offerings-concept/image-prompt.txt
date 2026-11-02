@@ -1,0 +1,40 @@
+Use case: ui-mockup.
+Asset: exactly ONE final high-fidelity desktop NEXG merchant portal Offerings screen, a straight-on application screenshot filling the whole landscape image, approximately 1800 by 1150. This is a single coherent app state, not a collage, infographic, annotated plan, browser window or device mockup. Crisp exceptionally readable UI text and careful alignment are essential.
+
+Reference image role: the supplied previous NEXG Offerings image is ONLY a visual reference for the established dark sidebar, cream workspace, white panels, gold accents, line icons, catalogue-plus-editor composition and general brand. Generate a NEW screen using the content and correct interactions below. Use clean compact sans-serif typography throughout, including the page heading, matching the existing built Home UI. Avoid the oversized serif heading from the old concept. Do not reproduce its editable externally-owned fields or vehicle-specific content.
+
+Visual design: warm cream workspace #f6f3ec, white surfaces, near-black #141414 sidebar, dark ink text, subtle neutral separators and restrained gold #d4a72c on the active destination and primary actions. Gold buttons have DARK ink text. Soft corners, restrained shadows, clear normal-sized labels, compact information-rich operational UI with generous enough spacing. No decorative metric cards, gradients, giant hero, charts or marketing graphics.
+
+Shared shell: approximately 195px-wide dark left sidebar. Gold NEXG wordmark at the top. EXACT sidebar destinations in this order: Home, Work, Offerings, Availability, Business, Money, Promotions, Insights, Settings. Offerings alone is highlighted in gold. Small consistent line icons. Help at sidebar foot. Slim white top header shows Zuri Studio, location selector Westlands, Preview data badge, Help, notification bell and owner avatar AK. The fictional studio has a second location, so the location selector is meaningful. All figures are sample records, clearly covered by the Preview data badge.
+
+Merchant context: Zuri Studio is a fictional makeup business that explicitly enabled both appointment services and product sales. It is a sensible configured hybrid. This picture illustrates one general reusable screen; do NOT display all128 categories, a merchant-category picker, schema IDs, workflow codes or implementation/debug controls.
+
+Layout: main page title Offerings with subtitle "3 services · 2 products". At the right of the page-title row show an outlined Import button and gold "+ Add offering" button with a small dropdown caret. A low-emphasis "Manage connections" link is available near source controls. Below, coherent type tabs "All offerings (5)" active, "Services (3)", "Products (2)". A compact control row contains search "Search offerings...", "Status: All", "Source: All", and a view/column control. Keep all controls as normal useful UI, without opening every menu.
+
+Below controls: a clean catalogue table on the left and a selected editor pane on the right, both legible. Editor about 440–490px wide; remaining space gives the table room. Table columns: Offering, Price, Publication, Capacity / stock, Source. Small row overflow menus give access to Duplicate, Archive, History and Export; only the ellipsis trigger appears, not an open menu. Offering names include a small service/product type label and concise relevant details. The row selected for editing has a subtle warm-gold background and a narrow gold edge.
+
+The complete table contains EXACTLY these five coherent fictional records:
+1. Occasion makeup. Service · 60 min. KES 3,500 / appointment. Publication Draft. Capacity "Artist calendars linked". Source NEXG. This row is selected.
+2. Bridal makeup. Service · 120 min. KES 8,500 / appointment. Publication Published. Capacity "Artist calendars linked". Source NEXG.
+3. Makeup consultation. Service · 30 min. KES 1,500 / appointment. Publication Published. Capacity "Artist calendars linked". Source NEXG.
+4. Lip tint. Product · 1 item. KES 1,200 / item. Publication Published. Stock "12 units" with secondary "As of 09:40 EAT". Source field "NEXG" with secondary "Stock: connected system". Listing details and price are NEXG-owned; only stock comes from the external system. Use a small product thumbnail if it helps recognition, not a huge photograph.
+5. Brush set. Product · 1 set. KES 2,500 / set. Publication Draft. Stock "Stock not linked" with a small amber explanatory icon. Source NEXG. This is an unfinished separate draft, not a zero-stock claim.
+
+Counts must agree: five total offerings, three services, two products; three published and two drafts. Do not add an invented availability count or use an unqualified universal Available toggle. Service capacity is staff/calendar-based and product availability is stock-based. Publication and stock/capacity are different columns. A Published service does not promise every time slot is free.
+
+Selected right pane: header "Occasion makeup", a small Draft label, close X, and secondary "Service · Managed in NEXG". The selected draft is complete enough to publish. Tabs "Details" active, "Pricing", "Availability", "Preview" provide relevant editor sections, with an obvious preview action reachable. These are tabs, not several simultaneously expanded modals.
+
+Active Details pane has clearly labelled native-looking form fields with populated values:
+- Name: Occasion makeup
+- Description: "Makeup for celebrations, tailored to your look."
+- Price: KES 3,500; basis: per appointment
+- Duration: 60 min
+- Service location: Westlands studio
+- Eligible artists: Amina W. and Faith N., two readable selected chips
+- A small calendar-linked region labelled Availability, text "Uses linked artist calendars", link "Manage availability". Do not render stock quantity for this service.
+- A concise customer preview summary or compact line: "Customers book available artist slots automatically." There is no manual acceptance setting or incoming-order review queue.
+Keep pricing/duration grouped; resource/calendar information grouped. Business-wide policies are inherited with a low-emphasis "Uses business defaults" line and an Edit defaults link, not another copy of the onboarding form. No personal customer information or clinical data.
+
+Pane footer: clear outlined "Save draft" and gold dark-text "Publish offering" buttons. A small secondary "Preview" control can sit beside these if the Preview tab remains readable. No disabled-looking fake controls. NEXG owns all editable fields shown in this selected service pane; no external-ownership banner falsely claims those inputs are read-only.
+
+Use accurate visible labels, dark readable secondary text, clear hierarchy and minimal badge clutter. Product/service thumbnails are optional and small. Every major feature has a sensible entry point; retain calm density instead of displaying all secondary fields/actions at once. Show ONLY this one fully composed screen picture. No explanatory text outside the application UI, no multiple variants, no presentation title, no watermark.

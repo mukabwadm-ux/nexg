@@ -1,0 +1,203 @@
+{
+  "status": "DESIGN_ONLY_SAMPLE_AMOUNTS_NOT_FINANCE_RULES",
+  "time": "2026-11-03T09:40:00+03:00",
+  "timezone": "Africa/Nairobi",
+  "currency": {
+    "code": "KES",
+    "minorUnit": 2,
+    "basis": "Explicit sample currency metadata. Real values use the owning currency metadata/rounding policy."
+  },
+  "retail": {
+    "scope": "NEXG-collected only, 1–3 Nov2026; period postings and separate current settlement",
+    "sales": [
+      24800,
+      18000,
+      12200,
+      9600,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      5000,
+      10400
+    ],
+    "refunds": [
+      4000,
+      3000,
+      2000,
+      1000
+    ],
+    "fees": [
+      1200,
+      6800
+    ],
+    "gross": 200000,
+    "netSales": 190000,
+    "periodNetPayable": 182000,
+    "settlement": {
+      "opening": 20000,
+      "periodPayable": 182000,
+      "confirmedPayout": 150000,
+      "reserve": 22000,
+      "eligible": 30000
+    },
+    "basis": "Owner-issued sample statement explicitly defines these totals. This is not a general UI sales-to-payout formula.",
+    "visibleTransactionRefs": [
+      "TX-6112",
+      "TX-6113",
+      "TX-6114",
+      "TX-6115",
+      "TX-6116",
+      "TX-6117"
+    ],
+    "totalMovements": 36
+  },
+  "security": {
+    "scope": "Same six collected deposits, zero opening, all collections/refunds/posted allocations occur1–3Nov2026; recorded balance asof3Nov09:40",
+    "opening": 0,
+    "collections": [
+      {
+        "work": "RNT-2070",
+        "amount": 20000,
+        "status": "REFUND_OUTCOME_UNKNOWN"
+      },
+      {
+        "work": "BK-2071",
+        "amount": 24000,
+        "status": "COLLECTED"
+      },
+      {
+        "work": "BK-3180",
+        "amount": 22000,
+        "status": "COLLECTED"
+      },
+      {
+        "work": "RNT-2054",
+        "amount": 10000,
+        "status": "REFUND_CONFIRMED"
+      },
+      {
+        "work": "RNT-2041",
+        "amount": 12000,
+        "status": "REFUND_CONFIRMED"
+      },
+      {
+        "work": "RNT-2033",
+        "amount": 12000,
+        "status": "REFUND_CONFIRMED"
+      }
+    ],
+    "collected": 100000,
+    "confirmedRefunds": 34000,
+    "ownerConfirmedPostedChargeAllocation": 2000,
+    "recordedObligation": 64000,
+    "unknownRefund": 18000,
+    "selected": {
+      "work": "RNT-2070",
+      "collected": 20000,
+      "chargeAllocation": 2000,
+      "allocationState": "OWNER_CONFIRMED_POSTED",
+      "recordedReturnObligation": 18000,
+      "refundRequested": 18000,
+      "confirmedRefund": 0,
+      "refundObservation": "UNKNOWN",
+      "operationDisplayRef": "OP-6209",
+      "physicalReturn": "CONFIRMED_BY_WORK",
+      "availableNewRefund": "UNAVAILABLE_UNTIL_RECONCILED",
+      "policyEvidence": "Sample accepted policy and owner-confirmed posted case allocation; no universal damage tariff."
+    }
+  },
+  "workshop": {
+    "scope": "Same six currently open customer invoices asof3Nov09:40; this is a cohort snapshot, not cash-in-period",
+    "invoices": [
+      {
+        "ref": "INV-0812",
+        "total": 24000,
+        "applied": 18000,
+        "credits": 0,
+        "due": 6000,
+        "overdue": true
+      },
+      {
+        "ref": "INV-0819",
+        "total": 18000,
+        "applied": 14000,
+        "credits": 0,
+        "due": 4000,
+        "overdue": true
+      },
+      {
+        "ref": "INV-0821",
+        "total": 10000,
+        "applied": 8000,
+        "credits": 0,
+        "due": 2000,
+        "overdue": true
+      },
+      {
+        "ref": "INV-0832",
+        "total": 36000,
+        "applied": 20000,
+        "credits": 2000,
+        "due": 14000,
+        "overdue": false,
+        "dueAt": "2026-11-05",
+        "work": "JOB-1081",
+        "parts": 16000,
+        "labour": 20000
+      },
+      {
+        "ref": "INV-0835",
+        "total": 42000,
+        "applied": 30000,
+        "credits": 4000,
+        "due": 8000,
+        "overdue": false
+      },
+      {
+        "ref": "INV-0839",
+        "total": 50000,
+        "applied": 30000,
+        "credits": 4000,
+        "due": 16000,
+        "overdue": false
+      }
+    ],
+    "invoiceTotal": 180000,
+    "applied": 120000,
+    "credits": 10000,
+    "outstanding": 50000,
+    "overdue": 12000,
+    "overdueInvoices": 3,
+    "unallocatedCustomerCredit": 6000,
+    "unacceptedQuote": 15000,
+    "source": "Proposed merchant ERP/commerce receivables source, read-only. Not admin partner invoices.",
+    "excluded": [
+      "unaccepted quote15000",
+      "unallocated customer credit6000",
+      "unissued draft invoices",
+      "unapproved work changes"
+    ]
+  },
+  "fixtureAmountBasis": "Whole KES display amounts for picture arithmetic only. Runtime Money DTOs use exact integer amount_minor and explicit currency metadata."
+}

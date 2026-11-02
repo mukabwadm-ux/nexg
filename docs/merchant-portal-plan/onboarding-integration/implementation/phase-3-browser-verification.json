@@ -1,0 +1,16 @@
+{
+  "clientDate": "2026-11-02",
+  "status": "PASS",
+  "scope": "Shared existing merchant Home/frame with local registration/task adapter; no actual sign-in, server save or admin decision.",
+  "journeys": [
+    "Basic entry renders the shared merchant Home/frame with real business details and calculated 1/4 readiness, not sample 3/7.",
+    "Specialty answers, including false, zero and multiple selected choices, flow through the existing editor into the shared Home progress.",
+    "An applicable hours task completes from the captured schedule, while launch remains pending.",
+    "Pending evidence/payout editors remain usable; selected files and account details never become verified or unblock launch.",
+    "The existing accessible Home drawer is reused for help.",
+    "Changing the selected business activity produces its own task list and denominator without restaurant defaults or fake branch records.",
+    "Phone navigation preserves approval locks, fits the header, and returns to the same entered business."
+  ],
+  "pageErrors": [],
+  "networkWrites": []
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": [
+    "next-env.d.ts",
+    "lib/partner.ts",
+    "lib/partner.phase4.test.ts",
+    "app/(customer)/merchants/decision/page.tsx",
+    "app/(customer)/merchants/decision/page.test.tsx",
+    "middleware.ts",
+    "middleware.phase5-decision.test.ts"
+  ],
+  "exclude": ["node_modules", ".next*", ".turbo"]
+}

@@ -197,11 +197,14 @@ export function LocationProvider({
   /** Resolved on the server before the page was sent: QR token, deep link, IP city. */
   initial,
   maps = null,
+  passive = false,
 }: {
   children: React.ReactNode;
   actions: LocationActions;
   initial?: { place: Place | null; step: ResolutionStep } | null;
   maps?: MapsConfig | null;
+  /** Keep context available on workflows that do not use shopping location. */
+  passive?: boolean;
 }) {
   const [place, setPlaceState] = React.useState<Place | null>(initial?.place ?? null);
   const [step, setStep] = React.useState<ResolutionStep>(initial?.step ?? 'none');
@@ -259,6 +262,10 @@ export function LocationProvider({
    * what the browser already knows.
    */
   React.useEffect(() => {
+    if (passive) {
+      setReady(true);
+      return;
+    }
     if (!deviceId) return;
     let cancelled = false;
 
@@ -362,7 +369,7 @@ export function LocationProvider({
     return () => {
       cancelled = true;
     };
-  }, [deviceId, actions]);
+  }, [deviceId, actions, passive]);
 
   /* ──────────────────────────────────────── one place across tabs */
   React.useEffect(() => {
@@ -402,6 +409,7 @@ export function LocationProvider({
   const autoTried = React.useRef(false);
 
   React.useEffect(() => {
+    if (passive) return;
     if (!ready || consent !== 'granted' || autoTried.current || !isHandheld()) return;
     const chosen = stepRef.current;
     if (chosen === 'qr' || chosen === 'deep_link' || chosen === 'point') return;
@@ -460,7 +468,7 @@ export function LocationProvider({
     return () => {
       cancelled = true;
     };
-  }, [ready, consent, actions]);
+  }, [ready, consent, actions, passive]);
 
   const setPlace = React.useCallback(
     async (next: Place, nextStep: ResolutionStep) => {

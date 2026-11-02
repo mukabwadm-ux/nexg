@@ -17,7 +17,8 @@ export default function AuthPage() {
           <pre className="bg-surface p-3 rounded text-xs font-mono overflow-x-auto">
 {`curl -H "X-Api-Key: your_key_here" https://api.nexgapp.com/v1/catalog/merchants`}
           </pre>
-          <p>Scopes: <code className="font-mono text-xs">public_read</code> (default), <code className="font-mono text-xs">partner_read</code>, <code className="font-mono text-xs">partner_write</code>, <code className="font-mono text-xs">internal_read</code>, <code className="font-mono text-xs">internal_write</code>.</p>
+          <p>Available read scopes are <code className="font-mono text-xs">public_read</code> and <code className="font-mono text-xs">merchant_read</code>. Merchant keys require owner or authorized staff issuance and current merchant approval. A key remains independent of the issuing person's browser session.</p>
+          <p>Rotating a key does not reset its merchant or developer's token bucket. On HTTP 429, wait for the Retry-After number of seconds before retrying. Authentication and rate-limit failures are never cached.</p>
         </CardContent>
       </Card>
 
@@ -26,23 +27,7 @@ export default function AuthPage() {
           <CardTitle>OAuth 2.0</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-ink/80">
-          <p>Standard authorization code flow. Register clients at <code className="font-mono text-xs">/developers</code> (partner) or the staff console (internal).</p>
-          <pre className="bg-surface p-3 rounded text-xs font-mono overflow-x-auto whitespace-pre-wrap">
-{`GET /oauth/authorize?
-  response_type=code&
-  client_id=CLIENT_ID&
-  redirect_uri=REDIRECT_URI&
-  scope=read:catalog&
-  state=RANDOM_STRING`}
-          </pre>
-          <pre className="bg-surface p-3 rounded text-xs font-mono overflow-x-auto whitespace-pre-wrap">
-{`POST /oauth/token
-grant_type=authorization_code
-client_id=CLIENT_ID
-client_secret=CLIENT_SECRET
-code=CODE_FROM_AUTHORIZE
-redirect_uri=REDIRECT_URI`}
-          </pre>
+          <p>OAuth authorization and token endpoints are unavailable in this release. Existing registry tables are not an active OAuth integration.</p>
         </CardContent>
       </Card>
     </div>

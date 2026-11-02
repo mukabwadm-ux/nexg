@@ -1,0 +1,189 @@
+{
+  "scope": "Static artifact and synthetic arithmetic checks for eight restaurant Insights screens",
+  "status": "STATIC_RESTAURANT_PACKAGE_CHECKS_PASSED",
+  "complete": true,
+  "structuralOnly": false,
+  "runtimeTestsExecuted": false,
+  "runtimeValidationClaimed": false,
+  "pixelTextOrInteractionValidationClaimed": false,
+  "command": "python docs/merchant-portal-plan/insights-concept/navigation-v2-proposal/restaurant-eight-screens/verify.py",
+  "fixtureSha256": "ee75507995296dc791b501aac3409204d35785a6e1dee4a7b99d444e3baa3819",
+  "promptSha256": "6db19b50bf37984286cf538dfbaf38fcbcbb7ea8a6a45b3fed10a34f81293553",
+  "counts": {
+    "exactPeerTabs": 8,
+    "requests": 1248,
+    "completedOrders": 1176,
+    "menuItems": 8,
+    "fulfilledItemUnits": 1764,
+    "identifiedCustomerIds": 840,
+    "netPostedCreditKES": 1099560,
+    "restaurantReportIds": 8,
+    "imagePrompts": 8,
+    "promptsWithIdenticalSharedShell": 8,
+    "selectedPngs": 8,
+    "localDocumentLinks": 33
+  },
+  "checks": [
+    {
+      "id": "shared_fixture_scope_and_navigation",
+      "status": "PASS",
+      "detail": "Exact eight peer tabs; Karibu Kitchen/Karen; 4–31 October 2026; EAT/KES; comparison Off; Insights selected"
+    },
+    {
+      "id": "valid_synthetic_quantity_domains",
+      "status": "PASS",
+      "detail": "All declared numeric fixture quantities are finite and nonnegative; percentage fields are bounded"
+    },
+    {
+      "id": "orders_menu_and_weekly_arithmetic",
+      "status": "PASS",
+      "detail": "Request outcomes, all four weekly series, fulfilment counts, menu quantities/amounts and average amount reconcile"
+    },
+    {
+      "id": "customer_identity_and_order_cohorts",
+      "status": "PASS",
+      "detail": "840 synthetic merchant-scoped identities, 600/240 cohorts, 28.6% returning share and 1,176 completed-order contributions reconcile"
+    },
+    {
+      "id": "operations_promises_and_exclusions",
+      "status": "PASS",
+      "detail": "1,098 on time + 70 late = 1,168 eligible; eight missing promises and method breakdowns reconcile. Median is a declared fixture value, not recomputed without raw timestamps"
+    },
+    {
+      "id": "promotion_and_financial_arithmetic",
+      "status": "PASS",
+      "detail": "5%/6% event ratios, 30-minute closed attribution and unavailable value preserved; KES 1,099,560 net posted credit reconciles without a fee-policy or payout claim"
+    },
+    {
+      "id": "reports_reuse_and_preview",
+      "status": "PASS",
+      "detail": "Eight existing draft report IDs, selected order report and exact cohort preview agree; no generated export is claimed"
+    },
+    {
+      "id": "exact_eight_image_prompts",
+      "status": "PASS",
+      "detail": "Eight exact prompt IDs, selected peer tabs, nonempty prompts and unique local PNG filenames"
+    },
+    {
+      "id": "saved_prompt_scope_and_fixture_alignment",
+      "status": "PASS",
+      "detail": "Eight saved prompts share one exact header/sidebar/filter/tab directive; selected-tab content contains the relevant fixture values. Rendered pixels still require visual inspection"
+    },
+    {
+      "id": "selected_pngs_manifest_and_provenance",
+      "status": "PASS",
+      "detail": "Eight PNG signatures, all chunk CRCs, SHA256 hashes, dimensions, byte counts, prompts and tabs agree; shared canvas dimensions are consistent"
+    },
+    {
+      "id": "gallery_and_local_document_links",
+      "status": "PASS",
+      "detail": "33 local document targets checked; gallery selection matches saved images in the complete run"
+    }
+  ],
+  "errors": [],
+  "pending": [],
+  "pngIntegrity": [
+    {
+      "id": "RST_01",
+      "tab": "Overview",
+      "file": "01-overview.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1302189,
+      "sha256": "335b94fc966e5c76a99e7e917609e2933bc5fcbf377e95584d8c625e70ef6abd",
+      "chunkCount": 4,
+      "allChunkCrcsValid": true,
+      "generationSourceHashMatched": true
+    },
+    {
+      "id": "RST_02",
+      "tab": "Orders",
+      "file": "02-orders.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1460148,
+      "sha256": "9da28f3fdf8288035876c9224894aa2dae3aa034d17190c8bce4c9bd19bec914",
+      "chunkCount": 4,
+      "allChunkCrcsValid": true,
+      "generationSourceHashMatched": true
+    },
+    {
+      "id": "RST_03",
+      "tab": "Menu",
+      "file": "03-menu.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1572763,
+      "sha256": "aa96ca53a32d1b600455d193b605fb2a9bf62006d4015d814228c1775411839b",
+      "chunkCount": 4,
+      "allChunkCrcsValid": true,
+      "generationSourceHashMatched": true
+    },
+    {
+      "id": "RST_04",
+      "tab": "Customers",
+      "file": "04-customers.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1512753,
+      "sha256": "14b0b071ac31b869f289e83b73e8f775c8436d79c37e8fef8ec13d4e680d16a0",
+      "chunkCount": 4,
+      "allChunkCrcsValid": true,
+      "generationSourceHashMatched": true
+    },
+    {
+      "id": "RST_05",
+      "tab": "Operations",
+      "file": "05-operations.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1416899,
+      "sha256": "29f4b666279394aeb16d91e87c65394ee21643e4462f20828f21214d012a6b5f",
+      "chunkCount": 4,
+      "allChunkCrcsValid": true,
+      "generationSourceHashMatched": true
+    },
+    {
+      "id": "RST_06",
+      "tab": "Promotions",
+      "file": "06-promotions.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1564336,
+      "sha256": "545d041040398cbd318cf90d2e029f14e07f57a96e689dc64d253ff3e0c45b66",
+      "chunkCount": 4,
+      "allChunkCrcsValid": true,
+      "generationSourceHashMatched": true
+    },
+    {
+      "id": "RST_07",
+      "tab": "Finance",
+      "file": "07-finance.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1405677,
+      "sha256": "de5a4399fc71deeaa6a50266d3d77a02af9a0a957b1d45e1d6710c46720ae3e1",
+      "chunkCount": 4,
+      "allChunkCrcsValid": true,
+      "generationSourceHashMatched": true
+    },
+    {
+      "id": "RST_08",
+      "tab": "Reports",
+      "file": "08-reports.png",
+      "width": 1586,
+      "height": 992,
+      "bytes": 1515428,
+      "sha256": "43b4817c97339e870959875d9acc52a70eca08128b00b12fae5dd712c1ced495",
+      "chunkCount": 4,
+      "allChunkCrcsValid": true,
+      "generationSourceHashMatched": true
+    }
+  ],
+  "limitations": [
+    "PNG integrity and saved prompt scope do not establish that rendered labels, layout, header or selected states are correct; inspect the actual images separately.",
+    "Synthetic arithmetic does not validate live source ingestion, reporting calculations, permissions, financial ownership or interaction behavior.",
+    "The preparation median is a declared fixture aggregate; raw paired event timestamps are not included for recomputation.",
+    "Local links are checked for file/directory existence; section fragment IDs are not checked."
+  ]
+}

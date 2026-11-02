@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { archivePackage, savePackage, schedulePackage } from '@/app/host/actions';
+import { archivePackage, savePackage, schedulePackage } from '@/app/(customer)/host/actions';
 
 import { Actions, Area, Drawer, Field, Grid, Said, Select, Submit, Text, useAction } from './form';
 

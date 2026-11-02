@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "next-env.d.ts",
+    "components/merchant/money/**/*.ts",
+    "components/merchant/money/**/*.tsx",
+    "components/merchant/live-preview-shell.tsx",
+    "app/merchant-live-preview/money/page.tsx",
+    "app/merchant-live-preview/work/page.tsx",
+    "app/merchant-live-preview/offerings/page.tsx",
+    "components/location/chrome.tsx",
+    "components/consent/personalized-chrome.tsx"
+  ],
+  "exclude": ["node_modules", ".next*"]
+}

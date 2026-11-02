@@ -4,7 +4,7 @@ import { Button, Card, Input, Select } from '@nexg/ui';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import * as React from 'react';
 
-import { submitTicket } from '@/app/help/actions';
+import { submitTicket } from '@/app/(customer)/help/actions';
 
 type Role = 'guest' | 'rider' | 'merchant' | 'hotel';
 
