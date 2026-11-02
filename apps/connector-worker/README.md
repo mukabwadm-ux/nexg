@@ -22,3 +22,7 @@ Run from the repository root with `pnpm --filter @nexg/connector-worker dev`.
 Do not expose the service-role key to browser code, commit it, or use this worker
 as evidence of a live provider integration. The database migration must be
 reviewed and applied separately before the worker can claim connector jobs.
+
+Claiming a job updates its lease and attempt count on `connector_outbox`; it is
+queue bookkeeping, not a separate operator decision. The completed attempt is
+recorded in `connector_run` and audited by the completion RPC.
