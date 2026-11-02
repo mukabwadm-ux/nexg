@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 /**
- * The merchant sections, in the order the overview sheet lists them.
+ * Merchant console sections, including applications and lifecycle records.
  *
  * Every tab keeps its filters in the URL, so a link pasted into Slack
  * opens the same screen the sender was looking at. That is why the tab
@@ -9,6 +9,7 @@ import Link from 'next/link';
  */
 export const MERCHANT_TABS = [
   { key: 'directory', label: 'Directory', built: true },
+  { key: 'applications', label: 'Applications', built: true },
   { key: 'deactivated', label: 'Deactivated', built: true },
   { key: 'deleted', label: 'Deleted', built: true },
   { key: 'pipeline', label: 'Pipeline', built: true },
@@ -36,7 +37,9 @@ export function MerchantTabs({ current }: { current: string }) {
         tab.built ? (
           <Link
             key={tab.key}
-            href={`/merchants?tab=${tab.key}`}
+            href={tab.key === 'applications' ? '/merchants/applications' : `/merchants?tab=${tab.key}`}
+            prefetch={tab.key === 'applications' ? false : undefined}
+            aria-current={current === tab.key ? 'page' : undefined}
             className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
               current === tab.key
                 ? 'border-gold text-ink'

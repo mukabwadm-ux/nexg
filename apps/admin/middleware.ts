@@ -19,6 +19,35 @@ import { STAFF_SEEN_COOKIE, STAFF_IDLE_TIMEOUT_MS, isStaffIdle } from '@/lib/idl
  * after the previous one ends the session, whatever the browser says.
  */
 export async function middleware(request: NextRequest) {
+  let budget: ReturnType<typeof setTimeout> | undefined;
+  const response = request.nextUrl.pathname === '/api/merchant-applications/review'
+    ? await Promise.race([
+        staffSessionMiddleware(request).catch(() => reviewProblem(503, 'session_unavailable', 'Session verification is temporarily unavailable.')),
+        new Promise<NextResponse>((resolve) => {
+          budget = setTimeout(() => resolve(reviewProblem(504, 'session_timeout', 'Session verification timed out. No decision was sent.')), 8000);
+        }),
+      ]).finally(() => clearTimeout(budget))
+    : await staffSessionMiddleware(request);
+  response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('CDN-Cache-Control', 'no-store');
+  response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Expires', '0');
+  const vary = response.headers.get('Vary');
+  if (!vary?.split(',').some((value) => value.trim().toLowerCase() === 'cookie'))
+    response.headers.set('Vary', vary ? `${vary}, Cookie` : 'Cookie');
+  return response;
+}
+
+function reviewProblem(status: number, code: string, detail: string) {
+  const requestId = crypto.randomUUID();
+  return NextResponse.json(
+    { type: 'about:blank', title: status === 401 ? 'Session expired' : 'Session unavailable', status, code, detail, request_id: requestId },
+    { status, headers: { 'Content-Type': 'application/problem+json', 'X-Request-ID': requestId } },
+  );
+}
+
+async function staffSessionMiddleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -40,6 +69,12 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const isSignIn = pathname.startsWith('/sign-in');
+  const isReviewApi = pathname === '/api/merchant-applications/review';
+  const redirected = (destination: URL) => {
+    const result = NextResponse.redirect(destination);
+    response.cookies.getAll().forEach((cookie) => result.cookies.set(cookie));
+    return result;
+  };
   const projectRef = new URL(url).hostname.split('.')[0];
   const authCookie = `sb-${projectRef}-auth-token`;
   const hasAuthCookie = request.cookies
@@ -52,12 +87,13 @@ export async function middleware(request: NextRequest) {
    * including first visits to sign-in; chunked Supabase cookies are covered.
    */
   if (!hasAuthCookie) {
-    if (isSignIn) return response;
+    // The review handler returns authenticated Problem Details, not HTML.
+    if (isSignIn || isReviewApi) return response;
 
     const signInUrl = request.nextUrl.clone();
     signInUrl.pathname = '/sign-in';
     if (pathname !== '/') signInUrl.searchParams.set('next', pathname);
-    return NextResponse.redirect(signInUrl);
+    return redirected(signInUrl);
   }
 
   const supabase = createServerClient(url, key, {
@@ -67,7 +103,9 @@ export async function middleware(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        const previousCookies = response.cookies.getAll();
         response = NextResponse.next({ request });
+        previousCookies.forEach((cookie) => response.cookies.set(cookie));
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options),
         );
@@ -80,18 +118,19 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user && !isSignIn) {
+    if (isReviewApi) return response;
     const url = request.nextUrl.clone();
     url.pathname = '/sign-in';
     // So the console returns them where they were headed.
     if (pathname !== '/') url.searchParams.set('next', pathname);
-    return NextResponse.redirect(url);
+    return redirected(url);
   }
 
   if (user && isSignIn) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     url.search = '';
-    return NextResponse.redirect(url);
+    return redirected(url);
   }
 
   if (user) {
@@ -118,7 +157,9 @@ export async function middleware(request: NextRequest) {
       signInUrl.search = '';
       signInUrl.searchParams.set('idle', '1');
 
-      const expired = NextResponse.redirect(signInUrl);
+      const expired = isReviewApi
+        ? reviewProblem(401, 'session_expired', 'Sign in again before reviewing an application.')
+        : NextResponse.redirect(signInUrl);
       for (const cookie of request.cookies.getAll()) {
         if (cookie.name.startsWith('sb-')) {
           expired.cookies.set(cookie.name, '', { path: '/', maxAge: 0 });

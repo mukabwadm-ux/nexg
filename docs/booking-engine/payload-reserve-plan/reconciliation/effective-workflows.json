@@ -1,0 +1,3922 @@
+{
+  "status": "RECONCILED_DESIGN_NOT_IMPLEMENTED",
+  "commonGuards": [
+    "Server-derived business/location and actor scope, granted action, supported capability and complete applicable setup are mandatory on every command path, including staff/admin, Local API, imports and background work.",
+    "An exact accepted offering, configuration/workflow/policy revision, expected entity version and stable idempotency/operation reference accompany each mutation.",
+    "Instant, held, merchant-approval and external-confirmation are reservation-intake routes, not universal work states. Each route requires actual supported authority and compatible resources.",
+    "NEXG-controlled required allocations succeed or fail together. External-controlled allocations remain pending until confirmed by their owner; no claim of atomicity across independent provider transactions.",
+    "Finance prerequisites apply only where the accepted policy requires them, and use the correct payment authority. Acceptance, payment, reservation, fulfilment and refund are independent facts.",
+    "One root work identity and explicit allocation roles prevent a parent, child, calendar mirror or retry from reserving or charging the same requirement twice.",
+    "Kenya local entry/display uses Africa/Nairobi. Timed commitments retain UTC instants; date-only promises remain local dates. No merchant timezone question.",
+    "Missing or stale authoritative capacity is unknown, not free. Read-only or unsupported external capability cannot confirm a local reservation.",
+    "Post-commit delivery/sync/payment tasks use durable transactional records and idempotent workers; a pre-commit hook is not permission to send irreversible effects."
+  ],
+  "reservationLifecycle": {
+    "logicalStates": [
+      "NONE",
+      "HOLD_REQUESTED",
+      "HELD",
+      "RESERVATION_REQUESTED",
+      "RESERVED",
+      "IN_USE",
+      "RELEASE_REQUESTED",
+      "RELEASED",
+      "EXPIRED"
+    ],
+    "stateRules": [
+      {
+        "state": "NONE",
+        "capacityEffect": "none",
+        "meaning": "Order, enquiry, quote, entitlement or tentative work has not reserved time/capacity. Do not create a blocking Payload pending reservation merely to store this work."
+      },
+      {
+        "state": "HOLD_REQUESTED",
+        "capacityEffect": "none until owning authority confirms",
+        "meaning": "Operation pending. Preserve last confirmed allocations; request receipt is not a hold."
+      },
+      {
+        "state": "HELD",
+        "capacityEffect": "confirmed hold quantities block until trusted expiry/release/confirmation",
+        "meaning": "Hold ID, exact scope and authority-confirmed expiry required; native Payload hold mechanism is mapped by the adapter."
+      },
+      {
+        "state": "RESERVATION_REQUESTED",
+        "capacityEffect": "only existing confirmed holds remain blocking",
+        "meaning": "Confirmation request may be pending externally; never infer RESERVED from the request alone."
+      },
+      {
+        "state": "RESERVED",
+        "capacityEffect": "all confirmed role allocations block",
+        "meaning": "The owning authority confirmed durable capacity and all policy prerequisites for this commitment."
+      },
+      {
+        "state": "IN_USE",
+        "capacityEffect": "actual in-use resources remain unavailable",
+        "meaning": "Attendance, custody, occupancy or execution evidence controls physical use; elapsed scheduled time alone is insufficient release evidence."
+      },
+      {
+        "state": "RELEASE_REQUESTED",
+        "capacityEffect": "last confirmed allocated/in-use quantities remain blocking",
+        "meaning": "Cancellation or return request remains pending until actual release is confirmed."
+      },
+      {
+        "state": "RELEASED",
+        "capacityEffect": "released quantity only becomes available",
+        "meaning": "Authority confirms release; financial outcome remains independent."
+      },
+      {
+        "state": "EXPIRED",
+        "capacityEffect": "only an authoritatively expired temporary hold is released",
+        "meaning": "A browser countdown, payment timeout or end of planned physical-use interval is not trusted release."
+      }
+    ],
+    "routes": [
+      {
+        "id": "INSTANT",
+        "steps": [
+          "NONE",
+          "RESERVED"
+        ],
+        "guard": "Supported atomic reserve-and-confirm command and all declared prerequisites; no fabricated temporary hold."
+      },
+      {
+        "id": "HELD_CONFIRMATION",
+        "steps": [
+          "NONE",
+          "HOLD_REQUESTED",
+          "HELD",
+          "RESERVATION_REQUESTED",
+          "RESERVED"
+        ],
+        "guard": "Actual supported holds, valid expiry and conversion under the same allocation owner; avoid releasing then recreating the same capacity unprotected."
+      },
+      {
+        "id": "EXTERNAL_CONFIRMATION",
+        "steps": [
+          "NONE",
+          "RESERVATION_REQUESTED",
+          "RESERVED"
+        ],
+        "guard": "A verified external response confirms the reservation/resource reference. A local mirror does not become a second authority."
+      }
+    ],
+    "payloadProjection": {
+      "status": "PROPOSED_ADAPTER_BINDING_REQUIRES_IMPLEMENTATION",
+      "workRequests": "Store nonblocking business requests/quotes/entitlements in NEXG work records, not blocking reservation rows.",
+      "holds": "Map HELD to the inspected plugin's actual hold mechanism and expiry semantics; verify exact native representation at implementation.",
+      "reservations": "Use one common configured Payload reservation lifecycle and explicitly declare blocking statuses. Each blocking row has real allocation roles and quantities. Upstream pending status must never be a catch-all for enquiries.",
+      "completion": "Work completion and allocation release are coordinated facts, not a universal status alias. Do not let a generic completed/cancelled plugin status release an asset still physically out or goods still stored.",
+      "externalMirrors": "Keep externally confirmed identity and capacity semantics distinct from NEXG-owned allocations; do not double-count an imported owner fact plus its Google mirror."
+    }
+  },
+  "exceptionContract": {
+    "policy": "The source catalogue names many exceptions in prose. These definitions require registered owner commands and explicit valid source-state lists for each final compiled workflow. They are not generic permission to jump from any state.",
+    "cancellation": [
+      {
+        "operationState": "CANCELLATION_REQUESTED",
+        "guard": "Actor/policy/current work state permit the request; preserve all last-confirmed allocations and custody facts until owner result."
+      },
+      {
+        "operationState": "CANCELLATION_CONFIRMED",
+        "guard": "Owning work/reservation authorities confirm cancellation and releasable quantities. In-use assets or custody require an explicit return/recovery process; a cancellation cannot erase physical use. Any refund remains separately authorized and confirmed."
+      },
+      {
+        "operationState": "CANCELLATION_FAILED_OR_UNKNOWN",
+        "guard": "Retain original confirmed state and stable operation identity; explain rejection or reconcile unknown provider outcome before retry."
+      }
+    ],
+    "reschedule": [
+      {
+        "operationState": "CHANGE_REQUESTED",
+        "guard": "Check accepted change terms, price/scope revision, current version and eligible replacement resources."
+      },
+      {
+        "operationState": "CHANGE_CONFIRMED",
+        "guard": "For local allocations switch old/new commitments atomically; for external authority use supported change/compensation contract. A failed change retains the valid original commitment."
+      },
+      {
+        "operationState": "CHANGE_FAILED_OR_UNKNOWN",
+        "guard": "Preserve original valid allocation and reconcile uncertain provider results; never blindly release and rebook."
+      }
+    ],
+    "expiry": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release.",
+    "noShow": "Meaningful only for applicable attendance/arrival workflows, after configured deadline and authorized decision. Release policy, fee/refund state and occurrence attendance are distinct.",
+    "configurationChange": "New onboarding/configuration revisions apply to new work after publication. Existing accepted work retains its configuration, workflow, quote and policy version unless an explicit accepted migration/change is performed."
+  },
+  "appliedOverrideCount": 23,
+  "workflows": [
+    {
+      "workflowId": "WF_ORDER",
+      "title": "Stocked or prepared order",
+      "transitions": [
+        {
+          "from": "RECEIVED",
+          "to": "ACCEPTED",
+          "actor": "merchant or authoritative order service",
+          "command": "AcceptOrder",
+          "guard": "Current price, eligibility and order acceptance confirmed; configured payment prerequisite separately satisfied. If acceptance includes a firm chosen delivery/collection window, that window's authority-confirmed allocation or explicit request-only result must be recorded. Ordinary order acceptance has no appointment requirement.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Do not create an independent root booking/charge for the fulfilment-window role."
+          ]
+        },
+        {
+          "from": "ACCEPTED",
+          "to": "ALLOCATED",
+          "actor": "inventory authority",
+          "command": "ReserveOrderStock",
+          "guard": "Authoritative inventory confirms required stock or approved substitution branch",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ALLOCATED",
+          "to": "PICKING",
+          "actor": "assigned merchant staff",
+          "command": "StartPicking",
+          "guard": "Actor assigned to this location and order",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PICKING",
+          "to": "READY_FOR_HANDOVER",
+          "actor": "assigned merchant staff",
+          "command": "MarkOrderReady",
+          "guard": "Required picked items and packaging confirmed, no preparation task remains, and price changes approved",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "READY_FOR_HANDOVER",
+          "to": "AWAITING_CUSTOMER_COLLECTION",
+          "actor": "merchant staff",
+          "command": "OpenCollection",
+          "guard": "Customer-pickup mode and collection window confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "AWAITING_CUSTOMER_COLLECTION",
+          "to": "COLLECTED",
+          "actor": "merchant staff",
+          "command": "ConfirmCustomerCollection",
+          "guard": "Contracted collection identity/code/proof confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "READY_FOR_HANDOVER",
+          "to": "HANDED_TO_CARRIER",
+          "actor": "merchant staff and carrier authority",
+          "command": "ConfirmCarrierHandover",
+          "guard": "Assigned carrier, custody proof and required eligibility checks confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "HANDED_TO_CARRIER",
+          "to": "IN_TRANSIT",
+          "actor": "fulfilment authority",
+          "command": "ConfirmDispatch",
+          "guard": "Actual dispatch event confirmed by carrier owner",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_TRANSIT",
+          "to": "DELIVERED",
+          "actor": "fulfilment authority",
+          "command": "ConfirmDelivery",
+          "guard": "Required delivery and eligibility proof confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "COLLECTED",
+          "to": "COMPLETED",
+          "actor": "order authority",
+          "command": "CompleteOrder",
+          "guard": "No unresolved fulfilment exception",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "DELIVERED",
+          "to": "COMPLETED",
+          "actor": "order authority",
+          "command": "CompleteOrder",
+          "guard": "No unresolved fulfilment exception",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACCEPTED",
+          "to": "PICKING",
+          "actor": "assigned staff",
+          "command": "StartUnreservedPicking",
+          "guard": "Inventory is explicitly disabled or not required for this offering; pick task required. An unavailable inventory source never satisfies this guard.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACCEPTED",
+          "to": "PREPARING",
+          "actor": "assigned producer",
+          "command": "StartUnreservedPreparation",
+          "guard": "Inventory is explicitly disabled/not required and preparation is a real configured task; approved scope and inputs ready.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ALLOCATED",
+          "to": "PREPARING",
+          "actor": "assigned producer",
+          "command": "StartOrderPreparation",
+          "guard": "Preparation task required and picking is not separately required; authoritative allocation confirmed.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PICKING",
+          "to": "PREPARING",
+          "actor": "assigned producer",
+          "command": "StartPreparationAfterPicking",
+          "guard": "Both picking and preparation are configured; picking completion and required material custody confirmed.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PREPARING",
+          "to": "READY_FOR_HANDOVER",
+          "actor": "assigned producer",
+          "command": "CompleteOrderPreparation",
+          "guard": "Required preparation, quality and packaging checks completed; approved quantity/price preserved.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACCEPTED",
+          "to": "READY_FOR_HANDOVER",
+          "actor": "assigned staff",
+          "command": "ConfirmImmediateOrderReady",
+          "guard": "No stock reservation, picking or preparation task is required by this version; all handover prerequisites actually satisfied.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ALLOCATED",
+          "to": "READY_FOR_HANDOVER",
+          "actor": "assigned staff",
+          "command": "ConfirmAllocatedOrderReady",
+          "guard": "Stock reserved, no pick/preparation task required, and required handover checks satisfied.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RECEIVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestOrderCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ACCEPTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestOrderCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ALLOCATED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestOrderCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PICKING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestOrderCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PREPARING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestOrderCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "READY_FOR_HANDOVER",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestOrderCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "AWAITING_CUSTOMER_COLLECTION",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestOrderCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmOrderCancellation",
+          "guard": "Order and inventory/fulfilment owners confirm permitted cancellation and releasable stock/window quantities. Already transferred custody uses the supported return/recovery process, not this pre-handover edge; refund remains separate."
+        }
+      ],
+      "variants": [
+        {
+          "id": "VAR_ORDER_SCHEDULED_FULFILMENT",
+          "workflowId": "WF_ORDER",
+          "modelId": "ORDER",
+          "activation": "Explicit selected fulfilment method supports customer-selected windows and has a declared capacity owner.",
+          "allocationRoles": [
+            "FULFILMENT_WINDOW"
+          ],
+          "executionRule": "Window belongs to the existing order/root work; use a linked carrier leg only if that actual method requires it. A single delivery/collection window is not automatically a paired laundry workflow.",
+          "requiredFields": [
+            "selected_method",
+            "window_start",
+            "window_end",
+            "window_capacity_unit",
+            "authority_reference"
+          ]
+        }
+      ],
+      "modelIds": [
+        "ORDER"
+      ],
+      "reservationSemantics": "No time reservation by default. Stock remains inventory-owned. An explicitly selected scheduled fulfilment window is an allocation role on the same order, not a fabricated appointment or mandatory paired pickup-return child.",
+      "variantIds": [
+        "VAR_ORDER_SCHEDULED_FULFILMENT"
+      ],
+      "exceptionBinding": {
+        "workflowId": "WF_ORDER",
+        "cancellation": {
+          "requestCommand": "RequestOrderCancellation",
+          "fromStates": [
+            "RECEIVED",
+            "ACCEPTED",
+            "ALLOCATED",
+            "PICKING",
+            "PREPARING",
+            "READY_FOR_HANDOVER",
+            "AWAITING_CUSTOMER_COLLECTION"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmOrderCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Order and inventory/fulfilment owners confirm permitted cancellation and releasable stock/window quantities. Already transferred custody uses the supported return/recovery process, not this pre-handover edge; refund remains separate."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [],
+        "noShow": null
+      },
+      "states": [
+        "ACCEPTED",
+        "ALLOCATED",
+        "AWAITING_CUSTOMER_COLLECTION",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COLLECTED",
+        "COMPLETED",
+        "DELIVERED",
+        "HANDED_TO_CARRIER",
+        "IN_TRANSIT",
+        "PICKING",
+        "PREPARING",
+        "READY_FOR_HANDOVER",
+        "RECEIVED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_MADE_TO_ORDER",
+      "title": "Custom or made-to-order offering",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "SPECIFICATION_REVIEW",
+          "actor": "merchant specialist",
+          "command": "ReviewSpecification",
+          "guard": "Customer requirements and delivery date captured",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SPECIFICATION_REVIEW",
+          "to": "QUOTED",
+          "actor": "merchant quoting authority",
+          "command": "IssueCustomQuote",
+          "guard": "Required material, scope, price, expiry and completion terms supplied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUOTED",
+          "to": "APPROVED",
+          "actor": "customer",
+          "command": "ApproveCustomQuote",
+          "guard": "Current exact quote version accepted; payment/deposit prerequisite remains separately tracked",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SPECIFICATION_REVIEW",
+          "to": "APPROVED",
+          "actor": "customer and merchant authority",
+          "command": "AcceptFixedCustomOffering",
+          "guard": "Fixed price and complete approved specification; quote path explicitly not required",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "IN_PRODUCTION",
+          "actor": "assigned producer",
+          "command": "StartProduction",
+          "guard": "Approved specification/price revision, authoritative materials and typed production-capacity/due commitment confirmed; any policy-required Finance pre-start prerequisite is separately satisfied.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Changed due date/workload requires a new feasibility check and accepted material changes."
+          ]
+        },
+        {
+          "from": "IN_PRODUCTION",
+          "to": "QUALITY_CHECK",
+          "actor": "producer",
+          "command": "SubmitProductionResult",
+          "guard": "Contracted specification and checks recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUALITY_CHECK",
+          "to": "READY_FOR_HANDOVER",
+          "actor": "merchant quality reviewer",
+          "command": "ApproveProductionResult",
+          "guard": "Quality result and customer-required approval satisfied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "READY_FOR_HANDOVER",
+          "to": "HANDOVER_PENDING",
+          "actor": "merchant staff",
+          "command": "RequestCustomHandover",
+          "guard": "Configured collection/delivery leg created with authoritative reference",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "HANDOVER_PENDING",
+          "to": "FULFILLED",
+          "actor": "fulfilment or collection authority",
+          "command": "ConfirmCustomHandover",
+          "guard": "Required custody and recipient evidence confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "FULFILLED",
+          "to": "COMPLETED",
+          "actor": "merchant work authority",
+          "command": "CompleteCustomWork",
+          "guard": "All contracted deliverables fulfilled",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUALITY_CHECK",
+          "to": "IN_PRODUCTION",
+          "actor": "authorised quality reviewer",
+          "command": "ReturnCustomWorkForCorrection",
+          "guard": "A stated quality/specification check failed; record reason and scope without silently changing approved price or specification.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCustomWorkCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "SPECIFICATION_REVIEW",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCustomWorkCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "QUOTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCustomWorkCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "APPROVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCustomWorkCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "IN_PRODUCTION",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCustomWorkCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "QUALITY_CHECK",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCustomWorkCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "READY_FOR_HANDOVER",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCustomWorkCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "HANDOVER_PENDING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCustomWorkCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmCustomWorkCancellation",
+          "guard": "Accepted cancellation/change terms and actual production/material/custody position reviewed; owner confirms released future workload and preserves incurred work, goods and financial decisions separately. Cancellation cannot erase produced goods or handover custody."
+        },
+        {
+          "from": "QUOTED",
+          "to": "QUOTE_EXPIRED",
+          "command": "ConfirmQuoteExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "PRODUCTION_DUE"
+      ],
+      "reservationSemantics": "Accepted production workload and due promise are typed commitments. A due date is not a provider appointment start; optional fitting/handoff has a separate declared allocation role.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_MADE_TO_ORDER",
+        "cancellation": {
+          "requestCommand": "RequestCustomWorkCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "SPECIFICATION_REVIEW",
+            "QUOTED",
+            "APPROVED",
+            "IN_PRODUCTION",
+            "QUALITY_CHECK",
+            "READY_FOR_HANDOVER",
+            "HANDOVER_PENDING"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmCustomWorkCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Accepted cancellation/change terms and actual production/material/custody position reviewed; owner confirms released future workload and preserves incurred work, goods and financial decisions separately. Cancellation cannot erase produced goods or handover custody."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [
+          "QUOTED"
+        ],
+        "quoteExpiredState": "QUOTE_EXPIRED",
+        "noShow": null
+      },
+      "states": [
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "FULFILLED",
+        "HANDOVER_PENDING",
+        "IN_PRODUCTION",
+        "QUALITY_CHECK",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "READY_FOR_HANDOVER",
+        "REQUESTED",
+        "SPECIFICATION_REVIEW"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_APPOINTMENT",
+      "title": "Appointment at a merchant venue",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "HOLD_PENDING",
+          "actor": "booking application service",
+          "command": "RequestSlotHold",
+          "guard": "Exact offering duration, timezone, resource and notice valid",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "HOLD_PENDING",
+          "to": "HELD",
+          "actor": "booking authority",
+          "command": "ConfirmSlotHold",
+          "guard": "Authority confirms hold ID and expiry; no local invented reservation",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "HELD",
+          "to": "CONFIRMED",
+          "actor": "booking authority, or authorised merchant through its command",
+          "command": "ConfirmAppointment",
+          "guard": "confirmation_mode=merchant_accepts or declared hold-confirmation path; required acceptance, any contract-required Finance prerequisite and durable resource reservation confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CHECKED_IN",
+          "actor": "merchant front desk",
+          "command": "CheckInAppointment",
+          "guard": "Booked fulfilment is merchant_venue; correct booking, date and customer proof confirmed AND Venue-only binding of the primary command; booked fulfilment is merchant_venue and check-in proof confirmed. Mutually exclusive with field execution.",
+          "source": "workflow-catalogue.md",
+          "guardBindings": [
+            "Booked fulfilment is merchant_venue; correct booking, date and customer proof confirmed",
+            "Venue-only binding of the primary command; booked fulfilment is merchant_venue and check-in proof confirmed. Mutually exclusive with field execution."
+          ],
+          "actorBindings": [
+            "merchant front desk"
+          ]
+        },
+        {
+          "from": "CHECKED_IN",
+          "to": "IN_SESSION",
+          "actor": "assigned qualified staff",
+          "command": "StartAppointment",
+          "guard": "Staff available, location and any required consent/checks satisfied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_SESSION",
+          "to": "COMPLETED",
+          "actor": "appointment authority using assigned staff or child evidence",
+          "command": "CompleteAppointment",
+          "guard": "Venue service completion confirmed, or linked field child confirms contracted completion for customer_location; completion details recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CONFIRMED",
+          "actor": "booking authority",
+          "command": "ReserveAndConfirmInstantAppointment",
+          "guard": "confirmation_mode=instant_authority_confirmed; authoritative atomic reservation and all declared prerequisites confirmed. No temporary hold is fabricated.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CONFIRMED",
+          "actor": "external booking authority through verified adapter",
+          "command": "ConfirmExternallyReservedAppointment",
+          "guard": "confirmation_mode=external_system_confirms; durable booking/resource reference and current confirmed provider outcome received.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "FIELD_EXECUTION_PENDING",
+          "actor": "booking application service",
+          "command": "CreateLinkedFieldExecution",
+          "guard": "Booked fulfilment is customer_location, field-service variant enabled and one child execution reference registered; reuse existing resource reservation.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "FIELD_EXECUTION_PENDING",
+          "to": "IN_SESSION",
+          "actor": "appointment authority using field-child evidence",
+          "command": "ConfirmFieldAppointmentStarted",
+          "guard": "Linked WF_FIELD_SERVICE confirms IN_SERVICE at the booked site; mirror evidence without issuing a second StartService command.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "WALKIN_REQUESTED",
+          "to": "CHECKED_IN",
+          "command": "AllocateAndCheckInWalkin",
+          "guard": "Atomic current eligible resource allocation and any applicable consent/payment policy pass; customer actually arrived. No advance booked slot is fabricated."
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestAppointmentCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "HOLD_PENDING",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestAppointmentCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "HELD",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestAppointmentCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestAppointmentCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CHECKED_IN",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestAppointmentCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "FIELD_EXECUTION_PENDING",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestAppointmentCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_PENDING",
+          "to": "CANCELLED",
+          "command": "ConfirmAppointmentCancellation",
+          "guard": "Booking/allocation owner confirms permitted cancellation and release of applicable unperformed reservation; linked field execution and actual physical state are reconciled, and payment/refund outcome stays separate."
+        },
+        {
+          "from": "HELD",
+          "to": "HOLD_EXPIRED",
+          "command": "ConfirmTrustedHoldExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "NO_SHOW",
+          "command": "RecordAppointmentNoShow",
+          "guard": "Applicable arrival/attendance deadline passed, actual non-arrival verified and authorized decision recorded under accepted policy; allocation release is separately confirmed."
+        }
+      ],
+      "variants": [
+        {
+          "id": "VAR_APPOINTMENT_WALKIN",
+          "workflowId": "WF_APPOINTMENT",
+          "modelId": "APPOINTMENT",
+          "activation": "Walk-ins explicitly offered; scheduled bookings accepted and advance booking mandatory are separate inputs.",
+          "requiredFields": [
+            "actual_arrival",
+            "eligible_resources",
+            "exact_service_duration",
+            "intake_policy"
+          ],
+          "additionalTransitions": [
+            {
+              "from": "WALKIN_REQUESTED",
+              "to": "CHECKED_IN",
+              "command": "AllocateAndCheckInWalkin",
+              "guard": "Atomic current eligible resource allocation and any applicable consent/payment policy pass; customer actually arrived. No advance booked slot is fabricated."
+            }
+          ],
+          "executionRule": "Walk-ins share underlying resources with scheduled bookings. Queue-only services do not expose instant slot confirmation."
+        }
+      ],
+      "modelIds": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "reservationSemantics": "Reserve exact eligible resources before confirming the customer commitment. Venue and customer-location execution are mutually exclusive per booking; a linked field child reuses allocations.",
+      "variantIds": [
+        "VAR_APPOINTMENT_WALKIN"
+      ],
+      "exceptionBinding": {
+        "workflowId": "WF_APPOINTMENT",
+        "cancellation": {
+          "requestCommand": "RequestAppointmentCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "HOLD_PENDING",
+            "HELD",
+            "CONFIRMED",
+            "CHECKED_IN",
+            "FIELD_EXECUTION_PENDING"
+          ],
+          "pendingState": "CANCELLATION_PENDING",
+          "confirmCommand": "ConfirmAppointmentCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Booking/allocation owner confirms permitted cancellation and release of applicable unperformed reservation; linked field execution and actual physical state are reconciled, and payment/refund outcome stays separate."
+        },
+        "holdExpiryFromStates": [
+          "HELD"
+        ],
+        "holdExpiredState": "HOLD_EXPIRED",
+        "quoteExpiryFromStates": [],
+        "noShow": {
+          "fromStates": [
+            "CONFIRMED"
+          ],
+          "command": "RecordAppointmentNoShow",
+          "targetState": "NO_SHOW",
+          "guard": "Applicable arrival/attendance deadline passed, actual non-arrival verified and authorized decision recorded under accepted policy; allocation release is separately confirmed."
+        }
+      },
+      "states": [
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "CHECKED_IN",
+        "COMPLETED",
+        "CONFIRMED",
+        "FIELD_EXECUTION_PENDING",
+        "HELD",
+        "HOLD_EXPIRED",
+        "HOLD_PENDING",
+        "IN_SESSION",
+        "NO_SHOW",
+        "REQUESTED",
+        "WALKIN_REQUESTED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_REMOTE_SESSION",
+      "title": "Remote appointment or session",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "SLOT_HELD",
+          "actor": "booking authority",
+          "command": "HoldRemoteSession",
+          "guard": "Exact slot/resource authoritative hold confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SLOT_HELD",
+          "to": "CONFIRMED",
+          "actor": "booking authority",
+          "command": "ConfirmRemoteSession",
+          "guard": "Reservation and prerequisites confirmed before hold expiry",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "ACCESS_READY",
+          "actor": "session provider authority",
+          "command": "PrepareSessionAccess",
+          "guard": "Authorised participant access generated through supported secure provider",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACCESS_READY",
+          "to": "PARTICIPANT_JOINED",
+          "actor": "session authority or assigned professional",
+          "command": "ConfirmParticipantArrival",
+          "guard": "Participant presence confirmed; link issuance alone is insufficient",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PARTICIPANT_JOINED",
+          "to": "IN_SESSION",
+          "actor": "assigned qualified provider",
+          "command": "StartRemoteSession",
+          "guard": "Provider attendance, consent and applicable eligibility confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_SESSION",
+          "to": "COMPLETED",
+          "actor": "assigned provider",
+          "command": "CompleteRemoteSession",
+          "guard": "Session delivered; permitted operational completion recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "ACCESS_READY",
+          "actor": "session authority",
+          "command": "ConfirmExistingSessionAccess",
+          "guard": "A valid existing protected access reference belongs to this booking and participants; no duplicate meeting/access creation.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_SESSION",
+          "to": "SESSION_INTERRUPTED",
+          "actor": "assigned provider/session authority",
+          "command": "RecordSessionInterruption",
+          "guard": "Actual interruption confirmed with minimum necessary reason; completion not yet achieved.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SESSION_INTERRUPTED",
+          "to": "IN_SESSION",
+          "actor": "assigned provider/session authority",
+          "command": "ResumeRemoteSession",
+          "guard": "Participants reconnect and authorised provider confirms resumption under original or freshly accepted timing terms.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRemoteSessionCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "SLOT_HELD",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRemoteSessionCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRemoteSessionCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ACCESS_READY",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRemoteSessionCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PARTICIPANT_JOINED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRemoteSessionCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_PENDING",
+          "to": "CANCELLED",
+          "command": "ConfirmRemoteSessionCancellation",
+          "guard": "Booking owner confirms allowed unperformed session cancellation and allocation/access revocation; already delivered content/interruption uses its actual workflow. Financial outcome remains separate."
+        },
+        {
+          "from": "SLOT_HELD",
+          "to": "HOLD_EXPIRED",
+          "command": "ConfirmTrustedHoldExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        },
+        {
+          "from": "ACCESS_READY",
+          "to": "NO_SHOW",
+          "command": "RecordRemoteSessionNoShow",
+          "guard": "Valid authorized session access was available, participant absence was verified after configured deadline and authorized provider decision recorded; a failed session link is not a customer no-show."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "APPOINTMENT"
+      ],
+      "reservationSemantics": "Remote method of a real provider reservation. Session access is separately authorized and is not a physical-room allocation or completed consultation.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_REMOTE_SESSION",
+        "cancellation": {
+          "requestCommand": "RequestRemoteSessionCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "SLOT_HELD",
+            "CONFIRMED",
+            "ACCESS_READY",
+            "PARTICIPANT_JOINED"
+          ],
+          "pendingState": "CANCELLATION_PENDING",
+          "confirmCommand": "ConfirmRemoteSessionCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Booking owner confirms allowed unperformed session cancellation and allocation/access revocation; already delivered content/interruption uses its actual workflow. Financial outcome remains separate."
+        },
+        "holdExpiryFromStates": [
+          "SLOT_HELD"
+        ],
+        "holdExpiredState": "HOLD_EXPIRED",
+        "quoteExpiryFromStates": [],
+        "noShow": {
+          "fromStates": [
+            "ACCESS_READY"
+          ],
+          "command": "RecordRemoteSessionNoShow",
+          "targetState": "NO_SHOW",
+          "guard": "Valid authorized session access was available, participant absence was verified after configured deadline and authorized provider decision recorded; a failed session link is not a customer no-show."
+        }
+      },
+      "states": [
+        "ACCESS_READY",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "COMPLETED",
+        "CONFIRMED",
+        "HOLD_EXPIRED",
+        "IN_SESSION",
+        "NO_SHOW",
+        "PARTICIPANT_JOINED",
+        "REQUESTED",
+        "SESSION_INTERRUPTED",
+        "SLOT_HELD"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_FIELD_SERVICE",
+      "title": "Service at the customer location",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "SCOPE_REVIEW",
+          "actor": "merchant dispatcher or specialist",
+          "command": "ReviewSiteService",
+          "guard": "Customer location, work scope and minimum necessary access details captured",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SCOPE_REVIEW",
+          "to": "APPROVED",
+          "actor": "customer and merchant authority",
+          "command": "ApproveSiteService",
+          "guard": "Fixed terms or current quote approved; service-area eligibility confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "ASSIGNED",
+          "actor": "merchant resource authority",
+          "command": "AssignServiceTeam",
+          "guard": "Qualified team, actual equipment, customer area/access, exact arrival/service/travel interval and all required capacity allocations confirmed together; any payment prerequisite required at firm visit confirmation is separately satisfied.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "APPROVED remains scope acceptance until this firm promise exists; no automatic field child from an onboarding answer."
+          ]
+        },
+        {
+          "from": "ASSIGNED",
+          "to": "EN_ROUTE",
+          "actor": "assigned team or transport authority",
+          "command": "StartServiceTravel",
+          "guard": "Team confirms actual departure; no inferred travel from schedule",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "EN_ROUTE",
+          "to": "ARRIVED",
+          "actor": "assigned team",
+          "command": "ConfirmSiteArrival",
+          "guard": "Correct site/customer check-in and access conditions satisfied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ARRIVED",
+          "to": "IN_SERVICE",
+          "actor": "qualified assigned staff",
+          "command": "StartSiteService",
+          "guard": "Required safety/consent/site checks passed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_SERVICE",
+          "to": "COMPLETION_REVIEW",
+          "actor": "assigned staff",
+          "command": "SubmitSiteResult",
+          "guard": "Contracted work and evidence submitted",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "COMPLETION_REVIEW",
+          "to": "COMPLETED",
+          "actor": "authorised reviewer or customer per contract",
+          "command": "ConfirmSiteCompletion",
+          "guard": "Acceptance policy and outstanding deliverables satisfied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SCOPE_REVIEW",
+          "to": "QUOTE_PENDING",
+          "actor": "authorised quoting application service",
+          "command": "RequestSiteServiceQuote",
+          "guard": "Variable/diagnostic pricing requires a linked WF_REQUEST_QUOTE or registered quote contract; no extra work committed yet.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUOTE_PENDING",
+          "to": "APPROVED",
+          "actor": "site-service authority using quote evidence",
+          "command": "ConfirmApprovedSiteQuote",
+          "guard": "Customer approved current exact quote/scope; retain quote reference. This records acceptance, not payment.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFieldServiceCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "SCOPE_REVIEW",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFieldServiceCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "QUOTE_PENDING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFieldServiceCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "APPROVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFieldServiceCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ASSIGNED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFieldServiceCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "EN_ROUTE",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFieldServiceCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ARRIVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFieldServiceCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmFieldServiceCancellation",
+          "guard": "Owning service/allocation authorities resolve actual travel/site state and accepted cancellation terms, confirm releasable future resources and preserve any already incurred work/fees and custody facts; no fabricated refund or completed service."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "FIELD_VISIT"
+      ],
+      "reservationSemantics": "A scope approval is not a confirmed arrival/resource promise. Team, equipment and travel constraints are confirmed by the allocation owner before a firm visit is shown.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_FIELD_SERVICE",
+        "cancellation": {
+          "requestCommand": "RequestFieldServiceCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "SCOPE_REVIEW",
+            "QUOTE_PENDING",
+            "APPROVED",
+            "ASSIGNED",
+            "EN_ROUTE",
+            "ARRIVED"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmFieldServiceCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Owning service/allocation authorities resolve actual travel/site state and accepted cancellation terms, confirm releasable future resources and preserve any already incurred work/fees and custody facts; no fabricated refund or completed service."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [],
+        "noShow": null
+      },
+      "states": [
+        "APPROVED",
+        "ARRIVED",
+        "ASSIGNED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "COMPLETION_REVIEW",
+        "EN_ROUTE",
+        "IN_SERVICE",
+        "QUOTE_PENDING",
+        "REQUESTED",
+        "SCOPE_REVIEW"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_RENTAL",
+      "title": "Asset or vehicle rental",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "ASSET_HELD",
+          "actor": "rental inventory authority",
+          "command": "HoldRentalAsset",
+          "guard": "Exact Kenya pickup/return interval, asset eligibility, maintenance/turnaround and actual resources available; hold all required roles together, including qualified driver capacity when the selected rental offering includes a driver.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "The hold records role IDs and trusted expiry; a source fleet-size band is not capacity."
+          ]
+        },
+        {
+          "from": "ASSET_HELD",
+          "to": "CONFIRMED",
+          "actor": "rental authority",
+          "command": "ConfirmRental",
+          "guard": "All contracted asset and driver allocations are durably confirmed together for the whole interval before the hold expires; accepted contract/eligibility checks and only the deposit/payment prerequisite actually required by policy are confirmed.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "With-driver rental cannot become a confirmed customer commitment while driver capacity is still unreserved.",
+            "A driver-capacity pool is allowed only with an implemented guaranteed allocation/eligibility policy; free-form later assignment is insufficient."
+          ]
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CHECKOUT_REVIEW",
+          "actor": "merchant asset custodian",
+          "command": "PrepareAssetIssue",
+          "guard": "Self-drive or already confirmed suitable driver assignment; asset condition, accessories, fuel and authorised recipient recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CHECKOUT_REVIEW",
+          "to": "ACTIVE",
+          "actor": "asset custodian and renter",
+          "command": "IssueRentalAsset",
+          "guard": "Handover evidence and issue time confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACTIVE",
+          "to": "RETURN_REVIEW",
+          "actor": "asset custodian",
+          "command": "ReceiveRentalReturn",
+          "guard": "Physical asset returned with time/location proof",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RETURN_REVIEW",
+          "to": "INSPECTED",
+          "actor": "authorised inspector",
+          "command": "InspectReturnedAsset",
+          "guard": "Condition, accessories and applicable fuel/mileage comparison recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "INSPECTED",
+          "to": "CLOSED",
+          "actor": "rental authority",
+          "command": "CloseRental",
+          "guard": "Asset disposition resolved; any contested deduction remains separately reviewable",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "DRIVER_ASSIGNMENT_PENDING",
+          "actor": "rental application service",
+          "command": "RequestRentalDriverAssignment",
+          "guard": "Selected offering includes a driver and driver capacity is already durably reserved for the entire rental. This is operational assignment/acknowledgement for the existing allocation, not a request to discover capacity after confirmation.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Any resource substitution is a guarded atomic swap that preserves a valid original commitment on failure."
+          ]
+        },
+        {
+          "from": "DRIVER_ASSIGNMENT_PENDING",
+          "to": "CHECKOUT_REVIEW",
+          "actor": "rental/fleet authority",
+          "command": "ConfirmRentalDriverAssignment",
+          "guard": "Actual qualified driver is bound to the already guaranteed allocation and accepted interval; reserved asset, driver eligibility and handover prerequisites remain valid.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Do not create a second rental/transfer allocation or charge."
+          ]
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRentalCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ASSET_HELD",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRentalCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRentalCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "DRIVER_ASSIGNMENT_PENDING",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRentalCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CHECKOUT_REVIEW",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestRentalCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_PENDING",
+          "to": "CANCELLED",
+          "command": "ConfirmRentalCancellation",
+          "guard": "Rental owner confirms permitted pre-issue cancellation and release of asset/driver roles; an already issued asset follows early-return/custody recovery rather than being marked free. Deposit/refund is separate."
+        },
+        {
+          "from": "ASSET_HELD",
+          "to": "HOLD_EXPIRED",
+          "command": "ConfirmTrustedHoldExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "NO_SHOW",
+          "command": "RecordRentalPickupNoShow",
+          "guard": "No asset handover occurred, pickup grace and accepted policy permit decision, and authorized rental authority records non-arrival. Release of asset/driver roles must be confirmed; payment handling is independent."
+        },
+        {
+          "from": "DRIVER_ASSIGNMENT_PENDING",
+          "to": "NO_SHOW",
+          "command": "RecordRentalPickupNoShow",
+          "guard": "No asset handover occurred, pickup grace and accepted policy permit decision, and authorized rental authority records non-arrival. Release of asset/driver roles must be confirmed; payment handling is independent."
+        },
+        {
+          "from": "CHECKOUT_REVIEW",
+          "to": "NO_SHOW",
+          "command": "RecordRentalPickupNoShow",
+          "guard": "No asset handover occurred, pickup grace and accepted policy permit decision, and authorized rental authority records non-arrival. Release of asset/driver roles must be confirmed; payment handling is independent."
+        }
+      ],
+      "variants": [
+        {
+          "id": "VAR_RENTAL_DRIVER_EXECUTION",
+          "workflowId": "WF_RENTAL",
+          "modelId": "ASSET_INTERVAL",
+          "activation": "Selected eligible rental offering includes driver service.",
+          "requiredFields": [
+            "asset_allocation_reference",
+            "driver_allocation_reference",
+            "exact_shared_interval",
+            "driver_eligibility"
+          ],
+          "executionRule": "Driver capacity is guaranteed at rental confirmation. Later assignment/acknowledgement is execution readiness, not a new independent transfer."
+        }
+      ],
+      "modelIds": [
+        "ASSET_INTERVAL"
+      ],
+      "reservationSemantics": "At customer confirmation, exact vehicle/asset and any contracted driver requirement are jointly reserved. Later dispatch assignment refers to already guaranteed allocations.",
+      "variantIds": [
+        "VAR_RENTAL_DRIVER_EXECUTION"
+      ],
+      "exceptionBinding": {
+        "workflowId": "WF_RENTAL",
+        "cancellation": {
+          "requestCommand": "RequestRentalCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "ASSET_HELD",
+            "CONFIRMED",
+            "DRIVER_ASSIGNMENT_PENDING",
+            "CHECKOUT_REVIEW"
+          ],
+          "pendingState": "CANCELLATION_PENDING",
+          "confirmCommand": "ConfirmRentalCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Rental owner confirms permitted pre-issue cancellation and release of asset/driver roles; an already issued asset follows early-return/custody recovery rather than being marked free. Deposit/refund is separate."
+        },
+        "holdExpiryFromStates": [
+          "ASSET_HELD"
+        ],
+        "holdExpiredState": "HOLD_EXPIRED",
+        "quoteExpiryFromStates": [],
+        "noShow": {
+          "fromStates": [
+            "CONFIRMED",
+            "DRIVER_ASSIGNMENT_PENDING",
+            "CHECKOUT_REVIEW"
+          ],
+          "command": "RecordRentalPickupNoShow",
+          "targetState": "NO_SHOW",
+          "guard": "No asset handover occurred, pickup grace and accepted policy permit decision, and authorized rental authority records non-arrival. Release of asset/driver roles must be confirmed; payment handling is independent."
+        }
+      },
+      "states": [
+        "ACTIVE",
+        "ASSET_HELD",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "CHECKOUT_REVIEW",
+        "CLOSED",
+        "CONFIRMED",
+        "DRIVER_ASSIGNMENT_PENDING",
+        "HOLD_EXPIRED",
+        "INSPECTED",
+        "NO_SHOW",
+        "REQUESTED",
+        "RETURN_REVIEW"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_TRANSFER",
+      "title": "Passenger transfer",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "CONFIRMED",
+          "actor": "transfer booking authority",
+          "command": "ConfirmTransfer",
+          "guard": "Selected transport offering has accepted route, passenger/luggage constraints, pickup interval and price/quote; all required eligible driver/vehicle capacity and any policy-required payment prerequisite are authoritatively confirmed together.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "A class-pool assignment requires an implemented guaranteed reservation policy; otherwise reserve actual eligible resource identities before confirmation.",
+            "Greeter-only offerings use VAR_TRANSFER_GREETER_ONLY rather than passenger journey states."
+          ]
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "VEHICLE_ASSIGNED",
+          "actor": "fleet dispatcher",
+          "command": "AssignTransferVehicle",
+          "guard": "Dispatcher binds or acknowledges actual eligible driver/vehicle against the existing guaranteed reservation and accepted trip. A permitted substitution preserves allocation invariants and any affected customer terms.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "This transition is not the first resource-availability check and must not double-reserve the trip."
+          ]
+        },
+        {
+          "from": "VEHICLE_ASSIGNED",
+          "to": "DRIVER_EN_ROUTE",
+          "actor": "driver or fleet authority",
+          "command": "StartPickupApproach",
+          "guard": "Actual departure to pickup confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "DRIVER_EN_ROUTE",
+          "to": "AT_PICKUP",
+          "actor": "driver",
+          "command": "ConfirmPickupArrival",
+          "guard": "Correct meeting point and arrival recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "AT_PICKUP",
+          "to": "PASSENGER_ON_BOARD",
+          "actor": "driver and passenger proof",
+          "command": "ConfirmBoarding",
+          "guard": "Correct authorised passengers and luggage accepted",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PASSENGER_ON_BOARD",
+          "to": "JOURNEY_IN_PROGRESS",
+          "actor": "driver/fleet authority",
+          "command": "StartPassengerJourney",
+          "guard": "Actual passenger journey started",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "JOURNEY_IN_PROGRESS",
+          "to": "ARRIVED_DESTINATION",
+          "actor": "driver/fleet authority",
+          "command": "ConfirmDestinationArrival",
+          "guard": "Correct destination reached",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ARRIVED_DESTINATION",
+          "to": "COMPLETED",
+          "actor": "transfer authority",
+          "command": "CompleteTransfer",
+          "guard": "Passenger alighting and contracted journey complete",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CONFIRMED",
+          "actor": "transfer application service",
+          "command": "CreateLinkedReturnJourney",
+          "guard": "Accepted itinerary includes a return leg with its own time/route/price scope; create once by parent and leg key, with separate assignment and journey evidence.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTransferCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTransferCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "VEHICLE_ASSIGNED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTransferCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "DRIVER_EN_ROUTE",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTransferCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "AT_PICKUP",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTransferCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmTransferCancellation",
+          "guard": "Transfer authority confirms allowed cancellation against actual travel/boarding state and accepted policy, releases only available future roles and preserves already incurred travel and separate financial outcome. After boarding, use journey/interruption recovery."
+        },
+        {
+          "from": "AT_PICKUP",
+          "to": "NO_SHOW",
+          "command": "RecordPassengerNoShow",
+          "guard": "Driver actual arrival and agreed waiting allowance recorded; authorized absence decision under accepted policy, no passenger boarded and role-release result separately confirmed."
+        }
+      ],
+      "variants": [
+        {
+          "id": "VAR_TRANSFER_GREETER_ONLY",
+          "workflowId": "WF_TRANSFER",
+          "modelId": "TRANSFER",
+          "activation": "Meet-and-greet offering explicitly declares transport not included; missing transport mode requires clarification.",
+          "states": [
+            "REQUESTED",
+            "CONFIRMED",
+            "GREETER_ASSIGNED",
+            "GREETER_EN_ROUTE",
+            "AT_MEETING_POINT",
+            "CUSTOMER_MET",
+            "COMPLETED"
+          ],
+          "requiredFields": [
+            "meeting_point",
+            "meeting_interval",
+            "greeter_resource",
+            "waiting_policy",
+            "customer_contact_reference"
+          ],
+          "transitions": [
+            {
+              "from": "REQUESTED",
+              "to": "CONFIRMED",
+              "command": "ConfirmGreeterBooking",
+              "guard": "Greeter eligible capacity for exact meeting/wait interval is durably confirmed and accepted terms plus configured payment prerequisite satisfied."
+            },
+            {
+              "from": "CONFIRMED",
+              "to": "GREETER_ASSIGNED",
+              "command": "AssignReservedGreeter",
+              "guard": "Actual greeter binds the already confirmed allocation; substitution is guarded."
+            },
+            {
+              "from": "GREETER_ASSIGNED",
+              "to": "GREETER_EN_ROUTE",
+              "command": "StartGreeterApproach",
+              "guard": "Assigned greeter confirms actual departure under agreed meeting plan."
+            },
+            {
+              "from": "GREETER_EN_ROUTE",
+              "to": "AT_MEETING_POINT",
+              "command": "ConfirmGreeterArrival",
+              "guard": "Actual correct meeting point and time recorded."
+            },
+            {
+              "from": "AT_MEETING_POINT",
+              "to": "CUSTOMER_MET",
+              "command": "ConfirmCustomerGreeting",
+              "guard": "Correct authorized customer met; only minimum necessary identity/contact evidence retained."
+            },
+            {
+              "from": "CUSTOMER_MET",
+              "to": "COMPLETED",
+              "command": "CompleteGreeterService",
+              "guard": "Contracted greeting/assistance completed; allocation release and any unresolved waiting/no-show exception recorded."
+            }
+          ],
+          "excludedStates": [
+            "VEHICLE_ASSIGNED",
+            "PASSENGER_ON_BOARD",
+            "JOURNEY_IN_PROGRESS",
+            "ARRIVED_DESTINATION"
+          ],
+          "executionRule": "No vehicle, boarding or destination milestone. If transport is included, use the passenger-transfer graph and jointly allocate vehicle/driver."
+        }
+      ],
+      "modelIds": [
+        "TRANSFER"
+      ],
+      "reservationSemantics": "Confirmed transport requires jointly guaranteed eligible driver and vehicle capacity. Greeter-only offering uses its explicit greeting graph and allocates no invented transport.",
+      "variantIds": [
+        "VAR_TRANSFER_GREETER_ONLY"
+      ],
+      "exceptionBinding": {
+        "workflowId": "WF_TRANSFER",
+        "cancellation": {
+          "requestCommand": "RequestTransferCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "CONFIRMED",
+            "VEHICLE_ASSIGNED",
+            "DRIVER_EN_ROUTE",
+            "AT_PICKUP"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmTransferCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Transfer authority confirms allowed cancellation against actual travel/boarding state and accepted policy, releases only available future roles and preserves already incurred travel and separate financial outcome. After boarding, use journey/interruption recovery."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [],
+        "noShow": {
+          "fromStates": [
+            "AT_PICKUP"
+          ],
+          "command": "RecordPassengerNoShow",
+          "targetState": "NO_SHOW",
+          "guard": "Driver actual arrival and agreed waiting allowance recorded; authorized absence decision under accepted policy, no passenger boarded and role-release result separately confirmed."
+        }
+      },
+      "states": [
+        "ARRIVED_DESTINATION",
+        "AT_PICKUP",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "CONFIRMED",
+        "DRIVER_EN_ROUTE",
+        "JOURNEY_IN_PROGRESS",
+        "NO_SHOW",
+        "PASSENGER_ON_BOARD",
+        "REQUESTED",
+        "VEHICLE_ASSIGNED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_EVENT_SESSION",
+      "title": "Event admission or scheduled session",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "SEATS_HELD",
+          "actor": "event inventory authority",
+          "command": "HoldEventSeats",
+          "guard": "Selected session/seat/quantity available and authoritative hold confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SEATS_HELD",
+          "to": "BOOKING_CONFIRMED",
+          "actor": "event booking authority",
+          "command": "ConfirmEventBooking",
+          "guard": "Valid held ticket/seat/place quantities convert to durable reservation under the shared occurrence pool before expiry; eligibility and only configured payment prerequisites are confirmed.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Ticket types and passes obey declared shared pool/occurrence scope; issuer reference is separate."
+          ]
+        },
+        {
+          "from": "BOOKING_CONFIRMED",
+          "to": "TICKET_PENDING",
+          "actor": "ticketing application service",
+          "command": "RequestTicketIssue",
+          "guard": "Supported issuer authorised for this booking",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "TICKET_PENDING",
+          "to": "TICKET_ISSUED",
+          "actor": "ticket issuer",
+          "command": "ConfirmTicketIssue",
+          "guard": "Valid ticket/admission reference received from issuer",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "TICKET_ISSUED",
+          "to": "ADMITTED",
+          "actor": "venue admission authority",
+          "command": "ValidateAdmission",
+          "guard": "Ticket current, not already consumed and identity/age rules satisfied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ADMITTED",
+          "to": "ATTENDED",
+          "actor": "venue/session staff",
+          "command": "ConfirmEventAttendance",
+          "guard": "Attendance policy satisfied; scan does not imply session completion",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ATTENDED",
+          "to": "COMPLETED",
+          "actor": "event authority",
+          "command": "CompleteEventSession",
+          "guard": "Session completion and permitted operational outcome confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "BOOKING_CONFIRMED",
+          "to": "ADMITTED",
+          "actor": "venue admission authority",
+          "command": "AdmitByBookingReference",
+          "guard": "Manifest explicitly supports non-ticketed booking-reference admission; eligibility and one-time admission consumption confirmed. Ticket issuing states are inapplicable.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestEventBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "SEATS_HELD",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestEventBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "BOOKING_CONFIRMED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestEventBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "TICKET_PENDING",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestEventBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "TICKET_ISSUED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestEventBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_PENDING",
+          "to": "CANCELLED",
+          "command": "ConfirmEventBookingCancellation",
+          "guard": "Booking/issuer authorities confirm allowed cancellation, unused admission entitlement revocation and correct occurrence/ticket pool release. Issuer unknown stays pending; refund remains separate."
+        },
+        {
+          "from": "SEATS_HELD",
+          "to": "HOLD_EXPIRED",
+          "command": "ConfirmTrustedHoldExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        },
+        {
+          "from": "BOOKING_CONFIRMED",
+          "to": "NO_SHOW",
+          "command": "RecordEventBookingNoShow",
+          "guard": "Configured admission cutoff and authorized attendance evidence establish no admission; do not release or reissue already consumed tickets or fabricate a refund."
+        },
+        {
+          "from": "TICKET_ISSUED",
+          "to": "NO_SHOW",
+          "command": "RecordEventBookingNoShow",
+          "guard": "Configured admission cutoff and authorized attendance evidence establish no admission; do not release or reissue already consumed tickets or fabricate a refund."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "SESSION_CAPACITY"
+      ],
+      "reservationSemantics": "Place/seat/ticket quantities consume a shared dated occurrence pool. Ticket issue, admission and completion remain separate from reservation confirmation.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_EVENT_SESSION",
+        "cancellation": {
+          "requestCommand": "RequestEventBookingCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "SEATS_HELD",
+            "BOOKING_CONFIRMED",
+            "TICKET_PENDING",
+            "TICKET_ISSUED"
+          ],
+          "pendingState": "CANCELLATION_PENDING",
+          "confirmCommand": "ConfirmEventBookingCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Booking/issuer authorities confirm allowed cancellation, unused admission entitlement revocation and correct occurrence/ticket pool release. Issuer unknown stays pending; refund remains separate."
+        },
+        "holdExpiryFromStates": [
+          "SEATS_HELD"
+        ],
+        "holdExpiredState": "HOLD_EXPIRED",
+        "quoteExpiryFromStates": [],
+        "noShow": {
+          "fromStates": [
+            "BOOKING_CONFIRMED",
+            "TICKET_ISSUED"
+          ],
+          "command": "RecordEventBookingNoShow",
+          "targetState": "NO_SHOW",
+          "guard": "Configured admission cutoff and authorized attendance evidence establish no admission; do not release or reissue already consumed tickets or fabricate a refund."
+        }
+      },
+      "states": [
+        "ADMITTED",
+        "ATTENDED",
+        "BOOKING_CONFIRMED",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "COMPLETED",
+        "HOLD_EXPIRED",
+        "NO_SHOW",
+        "REQUESTED",
+        "SEATS_HELD",
+        "TICKET_ISSUED",
+        "TICKET_PENDING"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_GROUP_ACTIVITY",
+      "title": "Capacity-limited group activity",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "CAPACITY_HELD",
+          "actor": "activity booking authority",
+          "command": "HoldActivityCapacity",
+          "guard": "Participant count, exact occurrence and place/equipment capacity available; required occurrence-level instructor/venue/equipment allocations are confirmed once or held with the occurrence under the declared policy.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Do not add a new exclusive instructor reservation for every attendee in the same session."
+          ]
+        },
+        {
+          "from": "CAPACITY_HELD",
+          "to": "CONFIRMED",
+          "actor": "activity booking authority",
+          "command": "ConfirmActivityBooking",
+          "guard": "Held participant quantities convert to durable occurrence reservation before expiry; required consent/eligibility and only configured payment prerequisites are separately confirmed. Required occurrence resources are valid.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Place confirmation is distinct from a later minimum-participant/weather go decision; disclose the accepted contingency policy."
+          ]
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "GO_DECISION_PENDING",
+          "actor": "activity coordinator",
+          "command": "ReviewActivityDeparture",
+          "guard": "Configured minimum-participant and weather/safety decision time reached",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "GO_DECISION_PENDING",
+          "to": "CLEARED_TO_RUN",
+          "actor": "authorised activity lead",
+          "command": "ConfirmActivityGo",
+          "guard": "Minimum participants, instructor, equipment and safety prerequisites satisfied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CLEARED_TO_RUN",
+          "to": "CHECKED_IN",
+          "actor": "activity staff",
+          "command": "CheckInParticipants",
+          "guard": "Actual participants and required briefing/waivers recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CHECKED_IN",
+          "to": "IN_ACTIVITY",
+          "actor": "assigned instructor",
+          "command": "StartActivity",
+          "guard": "Qualified lead and session conditions ready",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_ACTIVITY",
+          "to": "COMPLETED",
+          "actor": "assigned instructor",
+          "command": "CompleteActivity",
+          "guard": "Participants and equipment safely accounted for under the activity contract",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CLEARED_TO_RUN",
+          "actor": "authorised activity lead",
+          "command": "ClearPrivateActivity",
+          "guard": "Private/no-minimum rule explicitly configured; instructor, equipment, participant eligibility and safety conditions confirmed. Skips only minimum-participant decision waiting.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestActivityBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CAPACITY_HELD",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestActivityBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestActivityBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "GO_DECISION_PENDING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestActivityBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CLEARED_TO_RUN",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestActivityBookingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmActivityBookingCancellation",
+          "guard": "Activity owner confirms allowed participant cancellation or occurrence cancellation, correct place quantities and occurrence-owned resources. Cancelling one attendee cannot release an instructor still needed by the session; refunds remain separate."
+        },
+        {
+          "from": "CAPACITY_HELD",
+          "to": "HOLD_EXPIRED",
+          "command": "ConfirmTrustedHoldExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        },
+        {
+          "from": "CLEARED_TO_RUN",
+          "to": "NO_SHOW",
+          "command": "RecordActivityParticipantNoShow",
+          "guard": "Activity actually cleared to run, configured arrival deadline and real absence evidence permit an authorized decision. Do not mislabel an occurrence cancelled by the operator as participant no-show."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "SESSION_CAPACITY"
+      ],
+      "reservationSemantics": "Attendee reservations consume places; instructor/venue/equipment allocations belong once to the occurrence or declared requirement. Go/no-go clearance is a separate operational decision.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_GROUP_ACTIVITY",
+        "cancellation": {
+          "requestCommand": "RequestActivityBookingCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "CAPACITY_HELD",
+            "CONFIRMED",
+            "GO_DECISION_PENDING",
+            "CLEARED_TO_RUN"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmActivityBookingCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Activity owner confirms allowed participant cancellation or occurrence cancellation, correct place quantities and occurrence-owned resources. Cancelling one attendee cannot release an instructor still needed by the session; refunds remain separate."
+        },
+        "holdExpiryFromStates": [
+          "CAPACITY_HELD"
+        ],
+        "holdExpiredState": "HOLD_EXPIRED",
+        "quoteExpiryFromStates": [],
+        "noShow": {
+          "fromStates": [
+            "CLEARED_TO_RUN"
+          ],
+          "command": "RecordActivityParticipantNoShow",
+          "targetState": "NO_SHOW",
+          "guard": "Activity actually cleared to run, configured arrival deadline and real absence evidence permit an authorized decision. Do not mislabel an occurrence cancelled by the operator as participant no-show."
+        }
+      },
+      "states": [
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "CAPACITY_HELD",
+        "CHECKED_IN",
+        "CLEARED_TO_RUN",
+        "COMPLETED",
+        "CONFIRMED",
+        "GO_DECISION_PENDING",
+        "HOLD_EXPIRED",
+        "IN_ACTIVITY",
+        "NO_SHOW",
+        "REQUESTED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_TOUR",
+      "title": "Tour or multi-stop travel service",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "ITINERARY_REVIEW",
+          "actor": "tour planner",
+          "command": "ReviewTourRequest",
+          "guard": "Dates, party, route and requested inclusions captured",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ITINERARY_REVIEW",
+          "to": "QUOTED",
+          "actor": "authorised tour planner",
+          "command": "IssueTourQuote",
+          "guard": "Supplier availability/holds, prices, exclusions and expiry identified",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUOTED",
+          "to": "APPROVED",
+          "actor": "customer",
+          "command": "ApproveTourItinerary",
+          "guard": "Current itinerary/price and required deposit terms accepted",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "SUPPLIERS_CONFIRMED",
+          "actor": "tour/supplier authority",
+          "command": "ConfirmTourSuppliers",
+          "guard": "Each contracted third-party component has an authoritative confirmation reference, all required NEXG-controlled departure/guide/vehicle/equipment allocations are durably confirmed, and only policy-required Finance prerequisites are satisfied. Unresolved commitments remain pending and visible.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Acceptance of an itinerary or an inclusion checkbox cannot imply a supplier allocation."
+          ]
+        },
+        {
+          "from": "SUPPLIERS_CONFIRMED",
+          "to": "READY_TO_DEPART",
+          "actor": "tour coordinator",
+          "command": "ClearTourDeparture",
+          "guard": "Guide, transport, participant documents and required briefing ready",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "READY_TO_DEPART",
+          "to": "ON_TOUR",
+          "actor": "assigned guide",
+          "command": "StartTour",
+          "guard": "Actual group departure confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ON_TOUR",
+          "to": "COMPLETION_REVIEW",
+          "actor": "guide",
+          "command": "SubmitTourCompletion",
+          "guard": "Contracted stops/days/inclusions accounted for with exceptions recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "COMPLETION_REVIEW",
+          "to": "COMPLETED",
+          "actor": "tour authority",
+          "command": "CompleteTour",
+          "guard": "Outstanding contracted components and complaints routed appropriately",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ITINERARY_REVIEW",
+          "to": "APPROVED",
+          "actor": "customer and tour authority",
+          "command": "AcceptFixedPublishedTour",
+          "guard": "Exact published itinerary/price version and inclusions accepted; quoted-custom path is not required. Acceptance does not mark payment complete.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "READY_TO_DEPART",
+          "actor": "tour authority",
+          "command": "ClearLocallyOperatedTour",
+          "guard": "No third-party supplier commitment exists in accepted scope; exact shared/private departure places, eligible guide/transport/equipment and other internal resource allocations are confirmed together and any configured payment/clearance prerequisites pass.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Shared and private offerings cannot independently consume the same guide/vehicle capacity."
+          ]
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTourCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ITINERARY_REVIEW",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTourCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "QUOTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTourCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "APPROVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTourCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "SUPPLIERS_CONFIRMED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTourCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "READY_TO_DEPART",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestTourCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmTourCancellation",
+          "guard": "Tour and all relevant allocation/supplier authorities confirm cancellation scope and results under accepted terms; partial/unknown provider results remain visible and do not imply all inventory released or refunds paid. On-tour disruption uses travel-exception recovery."
+        },
+        {
+          "from": "QUOTED",
+          "to": "QUOTE_EXPIRED",
+          "command": "ConfirmQuoteExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        },
+        {
+          "from": "READY_TO_DEPART",
+          "to": "NO_SHOW",
+          "command": "RecordTourParticipantNoShow",
+          "guard": "Departure is genuinely ready, agreed arrival/wait policy passed and authorized guide/operator confirms absence; shared departure resources remain owned by the occurrence."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "TOUR"
+      ],
+      "reservationSemantics": "Private intervals and shared departure places use declared resources and supplier authority. Quote approval alone does not reserve a tour. Customer confirmation requires all contracted local and supplier allocations plus relevant policy prerequisites.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_TOUR",
+        "cancellation": {
+          "requestCommand": "RequestTourCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "ITINERARY_REVIEW",
+            "QUOTED",
+            "APPROVED",
+            "SUPPLIERS_CONFIRMED",
+            "READY_TO_DEPART"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmTourCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Tour and all relevant allocation/supplier authorities confirm cancellation scope and results under accepted terms; partial/unknown provider results remain visible and do not imply all inventory released or refunds paid. On-tour disruption uses travel-exception recovery."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [
+          "QUOTED"
+        ],
+        "quoteExpiredState": "QUOTE_EXPIRED",
+        "noShow": {
+          "fromStates": [
+            "READY_TO_DEPART"
+          ],
+          "command": "RecordTourParticipantNoShow",
+          "targetState": "NO_SHOW",
+          "guard": "Departure is genuinely ready, agreed arrival/wait policy passed and authorized guide/operator confirms absence; shared departure resources remain owned by the occurrence."
+        }
+      },
+      "states": [
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "COMPLETION_REVIEW",
+        "ITINERARY_REVIEW",
+        "NO_SHOW",
+        "ON_TOUR",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "READY_TO_DEPART",
+        "REQUESTED",
+        "SUPPLIERS_CONFIRMED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_REQUEST_QUOTE",
+      "title": "Request, quote and coordination",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "CLARIFICATION_PENDING",
+          "actor": "assigned coordinator",
+          "command": "RequestClarification",
+          "guard": "Only necessary missing scope/customer decisions requested",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CLARIFICATION_PENDING",
+          "to": "SCOPED",
+          "actor": "customer and coordinator",
+          "command": "ConfirmRequestScope",
+          "guard": "Required scope, due date, location/budget and deliverables defined",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "SCOPED",
+          "actor": "coordinator",
+          "command": "AcceptCompleteScope",
+          "guard": "Initial request already contains all required scope",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SCOPED",
+          "to": "QUOTED",
+          "actor": "authorised quoting actor",
+          "command": "IssueCoordinationQuote",
+          "guard": "Price/fees, third-party costs, exclusions, expiry and completion evidence specified",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUOTED",
+          "to": "APPROVED",
+          "actor": "customer",
+          "command": "ApproveCoordinationQuote",
+          "guard": "Current exact quote version accepted; payment remains a separately owned fact",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "CONFIRMATION_PENDING",
+          "actor": "coordinator",
+          "command": "RequestSupplierConfirmation",
+          "guard": "Chosen provider/venue/supplier, explicit commitment authority and any Finance-confirmed pre-commitment prerequisite present",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMATION_PENDING",
+          "to": "COMMITTED",
+          "actor": "supplier authority and coordinator",
+          "command": "ConfirmCoordinationCommitment",
+          "guard": "Required supplier confirmations and references received; no guessed reservation",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "COMMITTED",
+          "to": "IN_PROGRESS",
+          "actor": "assigned coordinator/provider",
+          "command": "StartCoordinatedWork",
+          "guard": "Contracted execution can begin within approved scope",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_PROGRESS",
+          "to": "DELIVERABLE_REVIEW",
+          "actor": "coordinator",
+          "command": "SubmitCoordinationOutcome",
+          "guard": "Contracted output or supplier execution evidence available",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "DELIVERABLE_REVIEW",
+          "to": "COMPLETED",
+          "actor": "authorised customer/reviewer per contract",
+          "command": "AcceptCoordinationOutcome",
+          "guard": "Agreed completion evidence accepted or contract-defined acceptance period satisfied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SCOPED",
+          "to": "APPROVED",
+          "actor": "customer and authorised coordination actor",
+          "command": "AcceptFixedCoordinationScope",
+          "guard": "Complete scope, exact fixed service price, expense bounds, deadlines and completion terms explicitly accepted; quote drafting is not required.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "IN_PROGRESS",
+          "actor": "assigned coordinator",
+          "command": "StartAdvisoryCoordination",
+          "guard": "Accepted scope is purely advisory/output-based with no third-party booking/purchase; required financial prerequisite is confirmed separately.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CONFIRMATION_PENDING",
+          "to": "ALTERNATIVE_REVIEW",
+          "actor": "coordinator using supplier evidence",
+          "command": "RecordSupplierDecline",
+          "guard": "Actual supplier refusal/unavailability received; no substitute commitment made.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ALTERNATIVE_REVIEW",
+          "to": "QUOTED",
+          "actor": "authorised quoting actor",
+          "command": "IssueAlternativeQuote",
+          "guard": "Material scope/date/price changes described; customer approval required again before commitment.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCoordinationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CLARIFICATION_PENDING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCoordinationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "SCOPED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCoordinationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "QUOTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCoordinationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "APPROVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCoordinationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CONFIRMATION_PENDING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCoordinationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ALTERNATIVE_REVIEW",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCoordinationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "COMMITTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestCoordinationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmCoordinationCancellation",
+          "guard": "Coordination authority resolves accepted scope and any supplier/child commitments; pending provider outcomes are reconciled, actual releasable allocations confirmed and financial decisions kept separate. Uncommitted requests release no invented capacity."
+        },
+        {
+          "from": "QUOTED",
+          "to": "QUOTE_EXPIRED",
+          "command": "ConfirmQuoteExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "REQUEST_QUOTE"
+      ],
+      "reservationSemantics": "Enquiry and quote acceptance are nonblocking. Accepted commitment creates supported resource allocation only once; advisory work with no resource booking remains valid without an appointment.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_REQUEST_QUOTE",
+        "cancellation": {
+          "requestCommand": "RequestCoordinationCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "CLARIFICATION_PENDING",
+            "SCOPED",
+            "QUOTED",
+            "APPROVED",
+            "CONFIRMATION_PENDING",
+            "ALTERNATIVE_REVIEW",
+            "COMMITTED"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmCoordinationCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Coordination authority resolves accepted scope and any supplier/child commitments; pending provider outcomes are reconciled, actual releasable allocations confirmed and financial decisions kept separate. Uncommitted requests release no invented capacity."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [
+          "QUOTED"
+        ],
+        "quoteExpiredState": "QUOTE_EXPIRED",
+        "noShow": null
+      },
+      "states": [
+        "ALTERNATIVE_REVIEW",
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "CLARIFICATION_PENDING",
+        "COMMITTED",
+        "COMPLETED",
+        "CONFIRMATION_PENDING",
+        "DELIVERABLE_REVIEW",
+        "IN_PROGRESS",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "REQUESTED",
+        "SCOPED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_PICKUP_RETURN",
+      "title": "Collection, processing and return",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "COLLECTION_CONFIRMED",
+          "actor": "collection authority",
+          "command": "ConfirmCollectionLeg",
+          "guard": "Actual incoming method, location, interval and actor confirmed. For FIRM_PRE_ACCEPTED promise mode, collection/processing/return commitments are jointly feasible and reserved under accepted exact scope. For ASSESSMENT_REQUIRED mode, only the selected incoming leg is committed; later price/return is explicitly indicative until assessment and customer acceptance.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "No return promise is displayed as confirmed from the incoming-leg confirmation alone."
+          ]
+        },
+        {
+          "from": "COLLECTION_CONFIRMED",
+          "to": "COLLECTED",
+          "actor": "collection authority",
+          "command": "ConfirmGoodsCollected",
+          "guard": "Incoming goods/count/condition and custody proof captured",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "COLLECTED",
+          "to": "RECEIVED_FOR_PROCESSING",
+          "actor": "merchant receiving staff",
+          "command": "ReceiveProcessingGoods",
+          "guard": "Merchant confirms custody and discrepancy record",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RECEIVED_FOR_PROCESSING",
+          "to": "ASSESSMENT_PENDING",
+          "actor": "merchant assessor",
+          "command": "AssessGoods",
+          "guard": "Required item/weight/service checks recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ASSESSMENT_PENDING",
+          "to": "PRICE_APPROVED",
+          "actor": "customer or fixed-price authority",
+          "command": "ApproveProcessingPrice",
+          "guard": "Exact measured scope, price version and turnaround/return promise accepted; required typed processing and return-window capacity is authoritatively confirmed, reusing already valid incoming allocations and preserving custody facts.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "If a previously firm promise is materially affected, route change review rather than silently revising accepted time/price."
+          ]
+        },
+        {
+          "from": "PRICE_APPROVED",
+          "to": "PROCESSING",
+          "actor": "assigned processor",
+          "command": "StartProcessing",
+          "guard": "Approved work scope and required handling ready",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PROCESSING",
+          "to": "READY_FOR_RETURN",
+          "actor": "merchant quality staff",
+          "command": "MarkProcessingReady",
+          "guard": "Processing and item/condition checks complete",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "READY_FOR_RETURN",
+          "to": "RETURN_CONFIRMED",
+          "actor": "return authority",
+          "command": "ConfirmReturnLeg",
+          "guard": "Actual outgoing method, actor, location and dispatch/collection interval confirmed against the accepted feasible return commitment. Reuse the promise's allocation roles; any material change requires guarded revision and customer acceptance.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "This is operational leg confirmation, not the first validation of a return promise already sold to the customer."
+          ]
+        },
+        {
+          "from": "RETURN_CONFIRMED",
+          "to": "RETURNED",
+          "actor": "return or customer-collection authority",
+          "command": "ConfirmGoodsReturned",
+          "guard": "Outgoing custody/recipient proof confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RETURNED",
+          "to": "COMPLETED",
+          "actor": "processing authority",
+          "command": "CompletePickupReturn",
+          "guard": "All accepted items returned or an explicitly resolved exception remains separately recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "RECEIVED_FOR_PROCESSING",
+          "actor": "merchant receiving custodian",
+          "command": "ReceiveCustomerDropoff",
+          "guard": "Configured incoming mode is CUSTOMER_DROPOFF; item identity/count/condition and intake custody proof recorded. No collection carrier milestones created.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RECEIVED_FOR_PROCESSING",
+          "to": "PRICE_APPROVED",
+          "actor": "processing authority using accepted price evidence",
+          "command": "ConfirmFixedProcessingPrice",
+          "guard": "Exact fixed scope/price was accepted, no measured reassessment is required, and processing/return commitments are authoritatively reserved or confirmed against the existing firm promise.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Customer drop-off does not create a collection trip."
+          ]
+        },
+        {
+          "from": "READY_FOR_RETURN",
+          "to": "AWAITING_CUSTOMER_COLLECTION",
+          "actor": "merchant custodian",
+          "command": "OpenProcessedGoodsCollection",
+          "guard": "Outgoing mode is CUSTOMER_COLLECTION; collection window and customer notification request confirmed.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "AWAITING_CUSTOMER_COLLECTION",
+          "to": "RETURNED",
+          "actor": "merchant custodian",
+          "command": "ConfirmProcessedGoodsCollection",
+          "guard": "Correct authorised recipient, outgoing item/count and collection proof confirmed. No return-carrier journey fabricated.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "COLLECTION_CONFIRMED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "COLLECTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "RECEIVED_FOR_PROCESSING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ASSESSMENT_PENDING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PRICE_APPROVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PROCESSING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "READY_FOR_RETURN",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "RETURN_CONFIRMED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "AWAITING_CUSTOMER_COLLECTION",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestProcessingCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmProcessingCancellation",
+          "guard": "Processing/transport/custody authorities confirm permitted work cancellation and releasable promises. Goods already held require a separately owned return/recovery record with retained custody/allocations until actual handoff. Do not erase held goods, fabricate carrier completion or mark refund paid."
+        }
+      ],
+      "variants": [
+        {
+          "id": "VAR_PICKUP_RETURN_PROMISE_MODE",
+          "workflowId": "WF_PICKUP_RETURN",
+          "modelId": "LINKED_WINDOWS",
+          "activation": "Selected laundry/processing offering has declared actual incoming/outgoing methods and price confirmation policy.",
+          "requiredFields": [
+            "promise_mode",
+            "incoming_method",
+            "outgoing_method",
+            "processing_unit",
+            "capacity_authority",
+            "return_promise_status"
+          ],
+          "allowedPromiseModes": [
+            "FIRM_PRE_ACCEPTED",
+            "ASSESSMENT_REQUIRED"
+          ],
+          "executionRule": "Reserve each firm role when its promise becomes accepted; show indicative versus confirmed return explicitly. Customer dropoff/collection bypasses carrier milestones."
+        }
+      ],
+      "modelIds": [
+        "LINKED_WINDOWS"
+      ],
+      "reservationSemantics": "Firm turnaround promises reserve feasible collection/processing/return roles at commitment. Assessment-required work shows later return as indicative until actual workload/price/promise is approved. Later transport-dispatch confirmation reuses the existing promise.",
+      "variantIds": [
+        "VAR_PICKUP_RETURN_PROMISE_MODE"
+      ],
+      "exceptionBinding": {
+        "workflowId": "WF_PICKUP_RETURN",
+        "cancellation": {
+          "requestCommand": "RequestProcessingCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "COLLECTION_CONFIRMED",
+            "COLLECTED",
+            "RECEIVED_FOR_PROCESSING",
+            "ASSESSMENT_PENDING",
+            "PRICE_APPROVED",
+            "PROCESSING",
+            "READY_FOR_RETURN",
+            "RETURN_CONFIRMED",
+            "AWAITING_CUSTOMER_COLLECTION"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmProcessingCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Processing/transport/custody authorities confirm permitted work cancellation and releasable promises. Goods already held require a separately owned return/recovery record with retained custody/allocations until actual handoff. Do not erase held goods, fabricate carrier completion or mark refund paid."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [],
+        "noShow": null
+      },
+      "states": [
+        "ASSESSMENT_PENDING",
+        "AWAITING_CUSTOMER_COLLECTION",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COLLECTED",
+        "COLLECTION_CONFIRMED",
+        "COMPLETED",
+        "PRICE_APPROVED",
+        "PROCESSING",
+        "READY_FOR_RETURN",
+        "RECEIVED_FOR_PROCESSING",
+        "REQUESTED",
+        "RETURNED",
+        "RETURN_CONFIRMED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_MEMBERSHIP",
+      "title": "Membership or recurring entitlement",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "ELIGIBILITY_REVIEW",
+          "actor": "membership authority",
+          "command": "ReviewMembershipApplication",
+          "guard": "Requested plan and applicable eligibility/terms known",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ELIGIBILITY_REVIEW",
+          "to": "ACTIVATION_PENDING",
+          "actor": "customer and membership authority",
+          "command": "ApproveMembershipTerms",
+          "guard": "Current terms, price, period and payment mandate/prerequisite accepted",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACTIVATION_PENDING",
+          "to": "ACTIVE",
+          "actor": "membership authority",
+          "command": "ActivateMembership",
+          "guard": "Explicit commercial plan, accepted scope/validity and authoritative entitlement confirmed; only the configured enrollment payment or separate recurring mandate prerequisite is required. No session capacity is consumed by activation alone.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Legacy recurrence/subscription interest cannot independently authorize plan renewal or debit."
+          ]
+        },
+        {
+          "from": "ACTIVE",
+          "to": "PAUSE_PENDING",
+          "actor": "customer or authorised merchant",
+          "command": "RequestMembershipPause",
+          "guard": "Accepted pause policy and effective date permit request",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PAUSE_PENDING",
+          "to": "PAUSED",
+          "actor": "membership authority",
+          "command": "ConfirmMembershipPause",
+          "guard": "Entitlement/billing effect confirmed by relevant authorities",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PAUSED",
+          "to": "ACTIVE",
+          "actor": "membership authority",
+          "command": "ResumeMembership",
+          "guard": "Eligibility, capacity and billing requirements reconfirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACTIVE",
+          "to": "EXPIRED",
+          "actor": "membership authority",
+          "command": "ExpireMembership",
+          "guard": "Authoritative entitlement period ended without confirmed renewal",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACTIVE",
+          "to": "EXHAUSTED",
+          "actor": "entitlement authority",
+          "command": "ConsumeFinalEntitlement",
+          "guard": "Authoritative usage ledger confirms remaining entitlement zero",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "ACTIVE",
+          "to": "CANCELLATION_PENDING",
+          "actor": "customer/merchant per contract",
+          "command": "RequestMembershipCancellation",
+          "guard": "Cancellation request and effective date valid AND Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending.",
+          "source": "workflow-catalogue.md",
+          "guardBindings": [
+            "Cancellation request and effective date valid",
+            "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+          ],
+          "actorBindings": [
+            "customer/merchant per contract",
+            "owning authority"
+          ]
+        },
+        {
+          "from": "CANCELLATION_PENDING",
+          "to": "CANCELLED",
+          "actor": "membership authority",
+          "command": "ConfirmMembershipCancellation",
+          "guard": "Entitlement and applicable billing changes confirmed AND Entitlement owner confirms accepted effective cancellation and relevant billing authority confirms required mandate changes. Existing booked occurrences retain their own change rules; a plan cancellation does not silently erase their capacity commitments.",
+          "source": "workflow-catalogue.md",
+          "guardBindings": [
+            "Entitlement and applicable billing changes confirmed",
+            "Entitlement owner confirms accepted effective cancellation and relevant billing authority confirms required mandate changes. Existing booked occurrences retain their own change rules; a plan cancellation does not silently erase their capacity commitments."
+          ],
+          "actorBindings": [
+            "membership authority",
+            "owning authority"
+          ]
+        },
+        {
+          "from": "ACTIVE",
+          "to": "ACTIVE",
+          "actor": "membership occurrence scheduler authority",
+          "command": "CreateApprovedMembershipOccurrence",
+          "guard": "An actual accepted recurring occurrence is requested under a supported child offering; entitlement validity/credit and exact scope pass, child allocation authority confirms its reservation, and credit usage plus local allocation is coordinated atomically or through explicit external reconciliation. Idempotency uses membership plus occurrence identity.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "The entitlement remains separate from occurrence execution and payment; no automatic duplicate child/charge."
+          ]
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestMembershipCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ELIGIBILITY_REVIEW",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestMembershipCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ACTIVATION_PENDING",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestMembershipCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PAUSE_PENDING",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestMembershipCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PAUSED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestMembershipCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "ENTITLEMENT"
+      ],
+      "reservationSemantics": "Entitlement activation consumes no future session slots by itself. An explicitly approved occurrence creates actual child work and uses its own authoritative reservation and one-time credit use.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_MEMBERSHIP",
+        "cancellation": {
+          "requestCommand": "RequestMembershipCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "ELIGIBILITY_REVIEW",
+            "ACTIVATION_PENDING",
+            "ACTIVE",
+            "PAUSE_PENDING",
+            "PAUSED"
+          ],
+          "pendingState": "CANCELLATION_PENDING",
+          "confirmCommand": "ConfirmMembershipCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Entitlement owner confirms accepted effective cancellation and relevant billing authority confirms required mandate changes. Existing booked occurrences retain their own change rules; a plan cancellation does not silently erase their capacity commitments."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [],
+        "noShow": null
+      },
+      "states": [
+        "ACTIVATION_PENDING",
+        "ACTIVE",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "ELIGIBILITY_REVIEW",
+        "EXHAUSTED",
+        "EXPIRED",
+        "PAUSED",
+        "PAUSE_PENDING",
+        "REQUESTED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_FREIGHT",
+      "title": "Freight or shipment",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "CARGO_REVIEW",
+          "actor": "freight specialist",
+          "command": "ReviewFreightRequest",
+          "guard": "Origin/destination, cargo type, pieces, mass/volume and handling declarations captured",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CARGO_REVIEW",
+          "to": "QUOTED",
+          "actor": "authorised freight quoting actor",
+          "command": "IssueFreightQuote",
+          "guard": "Chargeable units, mode, route, duties/fees scope, estimate and exclusions specified",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUOTED",
+          "to": "APPROVED",
+          "actor": "customer",
+          "command": "ApproveFreightQuote",
+          "guard": "Current quote and cargo/handling terms accepted",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "BOOKED",
+          "actor": "carrier booking authority",
+          "command": "ConfirmFreightBooking",
+          "guard": "Actual carrier/leg reference, typed cargo dimensions/quantity/units and all controlled capacity constraints are authoritatively confirmed, with accepted quote revision and any configured pre-booking payment prerequisite.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Mass/volume/container quantities cannot be converted to interchangeable guest counts; source capacity failure remains unknown."
+          ]
+        },
+        {
+          "from": "BOOKED",
+          "to": "DOCUMENTATION_READY",
+          "actor": "authorised documentation reviewer",
+          "command": "ClearFreightDocuments",
+          "guard": "Required cargo/customs documents reviewed for applicable route",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "DOCUMENTATION_READY",
+          "to": "COLLECTED",
+          "actor": "origin carrier authority",
+          "command": "ConfirmFreightCollection",
+          "guard": "Actual cargo and custody/condition proof confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "COLLECTED",
+          "to": "IN_TRANSIT",
+          "actor": "carrier authority",
+          "command": "ConfirmFreightDeparture",
+          "guard": "Actual mode/leg departure confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_TRANSIT",
+          "to": "CLEARANCE_REVIEW",
+          "actor": "customs/broker authority",
+          "command": "RecordClearanceArrival",
+          "guard": "Route requires clearance and authoritative arrival/reference received",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CLEARANCE_REVIEW",
+          "to": "CLEARED",
+          "actor": "customs/broker authority",
+          "command": "ConfirmFreightClearance",
+          "guard": "Actual clearance result received; no inferred regulatory approval",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CLEARED",
+          "to": "AT_DESTINATION",
+          "actor": "destination carrier authority",
+          "command": "ConfirmDestinationArrival",
+          "guard": "Destination cargo receipt confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_TRANSIT",
+          "to": "AT_DESTINATION",
+          "actor": "carrier authority",
+          "command": "ConfirmDomesticDestinationArrival",
+          "guard": "Route does not require a clearance stage",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "AT_DESTINATION",
+          "to": "DELIVERED",
+          "actor": "destination fulfilment authority",
+          "command": "ConfirmFreightDelivery",
+          "guard": "Consignee/cargo proof and contracted final leg complete",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "DELIVERED",
+          "to": "CLOSED",
+          "actor": "freight work authority",
+          "command": "CloseFreight",
+          "guard": "Outstanding cargo/document exceptions resolved or independently tracked",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "BOOKED",
+          "to": "COLLECTED",
+          "actor": "origin carrier authority",
+          "command": "CollectNoDocumentGateFreight",
+          "guard": "Route contract explicitly has no pre-collection documentation gate; cargo identity, booking and custody confirmed. Missing required documentation never satisfies this guard.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "AT_DESTINATION",
+          "to": "COLLECTED_BY_CONSIGNEE",
+          "actor": "destination warehouse/carrier authority",
+          "command": "ConfirmConsigneeCollection",
+          "guard": "Accepted final mode is consignee collection at terminal/warehouse; authorised recipient and cargo/custody evidence confirmed.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "COLLECTED_BY_CONSIGNEE",
+          "to": "CLOSED",
+          "actor": "freight work authority",
+          "command": "CloseCollectedFreight",
+          "guard": "Contracted final handover complete and outstanding cargo/document exceptions resolved or tracked separately.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFreightCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CARGO_REVIEW",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFreightCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "QUOTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFreightCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "APPROVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFreightCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "BOOKED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFreightCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "DOCUMENTATION_READY",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestFreightCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmFreightCancellation",
+          "guard": "Carrier and freight owners confirm permitted pre-collection cancellation and released cargo/leg capacity. Actual collected/in-transit custody requires an explicit carrier intercept/return workflow and cannot be cleared by this edge. Fees/refunds are separate."
+        },
+        {
+          "from": "QUOTED",
+          "to": "QUOTE_EXPIRED",
+          "command": "ConfirmQuoteExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "FREIGHT"
+      ],
+      "reservationSemantics": "Quotes are nonblocking. Carrier/controlled capacity is confirmed for actual cargo dimensions, leg and units; no interchangeable guest-count proxy.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_FREIGHT",
+        "cancellation": {
+          "requestCommand": "RequestFreightCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "CARGO_REVIEW",
+            "QUOTED",
+            "APPROVED",
+            "BOOKED",
+            "DOCUMENTATION_READY"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmFreightCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Carrier and freight owners confirm permitted pre-collection cancellation and released cargo/leg capacity. Actual collected/in-transit custody requires an explicit carrier intercept/return workflow and cannot be cleared by this edge. Fees/refunds are separate."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [
+          "QUOTED"
+        ],
+        "quoteExpiredState": "QUOTE_EXPIRED",
+        "noShow": null
+      },
+      "states": [
+        "APPROVED",
+        "AT_DESTINATION",
+        "BOOKED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "CARGO_REVIEW",
+        "CLEARANCE_REVIEW",
+        "CLEARED",
+        "CLOSED",
+        "COLLECTED",
+        "COLLECTED_BY_CONSIGNEE",
+        "DELIVERED",
+        "DOCUMENTATION_READY",
+        "IN_TRANSIT",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "REQUESTED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_STORAGE",
+      "title": "Storage allocation, custody and release",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "SPACE_REVIEW",
+          "actor": "storage manager",
+          "command": "ReviewStorageRequest",
+          "guard": "Goods, handling, required area/volume and storage dates captured",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SPACE_REVIEW",
+          "to": "QUOTED",
+          "actor": "authorised storage quoting actor",
+          "command": "IssueStorageQuote",
+          "guard": "Exact unit, billing period, access/insurance scope and capacity proposed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUOTED",
+          "to": "APPROVED",
+          "actor": "customer",
+          "command": "ApproveStorageTerms",
+          "guard": "Current quote, custody and access terms accepted",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "SPACE_RESERVED",
+          "actor": "storage inventory authority",
+          "command": "ReserveStorageSpace",
+          "guard": "Accepted typed quantity/unit/precision, compatible goods, exact location and full occupancy period fit authoritative capacity throughout the interval; required approval/payment policy is satisfied separately.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "No implicit sqm/sqft conversion or rounded capacity increase."
+          ]
+        },
+        {
+          "from": "SPACE_RESERVED",
+          "to": "INTAKE_REVIEW",
+          "actor": "warehouse custodian",
+          "command": "ReceiveStorageGoods",
+          "guard": "Goods identity, quantity, condition and custody receipt recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "INTAKE_REVIEW",
+          "to": "STORED",
+          "actor": "storage authority",
+          "command": "ConfirmStorageIntake",
+          "guard": "Agreed goods accepted into a known storage allocation",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "STORED",
+          "to": "RETRIEVAL_REQUESTED",
+          "actor": "authorised customer",
+          "command": "RequestGoodsRelease",
+          "guard": "Customer authority and scope of requested goods verified",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RETRIEVAL_REQUESTED",
+          "to": "READY_FOR_RELEASE",
+          "actor": "warehouse authority",
+          "command": "AuthoriseStorageRelease",
+          "guard": "Required access, payment/hold policy and goods availability confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "READY_FOR_RELEASE",
+          "to": "RELEASED",
+          "actor": "warehouse custodian",
+          "command": "ConfirmStorageRelease",
+          "guard": "Authorised recipient/carrier and outgoing custody proof confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RELEASED",
+          "to": "CLOSED",
+          "actor": "storage authority",
+          "command": "CloseStorageAllocation",
+          "guard": "All goods have actual authorized final release/custody evidence and the capacity owner confirms released quantity. Financial adjustments remain separate. Planned occupancy end or billing period alone cannot close physical custody.",
+          "source": "reconciled transition override",
+          "additionalGuards": [
+            "Overstay/uncleared goods create a visible occupancy exception and effective blocking constraint; do not display the resource as free because the scheduled end elapsed."
+          ]
+        },
+        {
+          "from": "STORED",
+          "to": "STORED",
+          "actor": "storage release application service",
+          "command": "CreatePartialRetrieval",
+          "guard": "Only a subset of stored goods requested; create an idempotent child release with scoped recipient/hold checks. Parent allocation remains STORED.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "STORED",
+          "to": "STORED",
+          "actor": "storage authority using child-release evidence",
+          "command": "ConfirmPartialGoodsRelease",
+          "guard": "Child release confirms custody transfer; reconcile remaining goods and occupied capacity atomically. Close allocation only after confirmed final release.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestStorageCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "SPACE_REVIEW",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestStorageCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "QUOTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestStorageCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "APPROVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestStorageCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "SPACE_RESERVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestStorageCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmStorageCancellation",
+          "guard": "Storage owner confirms permitted pre-intake cancellation and exact typed occupancy release. After goods intake, follow authorized retrieval/custody workflow; scheduled end or cancelled billing cannot make physically occupied space free."
+        },
+        {
+          "from": "QUOTED",
+          "to": "QUOTE_EXPIRED",
+          "command": "ConfirmQuoteExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "STORAGE"
+      ],
+      "reservationSemantics": "Typed occupancy applies across the entire accepted interval. Physical custody and partial release reconcile remaining quantities; scheduled end alone cannot mark uncleared goods as absent.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_STORAGE",
+        "cancellation": {
+          "requestCommand": "RequestStorageCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "SPACE_REVIEW",
+            "QUOTED",
+            "APPROVED",
+            "SPACE_RESERVED"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmStorageCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Storage owner confirms permitted pre-intake cancellation and exact typed occupancy release. After goods intake, follow authorized retrieval/custody workflow; scheduled end or cancelled billing cannot make physically occupied space free."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [
+          "QUOTED"
+        ],
+        "quoteExpiredState": "QUOTE_EXPIRED",
+        "noShow": null
+      },
+      "states": [
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "CLOSED",
+        "INTAKE_REVIEW",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "READY_FOR_RELEASE",
+        "RELEASED",
+        "REQUESTED",
+        "RETRIEVAL_REQUESTED",
+        "SPACE_RESERVED",
+        "SPACE_REVIEW",
+        "STORED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_REGULATED_ENQUIRY",
+      "title": "Regulated enquiry or professional referral",
+      "transitions": [
+        {
+          "from": "SUBMITTED",
+          "to": "TRIAGED",
+          "actor": "authorised intake staff",
+          "command": "TriageRegulatedEnquiry",
+          "guard": "Minimum necessary purpose/contact/consent captured in permitted scope",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "TRIAGED",
+          "to": "PROFESSIONAL_REVIEW",
+          "actor": "verified professional or authorised provider",
+          "command": "AssignProfessionalReview",
+          "guard": "Current provider authority and appropriate service scope verified",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PROFESSIONAL_REVIEW",
+          "to": "CLARIFICATION_PENDING",
+          "actor": "authorised reviewer",
+          "command": "RequestPermittedClarification",
+          "guard": "Only permitted minimum-necessary additional detail requested",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "CLARIFICATION_PENDING",
+          "to": "PROFESSIONAL_REVIEW",
+          "actor": "customer and reviewer",
+          "command": "SubmitClarification",
+          "guard": "Requested information securely provided",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PROFESSIONAL_REVIEW",
+          "to": "RESPONSE_READY",
+          "actor": "authorised provider",
+          "command": "PrepareRegulatedResponse",
+          "guard": "Permitted response/referral/next-step decision completed by its authority",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RESPONSE_READY",
+          "to": "RESPONSE_DELIVERED",
+          "actor": "authorised provider system",
+          "command": "ReleaseRegulatedResponse",
+          "guard": "Recipient authority, consent and secure channel satisfied",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RESPONSE_DELIVERED",
+          "to": "CLOSED",
+          "actor": "provider work authority",
+          "command": "CloseRegulatedEnquiry",
+          "guard": "Contracted enquiry outcome recorded without implying an underlying transaction completed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "TRIAGED",
+          "to": "REVIEW_BLOCKED",
+          "actor": "verification/professional routing authority",
+          "command": "BlockUnverifiedProfessionalReview",
+          "guard": "Required professional authority/evidence absent, expired or outside scope; expose allowed clarification/support only.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REVIEW_BLOCKED",
+          "to": "PROFESSIONAL_REVIEW",
+          "actor": "verification and enquiry authorities",
+          "command": "ResumeVerifiedProfessionalReview",
+          "guard": "Required evidence now authoritatively valid and assigned provider scope appropriate.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PROFESSIONAL_REVIEW",
+          "to": "REFERRED",
+          "actor": "authorised professional",
+          "command": "ReferRegulatedEnquiry",
+          "guard": "Enquiry outside current service scope and permitted referral route/customer consent recorded; no underlying transaction or diagnosis fabricated.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PROFESSIONAL_REVIEW",
+          "to": "DECLINED",
+          "actor": "authorised professional",
+          "command": "DeclineRegulatedEnquiry",
+          "guard": "Permitted service refusal reason recorded with appropriate privacy and next-step information.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "SUBMITTED",
+          "to": "WITHDRAWAL_PENDING",
+          "command": "RequestEnquiryWithdrawal",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "TRIAGED",
+          "to": "WITHDRAWAL_PENDING",
+          "command": "RequestEnquiryWithdrawal",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PROFESSIONAL_REVIEW",
+          "to": "WITHDRAWAL_PENDING",
+          "command": "RequestEnquiryWithdrawal",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CLARIFICATION_PENDING",
+          "to": "WITHDRAWAL_PENDING",
+          "command": "RequestEnquiryWithdrawal",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "REVIEW_BLOCKED",
+          "to": "WITHDRAWAL_PENDING",
+          "command": "RequestEnquiryWithdrawal",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "RESPONSE_READY",
+          "to": "WITHDRAWAL_PENDING",
+          "command": "RequestEnquiryWithdrawal",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "WITHDRAWAL_PENDING",
+          "to": "WITHDRAWN",
+          "command": "ConfirmEnquiryWithdrawal",
+          "guard": "Enquiry/provider authority confirms permitted withdrawal of this administrative enquiry, preserving required restricted history. This does not cancel or reverse a separately owned financial/professional transaction and releases no invented appointment."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "REQUEST_QUOTE"
+      ],
+      "reservationSemantics": "Administrative enquiry/provider handoff only. Preserve the regulated-enquiry work graph rather than forcing a quotation, financial transaction or appointment. A consultation is a separately enabled offering.",
+      "variantIds": [],
+      "modelLifecycleOverride": "Preserve WF_REGULATED_ENQUIRY lifecycle; REQUEST_QUOTE supplies only nonblocking intake/authority semantics, not compulsory commercial quotes.",
+      "exceptionBinding": {
+        "workflowId": "WF_REGULATED_ENQUIRY",
+        "cancellation": {
+          "requestCommand": "RequestEnquiryWithdrawal",
+          "fromStates": [
+            "SUBMITTED",
+            "TRIAGED",
+            "PROFESSIONAL_REVIEW",
+            "CLARIFICATION_PENDING",
+            "REVIEW_BLOCKED",
+            "RESPONSE_READY"
+          ],
+          "pendingState": "WITHDRAWAL_PENDING",
+          "confirmCommand": "ConfirmEnquiryWithdrawal",
+          "cancelledState": "WITHDRAWN",
+          "confirmGuard": "Enquiry/provider authority confirms permitted withdrawal of this administrative enquiry, preserving required restricted history. This does not cancel or reverse a separately owned financial/professional transaction and releases no invented appointment."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [],
+        "noShow": null
+      },
+      "states": [
+        "CLARIFICATION_PENDING",
+        "CLOSED",
+        "DECLINED",
+        "PROFESSIONAL_REVIEW",
+        "REFERRED",
+        "RESPONSE_DELIVERED",
+        "RESPONSE_READY",
+        "REVIEW_BLOCKED",
+        "SUBMITTED",
+        "TRIAGED",
+        "WITHDRAWAL_PENDING",
+        "WITHDRAWN"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_SERVICE_JOB",
+      "title": "Diagnostic, repair or workshop job",
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "INTAKE_REVIEW",
+          "actor": "merchant receiving staff",
+          "command": "AcceptServiceIntake",
+          "guard": "Customer issue, item/asset identity, condition and custody/access recorded",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "INTAKE_REVIEW",
+          "to": "DIAGNOSIS",
+          "actor": "qualified assigned technician",
+          "command": "StartDiagnosis",
+          "guard": "Diagnostic scope and any diagnostic fee approved",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "DIAGNOSIS",
+          "to": "QUOTED",
+          "actor": "authorised technician/quoting actor",
+          "command": "IssueServiceQuote",
+          "guard": "Findings, parts, scope, price, expected completion and warranty terms stated",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUOTED",
+          "to": "APPROVED",
+          "actor": "customer",
+          "command": "ApproveServiceJob",
+          "guard": "Current quote/version and retained/replaced parts terms accepted",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "PARTS_PENDING",
+          "actor": "merchant parts authority",
+          "command": "RequestServiceParts",
+          "guard": "Required parts identified; no available-stock assumption",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PARTS_PENDING",
+          "to": "IN_SERVICE",
+          "actor": "assigned technician",
+          "command": "StartRepair",
+          "guard": "merchant_venue execution, required parts/resources and approved scope available, with any contract-required Finance prerequisite confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "IN_SERVICE",
+          "actor": "assigned technician",
+          "command": "StartNoPartsService",
+          "guard": "merchant_venue execution; no parts needed or parts already authoritatively available, with any contract-required Finance prerequisite confirmed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "IN_SERVICE",
+          "to": "QUALITY_REVIEW",
+          "actor": "technician",
+          "command": "SubmitServiceResult",
+          "guard": "Approved work performed and relevant test/report evidence attached",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUALITY_REVIEW",
+          "to": "READY_FOR_RELEASE",
+          "actor": "authorised reviewer",
+          "command": "ApproveServiceRelease",
+          "guard": "Checks and required customer review passed",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "READY_FOR_RELEASE",
+          "to": "RELEASED",
+          "actor": "merchant custodian or field authority",
+          "command": "ConfirmServiceHandover",
+          "guard": "Item returned or site-service completion accepted under configured mode",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "RELEASED",
+          "to": "COMPLETED",
+          "actor": "service work authority",
+          "command": "CompleteServiceJob",
+          "guard": "Contracted deliverables and unresolved exceptions accounted for",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "INTAKE_REVIEW",
+          "to": "APPROVED",
+          "actor": "customer and authorised service actor",
+          "command": "AcceptFixedScopeServiceJob",
+          "guard": "No diagnostic quotation is needed; exact fixed scope/price, asset/site and acceptance terms confirmed. Approval is not payment.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "APPROVED",
+          "to": "FIELD_EXECUTION_PENDING",
+          "actor": "service-job application service",
+          "command": "CreateLinkedMobileServiceExecution",
+          "guard": "customer_location variant selected; one linked WF_FIELD_SERVICE execution reuses job scope and resource reservation. Parts prerequisites confirmed where needed.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "PARTS_PENDING",
+          "to": "FIELD_EXECUTION_PENDING",
+          "actor": "service-job application service",
+          "command": "CreateLinkedMobileServiceExecutionAfterParts",
+          "guard": "customer_location execution; required parts now authoritatively available, accepted scope and any Finance prerequisite confirmed. Create or resume the one linked field child, never a duplicate.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "FIELD_EXECUTION_PENDING",
+          "to": "IN_SERVICE",
+          "actor": "service-job authority using field-child evidence",
+          "command": "ConfirmMobileJobStarted",
+          "guard": "Linked field child confirms authorised on-site IN_SERVICE; parent mirrors the reference without starting another service execution.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "QUALITY_REVIEW",
+          "to": "IN_SERVICE",
+          "actor": "authorised quality reviewer",
+          "command": "ReturnServiceForCorrection",
+          "guard": "A specific quality test failed; record approved correction scope. Price/time changes require renewed customer consent.",
+          "source": "workflow-catalogue.md"
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestServiceJobCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "INTAKE_REVIEW",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestServiceJobCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "DIAGNOSIS",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestServiceJobCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "QUOTED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestServiceJobCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "APPROVED",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestServiceJobCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "PARTS_PENDING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestServiceJobCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "FIELD_EXECUTION_PENDING",
+          "to": "CANCELLATION_REVIEW",
+          "command": "RequestServiceJobCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_REVIEW",
+          "to": "CANCELLED",
+          "command": "ConfirmServiceJobCancellation",
+          "guard": "Job/parts/custody/field owners resolve accepted cancellation terms, actual diagnostic work and releasable resources. Customer goods require return-unrepaired or another explicit custody recovery; an already active service follows its controlled interruption/change policy. Financial outcomes stay separate."
+        },
+        {
+          "from": "QUOTED",
+          "to": "QUOTE_EXPIRED",
+          "command": "ConfirmQuoteExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        }
+      ],
+      "variants": [],
+      "modelIds": [
+        "SERVICE_JOB",
+        "FIELD_VISIT"
+      ],
+      "reservationSemantics": "Queue/intake, assessment, timed bay/provider work and promised completion are distinct. Mobile child execution reuses the accepted parent scope and allocations without a second charge.",
+      "variantIds": [],
+      "exceptionBinding": {
+        "workflowId": "WF_SERVICE_JOB",
+        "cancellation": {
+          "requestCommand": "RequestServiceJobCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "INTAKE_REVIEW",
+            "DIAGNOSIS",
+            "QUOTED",
+            "APPROVED",
+            "PARTS_PENDING",
+            "FIELD_EXECUTION_PENDING"
+          ],
+          "pendingState": "CANCELLATION_REVIEW",
+          "confirmCommand": "ConfirmServiceJobCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Job/parts/custody/field owners resolve accepted cancellation terms, actual diagnostic work and releasable resources. Customer goods require return-unrepaired or another explicit custody recovery; an already active service follows its controlled interruption/change policy. Financial outcomes stay separate."
+        },
+        "holdExpiryFromStates": [],
+        "quoteExpiryFromStates": [
+          "QUOTED"
+        ],
+        "quoteExpiredState": "QUOTE_EXPIRED",
+        "noShow": null
+      },
+      "states": [
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "DIAGNOSIS",
+        "FIELD_EXECUTION_PENDING",
+        "INTAKE_REVIEW",
+        "IN_SERVICE",
+        "PARTS_PENDING",
+        "QUALITY_REVIEW",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "READY_FOR_RELEASE",
+        "RELEASED",
+        "REQUESTED"
+      ],
+      "runtimeEnabled": false
+    },
+    {
+      "workflowId": "WF_SPACE_RESERVATION_V1",
+      "modelId": "SPACE_RESERVATION",
+      "registrationStatus": "PROPOSED_NOT_IMPLEMENTED",
+      "reason": "A party/table reservation needs a compatible-space allocation and seated/turnover lifecycle; do not silently reuse staff appointment semantics.",
+      "activation": "Explicit bookingSetup.offers_table_reservations=true, compatible table/space inventory and party policy, exact duration/turnover, completed setup and supported reservation authority. Existing reservation_system discovery does not activate this workflow.",
+      "requiredFields": [
+        "business_location",
+        "space_pool_or_ids",
+        "party_size",
+        "exact_interval",
+        "turnover_policy",
+        "accepted_policy_revision",
+        "allocation_owner_reference"
+      ],
+      "states": [
+        "ARRIVED",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "COMPLETED",
+        "CONFIRMED",
+        "HELD",
+        "HOLD_EXPIRED",
+        "NO_SHOW",
+        "REQUESTED",
+        "SEATED",
+        "TURNOVER"
+      ],
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "HELD",
+          "command": "HoldCompatibleSpace",
+          "guard": "Compatible actual table/space set fits party and exact interval/turnover; authority confirms all combination allocations and trusted hold expiry together."
+        },
+        {
+          "from": "HELD",
+          "to": "CONFIRMED",
+          "command": "ConfirmSpaceReservation",
+          "guard": "Valid hold converts to durable compatible-space reservation before expiry; accepted terms, approval and only configured payment prerequisites satisfied."
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CONFIRMED",
+          "command": "ReserveAndConfirmSpaceInstantly",
+          "guard": "Instant intake actually supported; atomically reserve all compatible spaces and pass every configured prerequisite without fabricating a temporary hold."
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CONFIRMED",
+          "command": "ConfirmExternallyReservedSpace",
+          "guard": "External authoritative provider confirms exact space/party/time and durable reference through a verified adapter; local mirror is not another writer."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "ARRIVED",
+          "command": "RecordPartyArrival",
+          "guard": "Correct reservation/date and actual party arrival recorded; a no-show decision is not inferred from elapsed time alone."
+        },
+        {
+          "from": "ARRIVED",
+          "to": "SEATED",
+          "command": "SeatReservedParty",
+          "guard": "Actual assigned compatible spaces are ready and party changes fit capacity; a reassignment is an atomic guarded swap."
+        },
+        {
+          "from": "SEATED",
+          "to": "TURNOVER",
+          "command": "RecordPartyDeparture",
+          "guard": "Actual party departure recorded; configured cleaning/turnover remains a blocking constraint."
+        },
+        {
+          "from": "TURNOVER",
+          "to": "COMPLETED",
+          "command": "ReleasePreparedSpace",
+          "guard": "Required turnover evidence and owner-confirmed release permit availability; dining completion does not fabricate order/payment completion."
+        },
+        {
+          "from": "REQUESTED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestSpaceReservationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "HELD",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestSpaceReservationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestSpaceReservationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "ARRIVED",
+          "to": "CANCELLATION_PENDING",
+          "command": "RequestSpaceReservationCancellation",
+          "guard": "Applicable actor, policy and owner permit request; preserve confirmed resources/custody while pending."
+        },
+        {
+          "from": "CANCELLATION_PENDING",
+          "to": "CANCELLED",
+          "command": "ConfirmSpaceReservationCancellation",
+          "guard": "Space owner confirms permitted pre-seating cancellation and release of exact table combinations; any refund is separately confirmed. Occupied spaces follow actual departure and turnover, not a generic cancellation release."
+        },
+        {
+          "from": "HELD",
+          "to": "HOLD_EXPIRED",
+          "command": "ConfirmTrustedHoldExpiry",
+          "guard": "Only verified temporary hold expiry releases held quantity. Accepted quotes may expire without allocation effects. Physical overstay becomes an exception requiring continued actual unavailability and resolution, not automatic release."
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "NO_SHOW",
+          "command": "RecordSpaceReservationNoShow",
+          "guard": "Actual non-arrival, accepted grace period and authorized host decision establish no-show; release of compatible spaces follows owner policy and never displaces a seated party."
+        }
+      ],
+      "exceptions": [
+        "hold_expiry",
+        "party_size_change",
+        "late_arrival",
+        "authorized_no_show",
+        "space_unavailable",
+        "cancellation",
+        "reschedule",
+        "external_outcome_unknown"
+      ],
+      "registrationDependencies": [
+        "versioned domain workflow declaration",
+        "SPACE_RESERVATION offering fields and view binding",
+        "party/space eligibility command contract",
+        "shared reservation exception contract",
+        "EXT_TABLE implementation and acceptance evidence"
+      ],
+      "exceptionBinding": {
+        "workflowId": "WF_SPACE_RESERVATION_V1",
+        "cancellation": {
+          "requestCommand": "RequestSpaceReservationCancellation",
+          "fromStates": [
+            "REQUESTED",
+            "HELD",
+            "CONFIRMED",
+            "ARRIVED"
+          ],
+          "pendingState": "CANCELLATION_PENDING",
+          "confirmCommand": "ConfirmSpaceReservationCancellation",
+          "cancelledState": "CANCELLED",
+          "confirmGuard": "Space owner confirms permitted pre-seating cancellation and release of exact table combinations; any refund is separately confirmed. Occupied spaces follow actual departure and turnover, not a generic cancellation release."
+        },
+        "holdExpiryFromStates": [
+          "HELD"
+        ],
+        "holdExpiredState": "HOLD_EXPIRED",
+        "quoteExpiryFromStates": [],
+        "noShow": {
+          "fromStates": [
+            "CONFIRMED"
+          ],
+          "command": "RecordSpaceReservationNoShow",
+          "targetState": "NO_SHOW",
+          "guard": "Actual non-arrival, accepted grace period and authorized host decision establish no-show; release of compatible spaces follows owner policy and never displaces a seated party."
+        }
+      },
+      "runtimeEnabled": false
+    }
+  ]
+}

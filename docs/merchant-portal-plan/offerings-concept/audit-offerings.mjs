@@ -1,0 +1,44 @@
+/** Design audit only: reads local specifications, writes no app or backend files. */
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import assert from 'node:assert/strict';
+import {fileURLToPath} from 'node:url';
+const out=path.dirname(fileURLToPath(import.meta.url));
+const root=path.resolve(out,'../../..');
+const base=path.resolve(out,'..');
+const current=path.join(root,'docs/booking-engine/payload-reserve-plan/reconciliation');
+const load=file=>JSON.parse(fs.readFileSync(file,'utf8'));
+const primary=load(path.join(base,'profiles-128.json')).profiles;
+const effective=load(path.join(current,'effective-profiles-128.json')).rows;
+const domain=load(path.join(current,'effective-domain-registry.json'));
+const registry=load(path.join(current,'effective-question-registry.json'));
+const schemas=new Map(domain.offeringSchemas.map(s=>[s.id,s]));
+const questions=new Map(registry.questions.map(q=>[q.questionId,q]));
+const effectiveMap=new Map(effective.map(p=>[p.subcategoryId,p]));
+assert.equal(primary.length,128);assert.equal(effective.length,128);assert.equal(effectiveMap.size,128);
+assert.equal(schemas.size,18);assert(schemas.has('SPACE_RESERVATION_V1'));
+const familyCounts={};let fieldReferences=0;
+const rows=primary.map(p=>{
+  const e=effectiveMap.get(p.subcategoryId);assert(e,p.subcategoryId);
+  assert.equal(e.categoryId,p.categoryId);const schema=schemas.get(p.offeringSchemaId);assert(schema,p.offeringSchemaId);
+  familyCounts[schema.id]=(familyCounts[schema.id]??0)+1;
+  const fields=p.exactOnboardingFields.map(f=>{
+    const q=questions.get(f.questionId)??registry.questions.find(q=>q.sourceQuestionId===f.questionId);
+    assert(q,`${p.subcategoryId}:${f.questionId}`);fieldReferences++;
+    return {sourceKey:f.field,questionId:q.questionId,captureScope:q.captureScope??null,captureMode:q.captureMode??null,canonicalTarget:q.canonicalTarget,renderPolicy:'Use scoped/inherited answer. Render a listing field only when selected offering schema/definition permits or requires it; never copy all business setup fields into every listing.'};
+  });
+  const binding=e.screens?.SC_OFFERINGS;assert(binding,p.subcategoryId);
+  for(const id of binding.specialtyQuestionIds??[])assert(questions.has(id),`${p.subcategoryId}:${id}`);
+  return {categoryId:p.categoryId,subcategoryId:p.subcategoryId,name:p.name,primaryEditorSchemaId:schema.id,primaryEditorRequiredFields:schema.schema.required,primaryEditorAllowedFields:Object.keys(schema.schema.properties),primaryWorkflowId:p.primaryWorkflowId,effectiveDefaultModelId:e.defaultModelId,effectiveOfferingModelIds:binding.modelIds??[],effectiveRuleCount:e.rules.length,effectiveConditionalBindings:e.bindings.length,scopedQuestionBindings:fields,sharedComponents:['catalogue','type_views','search_filters','identity_media','typed_fields','price_units','source_ownership','publication','customer_preview','detail_editor','history_import_export'],domainComponents:'Selected schema-specific sections from README.md; exact availability owner remains separate.',confirmationPolicy:'Automatic source-confirmed stock/resource-backed work is normal. Human review requires an explicit supported matching exception, never inferred from inherited order_acceptance metadata.',runtimeStatus:'DESIGN_REFERENCE_AUDIT_ONLY_NOT_RENDER_TESTED'};
+});
+const report={date:'2026-10-31',status:'OFFERINGS_COMPONENT_DESIGN_AUDIT_PASSED',scope:'Local reference/field/schema/mapping checks. Not frontend runtime coverage.',counts:{categories:new Set(rows.map(r=>r.categoryId)).size,subcategories:rows.length,primaryEditorSchemas:Object.keys(familyCounts).length,registeredEditorSchemas:schemas.size,effectiveBookingModels:new Set(rows.flatMap(r=>r.effectiveOfferingModelIds)).size,scopedFieldReferences:fieldReferences,effectiveRules:rows.reduce((n,r)=>n+r.effectiveRuleCount,0),effectiveConditionalBindings:rows.reduce((n,r)=>n+r.effectiveConditionalBindings,0)},familyCounts,additionalRegisteredSchema:{id:'SPACE_RESERVATION_V1',purpose:'Conditional tables/spaces/coworking; selected offering/method and exact shared capacity required.'},sources:{primaryEditorReferences:'../profiles-128.json',effectiveManifest:'../../booking-engine/payload-reserve-plan/reconciliation/manifest.json',latestUserConfirmationPolicy:'../order-confirmation.md'},precedence:'Effective snapshot used together. Older primary refs establish editor coverage only; no older conditional-rule replay. User automatic-confirmation instruction governs conflicting inherited intake metadata.',runtimeStatus:'NOT_BUILT_NOT_VERIFIED',artifacts:{}};
+for(const file of [path.join(base,'profiles-128.json'),path.join(current,'effective-profiles-128.json'),path.join(current,'effective-question-registry.json'),path.join(current,'effective-domain-registry.json'),path.join(base,'order-confirmation.md')])report.artifacts[path.relative(root,file).replaceAll('\\','/')]=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+fs.writeFileSync(path.join(out,'coverage-128.json'),JSON.stringify({date:report.date,status:report.status,rows},null,2)+'\n');
+let md='# Offerings component bindings for all 128 specialties\n\nDesign-only coverage, 31 October 2026. The primary editor is a starting shape; the selected effective offering/method resolves final fields and optional editors. Reuse scoped setup rather than requiring it on every listing.\n\n| Category | Specialty | Primary editor | Applicable effective offering models | Scoped specialty fields |\n| --- | --- | --- | --- | --- |\n';
+for(const r of rows)md+=`| ${r.categoryId} | ${r.name.replaceAll('|','/')} | ${r.primaryEditorSchemaId} | ${r.effectiveOfferingModelIds.join(', ')} | ${r.scopedQuestionBindings.map(q=>q.sourceKey).join(', ')} |\n`;
+md+='\nSPACE_RESERVATION_V1 additionally supports conditional tables/spaces/coworking. See README.md for18 editor contracts, field inheritance, source authority, states and the single general image. No row is evidence of a working application render.\n';
+fs.writeFileSync(path.join(out,'coverage-128.md'),md);
+for(const name of ['README.md','coverage-128.json','coverage-128.md','audit-offerings.mjs'])report.artifacts[name]=crypto.createHash('sha256').update(fs.readFileSync(path.join(out,name))).digest('hex');
+fs.writeFileSync(path.join(out,'verification.json'),JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({status:report.status,...report.counts,familyCounts},null,2));

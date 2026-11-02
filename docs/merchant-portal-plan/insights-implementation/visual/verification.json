@@ -1,0 +1,468 @@
+{
+  "capturedAt": "2026-11-01T11:42:51.999Z",
+  "base": "http://127.0.0.1:3141",
+  "results": [
+    {
+      "device": "desktop",
+      "name": "insights-overview",
+      "route": "/merchant-live-preview/insights?tab=overview",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-overview.png"
+    },
+    {
+      "device": "desktop",
+      "name": "insights-orders",
+      "route": "/merchant-live-preview/insights?tab=orders",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-orders.png"
+    },
+    {
+      "device": "desktop",
+      "name": "insights-menu",
+      "route": "/merchant-live-preview/insights?tab=menu",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-menu.png"
+    },
+    {
+      "device": "desktop",
+      "name": "insights-customers",
+      "route": "/merchant-live-preview/insights?tab=customers",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-customers.png"
+    },
+    {
+      "device": "desktop",
+      "name": "insights-operations",
+      "route": "/merchant-live-preview/insights?tab=operations",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-operations.png"
+    },
+    {
+      "device": "desktop",
+      "name": "insights-promotions",
+      "route": "/merchant-live-preview/insights?tab=promotions",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-promotions.png"
+    },
+    {
+      "device": "desktop",
+      "name": "insights-finance",
+      "route": "/merchant-live-preview/insights?tab=finance",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-finance.png"
+    },
+    {
+      "device": "desktop",
+      "name": "insights-reports",
+      "route": "/merchant-live-preview/insights?tab=reports",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-reports.png"
+    },
+    {
+      "device": "desktop",
+      "name": "home",
+      "route": "/merchant-live-preview",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Good afternoon, Nairobi Collective"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-home.png"
+    },
+    {
+      "device": "desktop",
+      "name": "work",
+      "route": "/merchant-live-preview/work",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Work"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-work.png"
+    },
+    {
+      "device": "desktop",
+      "name": "offerings",
+      "route": "/merchant-live-preview/offerings",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Offerings"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-offerings.png"
+    },
+    {
+      "device": "desktop",
+      "name": "availability",
+      "route": "/merchant-live-preview/availability",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Availability"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-availability.png"
+    },
+    {
+      "device": "desktop",
+      "name": "business",
+      "route": "/merchant-live-preview/business",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Business"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-business.png"
+    },
+    {
+      "device": "desktop",
+      "name": "money",
+      "route": "/merchant-live-preview/money",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Money"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-money.png"
+    },
+    {
+      "device": "desktop",
+      "name": "promotions",
+      "route": "/merchant-live-preview/promotions",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Promotions"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-promotions.png"
+    },
+    {
+      "device": "desktop",
+      "name": "settings",
+      "route": "/merchant-live-preview/settings",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Settings"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-settings.png"
+    },
+    {
+      "device": "desktop",
+      "name": "insights-invalid-profile",
+      "route": "/merchant-live-preview/insights?profile=invalid",
+      "status": 200,
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "desktop-insights-invalid-profile.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-overview",
+      "route": "/merchant-live-preview/insights?tab=overview",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-insights-overview.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-orders",
+      "route": "/merchant-live-preview/insights?tab=orders",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-insights-orders.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-menu",
+      "route": "/merchant-live-preview/insights?tab=menu",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-insights-menu.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-customers",
+      "route": "/merchant-live-preview/insights?tab=customers",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-insights-customers.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-operations",
+      "route": "/merchant-live-preview/insights?tab=operations",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-insights-operations.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-promotions",
+      "route": "/merchant-live-preview/insights?tab=promotions",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-insights-promotions.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-finance",
+      "route": "/merchant-live-preview/insights?tab=finance",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-insights-finance.png"
+    },
+    {
+      "device": "mobile",
+      "name": "insights-reports",
+      "route": "/merchant-live-preview/insights?tab=reports",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Insights"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-insights-reports.png"
+    },
+    {
+      "device": "mobile",
+      "name": "home",
+      "route": "/merchant-live-preview",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Good afternoon, Nairobi Collective"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-home.png"
+    },
+    {
+      "device": "mobile",
+      "name": "work",
+      "route": "/merchant-live-preview/work",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Work"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-work.png"
+    },
+    {
+      "device": "mobile",
+      "name": "offerings",
+      "route": "/merchant-live-preview/offerings",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Offerings"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-offerings.png"
+    },
+    {
+      "device": "mobile",
+      "name": "availability",
+      "route": "/merchant-live-preview/availability",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Availability"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-availability.png"
+    },
+    {
+      "device": "mobile",
+      "name": "business",
+      "route": "/merchant-live-preview/business",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Business"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-business.png"
+    },
+    {
+      "device": "mobile",
+      "name": "money",
+      "route": "/merchant-live-preview/money",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Money"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-money.png"
+    },
+    {
+      "device": "mobile",
+      "name": "promotions",
+      "route": "/merchant-live-preview/promotions",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Promotions"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-promotions.png"
+    },
+    {
+      "device": "mobile",
+      "name": "settings",
+      "route": "/merchant-live-preview/settings",
+      "status": 200,
+      "viewport": 390,
+      "documentWidth": 390,
+      "heading": [
+        "Settings"
+      ],
+      "dialogs": 0,
+      "errors": [],
+      "file": "mobile-settings.png"
+    }
+  ]
+}

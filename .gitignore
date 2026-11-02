@@ -52,6 +52,7 @@ test-results/
 
 # Next.js
 .next/
+.next-*/
 next-env.d.ts
 .vercel
 
@@ -76,3 +77,25 @@ vapid-keys.txt
 .maps-check.json
 .maps-status.json
 e2e/.auth/
+
+# Dedicated local booking runtime
+.booking-local/
+apps/booking-engine/data/
+apps/booking-engine/.data/
+apps/booking-engine/.env
+apps/web/.next-booking/
+apps/web/.next-offerings-preview/
+
+# Availability frontend preview
+apps/web/.next-availability-preview/
+
+# Money frontend preview
+apps/web/.next-money-preview/
+
+# Insights local verification outputs
+apps/web/.next-insights-preview/
+apps/web/.next-insights-build/
+apps/web/.next-merchant-layout-preview/
+
+# Isolated local merchant preview
+apps/web/.next-dev-3141/

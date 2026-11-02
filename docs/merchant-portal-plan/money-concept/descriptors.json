@@ -1,0 +1,1051 @@
+{
+  "status": "DESIGN_ONLY",
+  "descriptors": [
+    {
+      "id": "MONEY_PRODUCT_CATALOG_V1",
+      "schemaId": "PRODUCT_CATALOG_V1",
+      "modelId": "ORDER",
+      "workflowIds": [
+        "WF_ORDER"
+      ],
+      "title": "Product and menu orders",
+      "billingBasis": "items, variants and approved adjustments",
+      "invariant": "No stock-confirmed-order-to-paid inference; no direct cash in NEXG payout.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_fees",
+        "money_confirmed_collections_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_SERVICE_APPOINTMENT_V1",
+      "schemaId": "SERVICE_APPOINTMENT_V1",
+      "modelId": "APPOINTMENT",
+      "workflowIds": [
+        "WF_APPOINTMENT"
+      ],
+      "title": "On-site services",
+      "billingBasis": "accepted service and separately classified booking payment",
+      "invariant": "Advance is credited once; completion does not prove payment.",
+      "headlineMetricIds": [
+        "money_booking_advances_v1",
+        "money_customer_due_v1",
+        "money_confirmed_collections_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_REMOTE_SESSION_V1",
+      "schemaId": "REMOTE_SESSION_V1",
+      "modelId": "APPOINTMENT",
+      "workflowIds": [
+        "WF_REMOTE_SESSION"
+      ],
+      "title": "Remote services",
+      "billingBasis": "provider service charge and actual remaining balance",
+      "invariant": "No venue, travel or vehicle lines without an actual contract.",
+      "headlineMetricIds": [
+        "money_booking_advances_v1",
+        "money_customer_due_v1",
+        "money_confirmed_collections_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_FIELD_SERVICE_V1",
+      "schemaId": "FIELD_SERVICE_V1",
+      "modelId": "FIELD_VISIT",
+      "workflowIds": [
+        "WF_FIELD_SERVICE"
+      ],
+      "title": "Field service",
+      "billingBasis": "agreed visit/scope and approved changes",
+      "invariant": "No automatic travel/call-out tariff.",
+      "headlineMetricIds": [
+        "money_billed_work_v1",
+        "money_customer_due_v1",
+        "money_confirmed_collections_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_RENTAL_ASSET_V1",
+      "schemaId": "RENTAL_ASSET_V1",
+      "modelId": "ASSET_INTERVAL",
+      "workflowIds": [
+        "WF_RENTAL"
+      ],
+      "title": "Rentals and security",
+      "billingBasis": "rental unit/contract period, extensions, independent security",
+      "invariant": "Physical return does not release money; refundable security is not rental sales.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_security_collected_v1",
+        "money_security_recorded_obligation_v1",
+        "money_security_refunds_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_TRANSFER_ROUTE_V1",
+      "schemaId": "TRANSFER_ROUTE_V1",
+      "modelId": "TRANSFER",
+      "workflowIds": [
+        "WF_TRANSFER"
+      ],
+      "title": "Trips and greeters",
+      "billingBasis": "one root trip/greeting price and actual inclusions",
+      "invariant": "Driver and vehicle do not create another sale; greeter-only has no car income.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_EVENT_TICKET_V1",
+      "schemaId": "EVENT_TICKET_V1",
+      "modelId": "SESSION_CAPACITY",
+      "workflowIds": [
+        "WF_EVENT_SESSION"
+      ],
+      "title": "Event tickets",
+      "billingBasis": "actual ticket/party/pass price and occurrence",
+      "invariant": "Ticket/participant count is not payment count; cancelled event is not a refund.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_booking_advances_v1",
+        "finance_refunds"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_GROUP_SESSION_V1",
+      "schemaId": "GROUP_SESSION_V1",
+      "modelId": "SESSION_CAPACITY",
+      "workflowIds": [
+        "WF_GROUP_ACTIVITY"
+      ],
+      "title": "Group sessions",
+      "billingBasis": "accepted participant/place price and occurrence",
+      "invariant": "Included membership places are not resold; joint resources do not duplicate bills.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_booking_advances_v1",
+        "finance_refunds"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_SPACE_RESERVATION_V1",
+      "schemaId": "SPACE_RESERVATION_V1",
+      "modelId": "SPACE_RESERVATION",
+      "workflowIds": [
+        "WF_SPACE_RESERVATION_V1"
+      ],
+      "title": "Tables and spaces",
+      "billingBasis": "reservation charge/credited advance, minimum spend and final bill",
+      "invariant": "Minimum spend is a commitment until the owner charges it; credit advance once.",
+      "headlineMetricIds": [
+        "money_booking_advances_v1",
+        "money_unapplied_advances_v1",
+        "money_customer_due_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_TOUR_PACKAGE_V1",
+      "schemaId": "TOUR_PACKAGE_V1",
+      "modelId": "TOUR",
+      "workflowIds": [
+        "WF_TOUR"
+      ],
+      "title": "Tours and itineraries",
+      "billingBasis": "shared departure or private accepted itinerary; principal/agent basis",
+      "invariant": "Supplier/customer pass-through is not automatically merchant revenue.",
+      "headlineMetricIds": [
+        "money_quote_accepted_value_v1",
+        "money_customer_due_v1",
+        "money_supplier_payable_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_REQUEST_QUOTE_V1",
+      "schemaId": "REQUEST_QUOTE_V1",
+      "modelId": "REQUEST_QUOTE",
+      "workflowIds": [
+        "WF_REQUEST_QUOTE"
+      ],
+      "title": "Quoted work",
+      "billingBasis": "accepted scope, milestones, invoices and collections",
+      "invariant": "Requested/accepted quote is not cash, invoice debt or recognized revenue.",
+      "headlineMetricIds": [
+        "money_quote_accepted_value_v1",
+        "money_unbilled_milestones_v1",
+        "money_customer_due_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_MADE_TO_ORDER_V1",
+      "schemaId": "MADE_TO_ORDER_V1",
+      "modelId": "PRODUCTION_DUE",
+      "workflowIds": [
+        "WF_MADE_TO_ORDER"
+      ],
+      "title": "Custom production",
+      "billingBasis": "accepted specification, approved change and progress/final bill",
+      "invariant": "Unaccepted change and production deadline do not create payment.",
+      "headlineMetricIds": [
+        "money_quote_accepted_value_v1",
+        "money_billed_work_v1",
+        "money_customer_due_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_PICKUP_RETURN_V1",
+      "schemaId": "PICKUP_RETURN_V1",
+      "modelId": "LINKED_WINDOWS",
+      "workflowIds": [
+        "WF_PICKUP_RETURN"
+      ],
+      "title": "Measured linked services",
+      "billingBasis": "accepted rate and confirmed measured quantity on one commercial root",
+      "invariant": "Collection/processing/return legs do not each create revenue.",
+      "headlineMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_SERVICE_JOB_V1",
+      "schemaId": "SERVICE_JOB_V1",
+      "modelId": "SERVICE_JOB",
+      "workflowIds": [
+        "WF_SERVICE_JOB"
+      ],
+      "title": "Workshop and service jobs",
+      "billingBasis": "approved assessment, parts/labour and staged/final invoice",
+      "invariant": "Queue estimate is not invoice debt; approved changes already included are not added again.",
+      "headlineMetricIds": [
+        "money_billed_work_v1",
+        "money_applied_payments_v1",
+        "money_customer_due_v1",
+        "money_overdue_due_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_MEMBERSHIP_PLAN_V1",
+      "schemaId": "MEMBERSHIP_PLAN_V1",
+      "modelId": "ENTITLEMENT",
+      "workflowIds": [
+        "WF_MEMBERSHIP"
+      ],
+      "title": "Memberships and retainers",
+      "billingBasis": "contracted billing period, credits and renewal",
+      "invariant": "Cash collection is not automatically earned revenue; included redemption is not a sale.",
+      "headlineMetricIds": [
+        "money_confirmed_collections_v1",
+        "money_unapplied_credit_v1",
+        "money_recognized_revenue_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_FREIGHT_SHIPMENT_V1",
+      "schemaId": "FREIGHT_SHIPMENT_V1",
+      "modelId": "FREIGHT",
+      "workflowIds": [
+        "WF_FREIGHT"
+      ],
+      "title": "Freight",
+      "billingBasis": "agreed chargeable measure and authorized separate service lines",
+      "invariant": "No guessed dimensional conversion; carrier/customs funds classified by contract.",
+      "headlineMetricIds": [
+        "money_billed_work_v1",
+        "money_customer_due_v1",
+        "money_supplier_payable_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_STORAGE_SPACE_V1",
+      "schemaId": "STORAGE_SPACE_V1",
+      "modelId": "STORAGE",
+      "workflowIds": [
+        "WF_STORAGE"
+      ],
+      "title": "Storage",
+      "billingBasis": "declared space unit and billing period",
+      "invariant": "No assumed proration; custody end and money settlement remain independent.",
+      "headlineMetricIds": [
+        "money_billed_work_v1",
+        "money_customer_due_v1",
+        "money_overdue_due_v1"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "ACTUAL_ACCEPTED_COMMERCIAL_ROOTS",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    },
+    {
+      "id": "MONEY_REGULATED_ENQUIRY_V1",
+      "schemaId": "REGULATED_ENQUIRY_V1",
+      "modelId": "REQUEST_QUOTE",
+      "workflowIds": [
+        "WF_REGULATED_ENQUIRY"
+      ],
+      "title": "Regulated enquiry/referral",
+      "billingBasis": "permitted merchant service/referral fees only",
+      "invariant": "No customer banking, loan, FX, remittance or wallet balances or executable rails.",
+      "headlineMetricIds": [
+        "money_confirmed_collections_v1",
+        "finance_refunds"
+      ],
+      "reservationMoneyPolicyRef": "reservation-money-policy.json",
+      "reservationActivation": "Actual reservation-bearing offering plus accepted policy and independent owner/source/grant. NONE leaves ordinary views unchanged.",
+      "financialFactScope": "PERMITTED_MERCHANT_SERVICE_FEES_ONLY",
+      "coreViews": [
+        "overview",
+        "transactions",
+        "statements"
+      ],
+      "optionalViews": {
+        "balances": "Receivables owner, actual billed/credit capability, source facts and actor grant.",
+        "security": "Explicit refundable-security/authorization policy, security owner and grant.",
+        "payouts": "Merchant entitlement/settlement/payout contract; merchant-direct receipt is insufficient."
+      },
+      "otherEligibleExistingMetricIds": [
+        "finance_gross_sales",
+        "finance_refunds",
+        "finance_net_sales",
+        "finance_fees",
+        "finance_net_payable",
+        "finance_payouts_paid",
+        "contribution_margin"
+      ],
+      "authorityGates": [
+        "finance.payment",
+        "finance.refund",
+        "finance.settlement",
+        "finance.payout"
+      ],
+      "authorityRule": "Evaluate independently; no category or payment connector implies other leaf authorities.",
+      "status": "PROPOSED_DESCRIPTOR_NOT_IMPLEMENTED",
+      "allStateRefs": [
+        "R01-R12",
+        "A01-A10",
+        "MC01-MC24"
+      ],
+      "headlineSelectionRule": "Eligible priorities only. Evaluate applicability, owner contract, grant and source quality per measure; omit inapplicable metrics and choose supported useful fallbacks. No permanent security cards for no-deposit rentals.",
+      "fallbackMetricIds": [
+        "finance_gross_sales",
+        "money_confirmed_collections_v1",
+        "money_customer_due_v1"
+      ],
+      "createsMoneyMovement": false
+    }
+  ]
+}

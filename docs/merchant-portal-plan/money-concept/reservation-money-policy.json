@@ -1,0 +1,199 @@
+{
+  "status": "DESIGN_ONLY_NOT_IMPLEMENTED",
+  "date": "2026-10-31",
+  "purpose": "Reservation money follows the actual accepted policy, not the merchant category. Merchants without applicable reservation charges or guarantees keep their ordinary Money views.",
+  "eligibility": [
+    "Actual configured reservation or accepted reservation-bearing work exists. A category, enquiry or quote alone is insufficient.",
+    "An accepted versioned policy defines the specific component and event outcome.",
+    "The relevant independent financial owner/source and scoped action grant exist.",
+    "Policy descriptions and Offering fee fields do not themselves collect, retain, assess or refund money."
+  ],
+  "policyFields": [
+    "policy_id and version",
+    "accepted_at and accepted terms reference",
+    "actual offering/work/reservation identity",
+    "component/money kind",
+    "trigger: booking, cancellation actor/reason/time, confirmed no-show or other explicit accepted event",
+    "exact fixed amount or accepted percentage/base/rounding reference",
+    "currency metadata",
+    "already-included vs additional amount",
+    "credit-to-final-bill allocation rule",
+    "full/partial/no-refund rule and applicable exceptions",
+    "refund-to-source vs separately accepted customer credit",
+    "reschedule, merchant cancellation and waiver treatment when explicitly supported",
+    "financial owner, supported command and approval/evidence refs"
+  ],
+  "invariants": [
+    "No configured refund rule is not the same as an explicitly accepted non-refundable rule. Missing policy does not imply retention or an automatic refund.",
+    "No fee/cancellation policy means no invented penalty. A merchant without reservation money does not acquire a new money module.",
+    "Existing confirmed receipts/refunds remain visible even when a relevant policy is missing. The policy-dependent decision alone stays unresolved.",
+    "Capacity hold, payment authorization and customer-security obligation are separate and can have different expiry/confirmation states.",
+    "Cancellation/no-show confirmation is operational evidence, not a successful debit, credit allocation or refund.",
+    "No-show is not inferred merely because a calendar time passed. Check the owner-confirmed attendance state and accepted rule.",
+    "Accepted policy versions govern existing rights; later configuration edits do not silently rewrite them.",
+    "Do not levy both an advance-funded charge allocation and a second charge for the same obligation.",
+    "Unknown payment/refund result retains its operation identity and blocks duplicate execution until reconciled.",
+    "A waived charge is a source-confirmed decision, not a cash refund or proof that no payment was ever made.",
+    "finance_fees describes its existing Finance measure; it is not repurposed to mean merchant booking/cancellation fees.",
+    "A confirmed owner-issued/posted cancellation charge and allocation are required before it reduces an advance. An operational assessment alone is insufficient.",
+    "An existing service invoice must be corrected/credited by its issuer as applicable; cancellation cannot silently erase issued debt.",
+    "An unknown refund or credit blocks an alternative refund/credit/allocation against the same uncertain amount. Other unrelated obligations remain independently usable."
+  ],
+  "presentation": {
+    "section": "Booking payments, with contextual advance/fee/guarantee/cancellation labels. Show only applicable components.",
+    "security": "Use the protected-funds/security view only for a real supported refundable guarantee or authorization. Do not restrict it to vehicle category names.",
+    "statFilters": [
+      {
+        "label": "Booking fees collected",
+        "metricRef": "money_confirmed_collections_v1",
+        "requires": "Owner-confirmed merchant booking-fee classification and complete receipt facts."
+      },
+      {
+        "label": "Cancellation amounts due",
+        "metricRef": "money_customer_due_v1",
+        "requires": "Owner-issued compatible customer invoice/receivable classified as cancellation/no-show; an assessment alone is excluded."
+      },
+      {
+        "label": "Cancellation amounts collected",
+        "metricRef": "money_confirmed_collections_v1",
+        "requires": "Independent confirmed collection of the classified charge."
+      },
+      {
+        "label": "Booking advances awaiting allocation",
+        "metricRef": "money_unapplied_advances_v1",
+        "requires": "Actual credited advance policy and owner-confirmed unallocated amount."
+      }
+    ],
+    "unavailable": "An applicable paid reservation with missing refund/charge terms shows Policy needs review while retaining known money facts; a merchant with no such component sees no irrelevant module."
+  },
+  "states": [
+    "NOT_APPLICABLE",
+    "POLICY_MISSING_OR_CONTRADICTORY",
+    "POLICY_ACCEPTED_NO_CHARGE_YET",
+    "EVENT_CONFIRMATION_PENDING",
+    "ASSESSMENT_PENDING",
+    "ASSESSED_NOT_BILLED",
+    "OWNER_ISSUED_AMOUNT_DUE",
+    "PAYMENT_PENDING",
+    "COLLECTION_CONFIRMED",
+    "WAIVED_CONFIRMED",
+    "CREDIT_ALLOCATION_POSTED",
+    "REFUND_PENDING",
+    "REFUND_CONFIRMED",
+    "OUTCOME_UNKNOWN",
+    "SOURCE_CONFLICT",
+    "READ_ONLY",
+    "RESTRICTED"
+  ],
+  "example": {
+    "status": "ILLUSTRATIVE_EXPLICIT_POLICY_NOT_A_DEFAULT",
+    "currency": "KES",
+    "amountBasis": "Whole KES display examples; runtime DTOs use exact amount_minor and currency metadata.",
+    "advanceCollected": 500,
+    "cancellationChargeAssessed": 300,
+    "cancellationChargeAllocationPosted": 300,
+    "refundOrAcceptedCreditEligible": 200,
+    "extraCharge": 0,
+    "refundExecution": "Separate; an unknown result does not count as confirmed returned money.",
+    "cancellationChargeStatus": "OWNER_ISSUED_AND_POSTED",
+    "advanceAllocationStatus": "OWNER_CONFIRMED_POSTED_FROM_THIS_ADVANCE",
+    "serviceInvoiceStatus": "NOT_ISSUED_IN_THIS_SAMPLE",
+    "alternativeCredit": "Only a separately accepted supported option; never an automatic substitution. Also blocked while a refund/credit outcome for this amount is unknown."
+  },
+  "acceptance": [
+    {
+      "id": "RM01",
+      "case": "No reservation fee, advance, guarantee or cancellation policy",
+      "expected": "Ordinary Money view; no generated penalty, extra tab or irrelevant fee cards."
+    },
+    {
+      "id": "RM02",
+      "case": "Accepted separate fee payable at booking regardless of attendance",
+      "expected": "Correct accepted fee and refund terms displayed; no new attendance charge or automatic refund."
+    },
+    {
+      "id": "RM03",
+      "case": "Cancellation inside the owner-defined permitted window",
+      "expected": "Only the matched accepted outcome applies; operational cancellation and financial execution remain distinct."
+    },
+    {
+      "id": "RM04",
+      "case": "Late cancellation or owner-confirmed no-show under a conditional fee policy",
+      "expected": "Only the correctly assessed/billed obligation is due; no claim of collected money without confirmation."
+    },
+    {
+      "id": "RM05",
+      "case": "Advance500 and confirmed posted cancellation allocation300",
+      "expected": "Exactly200 remains eligible for return/accepted credit; no second300 collection."
+    },
+    {
+      "id": "RM06",
+      "case": "Refund policy not configured versus explicitly accepted non-refundable term",
+      "expected": "Different states. Missing policy cannot be coerced into non-refundable; confirmed receipts remain visible."
+    },
+    {
+      "id": "RM07",
+      "case": "A new fee policy is configured after a customer booked",
+      "expected": "Existing accepted version remains attached to that booking; no silent retrospective charge."
+    },
+    {
+      "id": "RM08",
+      "case": "Reservation guarantee outside vehicle rentals",
+      "expected": "Protected-funds component works only with the actual guarantee contract/owner; taxonomy grants nothing."
+    },
+    {
+      "id": "RM09",
+      "case": "Refund200 outcome unknown after reload",
+      "expected": "No confirmed refund and no duplicate submission; reconcile same operation."
+    },
+    {
+      "id": "RM10",
+      "case": "Merchant cancels or reschedules",
+      "expected": "Use that exact supported policy branch; never reuse customer late-cancellation penalties by default."
+    }
+  ],
+  "componentTemplates": [
+    {
+      "id": "NONE",
+      "label": "No reservation charge",
+      "behaviour": "No booking/advance/cancellation/security controls or statistics are added. Ordinary service bills and existing financial records remain available."
+    },
+    {
+      "id": "CREDITED_ADVANCE",
+      "label": "Advance toward the bill",
+      "behaviour": "Collected in advance and allocated once to the accepted bill. Cancellation outcome can permit refund, retained charge allocation or customer credit according to accepted policy."
+    },
+    {
+      "id": "SEPARATE_BOOKING_FEE",
+      "label": "Booking or reservation fee",
+      "behaviour": "A separately contracted charge. It may be payable regardless of attendance or customer cancellation when that precise accepted rule applies. Do not silently add it again if already included in the accepted total; refund exceptions remain source/policy controlled."
+    },
+    {
+      "id": "CANCELLATION_OR_NO_SHOW_CHARGE",
+      "label": "Conditional cancellation/no-show charge",
+      "behaviour": "An amount is assessed only after the required cancellation/no-show event and accepted conditions are confirmed. Assessment does not establish collection. An owner-issued bill/receivable and a separate authorized payment operation are required where applicable."
+    },
+    {
+      "id": "REFUNDABLE_GUARANTEE",
+      "label": "Refundable reservation guarantee",
+      "behaviour": "A protected collected amount or payment authorization secures an actual reservation. Its release/refund/posted charge allocation follows the supported owner and policy. It can occur outside rentals; ordinary fees/advances do not become security."
+    }
+  ],
+  "composition": {
+    "components": "A reservation may combine a credited advance, separate booking fee, conditional cancellation/no-show charge and independent guarantee. These are not mutually exclusive portal modes.",
+    "empty": "No applicable components means no reservation-money module.",
+    "orthogonal": "Trigger, refundability, price inclusion and allocation are independent properties of each accepted component."
+  },
+  "compositeExample": {
+    "currency": "KES",
+    "amountBasis": "Whole KES display example only",
+    "advance": 500,
+    "separateBookingFee": 100,
+    "independentGuarantee": 1000,
+    "totalCollected": 1600,
+    "cancellationChargePostedFromAdvance": 300,
+    "remainingAdvance": 200,
+    "guaranteeStillSeparate": 1000,
+    "assumption": "Sample accepted policy retains the separate fee. Guarantee has its own owner/policy; neither is an extra allocation of the advance."
+  }
+}

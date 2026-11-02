@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { goOnline, type Outcome } from '@/app/rider/actions';
+import { goOnline, type Outcome } from '@/app/(customer)/rider/actions';
 
 import { Panel, ago } from './bits';
 

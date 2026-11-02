@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { createReferralLink } from '@/app/host/actions';
+import { createReferralLink } from '@/app/(customer)/host/actions';
 
 import { Said, Submit, useAction } from './form';
 

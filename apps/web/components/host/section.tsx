@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import type { Attention, HostHome, SetupProgress } from '@/app/host/layout';
+import type { Attention, HostHome, SetupProgress } from '@/app/(customer)/host/layout';
 import { requireHost } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 

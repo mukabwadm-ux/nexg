@@ -1,0 +1,5541 @@
+{
+  "revision": "2026-10-31-offerings-v1",
+  "profiles": [
+    {
+      "categoryId": "adults_only",
+      "id": "adult_products",
+      "name": "Adult Products",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "adults_only",
+      "id": "adult_wellness",
+      "name": "Adult Wellness",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "adults_only",
+      "id": "cigarettes",
+      "name": "Cigarettes",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRANDS_STOCKED_TEXT",
+          "label": "Which brands do you stock?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.brands_stocked_text"
+        }
+      ]
+    },
+    {
+      "categoryId": "adults_only",
+      "id": "cigars",
+      "name": "Cigars",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRANDS_STOCKED_TEXT",
+          "label": "Which brands do you stock?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.brands_stocked_text"
+        },
+        {
+          "id": "Q_GIFT_PACKAGING",
+          "label": "Gift Packaging?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_packaging"
+        }
+      ]
+    },
+    {
+      "categoryId": "adults_only",
+      "id": "vapes",
+      "name": "Vapes",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VAPE_DEVICE_TYPES",
+          "label": "Vape Device Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "disposable",
+                "refillable",
+                "pod",
+                "mods"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "disposable",
+              "label": "Disposable devices"
+            },
+            {
+              "value": "refillable",
+              "label": "Refillable devices"
+            },
+            {
+              "value": "pod",
+              "label": "Pod systems"
+            },
+            {
+              "value": "mods",
+              "label": "Mods and advanced devices"
+            }
+          ],
+          "target": "catalog.attributes.vape_device_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "adults_only",
+      "id": "adult_accessories",
+      "name": "Adult Accessories",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "airport_transfers",
+      "id": "airport_pickup",
+      "name": "Airport Pickup",
+      "schema": "TRANSFER_ROUTE_V1",
+      "models": [
+        "TRANSFER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VEHICLE_TYPES_TRANSFER",
+          "label": "Which vehicles do you use for transfers?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "sedan",
+                "suv",
+                "van",
+                "minibus",
+                "executive"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "sedan",
+              "label": "Sedans"
+            },
+            {
+              "value": "suv",
+              "label": "SUVs and 4x4s"
+            },
+            {
+              "value": "van",
+              "label": "Vans"
+            },
+            {
+              "value": "minibus",
+              "label": "Minibuses"
+            },
+            {
+              "value": "executive",
+              "label": "Executive vehicles"
+            }
+          ],
+          "target": "catalog.attributes.vehicle_types_transfer"
+        }
+      ]
+    },
+    {
+      "categoryId": "airport_transfers",
+      "id": "airport_dropoff",
+      "name": "Airport Drop-off",
+      "schema": "TRANSFER_ROUTE_V1",
+      "models": [
+        "TRANSFER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VEHICLE_TYPES_TRANSFER",
+          "label": "Which vehicles do you use for transfers?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "sedan",
+                "suv",
+                "van",
+                "minibus",
+                "executive"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "sedan",
+              "label": "Sedans"
+            },
+            {
+              "value": "suv",
+              "label": "SUVs and 4x4s"
+            },
+            {
+              "value": "van",
+              "label": "Vans"
+            },
+            {
+              "value": "minibus",
+              "label": "Minibuses"
+            },
+            {
+              "value": "executive",
+              "label": "Executive vehicles"
+            }
+          ],
+          "target": "catalog.attributes.vehicle_types_transfer"
+        }
+      ]
+    },
+    {
+      "categoryId": "airport_transfers",
+      "id": "meet_greet",
+      "name": "Meet & Greet",
+      "schema": "TRANSFER_ROUTE_V1",
+      "models": [
+        "TRANSFER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VEHICLE_TYPES_TRANSFER",
+          "label": "Which vehicles do you use for transfers?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "sedan",
+                "suv",
+                "van",
+                "minibus",
+                "executive"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "sedan",
+              "label": "Sedans"
+            },
+            {
+              "value": "suv",
+              "label": "SUVs and 4x4s"
+            },
+            {
+              "value": "van",
+              "label": "Vans"
+            },
+            {
+              "value": "minibus",
+              "label": "Minibuses"
+            },
+            {
+              "value": "executive",
+              "label": "Executive vehicles"
+            }
+          ],
+          "target": "catalog.attributes.vehicle_types_transfer"
+        }
+      ]
+    },
+    {
+      "categoryId": "airport_transfers",
+      "id": "executive_transfer",
+      "name": "Executive Transfer",
+      "schema": "TRANSFER_ROUTE_V1",
+      "models": [
+        "TRANSFER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VEHICLE_TYPES_TRANSFER",
+          "label": "Which vehicles do you use for transfers?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "sedan",
+                "suv",
+                "van",
+                "minibus",
+                "executive"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "sedan",
+              "label": "Sedans"
+            },
+            {
+              "value": "suv",
+              "label": "SUVs and 4x4s"
+            },
+            {
+              "value": "van",
+              "label": "Vans"
+            },
+            {
+              "value": "minibus",
+              "label": "Minibuses"
+            },
+            {
+              "value": "executive",
+              "label": "Executive vehicles"
+            }
+          ],
+          "target": "catalog.attributes.vehicle_types_transfer"
+        }
+      ]
+    },
+    {
+      "categoryId": "alcohol_beverages",
+      "id": "wine",
+      "name": "Wine",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_WINE_ORIGINS",
+          "label": "wine origins?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kenya",
+                "south_africa",
+                "europe",
+                "americas",
+                "oceania",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.wine_origins"
+        },
+        {
+          "id": "Q_GIFT_WRAPPING",
+          "label": "Gift Wrapping?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_wrapping"
+        }
+      ]
+    },
+    {
+      "categoryId": "alcohol_beverages",
+      "id": "spirits",
+      "name": "Spirits",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRANDS_STOCKED_TEXT",
+          "label": "Which brands do you stock?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.brands_stocked_text"
+        },
+        {
+          "id": "Q_GIFT_WRAPPING",
+          "label": "Gift Wrapping?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_wrapping"
+        }
+      ]
+    },
+    {
+      "categoryId": "alcohol_beverages",
+      "id": "beer",
+      "name": "Beer",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRANDS_STOCKED_TEXT",
+          "label": "Which brands do you stock?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.brands_stocked_text"
+        }
+      ]
+    },
+    {
+      "categoryId": "alcohol_beverages",
+      "id": "champagne",
+      "name": "Champagne",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_OCCASIONS_SPEC",
+          "label": "occasions spec?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "birthday",
+                "anniversary",
+                "sympathy",
+                "corporate",
+                "wedding",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.occasions_spec"
+        },
+        {
+          "id": "Q_GIFT_WRAPPING",
+          "label": "Gift Wrapping?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_wrapping"
+        }
+      ]
+    },
+    {
+      "categoryId": "alcohol_beverages",
+      "id": "cocktail_mixers",
+      "name": "Cocktail Mixers",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_GIFT_PACKAGING",
+          "label": "Gift Packaging?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_packaging"
+        }
+      ]
+    },
+    {
+      "categoryId": "alcohol_beverages",
+      "id": "liquor_stores",
+      "name": "Liquor Stores",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "fashion_apparel",
+      "id": "mens_fashion",
+      "name": "Men's Fashion",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "APPOINTMENT",
+        "ORDER",
+        "PRODUCTION_DUE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRAND_TIER",
+          "label": "Brand Tier?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "local",
+              "mainstream",
+              "premium",
+              "mixed"
+            ]
+          },
+          "options": [
+            {
+              "value": "local",
+              "label": "Local and independent brands"
+            },
+            {
+              "value": "mainstream",
+              "label": "Mainstream brands"
+            },
+            {
+              "value": "premium",
+              "label": "Premium brands"
+            },
+            {
+              "value": "mixed",
+              "label": "A mix of brands"
+            }
+          ],
+          "target": "catalog.attributes.brand_tier"
+        },
+        {
+          "id": "Q_SIZE_RANGE_ADULTS",
+          "label": "Size Range Adults?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "xs_s",
+                "m_l",
+                "xl_xxl",
+                "extended"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "xs_s",
+              "label": "XS-S"
+            },
+            {
+              "value": "m_l",
+              "label": "M-L"
+            },
+            {
+              "value": "xl_xxl",
+              "label": "XL-XXL"
+            },
+            {
+              "value": "extended",
+              "label": "Extended sizes"
+            }
+          ],
+          "target": "catalog.attributes.size_range_adults"
+        }
+      ]
+    },
+    {
+      "categoryId": "fashion_apparel",
+      "id": "womens_fashion",
+      "name": "Women's Fashion",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "APPOINTMENT",
+        "ORDER",
+        "PRODUCTION_DUE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRAND_TIER",
+          "label": "Brand Tier?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "local",
+              "mainstream",
+              "premium",
+              "mixed"
+            ]
+          },
+          "options": [
+            {
+              "value": "local",
+              "label": "Local and independent brands"
+            },
+            {
+              "value": "mainstream",
+              "label": "Mainstream brands"
+            },
+            {
+              "value": "premium",
+              "label": "Premium brands"
+            },
+            {
+              "value": "mixed",
+              "label": "A mix of brands"
+            }
+          ],
+          "target": "catalog.attributes.brand_tier"
+        },
+        {
+          "id": "Q_SIZE_RANGE_ADULTS",
+          "label": "Size Range Adults?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "xs_s",
+                "m_l",
+                "xl_xxl",
+                "extended"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "xs_s",
+              "label": "XS-S"
+            },
+            {
+              "value": "m_l",
+              "label": "M-L"
+            },
+            {
+              "value": "xl_xxl",
+              "label": "XL-XXL"
+            },
+            {
+              "value": "extended",
+              "label": "Extended sizes"
+            }
+          ],
+          "target": "catalog.attributes.size_range_adults"
+        }
+      ]
+    },
+    {
+      "categoryId": "fashion_apparel",
+      "id": "kids_fashion",
+      "name": "Kids Fashion",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRAND_TIER",
+          "label": "Brand Tier?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "local",
+              "mainstream",
+              "premium",
+              "mixed"
+            ]
+          },
+          "options": [
+            {
+              "value": "local",
+              "label": "Local and independent brands"
+            },
+            {
+              "value": "mainstream",
+              "label": "Mainstream brands"
+            },
+            {
+              "value": "premium",
+              "label": "Premium brands"
+            },
+            {
+              "value": "mixed",
+              "label": "A mix of brands"
+            }
+          ],
+          "target": "catalog.attributes.brand_tier"
+        },
+        {
+          "id": "Q_KIDS_AGE_RANGE",
+          "label": "Kids Age Range?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "0_2",
+              "3_5",
+              "6_12",
+              "13_17"
+            ]
+          },
+          "options": [
+            {
+              "value": "0_2",
+              "label": "Baby and toddler (0-2)"
+            },
+            {
+              "value": "3_5",
+              "label": "Early childhood (3-5)"
+            },
+            {
+              "value": "6_12",
+              "label": "Children (6-12)"
+            },
+            {
+              "value": "13_17",
+              "label": "Teens (13-17)"
+            }
+          ],
+          "target": "catalog.attributes.kids_age_range"
+        }
+      ]
+    },
+    {
+      "categoryId": "fashion_apparel",
+      "id": "shoes",
+      "name": "Shoes",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRAND_TIER",
+          "label": "Brand Tier?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "local",
+              "mainstream",
+              "premium",
+              "mixed"
+            ]
+          },
+          "options": [
+            {
+              "value": "local",
+              "label": "Local and independent brands"
+            },
+            {
+              "value": "mainstream",
+              "label": "Mainstream brands"
+            },
+            {
+              "value": "premium",
+              "label": "Premium brands"
+            },
+            {
+              "value": "mixed",
+              "label": "A mix of brands"
+            }
+          ],
+          "target": "catalog.attributes.brand_tier"
+        },
+        {
+          "id": "Q_SHOE_SIZE_SYSTEM",
+          "label": "Shoe Size System?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "uk",
+              "eu",
+              "us",
+              "multiple"
+            ]
+          },
+          "options": [
+            {
+              "value": "uk",
+              "label": "UK sizes"
+            },
+            {
+              "value": "eu",
+              "label": "EU sizes"
+            },
+            {
+              "value": "us",
+              "label": "US sizes"
+            },
+            {
+              "value": "multiple",
+              "label": "More than one size system"
+            }
+          ],
+          "target": "catalog.attributes.shoe_size_system"
+        }
+      ]
+    },
+    {
+      "categoryId": "fashion_apparel",
+      "id": "bags",
+      "name": "Bags",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRAND_TIER",
+          "label": "Brand Tier?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "local",
+              "mainstream",
+              "premium",
+              "mixed"
+            ]
+          },
+          "options": [
+            {
+              "value": "local",
+              "label": "Local and independent brands"
+            },
+            {
+              "value": "mainstream",
+              "label": "Mainstream brands"
+            },
+            {
+              "value": "premium",
+              "label": "Premium brands"
+            },
+            {
+              "value": "mixed",
+              "label": "A mix of brands"
+            }
+          ],
+          "target": "catalog.attributes.brand_tier"
+        }
+      ]
+    },
+    {
+      "categoryId": "fashion_apparel",
+      "id": "watches",
+      "name": "Watches",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRAND_TIER",
+          "label": "Brand Tier?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "local",
+              "mainstream",
+              "premium",
+              "mixed"
+            ]
+          },
+          "options": [
+            {
+              "value": "local",
+              "label": "Local and independent brands"
+            },
+            {
+              "value": "mainstream",
+              "label": "Mainstream brands"
+            },
+            {
+              "value": "premium",
+              "label": "Premium brands"
+            },
+            {
+              "value": "mixed",
+              "label": "A mix of brands"
+            }
+          ],
+          "target": "catalog.attributes.brand_tier"
+        }
+      ]
+    },
+    {
+      "categoryId": "fashion_apparel",
+      "id": "accessories",
+      "name": "Accessories",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRAND_TIER",
+          "label": "Brand Tier?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "local",
+              "mainstream",
+              "premium",
+              "mixed"
+            ]
+          },
+          "options": [
+            {
+              "value": "local",
+              "label": "Local and independent brands"
+            },
+            {
+              "value": "mainstream",
+              "label": "Mainstream brands"
+            },
+            {
+              "value": "premium",
+              "label": "Premium brands"
+            },
+            {
+              "value": "mixed",
+              "label": "A mix of brands"
+            }
+          ],
+          "target": "catalog.attributes.brand_tier"
+        }
+      ]
+    },
+    {
+      "categoryId": "beauty",
+      "id": "makeup",
+      "name": "Makeup",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BRIDAL_PACKAGES",
+          "label": "bridal packages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.bridal_packages"
+        },
+        {
+          "id": "Q_EVENT_MAKEUP",
+          "label": "event makeup?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.event_makeup"
+        }
+      ]
+    },
+    {
+      "categoryId": "beauty",
+      "id": "skincare",
+      "name": "Skincare",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_SKIN_TYPES_SERVED",
+          "label": "skin types served?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "dry",
+                "oily",
+                "combination",
+                "sensitive",
+                "normal",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.skin_types_served"
+        }
+      ]
+    },
+    {
+      "categoryId": "beauty",
+      "id": "haircare",
+      "name": "Haircare",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_HAIR_TYPES_SERVED",
+          "label": "hair types served?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "straight",
+                "wavy",
+                "curly",
+                "coily",
+                "protective_styles",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.hair_types_served"
+        }
+      ]
+    },
+    {
+      "categoryId": "beauty",
+      "id": "fragrances",
+      "name": "Fragrances",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_FRAGRANCE_FAMILIES",
+          "label": "fragrance families?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "floral",
+                "fresh",
+                "woody",
+                "amber",
+                "aromatic",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.fragrance_families"
+        },
+        {
+          "id": "Q_GIFT_WRAPPING",
+          "label": "Gift Wrapping?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_wrapping"
+        }
+      ]
+    },
+    {
+      "categoryId": "beauty",
+      "id": "cosmetics_stores",
+      "name": "Cosmetics Stores",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_OWN_BRAND",
+          "label": "own brand?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.own_brand"
+        },
+        {
+          "id": "Q_MULTI_BRAND",
+          "label": "multi brand?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.multi_brand"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_rentals",
+      "id": "car_rental",
+      "name": "Car Rental",
+      "schema": "RENTAL_ASSET_V1",
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VEHICLE_TYPES_RENTAL",
+          "label": "Which vehicles can customers rent?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "car",
+                "motorbike",
+                "van",
+                "suv",
+                "tuktuk"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "car",
+              "label": "Cars"
+            },
+            {
+              "value": "motorbike",
+              "label": "Motorbikes"
+            },
+            {
+              "value": "van",
+              "label": "Vans"
+            },
+            {
+              "value": "suv",
+              "label": "SUVs and 4x4s"
+            },
+            {
+              "value": "tuktuk",
+              "label": "Tuk-tuks"
+            }
+          ],
+          "target": "catalog.attributes.vehicle_types_rental"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_rentals",
+      "id": "self_drive",
+      "name": "Self Drive",
+      "schema": "RENTAL_ASSET_V1",
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VEHICLE_TYPES_RENTAL",
+          "label": "Which vehicles can customers rent?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "car",
+                "motorbike",
+                "van",
+                "suv",
+                "tuktuk"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "car",
+              "label": "Cars"
+            },
+            {
+              "value": "motorbike",
+              "label": "Motorbikes"
+            },
+            {
+              "value": "van",
+              "label": "Vans"
+            },
+            {
+              "value": "suv",
+              "label": "SUVs and 4x4s"
+            },
+            {
+              "value": "tuktuk",
+              "label": "Tuk-tuks"
+            }
+          ],
+          "target": "catalog.attributes.vehicle_types_rental"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_rentals",
+      "id": "corporate_rental",
+      "name": "Corporate Rental",
+      "schema": "RENTAL_ASSET_V1",
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VEHICLE_TYPES_RENTAL",
+          "label": "Which vehicles can customers rent?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "car",
+                "motorbike",
+                "van",
+                "suv",
+                "tuktuk"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "car",
+              "label": "Cars"
+            },
+            {
+              "value": "motorbike",
+              "label": "Motorbikes"
+            },
+            {
+              "value": "van",
+              "label": "Vans"
+            },
+            {
+              "value": "suv",
+              "label": "SUVs and 4x4s"
+            },
+            {
+              "value": "tuktuk",
+              "label": "Tuk-tuks"
+            }
+          ],
+          "target": "catalog.attributes.vehicle_types_rental"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_rentals",
+      "id": "long_term_rental",
+      "name": "Long-Term Rental",
+      "schema": "RENTAL_ASSET_V1",
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VEHICLE_TYPES_RENTAL",
+          "label": "Which vehicles can customers rent?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "car",
+                "motorbike",
+                "van",
+                "suv",
+                "tuktuk"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "car",
+              "label": "Cars"
+            },
+            {
+              "value": "motorbike",
+              "label": "Motorbikes"
+            },
+            {
+              "value": "van",
+              "label": "Vans"
+            },
+            {
+              "value": "suv",
+              "label": "SUVs and 4x4s"
+            },
+            {
+              "value": "tuktuk",
+              "label": "Tuk-tuks"
+            }
+          ],
+          "target": "catalog.attributes.vehicle_types_rental"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_rentals",
+      "id": "bike_rental",
+      "name": "Bike Rental",
+      "schema": "RENTAL_ASSET_V1",
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BIKE_TYPES",
+          "label": "Bike Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "motorcycle",
+                "scooter",
+                "bicycle",
+                "electric"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "motorcycle",
+              "label": "Motorcycles"
+            },
+            {
+              "value": "scooter",
+              "label": "Scooters"
+            },
+            {
+              "value": "bicycle",
+              "label": "Bicycles"
+            },
+            {
+              "value": "electric",
+              "label": "Electric bikes"
+            }
+          ],
+          "target": "catalog.attributes.bike_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "experiences",
+      "id": "concerts",
+      "name": "Concerts",
+      "schema": "EVENT_TICKET_V1",
+      "models": [
+        "SESSION_CAPACITY"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VIP_PACKAGES",
+          "label": "Vip Packages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.vip_packages"
+        }
+      ]
+    },
+    {
+      "categoryId": "experiences",
+      "id": "festivals",
+      "name": "Festivals",
+      "schema": "EVENT_TICKET_V1",
+      "models": [
+        "SESSION_CAPACITY"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VIP_PACKAGES",
+          "label": "Vip Packages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.vip_packages"
+        }
+      ]
+    },
+    {
+      "categoryId": "experiences",
+      "id": "conferences",
+      "name": "Conferences",
+      "schema": "EVENT_TICKET_V1",
+      "models": [
+        "SESSION_CAPACITY"
+      ],
+      "attributes": [
+        {
+          "id": "Q_AV_EQUIPMENT",
+          "label": "Av Equipment?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "sound",
+                "projector",
+                "microphones",
+                "lighting",
+                "video"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "sound",
+              "label": "Sound system"
+            },
+            {
+              "value": "projector",
+              "label": "Projector and screen"
+            },
+            {
+              "value": "microphones",
+              "label": "Microphones"
+            },
+            {
+              "value": "lighting",
+              "label": "Lighting"
+            },
+            {
+              "value": "video",
+              "label": "Video equipment"
+            }
+          ],
+          "target": "catalog.attributes.av_equipment"
+        }
+      ]
+    },
+    {
+      "categoryId": "experiences",
+      "id": "private_events",
+      "name": "Private Events",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "REQUEST_QUOTE"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "experiences",
+      "id": "photography",
+      "name": "Photography",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "experiences",
+      "id": "workshops",
+      "name": "Workshops",
+      "schema": "GROUP_SESSION_V1",
+      "models": [
+        "SESSION_CAPACITY"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "experiences",
+      "id": "classes",
+      "name": "Classes",
+      "schema": "GROUP_SESSION_V1",
+      "models": [
+        "ENTITLEMENT",
+        "SESSION_CAPACITY"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "experiences",
+      "id": "sports_activities",
+      "name": "Sports Activities",
+      "schema": "GROUP_SESSION_V1",
+      "models": [
+        "ENTITLEMENT",
+        "SESSION_CAPACITY"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "experiences",
+      "id": "recreation",
+      "name": "Recreation",
+      "schema": "GROUP_SESSION_V1",
+      "models": [
+        "SESSION_CAPACITY"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "financial_services",
+      "id": "banking",
+      "name": "Banking",
+      "schema": "REGULATED_ENQUIRY_V1",
+      "models": [
+        "APPOINTMENT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_FIN_SERVICES_OFFERED_BANK",
+          "label": "Fin Services Offered Bank?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "accounts",
+                "loans",
+                "savings",
+                "payments",
+                "advisory"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "accounts",
+              "label": "Accounts"
+            },
+            {
+              "value": "loans",
+              "label": "Loans"
+            },
+            {
+              "value": "savings",
+              "label": "Savings"
+            },
+            {
+              "value": "payments",
+              "label": "Payments"
+            },
+            {
+              "value": "advisory",
+              "label": "Financial advice"
+            }
+          ],
+          "target": "catalog.attributes.fin_services_offered_bank"
+        }
+      ]
+    },
+    {
+      "categoryId": "financial_services",
+      "id": "forex",
+      "name": "Forex",
+      "schema": "REGULATED_ENQUIRY_V1",
+      "models": [
+        "APPOINTMENT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CURRENCIES_TRADED",
+          "label": "Currencies Traded?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kes_usd",
+                "kes_eur",
+                "kes_gbp",
+                "east_african",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "kes_usd",
+              "label": "KES and USD"
+            },
+            {
+              "value": "kes_eur",
+              "label": "KES and EUR"
+            },
+            {
+              "value": "kes_gbp",
+              "label": "KES and GBP"
+            },
+            {
+              "value": "east_african",
+              "label": "East African currencies"
+            },
+            {
+              "value": "other",
+              "label": "Other currencies"
+            }
+          ],
+          "target": "catalog.attributes.currencies_traded"
+        }
+      ]
+    },
+    {
+      "categoryId": "financial_services",
+      "id": "insurance",
+      "name": "Insurance",
+      "schema": "REGULATED_ENQUIRY_V1",
+      "models": [
+        "APPOINTMENT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_INSURANCE_TYPES",
+          "label": "Insurance Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "health",
+                "motor",
+                "life",
+                "property",
+                "business",
+                "travel"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "health",
+              "label": "Health"
+            },
+            {
+              "value": "motor",
+              "label": "Motor"
+            },
+            {
+              "value": "life",
+              "label": "Life"
+            },
+            {
+              "value": "property",
+              "label": "Property"
+            },
+            {
+              "value": "business",
+              "label": "Business"
+            },
+            {
+              "value": "travel",
+              "label": "Travel"
+            }
+          ],
+          "target": "catalog.attributes.insurance_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "financial_services",
+      "id": "payments",
+      "name": "Payments",
+      "schema": "REGULATED_ENQUIRY_V1",
+      "models": [
+        "APPOINTMENT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "financial_services",
+      "id": "remittance",
+      "name": "Remittance",
+      "schema": "REGULATED_ENQUIRY_V1",
+      "models": [
+        "APPOINTMENT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_REMITTANCE_CORRIDORS",
+          "label": "Remittance Corridors?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kenya_east_africa",
+                "kenya_europe",
+                "kenya_north_america",
+                "global"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "kenya_east_africa",
+              "label": "Kenya and East Africa"
+            },
+            {
+              "value": "kenya_europe",
+              "label": "Kenya and Europe"
+            },
+            {
+              "value": "kenya_north_america",
+              "label": "Kenya and North America"
+            },
+            {
+              "value": "global",
+              "label": "Other international corridors"
+            }
+          ],
+          "target": "catalog.attributes.remittance_corridors"
+        }
+      ]
+    },
+    {
+      "categoryId": "financial_services",
+      "id": "sacco_services",
+      "name": "Sacco Services",
+      "schema": "REGULATED_ENQUIRY_V1",
+      "models": [
+        "APPOINTMENT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_SACCO_SERVICES_OFFERED",
+          "label": "Sacco Services Offered?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "savings",
+                "loans",
+                "payments",
+                "insurance",
+                "member_services"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "savings",
+              "label": "Savings"
+            },
+            {
+              "value": "loans",
+              "label": "Loans"
+            },
+            {
+              "value": "payments",
+              "label": "Payments"
+            },
+            {
+              "value": "insurance",
+              "label": "Insurance"
+            },
+            {
+              "value": "member_services",
+              "label": "Member services"
+            }
+          ],
+          "target": "catalog.attributes.sacco_services_offered"
+        }
+      ]
+    },
+    {
+      "categoryId": "financial_services",
+      "id": "business_services",
+      "name": "Business Services",
+      "schema": "REGULATED_ENQUIRY_V1",
+      "models": [
+        "APPOINTMENT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BIZ_SERVICES_OFFERED",
+          "label": "Biz Services Offered?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "registration",
+                "tax",
+                "accounting",
+                "legal",
+                "consulting"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "registration",
+              "label": "Business registration"
+            },
+            {
+              "value": "tax",
+              "label": "Tax and compliance support"
+            },
+            {
+              "value": "accounting",
+              "label": "Accounting"
+            },
+            {
+              "value": "legal",
+              "label": "Legal services"
+            },
+            {
+              "value": "consulting",
+              "label": "Business consulting"
+            }
+          ],
+          "target": "catalog.attributes.biz_services_offered"
+        }
+      ]
+    },
+    {
+      "categoryId": "flowers_gifts",
+      "id": "flowers",
+      "name": "Flowers",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ENTITLEMENT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_FRESH_OR_PRESERVED",
+          "label": "fresh or preserved?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "fresh",
+              "preserved",
+              "both"
+            ]
+          },
+          "options": [],
+          "target": "catalog.attributes.fresh_or_preserved"
+        },
+        {
+          "id": "Q_CUSTOM_MESSAGES",
+          "label": "custom messages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.custom_messages"
+        }
+      ]
+    },
+    {
+      "categoryId": "flowers_gifts",
+      "id": "gift_hampers",
+      "name": "Gift Hampers",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER",
+        "PRODUCTION_DUE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CORPORATE_GIFTING",
+          "label": "corporate gifting?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.corporate_gifting"
+        },
+        {
+          "id": "Q_CUSTOM_MESSAGES",
+          "label": "custom messages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.custom_messages"
+        }
+      ]
+    },
+    {
+      "categoryId": "flowers_gifts",
+      "id": "cakes",
+      "name": "Cakes",
+      "schema": "MADE_TO_ORDER_V1",
+      "models": [
+        "PRODUCTION_DUE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_DIETARY_OPTIONS_CAKE",
+          "label": "dietary options cake?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "vegetarian",
+                "vegan",
+                "gluten_free",
+                "dairy_free",
+                "nut_free_request",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.dietary_options_cake"
+        }
+      ]
+    },
+    {
+      "categoryId": "flowers_gifts",
+      "id": "chocolates",
+      "name": "Chocolates",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_GIFT_WRAPPING",
+          "label": "Gift Wrapping?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_wrapping"
+        },
+        {
+          "id": "Q_CUSTOM_MESSAGES",
+          "label": "custom messages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.custom_messages"
+        }
+      ]
+    },
+    {
+      "categoryId": "flowers_gifts",
+      "id": "personalized_gifts",
+      "name": "Personalized Gifts",
+      "schema": "MADE_TO_ORDER_V1",
+      "models": [
+        "PRODUCTION_DUE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CUSTOM_MESSAGES",
+          "label": "custom messages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.custom_messages"
+        },
+        {
+          "id": "Q_CORPORATE_GIFTING",
+          "label": "corporate gifting?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.corporate_gifting"
+        }
+      ]
+    },
+    {
+      "categoryId": "flowers_gifts",
+      "id": "occasion_gifts",
+      "name": "Occasion Gifts",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_OCCASIONS_SPEC",
+          "label": "occasions spec?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "birthday",
+                "anniversary",
+                "sympathy",
+                "corporate",
+                "wedding",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.occasions_spec"
+        },
+        {
+          "id": "Q_CUSTOM_MESSAGES",
+          "label": "custom messages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.custom_messages"
+        },
+        {
+          "id": "Q_GIFT_WRAPPING",
+          "label": "Gift Wrapping?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_wrapping"
+        }
+      ]
+    },
+    {
+      "categoryId": "restaurants_food",
+      "id": "restaurant",
+      "name": "Restaurant",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER",
+        "SPACE_RESERVATION"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CUISINE_TYPES",
+          "label": "cuisine types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kenyan",
+                "swahili",
+                "indian",
+                "chinese",
+                "italian",
+                "continental",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.cuisine_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "restaurants_food",
+      "id": "fast_food",
+      "name": "Fast Food",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "restaurants_food",
+      "id": "cafe",
+      "name": "Café",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BREWING_METHODS",
+          "label": "brewing methods?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "espresso",
+                "filter",
+                "french_press",
+                "pour_over",
+                "cold_brew",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.brewing_methods"
+        },
+        {
+          "id": "Q_WIFI_AVAILABLE",
+          "label": "wifi available?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.wifi_available"
+        }
+      ]
+    },
+    {
+      "categoryId": "restaurants_food",
+      "id": "bakery",
+      "name": "Bakery",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER",
+        "PRODUCTION_DUE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BAKERY_SPECIALTIES",
+          "label": "bakery specialties?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "bread",
+                "pastry",
+                "cakes",
+                "biscuits",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.bakery_specialties"
+        }
+      ]
+    },
+    {
+      "categoryId": "restaurants_food",
+      "id": "desserts",
+      "name": "Desserts",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER",
+        "PRODUCTION_DUE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_DESSERT_SPECIALTIES",
+          "label": "dessert specialties?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "cakes",
+                "ice_cream",
+                "pastry",
+                "chocolate",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.dessert_specialties"
+        },
+        {
+          "id": "Q_DIETARY_OPTIONS_CAKE",
+          "label": "dietary options cake?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "vegetarian",
+                "vegan",
+                "gluten_free",
+                "dairy_free",
+                "nut_free_request",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.dietary_options_cake"
+        }
+      ]
+    },
+    {
+      "categoryId": "restaurants_food",
+      "id": "juice_bar",
+      "name": "Juice Bar",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_COLD_PRESSED",
+          "label": "cold pressed?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.cold_pressed"
+        },
+        {
+          "id": "Q_SMOOTHIE_BOWLS",
+          "label": "smoothie bowls?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.smoothie_bowls"
+        },
+        {
+          "id": "Q_VEGAN_MENU",
+          "label": "vegan menu?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.vegan_menu"
+        }
+      ]
+    },
+    {
+      "categoryId": "restaurants_food",
+      "id": "cloud_kitchen",
+      "name": "Cloud Kitchen",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_NUMBER_OF_BRANDS",
+          "label": "number of brands?",
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "unit": "brand",
+            "finite": true
+          },
+          "options": [],
+          "target": "catalog.attributes.number_of_brands"
+        },
+        {
+          "id": "Q_CUISINE_TYPES",
+          "label": "cuisine types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kenyan",
+                "swahili",
+                "indian",
+                "chinese",
+                "italian",
+                "continental",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.cuisine_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "restaurants_food",
+      "id": "catering",
+      "name": "Catering",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CUISINE_TYPES",
+          "label": "cuisine types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kenyan",
+                "swahili",
+                "indian",
+                "chinese",
+                "italian",
+                "continental",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.cuisine_types"
+        },
+        {
+          "id": "Q_STAFF_INCLUDED",
+          "label": "staff included?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.staff_included"
+        }
+      ]
+    },
+    {
+      "categoryId": "groceries_essentials",
+      "id": "supermarket",
+      "name": "Supermarket",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "groceries_essentials",
+      "id": "convenience_store",
+      "name": "Convenience Store",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "groceries_essentials",
+      "id": "fresh_produce",
+      "name": "Fresh Produce",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ENTITLEMENT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_ORGANIC_OPTIONS",
+          "label": "organic options?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.organic_options"
+        },
+        {
+          "id": "Q_FARM_DIRECT",
+          "label": "farm direct?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.farm_direct"
+        },
+        {
+          "id": "Q_WEEKLY_MARKET",
+          "label": "weekly market?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.weekly_market"
+        }
+      ]
+    },
+    {
+      "categoryId": "groceries_essentials",
+      "id": "butchery",
+      "name": "Butchery",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "groceries_essentials",
+      "id": "seafood",
+      "name": "Seafood",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_LIVE_SEAFOOD",
+          "label": "Live Seafood?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.live_seafood"
+        }
+      ]
+    },
+    {
+      "categoryId": "groceries_essentials",
+      "id": "organic_store",
+      "name": "Organic Store",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_LOCAL_SOURCING",
+          "label": "local sourcing?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [],
+          "target": "catalog.attributes.local_sourcing"
+        }
+      ]
+    },
+    {
+      "categoryId": "laundry_cleaning",
+      "id": "laundry",
+      "name": "Laundry",
+      "schema": "PICKUP_RETURN_V1",
+      "models": [
+        "LINKED_WINDOWS"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "laundry_cleaning",
+      "id": "dry_cleaning",
+      "name": "Dry Cleaning",
+      "schema": "PICKUP_RETURN_V1",
+      "models": [
+        "LINKED_WINDOWS"
+      ],
+      "attributes": [
+        {
+          "id": "Q_GARMENT_TYPES",
+          "label": "garment types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "everyday",
+                "formal",
+                "delicate",
+                "bedding",
+                "curtains",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.garment_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "laundry_cleaning",
+      "id": "ironing",
+      "name": "Ironing",
+      "schema": "PICKUP_RETURN_V1",
+      "models": [
+        "LINKED_WINDOWS"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "laundry_cleaning",
+      "id": "home_cleaning",
+      "name": "Home Cleaning",
+      "schema": "FIELD_SERVICE_V1",
+      "models": [
+        "ENTITLEMENT",
+        "FIELD_VISIT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_ECO_PRODUCTS",
+          "label": "Eco Products?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.eco_products"
+        }
+      ]
+    },
+    {
+      "categoryId": "laundry_cleaning",
+      "id": "office_cleaning",
+      "name": "Office Cleaning",
+      "schema": "FIELD_SERVICE_V1",
+      "models": [
+        "ENTITLEMENT",
+        "FIELD_VISIT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_ECO_PRODUCTS",
+          "label": "Eco Products?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.eco_products"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "home_living",
+      "name": "Home & Living",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        },
+        {
+          "id": "Q_NEW_OR_USED",
+          "label": "New Or Used?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "new",
+              "used",
+              "both"
+            ]
+          },
+          "options": [
+            {
+              "value": "new",
+              "label": "New only"
+            },
+            {
+              "value": "used",
+              "label": "Pre-owned only"
+            },
+            {
+              "value": "both",
+              "label": "New and pre-owned"
+            }
+          ],
+          "target": "catalog.attributes.new_or_used"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "furniture",
+      "name": "Furniture",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        },
+        {
+          "id": "Q_NEW_OR_USED",
+          "label": "New Or Used?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "new",
+              "used",
+              "both"
+            ]
+          },
+          "options": [
+            {
+              "value": "new",
+              "label": "New only"
+            },
+            {
+              "value": "used",
+              "label": "Pre-owned only"
+            },
+            {
+              "value": "both",
+              "label": "New and pre-owned"
+            }
+          ],
+          "target": "catalog.attributes.new_or_used"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "appliances",
+      "name": "Appliances",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "decor",
+      "name": "Decor",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        },
+        {
+          "id": "Q_NEW_OR_USED",
+          "label": "New Or Used?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "new",
+              "used",
+              "both"
+            ]
+          },
+          "options": [
+            {
+              "value": "new",
+              "label": "New only"
+            },
+            {
+              "value": "used",
+              "label": "Pre-owned only"
+            },
+            {
+              "value": "both",
+              "label": "New and pre-owned"
+            }
+          ],
+          "target": "catalog.attributes.new_or_used"
+        },
+        {
+          "id": "Q_GIFT_WRAPPING",
+          "label": "Gift Wrapping?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_wrapping"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "kitchenware",
+      "name": "Kitchenware",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        },
+        {
+          "id": "Q_NEW_OR_USED",
+          "label": "New Or Used?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "new",
+              "used",
+              "both"
+            ]
+          },
+          "options": [
+            {
+              "value": "new",
+              "label": "New only"
+            },
+            {
+              "value": "used",
+              "label": "Pre-owned only"
+            },
+            {
+              "value": "both",
+              "label": "New and pre-owned"
+            }
+          ],
+          "target": "catalog.attributes.new_or_used"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "books",
+      "name": "Books",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER",
+        "PRODUCTION_DUE",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BOOK_GENRES",
+          "label": "Book Genres?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "fiction",
+                "nonfiction",
+                "children",
+                "business",
+                "academic",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "fiction",
+              "label": "Fiction"
+            },
+            {
+              "value": "nonfiction",
+              "label": "Non-fiction"
+            },
+            {
+              "value": "children",
+              "label": "Children and education"
+            },
+            {
+              "value": "business",
+              "label": "Business"
+            },
+            {
+              "value": "academic",
+              "label": "Academic"
+            },
+            {
+              "value": "other",
+              "label": "Other genres"
+            }
+          ],
+          "target": "catalog.attributes.book_genres"
+        },
+        {
+          "id": "Q_NEW_OR_USED",
+          "label": "New Or Used?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "new",
+              "used",
+              "both"
+            ]
+          },
+          "options": [
+            {
+              "value": "new",
+              "label": "New only"
+            },
+            {
+              "value": "used",
+              "label": "Pre-owned only"
+            },
+            {
+              "value": "both",
+              "label": "New and pre-owned"
+            }
+          ],
+          "target": "catalog.attributes.new_or_used"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "stationery",
+      "name": "Stationery",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "office_supplies",
+      "name": "Office Supplies",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "id": "general_retail",
+      "name": "General Retail",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        },
+        {
+          "id": "Q_NEW_OR_USED",
+          "label": "New Or Used?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "new",
+              "used",
+              "both"
+            ]
+          },
+          "options": [
+            {
+              "value": "new",
+              "label": "New only"
+            },
+            {
+              "value": "used",
+              "label": "Pre-owned only"
+            },
+            {
+              "value": "both",
+              "label": "New and pre-owned"
+            }
+          ],
+          "target": "catalog.attributes.new_or_used"
+        }
+      ]
+    },
+    {
+      "categoryId": "pharmacy",
+      "id": "pharmacy_retail",
+      "name": "Pharmacy",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "pharmacy",
+      "id": "medical_supplies",
+      "name": "Medical Supplies",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_MED_SUPPLY_TYPES",
+          "label": "med supply types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "first_aid",
+                "diagnostic",
+                "mobility",
+                "consumables",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.med_supply_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "pharmacy",
+      "id": "baby_products",
+      "name": "Baby Products",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ENTITLEMENT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_BABY_PRODUCT_RANGE",
+          "label": "baby product range?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "feeding",
+                "diapers",
+                "skincare",
+                "equipment",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.baby_product_range"
+        }
+      ]
+    },
+    {
+      "categoryId": "pharmacy",
+      "id": "supplements",
+      "name": "Supplements",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_SUPPLEMENT_CATEGORIES",
+          "label": "supplement categories?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "vitamins",
+                "minerals",
+                "sports_nutrition",
+                "herbal",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "otherDetailsRequiredWhenContains": "other"
+          },
+          "options": [],
+          "target": "catalog.attributes.supplement_categories"
+        }
+      ]
+    },
+    {
+      "categoryId": "health",
+      "id": "clinics",
+      "name": "Clinics",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CLINIC_SPECIALIZATIONS",
+          "label": "Clinic Specializations?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "general",
+                "dental",
+                "paediatrics",
+                "maternal",
+                "specialist"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "general",
+              "label": "General practice"
+            },
+            {
+              "value": "dental",
+              "label": "Dental"
+            },
+            {
+              "value": "paediatrics",
+              "label": "Paediatrics"
+            },
+            {
+              "value": "maternal",
+              "label": "Maternal health"
+            },
+            {
+              "value": "specialist",
+              "label": "Specialist care"
+            }
+          ],
+          "target": "catalog.attributes.clinic_specializations"
+        }
+      ]
+    },
+    {
+      "categoryId": "health",
+      "id": "telemedicine",
+      "name": "Telemedicine",
+      "schema": "REMOTE_SESSION_V1",
+      "models": [
+        "APPOINTMENT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CLINIC_SPECIALIZATIONS",
+          "label": "Clinic Specializations?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "general",
+                "dental",
+                "paediatrics",
+                "maternal",
+                "specialist"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "general",
+              "label": "General practice"
+            },
+            {
+              "value": "dental",
+              "label": "Dental"
+            },
+            {
+              "value": "paediatrics",
+              "label": "Paediatrics"
+            },
+            {
+              "value": "maternal",
+              "label": "Maternal health"
+            },
+            {
+              "value": "specialist",
+              "label": "Specialist care"
+            }
+          ],
+          "target": "catalog.attributes.clinic_specializations"
+        }
+      ]
+    },
+    {
+      "categoryId": "health",
+      "id": "labs",
+      "name": "Labs",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_LAB_TEST_TYPES",
+          "label": "Lab Test Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "blood",
+                "imaging",
+                "wellness",
+                "diagnostic"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "blood",
+              "label": "Blood tests"
+            },
+            {
+              "value": "imaging",
+              "label": "Imaging"
+            },
+            {
+              "value": "wellness",
+              "label": "Wellness screening"
+            },
+            {
+              "value": "diagnostic",
+              "label": "Diagnostic tests"
+            }
+          ],
+          "target": "catalog.attributes.lab_test_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "health",
+      "id": "mental_health",
+      "name": "Mental Health (Therapy)",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_THERAPY_TYPES",
+          "label": "Therapy Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "individual",
+                "couples",
+                "family",
+                "group"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "individual",
+              "label": "Individual therapy"
+            },
+            {
+              "value": "couples",
+              "label": "Couples therapy"
+            },
+            {
+              "value": "family",
+              "label": "Family therapy"
+            },
+            {
+              "value": "group",
+              "label": "Group therapy"
+            }
+          ],
+          "target": "catalog.attributes.therapy_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "health",
+      "id": "coaching",
+      "name": "Coaching",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "SESSION_CAPACITY"
+      ],
+      "attributes": [
+        {
+          "id": "Q_COACHING_AREAS",
+          "label": "Coaching Areas?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "fitness",
+                "nutrition",
+                "mental_wellbeing",
+                "career",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "fitness",
+              "label": "Fitness"
+            },
+            {
+              "value": "nutrition",
+              "label": "Nutrition"
+            },
+            {
+              "value": "mental_wellbeing",
+              "label": "Mental wellbeing"
+            },
+            {
+              "value": "career",
+              "label": "Career and life coaching"
+            },
+            {
+              "value": "other",
+              "label": "Other coaching"
+            }
+          ],
+          "target": "catalog.attributes.coaching_areas"
+        }
+      ]
+    },
+    {
+      "categoryId": "tech_electronics",
+      "id": "smartphones",
+      "name": "Smartphones",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER",
+        "SERVICE_JOB"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PHONE_BRANDS",
+          "label": "Phone Brands?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "samsung",
+                "apple",
+                "tecno_infinix",
+                "xiaomi",
+                "multiple"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "samsung",
+              "label": "Samsung"
+            },
+            {
+              "value": "apple",
+              "label": "Apple"
+            },
+            {
+              "value": "tecno_infinix",
+              "label": "Tecno and Infinix"
+            },
+            {
+              "value": "xiaomi",
+              "label": "Xiaomi"
+            },
+            {
+              "value": "multiple",
+              "label": "Other brands"
+            }
+          ],
+          "target": "catalog.attributes.phone_brands"
+        },
+        {
+          "id": "Q_NEW_OR_REFURBISHED",
+          "label": "New Or Refurbished?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "new",
+              "refurbished",
+              "both"
+            ]
+          },
+          "options": [
+            {
+              "value": "new",
+              "label": "New only"
+            },
+            {
+              "value": "refurbished",
+              "label": "Refurbished only"
+            },
+            {
+              "value": "both",
+              "label": "New and refurbished"
+            }
+          ],
+          "target": "catalog.attributes.new_or_refurbished"
+        },
+        {
+          "id": "Q_REPAIR_SERVICES",
+          "label": "Repair Services?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "screen",
+                "battery",
+                "software",
+                "hardware",
+                "diagnostics"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "screen",
+              "label": "Screen replacement"
+            },
+            {
+              "value": "battery",
+              "label": "Battery replacement"
+            },
+            {
+              "value": "software",
+              "label": "Software support"
+            },
+            {
+              "value": "hardware",
+              "label": "Hardware repairs"
+            },
+            {
+              "value": "diagnostics",
+              "label": "Diagnostics"
+            }
+          ],
+          "target": "catalog.attributes.repair_services"
+        }
+      ]
+    },
+    {
+      "categoryId": "tech_electronics",
+      "id": "tech_accessories",
+      "name": "Accessories",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        }
+      ]
+    },
+    {
+      "categoryId": "tech_electronics",
+      "id": "computers",
+      "name": "Computers",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER",
+        "SERVICE_JOB"
+      ],
+      "attributes": [
+        {
+          "id": "Q_COMPUTER_BRANDS",
+          "label": "Computer Brands?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "apple",
+                "dell",
+                "hp",
+                "lenovo",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "apple",
+              "label": "Apple"
+            },
+            {
+              "value": "dell",
+              "label": "Dell"
+            },
+            {
+              "value": "hp",
+              "label": "HP"
+            },
+            {
+              "value": "lenovo",
+              "label": "Lenovo"
+            },
+            {
+              "value": "other",
+              "label": "Other brands"
+            }
+          ],
+          "target": "catalog.attributes.computer_brands"
+        },
+        {
+          "id": "Q_NEW_OR_REFURBISHED",
+          "label": "New Or Refurbished?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "new",
+              "refurbished",
+              "both"
+            ]
+          },
+          "options": [
+            {
+              "value": "new",
+              "label": "New only"
+            },
+            {
+              "value": "refurbished",
+              "label": "Refurbished only"
+            },
+            {
+              "value": "both",
+              "label": "New and refurbished"
+            }
+          ],
+          "target": "catalog.attributes.new_or_refurbished"
+        },
+        {
+          "id": "Q_REPAIR_SERVICES",
+          "label": "Repair Services?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "screen",
+                "battery",
+                "software",
+                "hardware",
+                "diagnostics"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "screen",
+              "label": "Screen replacement"
+            },
+            {
+              "value": "battery",
+              "label": "Battery replacement"
+            },
+            {
+              "value": "software",
+              "label": "Software support"
+            },
+            {
+              "value": "hardware",
+              "label": "Hardware repairs"
+            },
+            {
+              "value": "diagnostics",
+              "label": "Diagnostics"
+            }
+          ],
+          "target": "catalog.attributes.repair_services"
+        }
+      ]
+    },
+    {
+      "categoryId": "tech_electronics",
+      "id": "gaming",
+      "name": "Gaming",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CONSOLE_TYPES",
+          "label": "Console Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "playstation",
+                "xbox",
+                "nintendo",
+                "pc"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "playstation",
+              "label": "PlayStation"
+            },
+            {
+              "value": "xbox",
+              "label": "Xbox"
+            },
+            {
+              "value": "nintendo",
+              "label": "Nintendo"
+            },
+            {
+              "value": "pc",
+              "label": "PC gaming"
+            }
+          ],
+          "target": "catalog.attributes.console_types"
+        },
+        {
+          "id": "Q_PRE_OWNED_GAMES",
+          "label": "Pre Owned Games?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.pre_owned_games"
+        },
+        {
+          "id": "Q_GAMING_ACCESSORIES",
+          "label": "Gaming Accessories?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "controllers",
+                "headsets",
+                "keyboards",
+                "storage"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "controllers",
+              "label": "Controllers"
+            },
+            {
+              "value": "headsets",
+              "label": "Headsets"
+            },
+            {
+              "value": "keyboards",
+              "label": "Keyboards and mice"
+            },
+            {
+              "value": "storage",
+              "label": "Storage and charging"
+            }
+          ],
+          "target": "catalog.attributes.gaming_accessories"
+        }
+      ]
+    },
+    {
+      "categoryId": "tech_electronics",
+      "id": "audio",
+      "name": "Audio",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        }
+      ]
+    },
+    {
+      "categoryId": "tech_electronics",
+      "id": "telecom_services",
+      "name": "Telecom Services",
+      "schema": "SERVICE_JOB_V1",
+      "models": [
+        "ORDER",
+        "SERVICE_JOB"
+      ],
+      "attributes": [
+        {
+          "id": "Q_TELECOM_SERVICES_OFFERED",
+          "label": "Telecom Services Offered?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "airtime",
+                "data",
+                "devices",
+                "accessories",
+                "sim_services"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "airtime",
+              "label": "Airtime"
+            },
+            {
+              "value": "data",
+              "label": "Data bundles"
+            },
+            {
+              "value": "devices",
+              "label": "Devices"
+            },
+            {
+              "value": "accessories",
+              "label": "Accessories"
+            },
+            {
+              "value": "sim_services",
+              "label": "SIM services"
+            }
+          ],
+          "target": "catalog.attributes.telecom_services_offered"
+        },
+        {
+          "id": "Q_TELECOM_NETWORKS",
+          "label": "Telecom Networks?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "safaricom",
+                "airtel",
+                "telkom",
+                "multiple"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "safaricom",
+              "label": "Safaricom"
+            },
+            {
+              "value": "airtel",
+              "label": "Airtel"
+            },
+            {
+              "value": "telkom",
+              "label": "Telkom"
+            },
+            {
+              "value": "multiple",
+              "label": "Multiple networks"
+            }
+          ],
+          "target": "catalog.attributes.telecom_networks"
+        }
+      ]
+    },
+    {
+      "categoryId": "tech_electronics",
+      "id": "smart_devices",
+      "name": "Smart Devices",
+      "schema": "PRODUCT_CATALOG_V1",
+      "models": [
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PRODUCT_DESCRIPTION",
+          "label": "What should customers know about your products?",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.product_description"
+        }
+      ]
+    },
+    {
+      "categoryId": "travel_tours",
+      "id": "safaris",
+      "name": "Safaris",
+      "schema": "TOUR_PACKAGE_V1",
+      "models": [
+        "TOUR"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PARKS_COVERED",
+          "label": "Parks Covered?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "maasai_mara",
+                "amboseli",
+                "tsavo",
+                "lake_nakuru",
+                "other_kenya"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "maasai_mara",
+              "label": "Maasai Mara"
+            },
+            {
+              "value": "amboseli",
+              "label": "Amboseli"
+            },
+            {
+              "value": "tsavo",
+              "label": "Tsavo"
+            },
+            {
+              "value": "lake_nakuru",
+              "label": "Lake Nakuru"
+            },
+            {
+              "value": "other_kenya",
+              "label": "Other parks in Kenya"
+            }
+          ],
+          "target": "catalog.attributes.parks_covered"
+        },
+        {
+          "id": "Q_ACCOMMODATION_INCLUDED",
+          "label": "Accommodation Included?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.accommodation_included"
+        },
+        {
+          "id": "Q_MEAL_PLAN",
+          "label": "Meal Plan?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "none",
+              "breakfast",
+              "half_board",
+              "full_board"
+            ]
+          },
+          "options": [
+            {
+              "value": "none",
+              "label": "No meals"
+            },
+            {
+              "value": "breakfast",
+              "label": "Breakfast"
+            },
+            {
+              "value": "half_board",
+              "label": "Breakfast and one other meal"
+            },
+            {
+              "value": "full_board",
+              "label": "All meals"
+            }
+          ],
+          "target": "catalog.attributes.meal_plan"
+        }
+      ]
+    },
+    {
+      "categoryId": "travel_tours",
+      "id": "game_drives",
+      "name": "Game Drives",
+      "schema": "TOUR_PACKAGE_V1",
+      "models": [
+        "TOUR"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PARKS_COVERED",
+          "label": "Parks Covered?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "maasai_mara",
+                "amboseli",
+                "tsavo",
+                "lake_nakuru",
+                "other_kenya"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "maasai_mara",
+              "label": "Maasai Mara"
+            },
+            {
+              "value": "amboseli",
+              "label": "Amboseli"
+            },
+            {
+              "value": "tsavo",
+              "label": "Tsavo"
+            },
+            {
+              "value": "lake_nakuru",
+              "label": "Lake Nakuru"
+            },
+            {
+              "value": "other_kenya",
+              "label": "Other parks in Kenya"
+            }
+          ],
+          "target": "catalog.attributes.parks_covered"
+        }
+      ]
+    },
+    {
+      "categoryId": "travel_tours",
+      "id": "luxury_safaris",
+      "name": "Luxury Safaris",
+      "schema": "TOUR_PACKAGE_V1",
+      "models": [
+        "TOUR"
+      ],
+      "attributes": [
+        {
+          "id": "Q_PARKS_COVERED",
+          "label": "Parks Covered?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "maasai_mara",
+                "amboseli",
+                "tsavo",
+                "lake_nakuru",
+                "other_kenya"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "maasai_mara",
+              "label": "Maasai Mara"
+            },
+            {
+              "value": "amboseli",
+              "label": "Amboseli"
+            },
+            {
+              "value": "tsavo",
+              "label": "Tsavo"
+            },
+            {
+              "value": "lake_nakuru",
+              "label": "Lake Nakuru"
+            },
+            {
+              "value": "other_kenya",
+              "label": "Other parks in Kenya"
+            }
+          ],
+          "target": "catalog.attributes.parks_covered"
+        },
+        {
+          "id": "Q_ACCOMMODATION_INCLUDED",
+          "label": "Accommodation Included?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.accommodation_included"
+        },
+        {
+          "id": "Q_MEAL_PLAN",
+          "label": "Meal Plan?",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "none",
+              "breakfast",
+              "half_board",
+              "full_board"
+            ]
+          },
+          "options": [
+            {
+              "value": "none",
+              "label": "No meals"
+            },
+            {
+              "value": "breakfast",
+              "label": "Breakfast"
+            },
+            {
+              "value": "half_board",
+              "label": "Breakfast and one other meal"
+            },
+            {
+              "value": "full_board",
+              "label": "All meals"
+            }
+          ],
+          "target": "catalog.attributes.meal_plan"
+        }
+      ]
+    },
+    {
+      "categoryId": "travel_tours",
+      "id": "city_tours",
+      "name": "City Tours",
+      "schema": "TOUR_PACKAGE_V1",
+      "models": [
+        "TOUR"
+      ],
+      "attributes": [
+        {
+          "id": "Q_TOUR_MODES",
+          "label": "Tour Modes?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "walking",
+                "vehicle",
+                "cycling",
+                "boat",
+                "flight"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "walking",
+              "label": "Walking"
+            },
+            {
+              "value": "vehicle",
+              "label": "Vehicle"
+            },
+            {
+              "value": "cycling",
+              "label": "Cycling"
+            },
+            {
+              "value": "boat",
+              "label": "Boat"
+            },
+            {
+              "value": "flight",
+              "label": "Flight"
+            }
+          ],
+          "target": "catalog.attributes.tour_modes"
+        },
+        {
+          "id": "Q_GUIDE_INCLUDED",
+          "label": "Guide Included?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.guide_included"
+        },
+        {
+          "id": "Q_TOUR_LANGUAGES",
+          "label": "Tour Languages?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "english",
+                "swahili",
+                "french",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "english",
+              "label": "English"
+            },
+            {
+              "value": "swahili",
+              "label": "Swahili"
+            },
+            {
+              "value": "french",
+              "label": "French"
+            },
+            {
+              "value": "other",
+              "label": "Other languages"
+            }
+          ],
+          "target": "catalog.attributes.tour_languages"
+        }
+      ]
+    },
+    {
+      "categoryId": "travel_tours",
+      "id": "cultural_tours",
+      "name": "Cultural Tours",
+      "schema": "TOUR_PACKAGE_V1",
+      "models": [
+        "TOUR"
+      ],
+      "attributes": [
+        {
+          "id": "Q_TOUR_MODES",
+          "label": "Tour Modes?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "walking",
+                "vehicle",
+                "cycling",
+                "boat",
+                "flight"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "walking",
+              "label": "Walking"
+            },
+            {
+              "value": "vehicle",
+              "label": "Vehicle"
+            },
+            {
+              "value": "cycling",
+              "label": "Cycling"
+            },
+            {
+              "value": "boat",
+              "label": "Boat"
+            },
+            {
+              "value": "flight",
+              "label": "Flight"
+            }
+          ],
+          "target": "catalog.attributes.tour_modes"
+        },
+        {
+          "id": "Q_GUIDE_INCLUDED",
+          "label": "Guide Included?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.guide_included"
+        },
+        {
+          "id": "Q_TOUR_LANGUAGES",
+          "label": "Tour Languages?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "english",
+                "swahili",
+                "french",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "english",
+              "label": "English"
+            },
+            {
+              "value": "swahili",
+              "label": "Swahili"
+            },
+            {
+              "value": "french",
+              "label": "French"
+            },
+            {
+              "value": "other",
+              "label": "Other languages"
+            }
+          ],
+          "target": "catalog.attributes.tour_languages"
+        }
+      ]
+    },
+    {
+      "categoryId": "travel_tours",
+      "id": "adventure_tours",
+      "name": "Adventure Tours",
+      "schema": "TOUR_PACKAGE_V1",
+      "models": [
+        "TOUR"
+      ],
+      "attributes": [
+        {
+          "id": "Q_TOUR_MODES",
+          "label": "Tour Modes?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "walking",
+                "vehicle",
+                "cycling",
+                "boat",
+                "flight"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "walking",
+              "label": "Walking"
+            },
+            {
+              "value": "vehicle",
+              "label": "Vehicle"
+            },
+            {
+              "value": "cycling",
+              "label": "Cycling"
+            },
+            {
+              "value": "boat",
+              "label": "Boat"
+            },
+            {
+              "value": "flight",
+              "label": "Flight"
+            }
+          ],
+          "target": "catalog.attributes.tour_modes"
+        },
+        {
+          "id": "Q_GUIDE_INCLUDED",
+          "label": "Guide Included?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.guide_included"
+        }
+      ]
+    },
+    {
+      "categoryId": "travel_tours",
+      "id": "travel_packages",
+      "name": "Travel Packages",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_DESTINATIONS_TEXT",
+          "label": "Destinations",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.destinations_text"
+        },
+        {
+          "id": "Q_PACKAGE_TYPES",
+          "label": "Package Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "day_trip",
+                "weekend",
+                "multi_day",
+                "custom"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "day_trip",
+              "label": "Day trips"
+            },
+            {
+              "value": "weekend",
+              "label": "Weekend trips"
+            },
+            {
+              "value": "multi_day",
+              "label": "Multi-day trips"
+            },
+            {
+              "value": "custom",
+              "label": "Custom packages"
+            }
+          ],
+          "target": "catalog.attributes.package_types"
+        },
+        {
+          "id": "Q_FLIGHT_INCLUDED",
+          "label": "Flight Included?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.flight_included"
+        },
+        {
+          "id": "Q_TOUR_LANGUAGES",
+          "label": "Tour Languages?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "english",
+                "swahili",
+                "french",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "english",
+              "label": "English"
+            },
+            {
+              "value": "swahili",
+              "label": "Swahili"
+            },
+            {
+              "value": "french",
+              "label": "French"
+            },
+            {
+              "value": "other",
+              "label": "Other languages"
+            }
+          ],
+          "target": "catalog.attributes.tour_languages"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_services",
+      "id": "car_wash",
+      "name": "Car Wash",
+      "schema": "SERVICE_JOB_V1",
+      "models": [
+        "ENTITLEMENT",
+        "FIELD_VISIT",
+        "SERVICE_JOB"
+      ],
+      "attributes": [
+        {
+          "id": "Q_WASH_TYPES",
+          "label": "Wash Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "exterior",
+                "interior",
+                "full_detail",
+                "engine",
+                "motorcycle"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "exterior",
+              "label": "Exterior wash"
+            },
+            {
+              "value": "interior",
+              "label": "Interior cleaning"
+            },
+            {
+              "value": "full_detail",
+              "label": "Full detailing"
+            },
+            {
+              "value": "engine",
+              "label": "Engine cleaning"
+            },
+            {
+              "value": "motorcycle",
+              "label": "Motorcycle wash"
+            }
+          ],
+          "target": "catalog.attributes.wash_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_services",
+      "id": "tire_service",
+      "name": "Tire Service",
+      "schema": "SERVICE_JOB_V1",
+      "models": [
+        "FIELD_VISIT",
+        "SERVICE_JOB"
+      ],
+      "attributes": [
+        {
+          "id": "Q_TIRE_BRANDS_TEXT",
+          "label": "Tire Brands",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.tire_brands_text"
+        },
+        {
+          "id": "Q_EMERGENCY_CALLOUT",
+          "label": "Emergency Callout?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.emergency_callout"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_services",
+      "id": "battery_service",
+      "name": "Battery Service",
+      "schema": "FIELD_SERVICE_V1",
+      "models": [
+        "FIELD_VISIT",
+        "SERVICE_JOB"
+      ],
+      "attributes": [
+        {
+          "id": "Q_EMERGENCY_CALLOUT",
+          "label": "Emergency Callout?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.emergency_callout"
+        },
+        {
+          "id": "Q_BATTERY_BRANDS_TEXT",
+          "label": "Battery Brands",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.battery_brands_text"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_services",
+      "id": "vehicle_assistance",
+      "name": "Vehicle Assistance",
+      "schema": "FIELD_SERVICE_V1",
+      "models": [
+        "FIELD_VISIT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_ASSISTANCE_SERVICES",
+          "label": "Assistance Services?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "breakdown",
+                "jump_start",
+                "towing",
+                "lockout",
+                "fuel_delivery"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "breakdown",
+              "label": "Breakdown recovery"
+            },
+            {
+              "value": "jump_start",
+              "label": "Jump start"
+            },
+            {
+              "value": "towing",
+              "label": "Towing"
+            },
+            {
+              "value": "lockout",
+              "label": "Lockout support"
+            },
+            {
+              "value": "fuel_delivery",
+              "label": "Emergency fuel"
+            }
+          ],
+          "target": "catalog.attributes.assistance_services"
+        }
+      ]
+    },
+    {
+      "categoryId": "vehicle_services",
+      "id": "vehicle_inspection",
+      "name": "Vehicle Inspection",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_INSPECTION_TYPES",
+          "label": "Inspection Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pre_purchase",
+                "roadworthy",
+                "insurance",
+                "diagnostic",
+                "routine"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "pre_purchase",
+              "label": "Pre-purchase"
+            },
+            {
+              "value": "roadworthy",
+              "label": "Roadworthiness"
+            },
+            {
+              "value": "insurance",
+              "label": "Insurance"
+            },
+            {
+              "value": "diagnostic",
+              "label": "Diagnostic"
+            },
+            {
+              "value": "routine",
+              "label": "Routine inspection"
+            }
+          ],
+          "target": "catalog.attributes.inspection_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "wellness",
+      "id": "spa",
+      "name": "Spa",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "ENTITLEMENT",
+        "FIELD_VISIT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_SPA_SERVICES",
+          "label": "Spa Services?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "facials",
+                "body_treatments",
+                "massage",
+                "nails",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "facials",
+              "label": "Facials"
+            },
+            {
+              "value": "body_treatments",
+              "label": "Body treatments"
+            },
+            {
+              "value": "massage",
+              "label": "Massage"
+            },
+            {
+              "value": "nails",
+              "label": "Nails"
+            },
+            {
+              "value": "other",
+              "label": "Other spa services"
+            }
+          ],
+          "target": "catalog.attributes.spa_services"
+        },
+        {
+          "id": "Q_COUPLES_PACKAGES",
+          "label": "Couples Packages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.couples_packages"
+        }
+      ]
+    },
+    {
+      "categoryId": "wellness",
+      "id": "massage",
+      "name": "Massage",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_MASSAGE_TYPES",
+          "label": "Massage Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "swedish",
+                "deep_tissue",
+                "sports",
+                "aromatherapy",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "swedish",
+              "label": "Swedish"
+            },
+            {
+              "value": "deep_tissue",
+              "label": "Deep tissue"
+            },
+            {
+              "value": "sports",
+              "label": "Sports"
+            },
+            {
+              "value": "aromatherapy",
+              "label": "Aromatherapy"
+            },
+            {
+              "value": "other",
+              "label": "Other massage"
+            }
+          ],
+          "target": "catalog.attributes.massage_types"
+        },
+        {
+          "id": "Q_COUPLES_PACKAGES",
+          "label": "Couples Packages?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.couples_packages"
+        }
+      ]
+    },
+    {
+      "categoryId": "wellness",
+      "id": "gym",
+      "name": "Gym",
+      "schema": "MEMBERSHIP_PLAN_V1",
+      "models": [
+        "APPOINTMENT",
+        "ENTITLEMENT"
+      ],
+      "attributes": [
+        {
+          "id": "Q_GYM_FACILITIES",
+          "label": "Gym Facilities?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "weights",
+                "cardio",
+                "classes",
+                "showers",
+                "pool"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "weights",
+              "label": "Weights"
+            },
+            {
+              "value": "cardio",
+              "label": "Cardio equipment"
+            },
+            {
+              "value": "classes",
+              "label": "Group classes"
+            },
+            {
+              "value": "showers",
+              "label": "Changing rooms and showers"
+            },
+            {
+              "value": "pool",
+              "label": "Pool"
+            }
+          ],
+          "target": "catalog.attributes.gym_facilities"
+        },
+        {
+          "id": "Q_MEMBERSHIP_TYPES",
+          "label": "Membership Types?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "monthly",
+                "quarterly",
+                "annual",
+                "class_pack"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "monthly",
+              "label": "Monthly"
+            },
+            {
+              "value": "quarterly",
+              "label": "Quarterly"
+            },
+            {
+              "value": "annual",
+              "label": "Annual"
+            },
+            {
+              "value": "class_pack",
+              "label": "Class or session packs"
+            }
+          ],
+          "target": "catalog.attributes.membership_types"
+        }
+      ]
+    },
+    {
+      "categoryId": "wellness",
+      "id": "personal_training",
+      "name": "Personal Training",
+      "schema": "SERVICE_APPOINTMENT_V1",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT",
+        "SESSION_CAPACITY"
+      ],
+      "attributes": [
+        {
+          "id": "Q_TRAINING_SPECIALIZATIONS",
+          "label": "Training Specializations?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "strength",
+                "cardio",
+                "weight_loss",
+                "rehabilitation",
+                "other"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "strength",
+              "label": "Strength training"
+            },
+            {
+              "value": "cardio",
+              "label": "Cardio"
+            },
+            {
+              "value": "weight_loss",
+              "label": "Weight management"
+            },
+            {
+              "value": "rehabilitation",
+              "label": "Rehabilitation"
+            },
+            {
+              "value": "other",
+              "label": "Other specializations"
+            }
+          ],
+          "target": "catalog.attributes.training_specializations"
+        }
+      ]
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "reservations",
+      "name": "Reservations",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "personal_assistance",
+      "name": "Personal Assistance",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "ENTITLEMENT",
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CORPORATE_CLIENTS",
+          "label": "Corporate Clients?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.corporate_clients"
+        }
+      ]
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "shopping_assistance",
+      "name": "Shopping Assistance",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CORPORATE_CLIENTS",
+          "label": "Corporate Clients?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.corporate_clients"
+        }
+      ]
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "gift_sourcing",
+      "name": "Gift Sourcing",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_CORPORATE_CLIENTS",
+          "label": "Corporate Clients?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.corporate_clients"
+        },
+        {
+          "id": "Q_GIFT_WRAPPING",
+          "label": "Gift Wrapping?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.gift_wrapping"
+        }
+      ]
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "travel_planning",
+      "name": "Travel Planning",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_DESTINATIONS_COVERAGE",
+          "label": "Destinations Coverage?",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "nairobi",
+                "kenya",
+                "east_africa",
+                "international"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "options": [
+            {
+              "value": "nairobi",
+              "label": "Nairobi"
+            },
+            {
+              "value": "kenya",
+              "label": "Across Kenya"
+            },
+            {
+              "value": "east_africa",
+              "label": "East Africa"
+            },
+            {
+              "value": "international",
+              "label": "International"
+            }
+          ],
+          "target": "catalog.attributes.destinations_coverage"
+        }
+      ]
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "property_coordination",
+      "name": "Property Coordination",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "moving_assistance",
+      "name": "Moving Assistance",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "cleaning_coordination",
+      "name": "Cleaning Coordination",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "ENTITLEMENT",
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_ECO_PRODUCTS",
+          "label": "Eco Products?",
+          "schema": {
+            "type": "boolean"
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "target": "catalog.attributes.eco_products"
+        }
+      ]
+    },
+    {
+      "categoryId": "concierge_services",
+      "id": "vip_assistance",
+      "name": "VIP Assistance",
+      "schema": "REQUEST_QUOTE_V1",
+      "models": [
+        "ENTITLEMENT",
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "attributes": [
+        {
+          "id": "Q_VIP_SERVICES_TEXT",
+          "label": "Vip Services",
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "trim": true
+          },
+          "options": [],
+          "target": "catalog.attributes.vip_services_text"
+        }
+      ]
+    },
+    {
+      "categoryId": "logistics_shipping",
+      "id": "sea_freight",
+      "name": "Sea Freight",
+      "schema": "FREIGHT_SHIPMENT_V1",
+      "models": [
+        "FREIGHT"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "logistics_shipping",
+      "id": "air_freight",
+      "name": "Air Freight",
+      "schema": "FREIGHT_SHIPMENT_V1",
+      "models": [
+        "FREIGHT"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "logistics_shipping",
+      "id": "road_freight",
+      "name": "Road Freight & Trucking",
+      "schema": "FREIGHT_SHIPMENT_V1",
+      "models": [
+        "FREIGHT"
+      ],
+      "attributes": []
+    },
+    {
+      "categoryId": "logistics_shipping",
+      "id": "warehousing",
+      "name": "Warehousing & Storage",
+      "schema": "STORAGE_SPACE_V1",
+      "models": [
+        "STORAGE"
+      ],
+      "attributes": []
+    }
+  ],
+  "registeredSchemas": [
+    "PRODUCT_CATALOG_V1",
+    "MADE_TO_ORDER_V1",
+    "SERVICE_APPOINTMENT_V1",
+    "REMOTE_SESSION_V1",
+    "FIELD_SERVICE_V1",
+    "RENTAL_ASSET_V1",
+    "TRANSFER_ROUTE_V1",
+    "EVENT_TICKET_V1",
+    "GROUP_SESSION_V1",
+    "TOUR_PACKAGE_V1",
+    "REQUEST_QUOTE_V1",
+    "PICKUP_RETURN_V1",
+    "MEMBERSHIP_PLAN_V1",
+    "FREIGHT_SHIPMENT_V1",
+    "STORAGE_SPACE_V1",
+    "REGULATED_ENQUIRY_V1",
+    "SERVICE_JOB_V1",
+    "SPACE_RESERVATION_V1"
+  ]
+}

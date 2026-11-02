@@ -4,7 +4,7 @@ import { Button, ChipGroup, Input, PhoneInput, useToast } from '@nexg/ui';
 import { ArrowRight } from 'lucide-react';
 import * as React from 'react';
 
-import { applyAsHost, type HostApplyResult } from '@/app/hosts/actions';
+import { applyAsHost, type HostApplyResult } from '@/app/(customer)/hosts/actions';
 
 /**
  * The "List your Airbnb" form from the `Hosts` artboard.

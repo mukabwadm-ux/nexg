@@ -1,0 +1,1574 @@
+{
+  "version": "1.0.0-proposed",
+  "status": "WORK_DESIGN_ONLY",
+  "views": [
+    {
+      "workflowId": "WF_ORDER",
+      "modelIds": [
+        "ORDER"
+      ],
+      "workNoun": "order",
+      "queueFields": [
+        "order_reference",
+        "customer_display",
+        "items_quantity",
+        "fulfilment_method",
+        "promised_milestone",
+        "stage",
+        "operator"
+      ],
+      "detailSections": [
+        "actual order lines and variants",
+        "stock confirmation and source",
+        "selected fulfilment and custody",
+        "actual picking/preparation checklist"
+      ],
+      "primaryActions": [
+        {
+          "label": "Start picking",
+          "commandRefs": [
+            "StartPicking"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Mark ready",
+          "commandRefs": [
+            "MarkOrderReady"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record collection",
+          "commandRefs": [
+            "ConfirmCustomerCollection"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record carrier handover",
+          "commandRefs": [
+            "ConfirmCarrierHandover"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "source confirmation",
+        "picking or preparation only when required",
+        "ready",
+        "contracted handover",
+        "completion"
+      ],
+      "sourceStateIds": [
+        "ACCEPTED",
+        "ALLOCATED",
+        "AWAITING_CUSTOMER_COLLECTION",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COLLECTED",
+        "COMPLETED",
+        "DELIVERED",
+        "HANDED_TO_CARRIER",
+        "IN_TRANSIT",
+        "PICKING",
+        "PREPARING",
+        "READY_FOR_HANDOVER",
+        "RECEIVED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "stocked retail",
+        "prepared food",
+        "customer pickup",
+        "scheduled fulfilment only when explicitly enabled"
+      ],
+      "restrictions": [
+        "No generic Accept/Decline step.",
+        "No cooking stage for ordinary retail.",
+        "Stock outage is a source/availability state, not merchant review."
+      ]
+    },
+    {
+      "workflowId": "WF_MADE_TO_ORDER",
+      "modelIds": [
+        "PRODUCTION_DUE"
+      ],
+      "workNoun": "custom job",
+      "queueFields": [
+        "reference",
+        "specification_version",
+        "customer_display",
+        "production_due",
+        "stage",
+        "operator"
+      ],
+      "detailSections": [
+        "agreed specification and proof",
+        "actual quote/customer decision where needed",
+        "production tasks",
+        "quality evidence",
+        "handover"
+      ],
+      "primaryActions": [
+        {
+          "label": "Send quote",
+          "commandRefs": [
+            "IssueCustomQuote"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start production",
+          "commandRefs": [
+            "StartProduction"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record quality result",
+          "commandRefs": [
+            "SubmitProductionResult"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record handover",
+          "commandRefs": [
+            "ConfirmCustomHandover"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "specification",
+        "agreed scope",
+        "production",
+        "quality",
+        "handover"
+      ],
+      "sourceStateIds": [
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "FULFILLED",
+        "HANDOVER_PENDING",
+        "IN_PRODUCTION",
+        "QUALITY_CHECK",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "READY_FOR_HANDOVER",
+        "REQUESTED",
+        "SPECIFICATION_REVIEW"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "customer proof approval",
+        "fixed pre-agreed variant",
+        "measured/custom pricing"
+      ],
+      "restrictions": [
+        "Proof/quotation approval is scoped to the work that needs it; it is not an order acceptance default."
+      ]
+    },
+    {
+      "workflowId": "WF_APPOINTMENT",
+      "modelIds": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "workNoun": "appointment",
+      "queueFields": [
+        "reference",
+        "service",
+        "customer_display",
+        "start_end",
+        "provider_or_resource",
+        "location_mode",
+        "stage"
+      ],
+      "detailSections": [
+        "confirmed service and interval",
+        "provider and shared resource",
+        "venue or linked home-visit execution",
+        "attendance and completion"
+      ],
+      "primaryActions": [
+        {
+          "label": "Check in",
+          "commandRefs": [
+            "CheckInAppointment"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start service",
+          "commandRefs": [
+            "StartAppointment"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Complete service",
+          "commandRefs": [
+            "CompleteAppointment"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "source reservation",
+        "arrival",
+        "service started",
+        "service completed"
+      ],
+      "sourceStateIds": [
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "CHECKED_IN",
+        "COMPLETED",
+        "CONFIRMED",
+        "FIELD_EXECUTION_PENDING",
+        "HELD",
+        "HOLD_EXPIRED",
+        "HOLD_PENDING",
+        "IN_SESSION",
+        "NO_SHOW",
+        "REQUESTED",
+        "WALKIN_REQUESTED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "venue",
+        "optional appointments plus walk-in allocation",
+        "linked home execution"
+      ],
+      "restrictions": [
+        "No manual confirmation for automatically source-confirmed slots.",
+        "No clinical content in administrative health work."
+      ]
+    },
+    {
+      "workflowId": "WF_REMOTE_SESSION",
+      "modelIds": [
+        "APPOINTMENT"
+      ],
+      "workNoun": "remote session",
+      "queueFields": [
+        "reference",
+        "session_service",
+        "customer_display",
+        "start_end",
+        "provider",
+        "access_readiness",
+        "stage"
+      ],
+      "detailSections": [
+        "remote access readiness",
+        "session interval/provider",
+        "permitted attendance",
+        "interruption/recovery"
+      ],
+      "primaryActions": [
+        {
+          "label": "Prepare access",
+          "commandRefs": [
+            "PrepareSessionAccess"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start session",
+          "commandRefs": [
+            "StartRemoteSession"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Complete session",
+          "commandRefs": [
+            "CompleteRemoteSession"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "source-confirmed slot",
+        "access ready",
+        "participant joined",
+        "session started",
+        "completed"
+      ],
+      "sourceStateIds": [
+        "ACCESS_READY",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "COMPLETED",
+        "CONFIRMED",
+        "HOLD_EXPIRED",
+        "IN_SESSION",
+        "NO_SHOW",
+        "PARTICIPANT_JOINED",
+        "REQUESTED",
+        "SESSION_INTERRUPTED",
+        "SLOT_HELD"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "existing provider access",
+        "interrupted session"
+      ],
+      "restrictions": [
+        "Never display private consultation content or fabricate a meeting link."
+      ]
+    },
+    {
+      "workflowId": "WF_FIELD_SERVICE",
+      "modelIds": [
+        "FIELD_VISIT"
+      ],
+      "workNoun": "visit",
+      "queueFields": [
+        "reference",
+        "service",
+        "service_area",
+        "arrival_window",
+        "assigned_team",
+        "stage"
+      ],
+      "detailSections": [
+        "site access and service scope",
+        "travel/resource allocation",
+        "required equipment",
+        "arrival and completion evidence"
+      ],
+      "primaryActions": [
+        {
+          "label": "Assign team",
+          "commandRefs": [
+            "AssignServiceTeam"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record arrival",
+          "commandRefs": [
+            "ConfirmSiteArrival"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start visit",
+          "commandRefs": [
+            "StartSiteService"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Submit result",
+          "commandRefs": [
+            "SubmitSiteResult"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "scope/resource ready",
+        "team travel",
+        "arrival",
+        "service",
+        "completion evidence"
+      ],
+      "sourceStateIds": [
+        "APPROVED",
+        "ARRIVED",
+        "ASSIGNED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "COMPLETION_REVIEW",
+        "EN_ROUTE",
+        "IN_SERVICE",
+        "QUOTE_PENDING",
+        "REQUESTED",
+        "SCOPE_REVIEW"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "known fixed scope",
+        "assessment/quote when genuinely needed",
+        "parent-linked visit"
+      ],
+      "restrictions": [
+        "Assignment can be automatic; no assignment task when already resolved.",
+        "Do not expose a full private address in a broad queue."
+      ]
+    },
+    {
+      "workflowId": "WF_RENTAL",
+      "modelIds": [
+        "ASSET_INTERVAL"
+      ],
+      "workNoun": "rental",
+      "queueFields": [
+        "reference",
+        "asset",
+        "customer_display",
+        "rental_interval",
+        "next_handover_or_return",
+        "stage"
+      ],
+      "detailSections": [
+        "allocated asset and dates",
+        "collection/return locations",
+        "accepted rental terms and eligibility outcome",
+        "condition/custody evidence",
+        "driver section only for with-driver work"
+      ],
+      "primaryActions": [
+        {
+          "label": "Prepare handover",
+          "commandRefs": [
+            "PrepareAssetIssue"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record handover",
+          "commandRefs": [
+            "IssueRentalAsset"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record return",
+          "commandRefs": [
+            "ReceiveRentalReturn"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Inspect returned asset",
+          "commandRefs": [
+            "InspectReturnedAsset"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "source-confirmed asset interval",
+        "handover",
+        "active rental",
+        "return received",
+        "inspection",
+        "closed"
+      ],
+      "sourceStateIds": [
+        "ACTIVE",
+        "ASSET_HELD",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "CHECKOUT_REVIEW",
+        "CLOSED",
+        "CONFIRMED",
+        "DRIVER_ASSIGNMENT_PENDING",
+        "HOLD_EXPIRED",
+        "INSPECTED",
+        "NO_SHOW",
+        "REQUESTED",
+        "RETURN_REVIEW"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "self-drive",
+        "with-driver joint allocation",
+        "long-term renewal",
+        "bike asset fields"
+      ],
+      "restrictions": [
+        "With-driver rental remains rental; transfers need a separate activity.",
+        "Recording return does not close the rental or settle a deposit."
+      ]
+    },
+    {
+      "workflowId": "WF_TRANSFER",
+      "modelIds": [
+        "TRANSFER"
+      ],
+      "workNoun": "transfer",
+      "queueFields": [
+        "reference",
+        "pickup_dropoff",
+        "pickup_window",
+        "passengers_or_greeter_role",
+        "vehicle_driver",
+        "stage"
+      ],
+      "detailSections": [
+        "route or greet-only scope",
+        "passenger/party quantity",
+        "pickup/access details",
+        "driver/vehicle allocation where required",
+        "actual journey milestones"
+      ],
+      "primaryActions": [
+        {
+          "label": "Start pickup approach",
+          "commandRefs": [
+            "StartPickupApproach"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record pickup arrival",
+          "commandRefs": [
+            "ConfirmPickupArrival"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record boarding",
+          "commandRefs": [
+            "ConfirmBoarding"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record destination arrival",
+          "commandRefs": [
+            "ConfirmDestinationArrival"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "source-confirmed resources",
+        "pickup approach",
+        "arrival",
+        "journey",
+        "destination",
+        "completion"
+      ],
+      "sourceStateIds": [
+        "ARRIVED_DESTINATION",
+        "AT_PICKUP",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "CONFIRMED",
+        "DRIVER_EN_ROUTE",
+        "JOURNEY_IN_PROGRESS",
+        "NO_SHOW",
+        "PASSENGER_ON_BOARD",
+        "REQUESTED",
+        "VEHICLE_ASSIGNED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "single journey",
+        "linked return journey",
+        "greeter-only without inferred vehicle"
+      ],
+      "restrictions": [
+        "No rental return stages on transfer work.",
+        "A greet-only service need not reserve a vehicle."
+      ]
+    },
+    {
+      "workflowId": "WF_EVENT_SESSION",
+      "modelIds": [
+        "SESSION_CAPACITY"
+      ],
+      "workNoun": "event booking",
+      "queueFields": [
+        "reference",
+        "event_session",
+        "admission_places",
+        "issuer_status",
+        "checkin_status",
+        "stage"
+      ],
+      "detailSections": [
+        "session and admission quantities",
+        "confirmed booking vs actual issued ticket",
+        "capacity source",
+        "permitted check-in records"
+      ],
+      "primaryActions": [
+        {
+          "label": "Request ticket issue",
+          "commandRefs": [
+            "RequestTicketIssue"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Validate admission",
+          "commandRefs": [
+            "ValidateAdmission"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Confirm attendance",
+          "commandRefs": [
+            "ConfirmEventAttendance"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "place confirmed",
+        "ticket issue only when required",
+        "admission",
+        "attendance"
+      ],
+      "sourceStateIds": [
+        "ADMITTED",
+        "ATTENDED",
+        "BOOKING_CONFIRMED",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "COMPLETED",
+        "HOLD_EXPIRED",
+        "NO_SHOW",
+        "REQUESTED",
+        "SEATS_HELD",
+        "TICKET_ISSUED",
+        "TICKET_PENDING"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "issuer tickets",
+        "booking-reference admission",
+        "multiday pass scope"
+      ],
+      "restrictions": [
+        "Confirmed places are not issued tickets or unique people."
+      ]
+    },
+    {
+      "workflowId": "WF_GROUP_ACTIVITY",
+      "modelIds": [
+        "SESSION_CAPACITY"
+      ],
+      "workNoun": "activity booking",
+      "queueFields": [
+        "reference",
+        "session",
+        "participant_places",
+        "instructor",
+        "remaining_places",
+        "stage"
+      ],
+      "detailSections": [
+        "actual participants/quantity",
+        "instructor and equipment",
+        "dated session readiness",
+        "attendance"
+      ],
+      "primaryActions": [
+        {
+          "label": "Check in participants",
+          "commandRefs": [
+            "CheckInParticipants"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start activity",
+          "commandRefs": [
+            "StartActivity"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Complete activity",
+          "commandRefs": [
+            "CompleteActivity"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "place allocation",
+        "session readiness",
+        "check-in",
+        "activity",
+        "attendance"
+      ],
+      "sourceStateIds": [
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "CAPACITY_HELD",
+        "CHECKED_IN",
+        "CLEARED_TO_RUN",
+        "COMPLETED",
+        "CONFIRMED",
+        "GO_DECISION_PENDING",
+        "HOLD_EXPIRED",
+        "IN_ACTIVITY",
+        "NO_SHOW",
+        "REQUESTED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "group/private session",
+        "minimum participant decision only where configured",
+        "recurring occurrences"
+      ],
+      "restrictions": [
+        "Bookings and participant places use separate counts.",
+        "Recurrence does not create a paid membership."
+      ]
+    },
+    {
+      "workflowId": "WF_TOUR",
+      "modelIds": [
+        "TOUR"
+      ],
+      "workNoun": "tour booking",
+      "queueFields": [
+        "reference",
+        "departure",
+        "itinerary",
+        "party_places",
+        "guide_vehicle",
+        "stage"
+      ],
+      "detailSections": [
+        "published or agreed itinerary",
+        "supplier/local allocation confirmations",
+        "departure prerequisites",
+        "party scope",
+        "actual tour milestones"
+      ],
+      "primaryActions": [
+        {
+          "label": "Send itinerary quote",
+          "commandRefs": [
+            "IssueTourQuote"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Clear departure",
+          "commandRefs": [
+            "ClearTourDeparture"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start tour",
+          "commandRefs": [
+            "StartTour"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record completion",
+          "commandRefs": [
+            "SubmitTourCompletion"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "agreed itinerary",
+        "actual supplier/resource confirmation",
+        "departure readiness",
+        "in progress",
+        "completion"
+      ],
+      "sourceStateIds": [
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "COMPLETION_REVIEW",
+        "ITINERARY_REVIEW",
+        "NO_SHOW",
+        "ON_TOUR",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "READY_TO_DEPART",
+        "REQUESTED",
+        "SUPPLIERS_CONFIRMED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "fixed published tour",
+        "supplier-dependent trip",
+        "locally controlled tour"
+      ],
+      "restrictions": [
+        "An enquiry is not a supplier booking.",
+        "No tour promise from an empty external inventory response."
+      ]
+    },
+    {
+      "workflowId": "WF_REQUEST_QUOTE",
+      "modelIds": [
+        "REQUEST_QUOTE"
+      ],
+      "workNoun": "request",
+      "queueFields": [
+        "reference",
+        "request_scope",
+        "customer_display",
+        "response_due",
+        "quote_version",
+        "stage"
+      ],
+      "detailSections": [
+        "clarification and scope",
+        "current quote and customer decision",
+        "supplier commitment only if applicable",
+        "execution and agreed outcome"
+      ],
+      "primaryActions": [
+        {
+          "label": "Ask for clarification",
+          "commandRefs": [
+            "RequestClarification"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Send quote",
+          "commandRefs": [
+            "IssueCoordinationQuote"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start agreed work",
+          "commandRefs": [
+            "StartCoordinatedWork"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "request received",
+        "scope",
+        "quote when required",
+        "customer decision",
+        "commitment",
+        "execution"
+      ],
+      "sourceStateIds": [
+        "ALTERNATIVE_REVIEW",
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "CLARIFICATION_PENDING",
+        "COMMITTED",
+        "COMPLETED",
+        "CONFIRMATION_PENDING",
+        "DELIVERABLE_REVIEW",
+        "IN_PROGRESS",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "REQUESTED",
+        "SCOPED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "fixed agreed scope",
+        "supplier coordination",
+        "advisory execution without supplier booking"
+      ],
+      "restrictions": [
+        "Waiting for the customer is not a merchant acceptance task."
+      ]
+    },
+    {
+      "workflowId": "WF_PICKUP_RETURN",
+      "modelIds": [
+        "LINKED_WINDOWS"
+      ],
+      "workNoun": "collection and return job",
+      "queueFields": [
+        "reference",
+        "collection_window",
+        "intake_quantity_unit",
+        "processing_stage",
+        "return_window",
+        "custodian"
+      ],
+      "detailSections": [
+        "linked feasible collection/processing/return promises",
+        "measured intake and agreed price basis",
+        "current custody",
+        "processing evidence",
+        "returned goods confirmation"
+      ],
+      "primaryActions": [
+        {
+          "label": "Record collection",
+          "commandRefs": [
+            "ConfirmGoodsCollected"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record intake",
+          "commandRefs": [
+            "ReceiveProcessingGoods"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start processing",
+          "commandRefs": [
+            "StartProcessing"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record return",
+          "commandRefs": [
+            "ConfirmGoodsReturned"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "paired windows confirmed",
+        "collection or drop-off",
+        "intake",
+        "processing",
+        "return/collection",
+        "complete"
+      ],
+      "sourceStateIds": [
+        "ASSESSMENT_PENDING",
+        "AWAITING_CUSTOMER_COLLECTION",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COLLECTED",
+        "COLLECTION_CONFIRMED",
+        "COMPLETED",
+        "PRICE_APPROVED",
+        "PROCESSING",
+        "READY_FOR_RETURN",
+        "RECEIVED_FOR_PROCESSING",
+        "REQUESTED",
+        "RETURNED",
+        "RETURN_CONFIRMED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "customer drop-off",
+        "customer collection",
+        "measured repricing only when needed"
+      ],
+      "restrictions": [
+        "The first transport leg is not full-cycle completion.",
+        "Do not require a collection driver for customer drop-off."
+      ]
+    },
+    {
+      "workflowId": "WF_MEMBERSHIP",
+      "modelIds": [
+        "ENTITLEMENT"
+      ],
+      "workNoun": "membership",
+      "queueFields": [
+        "reference",
+        "plan",
+        "member_reference",
+        "validity",
+        "renewal_due",
+        "access_state"
+      ],
+      "detailSections": [
+        "entitlement scope and validity",
+        "actual access status",
+        "renewal cycle",
+        "linked session occurrences",
+        "independent finance state"
+      ],
+      "primaryActions": [
+        {
+          "label": "Request pause",
+          "commandRefs": [
+            "RequestMembershipPause"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Resume entitlement",
+          "commandRefs": [
+            "ResumeMembership"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Open permitted session occurrence",
+          "commandRefs": [
+            "CreateApprovedMembershipOccurrence"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "enrolment",
+        "active entitlement",
+        "pause/expiry",
+        "renewal"
+      ],
+      "sourceStateIds": [
+        "ACTIVATION_PENDING",
+        "ACTIVE",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "ELIGIBILITY_REVIEW",
+        "EXHAUSTED",
+        "EXPIRED",
+        "PAUSED",
+        "PAUSE_PENDING",
+        "REQUESTED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "access-only",
+        "credit/usage entitlements",
+        "booked occurrences"
+      ],
+      "restrictions": [
+        "Entitlement is not a completed appointment.",
+        "Renewal eligibility and payment consent remain separate."
+      ]
+    },
+    {
+      "workflowId": "WF_FREIGHT",
+      "modelIds": [
+        "FREIGHT"
+      ],
+      "workNoun": "shipment",
+      "queueFields": [
+        "reference",
+        "cargo_quantity_unit",
+        "origin_destination",
+        "leg",
+        "next_milestone",
+        "stage"
+      ],
+      "detailSections": [
+        "cargo dimensions and original units",
+        "carrier booking confirmation",
+        "required document status",
+        "actual leg/tracking milestones",
+        "custody"
+      ],
+      "primaryActions": [
+        {
+          "label": "Send freight quote",
+          "commandRefs": [
+            "IssueFreightQuote"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record freight collection",
+          "commandRefs": [
+            "ConfirmFreightCollection"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record departure",
+          "commandRefs": [
+            "ConfirmFreightDeparture"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record delivery",
+          "commandRefs": [
+            "ConfirmFreightDelivery"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "declared scope",
+        "agreed quote if needed",
+        "carrier booked",
+        "custody",
+        "transit",
+        "delivery"
+      ],
+      "sourceStateIds": [
+        "APPROVED",
+        "AT_DESTINATION",
+        "BOOKED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "CARGO_REVIEW",
+        "CLEARANCE_REVIEW",
+        "CLEARED",
+        "CLOSED",
+        "COLLECTED",
+        "COLLECTED_BY_CONSIGNEE",
+        "DELIVERED",
+        "DOCUMENTATION_READY",
+        "IN_TRANSIT",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "REQUESTED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "domestic direct leg",
+        "clearance branch where applicable",
+        "consignee collection"
+      ],
+      "restrictions": [
+        "kg and cubic metres stay separate.",
+        "Quotation approval is not carrier booking."
+      ]
+    },
+    {
+      "workflowId": "WF_STORAGE",
+      "modelIds": [
+        "STORAGE"
+      ],
+      "workNoun": "storage allocation",
+      "queueFields": [
+        "reference",
+        "space_allocation",
+        "occupied_quantity_unit",
+        "storage_period",
+        "next_intake_release",
+        "stage"
+      ],
+      "detailSections": [
+        "goods and compatible space",
+        "allocated original physical unit",
+        "intake/custody evidence",
+        "partial release history",
+        "contract extension"
+      ],
+      "primaryActions": [
+        {
+          "label": "Record intake",
+          "commandRefs": [
+            "ConfirmStorageIntake"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Request release",
+          "commandRefs": [
+            "RequestGoodsRelease"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record partial release",
+          "commandRefs": [
+            "ConfirmPartialGoodsRelease"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record release",
+          "commandRefs": [
+            "ConfirmStorageRelease"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "compatible allocation",
+        "intake",
+        "stored",
+        "authorized release",
+        "custody confirmed"
+      ],
+      "sourceStateIds": [
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "CLOSED",
+        "INTAKE_REVIEW",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "READY_FOR_RELEASE",
+        "RELEASED",
+        "REQUESTED",
+        "RETRIEVAL_REQUESTED",
+        "SPACE_RESERVED",
+        "SPACE_REVIEW",
+        "STORED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "partial retrieval",
+        "extension",
+        "location access windows"
+      ],
+      "restrictions": [
+        "Partial release retains remaining allocation and history.",
+        "Area/volume/pallet counts are not added."
+      ]
+    },
+    {
+      "workflowId": "WF_REGULATED_ENQUIRY",
+      "modelIds": [
+        "REQUEST_QUOTE"
+      ],
+      "workNoun": "provider enquiry",
+      "queueFields": [
+        "reference",
+        "enquiry_type",
+        "provider",
+        "response_due",
+        "handoff_status",
+        "stage"
+      ],
+      "detailSections": [
+        "administrative request scope",
+        "authorized provider reference",
+        "permitted clarification",
+        "response/handoff acknowledgement"
+      ],
+      "primaryActions": [
+        {
+          "label": "Route enquiry",
+          "commandRefs": [
+            "ReferRegulatedEnquiry"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Prepare permitted response",
+          "commandRefs": [
+            "PrepareRegulatedResponse"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Close enquiry",
+          "commandRefs": [
+            "CloseRegulatedEnquiry"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "received",
+        "permitted triage",
+        "provider response",
+        "acknowledged handoff",
+        "closed"
+      ],
+      "sourceStateIds": [
+        "CLARIFICATION_PENDING",
+        "CLOSED",
+        "DECLINED",
+        "PROFESSIONAL_REVIEW",
+        "REFERRED",
+        "RESPONSE_DELIVERED",
+        "RESPONSE_READY",
+        "REVIEW_BLOCKED",
+        "SUBMITTED",
+        "TRIAGED",
+        "WITHDRAWAL_PENDING",
+        "WITHDRAWN"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "banking/forex/insurance/remittance scope labels",
+        "professional referral"
+      ],
+      "restrictions": [
+        "No balances, transactions, lending outcomes or clinical content through category inference.",
+        "Sending a referral is not provider acceptance."
+      ]
+    },
+    {
+      "workflowId": "WF_SERVICE_JOB",
+      "modelIds": [
+        "SERVICE_JOB",
+        "FIELD_VISIT"
+      ],
+      "workNoun": "service job",
+      "queueFields": [
+        "reference",
+        "item_asset",
+        "service_scope",
+        "assessment_or_parts_status",
+        "promised_release",
+        "stage"
+      ],
+      "detailSections": [
+        "actual item/custody",
+        "diagnosis only where needed",
+        "agreed scope/quote",
+        "parts",
+        "repair/quality/release"
+      ],
+      "primaryActions": [
+        {
+          "label": "Start assessment",
+          "commandRefs": [
+            "StartDiagnosis"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Send service quote",
+          "commandRefs": [
+            "IssueServiceQuote"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Start service",
+          "commandRefs": [
+            "StartRepair"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record handover",
+          "commandRefs": [
+            "ConfirmServiceHandover"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "intake",
+        "assessment if needed",
+        "customer scope decision",
+        "parts if needed",
+        "service",
+        "quality",
+        "release"
+      ],
+      "sourceStateIds": [
+        "APPROVED",
+        "CANCELLATION_REVIEW",
+        "CANCELLED",
+        "COMPLETED",
+        "DIAGNOSIS",
+        "FIELD_EXECUTION_PENDING",
+        "INTAKE_REVIEW",
+        "IN_SERVICE",
+        "PARTS_PENDING",
+        "QUALITY_REVIEW",
+        "QUOTED",
+        "QUOTE_EXPIRED",
+        "READY_FOR_RELEASE",
+        "RELEASED",
+        "REQUESTED"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "fixed known scope",
+        "no parts",
+        "mobile linked execution",
+        "rework"
+      ],
+      "restrictions": [
+        "No diagnostic/quote gate for a fixed known-scope variant that has an approved bypass."
+      ]
+    },
+    {
+      "workflowId": "WF_SPACE_RESERVATION_V1",
+      "modelIds": [
+        "SPACE_RESERVATION"
+      ],
+      "workNoun": "space reservation",
+      "queueFields": [
+        "reference",
+        "party_or_group",
+        "reservation_interval",
+        "allocated_space",
+        "arrival_status",
+        "stage"
+      ],
+      "detailSections": [
+        "party quantity and compatibility",
+        "actual table/space interval",
+        "turnover and shared capacity",
+        "arrival/seating/departure"
+      ],
+      "primaryActions": [
+        {
+          "label": "Record arrival",
+          "commandRefs": [
+            "RecordPartyArrival"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Seat party",
+          "commandRefs": [
+            "SeatReservedParty"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Record departure",
+          "commandRefs": [
+            "RecordPartyDeparture"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        },
+        {
+          "label": "Release prepared space",
+          "commandRefs": [
+            "ReleasePreparedSpace"
+          ],
+          "availableWhen": "Owner supplies this currently permitted action for the selected existing record/state and viewer scope; the button opens required evidence/confirmation when applicable."
+        }
+      ],
+      "stageLabels": [
+        "source-confirmed space",
+        "arrival",
+        "seated/in use",
+        "departure",
+        "turnover release"
+      ],
+      "sourceStateIds": [
+        "ARRIVED",
+        "CANCELLATION_PENDING",
+        "CANCELLED",
+        "COMPLETED",
+        "CONFIRMED",
+        "HELD",
+        "HOLD_EXPIRED",
+        "NO_SHOW",
+        "REQUESTED",
+        "SEATED",
+        "TURNOVER"
+      ],
+      "confirmation": "Use automatic native/API/webhook stock/resource confirmation when supported by the actual selected offering/model and confirmed source evidence. Human judgment is limited to a specific supported matching exception, genuine quotation/assessment/customer decision or provider milestone; never a category-wide manual acceptance default.",
+      "defaultViews": [
+        "needs_attention",
+        "upcoming",
+        "in_progress",
+        "history"
+      ],
+      "optionalVariants": [
+        "table/party",
+        "room/space",
+        "walk-in allocation"
+      ],
+      "restrictions": [
+        "Restaurant reservation_system disclosure alone does not enable this view.",
+        "No meal preparation timeline for a table booking."
+      ]
+    }
+  ],
+  "renderingPolicy": "Workflow state/action contracts are source references, not implemented UI behavior. Automatic order confirmation follows ../order-confirmation.md over stale AcceptOrder wording in imported effective workflows."
+}

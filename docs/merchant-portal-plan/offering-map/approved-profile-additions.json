@@ -1,0 +1,788 @@
+{
+  "approval": {
+    "approvalId": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+    "date": "2026-10-31",
+    "approvedBy": "user",
+    "userInstruction": "yes include these",
+    "status": "APPROVED_FOR_DESIGN_INCLUSION",
+    "scope": "The 21 additional specialty/template/model routes shown to the user. This records inclusion in the design and does not activate runtime capabilities or approve all individual field requirements.",
+    "routes": [
+      {
+        "subcategoryId": "festivals",
+        "templateId": "session_pass",
+        "modelId": "ENTITLEMENT"
+      },
+      {
+        "subcategoryId": "conferences",
+        "templateId": "event_space",
+        "modelId": "SPACE_RESERVATION"
+      },
+      {
+        "subcategoryId": "private_events",
+        "templateId": "event_space",
+        "modelId": "SPACE_RESERVATION"
+      },
+      {
+        "subcategoryId": "private_events",
+        "templateId": "photography",
+        "modelId": "APPOINTMENT"
+      },
+      {
+        "subcategoryId": "private_events",
+        "templateId": "photography",
+        "modelId": "FIELD_VISIT"
+      },
+      {
+        "subcategoryId": "workshops",
+        "templateId": "session_pass",
+        "modelId": "ENTITLEMENT"
+      },
+      {
+        "subcategoryId": "recreation",
+        "templateId": "session_pass",
+        "modelId": "ENTITLEMENT"
+      },
+      {
+        "subcategoryId": "cakes",
+        "templateId": "ready_cake",
+        "modelId": "ORDER"
+      },
+      {
+        "subcategoryId": "restaurant",
+        "templateId": "catering",
+        "modelId": "REQUEST_QUOTE"
+      },
+      {
+        "subcategoryId": "stationery",
+        "templateId": "personalized_gift",
+        "modelId": "PRODUCTION_DUE"
+      },
+      {
+        "subcategoryId": "coaching",
+        "templateId": "session_pass",
+        "modelId": "ENTITLEMENT"
+      },
+      {
+        "subcategoryId": "travel_packages",
+        "templateId": "safari",
+        "modelId": "TOUR"
+      },
+      {
+        "subcategoryId": "travel_packages",
+        "templateId": "city_tour",
+        "modelId": "TOUR"
+      },
+      {
+        "subcategoryId": "tire_service",
+        "templateId": "tire_product",
+        "modelId": "ORDER"
+      },
+      {
+        "subcategoryId": "battery_service",
+        "templateId": "battery_product",
+        "modelId": "ORDER"
+      },
+      {
+        "subcategoryId": "spa",
+        "templateId": "personal_care",
+        "modelId": "ORDER"
+      },
+      {
+        "subcategoryId": "massage",
+        "templateId": "personal_care",
+        "modelId": "ORDER"
+      },
+      {
+        "subcategoryId": "gym",
+        "templateId": "training",
+        "modelId": "FIELD_VISIT"
+      },
+      {
+        "subcategoryId": "gym",
+        "templateId": "class",
+        "modelId": "SESSION_CAPACITY"
+      },
+      {
+        "subcategoryId": "personal_training",
+        "templateId": "session_pass",
+        "modelId": "ENTITLEMENT"
+      },
+      {
+        "subcategoryId": "moving_assistance",
+        "templateId": "road_freight",
+        "modelId": "FREIGHT"
+      }
+    ]
+  },
+  "sourceProfileSnapshot": {
+    "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-profiles-128.json",
+    "sha256": "4a831d5a4f3392369153a6c5e2b37445ea760b8d6787fcd73b679bc47ac9714b"
+  },
+  "interpretation": "Explicit approved per-offering design extensions; preserve the base profile guards and model contracts. This is not a second runtime resolver.",
+  "runtimeEnabled": false,
+  "profiles": [
+    {
+      "subcategoryId": "festivals",
+      "baseModelIds": [
+        "SESSION_CAPACITY"
+      ],
+      "effectiveDesignModelIds": [
+        "SESSION_CAPACITY",
+        "ENTITLEMENT"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "session_pass",
+          "modelRoutes": [
+            {
+              "modelId": "ENTITLEMENT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_MEMBERSHIP"
+              ],
+              "allowedIntakeModes": [
+                "plan_enrolment"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "conferences",
+      "baseModelIds": [
+        "SESSION_CAPACITY"
+      ],
+      "effectiveDesignModelIds": [
+        "SESSION_CAPACITY",
+        "SPACE_RESERVATION"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "event_space",
+          "modelRoutes": [
+            {
+              "modelId": "SPACE_RESERVATION",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_SPACE_RESERVATION_V1"
+              ],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote",
+                "walk_in_only"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "private_events",
+      "baseModelIds": [
+        "REQUEST_QUOTE"
+      ],
+      "effectiveDesignModelIds": [
+        "REQUEST_QUOTE",
+        "SPACE_RESERVATION",
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "event_space",
+          "modelRoutes": [
+            {
+              "modelId": "SPACE_RESERVATION",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_SPACE_RESERVATION_V1"
+              ],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote",
+                "walk_in_only"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        },
+        {
+          "templateId": "photography",
+          "modelRoutes": [
+            {
+              "modelId": "APPOINTMENT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_APPOINTMENT"
+              ],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote",
+                "walk_in_only"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            },
+            {
+              "modelId": "FIELD_VISIT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_FIELD_SERVICE"
+              ],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "workshops",
+      "baseModelIds": [
+        "SESSION_CAPACITY"
+      ],
+      "effectiveDesignModelIds": [
+        "SESSION_CAPACITY",
+        "ENTITLEMENT"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "session_pass",
+          "modelRoutes": [
+            {
+              "modelId": "ENTITLEMENT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_MEMBERSHIP"
+              ],
+              "allowedIntakeModes": [
+                "plan_enrolment"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "recreation",
+      "baseModelIds": [
+        "SESSION_CAPACITY"
+      ],
+      "effectiveDesignModelIds": [
+        "SESSION_CAPACITY",
+        "ENTITLEMENT"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "session_pass",
+          "modelRoutes": [
+            {
+              "modelId": "ENTITLEMENT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_MEMBERSHIP"
+              ],
+              "allowedIntakeModes": [
+                "plan_enrolment"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "cakes",
+      "baseModelIds": [
+        "PRODUCTION_DUE"
+      ],
+      "effectiveDesignModelIds": [
+        "PRODUCTION_DUE",
+        "ORDER"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "ready_cake",
+          "modelRoutes": [
+            {
+              "modelId": "ORDER",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_ORDER"
+              ],
+              "allowedIntakeModes": [
+                "order_acceptance"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "restaurant",
+      "baseModelIds": [
+        "ORDER",
+        "SPACE_RESERVATION"
+      ],
+      "effectiveDesignModelIds": [
+        "ORDER",
+        "SPACE_RESERVATION",
+        "REQUEST_QUOTE"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "catering",
+          "modelRoutes": [
+            {
+              "modelId": "REQUEST_QUOTE",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_REQUEST_QUOTE"
+              ],
+              "allowedIntakeModes": [
+                "request_quote"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "stationery",
+      "baseModelIds": [
+        "ORDER"
+      ],
+      "effectiveDesignModelIds": [
+        "ORDER",
+        "PRODUCTION_DUE"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "personalized_gift",
+          "modelRoutes": [
+            {
+              "modelId": "PRODUCTION_DUE",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_MADE_TO_ORDER"
+              ],
+              "allowedIntakeModes": [
+                "merchant_approval",
+                "request_quote"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "coaching",
+      "baseModelIds": [
+        "APPOINTMENT",
+        "SESSION_CAPACITY"
+      ],
+      "effectiveDesignModelIds": [
+        "APPOINTMENT",
+        "SESSION_CAPACITY",
+        "ENTITLEMENT"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "session_pass",
+          "modelRoutes": [
+            {
+              "modelId": "ENTITLEMENT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_MEMBERSHIP"
+              ],
+              "allowedIntakeModes": [
+                "plan_enrolment"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "travel_packages",
+      "baseModelIds": [
+        "REQUEST_QUOTE"
+      ],
+      "effectiveDesignModelIds": [
+        "REQUEST_QUOTE",
+        "TOUR"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "safari",
+          "modelRoutes": [
+            {
+              "modelId": "TOUR",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_TOUR"
+              ],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        },
+        {
+          "templateId": "city_tour",
+          "modelRoutes": [
+            {
+              "modelId": "TOUR",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_TOUR"
+              ],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "tire_service",
+      "baseModelIds": [
+        "FIELD_VISIT",
+        "SERVICE_JOB"
+      ],
+      "effectiveDesignModelIds": [
+        "FIELD_VISIT",
+        "SERVICE_JOB",
+        "ORDER"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "tire_product",
+          "modelRoutes": [
+            {
+              "modelId": "ORDER",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_ORDER"
+              ],
+              "allowedIntakeModes": [
+                "order_acceptance"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "battery_service",
+      "baseModelIds": [
+        "FIELD_VISIT",
+        "SERVICE_JOB"
+      ],
+      "effectiveDesignModelIds": [
+        "FIELD_VISIT",
+        "SERVICE_JOB",
+        "ORDER"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "battery_product",
+          "modelRoutes": [
+            {
+              "modelId": "ORDER",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_ORDER"
+              ],
+              "allowedIntakeModes": [
+                "order_acceptance"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "spa",
+      "baseModelIds": [
+        "APPOINTMENT",
+        "ENTITLEMENT",
+        "FIELD_VISIT"
+      ],
+      "effectiveDesignModelIds": [
+        "APPOINTMENT",
+        "ENTITLEMENT",
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "personal_care",
+          "modelRoutes": [
+            {
+              "modelId": "ORDER",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_ORDER"
+              ],
+              "allowedIntakeModes": [
+                "order_acceptance"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "massage",
+      "baseModelIds": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "effectiveDesignModelIds": [
+        "APPOINTMENT",
+        "FIELD_VISIT",
+        "ORDER"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "personal_care",
+          "modelRoutes": [
+            {
+              "modelId": "ORDER",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_ORDER"
+              ],
+              "allowedIntakeModes": [
+                "order_acceptance"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "gym",
+      "baseModelIds": [
+        "APPOINTMENT",
+        "ENTITLEMENT"
+      ],
+      "effectiveDesignModelIds": [
+        "APPOINTMENT",
+        "ENTITLEMENT",
+        "FIELD_VISIT",
+        "SESSION_CAPACITY"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "training",
+          "modelRoutes": [
+            {
+              "modelId": "APPOINTMENT",
+              "compatibility": "WITHIN_PROFILE_CANDIDATES",
+              "designApprovalRef": null,
+              "approvedWorkflowRefs": [],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote",
+                "walk_in_only"
+              ],
+              "existingWorkflowRefs": [
+                "WF_APPOINTMENT",
+                "WF_REMOTE_SESSION"
+              ],
+              "createsWork": false,
+              "runtimeEnabled": false
+            },
+            {
+              "modelId": "FIELD_VISIT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_FIELD_SERVICE"
+              ],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        },
+        {
+          "templateId": "class",
+          "modelRoutes": [
+            {
+              "modelId": "SESSION_CAPACITY",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_GROUP_ACTIVITY"
+              ],
+              "allowedIntakeModes": [
+                "instant_after_requirements",
+                "merchant_approval",
+                "request_quote",
+                "walk_in_only"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "personal_training",
+      "baseModelIds": [
+        "APPOINTMENT",
+        "FIELD_VISIT",
+        "SESSION_CAPACITY"
+      ],
+      "effectiveDesignModelIds": [
+        "APPOINTMENT",
+        "FIELD_VISIT",
+        "SESSION_CAPACITY",
+        "ENTITLEMENT"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "session_pass",
+          "modelRoutes": [
+            {
+              "modelId": "ENTITLEMENT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_MEMBERSHIP"
+              ],
+              "allowedIntakeModes": [
+                "plan_enrolment"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subcategoryId": "moving_assistance",
+      "baseModelIds": [
+        "FIELD_VISIT",
+        "REQUEST_QUOTE"
+      ],
+      "effectiveDesignModelIds": [
+        "FIELD_VISIT",
+        "REQUEST_QUOTE",
+        "FREIGHT"
+      ],
+      "approvedOfferings": [
+        {
+          "templateId": "road_freight",
+          "modelRoutes": [
+            {
+              "modelId": "FREIGHT",
+              "compatibility": "APPROVED_PROFILE_EXTENSION",
+              "designApprovalRef": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+              "approvedWorkflowRefs": [
+                "WF_FREIGHT"
+              ],
+              "allowedIntakeModes": [
+                "merchant_approval",
+                "request_quote"
+              ],
+              "existingWorkflowRefs": [],
+              "createsWork": false,
+              "runtimeEnabled": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

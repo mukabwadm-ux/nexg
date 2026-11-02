@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-31",
+  "status": "RECONCILED_DESIGN_NOT_IMPLEMENTED",
+  "entryPoint": "README.md",
+  "questionRegistry": "effective-question-registry.json",
+  "profileRegistry": "effective-profiles-128.json",
+  "workflowRegistry": "effective-workflows.json",
+  "domainRegistry": "effective-domain-registry.json",
+  "inputBase": "../..",
+  "sourceVerification": {
+    "workingSourceRoot": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE",
+    "taxonomyPath": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\packages\\contracts\\src\\taxonomy.ts",
+    "taxonomySha256": "957f877487f8638ac56865b73d4d7f74283e1b0c5560fa033251941ded86b2ad",
+    "questionGeneratorPath": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\apps\\web\\components\\onboarding\\subcategory-questions.ts",
+    "questionGeneratorSha256": "daa8f6f823c818af4ea9237fda02feb281b7bfb4b9ba054c73483cc0e02c30e5",
+    "savedAuditPath": "../../../audits/merchant-onboarding-128-taxonomy.json",
+    "savedAuditSha256": "6ddf4228e47c7e9d96399b1e96d7373c0024ca261e0caaac1893b4635c28777a",
+    "categoryCount": 21,
+    "subcategoryCount": 128,
+    "comparedProperties": [
+      "name",
+      "categoryId",
+      "fields",
+      "fulfillmentHint",
+      "workflowHint",
+      "defaultWorkflow",
+      "suggestedItemCount"
+    ],
+    "comparisonMethod": "Read-only TypeScript transpilation of Desktop MERCHANT_TAXONOMY followed by exact property comparison with saved audit rows.",
+    "comparisonResult": "NO_DIFFERENCES",
+    "differenceCount": 0
+  },
+  "precedence": "Use one generated effective snapshot. Older registries are source/audit history; never replay their superseded rule effects.",
+  "buildCommand": "C:/Python314/python.exe docs/merchant-portal-plan/payload-reserve-plan/reconciliation/reconcile.py",
+  "validationCommand": "C:/Python314/python.exe docs/merchant-portal-plan/payload-reserve-plan/reconciliation/verify_reconciliation.py",
+  "inputSha256": {
+    "question-registry.json": "6d69e0aff0d02e43346dce9687094a55425f58b0e1c11205b3942247f1675a9c",
+    "profiles-128.json": "45050cee7f24255fbaab4b83bb72df9a935f01d8465fca80ab03e238da8a75dd",
+    "domain-registry.json": "ac9ae1357057105dc64a97f00d7eeaf839857a713d380e7a96e7c7a40deccd40",
+    "workflow-catalogue.md": "43a36a10c608aab3ee21cc968ce55b30802e5c0240289ddb4715c8632d0b3451",
+    "payload-reserve-plan/models.json": "e4800f98ddb2314bc3f3d174159f3e70f2d1c2b449df94d1ade7b32db52fd9c8",
+    "payload-reserve-plan/extensions.json": "8970c9ea588d714a1fafc26ec8e28f39010f4bd2a0a74dcb9911d3e1098b1271",
+    "payload-reserve-plan/coverage-128.json": "723bd326ae6b20c6b84fc0a224297f1b2a162f295e7b030c9d0c57149ebf9c02"
+  },
+  "sha256": {
+    "effective-question-registry.json": "8381f6d88bbd4bd7b24d7e0865e138fad421f62c8921151d61f3a043d3cbe6ac",
+    "question-bridge.json": "b88c52a3ab4fa8e7e6b7abaf0305d4769c524a08d6d90b31f8c73eab483f4c81",
+    "profile-decisions.json": "a2ebd7d3582267c6ba7b62a9d3d42a8a9c91b73c748f0d3f48622f679ab0f279",
+    "workflow-bindings.json": "1c1d5735ee5378999ec34f22a8b6f59733753f1105cfc2571c55021bd9f61a05",
+    "effective-profiles-128.json": "4a831d5a4f3392369153a6c5e2b37445ea760b8d6787fcd73b679bc47ac9714b",
+    "effective-workflows.json": "684ed4db68bdf27df6281da106eece1780c4c2e2b0e7a36daae0dc95ef6cc210",
+    "effective-domain-registry.json": "6ab91de44e853f06b2606ebfc03a123d150650658355b53558778dfbe1578a5b"
+  },
+  "generationCommands": [
+    "C:/Python314/python.exe docs/merchant-portal-plan/payload-reserve-plan/reconciliation/generate-question-registry.py",
+    "C:/Python314/python.exe docs/merchant-portal-plan/payload-reserve-plan/generate-coverage.py",
+    "C:/Python314/python.exe docs/merchant-portal-plan/payload-reserve-plan/reconciliation/verify_reconciliation.py",
+    "C:/Python314/python.exe docs/merchant-portal-plan/payload-reserve-plan/verify-plan.py"
+  ]
+}

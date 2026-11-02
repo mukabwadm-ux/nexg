@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 /**
  * The scan happens here, not in the page.
@@ -52,10 +53,26 @@ export const config = {
    * the number they are previewing. The guard for that is the first
    * thing in the function.
    */
-  matcher: ['/', '/q/:code*'],
+  matcher: ['/', '/q/:code*', '/merchant/:path*', '/merchants/register/:path*', '/merchants/verify-email/:path*', '/merchants/decision/:path*', '/api/merchant/:path*',
+    '/sign-in/:path*', '/auth/:path*', '/merchants/sign-in/:path*', '/riders/sign-in/:path*',
+    '/forgot-password/:path*', '/reset-password/:path*'],
 };
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  if (pathname === '/merchant' || pathname.startsWith('/merchant/') ||
+      pathname === '/merchants/register' || pathname.startsWith('/merchants/register/') ||
+      pathname === '/merchants/verify-email' || pathname.startsWith('/merchants/verify-email/') ||
+      pathname === '/merchants/decision' || pathname.startsWith('/merchants/decision/') ||
+      pathname === '/sign-in' || pathname.startsWith('/sign-in/') ||
+      pathname === '/auth' || pathname.startsWith('/auth/') ||
+      pathname === '/merchants/sign-in' || pathname.startsWith('/merchants/sign-in/') ||
+      pathname === '/riders/sign-in' || pathname.startsWith('/riders/sign-in/') ||
+      pathname === '/forgot-password' || pathname.startsWith('/forgot-password/') ||
+      pathname === '/reset-password' || pathname.startsWith('/reset-password/') ||
+      pathname.startsWith('/api/merchant/')) {
+    return refreshMerchantSession(request);
+  }
   if (request.nextUrl.pathname === '/') {
     const locale = request.cookies.get('nexg_locale')?.value;
     if (locale && locale !== 'en') {
@@ -171,6 +188,37 @@ export async function middleware(request: NextRequest) {
     );
   }
 
+  return response;
+}
+
+async function refreshMerchantSession(request: NextRequest) {
+  let response = NextResponse.next({ request });
+  const refreshed = new Map<string, { name: string; value: string; options: CookieOptions }>();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (url && key) {
+    const client = createServerClient(url, key, {
+      global: { fetch: (input, init) => fetch(input, { ...init, cache: 'no-store' }) },
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach((cookie) => {
+            request.cookies.set(cookie.name, cookie.value);
+            refreshed.set(cookie.name, cookie);
+          });
+          response = NextResponse.next({ request });
+          refreshed.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        },
+      },
+    });
+    // Refresh through the installed SDK. Pages and commands still authorize
+    // identity, current membership, application revision and session deadlines.
+    await client.auth.getUser();
+  }
+  response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Expires', '0');
+  response.headers.append('Vary', 'Cookie');
   return response;
 }
 

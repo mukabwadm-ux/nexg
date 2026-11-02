@@ -18,6 +18,8 @@ export default function AuthPage() {
 {`curl -H "X-Api-Key: your_key_here" https://api.nexgapp.com/v1/catalog/merchants`}
           </pre>
           <p>Scopes currently defined: <code className="font-mono text-xs">public_read</code> (default), <code className="font-mono text-xs">merchant_read</code>, <code className="font-mono text-xs">merchant_write</code>, <code className="font-mono text-xs">internal_read</code>, and <code className="font-mono text-xs">internal_write</code>. No bank-transfer endpoint currently accepts these scopes.</p>
+          <p>Merchant keys require issuance by the owner or authorized staff and current merchant approval. A key remains independent of the issuing person&apos;s browser session.</p>
+          <p>Rotating a key does not reset its merchant or developer&apos;s token bucket. On HTTP 429, wait for the Retry-After number of seconds before retrying. Authentication and rate-limit failures are never cached.</p>
         </CardContent>
       </Card>
 

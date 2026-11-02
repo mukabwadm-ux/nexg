@@ -5,7 +5,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
-import { applyToJob } from '@/app/careers/[slug]/apply/actions';
+import { applyToJob } from '@/app/(customer)/careers/[slug]/apply/actions';
 
 /**
  * Apply · about two minutes.

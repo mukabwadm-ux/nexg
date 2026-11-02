@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-11-01T12:10:41.623Z",
+  "status": "passed",
+  "documentHeight": 844,
+  "viewportHeight": 844,
+  "documentWidth": 390,
+  "viewportWidth": 390,
+  "innerScrollTop": 1588,
+  "values": [
+    {
+      "text": "1,176",
+      "lines": 1
+    },
+    {
+      "text": "KES 1,176,000.00",
+      "lines": 1
+    },
+    {
+      "text": "KES 1,000.00",
+      "lines": 1
+    },
+    {
+      "text": "94%",
+      "lines": 1
+    }
+  ]
+}

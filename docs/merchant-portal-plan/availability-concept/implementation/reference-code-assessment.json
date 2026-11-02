@@ -1,0 +1,37 @@
+{
+  "reviewed": [
+    {
+      "example": 1,
+      "file": "C:/Users/limta/.codex/attachments/48b1ca43-c3f6-48dc-86d7-324648935bda/Pasted text.txt",
+      "bytes": 62970,
+      "sha256": "40a7f9798bd42dfa2b78a8629c92fd9941ecfdf41abea62f80e33b0e01615156"
+    },
+    {
+      "example": 2,
+      "file": "C:/Users/limta/.codex/attachments/099269b1-ccfd-42e3-8458-261accc4088e/Pasted text.txt",
+      "bytes": 27986,
+      "sha256": "d7a2abeed1ed1626451f22c570c60e1357e5177e3c20ca279e21d0d5fa7c09ac"
+    },
+    {
+      "example": 3,
+      "file": "C:/Users/limta/.codex/attachments/1e31f889-07b9-4677-809e-b83abfbb5a59/Pasted text.txt",
+      "bytes": 6840,
+      "sha256": "d47b1a6420d73ec9615e2eb879d64ed6a4ea9ed7878af2d9929b29c239f3ecc7"
+    }
+  ],
+  "adopted": [
+    "Bounded calendar frame and independent inspector scrolling",
+    "Resources as columns or rows according to the promise being made",
+    "One semantic status label, icon and colour map",
+    "Controlled month, week, day and agenda projections",
+    "Keyboard empty-slot proposal and guarded drag callbacks",
+    "Overlapping intervals packed into lanes and cross-day spans clipped correctly"
+  ],
+  "decisions": [
+    "Kept the installed Next14/Tailwind3/Radix/Lucide stack",
+    "Did not copy or install the incomplete ReUI bundle or missing utility modules",
+    "Kenya-only Africa/Nairobi, without an unnecessary timezone selector",
+    "Calendar is a projection; the local source rechecks constraints before applying",
+    "Queue work, production due dates, entitlements and requests keep their own semantics"
+  ]
+}

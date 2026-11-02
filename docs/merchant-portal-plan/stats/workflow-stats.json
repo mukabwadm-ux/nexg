@@ -1,0 +1,3838 @@
+{
+  "schemaVersion": "1.0.0-proposed",
+  "status": "DESIGN_ONLY",
+  "workflowBindings": [
+    {
+      "workflowId": "WF_ORDER",
+      "headlineBindings": [
+        {
+          "metricId": "confirmed_orders",
+          "label": "Orders confirmed",
+          "predicateId": "order_confirmed"
+        },
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Orders in progress",
+          "predicateId": "order_in_progress"
+        },
+        {
+          "metricId": "completed_orders",
+          "label": "Orders completed",
+          "predicateId": "order_completed"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_orders",
+        "fulfilment_time",
+        "order_value"
+      ],
+      "insightsMetricIds": [
+        "completed_orders",
+        "order_value",
+        "fulfilment_time"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Order fulfilment overdue",
+          "predicateId": "order_fulfilment_overdue"
+        },
+        {
+          "metricId": "low_stock_items",
+          "label": "Items below stock threshold",
+          "predicateId": "order_low_stock"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Orders needing exceptional review",
+          "predicateId": "order_review_required",
+          "visibilityRule": "EXPLICIT_MATCHED_REVIEW_EXCEPTION"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "order_value is accepted order value, not paid sales, recognized revenue, net earnings or payout.",
+        "Automatic native/API/webhook stock-confirmed intake is normal. Orders confirmed excludes unconfirmed checkout attempts. Exceptional review is conditional; it is not a standard headline. See order-confirmation.md."
+      ],
+      "excludedInterpretations": [
+        "No universal food/rider stages.",
+        "No profit from sales alone; missing inventory never means low stock."
+      ]
+    },
+    {
+      "workflowId": "WF_MADE_TO_ORDER",
+      "headlineBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Custom orders to review",
+          "predicateId": "custom_review_required"
+        },
+        {
+          "metricId": "work_due",
+          "label": "Custom completions due",
+          "predicateId": "custom_completion_due"
+        },
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Custom orders in production",
+          "predicateId": "custom_in_production"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_custom_orders",
+        "on_time_completion",
+        "approval_time"
+      ],
+      "insightsMetricIds": [
+        "completed_custom_orders",
+        "approval_time",
+        "on_time_completion"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Custom completion overdue",
+          "predicateId": "custom_completion_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Handover needs action",
+          "predicateId": "custom_handover_action"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "approval_time needs issue and approval timestamps for the accepted quote version; fixed-price paths are excluded."
+      ],
+      "excludedInterpretations": [
+        "Quote approval is not production completion.",
+        "Completed-only punctuality does not describe outstanding overdue work."
+      ]
+    },
+    {
+      "workflowId": "WF_APPOINTMENT",
+      "headlineBindings": [
+        {
+          "metricId": "work_due",
+          "label": "Appointments scheduled",
+          "predicateId": "appointment_session_due"
+        },
+        {
+          "metricId": "bookable_capacity",
+          "label": "Remaining appointment capacity",
+          "predicateId": "appointment_remaining_capacity"
+        },
+        {
+          "metricId": "completed_appointments",
+          "label": "Appointments completed",
+          "predicateId": "appointment_completed"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_appointments",
+        "slot_utilisation",
+        "no_show_rate"
+      ],
+      "insightsMetricIds": [
+        "completed_appointments",
+        "slot_utilisation",
+        "no_show_rate"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Appointment setup needs action",
+          "predicateId": "appointment_setup_action"
+        },
+        {
+          "metricId": "work_overdue_now",
+          "label": "Appointment outcome overdue",
+          "predicateId": "appointment_outcome_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Bookings needing exceptional confirmation",
+          "predicateId": "appointment_confirmation_required",
+          "visibilityRule": "EXPLICIT_MATCHED_REVIEW_EXCEPTION"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "slot_utilisation is booked resource-minutes, not actual attendance or use.",
+        "Linked home-visit execution reuses the parent allocation and root commercial-work identity."
+      ],
+      "excludedInterpretations": [
+        "Requested/held/confirmed differ.",
+        "No clinical outcomes, diagnoses, therapy notes or test results."
+      ]
+    },
+    {
+      "workflowId": "WF_REMOTE_SESSION",
+      "headlineBindings": [
+        {
+          "metricId": "work_due",
+          "label": "Remote sessions scheduled",
+          "predicateId": "remote_session_due"
+        },
+        {
+          "metricId": "bookable_capacity",
+          "label": "Remaining session capacity",
+          "predicateId": "remote_remaining_capacity"
+        },
+        {
+          "metricId": "completed_sessions",
+          "label": "Remote sessions completed",
+          "predicateId": "remote_completed"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_sessions",
+        "slot_utilisation",
+        "no_show_rate"
+      ],
+      "insightsMetricIds": [
+        "completed_sessions",
+        "slot_utilisation",
+        "no_show_rate"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Session access needs action",
+          "predicateId": "remote_access_action"
+        },
+        {
+          "metricId": "work_overdue_now",
+          "label": "Remote outcome overdue",
+          "predicateId": "remote_outcome_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Bookings needing exceptional confirmation",
+          "predicateId": "remote_confirmation_required",
+          "visibilityRule": "EXPLICIT_MATCHED_REVIEW_EXCEPTION"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "Provider/link-open signals do not confirm session attendance or completion."
+      ],
+      "excludedInterpretations": [
+        "No physical pickup/delivery metrics.",
+        "No clinical outcomes for telemedicine."
+      ]
+    },
+    {
+      "workflowId": "WF_FIELD_SERVICE",
+      "headlineBindings": [
+        {
+          "metricId": "work_due",
+          "label": "Visits scheduled",
+          "predicateId": "field_visit_due"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Visits needing assignment",
+          "predicateId": "field_assignment_required"
+        },
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Visits in progress",
+          "predicateId": "field_in_progress"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_visits",
+        "arrival_reliability",
+        "team_utilisation"
+      ],
+      "insightsMetricIds": [
+        "completed_visits",
+        "arrival_reliability",
+        "team_utilisation"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Arrival window missed",
+          "predicateId": "field_arrival_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Completion evidence needs review",
+          "predicateId": "field_completion_review"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "team_utilisation includes travel only where an accepted roster/reservation contract defines it."
+      ],
+      "excludedInterpretations": [
+        "A schedule is not arrival proof.",
+        "A linked appointment execution child is not a second unique customer job."
+      ]
+    },
+    {
+      "workflowId": "WF_RENTAL",
+      "headlineBindings": [
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Active rentals",
+          "predicateId": "rental_active"
+        },
+        {
+          "metricId": "work_due",
+          "label": "Handovers scheduled",
+          "predicateId": "rental_handover_due"
+        },
+        {
+          "metricId": "work_due",
+          "label": "Returns scheduled",
+          "predicateId": "rental_returns_due"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_rentals",
+        "asset_utilisation",
+        "return_punctuality"
+      ],
+      "insightsMetricIds": [
+        "completed_rentals",
+        "asset_utilisation",
+        "return_punctuality"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Unreturned rentals overdue",
+          "predicateId": "rental_returns_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Return inspections to review",
+          "predicateId": "rental_inspection_action"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "asset_utilisation uses actual handover-to-return occupation, not booked reservations.",
+        "with_driver remains rental; transfer metrics require separately configured WF_TRANSFER."
+      ],
+      "excludedInterpretations": [
+        "A returned asset awaiting inspection is not unreturned.",
+        "A rental driver option does not create passenger-transfer counts."
+      ]
+    },
+    {
+      "workflowId": "WF_TRANSFER",
+      "headlineBindings": [
+        {
+          "metricId": "work_due",
+          "label": "Pickups scheduled",
+          "predicateId": "transfer_pickups_due"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Transfers needing assignment",
+          "predicateId": "transfer_assignment_required"
+        },
+        {
+          "metricId": "completed_transfers",
+          "label": "Transfers completed",
+          "predicateId": "transfer_completed"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_transfers",
+        "pickup_punctuality",
+        "vehicle_utilisation"
+      ],
+      "insightsMetricIds": [
+        "completed_transfers",
+        "pickup_punctuality",
+        "vehicle_utilisation"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Pickup window missed",
+          "predicateId": "transfer_pickup_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Transfer completion needs review",
+          "predicateId": "transfer_completion_action"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "vehicle_utilisation is booked vehicle-minutes including defined positioning buffers, not engine-running time."
+      ],
+      "excludedInterpretations": [
+        "Flight tracking does not prove passenger pickup.",
+        "A rental is not a transfer."
+      ]
+    },
+    {
+      "workflowId": "WF_EVENT_SESSION",
+      "headlineBindings": [
+        {
+          "metricId": "tickets_confirmed",
+          "label": "Confirmed admission places",
+          "predicateId": "event_confirmed_places"
+        },
+        {
+          "metricId": "bookable_capacity",
+          "label": "Remaining admission places",
+          "predicateId": "event_remaining_places"
+        },
+        {
+          "metricId": "attendance",
+          "label": "Finalized attendance",
+          "predicateId": "event_attendance"
+        }
+      ],
+      "chartMetricIds": [
+        "tickets_confirmed",
+        "attendance",
+        "capacity_utilisation"
+      ],
+      "insightsMetricIds": [
+        "tickets_confirmed",
+        "attendance",
+        "capacity_utilisation"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Admission requests to review",
+          "predicateId": "event_booking_review"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Tickets needing resolution",
+          "predicateId": "event_ticket_action"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "tickets_confirmed measures admission-place quantities, not issued tickets.",
+        "Snapshot session values may compare labelled sessions; daily intake requires actual booking-event history."
+      ],
+      "excludedInterpretations": [
+        "Bookings, places, tickets and attendance differ.",
+        "No attendance ratio before session attendance is finalized."
+      ]
+    },
+    {
+      "workflowId": "WF_GROUP_ACTIVITY",
+      "headlineBindings": [
+        {
+          "metricId": "session_bookings",
+          "label": "Confirmed activity bookings",
+          "predicateId": "group_confirmed_bookings"
+        },
+        {
+          "metricId": "bookable_capacity",
+          "label": "Remaining participant places",
+          "predicateId": "group_remaining_places"
+        },
+        {
+          "metricId": "attendance",
+          "label": "Finalized attendance",
+          "predicateId": "group_attendance"
+        }
+      ],
+      "chartMetricIds": [
+        "session_bookings",
+        "attendance",
+        "capacity_utilisation"
+      ],
+      "insightsMetricIds": [
+        "session_bookings",
+        "attendance",
+        "capacity_utilisation"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Activity requests to review",
+          "predicateId": "group_booking_review"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Run readiness needs action",
+          "predicateId": "group_run_readiness"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "session_bookings keeps session-start snapshot basis; use a separately defined received-event metric for intake."
+      ],
+      "excludedInterpretations": [
+        "A group booking is not one participant.",
+        "A confirmed booking does not grant safety/run clearance."
+      ]
+    },
+    {
+      "workflowId": "WF_TOUR",
+      "headlineBindings": [
+        {
+          "metricId": "confirmed_departures",
+          "label": "Confirmed departures",
+          "predicateId": "tour_confirmed_departures"
+        },
+        {
+          "metricId": "occupied_places",
+          "label": "Confirmed tour places",
+          "predicateId": "tour_confirmed_places"
+        },
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Tours in progress",
+          "predicateId": "tour_in_progress"
+        }
+      ],
+      "chartMetricIds": [
+        "confirmed_departures",
+        "occupied_places",
+        "booking_lead_time"
+      ],
+      "insightsMetricIds": [
+        "confirmed_departures",
+        "occupied_places",
+        "booking_lead_time"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Departure readiness needs action",
+          "predicateId": "tour_readiness_action"
+        },
+        {
+          "metricId": "work_overdue_now",
+          "label": "Departure readiness overdue",
+          "predicateId": "tour_readiness_overdue"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "capacity_utilisation has no registered departure-model variant. Use occupied_places until a compatible capacity denominator exists."
+      ],
+      "excludedInterpretations": [
+        "Booking alone does not independently confirm a departure.",
+        "Parties, participant places and departures cannot be added together."
+      ]
+    },
+    {
+      "workflowId": "WF_REQUEST_QUOTE",
+      "headlineBindings": [
+        {
+          "metricId": "work_received",
+          "label": "Requests received",
+          "predicateId": "quote_requests_received"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Requests needing response",
+          "predicateId": "quote_response_action"
+        },
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Committed work in progress",
+          "predicateId": "quote_execution_in_progress"
+        }
+      ],
+      "chartMetricIds": [
+        "qualified_requests",
+        "quote_acceptance",
+        "response_time"
+      ],
+      "insightsMetricIds": [
+        "qualified_requests",
+        "quote_acceptance",
+        "response_time"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Response deadline missed",
+          "predicateId": "quote_response_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Deliverables to review",
+          "predicateId": "quote_deliverable_review"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "qualified_requests means requests scoped by the workflow, not professional qualification.",
+        "quote_acceptance includes decided current versions; open/superseded/withdrawn quotes remain separate."
+      ],
+      "excludedInterpretations": [
+        "Quote acceptance is not execution completion or paid revenue.",
+        "No conversion from unrelated-period request and acceptance totals."
+      ]
+    },
+    {
+      "workflowId": "WF_PICKUP_RETURN",
+      "headlineBindings": [
+        {
+          "metricId": "work_due",
+          "label": "Collections scheduled",
+          "predicateId": "pickup_collection_due"
+        },
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Cycles processing",
+          "predicateId": "pickup_processing"
+        },
+        {
+          "metricId": "work_due",
+          "label": "Returns scheduled",
+          "predicateId": "pickup_return_due"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_cycles",
+        "turnaround",
+        "collection_return_punctuality"
+      ],
+      "insightsMetricIds": [
+        "completed_cycles",
+        "turnaround",
+        "collection_return_punctuality"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Collection window missed",
+          "predicateId": "pickup_collection_overdue"
+        },
+        {
+          "metricId": "work_overdue_now",
+          "label": "Return window missed",
+          "predicateId": "pickup_return_overdue"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "Separate collection and return punctuality cohorts. Turnaround needs both confirmed custody instants."
+      ],
+      "excludedInterpretations": [
+        "Two transport legs are not two completed customer jobs.",
+        "Unconfirmed measured assessment cannot establish goods weight or charges."
+      ]
+    },
+    {
+      "workflowId": "WF_MEMBERSHIP",
+      "headlineBindings": [
+        {
+          "metricId": "active_memberships",
+          "label": "Active entitlements",
+          "predicateId": "membership_active"
+        },
+        {
+          "metricId": "renewals_due",
+          "label": "Entitlements due for renewal",
+          "predicateId": "membership_renewals_due"
+        },
+        {
+          "metricId": "renewals",
+          "label": "Renewals confirmed",
+          "predicateId": "membership_renewed"
+        }
+      ],
+      "chartMetricIds": [
+        "active_memberships",
+        "renewals"
+      ],
+      "insightsMetricIds": [
+        "active_memberships",
+        "renewals",
+        "capacity_utilisation"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Activation needs action",
+          "predicateId": "membership_activation_action"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Entitlement changes to resolve",
+          "predicateId": "membership_change_action"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "Entitlement snapshot history requires saved snapshots or a reconstructable lifecycle.",
+        "Access utilisation requires a separate concurrent access-allocation contract."
+      ],
+      "excludedInterpretations": [
+        "Entitlement count is not unique people, attendance, booked sessions or recurring revenue.",
+        "Renewal count is not retention or renewal rate without a due cohort."
+      ]
+    },
+    {
+      "workflowId": "WF_FREIGHT",
+      "headlineBindings": [
+        {
+          "metricId": "accepted_shipments",
+          "label": "Carrier-booked shipments",
+          "predicateId": "freight_booked"
+        },
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Shipments in progress",
+          "predicateId": "freight_in_progress"
+        },
+        {
+          "metricId": "work_due",
+          "label": "Shipment milestones scheduled",
+          "predicateId": "freight_milestones_due"
+        }
+      ],
+      "chartMetricIds": [
+        "accepted_shipments",
+        "milestone_punctuality",
+        "capacity_utilisation"
+      ],
+      "insightsMetricIds": [
+        "accepted_shipments",
+        "milestone_punctuality",
+        "capacity_utilisation"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Shipment milestone overdue",
+          "predicateId": "freight_milestone_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Documentation needs action",
+          "predicateId": "freight_documentation_action"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "Keep cargo kg and cubic metres as separate constraints on each leg. No volumetric conversion is inferred."
+      ],
+      "excludedInterpretations": [
+        "Quote approval is not a carrier booking.",
+        "Do not combine mass, volume, shipment count and milestone count."
+      ]
+    },
+    {
+      "workflowId": "WF_STORAGE",
+      "headlineBindings": [
+        {
+          "metricId": "occupied_space",
+          "label": "Occupied storage capacity",
+          "predicateId": "storage_occupied"
+        },
+        {
+          "metricId": "work_due",
+          "label": "Storage intakes scheduled",
+          "predicateId": "storage_intake_due"
+        },
+        {
+          "metricId": "inbound_outbound_completion",
+          "label": "Custody operations confirmed",
+          "predicateId": "storage_custody_completed"
+        }
+      ],
+      "chartMetricIds": [
+        "occupied_space",
+        "inbound_outbound_completion",
+        "contract_renewals"
+      ],
+      "insightsMetricIds": [
+        "occupied_space",
+        "contract_renewals",
+        "inbound_outbound_completion"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Releases needing action",
+          "predicateId": "storage_release_action"
+        },
+        {
+          "metricId": "work_overdue_now",
+          "label": "Custody milestone overdue",
+          "predicateId": "storage_custody_overdue"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "occupied_space preserves original area/volume/pallet units and location.",
+        "No storage-space capacity_utilisation variant exists; occupancy percentage needs a separately registered usable-space denominator."
+      ],
+      "excludedInterpretations": [
+        "Allocated quantity is not a custody-operation count.",
+        "A release request is not confirmed goods departure."
+      ]
+    },
+    {
+      "workflowId": "WF_REGULATED_ENQUIRY",
+      "headlineBindings": [
+        {
+          "metricId": "enquiries_received",
+          "label": "Enquiries received",
+          "predicateId": "regulated_received"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Enquiries needing response",
+          "predicateId": "regulated_response_action"
+        },
+        {
+          "metricId": "provider_handoffs",
+          "label": "Provider handoffs confirmed",
+          "predicateId": "regulated_handoffs"
+        }
+      ],
+      "chartMetricIds": [
+        "enquiries_received",
+        "response_time",
+        "provider_handoffs"
+      ],
+      "insightsMetricIds": [
+        "enquiries_received",
+        "response_time",
+        "provider_handoffs"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Response deadline missed",
+          "predicateId": "regulated_response_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Provider review needs resolution",
+          "predicateId": "regulated_review_action"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "Use minimal administrative references. Handoffs require receiving-provider acknowledgment, not sent messages."
+      ],
+      "excludedInterpretations": [
+        "No customer balances, FX positions, lending outcomes, remittance funds or invented regulated transaction volume.",
+        "Enquiry outcomes never prove moved money, issued cover or a clinical/professional result."
+      ]
+    },
+    {
+      "workflowId": "WF_SERVICE_JOB",
+      "headlineBindings": [
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Jobs needing intake review",
+          "predicateId": "job_intake_action"
+        },
+        {
+          "metricId": "work_in_progress_now",
+          "label": "Jobs in service",
+          "predicateId": "job_in_service"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Jobs ready for release",
+          "predicateId": "job_release_action"
+        }
+      ],
+      "chartMetricIds": [
+        "completed_jobs",
+        "job_turnaround",
+        "rework_rate"
+      ],
+      "insightsMetricIds": [
+        "completed_jobs",
+        "job_turnaround",
+        "rework_rate"
+      ],
+      "alertBindings": [
+        {
+          "metricId": "work_overdue_now",
+          "label": "Job completion overdue",
+          "predicateId": "job_completion_overdue"
+        },
+        {
+          "metricId": "work_needs_action_now",
+          "label": "Quality review needs action",
+          "predicateId": "job_quality_action"
+        }
+      ],
+      "collectionNotes": [
+        "Resolve confirmed onboarding configuration and actor/location scope first. Current-state values use the displayed as-of cutoff; period counts use their registered event-time basis and merchant timezone.",
+        "Snapshot-only sources support as-of values. A historical chart requires reconstructable lifecycle/capacity history or saved versioned snapshots; never create a line by repeating the current snapshot.",
+        "Due/overdue cards count accepted milestone identities, not unique work when one job has several milestones. Display type/unit explicitly. Unknown/stale coverage remains visible.",
+        "Deduplicate replayed facts and linked child identities. Metric definitions and accepted historical work retain their versions.",
+        "job_turnaround uses intake-to-confirmed release and separates diagnostic-only from repaired jobs.",
+        "rework_rate needs matured follow-up cohorts, linked rework IDs and the accepted follow-up window."
+      ],
+      "excludedInterpretations": [
+        "COMPLETED does not prove repair success or customer satisfaction.",
+        "Walk-in job metrics replace appointment-only statistics where booking is removed."
+      ]
+    }
+  ],
+  "predicateDefinitions": [
+    {
+      "id": "order_review_required",
+      "workflowId": "WF_ORDER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "review_exception_rule_id",
+        "review_exception_enabled",
+        "review_exception_matched",
+        "review_reason",
+        "responsible_actor"
+      ],
+      "selection": "Require an explicitly enabled, supported and matching exceptional-review rule for this particular offering/work, with a named reason and responsible actor. RECEIVED/REQUESTED alone is insufficient. Automatic source confirmation is the normal path. Unknown stock, out-of-stock or connection failure never creates this review. At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of RECEIVED. Merchant acceptance/decline is pending. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "RECEIVED"
+      ],
+      "visibilityRule": "EXPLICIT_MATCHED_REVIEW_EXCEPTION"
+    },
+    {
+      "id": "order_in_progress",
+      "workflowId": "WF_ORDER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of ACCEPTED, ALLOCATED, PICKING, PREPARING, READY_FOR_HANDOVER, AWAITING_CUSTOMER_COLLECTION, HANDED_TO_CARRIER, IN_TRANSIT. One order counts once across preparation/collection/delivery variants. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ACCEPTED",
+        "ALLOCATED",
+        "PICKING",
+        "PREPARING",
+        "READY_FOR_HANDOVER",
+        "AWAITING_CUSTOMER_COLLECTION",
+        "HANDED_TO_CARRIER",
+        "IN_TRANSIT"
+      ]
+    },
+    {
+      "id": "order_completed",
+      "workflowId": "WF_ORDER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage"
+      ],
+      "selection": "Bind registered completed_orders v1.0.0 exactly. Population: Distinct order_id authoritatively confirmed WF_ORDER COMPLETED in period. Date basis: authoritative terminal-state confirmation_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "COMPLETED"
+      ]
+    },
+    {
+      "id": "order_fulfilment_overdue",
+      "workflowId": "WF_ORDER",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted contracted_collection_or_delivery milestone identities attached to work in ACCEPTED, ALLOCATED, PICKING, PREPARING, READY_FOR_HANDOVER, AWAITING_CUSTOMER_COLLECTION, HANDED_TO_CARRIER, IN_TRANSIT. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Use selected fulfilment method, with no invented preparation stage. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ACCEPTED",
+        "ALLOCATED",
+        "PICKING",
+        "PREPARING",
+        "READY_FOR_HANDOVER",
+        "AWAITING_CUSTOMER_COLLECTION",
+        "HANDED_TO_CARRIER",
+        "IN_TRANSIT"
+      ]
+    },
+    {
+      "id": "order_low_stock",
+      "workflowId": "WF_ORDER",
+      "recordGrain": "allocation",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "offering_id",
+        "variant_id",
+        "saleable_quantity",
+        "inventory_unit",
+        "configured_low_stock_threshold",
+        "threshold_scope",
+        "inventory_as_of"
+      ],
+      "selection": "Select authoritative inventory positions below an explicitly configured threshold in the same unit/variant/location. Count distinct affected offering-variant-location positions, not stock units. Missing threshold/unit/current quantity is unavailable.",
+      "sourceIds": [
+        "SRC_INVENTORY"
+      ],
+      "states": []
+    },
+    {
+      "id": "custom_review_required",
+      "workflowId": "WF_MADE_TO_ORDER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REQUESTED, SPECIFICATION_REVIEW. Specification/quote preparation action is pending; customer approval is separate. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED",
+        "SPECIFICATION_REVIEW"
+      ]
+    },
+    {
+      "id": "custom_completion_due",
+      "workflowId": "WF_MADE_TO_ORDER",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted contracted_custom_completion milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Use accepted completion promise; fixed-price paths need no quote. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "custom_in_production",
+      "workflowId": "WF_MADE_TO_ORDER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of IN_PRODUCTION, QUALITY_CHECK. Production and quality review remain distinct substates. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "IN_PRODUCTION",
+        "QUALITY_CHECK"
+      ]
+    },
+    {
+      "id": "custom_completion_overdue",
+      "workflowId": "WF_MADE_TO_ORDER",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted contracted_custom_completion milestone identities attached to work in APPROVED, IN_PRODUCTION, QUALITY_CHECK, READY_FOR_HANDOVER, HANDOVER_PENDING. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Show still-overdue work alongside completed-only punctuality. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "APPROVED",
+        "IN_PRODUCTION",
+        "QUALITY_CHECK",
+        "READY_FOR_HANDOVER",
+        "HANDOVER_PENDING"
+      ]
+    },
+    {
+      "id": "custom_handover_action",
+      "workflowId": "WF_MADE_TO_ORDER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of READY_FOR_HANDOVER, HANDOVER_PENDING. Only a supported handover/notification action counts. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "READY_FOR_HANDOVER",
+        "HANDOVER_PENDING"
+      ]
+    },
+    {
+      "id": "appointment_session_due",
+      "workflowId": "WF_APPOINTMENT",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted appointment_start milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Requests and held slots are not confirmed appointments. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "appointment_confirmation_required",
+      "workflowId": "WF_APPOINTMENT",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "review_exception_rule_id",
+        "review_exception_enabled",
+        "review_exception_matched",
+        "review_reason",
+        "responsible_actor"
+      ],
+      "selection": "Require an explicitly enabled, supported and matching exceptional-review rule for this particular offering/work, with a named reason and responsible actor. RECEIVED/REQUESTED alone is insufficient. Automatic source confirmation is the normal path. Unknown stock, out-of-stock or connection failure never creates this review. At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REQUESTED, HOLD_PENDING, HELD. Only permitted confirmation/hold-resolution actions count. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED",
+        "HOLD_PENDING",
+        "HELD"
+      ],
+      "visibilityRule": "EXPLICIT_MATCHED_REVIEW_EXCEPTION"
+    },
+    {
+      "id": "appointment_completed",
+      "workflowId": "WF_APPOINTMENT",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage"
+      ],
+      "selection": "Bind registered completed_appointments v1.0.0 exactly. Population: Distinct booking_id authoritatively confirmed WF_APPOINTMENT COMPLETED in period. Date basis: authoritative terminal-state confirmation_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "COMPLETED"
+      ]
+    },
+    {
+      "id": "appointment_setup_action",
+      "workflowId": "WF_APPOINTMENT",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "required_resource_ids",
+        "prerequisite_results"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of CONFIRMED, FIELD_EXECUTION_PENDING. A required resource/location prerequisite is unresolved and has a permitted fix. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY",
+        "SRC_REQUIREMENTS"
+      ],
+      "states": [
+        "CONFIRMED",
+        "FIELD_EXECUTION_PENDING"
+      ]
+    },
+    {
+      "id": "appointment_outcome_overdue",
+      "workflowId": "WF_APPOINTMENT",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted appointment_outcome_decision milestone identities attached to work in CONFIRMED, CHECKED_IN, IN_SESSION, FIELD_EXECUTION_PENDING. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Require exact owner-defined outcome-decision deadline; never create NO_SHOW automatically. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "CONFIRMED",
+        "CHECKED_IN",
+        "IN_SESSION",
+        "FIELD_EXECUTION_PENDING",
+        "NO_SHOW"
+      ]
+    },
+    {
+      "id": "remote_session_due",
+      "workflowId": "WF_REMOTE_SESSION",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted remote_session_start milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Require confirmed session/resource/timezone. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "remote_confirmation_required",
+      "workflowId": "WF_REMOTE_SESSION",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "review_exception_rule_id",
+        "review_exception_enabled",
+        "review_exception_matched",
+        "review_reason",
+        "responsible_actor"
+      ],
+      "selection": "Require an explicitly enabled, supported and matching exceptional-review rule for this particular offering/work, with a named reason and responsible actor. RECEIVED/REQUESTED alone is insufficient. Automatic source confirmation is the normal path. Unknown stock, out-of-stock or connection failure never creates this review. At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REQUESTED, SLOT_HELD. Only permitted confirmation/hold-resolution actions count. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED",
+        "SLOT_HELD"
+      ],
+      "visibilityRule": "EXPLICIT_MATCHED_REVIEW_EXCEPTION"
+    },
+    {
+      "id": "remote_completed",
+      "workflowId": "WF_REMOTE_SESSION",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage"
+      ],
+      "selection": "Bind registered completed_sessions v1.0.0 exactly. Population: Distinct session_booking_id authoritatively confirmed WF_REMOTE_SESSION COMPLETED in period. Date basis: authoritative terminal-state confirmation_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "COMPLETED"
+      ]
+    },
+    {
+      "id": "remote_access_action",
+      "workflowId": "WF_REMOTE_SESSION",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "access_readiness",
+        "interruption_reference"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of CONFIRMED, SESSION_INTERRUPTED. A missing access prerequisite or interruption has an actor-permitted remedy. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY",
+        "SRC_REQUIREMENTS"
+      ],
+      "states": [
+        "CONFIRMED",
+        "SESSION_INTERRUPTED"
+      ]
+    },
+    {
+      "id": "remote_outcome_overdue",
+      "workflowId": "WF_REMOTE_SESSION",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted remote_session_outcome_decision milestone identities attached to work in CONFIRMED, ACCESS_READY, PARTICIPANT_JOINED, IN_SESSION, SESSION_INTERRUPTED. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Require exact owner-defined outcome-decision deadline; unknown attendance is not a separately confirmed attendance outcome. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "CONFIRMED",
+        "ACCESS_READY",
+        "PARTICIPANT_JOINED",
+        "IN_SESSION",
+        "SESSION_INTERRUPTED"
+      ]
+    },
+    {
+      "id": "field_visit_due",
+      "workflowId": "WF_FIELD_SERVICE",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted field_arrival milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Only scoped confirmed visits with accepted arrival windows count. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "field_assignment_required",
+      "workflowId": "WF_FIELD_SERVICE",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "assignment_policy",
+        "assigned_resource_ids"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of APPROVED. A required qualified team/resource assignment is unresolved. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY"
+      ],
+      "states": [
+        "APPROVED"
+      ]
+    },
+    {
+      "id": "field_in_progress",
+      "workflowId": "WF_FIELD_SERVICE",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of EN_ROUTE, ARRIVED, IN_SERVICE, COMPLETION_REVIEW. Count each field-work identity once; retain distinct arrival/service/review substates. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "EN_ROUTE",
+        "ARRIVED",
+        "IN_SERVICE",
+        "COMPLETION_REVIEW"
+      ]
+    },
+    {
+      "id": "field_arrival_overdue",
+      "workflowId": "WF_FIELD_SERVICE",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted field_arrival milestone identities attached to work in APPROVED, ASSIGNED, EN_ROUTE. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Confirmed arrival satisfies this milestone even if service remains incomplete. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "APPROVED",
+        "ASSIGNED",
+        "EN_ROUTE"
+      ]
+    },
+    {
+      "id": "field_completion_review",
+      "workflowId": "WF_FIELD_SERVICE",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of COMPLETION_REVIEW. Select a permitted evidence/completion-review action. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "COMPLETION_REVIEW"
+      ]
+    },
+    {
+      "id": "rental_active",
+      "workflowId": "WF_RENTAL",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "handover_confirmed_at",
+        "return_confirmed_at"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of ACTIVE. Handover is confirmed and return is not yet confirmed; a reserved asset is not active occupation. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": "rental_handover_due",
+      "workflowId": "WF_RENTAL",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted rental_handover milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Driver and asset satisfy configured rental prerequisites. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "rental_returns_due",
+      "workflowId": "WF_RENTAL",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted rental_return milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Count return milestones, not subsequent inspection tasks. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "rental_returns_overdue",
+      "workflowId": "WF_RENTAL",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted rental_return milestone identities attached to work in ACTIVE. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Physical return removes unreturned status even while inspection/closure is pending. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": "rental_inspection_action",
+      "workflowId": "WF_RENTAL",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of RETURN_REVIEW. An authorized condition/accessory inspection is pending; damage/charges are separate confirmed decisions. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "RETURN_REVIEW"
+      ]
+    },
+    {
+      "id": "transfer_pickups_due",
+      "workflowId": "WF_TRANSFER",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted transfer_pickup milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Vehicle arrival, passenger boarding and destination arrival remain separate milestones. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "transfer_assignment_required",
+      "workflowId": "WF_TRANSFER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "vehicle_id",
+        "driver_id",
+        "assignment_policy"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of CONFIRMED. Required qualified vehicle/driver assignment is absent. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY"
+      ],
+      "states": [
+        "CONFIRMED"
+      ]
+    },
+    {
+      "id": "transfer_completed",
+      "workflowId": "WF_TRANSFER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage"
+      ],
+      "selection": "Bind registered completed_transfers v1.0.0 exactly. Population: Distinct transfer_id authoritatively confirmed WF_TRANSFER COMPLETED in period. Date basis: authoritative terminal-state confirmation_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "COMPLETED"
+      ]
+    },
+    {
+      "id": "transfer_pickup_overdue",
+      "workflowId": "WF_TRANSFER",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted transfer_vehicle_at_pickup milestone identities attached to work in CONFIRMED, VEHICLE_ASSIGNED, DRIVER_EN_ROUTE. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Confirmed vehicle-at-pickup satisfies arrival; missing GPS is unavailable evidence. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "CONFIRMED",
+        "VEHICLE_ASSIGNED",
+        "DRIVER_EN_ROUTE"
+      ]
+    },
+    {
+      "id": "transfer_completion_action",
+      "workflowId": "WF_TRANSFER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of ARRIVED_DESTINATION. A permitted journey-completion/evidence confirmation is pending. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ARRIVED_DESTINATION"
+      ]
+    },
+    {
+      "id": "event_confirmed_places",
+      "workflowId": "WF_EVENT_SESSION",
+      "recordGrain": "allocation",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "session_id",
+        "booking_id",
+        "admission_quantity",
+        "reservation_release_events"
+      ],
+      "selection": "Bind registered tickets_confirmed v1.0.0 exactly. Population: Nonreleased admission quantities on authoritative confirmed bookings for selected sessions Date basis: session starts_at; booking state as of cutoff. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    },
+    {
+      "id": "event_remaining_places",
+      "workflowId": "WF_EVENT_SESSION",
+      "recordGrain": "session",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "session_id",
+        "session_start_at",
+        "capacity_unit",
+        "published_usable_places",
+        "confirmed_allocated_places",
+        "unexpired_authoritative_hold_places",
+        "as_of"
+      ],
+      "selection": "For each published usable session report authority-confirmed allocatable admission places after confirmed allocations and current valid holds. Display next selected session or per-session breakdown. Count places, not tickets/bookings. Missing remaining-capacity or hold authority is unavailable.",
+      "sourceIds": [
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    },
+    {
+      "id": "event_attendance",
+      "workflowId": "WF_EVENT_SESSION",
+      "recordGrain": "allocation",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "session_id",
+        "attendance_finalized_at",
+        "expected_participants",
+        "attended_participants"
+      ],
+      "selection": "Bind registered attendance v1.0.0 exactly. Population: Participants confirmed attended for concluded sessions Date basis: session end_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": []
+    },
+    {
+      "id": "event_booking_review",
+      "workflowId": "WF_EVENT_SESSION",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REQUESTED, SEATS_HELD. Only supported merchant-review/hold-resolution actions count. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED",
+        "SEATS_HELD"
+      ]
+    },
+    {
+      "id": "event_ticket_action",
+      "workflowId": "WF_EVENT_SESSION",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of TICKET_PENDING. Issuing authority reports a resolvable issue; place confirmation is not ticket issuance. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "TICKET_PENDING"
+      ]
+    },
+    {
+      "id": "group_confirmed_bookings",
+      "workflowId": "WF_GROUP_ACTIVITY",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "session_id",
+        "booking_id"
+      ],
+      "selection": "Bind registered session_bookings v1.0.0 exactly. Population: Distinct noncancelled confirmed group booking IDs for selected sessions Date basis: session starts_at; state as of cutoff. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    },
+    {
+      "id": "group_remaining_places",
+      "workflowId": "WF_GROUP_ACTIVITY",
+      "recordGrain": "session",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "session_id",
+        "session_start_at",
+        "capacity_unit",
+        "published_usable_places",
+        "confirmed_allocated_places",
+        "unexpired_authoritative_hold_places",
+        "as_of"
+      ],
+      "selection": "For each published activity session report authority-confirmed allocatable participant places after current valid holds/allocations. A group booking may consume multiple places. Display next selected session or per-session breakdown; never infer places from booking count.",
+      "sourceIds": [
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    },
+    {
+      "id": "group_attendance",
+      "workflowId": "WF_GROUP_ACTIVITY",
+      "recordGrain": "allocation",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "session_id",
+        "attendance_finalized_at",
+        "expected_participants",
+        "attended_participants"
+      ],
+      "selection": "Bind registered attendance v1.0.0 exactly. Population: Participants confirmed attended for concluded sessions Date basis: session end_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": []
+    },
+    {
+      "id": "group_booking_review",
+      "workflowId": "WF_GROUP_ACTIVITY",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REQUESTED, CAPACITY_HELD. Only supported confirmation/hold-resolution actions count. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED",
+        "CAPACITY_HELD"
+      ]
+    },
+    {
+      "id": "group_run_readiness",
+      "workflowId": "WF_GROUP_ACTIVITY",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "go_decision_reference",
+        "assigned_resource_ids"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of GO_DECISION_PENDING, RUN_BLOCKED. Designated run authority reports unresolved readiness/safety action with a permitted remedy. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY",
+        "SRC_REQUIREMENTS"
+      ],
+      "states": [
+        "GO_DECISION_PENDING",
+        "RUN_BLOCKED"
+      ]
+    },
+    {
+      "id": "tour_confirmed_departures",
+      "workflowId": "WF_TOUR",
+      "recordGrain": "session",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "departure_id",
+        "departure_confirmation",
+        "scheduled_departure_at"
+      ],
+      "selection": "Bind registered confirmed_departures v1.0.0 exactly. Population: Distinct actual departure-instance IDs whose readiness remains confirmed at cutoff Date basis: scheduled departure_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    },
+    {
+      "id": "tour_confirmed_places",
+      "workflowId": "WF_TOUR",
+      "recordGrain": "allocation",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "departure_id",
+        "booking_id",
+        "confirmed_party_quantity"
+      ],
+      "selection": "Bind registered occupied_places v1.0.0 exactly. Population: Confirmed noncancelled party quantities per actual departure Date basis: scheduled departure_at; state as of cutoff. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    },
+    {
+      "id": "tour_in_progress",
+      "workflowId": "WF_TOUR",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "departure_id"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of ON_TOUR, COMPLETION_REVIEW. Count actual tour-work identity and retain departure_id for deduplication; no extra tour per participant. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ON_TOUR",
+        "COMPLETION_REVIEW"
+      ]
+    },
+    {
+      "id": "tour_readiness_action",
+      "workflowId": "WF_TOUR",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "departure_id",
+        "readiness_results"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of APPROVED, SUPPLIERS_CONFIRMED. Missing supplier/guide/vehicle/readiness facts require an owner-confirmed permitted resolution. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY",
+        "SRC_REQUIREMENTS"
+      ],
+      "states": [
+        "APPROVED",
+        "SUPPLIERS_CONFIRMED"
+      ]
+    },
+    {
+      "id": "tour_readiness_overdue",
+      "workflowId": "WF_TOUR",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted departure_readiness_decision milestone identities attached to work in APPROVED, SUPPLIERS_CONFIRMED. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Require an accepted readiness-decision deadline; proposed departure is not a guaranteed departure. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "APPROVED",
+        "SUPPLIERS_CONFIRMED"
+      ]
+    },
+    {
+      "id": "quote_requests_received",
+      "workflowId": "WF_REQUEST_QUOTE",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "received_confirmed_at",
+        "request_channel",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Count distinct root request work IDs first authoritatively REQUESTED/received in the period. Deduplicate retries/reopens. Imported history retains actual received time, not import time.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED"
+      ]
+    },
+    {
+      "id": "quote_response_action",
+      "workflowId": "WF_REQUEST_QUOTE",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "first_substantive_response_at"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REQUESTED, CLARIFICATION_PENDING, SCOPED. A substantive response/scoping action is permitted; automated acknowledgments do not resolve the first-response requirement. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED",
+        "CLARIFICATION_PENDING",
+        "SCOPED"
+      ]
+    },
+    {
+      "id": "quote_execution_in_progress",
+      "workflowId": "WF_REQUEST_QUOTE",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of COMMITTED, IN_PROGRESS, DELIVERABLE_REVIEW. Approved quotes awaiting external confirmation remain separate from committed execution. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "COMMITTED",
+        "IN_PROGRESS",
+        "DELIVERABLE_REVIEW"
+      ]
+    },
+    {
+      "id": "quote_response_overdue",
+      "workflowId": "WF_REQUEST_QUOTE",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted first_substantive_response milestone identities attached to work in REQUESTED, CLARIFICATION_PENDING, SCOPED. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Only accepted/owner-defined response promises create overdue status. Explain customer clarification waits separately. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED",
+        "CLARIFICATION_PENDING",
+        "SCOPED"
+      ]
+    },
+    {
+      "id": "quote_deliverable_review",
+      "workflowId": "WF_REQUEST_QUOTE",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of DELIVERABLE_REVIEW. A permitted deliverable review/release action is pending. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "DELIVERABLE_REVIEW"
+      ]
+    },
+    {
+      "id": "pickup_collection_due",
+      "workflowId": "WF_PICKUP_RETURN",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted goods_collection milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Inbound customer drop-off and carrier collection retain their actual mode. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "pickup_processing",
+      "workflowId": "WF_PICKUP_RETURN",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of RECEIVED_FOR_PROCESSING, ASSESSMENT_PENDING, PRICE_APPROVED, PROCESSING. One root cycle counts once; custody legs remain separate identities. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "RECEIVED_FOR_PROCESSING",
+        "ASSESSMENT_PENDING",
+        "PRICE_APPROVED",
+        "PROCESSING"
+      ]
+    },
+    {
+      "id": "pickup_return_due",
+      "workflowId": "WF_PICKUP_RETURN",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted goods_return milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Customer collection uses its confirmed collection window; ready alone does not confirm an outgoing leg. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "pickup_collection_overdue",
+      "workflowId": "WF_PICKUP_RETURN",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted goods_collection milestone identities attached to work in COLLECTION_CONFIRMED. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Confirmed incoming custody handover satisfies this milestone. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "COLLECTION_CONFIRMED"
+      ]
+    },
+    {
+      "id": "pickup_return_overdue",
+      "workflowId": "WF_PICKUP_RETURN",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted goods_return milestone identities attached to work in READY_FOR_RETURN, RETURN_CONFIRMED, AWAITING_CUSTOMER_COLLECTION. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Confirmed recipient custody satisfies return; processing-ready is not returned. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "READY_FOR_RETURN",
+        "RETURN_CONFIRMED",
+        "AWAITING_CUSTOMER_COLLECTION"
+      ]
+    },
+    {
+      "id": "membership_active",
+      "workflowId": "WF_MEMBERSHIP",
+      "recordGrain": "entitlement",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "entitlement_id",
+        "member_reference",
+        "plan_id",
+        "valid_from",
+        "valid_to",
+        "state_as_of"
+      ],
+      "selection": "Bind registered active_memberships v1.0.0 exactly. Population: Distinct member-plan entitlements authoritatively ACTIVE at cutoff Date basis: as_of cutoff. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": "membership_renewals_due",
+      "workflowId": "WF_MEMBERSHIP",
+      "recordGrain": "entitlement",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "entitlement_id",
+        "plan_id",
+        "state",
+        "renewal_due_at",
+        "renewal_eligibility",
+        "renewal_policy_version",
+        "confirmed_renewal_id",
+        "period_start",
+        "period_end",
+        "timezone",
+        "as_of"
+      ],
+      "selection": "Count entitlement renewal cycles with explicit renewal_due_at in period, confirmed eligibility and no confirmed replacement for that cycle. ACTIVE/PAUSED need policy eligibility. EXPIRED requires an explicit eligible grace/renewal rule. Missing policy/date is unresolved. This is entitlement cycles, not unique people.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ACTIVE",
+        "PAUSED",
+        "EXPIRED"
+      ]
+    },
+    {
+      "id": "membership_renewed",
+      "workflowId": "WF_MEMBERSHIP",
+      "recordGrain": "entitlement",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "renewal_id",
+        "previous_entitlement_id",
+        "renewed_period"
+      ],
+      "selection": "Bind registered renewals v1.0.0 exactly. Population: Distinct confirmed renewal IDs linking previous entitlement to renewed period Date basis: renewal_confirmed_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": []
+    },
+    {
+      "id": "membership_activation_action",
+      "workflowId": "WF_MEMBERSHIP",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "entitlement_id",
+        "eligibility_results"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REQUESTED, ELIGIBILITY_REVIEW, ACTIVATION_PENDING. A permitted activation/evidence action is pending. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_REQUIREMENTS"
+      ],
+      "states": [
+        "REQUESTED",
+        "ELIGIBILITY_REVIEW",
+        "ACTIVATION_PENDING"
+      ]
+    },
+    {
+      "id": "membership_change_action",
+      "workflowId": "WF_MEMBERSHIP",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "entitlement_id"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of PAUSE_PENDING, CANCELLATION_PENDING. A confirmed pending entitlement change has an authorized next action; billing consequences stay finance-owned. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "PAUSE_PENDING",
+        "CANCELLATION_PENDING"
+      ]
+    },
+    {
+      "id": "freight_booked",
+      "workflowId": "WF_FREIGHT",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "shipment_id",
+        "carrier_booking_reference",
+        "carrier_booking_confirmed_at"
+      ],
+      "selection": "Bind registered accepted_shipments v1.0.0 exactly. Population: Distinct shipments with authoritative carrier booking confirmation in period Date basis: carrier_booking_confirmed_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": []
+    },
+    {
+      "id": "freight_in_progress",
+      "workflowId": "WF_FREIGHT",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "shipment_id",
+        "carrier_booking_reference"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of BOOKED, DOCUMENTATION_READY, COLLECTED, IN_TRANSIT, CLEARANCE_REVIEW, CLEARED, AT_DESTINATION. Count distinct shipment work; milestone occurrences have their own grain. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "BOOKED",
+        "DOCUMENTATION_READY",
+        "COLLECTED",
+        "IN_TRANSIT",
+        "CLEARANCE_REVIEW",
+        "CLEARED",
+        "AT_DESTINATION"
+      ]
+    },
+    {
+      "id": "freight_milestones_due",
+      "workflowId": "WF_FREIGHT",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted declared_freight_milestone milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. Group by milestone type, route and leg: pickup, clearance and arrival stay distinct. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "freight_milestone_overdue",
+      "workflowId": "WF_FREIGHT",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted declared_freight_milestone milestone identities attached to work in BOOKED, DOCUMENTATION_READY, COLLECTED, IN_TRANSIT, CLEARANCE_REVIEW, CLEARED, AT_DESTINATION. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Require accepted promise and actual confirmation. Outside-authority customs delay is not automatically merchant fault. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "BOOKED",
+        "DOCUMENTATION_READY",
+        "COLLECTED",
+        "IN_TRANSIT",
+        "CLEARANCE_REVIEW",
+        "CLEARED",
+        "AT_DESTINATION"
+      ]
+    },
+    {
+      "id": "freight_documentation_action",
+      "workflowId": "WF_FREIGHT",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "shipment_id",
+        "requirement_id",
+        "requirement_status"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of BOOKED, CARGO_REVIEW, CLEARANCE_REVIEW. A missing/rejected documentation requirement has an owner-permitted correction. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_REQUIREMENTS"
+      ],
+      "states": [
+        "BOOKED",
+        "CARGO_REVIEW",
+        "CLEARANCE_REVIEW"
+      ]
+    },
+    {
+      "id": "storage_occupied",
+      "workflowId": "WF_STORAGE",
+      "recordGrain": "allocation",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "allocation_id",
+        "space_unit",
+        "allocated_quantity",
+        "valid_from",
+        "valid_to",
+        "release_quantity"
+      ],
+      "selection": "Bind registered occupied_space v1.0.0 exactly. Population: Active authoritative allocations at cutoff grouped by original space unit and location Date basis: as_of cutoff. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    },
+    {
+      "id": "storage_intake_due",
+      "workflowId": "WF_STORAGE",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone",
+        "accepted_due_at"
+      ],
+      "selection": "Select distinct accepted storage_intake milestone identities for noncancelled work with this confirmed milestone type, including milestones on completed work. The registered accepted_due_at is in [period_start, period_end); parent work and milestone are confirmed and not cancelled. Distinguish already completed versus outstanding milestones. A confirmed reservation/intake window is required; quoting is not allocation. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "periodMembership": {
+        "field": "accepted_due_at",
+        "interval": "HALF_OPEN",
+        "missing": "UNRESOLVED",
+        "anchor": "Explicit owner-approved due instant for this milestone type; retain window context. Do not use window overlap or infer a start/end anchor without the type mapping."
+      },
+      "states": []
+    },
+    {
+      "id": "storage_custody_completed",
+      "workflowId": "WF_STORAGE",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "custody_operation_id",
+        "direction",
+        "quantity_unit",
+        "confirmed_at"
+      ],
+      "selection": "Bind registered inbound_outbound_completion v1.0.0 exactly. Population: Distinct confirmed custody operation IDs split by intake/release direction Date basis: custody_operation_confirmed_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": []
+    },
+    {
+      "id": "storage_release_action",
+      "workflowId": "WF_STORAGE",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "allocation_id",
+        "custody_operation_id"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of RETRIEVAL_REQUESTED, READY_FOR_RELEASE. A permitted retrieval/release or custody-proof action is pending; partial releases preserve the remaining allocation. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "RETRIEVAL_REQUESTED",
+        "READY_FOR_RELEASE"
+      ]
+    },
+    {
+      "id": "storage_custody_overdue",
+      "workflowId": "WF_STORAGE",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted storage_intake_or_release milestone identities attached to work in SPACE_RESERVED, INTAKE_REVIEW, RETRIEVAL_REQUESTED, READY_FOR_RELEASE. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Split intake and release types, using their accepted operation deadlines and proof, not contract expiry alone. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "SPACE_RESERVED",
+        "INTAKE_REVIEW",
+        "RETRIEVAL_REQUESTED",
+        "READY_FOR_RELEASE"
+      ]
+    },
+    {
+      "id": "regulated_received",
+      "workflowId": "WF_REGULATED_ENQUIRY",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage"
+      ],
+      "selection": "Bind registered enquiries_received v1.0.0 exactly. Population: Distinct permitted enquiry IDs confirmed SUBMITTED in period Date basis: submitted_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "SUBMITTED"
+      ]
+    },
+    {
+      "id": "regulated_response_action",
+      "workflowId": "WF_REGULATED_ENQUIRY",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "enquiry_id",
+        "first_substantive_response_at"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of SUBMITTED, TRIAGED, CLARIFICATION_PENDING, RESPONSE_READY. Only permitted administrative triage/clarification/delivery actions count. Professional decisions require qualified provider authority and scope. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "SUBMITTED",
+        "TRIAGED",
+        "CLARIFICATION_PENDING",
+        "RESPONSE_READY"
+      ]
+    },
+    {
+      "id": "regulated_handoffs",
+      "workflowId": "WF_REGULATED_ENQUIRY",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "metric_definition_id",
+        "metric_definition_version",
+        "period_start",
+        "period_end",
+        "timezone",
+        "metric_date_basis",
+        "coverage",
+        "handoff_id",
+        "receiving_provider_id",
+        "provider_acknowledged_at"
+      ],
+      "selection": "Bind registered provider_handoffs v1.0.0 exactly. Population: Distinct handoff IDs acknowledged by authorized receiving provider Date basis: provider_handoff_confirmed_at. Preserve registered denominator, exclusions, unit and source events; this is not a new formula.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": []
+    },
+    {
+      "id": "regulated_response_overdue",
+      "workflowId": "WF_REGULATED_ENQUIRY",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted first_substantive_response milestone identities attached to work in SUBMITTED, TRIAGED, PROFESSIONAL_REVIEW, CLARIFICATION_PENDING, RESPONSE_READY. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Only an accepted response promise defines overdue status; no invented professional outcome. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "SUBMITTED",
+        "TRIAGED",
+        "PROFESSIONAL_REVIEW",
+        "CLARIFICATION_PENDING",
+        "RESPONSE_READY"
+      ]
+    },
+    {
+      "id": "regulated_review_action",
+      "workflowId": "WF_REGULATED_ENQUIRY",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope",
+        "provider_scope",
+        "requirement_id",
+        "requirement_status"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REVIEW_BLOCKED. Only authorized evidence/routing/support remediation counts; this does not grant professional authority. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW",
+        "SRC_REQUIREMENTS"
+      ],
+      "states": [
+        "REVIEW_BLOCKED"
+      ]
+    },
+    {
+      "id": "job_intake_action",
+      "workflowId": "WF_SERVICE_JOB",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of REQUESTED, INTAKE_REVIEW, DIAGNOSIS. An intake/diagnostic/quote action is permitted; customer approval wait alone is not merchant-actionable. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "REQUESTED",
+        "INTAKE_REVIEW",
+        "DIAGNOSIS"
+      ]
+    },
+    {
+      "id": "job_in_service",
+      "workflowId": "WF_SERVICE_JOB",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of APPROVED, PARTS_PENDING, IN_SERVICE, QUALITY_REVIEW, FIELD_EXECUTION_PENDING. Retain distinct parts-wait, service, field-execution and quality-review substates. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "APPROVED",
+        "PARTS_PENDING",
+        "IN_SERVICE",
+        "QUALITY_REVIEW",
+        "FIELD_EXECUTION_PENDING"
+      ]
+    },
+    {
+      "id": "job_release_action",
+      "workflowId": "WF_SERVICE_JOB",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of READY_FOR_RELEASE. A supported release/handover action is permitted and owner-defined prerequisites are satisfied. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "READY_FOR_RELEASE"
+      ]
+    },
+    {
+      "id": "job_completion_overdue",
+      "workflowId": "WF_SERVICE_JOB",
+      "recordGrain": "milestone",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "milestone_id",
+        "milestone_type",
+        "milestone_version",
+        "accepted_window_start",
+        "accepted_deadline_at",
+        "milestone_confirmation_state",
+        "milestone_completed_at",
+        "milestone_cancelled_at",
+        "as_of",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Select distinct accepted accepted_job_completion milestone identities attached to work in APPROVED, PARTS_PENDING, IN_SERVICE, QUALITY_REVIEW, FIELD_EXECUTION_PENDING. Deadline precedes as_of and no completion/cancellation of this milestone is confirmed. Unknown source never proves missed completion. Customer-authorized rescheduling replaces the old active promise; parts waiting alone cannot authorize a changed deadline. Current accepted reschedules replace earlier active promises; historical observations retain their applicable accepted version.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "APPROVED",
+        "PARTS_PENDING",
+        "IN_SERVICE",
+        "QUALITY_REVIEW",
+        "FIELD_EXECUTION_PENDING"
+      ]
+    },
+    {
+      "id": "job_quality_action",
+      "workflowId": "WF_SERVICE_JOB",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "merchant_id",
+        "location_id",
+        "workflow_id",
+        "authoritative_record_id",
+        "source_id",
+        "source_record_version",
+        "effective_at",
+        "observed_at",
+        "work_id",
+        "state",
+        "state_confirmed_at",
+        "as_of",
+        "allowed_next_actions",
+        "actor_scope"
+      ],
+      "selection": "At as_of select distinct current authoritative workflow_work identities whose latest confirmed state is one of QUALITY_REVIEW. A real authorized quality/inspection action is pending; failure/rework requires confirmed records. Require an owner-confirmed currently permitted next action for the viewing actor/location. Another party waiting alone is not an action for this actor. Deduplicate multiple permitted actions on one work_id. Superseded facts are replaced; absent/stale facts are unresolved, not zero.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "QUALITY_REVIEW"
+      ]
+    },
+    {
+      "id": "order_confirmed",
+      "workflowId": "WF_ORDER",
+      "recordGrain": "workflow_work",
+      "requiredFields": [
+        "order_id",
+        "canonical_identity",
+        "order_confirmed_at",
+        "stock_confirmation_or_allocation_reference",
+        "confirmation_source",
+        "source_record_version",
+        "coverage_start",
+        "coverage_end",
+        "period_start",
+        "period_end",
+        "timezone"
+      ],
+      "selection": "Use confirmed_orders exactly: count canonical orders with authoritative machine/source confirmation in period after confirmed availability. Exclude pending/unknown/negative stock checks, checkout attempts and duplicates. ACCEPTED denotes source confirmation, not a merchant click.",
+      "sourceIds": [
+        "SRC_WORKFLOW"
+      ],
+      "states": [
+        "ACCEPTED"
+      ]
+    },
+    {
+      "id": "appointment_remaining_capacity",
+      "workflowId": "WF_APPOINTMENT",
+      "recordGrain": "allocation",
+      "requiredFields": [
+        "resource_pool_id",
+        "published_schedule",
+        "usable_capacity",
+        "physical_unit",
+        "reservation_intervals",
+        "effective_holds",
+        "closures",
+        "buffers",
+        "period_start",
+        "period_end",
+        "as_of"
+      ],
+      "selection": "Apply the registered resource-slot capacity model for this workflow, selected interval and as-of cutoff. Calculate remaining capacity using the shared resource pool, confirmed allocations, valid holds and closures. Missing schedule/capacity is unknown; opening hours alone do not supply a denominator.",
+      "sourceIds": [
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    },
+    {
+      "id": "remote_remaining_capacity",
+      "workflowId": "WF_REMOTE_SESSION",
+      "recordGrain": "allocation",
+      "requiredFields": [
+        "resource_pool_id",
+        "published_schedule",
+        "usable_capacity",
+        "physical_unit",
+        "reservation_intervals",
+        "effective_holds",
+        "closures",
+        "buffers",
+        "period_start",
+        "period_end",
+        "as_of"
+      ],
+      "selection": "Apply the registered resource-slot capacity model for this workflow, selected interval and as-of cutoff. Calculate remaining capacity using the shared resource pool, confirmed allocations, valid holds and closures. Missing schedule/capacity is unknown; opening hours alone do not supply a denominator.",
+      "sourceIds": [
+        "SRC_AVAILABILITY"
+      ],
+      "states": []
+    }
+  ]
+}

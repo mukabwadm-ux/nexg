@@ -1,0 +1,1160 @@
+[
+  {
+    "greeting": "Hi Amina,",
+    "id": "01-email-verification-otp",
+    "group": "Access & security",
+    "name": "Welcome and verify email",
+    "subject": "Welcome to NEXG — verify your email",
+    "preheader": "Your six-digit verification code expires in 30 minutes.",
+    "eyebrow": "WELCOME TO NEXG",
+    "icon": "mail",
+    "tone": "gold",
+    "title": "Welcome to NEXG",
+    "intro": "Thanks for creating your NEXG merchant account. Enter the code below to verify your email and continue.",
+    "code": "482916",
+    "codeLabel": "YOUR VERIFICATION CODE",
+    "expiry": "Expires in 30 minutes",
+    "callout": {
+      "title": "Keep this code private",
+      "body": "NEXG will never ask you to share this code. If you did not request it, you can ignore this email.",
+      "tone": "warning"
+    },
+    "ctaNote": "Enter this code on the NEXG sign-up page to verify your email and continue setup.",
+    "trigger": "A merchant requests email verification.",
+    "delivery": "Proposed transactional email to the address being verified.",
+    "implementationNote": "Design proposal. User selected a 30-minute expiry. Current local auth.email.otp_expiry is 3600 seconds; use 1800 seconds when this flow is implemented. Email confirmations are currently disabled locally."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "02-sign-in-otp",
+    "group": "Access & security",
+    "name": "Sign-in OTP",
+    "subject": "482916 is your NEXG sign-in code",
+    "preheader": "Use this one-time code to sign in. It expires in 30 minutes.",
+    "eyebrow": "SECURE SIGN-IN",
+    "icon": "lock",
+    "tone": "gold",
+    "title": "Your sign-in code is here",
+    "intro": "Use this code to sign in to your NEXG merchant account. Enter it on the page where you started signing in.",
+    "code": "482916",
+    "codeLabel": "YOUR ONE-TIME CODE",
+    "expiry": "Expires in 30 minutes",
+    "callout": {
+      "title": "Only you should use this code",
+      "body": "Do not forward or share it. If you did not request a code, ignore this email and review your account security.",
+      "tone": "warning"
+    },
+    "ctaNote": "This code can be used once.",
+    "trigger": "A merchant requests a passwordless sign-in code.",
+    "delivery": "Proposed transactional email to the verified sign-in address.",
+    "implementationNote": "Proposed email OTP flow; the current merchant auth UI uses email/password. User selected a 30-minute expiry. Current local auth.email.otp_expiry is 3600 seconds; use 1800 seconds when email OTP is implemented."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "03-password-reset",
+    "group": "Access & security",
+    "name": "Password reset",
+    "subject": "Reset your NEXG password",
+    "preheader": "You requested a password reset. Choose a new password securely.",
+    "eyebrow": "ACCOUNT RECOVERY",
+    "icon": "key",
+    "tone": "gold",
+    "title": "Reset your password",
+    "intro": "We received a request to reset the password for your NEXG account. Follow the secure link to choose a new password.",
+    "cta": "Reset password",
+    "ctaNote": "This link is intended for the account owner only.",
+    "callout": {
+      "title": "Did not request this?",
+      "body": "You can ignore this email. Your password will stay the same unless you complete the reset.",
+      "tone": "neutral"
+    },
+    "trigger": "An account owner requests password recovery.",
+    "delivery": "Transactional recovery email to the account address.",
+    "implementationNote": "Recovery in apps/web/components/auth/password-recovery.tsx uses an email reset link. This is a visual proposal for that message; link lifetime must come from the active auth provider."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "04-password-changed",
+    "group": "Access & security",
+    "name": "Password changed",
+    "subject": "Your NEXG password was changed",
+    "preheader": "Review this account security change if it was not you.",
+    "eyebrow": "SECURITY NOTICE",
+    "icon": "shield",
+    "tone": "green",
+    "title": "Your password has changed",
+    "intro": "The password for your NEXG account was changed. If you made this change, there is nothing else to do.",
+    "rows": [
+      [
+        "Account",
+        "a••••@example.com"
+      ],
+      [
+        "Changed at",
+        "1 Nov 2026, 10:24 EAT"
+      ]
+    ],
+    "callout": {
+      "title": "Was this someone else?",
+      "body": "Open NEXG directly to recover your account, review active sessions and contact support.",
+      "tone": "warning"
+    },
+    "cta": "Review account security",
+    "trigger": "The authentication service confirms a password change.",
+    "delivery": "Proposed security notice to the account owner.",
+    "implementationNote": "Design proposal. Requires an authoritative auth change event and a supported account recovery destination; do not trigger from an unconfirmed request."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "05-new-sign-in",
+    "group": "Access & security",
+    "name": "New sign-in alert",
+    "subject": "A new sign-in to your NEXG account",
+    "preheader": "Check the device and time for this sign-in.",
+    "eyebrow": "ACCOUNT ACTIVITY",
+    "icon": "shield",
+    "tone": "amber",
+    "title": "Was this you signing in?",
+    "intro": "We noticed a sign-in to your NEXG merchant account from a device you have not used before.",
+    "rows": [
+      [
+        "Device",
+        "Chrome on Windows"
+      ],
+      [
+        "Time",
+        "1 Nov 2026, 10:24 EAT"
+      ],
+      [
+        "Business",
+        "Karibu Kitchen"
+      ]
+    ],
+    "callout": {
+      "title": "Do not recognise this activity?",
+      "body": "Open NEXG directly to review your sessions and secure your account. Contact support if you need help.",
+      "tone": "warning"
+    },
+    "cta": "Review account security",
+    "trigger": "A supported security service identifies a new-device sign-in.",
+    "delivery": "Proposed security notice to the account owner.",
+    "implementationNote": "Design proposal. New-device detection and session review capability must be implemented before enabling this notice. Do not infer reliable location from an IP address."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "06-email-change-confirmation",
+    "group": "Access & security",
+    "name": "Confirm email change",
+    "subject": "Confirm your NEXG email change",
+    "preheader": "Confirm the request to update your account email address.",
+    "eyebrow": "CONFIRM ACCOUNT CHANGE",
+    "icon": "mail",
+    "tone": "gold",
+    "title": "Confirm your email change",
+    "intro": "You asked to change the email address on your NEXG account. Confirm this request to continue.",
+    "rows": [
+      [
+        "Current email",
+        "a••••@example.com"
+      ],
+      [
+        "New email",
+        "o••••@example.com"
+      ]
+    ],
+    "cta": "Confirm email change",
+    "callout": {
+      "title": "Did not request this change?",
+      "body": "Do not confirm it. Open NEXG directly to review your account security and contact support.",
+      "tone": "warning"
+    },
+    "ctaNote": "Complete every confirmation requested by NEXG before the change takes effect.",
+    "trigger": "The account owner requests an email-address change.",
+    "delivery": "Proposed confirmation messages to both old and new addresses, as required by active auth settings.",
+    "implementationNote": "Local supabase/config.toml has double_confirm_changes=true. Final old/new address copy and token bindings must follow the provider templates; this mockup represents the confirmation family."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "07-welcome",
+    "group": "Onboarding & verification",
+    "name": "Finish setting up",
+    "subject": "Your email is verified — continue setting up NEXG",
+    "preheader": "Add your business details, documents and offerings in your workspace.",
+    "eyebrow": "EMAIL VERIFIED",
+    "icon": "store",
+    "tone": "gold",
+    "title": "Your business setup starts here",
+    "intro": "Your email is verified. Continue setting up Karibu Kitchen so we can review the details your business needs.",
+    "steps": [
+      "Complete your business details.",
+      "Add the documents requested for your business.",
+      "Set up your offerings and availability."
+    ],
+    "cta": "Continue setup",
+    "callout": {
+      "title": "Your business is not live yet",
+      "body": "We will show your verification and publication status in your workspace.",
+      "tone": "neutral"
+    },
+    "trigger": "A merchant successfully verifies the email address used to create their account.",
+    "delivery": "Proposed onboarding email to the business owner.",
+    "implementationNote": "Design proposal. Account creation, business approval and publication are separate states. Required steps must adapt to the merchant profile; these steps are illustrative."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "08-application-received",
+    "group": "Onboarding & verification",
+    "name": "Application received",
+    "subject": "We have your Karibu Kitchen application",
+    "preheader": "You can follow the review in your merchant workspace.",
+    "eyebrow": "APPLICATION RECEIVED",
+    "icon": "clock",
+    "tone": "blue",
+    "title": "Your application is with us",
+    "intro": "We have received the business application for Karibu Kitchen. We will email you if we need more information or when the review status changes.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Reference",
+        "NXG-APP-1042"
+      ],
+      [
+        "Status",
+        "Under review"
+      ]
+    ],
+    "cta": "View application status",
+    "ctaNote": "You can return to your workspace to check the latest status.",
+    "trigger": "The application service confirms a complete application submission.",
+    "delivery": "Proposed transactional email to the applicant and approved business recipients.",
+    "implementationNote": "Design proposal. No universal review SLA is promised. Use the authoritative application reference and status."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "09-documents-action-required",
+    "group": "Onboarding & verification",
+    "name": "Documents need attention",
+    "subject": "A document needs updating for Karibu Kitchen",
+    "preheader": "Review the reason and upload an updated document.",
+    "eyebrow": "ACTION REQUIRED",
+    "icon": "file",
+    "tone": "amber",
+    "title": "Please update this document",
+    "intro": "We could not complete the review of one document for Karibu Kitchen. You can see the review note and upload a replacement in your workspace.",
+    "rows": [
+      [
+        "Document",
+        "Business permit"
+      ],
+      [
+        "Review note",
+        "The expiry date is not readable."
+      ],
+      [
+        "Reference",
+        "NXG-APP-1042"
+      ]
+    ],
+    "cta": "Review and upload document",
+    "callout": {
+      "title": "Send documents securely",
+      "body": "Upload the replacement in NEXG. Please do not reply with identity or business documents attached.",
+      "tone": "neutral"
+    },
+    "trigger": "A reviewer records a document issue with an actionable reason.",
+    "delivery": "Proposed transactional email to authorized verification contacts.",
+    "implementationNote": "Design proposal. Document name and review reason are example data. Render only requirements actually assigned to this business; do not publish sensitive evidence in email."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "10-business-approved",
+    "group": "Onboarding & verification",
+    "name": "Business approved",
+    "subject": "Karibu Kitchen has been approved",
+    "preheader": "Review the remaining setup before your business goes live.",
+    "eyebrow": "BUSINESS APPROVED",
+    "icon": "check",
+    "tone": "green",
+    "title": "Your business review is complete",
+    "intro": "Karibu Kitchen has passed the business review. Open your workspace to check the remaining setup and publication status.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Review status",
+        "Approved"
+      ],
+      [
+        "Publication status",
+        "Setup to complete"
+      ]
+    ],
+    "cta": "Review go-live setup",
+    "callout": {
+      "title": "Approval and publication are separate",
+      "body": "Your workspace will confirm when your business is live and available to customers.",
+      "tone": "neutral"
+    },
+    "trigger": "The verification authority approves the business application.",
+    "delivery": "Proposed transactional email to the owner and approved business contacts.",
+    "implementationNote": "Design proposal. Approval does not imply publication. The existing merchant.live event requires a separate live/publication notice when that transition is authoritative."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "11-application-not-approved",
+    "group": "Onboarding & verification",
+    "name": "Application not approved",
+    "subject": "An update on the Karibu Kitchen application",
+    "preheader": "Review the decision and the next steps available to you.",
+    "eyebrow": "APPLICATION UPDATE",
+    "icon": "alert",
+    "tone": "amber",
+    "title": "We could not approve this application",
+    "intro": "We have completed the review of Karibu Kitchen. The application has not been approved. Please review the decision and any available next steps in your workspace.",
+    "rows": [
+      [
+        "Reference",
+        "NXG-APP-1042"
+      ],
+      [
+        "Review reason",
+        "Required business information could not be verified."
+      ]
+    ],
+    "cta": "Review application decision",
+    "ctaNote": "If you believe the information is incorrect, contact NEXG support.",
+    "trigger": "A reviewer records an authoritative not-approved decision.",
+    "delivery": "Proposed transactional email to the applicant and authorized business contacts.",
+    "implementationNote": "Design proposal. Show a permitted reviewer reason and only recovery or appeal options actually available; avoid implying all rejections can be resubmitted."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "12-document-expiring",
+    "group": "Onboarding & verification",
+    "name": "Document expiring",
+    "subject": "A Karibu Kitchen document expires soon",
+    "preheader": "Review and update the document before its expiry date.",
+    "eyebrow": "DOCUMENT REMINDER",
+    "icon": "file",
+    "tone": "amber",
+    "title": "Your document needs renewal",
+    "intro": "A document on the Karibu Kitchen account is approaching its expiry date. Upload the renewed document when it is available.",
+    "rows": [
+      [
+        "Document",
+        "Business permit"
+      ],
+      [
+        "Expires on",
+        "30 Nov 2026"
+      ],
+      [
+        "Business",
+        "Karibu Kitchen"
+      ]
+    ],
+    "cta": "Update business document",
+    "ctaNote": "Your workspace shows any effect this document has on your business status.",
+    "trigger": "A verified required document reaches a configured expiry reminder threshold.",
+    "delivery": "Proposed reminder to authorized verification contacts.",
+    "implementationNote": "Design proposal. Document requirement, expiry and reminder schedule must be authoritative; do not imply automatic suspension for every document."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "13-new-order",
+    "group": "Orders & bookings",
+    "name": "New confirmed order",
+    "subject": "New confirmed order NXG-1048",
+    "preheader": "The order is confirmed. Open your workspace to start preparation.",
+    "eyebrow": "ORDER CONFIRMED",
+    "icon": "bag",
+    "tone": "green",
+    "title": "A new order is ready for preparation",
+    "intro": "Order NXG-1048 for Karibu Kitchen has been confirmed. Open the work details to follow the preparation and handover steps.",
+    "amount": "KES 2,800",
+    "amountLabel": "ORDER TOTAL",
+    "rows": [
+      [
+        "Order",
+        "NXG-1048"
+      ],
+      [
+        "Items",
+        "3 items"
+      ],
+      [
+        "Fulfilment",
+        "Collection"
+      ],
+      [
+        "Collection time",
+        "1 Nov 2026, 13:30 EAT"
+      ]
+    ],
+    "cta": "Open order",
+    "ctaNote": "Customer details and preparation notes are available securely in your workspace.",
+    "trigger": "The authoritative order and stock operation confirms an ordinary order.",
+    "delivery": "Proposed opt-in work email to authorized operators; routine live work should also use the portal/push.",
+    "implementationNote": "Design proposal. Automatic confirmation follows docs/merchant-portal-plan/order-confirmation.md. No Accept/Decline gate. Order total is not merchant earnings or payout entitlement."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "14-booking-confirmed",
+    "group": "Orders & bookings",
+    "name": "Booking confirmed",
+    "subject": "Booking NXG-B218 is confirmed",
+    "preheader": "View the confirmed time and preparation details in NEXG.",
+    "eyebrow": "BOOKING CONFIRMED",
+    "icon": "calendar",
+    "tone": "green",
+    "title": "A booking has been confirmed",
+    "intro": "The source system has confirmed booking NXG-B218 for Karibu Kitchen. Review the time and the work details in your workspace.",
+    "rows": [
+      [
+        "Booking",
+        "NXG-B218"
+      ],
+      [
+        "Date",
+        "3 Nov 2026"
+      ],
+      [
+        "Time",
+        "18:30 EAT"
+      ],
+      [
+        "Service",
+        "Table booking"
+      ],
+      [
+        "Party size",
+        "4 guests"
+      ]
+    ],
+    "cta": "View booking",
+    "ctaNote": "Open the booking for customer details and any permitted service notes.",
+    "trigger": "The authoritative booking operation confirms the required slot and resources.",
+    "delivery": "Proposed opt-in work email to authorized booking operators.",
+    "implementationNote": "Design proposal for a configured table-booking scenario. Confirmation requires an authoritative slot/resource result and does not require ordinary merchant acceptance."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "15-work-cancelled",
+    "group": "Orders & bookings",
+    "name": "Order or booking cancelled",
+    "subject": "Order NXG-1048 has been cancelled",
+    "preheader": "Review the cancellation and any remaining work in your workspace.",
+    "eyebrow": "CANCELLATION UPDATE",
+    "icon": "alert",
+    "tone": "amber",
+    "title": "This order has been cancelled",
+    "intro": "The source system has confirmed the cancellation of order NXG-1048. Review the record before taking any further preparation or handover action.",
+    "rows": [
+      [
+        "Order",
+        "NXG-1048"
+      ],
+      [
+        "Status",
+        "Cancelled"
+      ],
+      [
+        "Recorded at",
+        "1 Nov 2026, 12:48 EAT"
+      ]
+    ],
+    "cta": "View cancellation details",
+    "callout": {
+      "title": "Payment status is separate",
+      "body": "Open Money for any confirmed refund or adjustment linked to this order.",
+      "tone": "neutral"
+    },
+    "trigger": "An authoritative order or booking cancellation is recorded.",
+    "delivery": "Proposed opt-in work email to operators assigned to the affected business.",
+    "implementationNote": "Design proposal. The record type, reason and allowed actions must adapt to the authoritative cancellation. Cancellation alone does not prove a refund or fee outcome."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "16-customer-message",
+    "group": "Orders & bookings",
+    "name": "New customer message",
+    "subject": "A new message about order NXG-1048",
+    "preheader": "Read and reply securely from your merchant workspace.",
+    "eyebrow": "NEW MESSAGE",
+    "icon": "message",
+    "tone": "blue",
+    "title": "There is a message for your business",
+    "intro": "A new customer message is waiting for Karibu Kitchen about order NXG-1048. Open NEXG to read it and reply.",
+    "rows": [
+      [
+        "Related work",
+        "Order NXG-1048"
+      ],
+      [
+        "Received",
+        "1 Nov 2026, 12:40 EAT"
+      ]
+    ],
+    "cta": "Read message in NEXG",
+    "ctaNote": "Customer information and the message content stay in your workspace.",
+    "trigger": "A permitted merchant conversation receives a new customer message.",
+    "delivery": "Proposed opt-in email or digest to authorized conversation participants.",
+    "implementationNote": "Design proposal. No customer identity, message body or sensitive attachments are exposed. Requires implemented conversation permissions and delivery preferences."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "17-payment-received",
+    "group": "Money",
+    "name": "Customer payment received",
+    "subject": "Payment confirmed for order NXG-1048",
+    "preheader": "The payment provider has confirmed the customer payment.",
+    "eyebrow": "PAYMENT CONFIRMED",
+    "icon": "wallet",
+    "tone": "green",
+    "title": "A customer payment is confirmed",
+    "intro": "The payment provider has confirmed a customer payment linked to order NXG-1048 for Karibu Kitchen.",
+    "amount": "KES 2,800",
+    "amountLabel": "CUSTOMER PAYMENT",
+    "rows": [
+      [
+        "Order",
+        "NXG-1048"
+      ],
+      [
+        "Payment reference",
+        "PAY-78412"
+      ],
+      [
+        "Method",
+        "M-Pesa"
+      ],
+      [
+        "Recorded at",
+        "1 Nov 2026, 12:35 EAT"
+      ]
+    ],
+    "cta": "View payment details",
+    "callout": {
+      "title": "Payment is not a payout",
+      "body": "Your available merchant balance and any fees or adjustments are shown separately in Money.",
+      "tone": "neutral"
+    },
+    "trigger": "A verified payment provider event confirms customer payment.",
+    "delivery": "Proposed optional transaction email to explicitly authorized finance recipients.",
+    "implementationNote": "Design proposal. Customer payment, merchant entitlement, settlement and payout are separate facts. Trigger only from the payment authority, with safe deduplication."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "18-payout-sent",
+    "group": "Money",
+    "name": "Payout initiated",
+    "subject": "Your KES 18,450 payout has been initiated",
+    "preheader": "Follow the payout status and destination in Money.",
+    "eyebrow": "PAYOUT INITIATED",
+    "icon": "arrow",
+    "tone": "blue",
+    "title": "Your payout is on its way",
+    "intro": "The payout provider has accepted a transfer for Karibu Kitchen. You can follow its progress in Money.",
+    "amount": "KES 18,450",
+    "amountLabel": "PAYOUT AMOUNT",
+    "rows": [
+      [
+        "Payout",
+        "PYO-6208"
+      ],
+      [
+        "Destination",
+        "Bank account ending 4821"
+      ],
+      [
+        "Provider status",
+        "Transfer initiated"
+      ],
+      [
+        "Date",
+        "1 Nov 2026"
+      ]
+    ],
+    "cta": "Track payout",
+    "callout": {
+      "title": "Receipt is still pending",
+      "body": "This notice confirms initiation. Your bank or payout provider must confirm receipt before the payout is complete.",
+      "tone": "neutral"
+    },
+    "trigger": "The payout provider authoritatively accepts a transfer initiation.",
+    "delivery": "Proposed transactional email to explicitly authorized payout recipients.",
+    "implementationNote": "Design proposal. A sent or initiated payout must not be represented as received. Do not invent a bank arrival deadline or expose full payout credentials."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "19-payout-failed",
+    "group": "Money",
+    "name": "Payout failed",
+    "subject": "Action needed for payout PYO-6208",
+    "preheader": "Review the provider reason and supported next steps in Money.",
+    "eyebrow": "PAYOUT ACTION REQUIRED",
+    "icon": "alert",
+    "tone": "red",
+    "title": "Your payout could not be completed",
+    "intro": "The payout provider reported that payout PYO-6208 for Karibu Kitchen failed. Review the reason and the supported next steps in Money.",
+    "amount": "KES 18,450",
+    "amountLabel": "PAYOUT AMOUNT",
+    "rows": [
+      [
+        "Payout",
+        "PYO-6208"
+      ],
+      [
+        "Destination",
+        "Bank account ending 4821"
+      ],
+      [
+        "Provider reason",
+        "Destination account could not be verified."
+      ]
+    ],
+    "cta": "Review payout issue",
+    "ctaNote": "Update payout details only from your secure NEXG workspace.",
+    "trigger": "The payout provider confirms a failed transfer.",
+    "delivery": "Proposed transactional alert to explicitly authorized payout recipients.",
+    "implementationNote": "Design proposal. Show the provider-confirmed failure and actual balance treatment. Do not promise an automatic retry, returned funds or a transfer deadline without evidence."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "20-refund-completed",
+    "group": "Money",
+    "name": "Refund processed",
+    "subject": "Refund processed for order NXG-1029",
+    "preheader": "The provider has processed the refund. Customer posting may still be pending.",
+    "eyebrow": "REFUND UPDATE",
+    "icon": "wallet",
+    "tone": "blue",
+    "title": "The refund has been processed",
+    "intro": "The payment provider has marked the refund for order NXG-1029 as processed. Review its effect on the transaction and merchant balance in Money.",
+    "amount": "KES 1,200",
+    "amountLabel": "REFUND AMOUNT",
+    "rows": [
+      [
+        "Order",
+        "NXG-1029"
+      ],
+      [
+        "Refund reference",
+        "RFD-3186"
+      ],
+      [
+        "Provider status",
+        "Processed"
+      ]
+    ],
+    "cta": "View refund details",
+    "callout": {
+      "title": "Customer posting may take longer",
+      "body": "Provider processing does not confirm that the customer bank or wallet has posted the refund.",
+      "tone": "neutral"
+    },
+    "trigger": "The authoritative refund provider marks a refund as processed.",
+    "delivery": "Proposed transactional email to authorized finance recipients.",
+    "implementationNote": "Design proposal. ID uses the requested completed slug, but visible copy says processed. Bank or wallet posting is a separate fact; no customer receipt claim is made."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "21-statement-ready",
+    "group": "Money",
+    "name": "Statement ready",
+    "subject": "Your October 2026 NEXG statement is ready",
+    "preheader": "Open Money to review the statement for Karibu Kitchen.",
+    "eyebrow": "MONTHLY STATEMENT",
+    "icon": "file",
+    "tone": "gold",
+    "title": "Your statement is ready to review",
+    "intro": "The October 2026 statement for Karibu Kitchen is ready in Money. Open the statement to review the transactions and balance movements for the period.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Statement period",
+        "1–31 Oct 2026"
+      ],
+      [
+        "Currency",
+        "KES"
+      ]
+    ],
+    "cta": "Open statement",
+    "ctaNote": "Sign in with an account that has permission to view business finances.",
+    "trigger": "The statement service confirms that a scoped statement is available.",
+    "delivery": "Proposed statement email to authorized finance recipients who selected this delivery.",
+    "implementationNote": "Design proposal. Statement generation, scope and notification capability must exist before enabling. Do not attach unrestricted financial exports or imply every reporting action is implemented."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "22-payout-details-changed",
+    "group": "Money",
+    "name": "Payout details changed",
+    "subject": "Payout details changed for Karibu Kitchen",
+    "preheader": "Review this change to your business payout destination.",
+    "eyebrow": "FINANCIAL SECURITY",
+    "icon": "shield",
+    "tone": "amber",
+    "title": "Your payout destination has changed",
+    "intro": "An authorized change to the payout details for Karibu Kitchen was recorded. Review the destination in your secure workspace.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "New destination",
+        "Bank account ending 4821"
+      ],
+      [
+        "Changed at",
+        "1 Nov 2026, 10:24 EAT"
+      ]
+    ],
+    "cta": "Review payout settings",
+    "callout": {
+      "title": "Do not recognise this change?",
+      "body": "Open NEXG directly and contact support immediately. Review account access before making another payout change.",
+      "tone": "warning"
+    },
+    "trigger": "The payout-settings authority confirms an authenticated destination change.",
+    "delivery": "Proposed security email to the owner and explicitly authorized finance/security recipients.",
+    "implementationNote": "Design proposal. Requires provider-authorized payout mapping and account permissions. Do not expose full account numbers, tokens or verification documents."
+  },
+  {
+    "greeting": "Hi Sam,",
+    "id": "23-team-invitation",
+    "group": "Team & account",
+    "name": "Team invitation",
+    "subject": "You are invited to Karibu Kitchen on NEXG",
+    "preheader": "Review the business and role before joining its workspace.",
+    "eyebrow": "TEAM INVITATION",
+    "icon": "users",
+    "tone": "gold",
+    "title": "Join your team on NEXG",
+    "intro": "Amina has invited you to the Karibu Kitchen merchant workspace. Review the invitation and the role before joining.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Invited by",
+        "Amina"
+      ],
+      [
+        "Proposed role",
+        "Operations"
+      ],
+      [
+        "Access scope",
+        "Work and availability"
+      ]
+    ],
+    "cta": "Review invitation",
+    "ctaNote": "If you do not recognise this business or invitation, you can ignore this email.",
+    "trigger": "An authorized team administrator issues an invitation.",
+    "delivery": "Proposed transactional invitation to the invited address only.",
+    "implementationNote": "Design proposal. Role and access scope are examples and must resolve to actual grants. Invitation acceptance, expiry and account binding must be enforced by the implemented service."
+  },
+  {
+    "greeting": "Hi Sam,",
+    "id": "24-team-access-changed",
+    "group": "Team & account",
+    "name": "Team access changed",
+    "subject": "Your Karibu Kitchen access has changed",
+    "preheader": "Review your updated role and permissions in NEXG.",
+    "eyebrow": "TEAM ACCESS UPDATE",
+    "icon": "users",
+    "tone": "blue",
+    "title": "Your workspace access has changed",
+    "intro": "An administrator updated your access to the Karibu Kitchen workspace. Your available actions now follow the permissions on your account.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Role",
+        "Operations"
+      ],
+      [
+        "Access scope",
+        "Work and availability"
+      ],
+      [
+        "Updated at",
+        "1 Nov 2026, 10:24 EAT"
+      ]
+    ],
+    "cta": "View my access",
+    "callout": {
+      "title": "Need a different level of access?",
+      "body": "Contact your business administrator. A role change does not automatically authorize financial or connected-provider access.",
+      "tone": "neutral"
+    },
+    "trigger": "The permissions authority confirms a team role or grant change.",
+    "delivery": "Proposed transactional notice to the affected member and permitted business administrators.",
+    "implementationNote": "Design proposal. Expand to added, removed or changed access only from authoritative grants. Never imply a role label grants every capability."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "25-account-restricted",
+    "group": "Team & account",
+    "name": "Business restricted",
+    "subject": "Karibu Kitchen needs your attention",
+    "preheader": "Review the account restriction and the next steps available to you.",
+    "eyebrow": "BUSINESS STATUS UPDATE",
+    "icon": "alert",
+    "tone": "red",
+    "title": "Your business has been restricted",
+    "intro": "A restriction has been recorded for Karibu Kitchen. Open your workspace to review what is affected and the next steps available to you.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Affected area",
+        "New customer orders"
+      ],
+      [
+        "Reason",
+        "Required verification needs review."
+      ]
+    ],
+    "cta": "Review business status",
+    "ctaNote": "You can contact NEXG support if you need help understanding the decision.",
+    "trigger": "The business-status authority records a restriction, suspension or pause.",
+    "delivery": "Proposed transactional notice to the owner and permitted business contacts.",
+    "implementationNote": "Design proposal. Merchant email registry includes merchant.paused, merchant.suspended and merchant.delisted. Use event-specific scope, reasons and actual appeal options; do not combine distinct status semantics in production."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "26-account-restored",
+    "group": "Team & account",
+    "name": "Business access restored",
+    "subject": "The restriction on Karibu Kitchen has been removed",
+    "preheader": "Check the latest business and publication status in your workspace.",
+    "eyebrow": "BUSINESS STATUS UPDATE",
+    "icon": "check",
+    "tone": "green",
+    "title": "Your business access is restored",
+    "intro": "The recorded restriction on Karibu Kitchen has been removed. Open your workspace to check the latest business status and any remaining setup.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Restriction",
+        "Removed"
+      ],
+      [
+        "Updated at",
+        "1 Nov 2026, 10:24 EAT"
+      ]
+    ],
+    "cta": "Open merchant workspace",
+    "callout": {
+      "title": "Check your publication status",
+      "body": "Access restoration does not by itself confirm that your business is live or that every connected service is available.",
+      "tone": "neutral"
+    },
+    "trigger": "The business-status authority confirms removal of a restriction.",
+    "delivery": "Proposed transactional email to the owner and permitted business contacts.",
+    "implementationNote": "Design proposal. Restored access, verification, publication and provider availability remain separate facts. A live notice requires a confirmed merchant.live transition."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "27-support-received",
+    "group": "Support",
+    "name": "Support request received",
+    "subject": "We have your message · SUP-2468",
+    "preheader": "Keep this reference if you need to follow up with NEXG support.",
+    "eyebrow": "SUPPORT REQUEST RECEIVED",
+    "icon": "help",
+    "tone": "blue",
+    "title": "Your support request is with us",
+    "intro": "We have received your message about Karibu Kitchen. A member of the NEXG support team will review it and reply using your contact details.",
+    "rows": [
+      [
+        "Reference",
+        "SUP-2468"
+      ],
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Status",
+        "Received"
+      ]
+    ],
+    "cta": "View support request",
+    "ctaNote": "Use reference SUP-2468 if you contact info@nexgapp.com.",
+    "trigger": "The support service creates a support ticket successfully.",
+    "delivery": "Transactional acknowledgement to the ticket requester.",
+    "implementationNote": "Existing apps/web/lib/email.ts has a plain-text ticketReceived template. This is a visual proposal. Keep any portal CTA conditional on an implemented ticket view and its permissions."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "28-support-resolved",
+    "group": "Support",
+    "name": "Support request resolved",
+    "subject": "Support request SUP-2468 has been resolved",
+    "preheader": "Review the update and contact support if the issue remains.",
+    "eyebrow": "SUPPORT UPDATE",
+    "icon": "check",
+    "tone": "green",
+    "title": "Your support request is resolved",
+    "intro": "NEXG support has marked request SUP-2468 as resolved. Open the update to review the outcome for Karibu Kitchen.",
+    "rows": [
+      [
+        "Reference",
+        "SUP-2468"
+      ],
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Status",
+        "Resolved"
+      ]
+    ],
+    "cta": "Review support update",
+    "callout": {
+      "title": "Still need help with this?",
+      "body": "Contact NEXG support and quote SUP-2468 so we can review the same request.",
+      "tone": "neutral"
+    },
+    "ctaNote": "You can contact info@nexgapp.com for help.",
+    "trigger": "The support service records a resolved ticket status.",
+    "delivery": "Transactional support update to the ticket requester and permitted participants.",
+    "implementationNote": "Existing apps/web/lib/email.ts has a plain-text ticketResolved template. This is a visual proposal. Resolution content and any authenticated portal destination require actual ticket permissions."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "29-booking-updated",
+    "group": "Orders & bookings",
+    "name": "Booking updated",
+    "subject": "Booking NXG-B218 has been updated",
+    "preheader": "Check the confirmed booking time before preparing for the visit.",
+    "eyebrow": "BOOKING UPDATE",
+    "icon": "calendar",
+    "tone": "blue",
+    "title": "A booking time has changed",
+    "intro": "The source system has confirmed an update to booking NXG-B218 for Karibu Kitchen. Use the latest details below when planning the visit.",
+    "rows": [
+      [
+        "Booking",
+        "NXG-B218"
+      ],
+      [
+        "Date",
+        "3 Nov 2026"
+      ],
+      [
+        "Previous time",
+        "18:30 EAT"
+      ],
+      [
+        "Confirmed time",
+        "19:00 EAT"
+      ],
+      [
+        "Party size",
+        "4 guests"
+      ]
+    ],
+    "cta": "Review updated booking",
+    "ctaNote": "Customer details and the complete change history are available in your workspace.",
+    "trigger": "The authoritative booking service confirms a resource-valid booking change.",
+    "delivery": "Proposed opt-in work email to authorized booking operators.",
+    "implementationNote": "Design proposal. A requested change is not confirmed until the source validates the required resources. Preserve change history and deduplicate repeated provider events."
+  },
+  {
+    "greeting": "Hi Amina,",
+    "id": "30-email-changed",
+    "group": "Access & security",
+    "name": "Email address changed",
+    "subject": "Your NEXG account email has changed",
+    "preheader": "Review this completed account change if it was not you.",
+    "eyebrow": "SECURITY NOTICE",
+    "icon": "mail",
+    "tone": "green",
+    "title": "Your account email has changed",
+    "intro": "The email address for your NEXG account has been updated after the required confirmations were completed.",
+    "rows": [
+      [
+        "Previous email",
+        "a••••@example.com"
+      ],
+      [
+        "New email",
+        "o••••@example.com"
+      ],
+      [
+        "Changed at",
+        "1 Nov 2026, 10:24 EAT"
+      ]
+    ],
+    "cta": "Review account security",
+    "callout": {
+      "title": "Did not make this change?",
+      "body": "Open NEXG directly and contact support immediately. Include no passwords or verification codes in your message.",
+      "tone": "warning"
+    },
+    "trigger": "The authentication authority confirms completion of an email-address change.",
+    "delivery": "Proposed security notice to the previous and current account addresses, subject to approved security policy.",
+    "implementationNote": "Design proposal. Local auth requires double confirmation for changes. Send only after the authoritative change completes, and bind any recovery destination to the correct account."
+  },
+  {
+    "id": "31-business-live",
+    "group": "Onboarding & verification",
+    "name": "Business is live",
+    "subject": "Karibu Kitchen is live on NEXG",
+    "preheader": "Your business is now published and available to customers.",
+    "eyebrow": "YOUR BUSINESS IS LIVE",
+    "icon": "store",
+    "tone": "green",
+    "title": "Your business is live on NEXG",
+    "greeting": "Hi Amina,",
+    "intro": "Karibu Kitchen is now published on NEXG. Customers can discover your business and use the services you have made available.",
+    "rows": [
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Publication status",
+        "Live"
+      ],
+      [
+        "Published at",
+        "1 Nov 2026, 10:24 EAT"
+      ]
+    ],
+    "cta": "Open business workspace",
+    "ctaNote": "Check your current offerings, availability and business details.",
+    "trigger": "The authoritative publication service confirms a merchant.live transition.",
+    "delivery": "Transactional activation notice to the owner and approved business contacts.",
+    "implementationNote": "Design proposal for the existing merchant.live notification family. Send only when publication is confirmed; application approval alone is insufficient."
+  },
+  {
+    "id": "32-document-approved",
+    "group": "Onboarding & verification",
+    "name": "Document approved",
+    "subject": "Your Karibu Kitchen document has been approved",
+    "preheader": "The submitted document has passed review.",
+    "eyebrow": "DOCUMENT APPROVED",
+    "icon": "file",
+    "tone": "green",
+    "title": "Your document has been approved",
+    "greeting": "Hi Amina,",
+    "intro": "We have approved the business permit you submitted for Karibu Kitchen. Open your workspace to see the status of any remaining documents.",
+    "rows": [
+      [
+        "Document",
+        "Business permit"
+      ],
+      [
+        "Review status",
+        "Approved"
+      ],
+      [
+        "Business",
+        "Karibu Kitchen"
+      ]
+    ],
+    "cta": "View verification status",
+    "callout": {
+      "title": "Check the full application status",
+      "body": "Approval of this document does not confirm approval or publication of your business.",
+      "tone": "neutral"
+    },
+    "trigger": "A reviewer records approval of an assigned merchant document.",
+    "delivery": "Transactional review notice to authorized verification contacts.",
+    "implementationNote": "Design proposal. Name the specific approved document and use the verified review result. One approved document does not imply full business verification."
+  },
+  {
+    "id": "33-payout-completed",
+    "group": "Money",
+    "name": "Payout completed",
+    "subject": "Payout PYO-6208 has been completed",
+    "preheader": "The payout provider has confirmed a completed transfer.",
+    "eyebrow": "PAYOUT COMPLETED",
+    "icon": "check",
+    "tone": "green",
+    "title": "Your payout is complete",
+    "greeting": "Hi Amina,",
+    "intro": "The payout provider has confirmed that transfer PYO-6208 for Karibu Kitchen is complete. Review the provider confirmation in Money.",
+    "amount": "KES 18,450",
+    "amountLabel": "COMPLETED PAYOUT",
+    "rows": [
+      [
+        "Payout",
+        "PYO-6208"
+      ],
+      [
+        "Destination",
+        "Bank account ending 4821"
+      ],
+      [
+        "Provider status",
+        "Completed"
+      ],
+      [
+        "Confirmed at",
+        "1 Nov 2026, 14:10 EAT"
+      ]
+    ],
+    "cta": "View payout confirmation",
+    "ctaNote": "Contact support with this payout reference if you need help reconciling the transfer.",
+    "trigger": "A verified payout provider event confirms a terminal completed transfer status.",
+    "delivery": "Transactional notice to explicitly authorized payout recipients.",
+    "implementationNote": "Design proposal. Map terminal completion to the actual provider contract. Do not send from transfer initiation, internal balance movement or an unverified webhook. Recipient bank receipt can be claimed only when that is what the provider confirmation proves."
+  },
+  {
+    "id": "34-support-reply",
+    "group": "Support",
+    "name": "Support has replied",
+    "subject": "A reply to support request SUP-2468",
+    "preheader": "Read the support update in your secure NEXG workspace.",
+    "eyebrow": "A REPLY FROM SUPPORT",
+    "icon": "message",
+    "tone": "blue",
+    "title": "Support has replied to your request",
+    "greeting": "Hi Amina,",
+    "intro": "There is a new reply to your support request about Karibu Kitchen. Open the request to read the update and respond.",
+    "rows": [
+      [
+        "Reference",
+        "SUP-2468"
+      ],
+      [
+        "Business",
+        "Karibu Kitchen"
+      ],
+      [
+        "Status",
+        "Reply available"
+      ]
+    ],
+    "cta": "Read support reply",
+    "ctaNote": "For help, contact info@nexgapp.com and quote SUP-2468.",
+    "trigger": "An authorized support agent publishes a reply visible to the requester.",
+    "delivery": "Transactional support reply notice to the requester and permitted participants.",
+    "implementationNote": "Design proposal. Requires an authenticated ticket conversation view. Do not copy private notes, identity documents or financial attachments into the email."
+  }
+]

@@ -127,7 +127,7 @@ export default function DocsPage() {
             <CardContent className="text-sm text-ink/80 space-y-2">
               <p>Send the key in the <code className="font-mono bg-surface px-1 rounded text-xs">X-Api-Key</code> header. The server validates the SHA-256 hash (never the raw key) and checks scopes, rate limits, and expiry.</p>
               <p>For integrations, use <code className="font-mono text-xs">public_read</code> for public data or <code className="font-mono text-xs">merchant_read</code> for the bound merchant&apos;s orders. Other scopes are defined, but no write endpoints are currently available.</p>
-              <p>Rate limit per key (default 60/min). Manage at <Link href="/developers" className="underline">/developers</Link>.</p>
+              <p>Keys share a PostgreSQL token bucket per merchant or developer. Public reads cost one token; merchant order reads cost three. A 429 response includes Retry-After in seconds. Manage keys at <Link href="/developers" className="underline">/developers</Link>.</p>
             </CardContent>
           </Card>
           <Card>

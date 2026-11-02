@@ -1,0 +1,37 @@
+{
+  "status": "THREE_GENERATED_CONCEPTS_NOT_RUNTIME_UI",
+  "mode": "Built-in image_gen",
+  "imageCount": 3,
+  "images": [
+    {
+      "file": "images/01-sales-settlement.png",
+      "generatedOriginal": "C:/Users/limta/.codex/generated_images/01a1912b-45ed-7400-88d8-d3ddc7fcdd8e/exec-5fdfdfda-8959-45c5-a498-386a9d947061.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "4798b03febb3fbb5ffb7b15eb598d0c5de8f28e14942976638ba565c9de1962a",
+      "review": "Visually inspected: full single screen, all six table rows, complete inspector actions, coherent key amounts and distinct financial states."
+    },
+    {
+      "file": "images/02-rental-security.png",
+      "generatedOriginal": "C:/Users/limta/.codex/generated_images/01a1912b-45ed-7400-88d8-d3ddc7fcdd8e/exec-0ed7044b-7aaf-4fb4-bad6-73a7dc0d3a3e.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "957546cfa65da6b4a65584ff7dbb3eca81feabbf4c70faf520b4201c1f6e422a",
+      "review": "Visually inspected: full single screen, all six table rows, complete inspector actions, coherent key amounts and distinct financial states."
+    },
+    {
+      "file": "images/03-workshop-balances.png",
+      "generatedOriginal": "C:/Users/limta/.codex/generated_images/01a1912b-45ed-7400-88d8-d3ddc7fcdd8e/exec-ec755738-c240-4ea7-b415-16dec02ae9c0.png",
+      "width": 1672,
+      "height": 940,
+      "sha256": "41bad50354157b26c43f0db07d8b56cd410c294d2d2d61b58bb1e0d1a7511d1c",
+      "review": "Visually inspected: full single screen, all six table rows, complete inspector actions, coherent key amounts and distinct financial states."
+    }
+  ],
+  "arithmeticRef": "concept-fixtures.json",
+  "promptRef": "concept-prompts.json",
+  "limitations": [
+    "Concept pictures do not prove click behaviour, source authority, financial operations or accessibility conformance.",
+    "Image1 includes an explanatory concept-only statement caption; production copy should keep the shorter period/source definition."
+  ]
+}

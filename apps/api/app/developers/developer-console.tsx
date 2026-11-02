@@ -114,13 +114,8 @@ export function DeveloperConsole({
                 },
                 {
                   id: 'merchant_read',
-                  label: 'Read a merchant’s own records',
-                  hint: 'Its orders and its catalogue.',
-                },
-                {
-                  id: 'merchant_write',
-                  label: 'Book services for a merchant',
-                  hint: 'Act on behalf of that merchant.',
+                  label: 'Read your merchant orders',
+                  hint: 'Owner authorization and current merchant approval are required.',
                 },
               ].map((s) => (
                 <label key={s.id} className="flex items-start gap-3 cursor-pointer">
@@ -231,8 +226,8 @@ export function DeveloperConsole({
                     No merchants on this account
                   </p>
                   <p className="text-xs text-ink/70 mt-1">
-                    You can still issue a key for the public catalog. If you
-                    meant to book services, you need a merchant account first.
+                    You can still issue a key for the public catalog. Merchant
+                    order reads require a key for a merchant you own.
                   </p>
                   <input type="hidden" name="merchant_id" value="" />
                 </div>
@@ -241,7 +236,7 @@ export function DeveloperConsole({
 
             <div className="space-y-2">
               <label htmlFor="rate_limit" className="font-bold text-sm">
-                Requests per minute
+                Tokens per minute
               </label>
               <input
                 id="rate_limit"
@@ -254,8 +249,9 @@ export function DeveloperConsole({
                 className="w-32 border rounded px-3 py-2 text-sm"
               />
               <p className="text-xs text-ink/60">
-                How many requests this key may make each minute. Sixty is
-                plenty for most integrations.
+                Keys share one bucket per merchant or developer. Public reads
+                cost one token and merchant order reads cost three. Adding a
+                key does not add a separate quota.
               </p>
             </div>
 

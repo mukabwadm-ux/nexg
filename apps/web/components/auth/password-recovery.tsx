@@ -9,7 +9,7 @@ import * as React from 'react';
 import {
   requestPasswordRecovery,
   updateRecoveredPassword,
-} from '@/app/sign-in/actions';
+} from '@/app/(customer)/sign-in/actions';
 
 export function ForgotPasswordForm({ invalidLink = false }: { invalidLink?: boolean }) {
   const [pending, setPending] = React.useState(false);

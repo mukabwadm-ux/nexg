@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-29",
+  "scope": "Repository source and existing unit suites. No live onboarding, database deployment, external connector or end-to-end portal execution was tested.",
+  "inventoryChecks": {
+    "status": "passed",
+    "sourceCategories": 21,
+    "sourceSubcategories": 128,
+    "uniqueInventoryRows": 128,
+    "sourceIdsAndOrderMatch": true,
+    "taxonomyFieldOccurrences": 558,
+    "activeGeneratedQuestionSubcategories": 84,
+    "otherQuestionPathSubcategories": 44,
+    "emptyDefaultWorkflowDescriptions": 9,
+    "subcategoriesWithNoEffectiveStepTwoQuestions": 4,
+    "sourceHashesCompared": 7,
+    "actualGeneratorOutputsCompared": 439,
+    "generatorComparisonMethod": "Execute the current question generator after Node built-in TypeScript stripping; compare supported-field flags and question objects for every supported field occurrence against the audit inventory."
+  },
+  "promptChecks": {
+    "status": "passed",
+    "allEightScreenNamesPresent": true,
+    "allPlansBeforeImagesExplicit": true,
+    "exactlyEightImagesExplicit": true,
+    "designOnlyScopeExplicit": true,
+    "independentSourceReview": "No necessary factual or scope corrections found."
+  },
+  "existingUnitSuites": [
+    {
+      "workingDirectory": "apps/web",
+      "command": "node node_modules/vitest/vitest.mjs run components/onboarding/subcategory-questions.test.ts --reporter=verbose",
+      "status": "passed",
+      "testFilesPassed": 1,
+      "testsPassed": 1,
+      "limitation": "Checks generated-key support and order for the existing 13-category subset. Does not establish semantic completeness or runtime workflows for all 128 subcategories."
+    },
+    {
+      "workingDirectory": "packages/contracts",
+      "command": "node ../../apps/web/node_modules/vitest/vitest.mjs run src/index.test.ts --reporter=verbose",
+      "status": "passed",
+      "testFilesPassed": 1,
+      "testsPassed": 20,
+      "limitation": "Includes taxonomy counts, aliases, search, images and existing contract checks. Does not establish ERP interoperability or full onboarding behaviour."
+    }
+  ],
+  "dependencySetup": {
+    "initialAttempts": "Parallel pnpm test commands triggered dependency linking and failed before tests started with EBUSY and EEXIST.",
+    "recoveryCommand": "pnpm install --offline --frozen-lockfile",
+    "recoveryStatus": "passed",
+    "trackedDependencyFilesChanged": false
+  },
+  "applicationSourceChanged": false,
+  "picturesGenerated": 0
+}

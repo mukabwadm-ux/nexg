@@ -1,0 +1,76 @@
+{
+  "clientDate": "2026-10-29",
+  "status": "CATEGORY_DESIGN_CHECKS_PASSED",
+  "schemaDialect": "JSON Schema Draft 2020-12",
+  "schemaValid": true,
+  "typedQuestionSchemasValid": 300,
+  "exampleValid": true,
+  "questionReferences": 6,
+  "screenBindings": 8,
+  "syntheticFixtureActivationsChecked": 2,
+  "negativeCases": [
+    {
+      "name": "Missing discovery section",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "'discovery' is a required property"
+    },
+    {
+      "name": "Unknown screen",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "'SC_UNKNOWN' is not one of ['SC_WORK', 'SC_OFFERINGS', 'SC_AVAILABILITY', 'SC_BUSINESS', 'SC_MONEY', 'SC_PROMOTIONS', 'SC_INSIGHTS', 'SC_SETTINGS']"
+    },
+    {
+      "name": "Child missing execution rule",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "'executionRule' is a required property"
+    },
+    {
+      "name": "Script condition",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "{'script': 'grantPermission()'} is not valid under any of the given schemas"
+    },
+    {
+      "name": "Rewrite started work",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "True was expected"
+    },
+    {
+      "name": "Permission grant in manifest",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "Additional properties are not allowed ('permissionGrant' was unexpected)"
+    },
+    {
+      "name": "Unknown workflow reference",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "Unknown workflow"
+    },
+    {
+      "name": "Unknown question reference",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "Unknown question: Q_NOT_REGISTERED"
+    },
+    {
+      "name": "Unknown component reference",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "Unknown component"
+    },
+    {
+      "name": "Missing local availability binding",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "Unknown availabilityRef"
+    },
+    {
+      "name": "Duplicate screen instead of all eight",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "Each screen must appear exactly once"
+    },
+    {
+      "name": "Unsupported location value in fixture",
+      "result": "REJECTED_AS_EXPECTED",
+      "reason": "AssertionError"
+    }
+  ],
+  "command": "C:\\Python314\\python.exe docs/merchant-portal-plan/verify-category.py",
+  "scope": "Structural/selected semantic references and synthetic fixture activation. Does not implement production resolution, atomic publication, commands, resource reservation or provider authorization.",
+  "runtimeStatus": "NOT_IMPLEMENTED_NOT_EXECUTED"
+}

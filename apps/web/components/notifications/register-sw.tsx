@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { usePathname } from 'next/navigation';
 
 /**
  * Registers the service worker, which is what makes the site
@@ -13,7 +14,9 @@ import * as React from 'react';
  * connection.
  */
 export function RegisterServiceWorker() {
+  const pathname = usePathname();
   React.useEffect(() => {
+    if (pathname.startsWith('/merchant-live-preview')) return;
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
     const register = () => {
@@ -25,7 +28,7 @@ export function RegisterServiceWorker() {
 
     if (document.readyState === 'complete') register();
     else window.addEventListener('load', register, { once: true });
-  }, []);
+  }, [pathname]);
 
   return null;
 }

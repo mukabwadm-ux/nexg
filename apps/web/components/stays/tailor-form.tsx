@@ -4,7 +4,7 @@ import { Button, ChipGroup, Input, PhoneInput, useToast } from '@nexg/ui';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import * as React from 'react';
 
-import { requestStay } from '@/app/stays/actions';
+import { requestStay } from '@/app/(customer)/stays/actions';
 
 /**
  * "Tell us what you need" — three steps rather than one long column.

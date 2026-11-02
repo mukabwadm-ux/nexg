@@ -1,0 +1,779 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\playwright.settings-artboard.config.ts",
+    "rootDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/e2e/web",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/settings-artboard-report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 15000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "settings-desktop",
+        "name": "settings-desktop",
+        "testDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/e2e/web",
+        "testIgnore": [],
+        "testMatch": [
+          "merchant-settings-artboard.spec.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "settings-mobile",
+        "name": "settings-mobile",
+        "testDir": "C:/Users/limta/Desktop/MERCHANT WORKSPACE/e2e/web",
+        "testIgnore": [],
+        "testMatch": [
+          "merchant-settings-artboard.spec.ts"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "version": "1.49.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "merchant-settings-artboard.spec.ts",
+      "file": "merchant-settings-artboard.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "every section is reachable and the intended selected state is preserved",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "status": "failed",
+                  "duration": 19671,
+                  "error": {
+                    "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: getByRole('navigation', { name: 'Settings sections' }).getByRole('link')\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m6\u001b[39m\nCall log:\n\u001b[2m  - expect.toHaveCount with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('navigation', { name: 'Settings sections' }).getByRole('link')\u001b[22m\n\u001b[2m    8 × locator resolved to 6 elements\u001b[22m\n\u001b[2m      - unexpected value \"6\"\u001b[22m\n",
+                    "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: getByRole('navigation', { name: 'Settings sections' }).getByRole('link')\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m6\u001b[39m\nCall log:\n\u001b[2m  - expect.toHaveCount with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('navigation', { name: 'Settings sections' }).getByRole('link')\u001b[22m\n\u001b[2m    8 × locator resolved to 6 elements\u001b[22m\n\u001b[2m      - unexpected value \"6\"\u001b[22m\n\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:35:9",
+                    "matcherResult": {
+                      "actual": 6,
+                      "expected": 1,
+                      "message": "\u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: getByRole('navigation', { name: 'Settings sections' }).getByRole('link')\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m6\u001b[39m\nCall log:\n\u001b[2m  - expect.toHaveCount with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('navigation', { name: 'Settings sections' }).getByRole('link')\u001b[22m\n\u001b[2m    8 × locator resolved to 6 elements\u001b[22m\n\u001b[2m      - unexpected value \"6\"\u001b[22m\n",
+                      "name": "toHaveCount",
+                      "pass": false,
+                      "log": [
+                        "  - expect.toHaveCount with timeout 5000ms",
+                        "  - waiting for getByRole('navigation', { name: 'Settings sections' }).getByRole('link')",
+                        "    8 × locator resolved to 6 elements",
+                        "      - unexpected value \"6\""
+                      ],
+                      "timeout": 5000
+                    },
+                    "location": {
+                      "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                      "column": 9,
+                      "line": 35
+                    },
+                    "snippet": "  33 |           .getByRole('navigation', { name: 'Settings sections' })\n  34 |           .getByRole('link', { current: 'page' }),\n> 35 |       ).toHaveCount(1);\n     |         ^\n  36 |     else await expect(page.getByLabel('Settings section', { exact: true })).toHaveValue(id);\n  37 |     await page.screenshot({ path: info.outputPath(`${id}.png`), fullPage: true });\n  38 |   }"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                        "column": 9,
+                        "line": 35
+                      },
+                      "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: getByRole('navigation', { name: 'Settings sections' }).getByRole('link')\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m6\u001b[39m\nCall log:\n\u001b[2m  - expect.toHaveCount with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('navigation', { name: 'Settings sections' }).getByRole('link')\u001b[22m\n\u001b[2m    8 × locator resolved to 6 elements\u001b[22m\n\u001b[2m      - unexpected value \"6\"\u001b[22m\n\n\n  33 |           .getByRole('navigation', { name: 'Settings sections' })\n  34 |           .getByRole('link', { current: 'page' }),\n> 35 |       ).toHaveCount(1);\n     |         ^\n  36 |     else await expect(page.getByLabel('Settings section', { exact: true })).toHaveValue(id);\n  37 |     await page.screenshot({ path: info.outputPath(`${id}.png`), fullPage: true });\n  38 |   }\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:35:9"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:12:31.378Z",
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-277c1-selected-state-is-preserved-settings-desktop\\test-failed-1.png"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-277c1-selected-state-is-preserved-settings-desktop\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                    "column": 9,
+                    "line": 35
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-fccfc1f0dbf0ddd639af",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 11,
+          "column": 5
+        },
+        {
+          "title": "preferences persist while Kenya time remains fixed; unsaved changes can be retained or discarded",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "passed",
+                  "duration": 14519,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:13:17.950Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-f8cfa6c3b3bd9a179c1a",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 42,
+          "column": 5
+        },
+        {
+          "title": "personal alerts do not change business routing, and routing survives reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "passed",
+                  "duration": 13153,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:13:33.121Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-abe3b156daf344d23c65",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 70,
+          "column": 5
+        },
+        {
+          "title": "connection recovery and read-only setup preserve independent booking ownership",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "passed",
+                  "duration": 10657,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:13:46.298Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-2a927f7d0bc4d737a961",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 95,
+          "column": 5
+        },
+        {
+          "title": "credential creation requires review and revocation affects only that credential",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "passed",
+                  "duration": 10511,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:13:56.984Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-4cb20956c43b929d47ce",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 118,
+          "column": 5
+        },
+        {
+          "title": "webhook validation rejects unsafe endpoints and new signing is pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "passed",
+                  "duration": 12942,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:14:07.575Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-64fb35f612ae2e79a40c",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 138,
+          "column": 5
+        },
+        {
+          "title": "data request submission is distinct from completion, and sample closure does not erase history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "passed",
+                  "duration": 7540,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:14:20.636Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-a7cbeb23ed5392eb4f9c",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 155,
+          "column": 5
+        },
+        {
+          "title": "dialogs trap focus, close with Escape, and return focus to the initiating control",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "passed",
+                  "duration": 5186,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:14:28.213Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-d67ad1c207d7296de449",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 176,
+          "column": 5
+        },
+        {
+          "title": "Offerings renders its shared table without an undefined component",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-desktop",
+              "projectName": "settings-desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "status": "passed",
+                  "duration": 6492,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:14:33.463Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-245072058189fb5c7905",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 190,
+          "column": 5
+        },
+        {
+          "title": "every section is reachable and the intended selected state is preserved",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "status": "passed",
+                  "duration": 26232,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:14:42.347Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-b25bc4a822b1115cb764",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 11,
+          "column": 5
+        },
+        {
+          "title": "preferences persist while Kenya time remains fixed; unsaved changes can be retained or discarded",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "status": "passed",
+                  "duration": 12342,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:15:09.211Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-8ebda56efc879a5c2571",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 42,
+          "column": 5
+        },
+        {
+          "title": "personal alerts do not change business routing, and routing survives reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "status": "passed",
+                  "duration": 12538,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:15:21.576Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-5d834f0a164800b4cc5b",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 70,
+          "column": 5
+        },
+        {
+          "title": "connection recovery and read-only setup preserve independent booking ownership",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "status": "passed",
+                  "duration": 9550,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:15:34.144Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-80febd995572fbef44df",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 95,
+          "column": 5
+        },
+        {
+          "title": "credential creation requires review and revocation affects only that credential",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "status": "timedOut",
+                  "duration": 64044,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                        "column": 74,
+                        "line": 124
+                      },
+                      "message": "Error: locator.click: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Review access', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg font-bold transition-colors duration-150 focus-visible:ring-gold focus-visible:ring-offset-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-45 bg-gold text-ink hover:bg-gold/90 active:bg-gold/80 h-11 px-4 text-sm settings_button__7SZJu\">Review access</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"settings_actions__Xng8h\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <label class=\"settings_checkRow__YO8uc\">…</label> from <fieldset>…</fieldset> subtree intercepts pointer events\u001b[22m\n\u001b[2m  2 × retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"settings_form__JFW5b\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  26 × retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"settings_actions__Xng8h\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <label class=\"settings_checkRow__YO8uc\">…</label> from <fieldset>…</fieldset> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"settings_form__JFW5b\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"settings_form__JFW5b\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\n\n  122 |   await page.getByRole('button', { name: 'Create key', exact: true }).click();\n  123 |   await page.getByLabel('Credential name', { exact: true }).fill('Review-only key');\n> 124 |   await page.getByRole('button', { name: 'Review access', exact: true }).click();\n      |                                                                          ^\n  125 |   await expect(page.getByRole('dialog')).toContainText('This preview creates a sample label only');\n  126 |   await page.getByRole('button', { name: 'Create sample credential', exact: true }).click();\n  127 |   const row = page.getByRole('row').filter({ hasText: 'Review-only key' });\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:124:74"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:15:43.725Z",
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-b479d-ffects-only-that-credential-settings-mobile\\test-failed-1.png"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-b479d-ffects-only-that-credential-settings-mobile\\trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-ebc2e8a0e3c6748bd7cb",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 118,
+          "column": 5
+        },
+        {
+          "title": "webhook validation rejects unsafe endpoints and new signing is pending",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "status": "timedOut",
+                  "duration": 65360,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 60000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 60000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:4:6",
+                    "location": {
+                      "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                      "column": 6,
+                      "line": 4
+                    },
+                    "snippet": "  2 |\n  3 | const preview = '/merchant-live-preview/settings';\n> 4 | test.beforeEach(async ({ page }) => {\n    |      ^\n  5 |   await page.goto(preview, { waitUntil: 'domcontentloaded' });\n  6 |   await page.evaluate(() => localStorage.removeItem('nexg.settings.sample.v1'));\n  7 |   await page.reload({ waitUntil: 'domcontentloaded' });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                        "column": 6,
+                        "line": 4
+                      },
+                      "message": "\u001b[31mTest timeout of 60000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  2 |\n  3 | const preview = '/merchant-live-preview/settings';\n> 4 | test.beforeEach(async ({ page }) => {\n    |      ^\n  5 |   await page.goto(preview, { waitUntil: 'domcontentloaded' });\n  6 |   await page.evaluate(() => localStorage.removeItem('nexg.settings.sample.v1'));\n  7 |   await page.reload({ waitUntil: 'domcontentloaded' });\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:4:6"
+                    },
+                    {
+                      "location": {
+                        "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                        "column": 14,
+                        "line": 5
+                      },
+                      "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3141/merchant-live-preview/settings\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  3 | const preview = '/merchant-live-preview/settings';\n  4 | test.beforeEach(async ({ page }) => {\n> 5 |   await page.goto(preview, { waitUntil: 'domcontentloaded' });\n    |              ^\n  6 |   await page.evaluate(() => localStorage.removeItem('nexg.settings.sample.v1'));\n  7 |   await page.reload({ waitUntil: 'domcontentloaded' });\n  8 |   await expect(page.getByRole('heading', { name: 'Personal profile', exact: true })).toBeVisible();\n    at C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts:5:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:16:57.093Z",
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\test-results\\merchant-settings-artboard-2edcb--and-new-signing-is-pending-settings-mobile\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\limta\\Desktop\\MERCHANT WORKSPACE\\e2e\\web\\merchant-settings-artboard.spec.ts",
+                    "column": 6,
+                    "line": 4
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-1ea5b7a1b537cbbe7dfc",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 138,
+          "column": 5
+        },
+        {
+          "title": "data request submission is distinct from completion, and sample closure does not erase history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "status": "passed",
+                  "duration": 29763,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:18:12.903Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-18d807638763cb168d92",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 155,
+          "column": 5
+        },
+        {
+          "title": "dialogs trap focus, close with Escape, and return focus to the initiating control",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "status": "passed",
+                  "duration": 7404,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:18:43.402Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-7e4145e2fddf65830ae8",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 176,
+          "column": 5
+        },
+        {
+          "title": "Offerings renders its shared table without an undefined component",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "settings-mobile",
+              "projectName": "settings-mobile",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "status": "passed",
+                  "duration": 27048,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-01T13:18:50.864Z",
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4d04e99d68a7d113718b-b45daf38e705c01eab8e",
+          "file": "merchant-settings-artboard.spec.ts",
+          "line": 190,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-01T13:12:26.350Z",
+    "duration": 408516.215,
+    "expected": 15,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}

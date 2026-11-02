@@ -5,7 +5,7 @@ import { Check, Clock, Link2, Pencil, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { prefillFromUrl, type PrefillResult } from '@/app/merchants/apply/actions';
+import { prefillFromUrl, type PrefillResult } from '@/app/(customer)/merchants/apply/actions';
 import { createClient } from '@/lib/supabase/client';
 import { ensureApplicantSession } from '@/lib/uploads';
 

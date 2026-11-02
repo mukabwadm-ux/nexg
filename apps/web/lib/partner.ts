@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from './supabase/server';
+import { loadMerchantWorkspaceAccess, MerchantAccessError, type MerchantWorkspaceAccess } from './merchant-access';
 
 export interface PartnerHome {
   kind: 'merchant' | 'rider' | 'host' | 'guest' | 'staff' | 'anonymous';
@@ -27,29 +28,72 @@ export interface PartnerHome {
  * the URL would see nothing even if this check were wrong.
  */
 export async function partnerHome(): Promise<PartnerHome> {
-  const { data } = await createClient().rpc('fn_partner_home');
+  const client = createClient();
+  const auth = await client.auth.getUser();
+  if (auth.error || !auth.data.user)
+    return { kind: 'anonymous', home: '/sign-in' };
+  const { data, error } = await client.rpc('fn_partner_home');
+  if (error) throw new Error('Your account could not be loaded. Please retry.');
   return (data as unknown as PartnerHome) ?? { kind: 'anonymous', home: '/sign-in' };
 }
 
-/**
- * A merchant is no longer turned away for being unfinished.
- *
- * This used to bounce anybody under the readiness line back to
- * the application form, on the reasoning that a merchant with
- * no menu has nothing to run. That was true when the dashboard
- * had one state. It now has two, and the second one is built
- * for exactly this person: the setup strip, what going live
- * unlocks, and every section open with sample data.
- *
- * Sending them to a form instead means they never see what
- * finishing buys them — and it was the reason signing in
- * "did not work" for every real merchant on the system, all of
- * whom sit under the line.
- */
-export async function requireMerchant(): Promise<PartnerHome & { id: string }> {
+/** Operations require current approval. Home and setup may use the narrower access. */
+export type AuthorizedMerchant = PartnerHome & {
+  id: string;
+  userId: string;
+  isAnonymous: boolean;
+  access: MerchantWorkspaceAccess;
+};
+
+export async function requireMerchant(
+  options: { access?: 'operations' | 'setup' | 'shell'; merchantId?: string } = {},
+): Promise<AuthorizedMerchant> {
   const me = await partnerHome();
   if (me.kind !== 'merchant' || !me.id) redirect(me.home);
-  return me as PartnerHome & { id: string };
+  // A supplied target must match the database-selected workspace. Object-level
+  // membership and capability checks remain in the existing owner commands.
+  if (options.merchantId && options.merchantId !== me.id) redirect('/merchant');
+  const client = createClient();
+  const auth = await client.auth.getUser();
+  if (auth.error || !auth.data.user)
+    redirect('/sign-in?reason=workspace-session');
+  // An unknown session type must never be granted operational access.
+  const isAnonymous = auth.data.user.is_anonymous !== false;
+  if (isAnonymous && options.access !== 'setup' && options.access !== 'shell') redirect('/merchant');
+  const { data: membership, error } = await client
+    .from('merchant_user')
+    .select('role')
+    .eq('merchant_id', me.id)
+    .eq('user_id', auth.data.user.id)
+    .maybeSingle();
+  if (error) throw new MerchantAccessError('Your workspace membership could not be checked.', 503);
+  if (!membership || !['owner', 'manager'].includes(membership.role))
+    redirect('/sign-in?reason=workspace-access');
+  const access = await loadMerchantWorkspaceAccess(client, me.id);
+  // Approved operational members can open the shared layout even when the
+  // application owner is the only member allowed to edit registration setup.
+  if (!access.setup && !access.operations) {
+    // A current rejected application has no workspace capability. Give it a
+    // status-only recovery route instead of returning it to sign-in and Home.
+    if (access.state === 'rejected') redirect('/merchants/decision');
+    redirect('/sign-in?reason=workspace-session');
+  }
+  if (isAnonymous && (access.state === 'legacy' || !access.setup || access.operations))
+    redirect('/merchant');
+  if (options.access === 'setup' && access.state !== 'legacy') {
+    if (!access.setup) throw new MerchantAccessError('Only the application owner can edit setup.', 403);
+    const { data: merchant, error: merchantError } = await client.from('merchant')
+      .select('status').eq('id', me.id).maybeSingle();
+    if (merchantError) throw new MerchantAccessError('Your business setup could not be checked.', 503);
+    if (!merchant || !['applied', 'documents_pending', 'under_review'].includes(merchant.status))
+      throw new MerchantAccessError('Draft setup is not available for this business.', 403);
+  }
+  if (options.access !== 'setup' && options.access !== 'shell' && !access.operations) redirect('/merchant');
+  return { ...me, id: me.id, userId: auth.data.user.id, isAnonymous, access };
+}
+
+export function requireMerchantSetup(): Promise<AuthorizedMerchant> {
+  return requireMerchant({ access: 'setup' });
 }
 
 /**

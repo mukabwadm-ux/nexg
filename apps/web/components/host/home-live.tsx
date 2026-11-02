@@ -2,7 +2,7 @@ import { Bed, Download, Printer, QrCode, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
-import type { Attention, HostHome } from '@/app/host/layout';
+import type { Attention, HostHome } from '@/app/(customer)/host/layout';
 
 import {
   Attention as AttentionCard,

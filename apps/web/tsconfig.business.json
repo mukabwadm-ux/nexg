@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "incremental": false },
+  "include": [
+    "next-env.d.ts",
+    "components/merchant/business/**/*.ts",
+    "components/merchant/business/**/*.tsx",
+    "app/merchant-live-preview/business/page.tsx"
+  ],
+  "exclude": ["node_modules", ".next", ".next-dev", ".next-work-preview", ".next-booking"]
+}

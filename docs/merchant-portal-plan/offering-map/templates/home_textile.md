@@ -1,0 +1,81 @@
+# Bedding, curtain or home textile
+
+Status: proposed template. Review the completeness rules before runtime publication enforcement.
+
+[All categories](../README.md) / [Field library](../field-library.md) / [Customer display rules](../customer-display.md)
+
+## Customer presentation
+
+The browse card uses name, accurate media, a short summary, an accurately labelled price/quote state and actual availability where known.
+
+Additional card highlights: Dimensions and fit; Material, weave and care.
+
+The detail page groups the specifications below. Choice, sizing, price, fulfilment and terms sections appear only where applicable.
+
+- ORDER: Choose the actual variant and quantity, review fulfilment and total, then place an order through its authority.
+
+This extends the existing offering schema definitions PRODUCT_CATALOG_V1. It does not activate any model.
+
+## Shared listing information
+
+| Merchant captures | Input/value shape | Scope and proposed requirement | Customer destination | Guidance |
+| --- | --- | --- | --- | --- |
+| Offering name | Labelled text entry | offering; Publish | Browse/search card summary; Offering detail page description and inclusions | Name the actual offering; the merchant identity is referenced separately. |
+| Short description | Labelled text entry | offering; Publish | Browse/search card summary; Offering detail page description and inclusions | Explain what the customer receives without replacing structured specifications. |
+| Photos or relevant media | Media picker with captions | offering; Optional | Browse/search card summary; Offering detail page description and inclusions | Accurate media with accessible descriptions; link media to actual variants where relevant. |
+| Specific offering type | Existing record or registry selection | offering; Publish | Offering detail page description and inclusions | A registered template chosen for the item, not inferred solely from merchant category. |
+| Applicable branches or channels | Multiple existing-record selections | offering; Publish | Delivery, pickup, visit or access information | Use actual permitted locations and supported methods; a digital service can have a remote channel. |
+| Content source and external identity | Existing record or registry selection | offering; Publish | Authorized merchant/system view only | Preserve stable internal/external IDs and edit ownership; not a public product specification. |
+
+## Product purchase and variants
+
+| Merchant captures | Input/value shape | Scope and proposed requirement | Customer destination | Guidance |
+| --- | --- | --- | --- | --- |
+| Sale unit and pack quantity | Number with unit and basis | offering; Publish | Browse/search card summary; Selected price and itemized charges | Explicit count, weight or volume unit, precision and contents per sale unit. |
+| Actual purchasable combinations | Actual option combinations | offering; Required when options change the purchased item | Customer option or variant selector | Stable variant IDs; list actual combinations, never an automatic size-by-colour cross-product. |
+| Item condition | Single choice | offering; Publish | Labelled specification section | New, used or refurbished as applicable; explain the actual grading when relevant. |
+| Applicable return and warranty references | Applicable versioned policy | offering; Publish | Applicable terms before commitment | Reference the effective policy; inherited policies require explicit scope and overrides. |
+
+## Price and charge basis
+
+| Merchant captures | Input/value shape | Scope and proposed requirement | Customer destination | Guidance |
+| --- | --- | --- | --- | --- |
+| How the price is calculated | Single choice | offering; Publish | Browse/search card summary; Selected price and itemized charges | Fixed, per declared unit, variant, duration, person, package, starting estimate or quote-only. |
+| Published price or quote status | Price entry or quote-only state | offering; Publish | Browse/search card summary; Selected price and itemized charges | Money uses integer minor units and currency; quote-only is not a zero price. Never auto-convert legacy whole-KES fields. |
+| Included and additional charges | Charge rule rows | offering; Required when extra charges apply | Selected price and itemized charges; Applicable terms before commitment | Explicit unit, applicability, inclusions and source; show the selected total before commitment. |
+| Price and policy version | Existing record or registry selection | offering; Publish | Authorized merchant/system view only | Accepted work retains the applicable version; prices come from their declared authority. |
+
+## Product availability
+
+| Merchant captures | Input/value shape | Scope and proposed requirement | Customer destination | Guidance |
+| --- | --- | --- | --- | --- |
+| Stock control mode | Single choice | variant_location; Publish | Authorized merchant/system view only | Internal, external, hybrid or explicitly disabled. Unknown stock must remain unknown. |
+| Availability by variant and location | Read from stock owner | variant_location; Required when inventory is controlled | Customer option or variant selector; Browse/search card summary | Reference authoritative stock and unit; a merchant's shop hours are not proof of stock. |
+
+## Ways to receive the offering
+
+| Merchant captures | Input/value shape | Scope and proposed requirement | Customer destination | Guidance |
+| --- | --- | --- | --- | --- |
+| Delivery, pickup, visit or remote methods | Multiple choices | offering; Publish | Delivery, pickup, visit or access information | Only supported methods for the selected listing and location. |
+| Service area and pickup locations | Coverage-owner projection | offering; Required when physical delivery or customer-location service is offered | Delivery, pickup, visit or access information | Exact authoritative coverage; show eligibility for the selected customer location. |
+| Preparation or fulfilment lead time | Duration and unit | offering; Required when a lead time applies | Browse/search card summary; Delivery, pickup, visit or access information | Exact amount and unit; estimate versus firm promise must be labelled. |
+| Customer-facing fulfilment instructions | Labelled text entry | offering; Optional | Delivery, pickup, visit or access information | Public instructions exclude personal access credentials and internal notes. |
+
+## Home textile sizes and contents
+
+| Merchant captures | Input/value shape | Scope and proposed requirement | Customer destination | Guidance |
+| --- | --- | --- | --- | --- |
+| Item and set contents | Labelled text entry | offering; Publish | Labelled specification section | Duvet cover, curtain, towel or actual product; included pieces are explicit. |
+| Dimensions and fit | Dimensions and orientation | offering; Publish | Customer option or variant selector; Labelled specification section; Browse/search card summary | Length/width, curtain drop, mattress depth or applicable measurements with units. |
+| Material, weave and care | Material/composition entries | offering; Publish | Labelled specification section; Browse/search card summary | Only confirmed composition/performance claims. |
+
+## Textile fit and installation
+
+| Merchant captures | Input/value shape | Scope and proposed requirement | Customer destination | Guidance |
+| --- | --- | --- | --- | --- |
+| Actual bed, mattress, window or item fit | Dimensions and orientation | offering; Publish | Labelled specification section; Customer option or variant selector | Named dimensions, drop/depth/orientation and units; a queen/king label is not a universal measurement. |
+| Exact pieces and mounting accessories | Included component rows | offering; Publish | Offering detail page description and inclusions | Separate included cover/pillowcase/lining/hooks and optional mounting/installation. |
+
+## Source and visibility
+
+Field IDs and their single authoritative owner references are in [catalogue.json](../catalogue.json). Shared field meanings are defined once; each use can narrow its requirement or applicability. Internal references and transaction responses must not enter public projections.

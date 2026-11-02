@@ -1,0 +1,8 @@
+{
+  "clientDate": "2026-11-02",
+  "status": "PASS",
+  "scope": "Targeted check after the shared-Home display adapter changed; IDs and registry rules remain unchanged.",
+  "checks": [
+    "Canonical Café display label is consistent across registration, heading, task titles and activity summary."
+  ]
+}

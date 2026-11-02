@@ -1,0 +1,31 @@
+{
+  "approvalId": "OFF_SHOPPING_ADDITIONS_2026_10_31",
+  "date": "2026-10-31",
+  "approvedBy": "user",
+  "userInstruction": "yes include these",
+  "status": "APPROVED_FOR_DESIGN_INCLUSION",
+  "scope": "The 21 additional specialty/template/model routes shown to the user. This records inclusion in the design and does not activate runtime capabilities or approve all individual field requirements.",
+  "routes": [
+    {"subcategoryId": "festivals", "templateId": "session_pass", "modelId": "ENTITLEMENT"},
+    {"subcategoryId": "conferences", "templateId": "event_space", "modelId": "SPACE_RESERVATION"},
+    {"subcategoryId": "private_events", "templateId": "event_space", "modelId": "SPACE_RESERVATION"},
+    {"subcategoryId": "private_events", "templateId": "photography", "modelId": "APPOINTMENT"},
+    {"subcategoryId": "private_events", "templateId": "photography", "modelId": "FIELD_VISIT"},
+    {"subcategoryId": "workshops", "templateId": "session_pass", "modelId": "ENTITLEMENT"},
+    {"subcategoryId": "recreation", "templateId": "session_pass", "modelId": "ENTITLEMENT"},
+    {"subcategoryId": "cakes", "templateId": "ready_cake", "modelId": "ORDER"},
+    {"subcategoryId": "restaurant", "templateId": "catering", "modelId": "REQUEST_QUOTE"},
+    {"subcategoryId": "stationery", "templateId": "personalized_gift", "modelId": "PRODUCTION_DUE"},
+    {"subcategoryId": "coaching", "templateId": "session_pass", "modelId": "ENTITLEMENT"},
+    {"subcategoryId": "travel_packages", "templateId": "safari", "modelId": "TOUR"},
+    {"subcategoryId": "travel_packages", "templateId": "city_tour", "modelId": "TOUR"},
+    {"subcategoryId": "tire_service", "templateId": "tire_product", "modelId": "ORDER"},
+    {"subcategoryId": "battery_service", "templateId": "battery_product", "modelId": "ORDER"},
+    {"subcategoryId": "spa", "templateId": "personal_care", "modelId": "ORDER"},
+    {"subcategoryId": "massage", "templateId": "personal_care", "modelId": "ORDER"},
+    {"subcategoryId": "gym", "templateId": "training", "modelId": "FIELD_VISIT"},
+    {"subcategoryId": "gym", "templateId": "class", "modelId": "SESSION_CAPACITY"},
+    {"subcategoryId": "personal_training", "templateId": "session_pass", "modelId": "ENTITLEMENT"},
+    {"subcategoryId": "moving_assistance", "templateId": "road_freight", "modelId": "FREIGHT"}
+  ]
+}

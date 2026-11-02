@@ -1,0 +1,107 @@
+{
+  "date": "2026-10-31",
+  "selectedImageCount": 6,
+  "images": [
+    {
+      "id": "PROMO_01",
+      "file": "01-campaign-overview.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "0d82a879b8541261015e77fbd0240173f7f63cb8673ae13cddf2ca73dc756b6a",
+      "source": "C:/Users/limta/.codex/generated_images/01a1928f-a412-7413-a68b-fcd3f882bdc4/exec-c8ff38fb-ed4a-47ef-bd41-00ff7e0b19c4.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "INSPECTED",
+      "fileIntegrity": "PNG_CHUNK_CRC_PASSED"
+    },
+    {
+      "id": "PROMO_02",
+      "file": "02-service-offer-creation.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "b172815f1fc07e36e7ecde3e79ecf64fb3bef29dcb5877e1722257fcec5d19d9",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1928f-a412-7413-a68b-fcd3f882bdc4\\exec-5904899e-2a91-4ae8-bb4e-085d7f41baa0.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "INSPECTED",
+      "fileIntegrity": "PNG_CHUNK_CRC_PASSED"
+    },
+    {
+      "id": "PROMO_03",
+      "file": "03-rental-campaign-results.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "fd598b55f3cac9db4d807f5a1203c7a5173f0f85a16e673acd40a9d3538cc8a0",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a1928f-a412-7413-a68b-fcd3f882bdc4\\exec-21a04fff-47af-481e-b7dc-c17dec3b9890.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "INSPECTED",
+      "fileIntegrity": "PNG_CHUNK_CRC_PASSED"
+    },
+    {
+      "id": "PROMO_04",
+      "file": "04-featured-placements.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "fad5b4d6f8732819e931f7d6fc0ac05eca126681d62efeef277d4874c0de76e1",
+      "source": "C:/Users/limta/.codex/generated_images/01a1928f-a412-7413-a68b-fcd3f882bdc4/exec-bbe148ab-e09d-45a6-8741-f3ace3f605c4.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "INSPECTED",
+      "fileIntegrity": "PNG_CHUNK_CRC_PASSED"
+    },
+    {
+      "id": "PROMO_05",
+      "file": "05-promotion-history.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "7304b071c809a888f05aeb2bd2c80fa9956e03441163c03c513ed1fb73526992",
+      "source": "C:/Users/limta/.codex/generated_images/01a1928f-a412-7413-a68b-fcd3f882bdc4/exec-15f62e60-472b-460e-893d-4eb9b12d8e31.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "INSPECTED",
+      "fileIntegrity": "PNG_CHUNK_CRC_PASSED"
+    },
+    {
+      "id": "PROMO_06",
+      "file": "06-customer-app-preview.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "318cb510cec5470eac9b2e006eab52a2a2e07e9d08402373524c35c472ce5ddb",
+      "source": "C:/Users/limta/.codex/generated_images/01a1928f-a412-7413-a68b-fcd3f882bdc4/exec-3980e7b1-df30-407c-9585-f40279e38b4e.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "INSPECTED",
+      "fileIntegrity": "PNG_CHUNK_CRC_PASSED"
+    }
+  ],
+  "promptSet": "image-prompts.json",
+  "reference": "reference-workspace.png",
+  "correction": {
+    "imageId": "PROMO_03",
+    "promptFile": "image-3-correction-prompt.txt",
+    "rejectedSource": "C:\\Users\\limta\\.codex\\generated_images\\01a1928f-a412-7413-a68b-fcd3f882bdc4\\exec-5973ae0a-7bbe-415a-958c-da48a08b0182.png",
+    "reason": "Deposit displayed KES 18,000 instead of the requested KES 10,000; corrected with a single targeted image_gen edit."
+  },
+  "scope": "Illustrative concept references only, not application/runtime evidence",
+  "revisions": [
+    {
+      "imageId": "PROMO_01",
+      "reason": "User requested removal of the page-level status summary strip; in-list filters retained.",
+      "promptFile": "image-1-summary-removal-prompt.txt",
+      "previousSource": "C:\\Users\\limta\\.codex\\generated_images\\01a1928f-a412-7413-a68b-fcd3f882bdc4\\exec-0d0eeb0a-3c5f-4f98-b04c-125ad24f0726.png",
+      "previousSha256": "de8345c399b5c78805ee79e3f8def451a6e5a71a6847c9d766682900c313d6c2",
+      "archivedReference": "history/01-campaign-overview-before-summary-removal.png",
+      "selectedSource": "C:/Users/limta/.codex/generated_images/01a1928f-a412-7413-a68b-fcd3f882bdc4/exec-c8ff38fb-ed4a-47ef-bd41-00ff7e0b19c4.png"
+    }
+  ],
+  "additionalCorrections": [
+    {
+      "imageId": "PROMO_06",
+      "promptFile": "image-6-preview-note-correction-prompt.txt",
+      "rejectedSource": "C:/Users/limta/.codex/generated_images/01a1928f-a412-7413-a68b-fcd3f882bdc4/exec-fde2c386-c7ad-4640-b158-502a83e1ad44.png",
+      "selectedSource": "C:/Users/limta/.codex/generated_images/01a1928f-a412-7413-a68b-fcd3f882bdc4/exec-3980e7b1-df30-407c-9585-f40279e38b4e.png",
+      "reason": "Removed generation instructions from the product-facing bottom note; retained a short preview-only notice."
+    }
+  ]
+}

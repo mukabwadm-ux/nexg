@@ -10,13 +10,24 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
 import { jsonError } from '@/lib/http';
+import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { ApiService } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
-export async function GET() {
+export async function GET(request: Request) {
+  try {
+    const credential = await authenticate(request);
+    requireScope(credential, API_SCOPES.public_read);
+    await enforceRateLimit(credential, request);
+  } catch (error) {
+    if (error instanceof ApiAuthError) {
+      return jsonError(error.code, error.message, { status: error.status, retryAfter: error.retryAfter });
+    }
+    return jsonError('internal_error', 'The API is temporarily unavailable.', { status: 503 });
+  }
   const supabase = createPublicClient();
 
   const { data, error } = await supabase

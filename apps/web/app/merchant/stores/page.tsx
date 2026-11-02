@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
  * just saying no.
  */
 export default async function StoresPage() {
-  const me = await requireMerchant();
+  const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 
   const maps = mapsCapability();

@@ -1,0 +1,87 @@
+{
+  "fictional": true,
+  "merchant": "Nairobi Collective",
+  "location": "Westlands",
+  "actor": {
+    "role": "Owner",
+    "initials": "ZM"
+  },
+  "timezone": "Africa/Nairobi",
+  "sampleDate": "2026-11-03",
+  "sampleDateReason": "Retains the existing implementation fixture; not a claim about the user's actual current date.",
+  "statement": {
+    "id": "STM-1103",
+    "periodStart": "2026-11-01",
+    "periodEnd": "2026-11-03",
+    "currency": "KES",
+    "before": {
+      "revision": 0,
+      "postings": 36,
+      "postedSalesMinor": 20000000,
+      "confirmedRefundsMinor": 1000000,
+      "postedFeesMinor": 800000,
+      "netCollectionsMinor": 19000000,
+      "netPayableMinor": 18200000
+    },
+    "after": {
+      "revision": 1,
+      "postings": 37,
+      "postedSalesMinor": 20000000,
+      "confirmedRefundsMinor": 1000000,
+      "postedFeesMinor": 680000,
+      "netCollectionsMinor": 19000000,
+      "netPayableMinor": 18320000
+    }
+  },
+  "case": {
+    "id": "FIN-1103",
+    "suspectedIssue": "TX-6116 may duplicate a fee component in TX-6400",
+    "receivedAt": "2026-11-03T09:47:00+03:00",
+    "owner": "Finance support",
+    "resolutionAt": "2026-11-03T11:20:00+03:00",
+    "resolution": "Finance confirms duplication and posts a fee reversal",
+    "newProposedContract": true,
+    "entryFlow": [
+      "Select STM-1103",
+      "Report an issue",
+      "Review attached context and editable draft",
+      "Send to Finance support",
+      "Pending",
+      "Confirmed creation returns FIN-1103",
+      "View case from same statement",
+      "Later Finance resolution"
+    ],
+    "preSubmitCaseId": null,
+    "cancel": "Return to unchanged selected STM-1103",
+    "submissionFailure": "Preserve draft, show recovery, do not claim case creation"
+  },
+  "feeEntries": [
+    {
+      "id": "TX-6400",
+      "postedAt": "2026-11-01",
+      "amountMinor": -680000,
+      "role": "Original aggregate fee posting; includes the valid120000minor-unit fee and other560000minor-unit fees in this hypothetical case."
+    },
+    {
+      "id": "TX-6116",
+      "postedAt": "2026-11-03",
+      "amountMinor": -120000,
+      "role": "Questioned existing fee posting; later confirmed duplicate and retained in history."
+    },
+    {
+      "id": "RV-6116",
+      "postedAt": "2026-11-03T11:20:00+03:00",
+      "amountMinor": 120000,
+      "role": "New hypothetical Finance-owned fee reversal, not a customer refund."
+    }
+  ],
+  "eligiblePayoutBalanceMinor": 3000000,
+  "eligiblePayoutTreatment": "Outside statement scope; no inferred change or payment.",
+  "unasserted": [
+    "payout sent or received",
+    "customer refund",
+    "order completion",
+    "actual live case submission",
+    "fee policy change"
+  ]
+}

@@ -1,8 +1,15 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 
 import { merchantContext } from '@/components/merchant/frame';
 import { MerchantShell, StateControl } from '@/components/merchant/shell';
+import { MerchantAuthBoundary } from '@/components/merchant/auth-boundary';
+import {
+  MerchantWorkspaceShell,
+  type MerchantWorkspaceNavItem,
+} from '@/components/merchant/workspace/merchant-workspace-shell';
+import { SignOut } from '@/components/partner/sign-out';
 
 export const metadata: Metadata = {
   title: { default: 'Your business', template: '%s · NexG' },
@@ -10,6 +17,7 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export interface MerchantHome {
   merchant_id: string;
@@ -68,31 +76,81 @@ export interface MerchantHome {
  * reads it and one declaration beats fifteen.
  */
 export default async function MerchantLayout({ children }: { children: React.ReactNode }) {
-  const { m, live, nav } = await merchantContext();
+  const { m, live, nav, me } = await merchantContext({ setup: true });
 
   /* `merchantContext` has already established who is asking. A
      session with no merchant row has nothing to frame. */
   if (!m) redirect('/merchants/apply');
 
+  if (me.access.state !== 'legacy') {
+    const destinations: MerchantWorkspaceNavItem[] = [
+      { label: 'Home', href: '/merchant' },
+      { label: 'Work', href: '/merchant/orders' },
+      { label: 'Offerings', href: '/merchant/menu' },
+      { label: 'Availability', href: '/merchant/hours' },
+      { label: 'Business', href: '/merchant/stores' },
+      { label: 'Money', href: '/merchant/money' },
+      { label: 'Promotions', href: '/merchant/promotions' },
+      { label: 'Insights', href: '/merchant/insights' },
+      { label: 'Settings', href: '/merchant/settings' },
+    ];
+    const approvalLabel = me.access.needs_resubmission
+      ? 'Resubmit your changes'
+      : me.access.state === 'approved'
+        ? 'Workspace approved'
+        : me.access.state === 'changes_requested'
+          ? 'Changes requested'
+          : 'Waiting for admin approval';
+    return (
+      <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
+        <MerchantWorkspaceShell
+          businessName={m.name}
+          approvalLabel={approvalLabel}
+          setupDestinations={
+            me.access.setup
+              ? ['/merchant/menu', '/merchant/stores', '/merchant/hours', '/merchant/documents']
+              : []
+          }
+          nav={destinations.map((item) => ({
+            ...item,
+            locked: item.label !== 'Home' && !me.access.operations,
+          }))}
+          headerEnd={me.isAnonymous ? (
+            <Link href={process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true' ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'} className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold">
+              {process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true' ? 'Verify email' : 'Create account'}
+            </Link>
+          ) : (
+            <span className="bg-ink inline-flex rounded-lg px-1 py-0.5"><SignOut /></span>
+          )}
+        >
+          {children}
+        </MerchantWorkspaceShell>
+      </MerchantAuthBoundary>
+    );
+  }
+
   return (
-    <MerchantShell
-      businessName={m.name}
-      personName={firstName(m.contact_name, m.name)}
-      role="Owner"
-      live={live}
-      branchName={null}
-      unreadCount={m.unread_messages ?? 0}
-      nav={nav}
-      stateControl={
-        <StateControl
-          live={live}
-          accepting={m.accepting_orders ?? false}
-          busyUntil={m.busy_mode_until}
-        />
-      }
-    >
-      {children}
-    </MerchantShell>
+    <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
+      <MerchantShell
+        businessName={m.name}
+        personName={firstName(m.contact_name, m.name)}
+        role="Owner"
+        live={live}
+        branchName={null}
+        unreadCount={m.unread_messages ?? 0}
+        nav={nav}
+        operationsAllowed={me.access.operations}
+        stateControl={
+          <StateControl
+            live={live}
+            accepting={m.accepting_orders ?? false}
+            busyUntil={m.busy_mode_until}
+          />
+        }
+      >
+        {children}
+      </MerchantShell>
+    </MerchantAuthBoundary>
   );
 }
 
