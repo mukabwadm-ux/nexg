@@ -3,6 +3,7 @@
 import { z } from 'zod';
 
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
+import { clearedWelcomeMetadata, welcomeMetadata } from '@/lib/merchant-welcome';
 import { createClient } from '@/lib/supabase/server';
 
 export interface AuthResult {
@@ -174,6 +175,11 @@ export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
   )
     return { ok: false, message: 'We could not confirm the submitted application for this email. Please contact support.' };
 
+  // Mark this merchant so the setup email renders as a welcome (greeting,
+  // username, "Set your password"). Wording only: if it fails, the plain
+  // setup email still goes out.
+  await supabase.auth.updateUser({ data: welcomeMetadata(application.data.payload.business) });
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nexgapp.com';
   const redirectTo = new URL('/auth/callback', siteUrl);
   redirectTo.searchParams.set('next', '/reset-password?next=%2Fmerchant');
@@ -204,7 +210,11 @@ export async function updateRecoveredPassword(formData: FormData): Promise<AuthR
   }
 
   const supabase = createClient();
-  const { error } = await supabase.auth.updateUser({ password: password.data });
+  const { error } = await supabase.auth.updateUser({
+    password: password.data,
+    // Later reset emails use the normal wording instead of the welcome.
+    data: clearedWelcomeMetadata,
+  });
 
   if (error) {
     return {
