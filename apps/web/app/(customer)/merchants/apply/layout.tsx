@@ -13,7 +13,7 @@ import { createClient } from '@/lib/supabase/server';
  */
 export const dynamic = 'force-dynamic';
 
-export default async function ApplyLayout({ children }: { children: React.ReactNode }) {
+export default async function ApplyLayout({ children }: { children: React.ReactNode }): Promise<import('react').ReactNode> {
   const supabase = createClient();
   const {
     data: { user },

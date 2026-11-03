@@ -7,7 +7,7 @@ import { SiteLocationProvider } from '@/components/location/provider';
 import { DEFAULT_LOCALE } from '@/lib/i18n/dictionaries';
 import { canMachineTranslate } from '@/lib/i18n/translate';
 
-export default function CustomerLayout({ children }: { children: React.ReactNode }) {
+export default function CustomerLayout({ children }: { children: React.ReactNode }): import('react').ReactNode {
   return (
     <SiteLocationProvider initial={null}>
       <CartProvider>

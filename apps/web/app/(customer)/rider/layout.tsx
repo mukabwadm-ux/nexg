@@ -65,7 +65,7 @@ export interface RiderHome {
  * The dashboard's hero still differs between an applicant and a
  * working rider; that is page content, not the frame.
  */
-export default async function RiderLayout({ children }: { children: React.ReactNode }) {
+export default async function RiderLayout({ children }: { children: React.ReactNode }): Promise<import('react').ReactNode> {
   const { h, active, nav } = await riderContext();
 
   if (!h) redirect('/riders/apply');

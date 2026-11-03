@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { MerchantShell, StateControl, merchantNav } from '@/components/merchant/shell';
 
-export default function MerchantPreviewLayout({ children }: { children: React.ReactNode }) {
+export default function MerchantPreviewLayout({ children }: { children: React.ReactNode }): import('react').ReactNode {
   if (process.env.NODE_ENV !== 'development') notFound();
 
   const nav = merchantNav({
