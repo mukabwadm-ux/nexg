@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import { CalendarDays } from 'lucide-react';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -12,7 +13,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function BookingDevelopmentWorkspace() {
+export default function BookingDevelopmentWorkspace(): ReactElement {
   let hostname = '';
   try {
     hostname = new URL(`http://${headers().get('host') ?? ''}`).hostname;
