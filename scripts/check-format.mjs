@@ -10,7 +10,7 @@ if (baseRef) {
   if (/^0+$/.test(baseRef)) {
     throw new Error('FORMAT_BASE_REF must identify a commit to compare.');
   }
-  execFileSync('git', ['fetch', '--no-tags', '--depth=1', 'origin', baseRef], {
+  execFileSync('git', ['fetch', '--no-tags', 'origin', baseRef], {
     stdio: 'inherit',
   });
   changedFiles = git(['diff', '--name-only', '-z', '--diff-filter=ACMR', `${baseRef}...HEAD`]);

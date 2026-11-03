@@ -1,7 +1,10 @@
 import type { ReactElement } from 'react';
 import { CustomerBooking } from '@/components/merchant/booking/customer-booking';
 
-export const metadata = { title: 'Book with a NEXG merchant', robots: { index: false, follow: false } };
+export const metadata = {
+  title: 'Book with a NEXG merchant',
+  robots: { index: false, follow: false },
+};
 export const dynamic = 'force-dynamic';
 
 export default function CustomerBookingPage({
