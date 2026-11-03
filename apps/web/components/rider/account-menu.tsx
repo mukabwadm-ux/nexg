@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { signOut } from '@/app/sign-in/actions';
+import { signOut } from '@/app/(customer)/sign-in/actions';
 
 /**
  * The rider's account button, and the way out.

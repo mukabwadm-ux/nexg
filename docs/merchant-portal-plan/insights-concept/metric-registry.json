@@ -1,0 +1,1063 @@
+{
+  "definitionVersion": "INSIGHTS_CONCEPT_V1",
+  "status": "PROPOSED_ADAPTER_AND_CALCULATION_CONTRACT",
+  "eventNaming": "Logical evidence labels below are proposed reporting adapter concepts. They do not introduce operational states or prove that runtime ingestion exists.",
+  "timezone": "Africa/Nairobi",
+  "defaultPeriod": "Last 28 completed local days",
+  "admissionGates": [
+    "actual offering/model enabled",
+    "current merchant/location/field permissions",
+    "required evidence exists and is complete for stated scope",
+    "approved definition and unit",
+    "approved privacy policy for any sensitive or identifiable breakdown"
+  ],
+  "requiredMetricFields": [
+    "id",
+    "version",
+    "question",
+    "models",
+    "owner",
+    "requiredEvidence",
+    "aggregation",
+    "dateBasis",
+    "unit",
+    "exclusions",
+    "dimensions",
+    "drilldown",
+    "availability"
+  ],
+  "requiredRuntimeProvenance": [
+    "merchantId",
+    "authorizedLocationIds",
+    "actualOfferingModel",
+    "definitionVersion",
+    "reportRevision",
+    "sourceVersions",
+    "coverageIntervals",
+    "asOf",
+    "dateBasis",
+    "timezone",
+    "unit",
+    "currencyIfFinancial",
+    "privacySuppression",
+    "comparisonValidity"
+  ],
+  "defaults": {
+    "version": 1,
+    "availability": "Candidate only; source adapter, definition and permissions must pass admission gates.",
+    "dimensions": [
+      "authorized location",
+      "actual offering/model",
+      "accepted variant/specification version where captured"
+    ],
+    "exclusions": [
+      "duplicate/replayed evidence",
+      "unauthorized rows/fields",
+      "unmapped events reported separately"
+    ],
+    "comparison": "Same definition, units, scope and compatible source coverage; ratios use percentage points. No growth percentage when prior count is zero.",
+    "privacy": "No raw personal intake. Customer-based measures require approved merchant-scoped pseudonymous identity and suppression policy. Health is administration only.",
+    "freshness": "Reporting owner must supply policy reference and measured coverage intervals; no invented freshness threshold.",
+    "drilldown": "Server-resolved exact contributing evidence under renewed authorization; preserve period/date basis/model/timezone/definition version."
+  },
+  "metrics": [
+    {
+      "id": "work_requested",
+      "version": 1,
+      "question": "How many requests entered each actual workflow?",
+      "models": [
+        "*"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "request identity",
+        "received instant",
+        "actual model"
+      ],
+      "aggregation": "Distinct request IDs, grouped by model; never infer people or fulfilled quantity.",
+      "dateBasis": "request received",
+      "unit": "requests per model",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "work_completed",
+      "version": 1,
+      "question": "Which work records reached their actual domain completion?",
+      "models": [
+        "*"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "domain completion event",
+        "work identity",
+        "actual model"
+      ],
+      "aggregation": "Distinct work IDs with valid completion evidence. Later refunds/disputes remain separate states.",
+      "dateBasis": "completion event",
+      "unit": "completed records per model",
+      "exclusions": [
+        "no universal delivered status",
+        "no merging appointments with product units"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "response_median",
+      "version": 1,
+      "question": "How long did the first valid merchant response take?",
+      "models": [
+        "REQUEST_QUOTE",
+        "APPOINTMENT",
+        "SERVICE_JOB",
+        "FIELD_VISIT"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "received instant",
+        "first qualifying response instant",
+        "response definition"
+      ],
+      "aggregation": "Median and distribution of elapsed durations; show eligible, responded, open and missing-event counts. No response inferred from unrelated updates.",
+      "dateBasis": "request cohort with observation cutoff",
+      "unit": "minutes",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "cancellation_reasons",
+      "version": 1,
+      "question": "What recorded reasons explain cancellations?",
+      "models": [
+        "*"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "cancel event",
+        "reason taxonomy/version",
+        "actual work model"
+      ],
+      "aggregation": "Count eligible cancelled identities by recorded reason with Unknown separate; report denominator by model.",
+      "dateBasis": "cancellation event",
+      "unit": "cancelled records per model",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "offering_outcomes",
+      "version": 1,
+      "question": "How did actual offering variants perform?",
+      "models": [
+        "*"
+      ],
+      "owner": "catalog and work",
+      "requiredEvidence": [
+        "accepted offering/variant/specification snapshot",
+        "actual work outcome",
+        "typed quantity"
+      ],
+      "aggregation": "Group compatible actual offering/model/unit outcomes. Missing variant remains Unknown. Do not rewrite history from current catalogue.",
+      "dateBasis": "report-selected accepted/completed basis",
+      "unit": "typed model-specific units",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Offering and exact matching accepted work",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "order_completed",
+      "version": 1,
+      "question": "How many product orders were fulfilled?",
+      "models": [
+        "ORDER"
+      ],
+      "owner": "orders",
+      "requiredEvidence": [
+        "order completion event",
+        "order identity",
+        "partial-fulfilment rule"
+      ],
+      "aggregation": "Distinct orders with the owner-defined fulfilled outcome; partial fulfilment shown separately.",
+      "dateBasis": "completion event",
+      "unit": "orders",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "order_units",
+      "version": 1,
+      "question": "Which item units were fulfilled?",
+      "models": [
+        "ORDER"
+      ],
+      "owner": "orders and catalog",
+      "requiredEvidence": [
+        "historical order item",
+        "fulfilled quantity",
+        "actual variant and unit"
+      ],
+      "aggregation": "Sum confirmed fulfilled quantities within compatible unit groups; ordered quantity is separate.",
+      "dateBasis": "fulfilment event",
+      "unit": "typed item units",
+      "exclusions": [
+        "no service appointments",
+        "no cross-unit addition"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "order_ready_on_time",
+      "version": 1,
+      "question": "Were orders ready by the accepted promise?",
+      "models": [
+        "ORDER"
+      ],
+      "owner": "orders",
+      "requiredEvidence": [
+        "actual ready instant",
+        "accepted promised ready instant/version"
+      ],
+      "aggregation": "Eligible orders with ready<=promise divided by eligible orders with both instants; show missing promises and open cases separately.",
+      "dateBasis": "accepted promise due in period, closed observation",
+      "unit": "percent and orders",
+      "exclusions": [
+        "delivery punctuality is a separate measure"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "appointment_outcomes",
+      "version": 1,
+      "question": "What happened to scheduled appointments?",
+      "models": [
+        "APPOINTMENT"
+      ],
+      "owner": "booking and work",
+      "requiredEvidence": [
+        "scheduled appointment identity/date",
+        "confirmed administrative outcome"
+      ],
+      "aggregation": "Mutually exclusive appointment outcomes as of cutoff; cancellations, no-shows, completed and open remain distinct.",
+      "dateBasis": "scheduled appointment start",
+      "unit": "appointments",
+      "exclusions": [
+        "clinical records",
+        "diagnoses",
+        "inferred no-shows"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "appointment_confirmed_rate",
+      "version": 1,
+      "question": "Which requests became confirmed appointments?",
+      "models": [
+        "APPOINTMENT"
+      ],
+      "owner": "booking",
+      "requiredEvidence": [
+        "request identity",
+        "confirmation evidence",
+        "observation cutoff"
+      ],
+      "aggregation": "Distinct confirmed request identities / eligible request identities from the same cohort; pending stays visible.",
+      "dateBasis": "request cohort",
+      "unit": "percent and requests",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "provider_reserved_util",
+      "version": 1,
+      "question": "How much usable provider time was reserved?",
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "owner": "availability",
+      "requiredEvidence": [
+        "provider resource identity",
+        "usable schedule intervals",
+        "confirmed reservation intervals",
+        "closure exclusions"
+      ],
+      "aggregation": "Union of reserved intervals clipped to report scope / usable resource-time intervals; avoid duplicates across offerings.",
+      "dateBasis": "resource interval",
+      "unit": "percent and provider-hours",
+      "exclusions": [
+        "travel capacity only if explicitly modeled",
+        "no schedule denominator inferred from bookings"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Availability intervals, provider schedule and exclusions",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "visit_on_time",
+      "version": 1,
+      "question": "Did visits arrive within the accepted arrival window?",
+      "models": [
+        "FIELD_VISIT"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "accepted visit window/version",
+        "actual arrival evidence"
+      ],
+      "aggregation": "Eligible arrivals within the accepted arrival window / eligible due visits with complete observation; open/missing events separate. Visit completion timing requires a separately recorded commitment.",
+      "dateBasis": "accepted visit window due",
+      "unit": "percent and visits",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "asset_reserved_util",
+      "version": 1,
+      "question": "How much usable asset time was reserved?",
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "owner": "availability",
+      "requiredEvidence": [
+        "asset identity",
+        "scheduled intervals",
+        "maintenance/closure exclusions",
+        "confirmed reservation intervals"
+      ],
+      "aggregation": "Union of reserved intervals per asset clipped to report period / union of usable intervals. Synthetic example 1240/2000=62%.",
+      "dateBasis": "asset interval",
+      "unit": "percent and asset-hours",
+      "exclusions": [
+        "do not sum overlapping reservations",
+        "actual use is separate"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Included reservation intervals, resource capacity and excluded intervals",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "asset_used_util",
+      "version": 1,
+      "question": "How much usable asset time was actually used?",
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "owner": "work and availability",
+      "requiredEvidence": [
+        "verified handover/return instants",
+        "usable asset intervals",
+        "usage correction history"
+      ],
+      "aggregation": "Union of verified actual-use intervals per asset / union of usable asset intervals; missing returns require owner-defined open-interval treatment.",
+      "dateBasis": "actual-use interval",
+      "unit": "percent and asset-hours",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Usage intervals and handover/return evidence",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "rental_on_time_return",
+      "version": 1,
+      "question": "Were rental returns recorded by the accepted due time?",
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "accepted return due instant/version",
+        "recorded return instant"
+      ],
+      "aggregation": "Due rentals with recorded return<=due / eligible due rentals with closed observation; show overdue open and missing evidence separately.",
+      "dateBasis": "accepted return due",
+      "unit": "percent and rentals",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "transfer_on_time",
+      "version": 1,
+      "question": "Were transfers recorded at the promised milestone?",
+      "models": [
+        "TRANSFER"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "accepted route/pickup promise/version",
+        "actual milestone evidence",
+        "milestone definition"
+      ],
+      "aggregation": "Eligible transfer milestone events meeting promise / eligible transfers with complete observation; waiting and greeting scope remain explicit.",
+      "dateBasis": "selected promise due",
+      "unit": "percent and transfers",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "booked_place_fill",
+      "version": 1,
+      "question": "How many usable session places were reserved?",
+      "models": [
+        "SESSION_CAPACITY",
+        "TOUR"
+      ],
+      "owner": "booking and availability",
+      "requiredEvidence": [
+        "dated occurrence",
+        "usable place capacity",
+        "confirmed place allocations"
+      ],
+      "aggregation": "Confirmed allocated places / usable places for each occurrence; deduplicate shared pools across ticket tiers.",
+      "dateBasis": "occurrence date",
+      "unit": "percent and places",
+      "exclusions": [
+        "passes are not attendance",
+        "party counts are not places"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Dated occurrences, capacity pools and allocations",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "session_attendance",
+      "version": 1,
+      "question": "How many booked places have recorded attendance?",
+      "models": [
+        "SESSION_CAPACITY",
+        "TOUR"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "occurrence",
+        "attended place evidence",
+        "booked place allocation"
+      ],
+      "aggregation": "Recorded attended places / eligible booked places with closed attendance observation; unrecorded remains Unknown.",
+      "dateBasis": "occurrence date",
+      "unit": "places and percent",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "space_reserved_util",
+      "version": 1,
+      "question": "How much usable space capacity was reserved?",
+      "models": [
+        "SPACE_RESERVATION"
+      ],
+      "owner": "availability",
+      "requiredEvidence": [
+        "space identity",
+        "usable intervals",
+        "confirmed allocations",
+        "turnover/maintenance exclusions",
+        "capacity unit"
+      ],
+      "aggregation": "Union of allocated compatible space intervals / usable space intervals, time-weighted when capacity is quantitative. Space-hours, tables and seats remain separate.",
+      "dateBasis": "local occupancy interval/date",
+      "unit": "percent and declared space unit",
+      "exclusions": [
+        "no space-hour inference from guest counts"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Space intervals, reservations and exclusions",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "tour_operated",
+      "version": 1,
+      "question": "Which confirmed departures actually operated?",
+      "models": [
+        "TOUR"
+      ],
+      "owner": "work and supplier adapter",
+      "requiredEvidence": [
+        "departure identity",
+        "supplier confirmation",
+        "actual operation outcome"
+      ],
+      "aggregation": "Distinct confirmed departures by actual operated/cancelled/open outcome; show parties and places separately.",
+      "dateBasis": "departure date",
+      "unit": "departures",
+      "exclusions": [
+        "enquiries are not supplier confirmations"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "production_on_time",
+      "version": 1,
+      "question": "Were accepted production jobs completed by their agreed due time?",
+      "models": [
+        "PRODUCTION_DUE"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "production acceptance",
+        "accepted due version",
+        "completion/accepted output evidence"
+      ],
+      "aggregation": "Eligible due jobs with accepted completion<=due / eligible due jobs with closed observation; partial output and agreed due revisions remain visible.",
+      "dateBasis": "accepted production due",
+      "unit": "percent and production jobs",
+      "exclusions": [
+        "accepted quote is not production acceptance"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "request_with_accepted_quote_rate",
+      "version": 1,
+      "question": "Which requests reached an accepted quote?",
+      "models": [
+        "REQUEST_QUOTE"
+      ],
+      "owner": "quotes",
+      "requiredEvidence": [
+        "request identity",
+        "quote revision/decision evidence",
+        "cohort cutoff/window"
+      ],
+      "aggregation": "Distinct eligible request identities with an accepted quote / eligible request identities. Do not divide decision-period acceptances by another request cohort. Separate open and enquiry-only routes.",
+      "dateBasis": "request cohort with observation cutoff",
+      "unit": "percent and requests",
+      "exclusions": [
+        "quote-only does not imply fulfilled work"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "linked_windows_on_time",
+      "version": 1,
+      "question": "Were collection and return promises both met?",
+      "models": [
+        "LINKED_WINDOWS"
+      ],
+      "owner": "work and custody",
+      "requiredEvidence": [
+        "linked cycle identity",
+        "accepted collection and return windows",
+        "actual custody events",
+        "assessed quantity"
+      ],
+      "aggregation": "Eligible closed cycles meeting both accepted windows / eligible cycles with complete observation; separately show collection-only and return-only performance.",
+      "dateBasis": "return due with collection context",
+      "unit": "percent and cycles",
+      "exclusions": [
+        "do not label partial custody as complete"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "job_outcomes",
+      "version": 1,
+      "question": "Which accepted jobs completed or remain blocked?",
+      "models": [
+        "SERVICE_JOB"
+      ],
+      "owner": "work",
+      "requiredEvidence": [
+        "assessment/approval where required",
+        "actual start/completion evidence",
+        "recorded blocker reason"
+      ],
+      "aggregation": "Distinct accepted jobs by source-confirmed outcome as of cutoff; stage durations use actual events only.",
+      "dateBasis": "job accepted or completed, explicitly selected",
+      "unit": "jobs",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "entitlement_issued",
+      "version": 1,
+      "question": "Which rights were issued or enrolled?",
+      "models": [
+        "ENTITLEMENT"
+      ],
+      "owner": "entitlements",
+      "requiredEvidence": [
+        "issued entitlement identity",
+        "validity interval",
+        "issue/revoke history"
+      ],
+      "aggregation": "Distinct issued entitlements; active-at-date is a separate interval measure. Recurring authorization not inferred.",
+      "dateBasis": "issue event or explicit valid-at date",
+      "unit": "entitlements",
+      "exclusions": [],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "entitlement_redemptions",
+      "version": 1,
+      "question": "How were valid rights redeemed?",
+      "models": [
+        "ENTITLEMENT"
+      ],
+      "owner": "entitlements and work",
+      "requiredEvidence": [
+        "validated redemption identity",
+        "entitlement identity",
+        "typed consumed unit",
+        "validity and reversal evidence"
+      ],
+      "aggregation": "Distinct confirmed redemption events and typed consumed quantities; distinct passes shown separately; reversed redemptions separate.",
+      "dateBasis": "redemption event",
+      "unit": "redemptions and typed units",
+      "exclusions": [
+        "a pass sale is not attendance",
+        "customer identity requires privacy authority"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "freight_milestone_on_time",
+      "version": 1,
+      "question": "Did accepted shipments meet the selected milestone promise?",
+      "models": [
+        "FREIGHT"
+      ],
+      "owner": "work and custody",
+      "requiredEvidence": [
+        "shipment identity",
+        "accepted milestone promise/version",
+        "recorded milestone",
+        "observation cutoff"
+      ],
+      "aggregation": "Eligible due shipments with recorded milestone within promise / all eligible due shipments in the closed observation window, including Unknown outcomes in the denominator. Open, late and unknown outcomes remain separate.",
+      "dateBasis": "selected milestone due",
+      "unit": "percent and shipments",
+      "exclusions": [
+        "no manufactured tracking scan",
+        "pieces/mass/volume separate"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "storage_occupied_util",
+      "version": 1,
+      "question": "How much usable storage capacity was occupied?",
+      "models": [
+        "STORAGE"
+      ],
+      "owner": "storage and availability",
+      "requiredEvidence": [
+        "storage unit and compatible capacity unit",
+        "confirmed custody quantities",
+        "quantity-change instants",
+        "usable interval/exclusions"
+      ],
+      "aggregation": "Integral of confirmed occupied compatible quantity over time / integral of usable compatible capacity over time; reservation is separate from actual custody.",
+      "dateBasis": "occupancy interval",
+      "unit": "percent and pallet-hours/area-hours/volume-hours separately",
+      "exclusions": [
+        "no addition of incompatible storage units"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Custody quantity intervals, capacity and exclusions",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "repeat_activity",
+      "version": 1,
+      "question": "What permitted customer activity repeated?",
+      "models": [
+        "*"
+      ],
+      "owner": "privacy and reporting",
+      "requiredEvidence": [
+        "approved merchant-scoped pseudonymous identity",
+        "declared cohort/window",
+        "actual completed work"
+      ],
+      "aggregation": "Repeat completed work and unique returning identities are separate measures under approved policy; no claim of globally unique people.",
+      "dateBasis": "declared customer/work cohort",
+      "unit": "repeat records or approved identities separately",
+      "exclusions": [
+        "no cross-merchant identity stitching",
+        "no inferred consent"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Matching Work records and their recorded events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "published_review_distribution",
+      "version": 1,
+      "question": "What feedback was published?",
+      "models": [
+        "*"
+      ],
+      "owner": "reviews",
+      "requiredEvidence": [
+        "published moderated review",
+        "review subject",
+        "rating scale/version"
+      ],
+      "aggregation": "Count ratings by approved scale/subject; separate reply workload. Keyword themes labelled as tags, not validated sentiment.",
+      "dateBasis": "publication event",
+      "unit": "reviews and rating distribution",
+      "exclusions": [
+        "private/rejected reviews excluded according to owner",
+        "no clinical inference"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Authorized published reviews",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "qualified_impressions",
+      "version": 1,
+      "question": "What promotion delivery was measured?",
+      "models": [
+        "*"
+      ],
+      "owner": "promotions measurement",
+      "requiredEvidence": [
+        "qualified view events",
+        "deduplication rule/version",
+        "campaign/surface/revision"
+      ],
+      "aggregation": "Count qualified impression events under source-defined deduplication; not unique people.",
+      "dateBasis": "view event",
+      "unit": "impression events",
+      "exclusions": [
+        "current ingestion is unproven"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Qualified campaign delivery events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "qualified_taps",
+      "version": 1,
+      "question": "What measured promotion taps occurred?",
+      "models": [
+        "*"
+      ],
+      "owner": "promotions measurement",
+      "requiredEvidence": [
+        "qualified tap events",
+        "deduplication rule/version",
+        "campaign revision"
+      ],
+      "aggregation": "Count qualified tap events; tap/impression ratio is an event ratio with compatible delivery coverage.",
+      "dateBasis": "tap event",
+      "unit": "tap events",
+      "exclusions": [
+        "current ingestion is unproven"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Qualified campaign tap events",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "attributed_orders",
+      "version": 1,
+      "question": "Which accepted orders met the attribution rule?",
+      "models": [
+        "ORDER"
+      ],
+      "owner": "promotions attribution",
+      "requiredEvidence": [
+        "qualified tap cohort",
+        "accepted order event",
+        "attribution/deduplication rule/version",
+        "closed observation window"
+      ],
+      "aggregation": "Distinct eligible accepted order IDs assigned once under approved model. Concept fixture 36 orders/600 taps=6%; configurable 30-minute tap window. Correlation is not incremental lift.",
+      "dateBasis": "tap cohort observed through cutoff",
+      "unit": "attributed accepted orders",
+      "exclusions": [
+        "value/ROAS unavailable until value and refund pipeline approved",
+        "no causal lift"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Attribution assignments and separately authorized matching Work",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "merchant_credits",
+      "version": 1,
+      "question": "What merchant credits were posted?",
+      "models": [
+        "*"
+      ],
+      "owner": "finance",
+      "requiredEvidence": [
+        "approved statement-compatible merchant credit postings"
+      ],
+      "aggregation": "Sum confirmed merchant credits in one currency on posting basis; synthetic 480000 KES.",
+      "dateBasis": "posted instant",
+      "unit": "currency-separated minor units",
+      "exclusions": [
+        "payouts and pending/holds separately",
+        "never use guest-paid envelope as merchant sales",
+        "unknown amount not zero"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Exact approved Money postings with independent finance authorization",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "refund_debits",
+      "version": 1,
+      "question": "What refund debits were posted?",
+      "models": [
+        "*"
+      ],
+      "owner": "finance",
+      "requiredEvidence": [
+        "approved merchant refund debit projection"
+      ],
+      "aggregation": "Sum confirmed refund debits in one currency on posting basis; synthetic 12000 KES. Do not infer from current order stage.",
+      "dateBasis": "posted instant",
+      "unit": "currency-separated minor units",
+      "exclusions": [
+        "payouts and pending/holds separately",
+        "never use guest-paid envelope as merchant sales",
+        "unknown amount not zero"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Exact approved Money postings with independent finance authorization",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "fee_debits",
+      "version": 1,
+      "question": "What recorded fee debits were posted?",
+      "models": [
+        "*"
+      ],
+      "owner": "finance",
+      "requiredEvidence": [
+        "approved merchant fee debit projection"
+      ],
+      "aggregation": "Sum source-confirmed fee debits in one currency; synthetic 23400 KES, not a fee policy.",
+      "dateBasis": "posted instant",
+      "unit": "currency-separated minor units",
+      "exclusions": [
+        "payouts and pending/holds separately",
+        "never use guest-paid envelope as merchant sales",
+        "unknown amount not zero"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Exact approved Money postings with independent finance authorization",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    },
+    {
+      "id": "net_posted_credit",
+      "version": 1,
+      "question": "What was the net posted merchant activity?",
+      "models": [
+        "*"
+      ],
+      "owner": "finance",
+      "requiredEvidence": [
+        "same approved posting set",
+        "classified credits and debits",
+        "currency"
+      ],
+      "aggregation": "For the fixture only: 480000 credits -12000 refund debits -23400 fee debits =444600 KES. Real source must include all approved posting classes and reconcile to Money; not payout or profit.",
+      "dateBasis": "posted instant",
+      "unit": "currency-separated minor units",
+      "exclusions": [
+        "payouts and pending/holds separately",
+        "never use guest-paid envelope as merchant sales",
+        "unknown amount not zero"
+      ],
+      "dimensions": [
+        "authorized location",
+        "actual offering/model",
+        "accepted variant/specification version where captured"
+      ],
+      "drilldown": "Exact approved Money postings with independent finance authorization",
+      "availability": "Candidate only; source adapter, definition and permissions must pass admission gates."
+    }
+  ]
+}

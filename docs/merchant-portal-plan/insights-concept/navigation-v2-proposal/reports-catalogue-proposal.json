@@ -1,0 +1,581 @@
+{
+  "date": "2026-11-01",
+  "status": "PROPOSED_FOR_REVIEW",
+  "runtimeEnabled": false,
+  "scope": "Draft canonical report catalogue for the proposed Reports peer. These IDs are proposed configuration symbols, not implemented report endpoints or a new metric engine.",
+  "metricRegistry": "../metric-registry.json",
+  "tabRegistry": "merchant-tab-matrix.json",
+  "reportCount": 26,
+  "metricAggregation": "All panels use the same metric definitions and exact authorized query/evidence contract across Overview, domain tabs, Reports and exports. Existing 37 metric IDs remain unchanged.",
+  "reports": [
+    {
+      "id": "RPT_SOURCE_COVERAGE",
+      "title": "Source coverage and readiness",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "overview",
+        "reports"
+      ],
+      "models": [
+        "*"
+      ],
+      "metricIds": [],
+      "question": "Which evidence supports this view and which intervals are missing?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_WORK_OUTCOMES",
+      "title": "Work outcomes by actual activity",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "overview",
+        "operations"
+      ],
+      "models": [
+        "*"
+      ],
+      "metricIds": [
+        "work_requested",
+        "work_completed",
+        "cancellation_reasons"
+      ],
+      "question": "What entered and completed each actual workflow on its declared date basis?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_ORDER_OUTCOMES",
+      "title": "Order outcomes",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "orders"
+      ],
+      "models": [
+        "ORDER"
+      ],
+      "metricIds": [
+        "order_completed",
+        "cancellation_reasons"
+      ],
+      "question": "Which product orders were fulfilled or cancelled?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_ORDER_VARIANTS",
+      "title": "Fulfilled product variants",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "orders",
+        "menu",
+        "products"
+      ],
+      "models": [
+        "ORDER"
+      ],
+      "metricIds": [
+        "order_units",
+        "offering_outcomes"
+      ],
+      "question": "Which compatible actual product variants contributed fulfilled quantities?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_ORDER_READINESS",
+      "title": "Order promise timing",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "orders",
+        "operations"
+      ],
+      "models": [
+        "ORDER"
+      ],
+      "metricIds": [
+        "order_ready_on_time"
+      ],
+      "question": "Were orders ready by the accepted ready promise?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_APPOINTMENT_OUTCOMES",
+      "title": "Appointment requests and scheduled outcomes",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "appointments"
+      ],
+      "models": [
+        "APPOINTMENT"
+      ],
+      "metricIds": [
+        "appointment_outcomes",
+        "appointment_confirmed_rate",
+        "response_median"
+      ],
+      "question": "How do the request cohort and separately scheduled appointment outcomes compare?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_PROVIDER_CAPACITY",
+      "title": "Provider time reserved",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "appointments",
+        "visits",
+        "capacity",
+        "staff"
+      ],
+      "models": [
+        "APPOINTMENT",
+        "FIELD_VISIT"
+      ],
+      "metricIds": [
+        "provider_reserved_util"
+      ],
+      "question": "How much usable provider time was reserved?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_VISIT_ARRIVAL",
+      "title": "Field-visit arrival promises",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "visits",
+        "operations"
+      ],
+      "models": [
+        "FIELD_VISIT"
+      ],
+      "metricIds": [
+        "visit_on_time"
+      ],
+      "question": "Did the visit arrive within the accepted arrival window?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_ASSET_UTILIZATION",
+      "title": "Reserved and actual asset use",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "rentals",
+        "fleet",
+        "capacity"
+      ],
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "metricIds": [
+        "asset_reserved_util",
+        "asset_used_util"
+      ],
+      "question": "How much usable asset time was reserved or actually used?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_RENTAL_RETURNS",
+      "title": "Rental return promises",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "rentals",
+        "operations"
+      ],
+      "models": [
+        "ASSET_INTERVAL"
+      ],
+      "metricIds": [
+        "rental_on_time_return"
+      ],
+      "question": "Were rental returns recorded by the accepted return due time?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_TRANSFER_PROMISES",
+      "title": "Transfer milestone promises",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "transfers",
+        "operations"
+      ],
+      "models": [
+        "TRANSFER"
+      ],
+      "metricIds": [
+        "transfer_on_time"
+      ],
+      "question": "Did actual transfers meet the selected accepted milestone promise?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_SESSION_PLACES",
+      "title": "Session places and attendance",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "bookings",
+        "capacity",
+        "services",
+        "experiences"
+      ],
+      "models": [
+        "SESSION_CAPACITY"
+      ],
+      "metricIds": [
+        "booked_place_fill",
+        "session_attendance"
+      ],
+      "question": "How did a dated session use its usable places and what attendance was recorded?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_SPACE_RESERVATIONS",
+      "title": "Table and event-space intervals",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "bookings",
+        "spaces",
+        "capacity"
+      ],
+      "models": [
+        "SPACE_RESERVATION"
+      ],
+      "metricIds": [
+        "space_reserved_util"
+      ],
+      "question": "How much usable compatible table/event-space capacity was reserved?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_TOUR_DEPARTURES",
+      "title": "Tour departures and places",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "bookings",
+        "experiences",
+        "capacity"
+      ],
+      "models": [
+        "TOUR"
+      ],
+      "metricIds": [
+        "tour_operated",
+        "booked_place_fill",
+        "session_attendance"
+      ],
+      "question": "Which departures operated and how did their confirmed places and recorded attendance compare?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_REQUEST_PROGRESS",
+      "title": "Requests progressing to accepted quotes",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "quotes"
+      ],
+      "models": [
+        "REQUEST_QUOTE"
+      ],
+      "metricIds": [
+        "request_with_accepted_quote_rate",
+        "response_median"
+      ],
+      "question": "Which identities in the request cohort reached an accepted quote, and when was the first response?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_PRODUCTION_DUE",
+      "title": "Accepted production due work",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "production",
+        "operations"
+      ],
+      "models": [
+        "PRODUCTION_DUE"
+      ],
+      "metricIds": [
+        "production_on_time"
+      ],
+      "question": "Were accepted production jobs completed by their accepted due commitment?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_COLLECTION_RETURN",
+      "title": "Linked collection and return promises",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "collections",
+        "operations"
+      ],
+      "models": [
+        "LINKED_WINDOWS"
+      ],
+      "metricIds": [
+        "linked_windows_on_time"
+      ],
+      "question": "Were both accepted promises met in each linked cycle?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_JOB_OUTCOMES",
+      "title": "Service-job outcomes",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "jobs",
+        "operations"
+      ],
+      "models": [
+        "SERVICE_JOB"
+      ],
+      "metricIds": [
+        "job_outcomes",
+        "response_median"
+      ],
+      "question": "Which actually accepted jobs completed or remain blocked?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_FREIGHT_MILESTONES",
+      "title": "Shipment milestone promises",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "shipments",
+        "operations"
+      ],
+      "models": [
+        "FREIGHT"
+      ],
+      "metricIds": [
+        "freight_milestone_on_time"
+      ],
+      "question": "Which due shipments have recorded on-time, late or unknown milestone evidence?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_STORAGE_CAPACITY",
+      "title": "Occupied storage capacity",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "storage",
+        "capacity",
+        "spaces"
+      ],
+      "models": [
+        "STORAGE"
+      ],
+      "metricIds": [
+        "storage_occupied_util"
+      ],
+      "question": "How much usable compatible storage quantity was occupied over time?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_ENTITLEMENT_USE",
+      "title": "Issued rights and redemptions",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "passes"
+      ],
+      "models": [
+        "ENTITLEMENT"
+      ],
+      "metricIds": [
+        "entitlement_issued",
+        "entitlement_redemptions"
+      ],
+      "question": "Which rights were issued, valid or redeemed under their actual units?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_OFFERING_OUTCOMES",
+      "title": "Actual offering performance",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "menu",
+        "products",
+        "services",
+        "fleet",
+        "experiences",
+        "spaces"
+      ],
+      "models": [
+        "*"
+      ],
+      "metricIds": [
+        "offering_outcomes"
+      ],
+      "question": "How did actual offering kinds, variants and accepted specifications contribute compatible outcomes?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_REPEAT_ACTIVITY",
+      "title": "Permitted repeat activity",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "customers"
+      ],
+      "models": [
+        "*"
+      ],
+      "metricIds": [
+        "repeat_activity"
+      ],
+      "question": "What repeat activity can the approved merchant-scoped identity policy support?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_PUBLISHED_FEEDBACK",
+      "title": "Published feedback",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "customers",
+        "reviews"
+      ],
+      "models": [
+        "*"
+      ],
+      "metricIds": [
+        "published_review_distribution"
+      ],
+      "question": "What permitted feedback was published and what response work remains?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_CAMPAIGN_MEASUREMENT",
+      "title": "Campaign delivery and attribution",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "promotions"
+      ],
+      "models": [
+        "*"
+      ],
+      "metricIds": [
+        "qualified_impressions",
+        "qualified_taps",
+        "attributed_orders"
+      ],
+      "question": "Which qualified campaign events and source-defined attributed outcomes were recorded?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    },
+    {
+      "id": "RPT_POSTED_MERCHANT_ACTIVITY",
+      "title": "Posted merchant financial activity",
+      "status": "PROPOSED_FOR_REVIEW",
+      "entryTabs": [
+        "finance"
+      ],
+      "models": [
+        "*"
+      ],
+      "metricIds": [
+        "merchant_credits",
+        "refund_debits",
+        "fee_debits",
+        "net_posted_credit"
+      ],
+      "question": "Which approved merchant credits and debits were posted in one currency on a stated basis?",
+      "runtimeEnabled": false,
+      "metricCompatibility": "Intersect the report models, actual enabled models and each metric's registered model applicability. Never project an ORDER-only attributed measure onto another model.",
+      "admission": "Inherited activity, permission, identity/privacy, Finance and source gates from merchant-tab-matrix.json and the existing metric registry.",
+      "comparison": "Use each metric's date basis, cohort, unit, version and coverage. No cross-model quantity aggregation.",
+      "detailedRecords": "Exact authorized contributing records and exclusions through the registered metric drill-down owner."
+    }
+  ]
+}

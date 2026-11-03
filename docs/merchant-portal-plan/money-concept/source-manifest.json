@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-31",
+  "status": "READ_ONLY_SOURCE_SNAPSHOT",
+  "missingNormativeFiles": [
+    "DOCS/master/nexg-master-platform-specification-v2.0.md",
+    "AGENTS.md"
+  ],
+  "existingVersusProposed": "Admin projections/staff functions exist; proposed merchant-safe receivables/security sources and commands are not established by that fact.",
+  "sources": [
+    {
+      "file": "packages/booking-config/src/data/registry.json",
+      "sha256": "3f356e648c4dc49f32d408e623fcff23bf29b434a8bd8dfcd708de6a04148c7a",
+      "bytes": 804967
+    },
+    {
+      "file": "apps/web/components/merchant/offerings/config.json",
+      "sha256": "9e46c7786ab0b051037e3e3b96d89af95ed9862be6379d6c92e513867d2f0bbe",
+      "bytes": 134083
+    },
+    {
+      "file": "apps/web/components/merchant/offerings/schemas.ts",
+      "sha256": "7704be05a5db5d62ee1a4ae24f42009f7ac216694f3f182a25b12de9fc58909d",
+      "bytes": 22536
+    },
+    {
+      "file": "docs/booking-engine/payload-reserve-plan/reconciliation/effective-profiles-128.json",
+      "sha256": "4a831d5a4f3392369153a6c5e2b37445ea760b8d6787fcd73b679bc47ac9714b",
+      "bytes": 1908592
+    },
+    {
+      "file": "docs/booking-engine/payload-reserve-plan/reconciliation/effective-workflows.json",
+      "sha256": "684ed4db68bdf27df6281da106eece1780c4c2e2b0e7a36daae0dc95ef6cc210",
+      "bytes": 176351
+    },
+    {
+      "file": "docs/booking-engine/payload-reserve-plan/reconciliation/effective-question-registry.json",
+      "sha256": "8381f6d88bbd4bd7b24d7e0865e138fad421f62c8921151d61f3a043d3cbe6ac",
+      "bytes": 1620504
+    },
+    {
+      "file": "docs/merchant-portal-plan/domain-registry.json",
+      "sha256": "66bbba0d6ee28b1bde04e666b57a8b289949d581fcd8c54cd550f7d3b8023227",
+      "bytes": 430544
+    },
+    {
+      "file": "docs/merchant-portal-plan/screens/05-money.md",
+      "sha256": "46bb28b4a24eb7c9654ec5187911f1be294a4ce6c45ed2780c694d1b03a4b5a1",
+      "bytes": 9513
+    },
+    {
+      "file": "docs/merchant-portal-plan/stats/profiles-128.json",
+      "sha256": "c9a7c1a8d2c5ce946b2e19007ea6bc7df49500874cc1324b12ba85543bee5e5f",
+      "bytes": 946104
+    },
+    {
+      "file": "docs/merchant-portal-plan/stats/workflow-stats.json",
+      "sha256": "dc52899e47eaacb43c6f6c0e72be0dade906d10507deb2b65d3d8fc1b518e18b",
+      "bytes": 148716
+    },
+    {
+      "file": "docs/merchant-portal-plan/order-confirmation.md",
+      "sha256": "59044555dadb9efe567095050b15d6cb52c5f65716b065d6b220543a2fab0a38",
+      "bytes": 5745
+    },
+    {
+      "file": "docs/finance.md",
+      "sha256": "06d19fdc2e52b324b49e36a91e0dcdc839f096c0e900528950a6dcd548f701f9",
+      "bytes": 7441
+    },
+    {
+      "file": "apps/admin/app/finance/page.tsx",
+      "sha256": "12542aa0771cfa354feef873b03c5c763dab71e4478508563bca5de1bf286dc7",
+      "bytes": 11407
+    },
+    {
+      "file": "apps/admin/components/finance/invoices.tsx",
+      "sha256": "d160d10169dd55dd059e28a3422100de36553fdd851ad3d294291547d17dd9ff",
+      "bytes": 6790
+    },
+    {
+      "file": "apps/admin/components/finance/settlement.tsx",
+      "sha256": "2e3fc3f5a7d205b5e96e0f9f24f906414525d1dbdb9f9ec00882eab2534045bc",
+      "bytes": 15021
+    },
+    {
+      "file": "apps/web/app/merchant/money/page.tsx",
+      "sha256": "d0fa167fe89a0293854c0c72b8dab8ad61dc8a8b835f5312b991e95f50cf24ee",
+      "bytes": 6032
+    },
+    {
+      "file": "apps/web/components/merchant/booking/payment-summary.tsx",
+      "sha256": "a40819c6039ae8561da3c91ea0ec7199ec2bf3a8aab87e89bf88a82421770e1a",
+      "bytes": 2869
+    }
+  ]
+}

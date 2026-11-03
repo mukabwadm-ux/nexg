@@ -1,0 +1,197 @@
+{
+  "date": "2026-11-01",
+  "method": "built-in image_gen",
+  "status": "ILLUSTRATIVE_GENERATED_CONCEPTS_NOT_RUNTIME_PROOF",
+  "reference": "../insights-concept/navigation-v2-proposal/restaurant-eight-screens/08-reports.png",
+  "exactBriefs": "image-prompts.json",
+  "images": [
+    {
+      "id": "01",
+      "title": "Account & security",
+      "filename": "01-account-security.png",
+      "sourcePath": "C:\\Users\\limta\\.codex\\generated_images\\01a196f2-3d10-7d41-89bf-2330a494efd8\\exec-c0d4780a-a6a8-4015-97cb-120ea598119c.png",
+      "assumptions": [
+        "Fictional identity owner supports the displayed sign-in, factor setup, session and activity operations; these are proposed contracts, not current runtime features."
+      ],
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\settings-concept\\01-account-security.png",
+      "bytes": 1428964,
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "180916736ef61d147d65cc01cf872e083094d8fa9e1931ce96cc7474d039ab8b"
+    },
+    {
+      "id": "02",
+      "title": "Notifications for appointments and retail",
+      "filename": "02-hybrid-notifications.png",
+      "sourcePath": "C:\\Users\\limta\\.codex\\generated_images\\01a196f2-3d10-7d41-89bf-2330a494efd8\\exec-d00d6d1f-e39c-41fe-ab3e-ca1811638e81.png",
+      "assumptions": [
+        "Fictional notification service supports in-app/email channels and these registered events; email verification and policy exceptions are illustrative owner-confirmed fixture facts.",
+        "The image shows an unsaved personal draft, not confirmed message delivery."
+      ],
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\settings-concept\\02-hybrid-notifications.png",
+      "bytes": 1323360,
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "c9d4336ca895c9d4c8eb3495be6e3ba2abb1d67874266d8beaf1f83b255a259c"
+    },
+    {
+      "id": "03",
+      "title": "Connections with scoped catalogue recovery",
+      "filename": "03-connection-recovery.png",
+      "sourcePath": "C:\\Users\\limta\\.codex\\generated_images\\01a196f2-3d10-7d41-89bf-2330a494efd8\\exec-8eb8ba24-0578-439d-8ff1-ec1f649f808b.png",
+      "assumptions": [
+        "Fictional supported fleet connector is read-only, with expired authorization and last successful sync at 1 Nov 2026 08:05 EAT.",
+        "NEXG owns booking/availability; accounting is outbound only. None is a claim of live provider compatibility."
+      ],
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\settings-concept\\03-connection-recovery.png",
+      "bytes": 1294650,
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "adaf1a0603c6fc13e7fec99f3d39bbbef530ce20bc0b558236b1eca142513cd2"
+    },
+    {
+      "id": "04",
+      "title": "Mobile Preferences with fixed Kenya time",
+      "filename": "04-mobile-preferences.png",
+      "sourcePath": "C:\\Users\\limta\\.codex\\generated_images\\01a196f2-3d10-7d41-89bf-2330a494efd8\\exec-a6c405b2-031c-4090-917c-30a8f9c46578.png",
+      "assumptions": [
+        "Fictional preference service supports English, date/time formats and a reduced-motion option; all merchant time remains Africa/Nairobi.",
+        "The image shows a draft preference change; Settings section selector is navigation, not a saved preference."
+      ],
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\settings-concept\\04-mobile-preferences.png",
+      "bytes": 1186144,
+      "dimensions": {
+        "width": 1024,
+        "height": 1536
+      },
+      "sha256": "4cb14ec067a1dab3400839d716ad28ad6c6d6be98133573c84ae9d3b9e73bed6"
+    },
+    {
+      "id": "05",
+      "title": "Preferences",
+      "filename": "05-desktop-preferences.png",
+      "sourcePath": "C:\\Users\\limta\\.codex\\generated_images\\01a196f2-3d10-7d41-89bf-2330a494efd8\\exec-a62e84dd-8e50-4420-95dd-e19988d70ed4.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\settings-concept\\05-desktop-preferences.png",
+      "bytes": 1262524,
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "184a55c65d2947f298a4382d7b39b34566150c3b03a2fee101e35f687e9256db",
+      "assumptions": [
+        "Fictional personal preference owner supports English, date/time format, Comfortable/Compact density and motion preference.",
+        "Fixed Africa/Nairobi time follows the effective project contract; formatting never moves accepted commitments."
+      ]
+    },
+    {
+      "id": "06",
+      "title": "API & webhooks",
+      "filename": "06-api-webhooks.png",
+      "sourcePath": "C:\\Users\\limta\\.codex\\generated_images\\01a196f2-3d10-7d41-89bf-2330a494efd8\\exec-be78dd97-b218-4f25-8720-8cdea8a01d74.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\settings-concept\\06-api-webhooks.png",
+      "bytes": 1569686,
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "74e645c8761b05acb9095351d64baca0a5cca8c0c8cffae477b42bfa554d65e1",
+      "assumptions": [
+        "Fictional actor independently holds credential-management and order-webhook management grants.",
+        "Fictional developer owner supports scoped inventory-read credentials, protected creation/rotation/revocation, signed order-event subscriptions and delivery replay.",
+        "The inventory key does not grant webhook permission or business writes; signing verification and transport delivery are separate confirmed fixture facts."
+      ]
+    },
+    {
+      "id": "07",
+      "title": "Data & privacy",
+      "filename": "07-data-privacy.png",
+      "sourcePath": "C:\\Users\\limta\\.codex\\generated_images\\01a196f2-3d10-7d41-89bf-2330a494efd8\\exec-b962ddd6-7594-4da6-be8f-69fcbfad1d36.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\settings-concept\\07-data-privacy.png",
+      "bytes": 1413296,
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "aa136765e60b5f2811ebd564cb78ffb182783767094bd4ae24ef525e32206c80",
+      "assumptions": [
+        "Fictional personal records owner supports the shown access/export request and request-history types and account-closure review.",
+        "Current request is at review stage and has not been submitted; prior completed request is a separate synthetic record.",
+        "No new retention, response-time, deletion or artifact-expiry policy is established."
+      ]
+    },
+    {
+      "id": "08",
+      "title": "Notifications · Business routing",
+      "filename": "08-notifications-business-routing.png",
+      "sourcePath": "C:\\Users\\limta\\.codex\\generated_images\\01a196f2-3d10-7d41-89bf-2330a494efd8\\exec-3c941127-e1da-426c-9c71-0132b7ca49bd.png",
+      "path": "C:\\Users\\limta\\Documents\\ChatGPT\\NEXG MERCHANT PORTA\\docs\\merchant-portal-plan\\settings-concept\\08-notifications-business-routing.png",
+      "bytes": 1558916,
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "c1177a353e6be3b5d2e2781e3c1b59697a7440c713c787020802a5588efffb32",
+      "assumptions": [
+        "Fictional actor holds location-scoped business notification-routing management and team-discovery grants for Kilimani.",
+        "Recipient groups exist in the Business Team owner; channels and listed event routes are supported by the fictional notification owner.",
+        "Personal preferences are separate; no new escalation timing, mandatory-delivery exception or cross-location inheritance policy is established."
+      ]
+    }
+  ],
+  "review": {
+    "inspectedAllFour": true,
+    "acceptedVisualIntent": true,
+    "notes": [
+      "All four show Sample preview, readable section/scope, and intended main state. Desktop screens select Settings; mobile provides section navigation.",
+      "Scene 1 adds branch descriptions in session rows. Treat them only as fictional source-provided workspace context, never inferred geographic location; implementation should omit unless sourced.",
+      "Scene 2 uses a local scope column rather than the planned compact view choice. Prefer inline Your notifications / Business routing controls in implementation to reduce competing navigation.",
+      "Scene 2 fixture actor has explicit business-routing discovery access. Its alert choices and quiet hours form one atomic personal preference bundle; destination changes remain separate.",
+      "Scene 3 brief says two-column authority table while naming three columns. Generated image correctly uses Data / Managed by / Access.",
+      "Section subtitle wording, avatar initials and small icon choices vary across images; canonical labels, scope and behavior in screen-design.md govern implementation.",
+      "Gold treatment and target sizes require measured implementation review; these images do not prove contrast, focus or accessibility compliance."
+    ],
+    "limits": [
+      "Synthetic identity, notification and connection capabilities require the named owners and contracts.",
+      "No runtime interaction, authorization, delivery, import, key, request or category activation was executed."
+    ]
+  },
+  "additionalBatchReview": {
+    "date": "2026-11-01",
+    "ids": [
+      "05",
+      "06",
+      "07"
+    ],
+    "inspectedAllThree": true,
+    "acceptedVisualIntent": true,
+    "notes": [
+      "Preferences shows personal scope, fixed Kenya time without picker and draft Save.",
+      "API screen corrected once to add explicit business scope and remove an unintended real-time delivery claim. Inventory-read credential and order-event subscription have independent scopes. Signing verified remains distinct from failed transport. No secrets displayed.",
+      "Data screen shows current request review rather than submitted confirmation, one separate completed past request and separated account-closure review. No retention or response-time promise."
+    ],
+    "limits": [
+      "Synthetic capabilities and permissions require the owners in the plan.",
+      "Pictures do not demonstrate actual save, API, webhook replay, data-request, security or accessibility behavior."
+    ]
+  },
+  "businessRoutingReview": {
+    "date": "2026-11-01",
+    "id": "08",
+    "inspected": true,
+    "acceptedVisualIntent": true,
+    "notes": [
+      "Matches the user-supplied Notifications reference and explicitly selects Business routing in the Scope panel.",
+      "Kilimani location scope, separate personal preferences, recipient-group routing, supported channels and draft Save routing are visible.",
+      "Recipient grants are checked separately; team membership links to Business. No personal quiet-hour editor or invented escalation timing."
+    ],
+    "limits": [
+      "Groups, permissions and channel support are fictional design fixtures. No routing policy or live notification is changed."
+    ]
+  }
+}

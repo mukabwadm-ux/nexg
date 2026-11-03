@@ -1,0 +1,2966 @@
+.root {
+  --av-bg: #f6f3ec;
+  --av-border: #e8e2d8;
+  --av-muted: #586476;
+  --av-gold: #d4a72c;
+  color: #15191f;
+  font-family: var(--font-manrope), Arial, sans-serif;
+}
+.root :global(.av-workspace) {
+  padding: 22px 26px 12px;
+  min-width: 0;
+  background: var(--av-bg);
+  min-height: calc(100dvh - 3rem);
+}
+.root :global(.av-page-heading) {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.root :global(.av-page-heading h1) {
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+  line-height: 1.25;
+  margin: 0 0 5px;
+}
+.root :global(.av-page-heading p) {
+  color: var(--av-muted);
+  margin: 0 0 5px;
+  font-size: 14px;
+}
+.root :global(.av-page-heading small) {
+  color: #6b675d;
+  font-size: 11px;
+}
+.root :global(.av-actions) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.root :global(.av-stack) {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+.root :global(.av-button),
+.root :global(.av-icon) {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid #dcd5c9;
+  border-radius: 8px;
+  background: white;
+  font-size: 12px;
+  font-weight: 700;
+  color: #161a20;
+  cursor: pointer;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.root :global(.av-button:hover),
+.root :global(.av-icon:hover) {
+  background: #f8f4e9;
+}
+.root :global(.av-button:disabled),
+.root :global(.av-icon:disabled),
+.root :global(.av-link:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.root :global(.av-primary) {
+  background: var(--av-gold);
+  border-color: var(--av-gold);
+  color: #111;
+}
+.root :global(.av-primary:hover) {
+  background: #c59a22;
+}
+.root :global(.av-icon) {
+  min-width: 36px;
+  padding: 7px;
+}
+.root :global(.av-quiet) {
+  border: 0;
+  color: #75551a;
+  background: transparent;
+}
+.root :global(.av-link) {
+  color: #75551a;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.root :global(button:focus-visible),
+.root :global(a:focus-visible),
+.root :global(summary:focus-visible),
+.root :global(input:focus-visible),
+.root :global(select:focus-visible),
+.root :global(textarea:focus-visible) {
+  outline: 2px solid #966a12;
+  outline-offset: 3px;
+}
+.root :global(input:not([type='checkbox']):not([type='radio'])),
+.root :global(select),
+.root :global(textarea) {
+  border: 1px solid #d9d5cd;
+  border-radius: 7px;
+  background: white;
+  color: #1a202b;
+  min-height: 38px;
+  padding: 8px 10px;
+  font-size: 12px;
+  min-width: 0;
+  max-width: 100%;
+}
+.root :global(input[type='checkbox']) {
+  accent-color: #a47515;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.root :global(.av-sr) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.root :global(.av-header-location) {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.root :global(.av-header-location select) {
+  min-height: 32px;
+  padding: 4px 7px;
+  font-weight: 700;
+}
+.root :global(.av-context-row) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 13px;
+}
+.root :global(.av-context-row select) {
+  max-width: 360px;
+}
+.root :global(.av-source) {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--av-muted);
+  font-size: 11px;
+}
+.root :global(.av-source i) {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7c8e85;
+}
+.root :global(.av-source-warning i) {
+  background: #bf861c;
+}
+.root :global(.av-tabs) {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--av-border);
+  margin: 0 0 16px;
+}
+.root :global(.av-tabs button) {
+  border-bottom: 3px solid transparent;
+  font-weight: 700;
+  padding: 10px 13px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.root :global(.av-tabs button[aria-selected='true']) {
+  border-color: var(--av-gold);
+  color: #16191e;
+}
+.root :global(.av-summary) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--av-border);
+  background: white;
+  border-radius: 11px;
+  padding: 14px 4px;
+  margin: 0 0 14px;
+}
+.root :global(.av-summary > div) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  min-width: 0;
+}
+.root :global(.av-summary > div + div) {
+  border-left: 1px solid var(--av-border);
+}
+.root :global(.av-summary strong) {
+  font-size: 12px;
+  display: block;
+}
+.root :global(.av-summary small) {
+  display: block;
+  font-size: 11px;
+  color: var(--av-muted);
+  margin-top: 3px;
+}
+.root :global(.av-summary svg) {
+  color: #6b5b31;
+  flex-shrink: 0;
+}
+.root :global(.av-rules-strip) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  background: #fffefa;
+  border: 1px solid var(--av-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 13px;
+}
+.root :global(.av-date-toolbar) {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.root :global(.av-date-label input) {
+  font-weight: 700;
+  width: 150px;
+}
+.root :global(.av-segment) {
+  display: flex;
+  background: #fff;
+  border: 1px solid #ded8ce;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.root :global(.av-segment button) {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 9px 15px;
+  min-height: 36px;
+}
+.root :global(.av-segment button[aria-pressed='true']) {
+  background: var(--av-gold);
+}
+.root :global(.av-search) {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.root :global(.av-search svg) {
+  position: absolute;
+  left: 10px;
+  color: #777;
+}
+.root :global(.av-search input) {
+  padding-left: 31px !important;
+  width: 150px;
+}
+.root :global(.av-layout) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.root :global(.av-layout:has(.av-side-stack)),
+.root :global(.av-detail-open) {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+.root :global(.av-main),
+.root :global(.av-side-stack) {
+  min-width: 0;
+}
+.root :global(.av-side-stack) {
+  display: grid;
+  gap: 14px;
+}
+.root :global(.av-card) {
+  border: 1px solid var(--av-border);
+  border-radius: 11px;
+  background: white;
+  min-width: 0;
+  overflow: hidden;
+}
+.root :global(.av-card-heading) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 16px;
+}
+.root :global(.av-card h2),
+.root :global(.av-card-heading h2),
+.root :global(h2.av-card-heading) {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+.root :global(.av-card h3) {
+  font-size: 13px;
+  font-weight: 750;
+}
+.root :global(.av-spaced) {
+  padding: 18px;
+}
+.root :global(.av-spaced h2) {
+  margin-bottom: 10px;
+}
+.root :global(.av-spaced p) {
+  font-size: 12px;
+  line-height: 1.65;
+  color: #4f5a6a;
+  margin-bottom: 12px;
+}
+.root :global(.av-spaced .av-card-heading) {
+  padding: 0 0 14px;
+}
+.root :global(.av-spaced .av-button) {
+  margin-top: 5px;
+}
+.root :global(.av-table-wrap) {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.root :global(.av-hours) {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+.root :global(.av-hours th),
+.root :global(.av-hours td) {
+  border-bottom: 1px solid #eee9e1;
+  padding: 13px 16px;
+  vertical-align: middle;
+}
+.root :global(.av-hours thead th) {
+  background: #f6f4ef;
+  font-size: 11px;
+  color: #4d5664;
+}
+.root :global(.av-hours tbody th) {
+  font-weight: 700;
+}
+.root :global(.av-hours small) {
+  display: block;
+  font-size: 10px;
+  color: #657084;
+  margin-top: 4px;
+}
+.root :global(.av-today) {
+  background: #fbf5e4;
+}
+.root :global(.av-badge) {
+  display: inline-flex;
+  border-radius: 5px;
+  padding: 4px 7px;
+  background: #eff1f3;
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 650;
+  color: #394552;
+}
+.root :global(.av-green) {
+  background: #e8f7ed;
+  color: #206740;
+}
+.root :global(.av-amber) {
+  background: #fff1cf;
+  color: #82550d;
+}
+.root :global(.av-red) {
+  background: #fde8e8;
+  color: #a33131;
+}
+.root :global(.av-footnote) {
+  font-size: 10px !important;
+  line-height: 1.65;
+  color: #657083 !important;
+  margin: 10px 14px 13px;
+}
+.root :global(.av-spaced .av-footnote),
+.root :global(.av-form .av-footnote) {
+  margin-left: 0;
+  margin-right: 0;
+}
+.root :global(.av-empty) {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding: 40px 20px;
+  gap: 12px;
+  color: #526172;
+}
+.root :global(.av-empty h2) {
+  font-size: 18px;
+  font-weight: 750;
+  color: #1c2632;
+}
+.root :global(.av-empty p) {
+  max-width: 540px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.root :global(.av-empty-inline) {
+  padding: 20px 0;
+  color: #697687;
+  font-size: 12px;
+}
+.root :global(.av-notice),
+.root :global(.av-draft-banner) {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 13px;
+  background: #ecf5ed;
+  border: 1px solid #cbdccb;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 13px;
+}
+.root :global(.av-notice .av-icon) {
+  margin-left: auto;
+  min-height: 25px;
+  border: 0;
+  background: transparent;
+}
+.root :global(.av-draft-banner) {
+  background: #fff8e7;
+  border-color: #e7d4a2;
+  flex-wrap: wrap;
+}
+.root :global(.av-note),
+.root :global(.av-error),
+.root :global(.av-scope-note) {
+  display: block;
+  background: #fff7e7;
+  border: 1px solid #ecd9ac;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0 0 12px;
+  color: #5e4d29;
+}
+.root :global(.av-note svg) {
+  display: inline;
+  vertical-align: middle;
+  margin-right: 7px;
+}
+.root :global(.av-note p) {
+  margin: 6px 0;
+}
+.root :global(.av-error) {
+  color: #8c2525;
+  background: #fff0ef;
+  border-color: #e4b8b5;
+}
+.root :global(.av-scope-note) {
+  background: #f6f5f1;
+  border-color: #e8e3db;
+  color: #525c6a;
+}
+.root :global(.av-inspector) {
+  padding: 18px;
+}
+.root :global(.av-inspector .av-card-heading) {
+  padding: 0 0 12px;
+}
+.root :global(.av-inspector h3) {
+  font-size: 17px;
+  line-height: 1.5;
+  margin-top: 16px;
+}
+.root :global(.av-inspector > p) {
+  color: #546172;
+  font-size: 12px;
+  margin: 7px 0;
+}
+.root :global(.av-details-list) {
+  display: grid;
+  grid-template-columns: 85px minmax(0, 1fr);
+  gap: 10px;
+  margin: 17px 0;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.root :global(.av-details-list dt) {
+  color: #68717c;
+}
+.root :global(.av-details-list dd) {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.root :global(.av-chip) {
+  display: inline-block;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #f1eee7;
+  margin: 0 4px 4px 0;
+  font-size: 10px;
+}
+.root :global(.av-inspector-section) {
+  border-top: 1px solid var(--av-border);
+  border-bottom: 1px solid var(--av-border);
+  margin: 18px 0;
+  padding: 15px 0;
+  font-size: 12px;
+}
+.root :global(.av-inspector-section h4) {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.root :global(.av-inspector-section small) {
+  color: var(--av-muted);
+  display: block;
+  margin-top: 7px;
+}
+.root :global(.av-calendar-scroll) {
+  overflow-x: auto;
+}
+.root :global(.av-calendar-head) {
+  display: grid;
+  border-bottom: 1px solid var(--av-border);
+  font-size: 12px;
+}
+.root :global(.av-calendar-head > div) {
+  padding: 12px 9px;
+  border-left: 1px solid #eee9e2;
+}
+.root :global(.av-calendar-head small) {
+  display: block;
+  color: #677487;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.root :global(.av-calendar-body) {
+  position: relative;
+  height: 490px;
+  display: grid;
+}
+.root :global(.av-time-axis) {
+  position: relative;
+  font-size: 10px;
+  color: #647286;
+}
+.root :global(.av-time-axis > span) {
+  position: absolute;
+  left: 12px;
+  transform: translateY(-50%);
+}
+.root :global(.av-calendar-lane) {
+  position: relative;
+  border-left: 1px solid #e9e6df;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(10% - 1px),
+    #eeeae3 calc(10% - 1px),
+    #eeeae3 10%
+  );
+}
+.root :global(.av-event) {
+  border: 1px solid transparent;
+  border-left-width: 3px;
+  border-radius: 5px;
+  text-align: left;
+  padding: 4px 6px;
+  font-size: 10px;
+  line-height: 1.35;
+  min-width: 0;
+  overflow: hidden;
+  color: #173651;
+}
+.root :global(.av-event strong) {
+  font-size: 10px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.root :global(.av-event span) {
+  font-size: 9px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.root :global(.av-event-confirmed) {
+  background: #e4f0fe;
+  border-left-color: #2580c4;
+  color: #16426c;
+}
+.root :global(.av-event-held) {
+  background: #fff0cb;
+  border-left-color: #c49113;
+  color: #6b4d18;
+}
+.root :global(.av-event-overdue),
+.root :global(.av-event-in_use) {
+  background: #ffe2df;
+  border-left-color: #dc6666;
+  color: #8a2626;
+}
+.root :global(.av-event-block) {
+  background: repeating-linear-gradient(135deg, #fff3d2, #fff3d2 3px, #f0ddb1 3px, #f0ddb1 4px);
+  border-left-color: #b88825;
+  color: #6d4d16;
+}
+.root :global(.av-event-break) {
+  background: #e8e9ec;
+  border-left-color: #929aa6;
+  color: #404f5e;
+}
+.root :global(.av-event-unknown) {
+  background: repeating-linear-gradient(135deg, #eee, #eee 3px, #ddd 3px, #ddd 4px);
+}
+.root :global(.av-buffer) {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  font-size: 8px;
+  color: #5f6875;
+  background: repeating-linear-gradient(135deg, #eee, #eee 3px, #dedede 3px, #dedede 4px);
+  overflow: hidden;
+  border-radius: 3px;
+  line-height: 1.3;
+}
+.root :global(.av-now) {
+  position: absolute;
+  left: 66px;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed #cf4c47;
+  pointer-events: none;
+}
+.root :global(.av-now span) {
+  position: absolute;
+  left: -48px;
+  top: -8px;
+  font-size: 9px;
+  color: #b72d28;
+  background: white;
+  padding-right: 4px;
+}
+.root :global(.av-lane-note) {
+  font-size: 11px;
+  padding: 14px;
+  background: #eee;
+}
+.root :global(.av-hatched) {
+  background: repeating-linear-gradient(
+    135deg,
+    #f3f3f3,
+    #f3f3f3 3px,
+    #e6e6e6 3px,
+    #e6e6e6 4px
+  ) !important;
+}
+.root :global(.av-legend) {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  font-size: 10px;
+  color: #566276;
+}
+.root :global(.av-legend > span) {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.root :global(.av-state-dot) {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.root :global(.av-timeline) {
+  min-width: 720px;
+}
+.root :global(.av-timeline-heading),
+.root :global(.av-timeline-row) {
+  display: grid;
+  grid-template-columns: 165px minmax(0, 1fr);
+}
+.root :global(.av-timeline-heading) {
+  border-bottom: 1px solid var(--av-border);
+  font-size: 11px;
+}
+.root :global(.av-timeline-heading > strong) {
+  padding: 14px 12px;
+}
+.root :global(.av-days) {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+.root :global(.av-days > span) {
+  padding: 12px 0;
+  border-left: 1px solid #ede9e2;
+  font-size: 10px;
+}
+.root :global(.av-timeline-row) {
+  border-bottom: 1px solid var(--av-border);
+  min-height: 119px;
+}
+.root :global(.av-resource-name) {
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 12px;
+}
+.root :global(.av-resource-name small) {
+  color: var(--av-muted);
+  margin-top: 5px;
+  font-size: 10px;
+}
+.root :global(.av-timeline-track) {
+  position: relative;
+  border-left: 1px solid #e8e3db;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0,
+    transparent calc(100% / 7 - 1px),
+    #eeeae3 calc(100% / 7 - 1px),
+    #eeeae3 calc(100% / 7)
+  );
+  min-width: 0;
+}
+.root :global(.av-timeline-now) {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed #d4534b;
+  pointer-events: none;
+}
+.root :global(.av-track-note) {
+  position: absolute;
+  top: 44%;
+  left: 10px;
+  font-size: 10px;
+  color: #566275;
+}
+.root :global(.av-ongoing) {
+  position: absolute;
+  height: 31px;
+  border: 1px dashed #df7771;
+  background: #fff5f3;
+  color: #9a3a33;
+  font-size: 9px;
+  text-align: left;
+  padding: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.root :global(.av-pool-grid) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 12px;
+  margin-bottom: 15px;
+}
+.root :global(.av-capacity) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0 15px 8px;
+  gap: 7px;
+  font-size: 10px;
+  color: #697284;
+}
+.root :global(.av-capacity strong) {
+  display: block;
+  font-size: 21px;
+  color: #1e2833;
+  margin-bottom: 3px;
+}
+.root :global(.av-occurrence) {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border-top: 1px solid #eee9df;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.root :global(.av-occurrence p),
+.root :global(.av-occurrence small) {
+  color: #626e7b;
+  margin-top: 5px;
+}
+.root :global(.av-agenda-row) {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 11px;
+  padding: 14px 16px;
+  border-top: 1px solid #eeebe5;
+  font-size: 12px;
+  cursor: pointer;
+}
+.root :global(.av-agenda-row:hover) {
+  background: #fcf8ef;
+}
+.root :global(.av-agenda-row > div) {
+  flex: 1;
+  min-width: 0;
+}
+.root :global(.av-agenda-row span:not(.av-badge):not(.av-state-dot)),
+.root :global(.av-agenda-row small) {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  color: #5d697a;
+}
+.root :global(.av-rule-grid),
+.root :global(.av-location-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.root :global(.av-location-grid .av-card) {
+  padding: 20px;
+}
+.root :global(.av-resource-row) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee8de;
+}
+.root :global(.av-resource-row p) {
+  font-size: 11px;
+  margin: 5px 0 0;
+}
+.root :global(.av-workspace-footer) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 13px;
+  padding: 14px 0 0;
+  font-size: 10px;
+  color: #677284;
+}
+.root :global(.av-loading) {
+  padding: 80px 20px;
+  display: grid;
+  justify-content: center;
+  gap: 18px;
+  color: var(--av-muted);
+  font-size: 13px;
+}
+.root :global(.av-loading > div) {
+  height: 5px;
+  background: #e5d6b7;
+  border-radius: 3px;
+  width: 200px;
+}
+.root :global(.av-mobile-agenda) {
+  display: none;
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(20, 22, 25, 0.36);
+}
+.modal {
+  position: fixed;
+  z-index: 101;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 90dvh;
+  width: min(620px, calc(100vw - 30px));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ded7cb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 60px #0002;
+  outline: 0;
+}
+.wide {
+  width: min(880px, calc(100vw - 30px));
+}
+.root :global(.av-dialog-heading) {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px 23px 15px;
+  border-bottom: 1px solid #eee8dd;
+  flex-shrink: 0;
+}
+.root :global(.av-dialog-heading h2) {
+  font-size: 20px;
+  font-weight: 800;
+}
+.root :global(.av-dialog-heading p) {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--av-muted);
+  margin-top: 6px;
+}
+.root :global(.av-dialog-body) {
+  padding: 20px 23px;
+  overflow-y: auto;
+  min-height: 0;
+}
+.root :global(.av-dialog-footer) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 14px 23px;
+  border-top: 1px solid #eee8dd;
+  flex-shrink: 0;
+}
+.root :global(.av-form) {
+  display: grid;
+  gap: 16px;
+  font-size: 12px;
+}
+.root :global(.av-form-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.root :global(.av-field) {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12px;
+  color: #273341;
+}
+.root :global(.av-field > span) {
+  font-weight: 700;
+}
+.root :global(.av-field small) {
+  font-size: 10px;
+  line-height: 1.6;
+  color: #667182;
+}
+.root :global(.av-field input),
+.root :global(.av-field select),
+.root :global(.av-field textarea) {
+  width: 100%;
+}
+.root :global(.av-fieldset) {
+  border: 1px solid #e6ded0;
+  border-radius: 8px;
+  padding: 13px;
+}
+.root :global(.av-fieldset legend),
+.root :global(.av-hours-editor legend) {
+  font-weight: 700;
+  font-size: 12px;
+  padding: 0 6px;
+}
+.root :global(.av-check-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.root :global(.av-check) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  min-height: 30px;
+  cursor: pointer;
+}
+.root :global(.av-hour-controls) {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 5px 0 10px;
+}
+.root :global(.av-hours-editor) {
+  display: grid;
+  gap: 12px;
+}
+.root :global(.av-hours-editor fieldset) {
+  border: 1px solid #e9e3d8;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.root :global(.av-interval-row) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 6px;
+}
+.root :global(.av-interval-row input[type='time']) {
+  max-width: 125px;
+}
+.root :global(.av-details) {
+  border: 1px solid #e9e1d5;
+  border-radius: 8px;
+  padding: 13px;
+  font-size: 12px;
+}
+.root :global(.av-details summary) {
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.root :global(.av-impact) {
+  border: 1px solid #cbdcc9;
+  background: #f6fbf4;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.root :global(.av-impact h3) {
+  font-size: 15px;
+  font-weight: 750;
+  margin-bottom: 8px;
+}
+.root :global(.av-impact h4) {
+  margin-top: 10px;
+  font-weight: 700;
+}
+.root :global(.av-impact ul) {
+  list-style: disc;
+  padding-left: 19px;
+}
+.root :global(.av-impact-error) {
+  border-color: #e2b6b1;
+  background: #fff6f4;
+  color: #8a3230;
+}
+.root :global(.av-comparison) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  font-size: 11px;
+}
+.root :global(.av-comparison pre) {
+  font-family: inherit;
+  white-space: pre-wrap;
+  line-height: 1.8;
+}
+.root :global(.av-history-row) {
+  font-size: 12px;
+  line-height: 1.6;
+  border-bottom: 1px solid #eee8dd;
+  padding: 10px 0;
+}
+.root :global(.av-history-row p) {
+  color: #647080;
+  margin-top: 5px;
+}
+.drawer {
+  top: 0;
+  left: auto;
+  right: 0;
+  transform: none;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: min(480px, 100vw);
+  border-radius: 0;
+}
+.drawerOverlay {
+  background: rgba(20, 22, 25, 0.15);
+}
+@media (max-width: 1199px) {
+  .root :global(.av-workspace) {
+    padding: 18px;
+  }
+  .root :global(.av-layout:has(.av-side-stack)) {
+    grid-template-columns: 1fr;
+  }
+  .root :global(.av-side-stack) {
+    grid-template-columns: 1fr 1fr;
+  }
+  .root :global(.av-detail-open) {
+    grid-template-columns: minmax(0, 1fr) 290px;
+  }
+  .root :global(.av-summary > div) {
+    padding: 0 12px;
+  }
+}
+@media (max-width: 767px) {
+  .root :global(.av-workspace) {
+    padding: 16px 12px;
+  }
+  .root :global(.av-page-heading) {
+    display: block;
+  }
+  .root :global(.av-page-heading > .av-actions) {
+    margin-top: 13px;
+  }
+  .root :global(.av-page-heading h1) {
+    font-size: 26px;
+  }
+  .root :global(.av-summary) {
+    grid-template-columns: 1fr;
+    padding: 0 12px;
+  }
+  .root :global(.av-summary > div) {
+    padding: 11px 0;
+    justify-content: space-between;
+  }
+  .root :global(.av-summary > div + div) {
+    border-left: 0;
+    border-top: 1px solid var(--av-border);
+  }
+  .root :global(.av-context-row > label),
+  .root :global(.av-context-row > label > select) {
+    width: 100%;
+  }
+  .root :global(.av-context-row select) {
+    max-width: 100%;
+  }
+  .root :global(.av-rules-strip) {
+    display: block;
+    line-height: 1.8;
+  }
+  .root :global(.av-rules-strip .av-link) {
+    margin-top: 6px;
+  }
+  .root :global(.av-layout),
+  .root :global(.av-layout:has(.av-side-stack)),
+  .root :global(.av-detail-open),
+  .root :global(.av-side-stack),
+  .root :global(.av-rule-grid),
+  .root :global(.av-location-grid) {
+    grid-template-columns: 1fr;
+  }
+  .root :global(.av-detail-open > .av-main) {
+    display: none;
+  }
+  .root :global(.av-inspector) {
+    min-height: 60vh;
+  }
+  .root :global(.av-calendar-card),
+  .root :global(.av-timeline-card) {
+    display: none;
+  }
+  .root :global(.av-mobile-agenda) {
+    display: block;
+  }
+  .root :global(.av-hours th),
+  .root :global(.av-hours td) {
+    padding: 9px 8px;
+    font-size: 10px;
+  }
+  .root :global(.av-hours .av-icon) {
+    min-width: 28px;
+  }
+  .root :global(.av-table-wrap) {
+    max-width: 100%;
+  }
+  .root :global(.av-resource-row) {
+    flex-wrap: wrap;
+  }
+  .root :global(.av-date-toolbar > .av-actions) {
+    width: 100%;
+    gap: 7px;
+  }
+  .root :global(.av-search) {
+    flex: 1;
+    min-width: 100px;
+  }
+  .root :global(.av-search input) {
+    width: 100%;
+  }
+  .root :global(.av-segment button) {
+    padding: 8px 12px;
+  }
+  .root :global(.av-workspace-footer) {
+    align-items: flex-start;
+  }
+  .root :global(.av-button),
+  .root :global(.av-icon) {
+    min-height: 42px;
+  }
+  .root :global(.av-form-grid),
+  .root :global(.av-check-grid),
+  .root :global(.av-comparison) {
+    grid-template-columns: 1fr;
+  }
+  .root :global(.av-dialog-heading),
+  .root :global(.av-dialog-body),
+  .root :global(.av-dialog-footer) {
+    padding: 15px;
+  }
+  .modal,
+  .wide,
+  .drawer {
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+  .root :global(.av-dialog-heading h2) {
+    font-size: 18px;
+  }
+  .root :global(.av-interval-row) {
+    gap: 7px;
+  }
+  .root :global(.av-interval-row input[type='time']) {
+    max-width: 110px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .root * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.root :global(.av-week-scroll) {
+  overflow-x: auto;
+}
+.root :global(.av-week-grid) {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(130px, 1fr));
+  min-width: 910px;
+}
+.root :global(.av-week-day) {
+  padding: 10px;
+  min-height: 350px;
+  border-left: 1px solid #eee8dd;
+}
+.root :global(.av-week-day h3) {
+  font-size: 11px;
+  margin-bottom: 14px;
+}
+.root :global(.av-week-event) {
+  margin-bottom: 10px;
+}
+.root :global(.av-week-event .av-event) {
+  width: 100%;
+  min-height: 50px;
+}
+.root :global(.av-week-event small) {
+  display: block;
+  font-size: 9px;
+  margin: 4px 0;
+  color: #647080;
+}
+
+/* One viewport: the schedule and inspector own their overflow. */
+.root:has([data-availability-workspace]) {
+  height: 100dvh;
+  overflow: hidden;
+}
+.root :global(.av-workspace) {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 22px 10px;
+  overflow: hidden;
+}
+.root :global(.av-page-heading),
+.root :global(.av-context-row),
+.root :global(.av-tabs),
+.root :global(.av-workspace-footer),
+.root :global(.av-notice),
+.root :global(.av-draft-banner) {
+  flex-shrink: 0;
+}
+.root :global(.av-page-heading) {
+  margin-bottom: 12px;
+}
+.root :global(.av-page-heading h1) {
+  font-size: 28px;
+}
+.root :global(.av-page-heading p) {
+  font-size: 13px;
+}
+.root :global(.av-context-row) {
+  margin-bottom: 10px;
+}
+.root :global(.av-tabs) {
+  margin-bottom: 12px;
+}
+.root :global(#av-active-panel) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.root :global(.av-summary),
+.root :global(.av-rules-strip),
+.root :global(.av-date-toolbar) {
+  flex-shrink: 0;
+}
+.root :global(.av-summary) {
+  padding: 11px 4px;
+  margin-bottom: 10px;
+}
+.root :global(.av-date-toolbar) {
+  margin: 8px 0 11px;
+}
+.root :global(.av-layout) {
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+  overflow: hidden;
+}
+.root :global(.av-main) {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+.root :global(.av-main > .av-card) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.root :global(.av-main > .av-card > .av-card-heading) {
+  flex-shrink: 0;
+  padding: 11px 14px;
+}
+.root :global(.av-main > .av-card > .av-table-wrap) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.root :global(.av-card .av-footnote) {
+  flex-shrink: 0;
+  margin: 6px 12px 9px;
+  font-size: 10px !important;
+}
+.root :global(.av-hours th),
+.root :global(.av-hours td) {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+.root :global(.av-hours .av-icon) {
+  min-height: 28px;
+  min-width: 28px;
+  padding: 4px;
+}
+.root :global(.av-hours small) {
+  font-size: 9px;
+  margin-top: 2px;
+}
+.root :global(.av-hours thead) {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f6f4ef;
+}
+.root :global(.av-side-stack) {
+  overflow: auto;
+  min-height: 0;
+  align-content: start;
+}
+.root :global(.av-inspector) {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  padding: 15px;
+}
+.root :global(.av-inspector > .av-card-heading) {
+  position: sticky;
+  top: -15px;
+  z-index: 2;
+  background: white;
+  padding: 10px 0;
+}
+.root :global(.av-inspector .av-stack) {
+  position: sticky;
+  bottom: -15px;
+  background: white;
+  padding: 12px 0;
+  z-index: 2;
+}
+.root :global(.av-inspector h3) {
+  font-size: 16px;
+  margin-top: 10px;
+}
+.root :global(.av-details-list) {
+  margin: 12px 0;
+  gap: 7px;
+}
+.root :global(.av-inspector-section) {
+  margin: 12px 0;
+  padding: 12px 0;
+}
+.root :global(.av-calendar-card) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.root :global(.av-calendar-scroll) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.root :global(.av-calendar) {
+  height: 100%;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+}
+.root :global(.av-calendar-head) {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 4;
+}
+.root :global(.av-calendar-body) {
+  height: auto;
+  flex: 1;
+  min-height: 285px;
+}
+.root :global(.av-legend) {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  gap: 12px;
+}
+.root :global(.av-timeline-card) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.root :global(.av-timeline) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.root :global(.av-timeline-heading) {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 3;
+}
+.root :global(.av-timeline-row) {
+  flex: 1;
+  min-height: 110px;
+}
+.root :global(.av-week-scroll) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.root :global(.av-week-grid) {
+  height: 100%;
+  min-height: 260px;
+}
+.root :global(.av-week-day) {
+  min-height: 0;
+  overflow: auto;
+}
+.root :global(.av-rule-grid),
+.root :global(.av-location-grid) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  align-content: start;
+}
+.root :global(#av-active-panel > .av-card) {
+  min-height: 0;
+  overflow: auto;
+  flex: 1;
+}
+.root :global(.av-pool-grid) {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  gap: 10px;
+}
+.root :global(.av-pool-grid .av-card-heading) {
+  padding: 8px 12px;
+}
+.root :global(.av-capacity) {
+  padding: 0 12px 5px;
+}
+.root :global(.av-capacity strong) {
+  font-size: 18px;
+}
+.root :global(.av-workspace-footer) {
+  padding-top: 10px;
+  min-height: 43px;
+}
+.root :global(.av-workspace-footer .av-actions) {
+  gap: 10px;
+}
+.drawer {
+  top: 62px;
+  right: 16px;
+  height: calc(100dvh - 78px);
+  max-height: calc(100dvh - 78px);
+  width: min(420px, 35vw);
+  border-radius: 12px;
+}
+@media (max-width: 1199px) and (min-width: 768px) {
+  .root :global(.av-side-stack) {
+    grid-template-columns: 1fr;
+  }
+  .root :global(.av-layout:has(.av-side-stack)) {
+    grid-template-columns: minmax(0, 1fr) 260px;
+  }
+}
+@media (max-width: 767px) {
+  .root :global(.av-workspace) {
+    padding: 10px 12px 8px;
+  }
+  .root :global(.av-page-heading) {
+    position: relative;
+    margin-bottom: 8px;
+    padding-right: 115px;
+  }
+  .root :global(.av-page-heading h1) {
+    font-size: 24px;
+  }
+  .root :global(.av-page-heading p) {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .root :global(.av-page-heading small) {
+    font-size: 9px;
+  }
+  .root :global(.av-page-heading > .av-actions) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-width: 110px;
+    margin: 0;
+  }
+  .root :global(.av-page-heading > .av-actions > .av-button:not(.av-primary)) {
+    display: none;
+  }
+  .root :global(.av-page-heading > .av-actions > .av-primary) {
+    font-size: 10px;
+    padding: 7px;
+    min-height: 38px;
+  }
+  .root :global(.av-context-row) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-bottom: 6px;
+  }
+  .root :global(.av-context-row > label) {
+    min-width: 0;
+  }
+  .root :global(.av-context-row select) {
+    font-size: 10px;
+    padding: 7px;
+    min-height: 34px;
+  }
+  .root :global(.av-context-row > .av-source) {
+    font-size: 9px;
+    grid-column: 1/-1;
+  }
+  .root :global(.av-context-row > .av-icon) {
+    position: absolute;
+    right: 70px;
+    min-height: 25px;
+    min-width: 25px;
+    margin-top: 69px;
+  }
+  .root :global(.av-context-row > .av-link) {
+    position: absolute;
+    right: 12px;
+    margin-top: 70px;
+    font-size: 9px;
+  }
+  .root :global(.av-tabs) {
+    margin-bottom: 8px;
+    gap: 4px;
+  }
+  .root :global(.av-tabs button) {
+    padding: 8px 9px;
+    font-size: 11px;
+  }
+  .root :global(.av-summary) {
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 6px;
+    margin-bottom: 6px;
+  }
+  .root :global(.av-summary > div) {
+    padding: 3px 6px;
+    border: 0 !important;
+    display: block;
+  }
+  .root :global(.av-summary > div > svg) {
+    display: none;
+  }
+  .root :global(.av-summary strong) {
+    font-size: 9px;
+  }
+  .root :global(.av-summary small) {
+    font-size: 9px;
+    line-height: 1.4;
+  }
+  .root :global(.av-summary .av-link) {
+    font-size: 9px;
+    margin-top: 3px;
+  }
+  .root :global(.av-rules-strip) {
+    padding: 6px 8px;
+    font-size: 9px;
+    line-height: 1.5;
+    margin-bottom: 5px;
+  }
+  .root :global(.av-rules-strip .av-link) {
+    font-size: 9px;
+  }
+  .root :global(.av-date-toolbar) {
+    margin: 5px 0 8px;
+    gap: 7px;
+  }
+  .root :global(.av-date-toolbar .av-icon) {
+    min-height: 32px;
+    min-width: 28px;
+    padding: 4px;
+  }
+  .root :global(.av-date-toolbar .av-button) {
+    min-height: 32px;
+    padding: 6px 9px;
+    font-size: 10px;
+  }
+  .root :global(.av-date-label input) {
+    font-size: 10px;
+    width: 130px;
+    min-height: 32px;
+  }
+  .root :global(.av-segment button) {
+    padding: 6px 10px;
+    min-height: 30px;
+    font-size: 10px;
+  }
+  .root :global(.av-side-stack) {
+    display: none;
+  }
+  .root :global(.av-mobile-agenda) {
+    display: block;
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+  .root :global(.av-main > .av-calendar-card),
+  .root :global(.av-main > .av-timeline-card) {
+    display: none;
+  }
+  .root :global(.av-inspector) {
+    min-height: 0;
+  }
+  .root :global(.av-calendar-card .av-mobile-agenda) {
+    display: block;
+  }
+  .root :global(.av-workspace-footer > span) {
+    display: none;
+  }
+  .root :global(.av-workspace-footer .av-actions) {
+    width: 100%;
+    gap: 5px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  .root :global(.av-workspace-footer .av-link) {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 9px;
+    min-width: 32px;
+    min-height: 34px;
+  }
+  .root :global(.av-workspace-footer .av-button) {
+    font-size: 10px;
+    padding: 7px 8px;
+    min-height: 34px;
+  }
+  .root :global(.av-hours th),
+  .root :global(.av-hours td) {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+  .root :global(.av-hours small) {
+    font-size: 8px;
+  }
+  .root :global(.av-hours .av-icon) {
+    min-width: 24px;
+    min-height: 26px;
+    padding: 3px;
+  }
+  .drawer {
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+}
+
+.root :global(.av-event) {
+  position: relative;
+  padding-left: 22px;
+}
+.root :global(.av-event-status-icon) {
+  position: absolute;
+  left: 5px;
+  top: 6px;
+}
+.root :global(.av-resource-identity) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  text-align: left;
+}
+.root :global(.av-resource-avatar) {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #f2efe8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 750;
+  color: #3a404a;
+}
+.root :global(.av-resource-identity > span:last-child) {
+  min-width: 0;
+}
+.root :global(.av-resource-identity strong) {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+.root :global(.av-resource-identity small) {
+  display: block;
+  font-size: 10px;
+  color: #687382;
+  margin-top: 3px;
+}
+.root :global(.av-calendar-chip) {
+  display: flex;
+  width: 100%;
+  gap: 5px;
+  align-items: flex-start;
+  border-radius: 5px;
+  border-left: 3px solid;
+  padding: 5px 7px;
+  text-align: left;
+  min-width: 0;
+  min-height: 30px;
+  cursor: pointer;
+}
+.root :global(.av-calendar-chip > svg) {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.root :global(.av-calendar-chip > span) {
+  min-width: 0;
+  display: block;
+}
+.root :global(.av-calendar-chip strong) {
+  display: block;
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 750;
+}
+.root :global(.av-calendar-chip small) {
+  display: block;
+  font-size: 9px;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.root :global(.av-event-occurrence) {
+  background: #e8edf9;
+  color: #334b84;
+  border-left-color: #6c80b5;
+}
+.root :global(.av-event-tentative) {
+  background: #f2f0ec;
+  color: #626363;
+  border-left-color: #969d9f;
+}
+.root :global(.av-event-completed) {
+  background: #edf3ed;
+  color: #3f6045;
+  border-left-color: #83a58b;
+}
+.root :global(.av-month-card) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+.root :global(.av-month-weekdays) {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  flex-shrink: 0;
+  background: #faf8f2;
+  border-bottom: 1px solid #e8e2d8;
+}
+.root :global(.av-month-weekdays > span) {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 9px 10px;
+  text-align: center;
+}
+.root :global(.av-month-grid) {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.root :global(.av-month-day) {
+  min-width: 0;
+  min-height: 65px;
+  overflow: hidden;
+  border-right: 1px solid #ebe7df;
+  border-bottom: 1px solid #ebe7df;
+  padding: 5px;
+}
+.root :global(.av-month-day > header) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+  margin-bottom: 3px;
+}
+.root :global(.av-day-number) {
+  font-size: 11px;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 50%;
+  font-weight: 650;
+}
+.root :global(.av-day-today) {
+  background: #d4a72c;
+  color: #121212;
+}
+.root :global(.av-day-add) {
+  border-radius: 4px;
+  opacity: 0;
+  min-width: 24px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.root :global(.av-month-day:hover .av-day-add),
+.root :global(.av-day-add:focus-visible) {
+  opacity: 1;
+  background: #f5ebd7;
+}
+.root :global(.av-outside-month) {
+  background: #faf9f6;
+  color: #7d8490;
+}
+.root :global(.av-month-events) {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.root :global(.av-month-day .av-calendar-chip) {
+  padding: 3px 4px;
+  min-height: 23px;
+  gap: 3px;
+}
+.root :global(.av-month-day .av-calendar-chip strong) {
+  font-size: 9px;
+}
+.root :global(.av-month-day .av-calendar-chip small) {
+  font-size: 8px;
+  max-height: 12px;
+  white-space: nowrap;
+}
+.root :global(.av-hours-chip) {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  font-size: 9px;
+  color: #5b6458;
+  background: #edf4ea;
+  padding: 3px;
+  border-radius: 4px;
+  margin-bottom: 3px;
+  width: 100%;
+  text-align: left;
+}
+.root :global(.av-more-events) {
+  font-size: 9px;
+  font-weight: 700;
+  color: #745620;
+  padding: 2px 4px;
+  text-align: left;
+}
+.root :global(.av-time-week) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+.root :global(.av-week-time-scroll) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.root :global(.av-week-time-inner) {
+  height: 100%;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+}
+.root :global(.av-week-time-header) {
+  display: grid;
+  grid-template-columns: 58px repeat(7, minmax(0, 1fr));
+  flex-shrink: 0;
+  border-bottom: 1px solid #e9e4db;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+.root :global(.av-week-time-header > span),
+.root :global(.av-week-time-header > strong) {
+  font-size: 10px;
+  text-align: center;
+  padding: 12px 3px;
+}
+.root :global(.av-week-hour-grid) {
+  display: grid;
+  grid-template-columns: 58px repeat(7, minmax(0, 1fr));
+  flex: 1;
+  min-height: 300px;
+}
+.root :global(.av-week-time-column) {
+  position: relative;
+  border-left: 1px solid #e9e4db;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(10% - 1px),
+    #eeeae3 calc(10% - 1px),
+    #eeeae3 10%
+  );
+}
+.root :global(.av-week-time-column:hover) {
+  background-color: #fffdf7;
+}
+.root :global(.av-week-positioned) {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  min-height: 23px;
+}
+.root :global(.av-week-positioned .av-calendar-chip) {
+  height: 100%;
+  overflow: hidden;
+}
+.root :global(.av-calendar-agenda) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.root :global(.av-calendar-agenda > .av-card-heading) {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.root :global(.av-calendar-agenda > article) {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid #eee8de;
+}
+.root :global(.av-calendar-agenda > article > span) {
+  flex: 0 0 80px;
+  font-size: 10px;
+  color: #626b7b;
+  padding-top: 5px;
+}
+.root :global(.av-calendar-agenda > article > .av-calendar-chip) {
+  flex: 1;
+  min-width: 0;
+}
+.root :global(.av-timeline-row) {
+  min-height: 68px;
+}
+.root :global(.av-timeline-row:has(.av-ongoing)) {
+  min-height: 110px;
+}
+.root :global(.av-timeline-row:not(:has(.av-ongoing)) .av-event) {
+  top: 16px !important;
+}
+.root :global(.av-timeline-row:not(:has(.av-ongoing)):has(.av-event-block)) {
+  min-height: 92px;
+}
+.root :global(.av-timeline-row:not(:has(.av-ongoing)):has(.av-event-block) .av-event-confirmed) {
+  top: 50px !important;
+}
+.root :global(.av-calendar-lane[aria-disabled='false']) {
+  cursor: crosshair;
+}
+.root :global(.av-calendar-lane[aria-disabled='true']) {
+  cursor: default;
+}
+.root :global(.av-queue-board) {
+  overflow: auto;
+}
+@media (min-width: 1024px) {
+  .root :global(.av-page-heading h1) {
+    font-size: 31px;
+  }
+}
+@media (max-width: 767px) {
+  .root :global(.av-month-card),
+  .root :global(.av-time-week) {
+    display: none !important;
+  }
+  .root :global(.av-calendar-agenda) {
+    min-height: 0;
+  }
+  .root :global(.av-calendar-agenda > article) {
+    padding: 8px;
+    gap: 7px;
+  }
+  .root :global(.av-calendar-agenda > article > span) {
+    flex-basis: 65px;
+    font-size: 9px;
+  }
+  .root :global(.av-calendar-agenda .av-calendar-chip strong) {
+    font-size: 10px;
+  }
+}
+
+.root :global(.av-inspector) {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.root :global(.av-inspector > .av-card-heading) {
+  position: static;
+  flex-shrink: 0;
+}
+.root :global(.av-inspector-scroll) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 3px;
+}
+.root :global(.av-inspector .av-inspector-actions) {
+  position: static;
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 10px 0 4px;
+  background: white;
+}
+.root :global(.av-inspector > .av-footnote) {
+  flex-shrink: 0;
+  margin: 5px 0 0;
+}
+
+@media (max-width: 767px) {
+  .root :global(.av-mobile-detail > .av-page-heading),
+  .root :global(.av-mobile-detail > .av-context-row),
+  .root :global(.av-mobile-detail > .av-tabs) {
+    display: none;
+  }
+  .root :global(.av-mobile-detail #av-active-panel > .av-summary),
+  .root :global(.av-mobile-detail #av-active-panel > .av-rules-strip),
+  .root :global(.av-mobile-detail #av-active-panel > .av-date-toolbar) {
+    display: none;
+  }
+  .root :global(.av-mobile-detail .av-inspector > .av-footnote) {
+    display: none;
+  }
+}
+
+.root :global(.av-slot-hit) {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+.root :global(.av-slot-hit:disabled) {
+  cursor: default;
+}
+.root :global(.av-calendar-lane > .av-event),
+.root :global(.av-event),
+.root :global(.av-week-positioned) {
+  z-index: 1;
+}
+.root :global(.av-timeline-track > .av-track-note),
+.root :global(.av-calendar-lane > .av-lane-note) {
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Hour lines follow the visible time range; bookings outside office hours stay at their real time. */
+.root :global(.av-week-time-column) {
+  background-image: linear-gradient(
+    to bottom,
+    transparent calc(100% - 1px),
+    #eeeae3 calc(100% - 1px)
+  );
+  background-repeat: repeat-y;
+}
+
+.root :global(.av-calendar-lane) {
+  background-image: linear-gradient(
+    to bottom,
+    transparent calc(100% - 1px),
+    #eeeae3 calc(100% - 1px)
+  );
+  background-repeat: repeat-y;
+}
+
+@media (max-width: 1023px) and (max-height: 720px) {
+  .root :global(.av-mobile-detail > .av-page-heading),
+  .root :global(.av-mobile-detail > .av-context-row),
+  .root :global(.av-mobile-detail > .av-tabs),
+  .root :global(.av-mobile-detail #av-active-panel > .av-summary),
+  .root :global(.av-mobile-detail #av-active-panel > .av-rules-strip),
+  .root :global(.av-mobile-detail #av-active-panel > .av-date-toolbar) {
+    display: none;
+  }
+  .root :global(.av-mobile-detail .av-main) {
+    display: none;
+  }
+  .root :global(.av-mobile-detail .av-layout) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .root :global(.av-mobile-detail .av-inspector) {
+    max-height: none;
+  }
+}
+
+.root :global(.av-context-summary-trigger) {
+  display: none;
+}
+@media (max-width: 767px) {
+  .root :global(.av-desktop-context) {
+    display: none;
+  }
+  .root :global(.av-context-summary-trigger) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+  .root :global(.av-mobile-detail .av-context-summary-trigger) {
+    display: none;
+  }
+  .root :global(.av-context-detail .av-summary) {
+    display: flex;
+    flex-direction: column;
+  }
+  .root :global(.av-context-detail .av-summary > div) {
+    width: 100%;
+    min-height: 60px;
+  }
+  .root :global(.av-context-detail .av-rules-strip) {
+    display: flex;
+  }
+  .root :global(.av-mobile-agenda) {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    display: flex;
+  }
+}
+
+.root :global(.av-desktop-context) {
+  flex-shrink: 0;
+}
+@media (max-width: 1023px) and (max-height: 720px) {
+  .root :global(.av-mobile-detail .av-desktop-context) {
+    display: none;
+  }
+}
+@media (min-width: 1440px) {
+  .root :global(.av-calendar-lane .av-event) {
+    padding: 3px 7px;
+  }
+  .root :global(.av-calendar-lane .av-event strong) {
+    font-size: 12px;
+  }
+  .root :global(.av-calendar-lane .av-event span) {
+    font-size: 10.5px;
+  }
+  .root :global(.av-calendar-head .av-resource-identity strong) {
+    font-size: 12px;
+  }
+  .root :global(.av-calendar-head .av-resource-identity small) {
+    font-size: 10.5px;
+  }
+  .root :global(.av-buffer) {
+    font-size: 9px;
+  }
+}
+
+/* Scheduling views prioritise time and exact claims; operating facts remain one click away. */
+.root :global(.av-compact-context .av-summary) {
+  display: none;
+}
+.root :global(.av-attention-strip) {
+  display: flex;
+  flex-shrink: 0;
+  background: white;
+  border: 1px solid var(--av-border);
+  border-radius: 9px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.root :global(.av-attention-strip button) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  padding: 12px 15px;
+  text-align: left;
+  border-right: 1px solid var(--av-border);
+  font-size: 12px;
+}
+.root :global(.av-attention-strip button:first-child > svg) {
+  color: #b13737;
+}
+.root :global(.av-attention-strip button > svg) {
+  color: #946712;
+  flex-shrink: 0;
+}
+.root :global(.av-attention-strip button > span:first-of-type) {
+  flex: 1;
+  min-width: 0;
+}
+.root :global(.av-attention-strip strong) {
+  display: block;
+  font-weight: 750;
+}
+.root :global(.av-attention-strip small) {
+  display: block;
+  color: var(--av-muted);
+  font-size: 11px;
+  margin-top: 3px;
+}
+@media (max-width: 767px) {
+  .root :global(.av-operating-control),
+  .root :global(.av-attention-strip) {
+    display: none;
+  }
+}
+@media (max-width: 1023px) and (max-height: 720px) {
+  .root :global(.av-mobile-detail .av-attention-strip) {
+    display: none;
+  }
+}
+
+/* Keep the schedule dominant, including short desktop viewports and browser zoom. */
+.root :global(.av-main > .av-date-toolbar),
+.root :global(.av-main > .av-attention-strip),
+.root :global(.av-main > .av-context-summary-trigger),
+.root :global(.av-main > .av-note) {
+  flex-shrink: 0;
+}
+.root :global(.av-layout) {
+  align-items: stretch;
+}
+.root :global(.av-layout:has(.av-side-stack)),
+.root :global(.av-detail-open) {
+  grid-template-columns: minmax(0, 1fr) 340px;
+}
+.root :global(.av-main) {
+  container-type: inline-size;
+}
+.root :global(.av-date-toolbar) {
+  flex-wrap: nowrap;
+}
+.root :global(.av-date-toolbar > .av-actions) {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+.root :global(.av-date-toolbar .av-segment button) {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.root :global(.av-detail-open .av-date-label input),
+.root :global(.av-layout:has(.av-side-stack) .av-date-label input) {
+  width: 126px;
+}
+.root :global(.av-date-toolbar select) {
+  max-width: 150px;
+}
+.root :global(.av-timeline) {
+  min-width: 0;
+}
+.root :global(.av-timeline-heading),
+.root :global(.av-timeline-row) {
+  grid-template-columns: 154px minmax(0, 1fr);
+}
+.root :global(.av-event-status-icon) {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+}
+.root :global(.av-event) {
+  padding-left: 23px;
+}
+@container (max-width:900px) {
+  .root :global(.av-search) {
+    width: 34px;
+    flex: 0 0 34px;
+    min-width: 34px;
+    height: 34px;
+    border: 1px solid #d9d5cd;
+    border-radius: 7px;
+    background: white;
+  }
+  .root :global(.av-search input) {
+    width: 32px;
+    min-width: 0;
+    padding: 0 !important;
+    opacity: 0;
+    cursor: text;
+  }
+  .root :global(.av-search:focus-within),
+  .root :global(.av-search:has(input:not(:placeholder-shown))) {
+    width: 160px;
+    flex-basis: 160px;
+  }
+  .root :global(.av-search:focus-within input),
+  .root :global(.av-search input:not(:placeholder-shown)) {
+    width: 158px;
+    padding-left: 30px !important;
+    opacity: 1;
+  }
+  .root :global(.av-date-toolbar select) {
+    max-width: 125px;
+  }
+}
+@media (min-width: 768px) and (max-height: 800px) {
+  .root :global(.av-workspace) {
+    padding: 12px 18px 8px;
+  }
+  .root:has([data-availability-workspace]) > div > div > header {
+    min-height: 46px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .root :global(.av-page-heading) {
+    margin-bottom: 8px;
+    gap: 10px;
+  }
+  .root :global(.av-page-heading h1) {
+    font-size: 24px;
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+  .root :global(.av-page-heading p) {
+    font-size: 12px;
+    margin-bottom: 0;
+  }
+  .root :global(.av-page-heading small) {
+    display: none;
+  }
+  .root :global(.av-page-heading .av-button),
+  .root :global(.av-context-row input),
+  .root :global(.av-context-row select),
+  .root :global(.av-context-row .av-icon) {
+    min-height: 32px;
+    padding: 6px 9px;
+  }
+  .root :global(.av-context-row) {
+    margin-bottom: 6px;
+    gap: 8px;
+  }
+  .root :global(.av-context-row select) {
+    max-width: 250px;
+  }
+  .root :global(.av-tabs) {
+    margin-bottom: 8px;
+    gap: 9px;
+  }
+  .root :global(.av-tabs button) {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+  .root :global(.av-layout:has(.av-side-stack)),
+  .root :global(.av-detail-open) {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 12px;
+  }
+  .root :global(.av-summary) {
+    margin-bottom: 8px;
+  }
+  .root :global(.av-summary > div) {
+    padding: 8px 10px;
+    min-height: 42px;
+  }
+  .root :global(.av-summary strong) {
+    font-size: 11px;
+  }
+  .root :global(.av-summary small) {
+    font-size: 9.5px;
+    margin-top: 1px;
+  }
+  .root :global(.av-rules-strip) {
+    padding: 6px 9px;
+    margin-bottom: 6px;
+    font-size: 10px;
+    min-height: 28px;
+  }
+  .root :global(.av-date-toolbar) {
+    margin: 0 0 6px;
+    gap: 6px;
+    min-height: 32px;
+  }
+  .root :global(.av-date-toolbar .av-button),
+  .root :global(.av-date-toolbar .av-icon),
+  .root :global(.av-date-toolbar input),
+  .root :global(.av-date-toolbar select) {
+    min-height: 32px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .root :global(.av-date-label input) {
+    width: 122px;
+  }
+  .root :global(.av-date-toolbar .av-segment button) {
+    min-height: 30px;
+    padding: 6px 9px;
+    font-size: 10.5px;
+  }
+  .root :global(.av-attention-strip) {
+    margin-bottom: 6px;
+  }
+  .root :global(.av-attention-strip button) {
+    padding: 7px 10px;
+    gap: 9px;
+    font-size: 11px;
+  }
+  .root :global(.av-attention-strip small) {
+    font-size: 9px;
+    margin-top: 1px;
+  }
+  .root :global(.av-attention-strip svg) {
+    width: 18px;
+    height: 18px;
+  }
+  .root :global(.av-workspace-footer) {
+    min-height: 36px;
+    padding-top: 6px;
+    gap: 6px;
+  }
+  .root :global(.av-workspace-footer .av-button) {
+    min-height: 30px;
+    padding: 5px 9px;
+  }
+  .root :global(.av-workspace-footer .av-link) {
+    font-size: 11px;
+  }
+  .root :global(.av-card-heading) {
+    padding: 9px 12px;
+  }
+  .root :global(.av-card-heading .av-button) {
+    min-height: 30px;
+    padding: 5px 9px;
+  }
+  .root :global(.av-hours th),
+  .root :global(.av-hours td) {
+    padding: 4px 12px;
+    font-size: 11px;
+    line-height: 1.25;
+  }
+  .root :global(.av-hours small) {
+    font-size: 9px;
+    margin-top: 1px;
+    line-height: 1.2;
+  }
+  .root :global(.av-hours .av-icon) {
+    min-height: 27px;
+    min-width: 27px;
+    padding: 3px;
+  }
+  .root :global(.av-footnote) {
+    margin: 4px 10px 6px;
+    font-size: 9px !important;
+  }
+  .root :global(.av-legend) {
+    padding: 5px 9px;
+    gap: 9px;
+  }
+  .root :global(.av-calendar) {
+    min-height: 260px;
+  }
+  .root :global(.av-calendar-head > div) {
+    padding: 8px 10px;
+  }
+  .root :global(.av-calendar-lane .av-event) {
+    font-size: 10px;
+    padding: 2px 5px 2px 21px;
+    line-height: 1.2;
+  }
+  .root :global(.av-calendar-lane .av-event strong) {
+    font-size: 10px;
+  }
+  .root :global(.av-calendar-lane .av-event span) {
+    font-size: 9px;
+  }
+  .root :global(.av-timeline) {
+    --av-track-inset: 4px;
+    --av-track-step: 28px;
+    --av-track-height: 25px;
+  }
+  .root :global(.av-timeline-heading > strong) {
+    padding: 8px 10px;
+  }
+  .root :global(.av-days > span) {
+    padding: 8px 0;
+  }
+  .root :global(.av-timeline-row) {
+    min-height: 38px;
+  }
+  .root :global(.av-timeline-row:has(.av-ongoing)) {
+    min-height: 90px;
+  }
+  .root :global(.av-timeline-row:not(:has(.av-ongoing)):has(.av-event-block)) {
+    min-height: 65px;
+  }
+  .root :global(.av-timeline-row:not(:has(.av-ongoing)) .av-event) {
+    top: 4px !important;
+  }
+  .root :global(.av-timeline-row:not(:has(.av-ongoing)):has(.av-event-block) .av-event-confirmed) {
+    top: 32px !important;
+  }
+  .root :global(.av-resource-name) {
+    padding: 5px 8px;
+  }
+  .root :global(.av-timeline-track .av-event) {
+    font-size: 9px;
+    padding: 2px 4px 2px 20px;
+    line-height: 1.15;
+  }
+  .root :global(.av-timeline-track .av-event strong) {
+    font-size: 9px;
+  }
+  .root :global(.av-timeline-track .av-event span) {
+    font-size: 8px;
+  }
+  .root :global(.av-ongoing) {
+    height: 25px;
+    top: 4px !important;
+    padding: 4px;
+    font-size: 8px;
+  }
+  .root :global(.av-inspector) {
+    padding: 12px;
+  }
+  .root :global(.av-inspector .av-card-heading) {
+    padding: 0 0 8px;
+  }
+  .root :global(.av-inspector .av-details-list) {
+    gap: 5px 9px;
+    margin: 10px 0;
+  }
+  .root :global(.av-inspector .av-note),
+  .root :global(.av-inspector .av-error) {
+    padding: 8px 9px;
+    margin: 8px 0;
+  }
+}
+@media (max-width: 767px) {
+  .root :global(.av-date-toolbar) {
+    flex-wrap: wrap;
+  }
+  .root :global(.av-layout),
+  .root :global(.av-layout:has(.av-side-stack)),
+  .root :global(.av-detail-open) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .root :global(.av-search) {
+    width: auto;
+    flex: 1;
+    min-width: 100px;
+    height: auto;
+  }
+  .root :global(.av-search input) {
+    width: 100%;
+    opacity: 1;
+    padding-left: 30px !important;
+  }
+}
+
+.root :global(.av-main) {
+  gap: 0;
+}
+.root :global(.av-context-no-duration .av-rules-strip) {
+  display: none;
+}
+.root :global(.av-date-toolbar) {
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+@media (min-width: 768px) and (max-height: 800px) {
+  .root :global(.av-summary) {
+    padding: 8px 4px;
+    margin-bottom: 6px;
+  }
+  .root :global(.av-summary > div) {
+    padding: 0 10px;
+    min-height: 30px;
+    gap: 8px;
+  }
+  .root :global(.av-date-toolbar) {
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+  .root :global(.av-date-toolbar input:not([type='checkbox']):not([type='radio'])),
+  .root :global(.av-date-toolbar select) {
+    min-height: 32px;
+    height: 32px;
+  }
+  .root :global(.av-search) {
+    height: 32px;
+  }
+  .root :global(.av-timeline-row) {
+    min-height: 35px;
+  }
+  .root :global(.av-resource-name) {
+    padding: 4px 8px;
+  }
+  .root :global(.av-resource-name .av-resource-avatar) {
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
+  }
+  .root :global(.av-resource-name .av-resource-identity) {
+    gap: 6px;
+  }
+  .root :global(.av-resource-name strong) {
+    font-size: 11px;
+    line-height: 1.2;
+  }
+  .root :global(.av-resource-name small) {
+    font-size: 9px;
+    line-height: 1.1;
+    margin-top: 1px;
+  }
+}
+
+.root {
+  --av-editor-width: 380px;
+}
+@media (min-width: 1024px) {
+  .root :global(.av-workspace.av-editing-side) {
+    padding-right: calc(var(--av-editor-width) + 36px);
+  }
+  .root :global(.av-editing-side .av-layout),
+  .root :global(.av-editing-side .av-detail-open),
+  .root :global(.av-editing-side .av-layout:has(.av-side-stack)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .root :global(.av-editing-side .av-inspector),
+  .root :global(.av-editing-side .av-side-stack),
+  .root :global(.av-editing-side > .av-page-heading > .av-actions),
+  .root :global(.av-editing-side .av-operating-control) {
+    display: none;
+  }
+  .root :global(.av-editing-side .av-context-row select) {
+    max-width: 210px;
+  }
+  .drawer {
+    width: var(--av-editor-width);
+    top: 72px;
+    height: calc(100dvh - 88px);
+    max-height: calc(100dvh - 88px);
+  }
+  .drawerOverlay {
+    background: transparent;
+  }
+}
+.root :global(.av-resource-choice) {
+  border: 1px solid var(--av-border);
+  border-radius: 8px;
+}
+.root :global(.av-resource-choice > summary) {
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.root :global(.av-resource-choice .av-fieldset) {
+  border: 0;
+  margin: 0;
+  padding: 10px 12px;
+}
+.drawer :global(.av-form) {
+  gap: 11px;
+}
+.drawer :global(.av-dialog-heading) {
+  padding: 15px 16px 12px;
+}
+.drawer :global(.av-dialog-heading h2) {
+  font-size: 18px;
+}
+.drawer :global(.av-dialog-heading p) {
+  font-size: 11px;
+  margin-top: 4px;
+}
+.drawer :global(.av-dialog-body) {
+  padding: 14px 16px;
+}
+.drawer :global(.av-dialog-footer) {
+  padding: 10px 16px;
+  gap: 6px;
+}
+.drawer :global(.av-scope-note) {
+  font-size: 10px;
+  line-height: 1.5;
+  padding: 8px 10px;
+}
+.drawer :global(.av-details) {
+  margin: 0;
+  padding: 8px 10px;
+}
+.drawer :global(.av-impact) {
+  padding: 11px 12px;
+}
+@media (min-width: 768px) and (max-height: 800px) {
+  .root {
+    --av-editor-width: 300px;
+  }
+  .root :global(.av-main > .av-card > .av-card-heading) {
+    padding: 5px 12px;
+  }
+  .root :global(.av-main > .av-card > .av-card-heading .av-button) {
+    min-height: 25px;
+    padding: 3px 6px;
+  }
+  .root :global(.av-main > .av-card > .av-footnote) {
+    margin: 2px 9px 3px;
+    font-size: 9px !important;
+    line-height: 1.3;
+  }
+  .root :global(.av-hours th),
+  .root :global(.av-hours td) {
+    padding: 3px 10px;
+  }
+  .root :global(.av-hours .av-icon) {
+    min-height: 25px;
+    min-width: 25px;
+    padding: 2px;
+  }
+  .drawer {
+    top: 54px;
+    height: calc(100dvh - 66px);
+    max-height: calc(100dvh - 66px);
+  }
+  .drawer :global(.av-dialog-heading),
+  .drawer :global(.av-dialog-body) {
+    padding: 11px 12px;
+  }
+  .drawer :global(.av-dialog-heading p) {
+    display: none;
+  }
+  .drawer :global(.av-dialog-footer) {
+    padding: 8px 12px;
+  }
+  .drawer :global(.av-dialog-footer .av-button) {
+    min-height: 30px;
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  .drawer :global(.av-form) {
+    gap: 9px;
+  }
+}
+
+.root :global(.av-scope-detail) {
+  font-size: 10px;
+  color: var(--av-muted);
+  border-bottom: 1px solid var(--av-border);
+}
+.root :global(.av-scope-detail > summary) {
+  padding: 6px 0;
+  line-height: 16px;
+  cursor: pointer;
+}
+.root :global(.av-impact-records article) {
+  padding: 7px 0;
+  border-top: 1px solid #e8d6d0;
+}
+.root :global(.av-impact-records small) {
+  display: block;
+  font-size: 10px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.root :global(.av-impact-records h4) {
+  font-size: 11px;
+  line-height: 1.4;
+}
+.root :global(.av-impact-warning) {
+  padding: 7px 8px;
+  background: #fff5db;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.drawer :global(.av-impact) {
+  margin-top: 12px;
+}
+.drawer :global(.av-impact h3) {
+  margin: 0 0 7px;
+  font-size: 13px;
+}
+.drawer :global(.av-impact p),
+.drawer :global(.av-impact ul) {
+  margin: 6px 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
+@media (min-width: 768px) and (max-height: 800px) {
+  .root :global(.av-hours th),
+  .root :global(.av-hours td) {
+    padding: 2px 10px;
+  }
+  .root :global(.av-calendar-head > div) {
+    padding: 6px 8px;
+  }
+  .root :global(.av-calendar-head .av-resource-identity strong) {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+  .root :global(.av-calendar-head .av-resource-identity small) {
+    font-size: 9px;
+    line-height: 1.2;
+    margin-top: 1px;
+  }
+  .root :global(.av-calendar-head .av-resource-avatar) {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+  }
+  .drawer :global(input:not([type='checkbox']):not([type='radio'])),
+  .drawer :global(select) {
+    min-height: 32px;
+    height: 32px;
+    font-size: 11px;
+    padding: 5px 7px;
+  }
+  .drawer :global(.av-resource-choice > summary) {
+    padding: 7px 9px;
+    line-height: 16px;
+  }
+  .drawer :global(.av-details > summary) {
+    font-size: 11px;
+    line-height: 16px;
+  }
+  .drawer :global(.av-field-label) {
+    font-size: 11px;
+    line-height: 14px;
+  }
+  .drawer :global(.av-form-grid) {
+    gap: 8px;
+  }
+}
+
+.root :global(.av-short-label) {
+  display: none;
+}
+@media (min-width: 768px) and (max-height: 800px) {
+  .drawer :global(.av-full-label) {
+    display: none;
+  }
+  .drawer :global(.av-short-label) {
+    display: inline;
+  }
+  .drawer :global(.av-form .av-field) {
+    gap: 3px;
+  }
+  .drawer :global(.av-form .av-field > span:first-child) {
+    font-size: 11px;
+    line-height: 14px;
+  }
+  .drawer :global(.av-form .av-details) {
+    padding: 6px 8px;
+  }
+  .drawer :global(.av-form .av-details > summary) {
+    font-size: 11px;
+    line-height: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .drawer :global(.av-dated-range) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+  }
+  .drawer :global(.av-dated-range .av-field) {
+    grid-template-columns: 68px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+  }
+}

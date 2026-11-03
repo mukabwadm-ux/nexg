@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { setPropertyPhotos } from '@/app/host/actions';
+import { setPropertyPhotos } from '@/app/(customer)/host/actions';
 import { createClient } from '@/lib/supabase/client';
 
 import { Said, useAction } from './form';

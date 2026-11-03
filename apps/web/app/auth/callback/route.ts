@@ -6,7 +6,11 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code');
   const requestedNext = request.nextUrl.searchParams.get('next');
-  const next = requestedNext === '/reset-password' ? requestedNext : '/';
+  const next =
+    requestedNext === '/reset-password' ||
+    requestedNext === '/reset-password?next=%2Fmerchant'
+      ? requestedNext
+      : '/';
 
   if (!code) {
     return NextResponse.redirect(new URL('/forgot-password?error=invalid-link', request.url));

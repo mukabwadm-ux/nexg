@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "flows": [
+    "Keyboard empty-slot proposal, focus, dirty-close keep/discard",
+    "Seven-day time grid; drag only proposes, same Work identity and times retained",
+    "Read-only role blocks edits while preserving booking inspection",
+    "Dated session month and one-day views; occurrence capacity inspector",
+    "Stale, unknown, partial, external, offline and missing-setup states never promise capacity",
+    "Cross-tab change invalidates reviewed impact, retains inputs and requires a fresh comparison",
+    "Denied local storage reports failure and preserves input"
+  ],
+  "viewports": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "documentWidth": 1920,
+      "documentHeight": 1080,
+      "action": {
+        "top": 896,
+        "bottom": 934
+      },
+      "footer": {
+        "top": 1022,
+        "bottom": 1070
+      }
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "documentHeight": 900,
+      "action": {
+        "top": 716,
+        "bottom": 754
+      },
+      "footer": {
+        "top": 842,
+        "bottom": 890
+      }
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "documentHeight": 720,
+      "action": {
+        "top": 553,
+        "bottom": 591
+      },
+      "footer": {
+        "top": 676,
+        "bottom": 712
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390,
+      "documentHeight": 844,
+      "action": {
+        "top": 700,
+        "bottom": 742
+      },
+      "footer": {
+        "top": 792,
+        "bottom": 836
+      }
+    },
+    {
+      "width": 960,
+      "height": 540,
+      "documentWidth": 960,
+      "documentHeight": 540,
+      "action": {
+        "top": 389.5,
+        "bottom": 427.5
+      },
+      "footer": {
+        "top": 496,
+        "bottom": 532
+      }
+    }
+  ],
+  "errors": [],
+  "writes": []
+}

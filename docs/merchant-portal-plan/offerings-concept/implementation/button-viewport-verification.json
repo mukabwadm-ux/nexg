@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "viewports": [
+    "desktop",
+    "compact",
+    "mobile"
+  ],
+  "visibleAddDiscountButton": true,
+  "publishControlsInViewport": true,
+  "closedCatalogueExpanded": true
+}

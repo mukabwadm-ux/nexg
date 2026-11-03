@@ -1,0 +1,27 @@
+# Merchant email verification and account setup
+
+The merchant onboarding email is an account identity, not proof of business approval. Before an application can be submitted, an applicant must verify the exact email address entered on the form. The API also rejects direct submit requests unless the authenticated Auth user's confirmed email matches the email saved on that application. Verification upgrades the anonymous Auth user in place, preserving the same owner ID and saved application. Changing the email invalidates the form's verified state and requires a new code.
+
+After submission, the verified applicant receives a single-use, expiring password setup link through Supabase Auth. The sign-in screen is shown with the verified email prefilled; following the link lets the applicant choose a password and returns them to the merchant workspace. No password is generated or sent by email. A returning merchant can still use an email code from the merchant sign-in option. Demo data remains separate.
+
+Supabase Auth generates and verifies the codes, applies rate limits, and manages sessions. The browser never receives a service-role key. Email verification uses the `email_change` code on the existing applicant identity; the same path supports confirming a changed address for an already verified applicant.
+
+Resending checks that the current authenticated applicant still has the requested pending address, then repeats the same `updateUser({ email })` operation on that identity. This is intentional: in local Auth testing, the generic `resend({ type: 'email_change' })` endpoint returned success without delivering another message for an anonymous applicant with a pending email change. The supported resend path was verified to produce a fresh code in Mailpit and accept that code.
+
+The full verification card is displayed while the initial request is in progress. If sending fails, the error and retry stay on that card; verification is disabled until the request succeeds.
+
+## Local environment
+
+The Auth recovery template is `supabase/templates/password-recovery.html`; it uses `{{ .ConfirmationURL }}` so the email contains the one-time Auth action link. The checked-in `supabase/config.toml` enables Mailpit and email confirmation for a fresh local stack, with six-digit codes, a 10-minute expiry, and code templates that render `{{ .Token }}`. Local messages are captured at `http://127.0.0.1:54324` and are not delivered externally. Restart the local Supabase project after changing Auth settings; the restart preserves database volumes. A separately managed local Supabase instance can have different SMTP settings, so check the active instance before assuming where test email will appear.
+
+The Resend key is kept in the gitignored `.env.resend.local`; it must not be copied into client variables or committed. `MERCHANT_EMAIL_OTP_ENABLED=true` in `apps/web/.env.local` enables the local screens. `scripts/configure-local-resend.ps1` records the current instance's original configuration before applying the local settings and restarts Supabase without deleting data volumes. This local instance uses a temporary Supabase working directory; if it is removed or the services are recreated, reapply the settings with access to the key rather than assuming they persist.
+
+## Hosted deployment
+
+Local configuration does not change a hosted Supabase project. The merchant verification code is sent by Supabase Auth, not by the web app's `RESEND_API_KEY`; that key is used by separate application email notifications. Configure custom SMTP on the hosted Supabase project before enabling this flow.
+
+For Resend SMTP, verify the sender domain in Resend, then configure the hosted Supabase project's Auth SMTP settings with host `smtp.resend.com`, port `465` or `587`, username `resend`, the Resend API key as the SMTP password, and a sender address on the verified domain. Keep the key only in Supabase's protected SMTP settings; never put it in a `NEXT_PUBLIC_*` variable or commit it.
+
+In Supabase Auth, enable email confirmations and secure email changes. For merchant registration, set the **Change email address** template to display `{{ .Token }}`; the separate **Magic link or OTP** template is used for email-code sign-in. Keep the password-recovery template as a one-time `{{ .ConfirmationURL }}` link, following `supabase/templates/password-recovery.html`. The registration form accepts the six- or eight-digit token length configured by hosted Auth. Configure token expiry and appropriate rate limits before using the flow. Inline OTP is enabled by default in code; set `MERCHANT_EMAIL_OTP_ENABLED=false` only to roll back. Existing deployment environment values are not changed by this code default, and production use still requires verified Auth/SMTP configuration and an authorized deployment. Use HTTPS for the deployed app and Auth endpoint.
+
+Before enabling a hosted deployment, send a code to a real inbox and verify delivery, resend, code acceptance, application submission, and the password-setup journey using that project's own settings. Check the Supabase Auth logs and Resend delivery logs if a send is accepted by the UI but no message arrives. A business email that already belongs to another account requires a safe account-linking/support process; this flow does not transfer ownership or silently create a second account. Email verification is separate from admin approval, business verification, and other setup permissions.

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { cancelBooking, connectCalendar, removeCalendar, saveBooking } from '@/app/host/actions';
+import { cancelBooking, connectCalendar, removeCalendar, saveBooking } from '@/app/(customer)/host/actions';
 
 import { Actions, Drawer, Field, Grid, Said, Select, Submit, Text, useAction } from './form';
 

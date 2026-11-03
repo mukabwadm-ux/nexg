@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": [
+    "next-env.d.ts",
+    "lib/merchant-application-review-contracts.ts",
+    "lib/merchant-application-review.ts",
+    "lib/merchant-application-review-http.ts",
+    "lib/merchant-application-review.test.ts",
+    "lib/merchant-application-review-http.test.ts",
+    "lib/merchant-application-review.integration.test.ts",
+    "lib/test-fixtures/application-review.ts",
+    "app/api/merchant-applications/review/route.ts"
+  ],
+  "exclude": ["node_modules", ".next", ".next-dev", ".turbo"]
+}

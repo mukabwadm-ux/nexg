@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": [
+    "next-env.d.ts",
+    "components/merchants/application-review-actor.tsx",
+    "components/merchants/application-review-controls.tsx",
+    "components/merchants/application-review-controls.test.tsx",
+    "components/merchants/application-review-view.tsx",
+    "components/merchants/application-review-view.test.tsx",
+    "app/merchants/applications/**/*.tsx",
+    "vitest.application-review.config.ts"
+  ]
+}

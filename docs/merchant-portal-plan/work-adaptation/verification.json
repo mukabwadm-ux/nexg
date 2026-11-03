@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-31",
+  "status": "WORK_ADAPTATION_DESIGN_CHECKS_PASSED",
+  "scope": "Identity, source-field, selected-model binding, rule-model and workflow-view reference checks only. No application, connector, workflow execution or runtime merchant acceptance tested.",
+  "counts": {
+    "categories": 21,
+    "subcategories": 128,
+    "effectiveWorkflowViews": 18,
+    "candidateWorkflowReferences": 304,
+    "effectiveBindings": 65,
+    "effectiveRules": 174,
+    "ruleModelReferences": 9,
+    "displayNameDiscrepancies": 1
+  },
+  "safeguards": {
+    "originalIdentitiesPreserved": true,
+    "exactSourceFieldsPreserved": true,
+    "onlyReconciledConditionalRulesUsed": true,
+    "categoryDefaultsDoNotActivateWork": true,
+    "genericAcceptOrderPrimaryActionsAbsent": true,
+    "laterAutomaticConfirmationPolicyApplied": true,
+    "runtimeRemainsUnverified": true
+  },
+  "inputProvenance": {
+    "profiles": {
+      "path": "docs/booking-engine/payload-reserve-plan/reconciliation/effective-profiles-128.json",
+      "sha256": "4a831d5a4f3392369153a6c5e2b37445ea760b8d6787fcd73b679bc47ac9714b"
+    },
+    "workflows": {
+      "path": "docs/booking-engine/payload-reserve-plan/reconciliation/effective-workflows.json",
+      "sha256": "684ed4db68bdf27df6281da106eece1780c4c2e2b0e7a36daae0dc95ef6cc210"
+    },
+    "sourceManifest": {
+      "path": "docs/booking-engine/payload-reserve-plan/reconciliation/manifest.json",
+      "sha256": "99fec7b69eb8cf72933ac39a82547a0fbacda2496cd5e40a0e595cbae743615f"
+    },
+    "audit": {
+      "path": "docs/audits/merchant-onboarding-128-taxonomy.json",
+      "sha256": "6ddf4228e47c7e9d96399b1e96d7373c0024ca261e0caaac1893b4635c28777a"
+    },
+    "vocabulary": {
+      "path": "docs/merchant-portal-plan/profiles-128.json",
+      "sha256": "49f1acbac8c5afe225efd8cc5ed9c1056f3e77e2474db4c2d2ac7b54d5006277"
+    },
+    "views": {
+      "path": "docs/merchant-portal-plan/work-adaptation/workflow-view-catalog.json",
+      "sha256": "0258a135cff822cca97715d171286b6e8bca2e79b0d3ef721061892e105eaa47"
+    },
+    "confirmation": {
+      "path": "docs/merchant-portal-plan/order-confirmation.md",
+      "sha256": "59044555dadb9efe567095050b15d6cb52c5f65716b065d6b220543a2fab0a38"
+    }
+  },
+  "displayNameDiscrepancies": [
+    {
+      "subcategoryId": "cafe",
+      "categoryId": "restaurants_food",
+      "sourceName": "CafÃƒÂ©",
+      "auditedTaxonomyName": "Café",
+      "displayName": "Café",
+      "treatment": "Display the audited taxonomy label; preserve the discrepant effective-source label and report it. No input registry is rewritten."
+    }
+  ],
+  "artifacts": {
+    "profiles-128.json": "bf27cd51ee94a9ad91b150b39317ebff02f75737d1443dcfddab52e1e63f5a7b",
+    "profiles-128.md": "0c9ab798101769bb7328c4a4bdee4c1da2f1df39445e44571c4513828a0b08df"
+  },
+  "runtimeStatus": "NOT_IMPLEMENTED_NOT_VERIFIED_BY_THIS_PLAN",
+  "command": "node docs/merchant-portal-plan/work-adaptation/generate-work-matrix.mjs"
+}

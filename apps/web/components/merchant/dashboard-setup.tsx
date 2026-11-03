@@ -86,13 +86,20 @@ export function DashboardSetup({
   branches,
   attention,
   personName,
+  guestPreview = false,
 }: {
   m: MerchantHome;
   progress: SetupProgress;
   branches: BranchCard[];
   attention: AttentionRow[];
   personName: string;
+  guestPreview?: boolean;
 }) {
+  const destination = (href: string) => {
+    if (!guestPreview) return href;
+    const section = href.replace(/^\/merchant\/?/, '') || 'dashboard';
+    return `/merchant-preview/${section}`;
+  };
   const pct = Math.round((progress.done_count / progress.of_count) * 100);
   const docsToDo =
     (m.documents_missing ?? 0) + (m.documents_to_fix ?? 0) + (m.documents_asked_for ?? 0);
@@ -155,7 +162,7 @@ export function DashboardSetup({
               fifteen-minute setup call.
             </p>
             <Link
-              href="/merchant/messages"
+              href={destination('/merchant/messages')}
               className="bg-gold text-ink mt-3 block rounded-lg px-4 py-2.5 text-center text-[0.8125rem] font-extrabold"
             >
               Message ops →
@@ -246,7 +253,7 @@ export function DashboardSetup({
                     </span>
                   ) : (
                     <Link
-                      href={s.href}
+                      href={destination(s.href)}
                       className={`mt-2.5 text-[0.6875rem] font-extrabold underline-offset-2 hover:underline ${
                         next ? 'text-ink' : 'text-gold'
                       }`}
@@ -276,7 +283,7 @@ export function DashboardSetup({
               My Branches
             </h2>
             <Link
-              href="/merchant/stores"
+              href={destination('/merchant/stores')}
               className="border-border-strong bg-surface rounded-lg border px-3.5 py-2 text-[0.8125rem] font-extrabold"
             >
               View all →
@@ -285,10 +292,10 @@ export function DashboardSetup({
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {branches.map((b) => (
-              <BranchTile key={b.branch_id} b={b} live={false} />
+              <BranchTile key={b.branch_id} b={b} live={false} guestPreview={guestPreview} />
             ))}
             <Link
-              href="/merchant/stores"
+              href={destination('/merchant/stores')}
               className="border-border text-muted hover:border-ink flex min-h-[8rem] flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed p-4 text-center transition-colors"
             >
               <span className="text-xl" aria-hidden="true">
@@ -368,25 +375,25 @@ export function DashboardSetup({
             <h2 className="text-[0.9375rem] font-extrabold tracking-tight">Quick actions</h2>
             <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
               <QuickAction
-                href="/merchant/documents"
+                href={destination('/merchant/documents')}
                 icon={<FileText className="h-4 w-4" />}
                 title="Upload documents"
                 note="Photo or PDF from your phone is fine."
               />
               <QuickAction
-                href="/merchant/menu"
+                href={destination('/merchant/menu')}
                 icon={<ListOrdered className="h-4 w-4" />}
                 title="Continue catalogue"
                 note="Changes before go-live need no review."
               />
               <QuickAction
-                href="/merchant/team"
+                href={destination('/merchant/team')}
                 icon={<Smartphone className="h-4 w-4" />}
                 title="Install on counter phone"
                 note="Order sounds and the accept screen."
               />
               <QuickAction
-                href="/merchant/messages"
+                href={destination('/merchant/messages')}
                 icon={<MessageSquare className="h-4 w-4" />}
                 title="Book a setup call"
                 note="Fifteen minutes with merchant ops."
@@ -419,7 +426,15 @@ export function DashboardSetup({
   );
 }
 
-export function BranchTile({ b, live }: { b: BranchCard; live: boolean }) {
+export function BranchTile({
+  b,
+  live,
+  guestPreview = false,
+}: {
+  b: BranchCard;
+  live: boolean;
+  guestPreview?: boolean;
+}) {
   const STATE: Record<string, { label: string; tone: string }> = {
     open: { label: 'Open · accepting', tone: 'bg-success/15 text-success' },
     busy: { label: 'Busy', tone: 'bg-warn/15 text-warn' },
@@ -431,7 +446,7 @@ export function BranchTile({ b, live }: { b: BranchCard; live: boolean }) {
 
   return (
     <Link
-      href="/merchant/stores"
+      href={guestPreview ? '/merchant-preview/stores' : '/merchant/stores'}
       className="bg-ink group relative flex min-h-[8rem] flex-col justify-end overflow-hidden rounded-xl p-4 text-white transition-transform hover:-translate-y-0.5"
     >
       <span className="absolute inset-0 bg-gradient-to-br from-white/[0.07] to-transparent" />

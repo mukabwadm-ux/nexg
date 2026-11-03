@@ -1,0 +1,126 @@
+{
+  "fictional": true,
+  "merchant": "Nairobi Collective",
+  "location": "Westlands",
+  "actor": {
+    "role": "Owner",
+    "initials": "ZM"
+  },
+  "timezone": "Africa/Nairobi",
+  "journeyTimes": [
+    "2026-11-01T10:10",
+    "2026-11-01T10:11",
+    "2026-11-01T10:12"
+  ],
+  "period": {
+    "start": "2026-10-25",
+    "end": "2026-10-31",
+    "basis": "accepted promised readiness",
+    "source": "selected NEXG records",
+    "due": 50,
+    "late": 8,
+    "readinessMissing": 0
+  },
+  "bands": [
+    {
+      "from": "08:00",
+      "to": "10:00",
+      "due": 8,
+      "late": 0
+    },
+    {
+      "from": "10:00",
+      "to": "12:00",
+      "due": 20,
+      "late": 6
+    },
+    {
+      "from": "12:00",
+      "to": "14:00",
+      "due": 12,
+      "late": 1
+    },
+    {
+      "from": "14:00",
+      "to": "16:00",
+      "due": 10,
+      "late": 1
+    }
+  ],
+  "selected": {
+    "from": "10:00",
+    "to": "12:00",
+    "due": 20,
+    "late": 6,
+    "onTime": 14,
+    "unknown": 0,
+    "latePercent": 30,
+    "records": [
+      {
+        "id": "ORD-1984",
+        "date": "2026-10-25",
+        "promisedReady": "10:15",
+        "recordedReady": "10:27",
+        "lateMinutes": 12
+      },
+      {
+        "id": "ORD-1991",
+        "date": "2026-10-26",
+        "promisedReady": "10:30",
+        "recordedReady": "10:48",
+        "lateMinutes": 18
+      },
+      {
+        "id": "ORD-2002",
+        "date": "2026-10-27",
+        "promisedReady": "11:00",
+        "recordedReady": "11:15",
+        "lateMinutes": 15
+      },
+      {
+        "id": "ORD-2011",
+        "date": "2026-10-28",
+        "promisedReady": "11:30",
+        "recordedReady": "11:39",
+        "lateMinutes": 9
+      },
+      {
+        "id": "ORD-2027",
+        "date": "2026-10-30",
+        "promisedReady": "10:45",
+        "recordedReady": "11:06",
+        "lateMinutes": 21
+      },
+      {
+        "id": "ORD-2036",
+        "date": "2026-10-31",
+        "promisedReady": "11:15",
+        "recordedReady": "11:30",
+        "lateMinutes": 15
+      }
+    ]
+  },
+  "trial": {
+    "classification": "operational staffing concept extension; not booking capacity",
+    "confirmedAt": "2026-11-01T10:12",
+    "effectiveDate": "2026-11-02",
+    "from": "10:00",
+    "to": "12:00",
+    "before": [
+      "Maya T."
+    ],
+    "after": [
+      "Maya T.",
+      "John M."
+    ],
+    "johnAvailability": "source-validated free interval; no overlapping assignment",
+    "performanceEffect": "not measured; future trial has not run",
+    "unchanged": [
+      "accepted orders",
+      "accepted promises",
+      "stock confirmation",
+      "opening hours",
+      "historical metrics"
+    ]
+  }
+}

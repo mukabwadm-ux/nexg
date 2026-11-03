@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": [
+    "next-env.d.ts",
+    "lib/merchant-real-journey.test.tsx",
+    "lib/test-fixtures/merchant-journey-pg.ts",
+    "vitest.phase5-journey.config.ts"
+  ]
+}

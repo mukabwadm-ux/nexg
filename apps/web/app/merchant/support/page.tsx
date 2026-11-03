@@ -43,7 +43,7 @@ function when(iso: string | null): string {
  * thread that waited two days is worse than no promise.
  */
 export default async function SupportPage() {
-  const { m } = await merchantContext();
+  const { m } = await merchantContext({ setup: true });
   if (!m) return null;
 
   const { data } = await createClient()

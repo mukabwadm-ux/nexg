@@ -1,0 +1,1157 @@
+{
+  "policy": "Keep passing checks. Run a passed case again only after its part changes, by explicitly selecting its id in LAYOUT_CASES.",
+  "cases": [
+    {
+      "id": "work-local-scroll-and-fade",
+      "checkedAt": "2026-11-01T13:20:23.109Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "true",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Work queue",
+            "client": 335,
+            "scroll": 561,
+            "bottom": 593
+          }
+        ],
+        "metrics": [],
+        "panels": [],
+        "pagination": [],
+        "localScrollTop": 226
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    },
+    {
+      "id": "insights-overview-compact",
+      "checkedAt": "2026-11-01T13:07:46.789Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "overview",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Top menu items table area",
+            "client": 102,
+            "scroll": 102,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "1,176",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 1,176,000.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 1,000.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "94%",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Completed orders by weekCompletion events in the selected periodTable viewView f",
+            "height": 143,
+            "bottom": 438.03125
+          },
+          {
+            "title": "Top menu itemsTop 5 of 8 matching items · each accepted unit retainedView full r",
+            "height": 173,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 2PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    },
+    {
+      "id": "insights-orders-compact",
+      "checkedAt": "2026-11-01T12:46:48.546Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "orders",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Order evidence table area",
+            "client": 88,
+            "scroll": 88,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "1,248",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "1,176",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "54",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "18",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Request-cohort outcomesTable viewView full report Completed request-cohort order",
+            "height": 138,
+            "bottom": 444.171875
+          },
+          {
+            "title": "Order evidence1,248 matching recordsView full report Order evidenceReferenceOffe",
+            "height": 167,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 624PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed"
+    },
+    {
+      "id": "insights-menu-compact",
+      "checkedAt": "2026-11-01T13:25:08.465Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "menu",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Offering and variant evidence table area",
+            "client": 96,
+            "scroll": 96,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "1,764",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "1,176",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 1,176,000.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 1,000.00",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Top items by fulfilled units · eachTable viewView full report Beef burger420Chic",
+            "height": 138,
+            "bottom": 444.171875
+          },
+          {
+            "title": "Offering and variant evidence8 matching recordsView full report Offering and var",
+            "height": 167,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 4PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    },
+    {
+      "id": "insights-customers-compact",
+      "checkedAt": "2026-11-01T12:47:26.650Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "customers",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Returning customer activity evidence table area",
+            "client": 80,
+            "scroll": 80,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "840",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "600",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "240",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "28.6%",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Customer identities by cohortTable viewView full report First time600Returning24",
+            "height": 131,
+            "bottom": 452.21875
+          },
+          {
+            "title": "Returning customer activity evidence840 matching evidence rows · Completed in pe",
+            "height": 159,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 420PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed"
+    },
+    {
+      "id": "insights-operations-compact",
+      "checkedAt": "2026-11-01T12:47:52.703Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "operations",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Readiness by fulfilment table area",
+            "client": 80,
+            "scroll": 80,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "94%",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "28 min",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "8",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "54",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Recorded cancellation reasonsTable viewView full report Changed plans24Item unav",
+            "height": 131,
+            "bottom": 452.28125
+          },
+          {
+            "title": "Readiness by fulfilment3 matching recordsView full report Readiness by fulfilmen",
+            "height": 159,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 2PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed"
+    },
+    {
+      "id": "insights-promotions-compact",
+      "checkedAt": "2026-11-01T12:48:11.156Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "promotions",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Campaign measurement evidence table area",
+            "client": 80,
+            "scroll": 80,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "12,000",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "600",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "5%",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "36",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Measured campaign eventsTable viewView full report Impressions12,000Taps600Quali",
+            "height": 131,
+            "bottom": 452.21875
+          },
+          {
+            "title": "Campaign measurement evidence1 matching evidence rows · Occurred in period · Afr",
+            "height": 159,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 1PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed"
+    },
+    {
+      "id": "insights-finance-compact",
+      "checkedAt": "2026-11-01T13:27:41.664Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "finance",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Posted merchant activity evidence table area",
+            "client": 104,
+            "scroll": 104,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "KES 1,176,000.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 17,640.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 58,800.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 1,099,560.00",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Posted credits, refunds and feesPosting amounts by class. Net posted credit is s",
+            "height": 138,
+            "bottom": 444.171875
+          },
+          {
+            "title": "Posted merchant activity evidence1,178 matching evidence rows · Posted in period",
+            "height": 167,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 393PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    },
+    {
+      "id": "insights-reports-compact",
+      "checkedAt": "2026-11-01T12:48:37.368Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "reports",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [],
+        "metrics": [
+          {
+            "text": "1,248",
+            "width": 186,
+            "scroll": 186
+          },
+          {
+            "text": "1,176",
+            "width": 186,
+            "scroll": 186
+          },
+          {
+            "text": "54",
+            "width": 186,
+            "scroll": 186
+          },
+          {
+            "text": "18",
+            "width": 186,
+            "scroll": 186
+          }
+        ],
+        "panels": [
+          {
+            "title": "LibrarySaved views (0)Exports (0)Search reportsSource coverageAll areas · Occurr",
+            "height": 385,
+            "bottom": 621
+          }
+        ],
+        "pagination": []
+      },
+      "status": "passed"
+    },
+    {
+      "id": "insights-overview-wide",
+      "checkedAt": "2026-11-01T12:48:47.794Z",
+      "evidence": {
+        "width": 1440,
+        "height": 900,
+        "documentWidth": 1440,
+        "documentHeight": 900,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 836,
+            "scroll": 836,
+            "overflow": "hidden"
+          },
+          {
+            "name": "overview",
+            "client": 836,
+            "scroll": 836,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Top menu items table area",
+            "client": 239,
+            "scroll": 239,
+            "bottom": 853
+          }
+        ],
+        "metrics": [
+          {
+            "text": "1,176",
+            "width": 268,
+            "scroll": 268
+          },
+          {
+            "text": "KES 1,176,000.00",
+            "width": 268,
+            "scroll": 268
+          },
+          {
+            "text": "KES 1,000.00",
+            "width": 268,
+            "scroll": 268
+          },
+          {
+            "text": "94%",
+            "width": 268,
+            "scroll": 268
+          }
+        ],
+        "panels": [
+          {
+            "title": "Completed orders by weekCompletion events in the selected periodTable viewView f",
+            "height": 262,
+            "bottom": 559.84375
+          },
+          {
+            "title": "Top menu itemsTop 5 of 8 matching items · each accepted unit retainedView full r",
+            "height": 318,
+            "bottom": 888
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 1PreviousNext",
+            "bottom": 881
+          }
+        ]
+      },
+      "status": "passed"
+    },
+    {
+      "id": "offerings-shared-table",
+      "checkedAt": "2026-11-01T13:13:02.400Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Scrollable offering list",
+            "client": 274,
+            "scroll": 274,
+            "bottom": 494.1875
+          }
+        ],
+        "metrics": [],
+        "panels": [],
+        "pagination": []
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    },
+    {
+      "id": "work-mobile-navigation",
+      "checkedAt": "2026-11-01T13:07:59.428Z",
+      "evidence": {
+        "width": 390,
+        "height": 844,
+        "documentWidth": 390,
+        "documentHeight": 844,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 732,
+            "scroll": 732,
+            "overflow": "hidden"
+          },
+          {
+            "name": "true",
+            "client": 732,
+            "scroll": 732,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Work queue",
+            "client": 504,
+            "scroll": 528,
+            "bottom": 806
+          }
+        ],
+        "metrics": [],
+        "panels": [],
+        "pagination": []
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    },
+    {
+      "id": "money-shared-table",
+      "checkedAt": "2026-11-01T13:08:02.595Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Recent activity records",
+            "client": 231,
+            "scroll": 231,
+            "bottom": 569
+          }
+        ],
+        "metrics": [],
+        "panels": [],
+        "pagination": []
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    },
+    {
+      "id": "promotions-shared-table",
+      "checkedAt": "2026-11-01T13:08:06.593Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Promotion records",
+            "client": 241,
+            "scroll": 241,
+            "bottom": 548.59375
+          }
+        ],
+        "metrics": [],
+        "panels": [],
+        "pagination": []
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    },
+    {
+      "id": "insights-chart-table-view",
+      "checkedAt": "2026-11-01T13:21:00.413Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "menu",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Top items by fulfilled units · each values",
+            "client": 101,
+            "scroll": 102,
+            "bottom": 443.171875
+          },
+          {
+            "name": "Item sales by offering values",
+            "client": 101,
+            "scroll": 102,
+            "bottom": 443.171875
+          },
+          {
+            "name": "Offering and variant evidence table area",
+            "client": 96,
+            "scroll": 96,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "1,764",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 1,176,000.00",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Top items by fulfilled units · eachChart viewView full report Top items by fulfi",
+            "height": 138,
+            "bottom": 444.171875
+          },
+          {
+            "title": "Offering and variant evidence8 matching recordsView full report Offering and var",
+            "height": 167,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 4PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed",
+      "runtimeErrors": []
+    }
+  ],
+  "history": [
+    {
+      "id": "work-local-scroll-and-fade",
+      "checkedAt": "2026-11-01T12:46:21.237Z",
+      "status": "failed",
+      "error": "\u001b[31mTimed out 5000ms waiting for \u001b[39mexpect(locator).toContainText(expected)\n\nLocator: getByRole('complementary', { name: 'Workspace sidebar' }).getByRole('link', { name: 'Merchant workspace Home' })\nExpected string: \"Business workspace\"\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - locator._expect with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('complementary', { name: 'Workspace sidebar' }).getByRole('link', { name: 'Merchant workspace Home' })\u001b[22m\n"
+    },
+    {
+      "id": "insights-overview-compact",
+      "checkedAt": "2026-11-01T12:46:37.061Z",
+      "status": "failed",
+      "error": "Summary rows fit without vertical table scrolling"
+    },
+    {
+      "id": "offerings-shared-table",
+      "checkedAt": "2026-11-01T12:48:54.600Z",
+      "status": "failed",
+      "error": "locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-merchant-workspace]') to be visible\u001b[22m\n\u001b[2m    - waiting for\" http://127.0.0.1:3141/merchant-live-preview/offerings\" navigation to finish...\u001b[22m\n\u001b[2m    - navigated to \"http://127.0.0.1:3141/merchant-live-preview/offerings\"\u001b[22m\n"
+    },
+    {
+      "id": "work-mobile-navigation",
+      "checkedAt": "2026-11-01T12:50:25.481Z",
+      "status": "failed",
+      "error": "locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Open workspace navigation' })\u001b[22m\n"
+    },
+    {
+      "id": "work-local-scroll-and-fade",
+      "checkedAt": "2026-11-01T13:07:39.600Z",
+      "status": "failed",
+      "error": "expect(received).toBe(expected) // Object.is equality\n\nExpected: \"rgb(184, 176, 159)\"\nReceived: \"rgb(149, 139, 120)\"\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate",
+      "diagnostics": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "true",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Work queue",
+            "client": 335,
+            "scroll": 561,
+            "bottom": 593
+          }
+        ],
+        "metrics": [],
+        "panels": [],
+        "pagination": []
+      },
+      "runtimeErrors": []
+    },
+    {
+      "id": "offerings-shared-table",
+      "checkedAt": "2026-11-01T13:07:51.876Z",
+      "status": "failed",
+      "error": "\u001b[31mTimed out 5000ms waiting for \u001b[39mexpect(locator).toHaveAttribute(expected)\n\nLocator: getByRole('region', { name: 'Scrollable offering list' })\nExpected string: \"\"\nReceived string: \"true\"\nCall log:\n\u001b[2m  - locator._expect with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: 'Scrollable offering list' })\u001b[22m\n\u001b[2m    9 × locator resolved to <div tabindex=\"0\" role=\"region\" data-table-viewport=\"true\" data-scroll-active=\"false\" aria-label=\"Scrollable offering list\" class=\"ui-table-viewport of-table-scroll\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"true\"\u001b[22m\n",
+      "diagnostics": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Scrollable offering list",
+            "client": 274,
+            "scroll": 274,
+            "bottom": 494.1875
+          }
+        ],
+        "metrics": [],
+        "panels": [],
+        "pagination": []
+      },
+      "runtimeErrors": []
+    },
+    {
+      "id": "work-local-scroll-and-fade",
+      "checkedAt": "2026-11-01T13:11:03.233Z",
+      "status": "failed",
+      "error": "locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/Loading sample work|Loading offerings|Loading sample money|Loading promotions|Loading sample schedule/) to be hidden\u001b[22m\n\u001b[2m    171 × locator resolved to visible <p role=\"status\" class=\"rounded-lg bg-white p-6 text-sm text-[#5e6b79]\">Loading sample work…</p>\u001b[22m\n",
+      "diagnostics": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "true",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [],
+        "metrics": [],
+        "panels": [],
+        "pagination": []
+      },
+      "runtimeErrors": [
+        "Invalid or unexpected token"
+      ]
+    },
+    {
+      "id": "insights-menu-compact",
+      "checkedAt": "2026-11-01T12:47:04.790Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "menu",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Offering and variant evidence table area",
+            "client": 88,
+            "scroll": 88,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "1,764",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 1,176,000.00",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Top items by fulfilled units · eachTable viewView full report Beef burger420Chic",
+            "height": 138,
+            "bottom": 444.171875
+          },
+          {
+            "title": "Offering and variant evidence8 matching recordsView full report Offering and var",
+            "height": 167,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 4PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed"
+    },
+    {
+      "id": "insights-finance-compact",
+      "checkedAt": "2026-11-01T12:48:21.180Z",
+      "evidence": {
+        "width": 1280,
+        "height": 633,
+        "documentWidth": 1280,
+        "documentHeight": 633,
+        "root": [
+          {
+            "name": "DIV",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          },
+          {
+            "name": "finance",
+            "client": 569,
+            "scroll": 569,
+            "overflow": "hidden"
+          }
+        ],
+        "tableAreas": [
+          {
+            "name": "Posted merchant activity evidence table area",
+            "client": 88,
+            "scroll": 88,
+            "bottom": 586
+          }
+        ],
+        "metrics": [
+          {
+            "text": "KES 1,176,000.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 17,640.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 58,800.00",
+            "width": 228,
+            "scroll": 228
+          },
+          {
+            "text": "KES 1,099,560.00",
+            "width": 228,
+            "scroll": 228
+          }
+        ],
+        "panels": [
+          {
+            "title": "Posted credits and net creditCredits less refunds and fees. Net credit is not pr",
+            "height": 138,
+            "bottom": 444.171875
+          },
+          {
+            "title": "Posted merchant activity evidence1,178 matching evidence rows · Posted in period",
+            "height": 167,
+            "bottom": 621
+          }
+        ],
+        "pagination": [
+          {
+            "text": "Page 1 of 589PreviousNext",
+            "bottom": 614
+          }
+        ]
+      },
+      "status": "passed"
+    }
+  ]
+}

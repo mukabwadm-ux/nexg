@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-01",
+  "tool": "built-in image_gen",
+  "refinements": [
+    {
+      "id": "INS_02",
+      "file": "02-product-variant-performance-v2.png",
+      "prompt": "Use case: precise-object-edit. In this NEXG Insights screenshot, change only the Ready on time metric card. Retain title Ready on time, value 90%, and 225 of 250 eligible orders. Add a clear small label 'Promise due in period' directly within that same Ready on time card, below its evidence line. This is distinct from the Fulfilled in period basis of the other metrics. Preserve all other content, table values, charts, navigation, layout and design. No other changes.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-691715c6-571d-4303-a69d-9810888dcce3.png",
+      "selectedSource": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-79660f3b-62e4-4b19-9331-42b1fac0e734.png"
+    },
+    {
+      "id": "INS_04",
+      "file": "04-rental-utilization-v2.png",
+      "prompt": "Use case: precise-object-edit. In this NEXG Insights screenshot change only the third metric card, the one with 42. Its primary measure label must read 'Completed rentals'. Retain 'Completed in period' as a smaller date-basis label in this same card. Keep value 42 and every other number, chart, table, label, layout and design unchanged.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-4b7209ab-102a-4843-9dc9-89a61692cfa7.png",
+      "selectedSource": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-7c6550ef-8884-4e86-ae01-8dd276d6f80b.png"
+    },
+    {
+      "id": "INS_06",
+      "file": "06-quotes-and-production-v2.png",
+      "prompt": "Use case: precise-object-edit. In this NEXG Insights screenshot add a small clear caption directly above the bottom production-job table: 'Showing 3 of 30 due jobs'. Add a compact footer below that table with 'Previous' and 'Next' controls and 'Page 1 of 10'. Preserve all table rows, blue View links, source semantics, requests-with-accepted-quote label, accepted production subtitle, all metric values and all charts, navigation and design unchanged. These table controls refer only to the production jobs table. Do not alter the upper request cohort.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-b463132e-e8f9-41bd-8319-64b163bee8ed.png",
+      "selectedSource": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-d77db1d9-e06d-47a0-8cbd-9a275fc7c176.png"
+    },
+    {
+      "id": "INS_07",
+      "file": "07-operational-milestones-v2.png",
+      "prompt": "Use case: precise-object-edit. In this NEXG shipment Insights screenshot change only the bottom table scope header and add its pagination. Replace 'Due shipments (100)' with 'Due shipments · Showing 3 of 100'. Retain all three existing rows exactly. Add a compact table footer: 'Previous' and 'Next' controls with 'Page 1 of 34'. Keep all headline metrics, chart counts 84/10/6, units, dates, unknown evidence labels, links, sidebar and design unchanged.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-f20d489c-569b-48d2-a65b-ce4fbb7808a0.png",
+      "selectedSource": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-4704d792-5a8b-48c4-ba78-46b501230760.png"
+    },
+    {
+      "id": "INS_08",
+      "file": "08-sessions-and-entitlements-v2.png",
+      "prompt": "Use case: precise-object-edit. In this NEXG Insights screenshot change only the session chart title from 'Booked and attended places by occurrence' to 'Booked and attended places by week'. The existing Week 1 to Week 4 grouping and values stay unchanged. Keep View occurrences as the drill-down control. Preserve all other text, 240/180/75%/162 session metrics, 80/120/52 entitlement metrics, all table values, sidebar, layout and design exactly unchanged.",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-0a5e0296-30f5-47e4-b222-73ed193e0901.png",
+      "selectedSource": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-eb435526-c221-4355-a781-ddf0d42886ed.png"
+    }
+  ]
+}

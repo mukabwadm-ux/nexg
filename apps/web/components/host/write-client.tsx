@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { replyToConversation, startConversation } from '@/app/host/actions';
+import { replyToConversation, startConversation } from '@/app/(customer)/host/actions';
 
 import { Actions, Area, Drawer, Field, Said, Select, Submit, Text, useAction } from './form';
 
@@ -271,7 +271,7 @@ export function MarkRead({ conversationId }: { conversationId: string }) {
      * somebody presses something is a badge people learn to
      * ignore.
      */
-    void import('@/app/host/actions').then(({ markConversationRead }) =>
+    void import('@/app/(customer)/host/actions').then(({ markConversationRead }) =>
       markConversationRead(conversationId).then(() => router.refresh()),
     );
   }, [conversationId, router]);

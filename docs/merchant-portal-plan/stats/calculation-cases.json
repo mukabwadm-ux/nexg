@@ -1,0 +1,607 @@
+{
+  "status": "INDEPENDENT_DESIGN_EXAMPLES_NOT_APPLICATION_TESTS",
+  "cases": [
+    {
+      "id": "ST-C01",
+      "kind": "confirmed_distinct",
+      "meaning": "A duplicate delivery and an unconfirmed click do not create completions.",
+      "input": {
+        "records": [
+          {
+            "workId": "a",
+            "confirmed": true
+          },
+          {
+            "workId": "a",
+            "confirmed": true
+          },
+          {
+            "workId": "b",
+            "confirmed": false
+          },
+          {
+            "workId": "c",
+            "confirmed": true
+          }
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "id": "ST-C02",
+      "kind": "canonical_roots",
+      "meaning": "External mirror and a linked child do not add unique root customer work.",
+      "input": {
+        "records": [
+          {
+            "workId": "native-a",
+            "rootId": "root-a"
+          },
+          {
+            "workId": "external-a",
+            "rootId": "root-a"
+          },
+          {
+            "workId": "visit-child",
+            "rootId": "root-a"
+          },
+          {
+            "workId": "b",
+            "rootId": "root-b"
+          }
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "id": "ST-C03",
+      "kind": "latest_revision",
+      "meaning": "A correction retracts a previous completion; replay does not add work.",
+      "input": {
+        "records": [
+          {
+            "workId": "a",
+            "revision": 1,
+            "state": "COMPLETED"
+          },
+          {
+            "workId": "a",
+            "revision": 2,
+            "state": "REOPENED"
+          },
+          {
+            "workId": "a",
+            "revision": 2,
+            "state": "REOPENED"
+          },
+          {
+            "workId": "b",
+            "revision": 1,
+            "state": "COMPLETED"
+          }
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "id": "ST-C04",
+      "kind": "cohort_ratio",
+      "meaning": "Open and superseded quotes do not enter final-decision acceptance.",
+      "input": {
+        "outcomes": [
+          "accepted",
+          "accepted",
+          "declined",
+          "expired",
+          "open",
+          "open",
+          "superseded"
+        ],
+        "numerator": [
+          "accepted"
+        ],
+        "denominator": [
+          "accepted",
+          "declined",
+          "expired"
+        ]
+      },
+      "expected": {
+        "numerator": 2,
+        "denominator": 4,
+        "value": 0.5
+      }
+    },
+    {
+      "id": "ST-C05",
+      "kind": "cohort_ratio",
+      "meaning": "Undecided and cancelled bookings do not become attended cases.",
+      "input": {
+        "outcomes": [
+          "no_show",
+          "attended",
+          "attended",
+          "attended",
+          "undecided",
+          "undecided",
+          "cancelled"
+        ],
+        "numerator": [
+          "no_show"
+        ],
+        "denominator": [
+          "no_show",
+          "attended"
+        ]
+      },
+      "expected": {
+        "numerator": 1,
+        "denominator": 4,
+        "value": 0.25
+      }
+    },
+    {
+      "id": "ST-C06",
+      "kind": "ratio_with_outstanding",
+      "meaning": "An on-time percentage does not conceal unreturned overdue assets.",
+      "input": {
+        "numerator": 4,
+        "denominator": 5,
+        "outstandingOverdue": 2
+      },
+      "expected": {
+        "numerator": 4,
+        "denominator": 5,
+        "value": 0.8,
+        "outstandingOverdue": 2
+      }
+    },
+    {
+      "id": "ST-C07",
+      "kind": "interval_union_ratio",
+      "meaning": "Overlapping reservations on one resource are unioned, not double counted.",
+      "input": {
+        "occupiedIntervals": [
+          [
+            0,
+            60
+          ],
+          [
+            30,
+            90
+          ]
+        ],
+        "capacityIntervals": [
+          [
+            0,
+            120
+          ]
+        ]
+      },
+      "expected": {
+        "numerator": 90,
+        "denominator": 120,
+        "value": 0.75
+      }
+    },
+    {
+      "id": "ST-C08",
+      "kind": "interval_union_ratio",
+      "meaning": "Maintenance is excluded from published rentable capacity.",
+      "input": {
+        "occupiedIntervals": [
+          [
+            60,
+            180
+          ]
+        ],
+        "capacityIntervals": [
+          [
+            60,
+            240
+          ]
+        ]
+      },
+      "expected": {
+        "numerator": 120,
+        "denominator": 180,
+        "value": 0.6666666666666666
+      }
+    },
+    {
+      "id": "ST-C09",
+      "kind": "grouped_sum",
+      "meaning": "Mass and volume are never combined into one capacity total.",
+      "input": {
+        "records": [
+          {
+            "unit": "kg",
+            "amount": 20
+          },
+          {
+            "unit": "kg",
+            "amount": 30
+          },
+          {
+            "unit": "m3",
+            "amount": 7
+          }
+        ]
+      },
+      "expected": {
+        "kg": 50,
+        "m3": 7
+      }
+    },
+    {
+      "id": "ST-C10",
+      "kind": "grouped_sum",
+      "meaning": "Money keeps its currency; there is no inferred exchange rate.",
+      "input": {
+        "records": [
+          {
+            "unit": "KES",
+            "amount": 1000
+          },
+          {
+            "unit": "KES",
+            "amount": 200
+          },
+          {
+            "unit": "USD",
+            "amount": 500
+          }
+        ]
+      },
+      "expected": {
+        "KES": 1200,
+        "USD": 500
+      }
+    },
+    {
+      "id": "ST-C11",
+      "kind": "ratio_with_outstanding",
+      "meaning": "Zero denominator is unavailable.",
+      "input": {
+        "numerator": 0,
+        "denominator": 0,
+        "outstandingOverdue": 0
+      },
+      "expected": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "outstandingOverdue": 0
+      }
+    },
+    {
+      "id": "ST-C12",
+      "kind": "half_open_period",
+      "meaning": "Nairobi's local day uses its configured instant boundaries, excluding the next midnight.",
+      "input": {
+        "start": "2026-10-31T00:00:00+03:00",
+        "end": "2026-11-01T00:00:00+03:00",
+        "instants": [
+          "2026-10-30T20:59:59Z",
+          "2026-10-30T21:00:00Z",
+          "2026-10-31T20:59:59Z",
+          "2026-10-31T21:00:00Z"
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "id": "ST-C13",
+      "kind": "evidence_gate",
+      "meaning": "An accepted order amount is insufficient evidence for sales collected.",
+      "input": {
+        "requiredSourceIds": [
+          "SRC_FINANCE"
+        ],
+        "availableSourceIds": [
+          "SRC_WORKFLOW"
+        ],
+        "minimumHistory": false,
+        "historyAvailable": false
+      },
+      "expected": "NOT_COLLECTED"
+    },
+    {
+      "id": "ST-C14",
+      "kind": "evidence_gate",
+      "meaning": "A complete current snapshot cannot produce historic duration or a historic series.",
+      "input": {
+        "requiredSourceIds": [
+          "SRC_WORKFLOW"
+        ],
+        "availableSourceIds": [
+          "SRC_WORKFLOW"
+        ],
+        "minimumHistory": true,
+        "historyAvailable": false
+      },
+      "expected": "INSUFFICIENT_HISTORY"
+    },
+    {
+      "id": "ST-C15",
+      "kind": "milestone_vs_work",
+      "meaning": "One rental can have two due milestones but one unique work item.",
+      "input": {
+        "records": [
+          {
+            "milestoneId": "handover",
+            "workId": "rental-a"
+          },
+          {
+            "milestoneId": "return",
+            "workId": "rental-a"
+          }
+        ]
+      },
+      "expected": {
+        "milestones": 2,
+        "work": 1
+      }
+    },
+    {
+      "id": "ST-C16",
+      "kind": "setup_progress",
+      "meaning": "Waiting review is remaining, optional and inapplicable tasks do not enter the required denominator.",
+      "input": {
+        "records": [
+          {
+            "required": true,
+            "applicable": true,
+            "state": "verified"
+          },
+          {
+            "required": true,
+            "applicable": true,
+            "state": "waiting_review"
+          },
+          {
+            "required": false,
+            "applicable": true,
+            "state": "pending"
+          },
+          {
+            "required": true,
+            "applicable": false,
+            "state": "pending"
+          }
+        ]
+      },
+      "expected": {
+        "completed": 1,
+        "remaining": 1,
+        "required": 2
+      }
+    },
+    {
+      "id": "ST-C17",
+      "kind": "grouped_sum",
+      "meaning": "Group bookings count two bookings while their participant quantities count eight places.",
+      "input": {
+        "records": [
+          {
+            "unit": "participant_place",
+            "amount": 3
+          },
+          {
+            "unit": "participant_place",
+            "amount": 5
+          }
+        ]
+      },
+      "expected": {
+        "participant_place": 8
+      }
+    },
+    {
+      "id": "ST-C18",
+      "kind": "coverage_gate",
+      "meaning": "Zero activity is valid only with complete coverage; freshness alone is insufficient.",
+      "input": {
+        "complete": false,
+        "fresh": true,
+        "recordCount": 0
+      },
+      "expected": {
+        "value": null,
+        "quality": "PARTIAL"
+      }
+    },
+    {
+      "id": "ST-C19",
+      "kind": "coverage_gate",
+      "meaning": "A confirmed empty covered period can show zero.",
+      "input": {
+        "complete": true,
+        "fresh": true,
+        "recordCount": 0
+      },
+      "expected": {
+        "value": 0,
+        "quality": "COMPLETE"
+      }
+    },
+    {
+      "id": "ST-C20",
+      "kind": "matured_rework_cohort",
+      "meaning": "A new job cannot count as no-rework before its contractual follow-up window ends.",
+      "input": {
+        "cutoff": 100,
+        "jobs": [
+          {
+            "id": "a",
+            "followupEndsAt": 90,
+            "hasRework": true
+          },
+          {
+            "id": "b",
+            "followupEndsAt": 80,
+            "hasRework": false
+          },
+          {
+            "id": "c",
+            "followupEndsAt": 120,
+            "hasRework": false
+          }
+        ]
+      },
+      "expected": {
+        "numerator": 1,
+        "denominator": 2,
+        "value": 0.5
+      }
+    },
+    {
+      "id": "ST-C21",
+      "kind": "matured_conversion",
+      "meaning": "A recent conversion cannot enter numerator before its entry cohort observation window matures.",
+      "input": {
+        "cutoff": 100,
+        "sessions": [
+          {
+            "windowEndsAt": 90,
+            "convertedInsideWindow": true
+          },
+          {
+            "windowEndsAt": 80,
+            "convertedInsideWindow": false
+          },
+          {
+            "windowEndsAt": 120,
+            "convertedInsideWindow": true
+          }
+        ]
+      },
+      "expected": {
+        "numerator": 1,
+        "denominator": 2,
+        "value": 0.5
+      }
+    },
+    {
+      "id": "ST-C22",
+      "kind": "due_population",
+      "meaning": "Due population retains completed milestones and uses one accepted due instant, avoiding a cross-midnight window counting twice.",
+      "input": {
+        "start": 0,
+        "end": 24,
+        "milestones": [
+          {
+            "confirmed": true,
+            "cancelled": false,
+            "dueAt": 10,
+            "completed": true
+          },
+          {
+            "confirmed": true,
+            "cancelled": false,
+            "dueAt": 20,
+            "completed": false
+          },
+          {
+            "confirmed": true,
+            "cancelled": false,
+            "dueAt": 24,
+            "windowStart": 23,
+            "completed": false
+          },
+          {
+            "confirmed": true,
+            "cancelled": true,
+            "dueAt": 12,
+            "completed": false
+          }
+        ]
+      },
+      "expected": 2
+    },
+    {
+      "id": "ST-C23",
+      "kind": "order_confirmation_policy",
+      "meaning": "Automatic source/stock confirmation is normal; review needs an enabled matching exception and cannot fix unavailable/unknown stock.",
+      "input": {
+        "sourceMode": "NATIVE_CONFIRMED",
+        "stock": "AVAILABLE",
+        "reviewRuleEnabled": false,
+        "reviewRuleMatches": false
+      },
+      "expected": "CONFIRMED"
+    },
+    {
+      "id": "ST-C24",
+      "kind": "order_confirmation_policy",
+      "meaning": "Automatic source/stock confirmation is normal; review needs an enabled matching exception and cannot fix unavailable/unknown stock.",
+      "input": {
+        "sourceMode": "EXTERNAL_CONFIRMED",
+        "stock": "AVAILABLE",
+        "reviewRuleEnabled": false,
+        "reviewRuleMatches": false
+      },
+      "expected": "CONFIRMED"
+    },
+    {
+      "id": "ST-C25",
+      "kind": "order_confirmation_policy",
+      "meaning": "Automatic source/stock confirmation is normal; review needs an enabled matching exception and cannot fix unavailable/unknown stock.",
+      "input": {
+        "sourceMode": "NATIVE_CONFIRMED",
+        "stock": "UNAVAILABLE",
+        "reviewRuleEnabled": false,
+        "reviewRuleMatches": false
+      },
+      "expected": "OUT_OF_STOCK"
+    },
+    {
+      "id": "ST-C26",
+      "kind": "order_confirmation_policy",
+      "meaning": "Automatic source/stock confirmation is normal; review needs an enabled matching exception and cannot fix unavailable/unknown stock.",
+      "input": {
+        "sourceMode": "EXTERNAL_CONFIRMED",
+        "stock": "UNKNOWN",
+        "reviewRuleEnabled": false,
+        "reviewRuleMatches": false
+      },
+      "expected": "STOCK_CHECK_PENDING"
+    },
+    {
+      "id": "ST-C27",
+      "kind": "order_confirmation_policy",
+      "meaning": "Automatic source/stock confirmation is normal; review needs an enabled matching exception and cannot fix unavailable/unknown stock.",
+      "input": {
+        "sourceMode": "NATIVE_CONFIRMED",
+        "stock": "AVAILABLE",
+        "reviewRuleEnabled": true,
+        "reviewRuleMatches": true
+      },
+      "expected": "EXCEPTION_REVIEW"
+    },
+    {
+      "id": "ST-C28",
+      "kind": "order_confirmation_policy",
+      "meaning": "Automatic source/stock confirmation is normal; review needs an enabled matching exception and cannot fix unavailable/unknown stock.",
+      "input": {
+        "sourceMode": "NATIVE_CONFIRMED",
+        "stock": "AVAILABLE",
+        "reviewRuleEnabled": true,
+        "reviewRuleMatches": false
+      },
+      "expected": "CONFIRMED"
+    },
+    {
+      "id": "ST-C29",
+      "kind": "order_confirmation_policy",
+      "meaning": "Automatic source/stock confirmation is normal; review needs an enabled matching exception and cannot fix unavailable/unknown stock.",
+      "input": {
+        "sourceMode": "EXTERNAL_CONFIRMED",
+        "stock": "UNAVAILABLE",
+        "reviewRuleEnabled": true,
+        "reviewRuleMatches": true
+      },
+      "expected": "OUT_OF_STOCK"
+    }
+  ]
+}

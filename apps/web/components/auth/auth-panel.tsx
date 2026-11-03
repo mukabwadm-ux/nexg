@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { type AccountRole, createAccount, signIn } from '@/app/sign-in/actions';
+import { type AccountRole, createAccount, signIn } from '@/app/(customer)/sign-in/actions';
+import { authDestination } from '@/lib/auth-navigation';
 
 const ROLES: { value: AccountRole; label: string; hint: string; icon: React.ReactNode }[] = [
   {
@@ -48,16 +49,24 @@ const ROLES: { value: AccountRole; label: string; hint: string; icon: React.Reac
  */
 export function AuthPanel({
   initialTab = 'signin',
+  initialRole = 'guest',
   next,
+  emailOtpEnabled = false,
+  initialEmail,
+  setupEmail,
 }: {
   initialTab?: 'signin' | 'create';
+  initialRole?: AccountRole;
   next?: string;
+  emailOtpEnabled?: boolean;
+  initialEmail?: string;
+  setupEmail?: string;
 }) {
   const { toast } = useToast();
   const router = useRouter();
 
   const [tab, setTab] = React.useState<'signin' | 'create'>(initialTab);
-  const [role, setRole] = React.useState<AccountRole>('guest');
+  const [role, setRole] = React.useState<AccountRole>(initialRole);
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [phone, setPhone] = React.useState<string | null>(null);
@@ -80,7 +89,7 @@ export function AuthPanel({
     }
 
     toast({ title: 'Welcome', description: result.message, tone: 'success' });
-    router.push(next ?? result.redirectTo ?? '/');
+    router.push(authDestination(role, next, result.redirectTo));
     router.refresh();
   };
 
@@ -115,10 +124,18 @@ export function AuthPanel({
         <h1 className="mt-6 text-3xl font-extrabold tracking-tight">
           {tab === 'signin' ? 'Welcome back' : 'Create your account'}
         </h1>
+        {setupEmail ? (
+          <p role="status" className="bg-gold-soft text-ink mt-4 rounded-xl p-4 text-sm leading-6">
+            We sent a secure, single-use password setup link to <strong className="break-all">{setupEmail}</strong>.
+            Open it to choose your password, then sign in here.
+          </p>
+        ) : null}
         <p className="text-muted mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
           {tab === 'signin'
             ? 'Sign in with your email and password.'
-            : 'For guests. You can order without an account — this just saves you time next visit.'}
+            : role === 'merchant'
+              ? 'Create your merchant account, then continue your saved registration.'
+              : 'For guests. You can order without an account — this just saves you time next visit.'}
         </p>
 
         <form onSubmit={submit} className="mt-6">
@@ -188,6 +205,7 @@ export function AuthPanel({
             label="Email"
             autoComplete="email"
             placeholder="you@example.com"
+            defaultValue={initialEmail}
             required
           />
 
@@ -212,6 +230,12 @@ export function AuthPanel({
               Forgot password?
             </Link>
           )}
+
+          {tab === 'signin' && role === 'merchant' && emailOtpEnabled ? (
+            <Link href="/merchants/sign-in/email" className="text-ink ml-4 mt-3 inline-block text-sm font-bold underline underline-offset-4">
+              Sign in with an email code
+            </Link>
+          ) : null}
 
           {tab === 'create' && (
             <div className="mt-4">
@@ -275,8 +299,8 @@ export function AuthPanel({
         <Card tone="muted" className="mt-5 p-4">
           <p className="text-muted text-xs leading-[1.7]">
             <span className="text-ink font-bold">One-time codes by SMS</span>, and Google and Apple
-            sign-in, arrive once those accounts are set up. Until then email and password is the way
-            in — and it works on any device.
+            sign-in, arrive once those accounts are set up.{' '}
+            {emailOtpEnabled ? 'Merchants can also sign in with an email code.' : 'Until then email and password is the way in — and it works on any device.'}
           </p>
         </Card>
 

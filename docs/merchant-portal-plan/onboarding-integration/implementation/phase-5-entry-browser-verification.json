@@ -1,0 +1,12 @@
+{
+  "clientDate": "2026-11-02",
+  "status": "PASS",
+  "scope": "Actual standalone entry/demo UI; real platform link inspected, not a remote Auth acceptance.",
+  "checks": [
+    "Default entry links to the existing real registration route and does not pretend to submit locally.",
+    "Demo activates from onboarding; its portal is labelled and has no activation toggle.",
+    "Exit discards the demo draft; a new demo starts from synthetic data and never transfers it to real entry."
+  ],
+  "serverWrites": [],
+  "pageErrors": []
+}

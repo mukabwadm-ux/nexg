@@ -19,6 +19,7 @@ import { cn } from '../lib/cn';
 import { Button } from './button';
 import { EmptyState } from './empty-state';
 import { Skeleton } from './skeleton';
+import { TableViewport } from './table-viewport';
 
 export interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[];
@@ -126,6 +127,10 @@ export function DataTable<TData>({
     initialState: pageSize ? { pagination: { pageIndex: 0, pageSize } } : {},
   });
 
+  React.useEffect(() => {
+    if (pageSize && table.getState().pagination.pageSize !== pageSize) table.setPageSize(pageSize);
+  }, [pageSize, table]);
+
   // Report selection upward, keyed on the selection state rather than the
   // derived rows so we do not loop on every render.
   React.useEffect(() => {
@@ -138,7 +143,7 @@ export function DataTable<TData>({
   const rows = table.getRowModel().rows;
 
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
+    <div data-table-root className={cn('flex min-h-0 flex-col gap-3', className)}>
       {(searchable || toolbar) && (
         <div className="flex flex-wrap items-center gap-2">
           {searchable && (
@@ -167,7 +172,7 @@ export function DataTable<TData>({
         </div>
       )}
 
-      <div className="border-border bg-surface overflow-x-auto rounded-xl border">
+      <TableViewport label={`${caption} table area`}>
         <table className="w-full min-w-[40rem] border-collapse text-left">
           <caption className="sr-only">{caption}</caption>
 
@@ -284,10 +289,10 @@ export function DataTable<TData>({
             )}
           </tbody>
         </table>
-      </div>
+      </TableViewport>
 
       {pageSize && !loading && !error && rows.length > 0 && (
-        <div className="flex items-center justify-between gap-3">
+        <div data-table-pagination className="flex shrink-0 items-center justify-between gap-3">
           <p className="text-muted-light text-xs">
             {selectable && Object.keys(rowSelection).length > 0
               ? `${table.getSelectedRowModel().rows.length} selected · `

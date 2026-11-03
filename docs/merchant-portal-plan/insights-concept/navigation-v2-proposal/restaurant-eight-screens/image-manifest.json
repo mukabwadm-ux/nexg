@@ -1,0 +1,149 @@
+{
+  "date": "2026-11-01",
+  "status": "EIGHT_SELECTED_RESTAURANT_INSIGHTS_CONCEPTS",
+  "selectedImageCount": 8,
+  "tool": "built-in image_gen",
+  "sourceTemplate": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-385dba70-1eec-426a-bd67-0b95eea8830c.png",
+  "runtimeVerified": false,
+  "images": [
+    {
+      "id": "RST_01",
+      "file": "01-overview.png",
+      "tab": "Overview",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-385dba70-1eec-426a-bd67-0b95eea8830c.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "DIRECTLY_INSPECTED",
+      "runtimeVerified": false,
+      "width": 1586,
+      "height": 992,
+      "sha256": "335b94fc966e5c76a99e7e917609e2933bc5fcbf377e95584d8c625e70ef6abd",
+      "bytes": 1302189
+    },
+    {
+      "id": "RST_02",
+      "file": "02-orders.png",
+      "tab": "Orders",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-5caf430c-c929-4439-a0a9-c0db9b06b7f4.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "DIRECTLY_INSPECTED",
+      "runtimeVerified": false,
+      "width": 1586,
+      "height": 992,
+      "sha256": "9da28f3fdf8288035876c9224894aa2dae3aa034d17190c8bce4c9bd19bec914",
+      "bytes": 1460148
+    },
+    {
+      "id": "RST_03",
+      "file": "03-menu.png",
+      "tab": "Menu",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-1be1b2e6-cd77-45dd-a6ce-d02dc6f5cae3.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "DIRECTLY_INSPECTED",
+      "runtimeVerified": false,
+      "width": 1586,
+      "height": 992,
+      "sha256": "aa96ca53a32d1b600455d193b605fb2a9bf62006d4015d814228c1775411839b",
+      "bytes": 1572763
+    },
+    {
+      "id": "RST_04",
+      "file": "04-customers.png",
+      "tab": "Customers",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-d95517f6-f607-447f-bf31-51baf35c47b6.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "DIRECTLY_INSPECTED",
+      "runtimeVerified": false,
+      "width": 1586,
+      "height": 992,
+      "sha256": "14b0b071ac31b869f289e83b73e8f775c8436d79c37e8fef8ec13d4e680d16a0",
+      "bytes": 1512753
+    },
+    {
+      "id": "RST_05",
+      "file": "05-operations.png",
+      "tab": "Operations",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-4dea6514-7690-445e-8615-d6bc46e21ef6.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "DIRECTLY_INSPECTED",
+      "runtimeVerified": false,
+      "width": 1586,
+      "height": 992,
+      "sha256": "29f4b666279394aeb16d91e87c65394ee21643e4462f20828f21214d012a6b5f",
+      "bytes": 1416899
+    },
+    {
+      "id": "RST_06",
+      "file": "06-promotions.png",
+      "tab": "Promotions",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-441e03c1-bfce-498a-9178-be503ff2efb6.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "DIRECTLY_INSPECTED",
+      "runtimeVerified": false,
+      "width": 1586,
+      "height": 992,
+      "sha256": "545d041040398cbd318cf90d2e029f14e07f57a96e689dc64d253ff3e0c45b66",
+      "bytes": 1564336
+    },
+    {
+      "id": "RST_07",
+      "file": "07-finance.png",
+      "tab": "Finance",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-e6720379-b581-41cc-8f88-b811ae9c8695.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "DIRECTLY_INSPECTED",
+      "runtimeVerified": false,
+      "width": 1586,
+      "height": 992,
+      "sha256": "de5a4399fc71deeaa6a50266d3d77a02af9a0a957b1d45e1d6710c46720ae3e1",
+      "bytes": 1405677
+    },
+    {
+      "id": "RST_08",
+      "file": "08-reports.png",
+      "tab": "Reports",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-4b8ab495-7598-42e0-a73e-2b28cab4a3ed.png",
+      "selected": true,
+      "tool": "built-in image_gen",
+      "visualReview": "DIRECTLY_INSPECTED",
+      "runtimeVerified": false,
+      "width": 1586,
+      "height": 992,
+      "sha256": "43b4817c97339e870959875d9acc52a70eca08128b00b12fae5dd712c1ced495",
+      "bytes": 1515428
+    }
+  ],
+  "retired": [
+    {
+      "id": "RST_03",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-71add6f0-18c7-4f51-a394-a6fd640a812a.png",
+      "reason": "Use a distinct-item label so the count of eight cannot be confused with fulfilled unit quantity.",
+      "selected": false
+    },
+    {
+      "id": "RST_04",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-a8d0c79d-46fa-43af-a91b-5aa19356c5c5.png",
+      "reason": "Use merchant-friendly cohort copy and remove an internal design note from product UI.",
+      "selected": false
+    },
+    {
+      "id": "RST_06",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-87db2ea4-36fe-4326-b9e1-1aa571120c78.png",
+      "reason": "Remove generation constraints accidentally rendered as in-app copy.",
+      "selected": false
+    },
+    {
+      "id": "RST_08",
+      "source": "C:\\Users\\limta\\.codex\\generated_images\\01a195fb-7db9-71a1-8918-aab41a1bc6b1\\exec-3eedb576-3d87-42f0-9264-daf1a4ec5ab7.png",
+      "reason": "Keep the shared Insights heading and one authoritative set of scope controls.",
+      "selected": false
+    }
+  ],
+  "notes": "All final selected outputs are copied to this project. Original generated files remain unchanged at tool output paths. The fixture, initial prompts, template derivation prompts and targeted correction prompts are saved separately."
+}

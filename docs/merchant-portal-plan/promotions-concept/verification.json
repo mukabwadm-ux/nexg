@@ -1,0 +1,130 @@
+{
+  "status": "DESIGN_CHECKS_PASSED",
+  "counts": {
+    "categories": 21,
+    "subcategories": 128,
+    "offeringTypes": 189,
+    "offeringBindings": 390,
+    "offeringModelBindings": 411,
+    "modelRules": 15,
+    "fields": 41,
+    "imageBriefs": 5
+  },
+  "sourceHashes": {
+    "catalogue": {
+      "path": "docs/merchant-portal-plan/offering-map/catalogue.json",
+      "sha256": "0638938f213486ce06a261ea4cc7764d80cfe62f993703860c2a2bdeac2f1fcf"
+    },
+    "effectiveDomains": {
+      "path": "docs/merchant-portal-plan/payload-reserve-plan/reconciliation/effective-domain-registry.json",
+      "sha256": "6ab91de44e853f06b2606ebfc03a123d150650658355b53558778dfbe1578a5b"
+    },
+    "definition": {
+      "path": "docs/merchant-portal-plan/promotions-concept/definition.py",
+      "sha256": "7b369a1bf998304d34ed372488c9b4fa2e66b3fef50816aa78dd298862f2cf9e"
+    }
+  },
+  "illustrativePriceExamples": [
+    {
+      "id": "retail",
+      "passed": true,
+      "savingMinor": 24000,
+      "payableMinor": 216000
+    },
+    {
+      "id": "service",
+      "passed": true,
+      "savingMinor": 60000,
+      "payableMinor": 340000
+    },
+    {
+      "id": "rental",
+      "passed": true,
+      "savingMinor": 180000,
+      "payableMinor": 1620000
+    },
+    {
+      "id": "cap",
+      "passed": true,
+      "savingMinor": 300000,
+      "payableMinor": 5700000
+    },
+    {
+      "id": "below_minimum",
+      "passed": true,
+      "savingMinor": 0,
+      "payableMinor": 100000
+    }
+  ],
+  "corruptedInputRejections": [
+    {
+      "case": "missing specialty",
+      "passed": true,
+      "diagnostic": "SPECIALTY_COVERAGE"
+    },
+    {
+      "case": "private field in public creative",
+      "passed": true,
+      "diagnostic": "PUBLIC_FIELD:clinics:clinic:health_intake.contact"
+    },
+    {
+      "case": "runtime activated by candidate metadata",
+      "passed": true,
+      "diagnostic": "RUNTIME_ACTIVATION"
+    }
+  ],
+  "selectedImageIntegrity": [
+    {
+      "file": "01-campaign-overview.png",
+      "passed": true,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "checksumMatches": true
+    },
+    {
+      "file": "02-service-offer-creation.png",
+      "passed": true,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "checksumMatches": true
+    },
+    {
+      "file": "03-rental-campaign-results.png",
+      "passed": true,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "checksumMatches": true
+    },
+    {
+      "file": "05-promotion-history.png",
+      "passed": true,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "checksumMatches": true
+    },
+    {
+      "file": "06-customer-app-preview.png",
+      "passed": true,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "checksumMatches": true
+    }
+  ],
+  "localLinksChecked": 105,
+  "errors": [],
+  "limits": [
+    "Static design/reference and exact illustrative calculations only.",
+    "No live publication, redemption, budget enforcement, capacity, provider, access or metrics behavior tested.",
+    "Images are separately inspected concept references, not runtime evidence."
+  ]
+}

@@ -1,0 +1,554 @@
+.page {
+  --registration-ink: var(--ink);
+  --registration-muted: var(--muted);
+  --registration-line: var(--border);
+  min-height: 100dvh;
+  padding: 0 clamp(20px, 5vw, 76px) 48px;
+  color: var(--registration-ink);
+  background: var(--bg);
+}
+
+.header,
+.hero,
+.benefits,
+.footer {
+  width: min(100%, 1320px);
+  margin-inline: auto;
+}
+
+.header {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--registration-line);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+}
+
+.logo {
+  width: 52px;
+  height: 50px;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 4vw, 52px);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.navLink,
+.signIn {
+  color: var(--registration-muted);
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+.navLink:hover,
+.signIn:hover {
+  color: var(--registration-ink);
+  text-decoration: underline;
+}
+
+.signIn span {
+  color: var(--registration-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+  align-items: start;
+  gap: clamp(36px, 6vw, 88px);
+  padding-block: clamp(40px, 6vw, 76px) clamp(68px, 8vw, 110px);
+}
+
+.registrationColumn {
+  min-width: 0;
+}
+
+.intro {
+  max-width: 660px;
+  margin-bottom: 30px;
+}
+
+.intro h1 {
+  max-width: 12ch;
+  font-size: clamp(36px, 4vw, 58px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.intro p {
+  max-width: 56ch;
+  margin-top: 16px;
+  color: var(--registration-muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.form {
+  scroll-margin-top: 24px;
+  container-name: registration-form;
+  container-type: inline-size;
+}
+
+.form :global(.merchant-onboarding) {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  color: var(--registration-ink);
+  font-family: inherit;
+  --mo-ink: var(--ink);
+  --mo-muted: var(--muted);
+  --mo-border: var(--border-strong);
+  --mo-paper: var(--surface);
+  --mo-soft: var(--gold-soft);
+  --mo-green: var(--ink);
+  --mo-green-dark: #343434;
+}
+
+.form :global(.merchant-onboarding .mo-topline) {
+  display: none;
+}
+
+.form :global(.merchant-onboarding .mo-status .mo-kicker) {
+  font-size: 12px;
+}
+
+.form :global(.merchant-onboarding form > .mo-registration-marketing) {
+  margin: 16px 0;
+  padding: 12px clamp(16px, 2vw, 24px) 0;
+}
+
+.form :global(.merchant-onboarding .mo-registration-terms .mo-check a:focus-visible) {
+  border-radius: 2px;
+  outline: 3px solid var(--gold-text);
+  outline-offset: 3px;
+}
+
+.form :global(.merchant-onboarding .mo-registration-contact-grid) {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.15fr) minmax(0, 1.05fr);
+}
+
+.form :global(.merchant-onboarding .mo-subcategory-options) {
+  box-sizing: border-box;
+  min-width: 0;
+  z-index: 50;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+}
+
+.form :global(.merchant-onboarding .mo-subcategory-options .mo-check) {
+  min-width: 0;
+  align-items: flex-start;
+}
+
+.form :global(.merchant-onboarding .mo-subcategory-options .mo-check input) {
+  flex: 0 0 auto;
+}
+
+.form :global(.merchant-onboarding .mo-subcategory-options .mo-check span) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.form :global(.merchant-onboarding input::placeholder),
+.form :global(.merchant-onboarding textarea::placeholder) {
+  color: #686868;
+  opacity: 1;
+}
+
+.form :global(.merchant-onboarding .mo-panel) {
+  border-color: var(--registration-line);
+  border-radius: 16px;
+  box-shadow: 0 16px 42px rgb(20 20 20 / 6%);
+}
+
+.form :global(.merchant-onboarding .mo-button-primary) {
+  color: var(--ink);
+  background: var(--gold);
+}
+
+.form :global(.merchant-onboarding .mo-button-primary:hover) {
+  background: #e0b83f;
+}
+
+.form :global(.merchant-onboarding .mo-check input) {
+  accent-color: var(--ink);
+}
+
+.form :global(.merchant-onboarding input:focus-visible),
+.form :global(.merchant-onboarding select:focus-visible),
+.form :global(.merchant-onboarding textarea:focus-visible),
+.form :global(.merchant-onboarding button:focus-visible),
+.brand:focus-visible,
+.navigation a:focus-visible,
+.footerAction:focus-visible {
+  outline: 3px solid var(--gold-text);
+  outline-offset: 3px;
+}
+
+.feature {
+  position: sticky;
+  top: 28px;
+  overflow: hidden;
+  border-radius: 20px;
+  color: white;
+  background: var(--ink);
+}
+
+.imageFrame {
+  position: relative;
+  aspect-ratio: 1.22;
+  overflow: hidden;
+  background: #292824;
+}
+
+.image {
+  object-fit: cover;
+  object-position: center;
+}
+
+.featureCopy {
+  padding: clamp(24px, 3vw, 38px);
+}
+
+.featureCopy h2 {
+  max-width: 14ch;
+  color: white;
+  font-size: clamp(25px, 2.4vw, 34px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.featureCopy p,
+.featureList {
+  color: rgb(255 255 255 / 78%);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.featureCopy p {
+  max-width: 42ch;
+  margin-top: 12px;
+}
+
+.featureList {
+  display: grid;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featureList li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.featureList li::before {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  content: '';
+}
+
+.benefits {
+  padding-block: clamp(46px, 6vw, 78px);
+  border-top: 1px solid var(--registration-line);
+}
+
+.benefitsHeading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.55fr);
+  align-items: end;
+  gap: 32px;
+}
+
+.benefitsHeading h2 {
+  max-width: 19ch;
+  font-size: clamp(28px, 3.2vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.benefitsHeading p {
+  max-width: 34ch;
+  color: var(--registration-muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.benefitList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 42px;
+  border-top: 1px solid var(--registration-line);
+}
+
+.benefit {
+  min-width: 0;
+  padding: 24px 28px 8px 0;
+}
+
+.benefit + .benefit {
+  padding-left: 28px;
+  border-left: 1px solid var(--registration-line);
+}
+
+.benefit h3 {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.benefit p {
+  max-width: 38ch;
+  margin-top: 10px;
+  color: var(--registration-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: clamp(28px, 4vw, 46px);
+  border-radius: 18px;
+  color: white;
+  background: var(--ink);
+}
+
+.footer h2 {
+  font-size: clamp(23px, 2.5vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.footer p {
+  margin-top: 8px;
+  color: rgb(255 255 255 / 75%);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footerAction {
+  display: inline-flex;
+  min-height: 48px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--gold);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease-out,
+    transform 160ms ease-out;
+}
+
+.footerAction:hover {
+  transform: translateY(-2px);
+  background: #e0b83f;
+}
+
+@media (max-width: 1150px) {
+  .page {
+    padding-inline: clamp(20px, 4vw, 42px);
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+    gap: 32px;
+  }
+
+  .form :global(.merchant-onboarding .mo-registration-identity-grid),
+  .form :global(.merchant-onboarding .mo-registration-contact-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 42px;
+    padding-block: 42px 64px;
+  }
+
+  .feature {
+    position: static;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: stretch;
+  }
+
+  .imageFrame {
+    min-height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .benefitsHeading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding-inline: 16px;
+    padding-bottom: 24px;
+  }
+
+  .header {
+    min-height: 72px;
+    gap: 12px;
+  }
+
+  .logo {
+    width: 44px;
+    height: 42px;
+  }
+
+  .navigation {
+    gap: 16px;
+    font-size: 12px;
+  }
+
+  .navLink {
+    display: none;
+  }
+
+  .hero {
+    gap: 36px;
+    padding-block: 36px 52px;
+  }
+
+  .intro {
+    margin-bottom: 22px;
+  }
+
+  .intro h1 {
+    max-width: 11ch;
+    font-size: clamp(34px, 10vw, 44px);
+  }
+
+  .intro p {
+    margin-top: 12px;
+    font-size: 15px;
+  }
+
+  .form :global(.merchant-onboarding .mo-actions) {
+    align-items: stretch;
+  }
+
+  .form :global(.merchant-onboarding .mo-action-right) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form :global(.merchant-onboarding .mo-grid),
+  .form :global(.merchant-onboarding .mo-check-grid),
+  .form :global(.merchant-onboarding .mo-upload-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .feature {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .imageFrame {
+    min-height: 0;
+    aspect-ratio: 1.35;
+  }
+
+  .featureCopy {
+    padding: 24px;
+  }
+
+  .benefitList {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 28px;
+  }
+
+  .benefit,
+  .benefit + .benefit {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--registration-line);
+    border-left: 0;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 22px;
+    padding: 26px 22px;
+  }
+
+  .footerAction {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footerAction {
+    transition: none;
+  }
+}
+
+@container registration-form (max-width: 600px) {
+  .form :global(.merchant-onboarding .mo-registration-activities) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form :global(.merchant-onboarding .mo-registration-identity-grid),
+  .form :global(.merchant-onboarding .mo-registration-contact-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form :global(.merchant-onboarding .mo-registration-identity-grid > :first-child) {
+    grid-column: 1 / -1;
+  }
+
+  .form :global(.merchant-onboarding .mo-registration-contact-grid > :nth-child(3)) {
+    grid-column: 1 / -1;
+  }
+}
+
+@container registration-form (max-width: 460px) {
+  .form :global(.merchant-onboarding .mo-registration-identity-grid),
+  .form :global(.merchant-onboarding .mo-registration-contact-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container registration-form (min-width: 601px) {
+  .form :global(.merchant-onboarding .mo-registration-identity-grid) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .form :global(.merchant-onboarding .mo-registration-contact-grid) {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.15fr) minmax(0, 1.05fr);
+  }
+}

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 import { restoreDeletedMerchant } from '@/app/merchants/actions';
 import { ConsoleHeader } from '@/components/console-header';
@@ -49,6 +50,7 @@ export default async function MerchantsPage({
 }) {
   const staff = await requireStaff();
   requireModule(staff, 'merchants');
+  if (searchParams?.tab === 'applications') redirect('/merchants/applications');
   const supabase = createClient();
 
   const tab = MERCHANT_TABS.some((t) => t.key === searchParams?.tab && t.built)

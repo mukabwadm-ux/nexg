@@ -1,0 +1,755 @@
+{
+  "scope": "Local visual mockups only. No sending, event integration or inbox-client compatibility certification.",
+  "rendering": "HTML/CSS rendered in local Chromium, not AI image generation.",
+  "otpRequirement": {
+    "digits": 6,
+    "expiryMinutes": 30,
+    "source": "User instruction",
+    "existingLocalConfigSeconds": 3600,
+    "configurationChanged": false
+  },
+  "count": 34,
+  "results": [
+    {
+      "id": "01-email-verification-otp",
+      "desktop": {
+        "width": 760,
+        "height": 1029,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1036,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "02-sign-in-otp",
+      "desktop": {
+        "width": 760,
+        "height": 1029,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1018,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "03-password-reset",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 844,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "04-password-changed",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 916,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "05-new-sign-in",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 925,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "06-email-change-confirmation",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 963,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "07-welcome",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 941,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "08-application-received",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 901,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "09-documents-action-required",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 984,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "10-business-approved",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 984,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "11-application-not-approved",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 900,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "12-document-expiring",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 919,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "13-new-order",
+      "desktop": {
+        "width": 760,
+        "height": 1060,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1089,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "14-booking-confirmed",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1005,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "15-work-cancelled",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 984,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "16-customer-message",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 875,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "17-payment-received",
+      "desktop": {
+        "width": 760,
+        "height": 1125,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1130,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "18-payout-sent",
+      "desktop": {
+        "width": 760,
+        "height": 1101,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1113,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "19-payout-failed",
+      "desktop": {
+        "width": 760,
+        "height": 1016,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1046,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "20-refund-completed",
+      "desktop": {
+        "width": 760,
+        "height": 1081,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1111,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "21-statement-ready",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 919,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "22-payout-details-changed",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1002,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "23-team-invitation",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 927,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "24-team-access-changed",
+      "desktop": {
+        "width": 760,
+        "height": 1011,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1045,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "25-account-restricted",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 937,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "26-account-restored",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1002,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "27-support-received",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 901,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "28-support-resolved",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1013,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "29-booking-updated",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1005,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "30-email-changed",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1002,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "31-business-live",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 901,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "32-document-approved",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 984,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "33-payout-completed",
+      "desktop": {
+        "width": 760,
+        "height": 1060,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 1054,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    },
+    {
+      "id": "34-support-reply",
+      "desktop": {
+        "width": 760,
+        "height": 1000,
+        "documentWidth": 760,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      },
+      "mobile": {
+        "width": 390,
+        "height": 901,
+        "documentWidth": 390,
+        "fits": true,
+        "assetsLoaded": true,
+        "fontLoaded": true,
+        "textFits": true
+      }
+    }
+  ],
+  "capturedIds": [
+    "01-email-verification-otp",
+    "07-welcome"
+  ],
+  "gallery": {
+    "desktop": {
+      "width": 1440,
+      "height": 4742,
+      "documentWidth": 1440,
+      "fits": true,
+      "assetsLoaded": true,
+      "fontLoaded": true,
+      "textFits": true
+    },
+    "mobile": {
+      "width": 390,
+      "height": 18144,
+      "documentWidth": 390,
+      "fits": true,
+      "assetsLoaded": true,
+      "fontLoaded": true,
+      "textFits": true
+    },
+    "filterWorks": true
+  },
+  "runtimeErrors": [],
+  "status": "passed"
+}

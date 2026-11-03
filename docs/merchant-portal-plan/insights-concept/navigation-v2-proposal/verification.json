@@ -1,0 +1,170 @@
+{
+  "scope": "Static checks for the new navigation proposal only",
+  "status": "STATIC_PROPOSAL_CHECKS_PASSED",
+  "proposalStatus": "PROPOSED_FOR_REVIEW",
+  "newNavigationApproved": false,
+  "runtimeEnabled": false,
+  "runtimeTestsExecuted": false,
+  "runtimeValidationClaimed": false,
+  "command": "python docs/merchant-portal-plan/insights-concept/navigation-v2-proposal/verify.py",
+  "counts": {
+    "preProposalSourceHashesCompared": 3,
+    "categories": 21,
+    "baselineProfiles": 128,
+    "baselineCandidateModelBindings": 193,
+    "inheritedRouteWorkflowIntakeBindings": 411,
+    "additionalSourceRoutes": 21,
+    "specialtiesWithAdditionalRoutes": 17,
+    "models": 15,
+    "workPeerKeys": 13,
+    "offeringPresentationKeys": 6,
+    "totalRegisteredPeerKeys": 28,
+    "draftReports": 26,
+    "existingMetricsReferenced": 37,
+    "catalogueModelsExplicitlyCovered": 15,
+    "unchangedReferencePngs": 2,
+    "parentSelectedImageHashesCompared": 12,
+    "proposalMarkdownFiles": 4,
+    "localDocumentLinks": 23,
+    "parentDirectFilesReadOnlyDuringCheck": 31
+  },
+  "checks": [
+    {
+      "id": "independent_source_inputs",
+      "status": "PASS",
+      "detail": "Loaded independent parent coverage, effective profiles, approved-source additions, offering composition, model and metric registries"
+    },
+    {
+      "id": "pre_proposal_source_preservation",
+      "status": "PASS",
+      "detail": "Three saved pre-proposal source hashes match; all four inherited source hashes also match"
+    },
+    {
+      "id": "baseline_mappings_and_guards",
+      "status": "PASS",
+      "detail": "128 exact IDs; model/default suggestions, source-relative guards, conditional rules, workflows and actual template scope preserved"
+    },
+    {
+      "id": "inherited_route_and_intake_integrity",
+      "status": "PASS",
+      "detail": "411 inherited route bindings exactly match composition and effective intake contracts; no new workflow or intake is introduced"
+    },
+    {
+      "id": "separate_source_additions",
+      "status": "PASS",
+      "detail": "21 exact source tuples across 17 specialties; baseline, workflows and intake modes preserved"
+    },
+    {
+      "id": "peer_order_model_rules_and_gates",
+      "status": "PASS",
+      "detail": "15 exact model rules, 13 work peers, 28 unique ordered keys, Overview/Reports peers, Bookings segments and capacity/staff gates"
+    },
+    {
+      "id": "proposal_status_and_runtime_boundary",
+      "status": "PASS",
+      "detail": "All new mappings remain PROPOSED_FOR_REVIEW; no runtime enablement or navigation approval is claimed"
+    },
+    {
+      "id": "optional_report_catalogue",
+      "status": "PASS",
+      "detail": "26 unique proposed report IDs; valid peer/model/metric references, all 37 metrics and all 15 models covered"
+    },
+    {
+      "id": "unchanged_supplied_reference_images",
+      "status": "PASS",
+      "detail": "Two valid PNGs match original fingerprints; available Temp originals are compared byte for byte"
+    },
+    {
+      "id": "parent_selected_image_preservation",
+      "status": "PASS",
+      "detail": "12 parent selected images match their existing saved manifest hashes"
+    },
+    {
+      "id": "proposal_documents_and_local_links",
+      "status": "PASS",
+      "detail": "Required proposal files, 128 + 21 Markdown rows and 23 local link targets exist; section fragments are not checked"
+    },
+    {
+      "id": "declared_matrix_counts",
+      "status": "PASS",
+      "detail": "All declared matrix counts independently reconciled"
+    },
+    {
+      "id": "parent_files_read_only_during_check",
+      "status": "PASS",
+      "detail": "All 31 direct parent files have identical hashes before and after this verification run"
+    }
+  ],
+  "errors": [],
+  "referenceImageIntegrity": [
+    {
+      "file": "reference-detail-tabs.png",
+      "sha256": "85ee2cb562b8103cda304ddc523051f214e8a4c2d83d9b76cfa63bc01b5a1b03",
+      "bytes": 2108477,
+      "width": 1536,
+      "height": 1024,
+      "chunkCount": 517,
+      "allChunkCrcsValid": true,
+      "originalTempCompared": true,
+      "originalTempPath": "C:\\Users\\limta\\AppData\\Local\\Temp\\codex-clipboard-a320999c-7742-4035-9c4c-c1ee9b3133eb.png",
+      "originalSha256": "85ee2cb562b8103cda304ddc523051f214e8a4c2d83d9b76cfa63bc01b5a1b03"
+    },
+    {
+      "file": "reference-overview-tabs.png",
+      "sha256": "b7e3ebc31d8e1369c3c635463bec89a8a0587eac7343993198b6249e22169de5",
+      "bytes": 2027177,
+      "width": 1536,
+      "height": 1024,
+      "chunkCount": 497,
+      "allChunkCrcsValid": true,
+      "originalTempCompared": true,
+      "originalTempPath": "C:\\Users\\limta\\AppData\\Local\\Temp\\codex-clipboard-d7830d3d-fc27-4b5c-a402-19fea98acf40.png",
+      "originalSha256": "b7e3ebc31d8e1369c3c635463bec89a8a0587eac7343993198b6249e22169de5"
+    }
+  ],
+  "parentDirectFileHashInventoryAtRunStart": {
+    "01-mixed-overview.png": "f1d47f54f87e2bc4b156fc145fc677d97c2f38833b98e770e2cc9dfe37772f58",
+    "02-product-variant-performance-v2.png": "3f1257d0c0c06a242d665b15d32062f22162e2891b018f0e5974bcbc46ce3448",
+    "02-product-variant-performance.png": "f1b04d329863971e8fa384e55d5b6102a0c78c81d220749c62d154b9dd96f3b9",
+    "03-appointment-performance.png": "8ca875c4ac2a80cb77ddb80c189448b3eae7d92627c633df5fa50d1bcbff0284",
+    "04-rental-utilization-v2.png": "9b1c57d5a9b8c632019c20a24bfa117e99ce9c92ce0831e0be812a0746ab7f34",
+    "04-rental-utilization.png": "0bb7efe73e325b28e47d8bb03c2b3965a03e868c5ad15abe79717e8a2ba8b877",
+    "05-space-reservations.png": "a2e3201376147b02b420dc64e22713a999a71be5cf2c9baf0e417fd2b1d3d577",
+    "06-quotes-and-production-v2.png": "d362812f8c5fee3080fc62a0d13be17f30f29c6fe4bdedbce43866ff56365657",
+    "06-quotes-and-production.png": "c6d159c506fd77e10690d97dbda43c61c9052ced2c8b8ce1c338a71ac4ebe0e0",
+    "07-operational-milestones-v2.png": "bf71381fb4ebf10e28cbea3ca0064ed2b4334004e23697e3e8a1a88701f3e31a",
+    "07-operational-milestones.png": "5ade71524bbc3854a56b93047af46c6e39ef871d0c732ff1bbe4193d10568ad4",
+    "08-sessions-and-entitlements-v2.png": "c48a39786d326208d47df2f20b6e40fb8643729e99462a27a5dcc9919ac0429d",
+    "08-sessions-and-entitlements.png": "3dfd2ec5b3f4d9cca664a7790c24abc935569f863d1ded7ead96c2015576c069",
+    "09-promotion-attribution.png": "da3bcd0ccba5976d26c3b6adb88917d99d589cbf333abe9b81bb178f3f4754ea",
+    "10-financial-activity.png": "647da3be7f3f8543aef7bba91aa3e68991fc30f5160cfd2254039d19c8eaeeb3",
+    "11-metric-definition-and-evidence.png": "82d1b9f48c85883f427e484cbb44964a845517288f2d89399776b9a87ca018c7",
+    "12-mobile-partial-data.png": "ae50f12e84eaf2005f6782582a968851a7dd79a20f87af3f392bdf2c4a535fb8",
+    "coverage.json": "c0380931383021fa2c2a44c5d74cfeb73182c023c949117d061df3692c17e06f",
+    "coverage.md": "9569c669a9f8cedf6e4f4b855e8eaee040ed945938552c2f84d56a0ec7b52cf4",
+    "image-corrections.json": "593c71759f76c337a9ae4db83d7cdbcba66fb9c60f5279f83fcd2cfda64edd43",
+    "image-manifest.json": "267260e0985b19bcca877716d8e584053f455afbf7558e9a95a382fe1b2e7b87",
+    "image-prompts.json": "e870d7840edb11e7da836b2f21115d113a307e357cb677cb203d93a5495000f8",
+    "image-refinements.json": "5ea9fa05a46c5bb684db33dba7c7a715cfdd52d38749452aa671a0eb80cf492a",
+    "image-review.md": "57c23f5d3825706ca32b58cd2cae912e3d3f3e97f89197a92d5851a141f5a729",
+    "images.md": "6f8d09f6727db44f114de8afee704c660f0b127a88f9256f4fba164c7fac4106",
+    "metric-registry.json": "dd6fcefbc0e1248270a92692690728aa90e0ed81173d43d1e89694227129d71d",
+    "README.md": "cb8bda32e1d75fbdfb2a23b68d1901f5ce4b87645bddb73a93f2ef08cf26d497",
+    "screen-design.md": "7d562eaed2f60301a2c331e697619795fa6e563808d3f6ddd1199b4a2ae6f044",
+    "validation-plan.md": "f03de9387ba030217cff521f7f4f98a999225e0bbe3d9885ee45621a11d513f0",
+    "verification.json": "e1e4de61884b3420fc1e66cbade722477d049c1be8228ad22dcc5a91d16ae7eb",
+    "verify.py": "1854f860062d5c7f42d769f927f8a32ebc26b57505de6bea63fecb184841ed7c"
+  },
+  "preservationEvidence": {
+    "preProposalSnapshot": "The matrix records three earlier source hashes: parent coverage, effective profiles and prior source additions. Those are compared directly. The unchanged parent coverage also records four inherited source hashes.",
+    "parentImages": "Existing parent image-manifest hashes are compared with the 12 selected parent PNGs.",
+    "otherParentFiles": "The inventory records current direct-parent hashes and checks they do not change during this verifier run. Without earlier hashes, it does not prove those other files were unchanged throughout proposal authoring.",
+    "writes": "Only proposal-local verification.json is written by this script. Parent files are read only."
+  },
+  "limitations": [
+    "No application navigation, reporting query, source ingestion, export generation, authorization or accessibility is tested.",
+    "Static mapping and file integrity do not establish user approval or runtime readiness.",
+    "PNG integrity and unchanged reference bytes do not approve their labels, business rules or example data.",
+    "Local Markdown targets are checked for file/directory existence; section fragment IDs are not validated."
+  ]
+}

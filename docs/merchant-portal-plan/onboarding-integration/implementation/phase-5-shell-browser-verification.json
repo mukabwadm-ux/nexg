@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-11-02T00:44:09.349Z",
+  "boundary": "Actual WorkspaceFrame, managed shell and Radix mobile drawer; in-memory Next pathname/link and fixed setup fixture. No Auth, backend, live records or whole service startup.",
+  "cases": [
+    {
+      "id": "pending-nav-shows-generic-lock-without-child-records-or-requests",
+      "status": "passed"
+    },
+    {
+      "id": "approved-nav-uses-actual-routes-without-activation-controls",
+      "status": "passed"
+    },
+    {
+      "id": "mobile-locked-selection-closes-drawer-and-home-restores-setup",
+      "status": "passed"
+    },
+    {
+      "id": "pending-setup-route-renders-editor-with-nav-still-locked",
+      "status": "passed",
+      "checkedAt": "2026-11-02T00:44:09.347Z"
+    }
+  ],
+  "checkedThisRun": 1,
+  "runtimeErrors": [],
+  "requests": []
+}

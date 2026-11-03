@@ -1,0 +1,157 @@
+{
+  "status": "PASS",
+  "date": "2026-10-31",
+  "scope": "Frontend-only Availability, with local sample sources; onboarding last",
+  "checks": {
+    "unit": {
+      "status": "PASS",
+      "files": 3,
+      "tests": 57,
+      "availability": 31,
+      "offerings": 19,
+      "work": 7
+    },
+    "types": {
+      "status": "PASS",
+      "config": "apps/web/tsconfig.availability.json"
+    },
+    "lint": {
+      "status": "PASS",
+      "scope": "Availability and changed shared frontend dependencies"
+    },
+    "whitespace": {
+      "status": "PASS",
+      "scope": "Changed tracked frontend files"
+    },
+    "allCategoryBrowser": {
+      "status": "PASS",
+      "profiles": 128,
+      "bindings": 193,
+      "schemas": 18,
+      "networkWrites": 0,
+      "errors": 0
+    },
+    "interactionBrowser": {
+      "status": "PASS",
+      "journeys": [
+        "Keyboard empty-slot proposal, focus, dirty-close keep/discard",
+        "Seven-day time grid; drag only proposes, same Work identity and times retained",
+        "Read-only role blocks edits while preserving booking inspection",
+        "Dated session month and one-day views; occurrence capacity inspector",
+        "Stale, unknown, partial, external, offline and missing-setup states never promise capacity",
+        "Cross-tab change invalidates reviewed impact, retains inputs and requires a fresh comparison",
+        "Denied local storage reports failure and preserves input"
+      ],
+      "networkWrites": 0,
+      "errors": 0
+    },
+    "calendarLayout": {
+      "status": "PASS",
+      "cases": 17,
+      "sizes": [
+        "1920x1080",
+        "1672x941",
+        "1440x900",
+        "1280x720",
+        "1280x633"
+      ],
+      "shortViewportPixelScale": 1.5,
+      "assertions": [
+        "Outer viewport fits",
+        "Seven hours rows visible",
+        "Whole seven-day asset timeline and four resources visible",
+        "Complete default timed range visible",
+        "Editor covers no calendar content",
+        "Affected work links and actions visible"
+      ]
+    },
+    "productionBuild": "Not part of this frontend preview verification",
+    "fullAccessibilityCertification": "Not claimed"
+  },
+  "files": [
+    {
+      "file": "apps/web/components/merchant/availability/model.ts",
+      "sha256": "13081211ab504e65ca01bce68a7ccf91986b4fc78c537041ee53fdb1c3d55517"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/source.ts",
+      "sha256": "4349355745b2930ce2e6eff974de784d94ba6f03e5165812a57336b528cf2e5c"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/views.tsx",
+      "sha256": "599fa8e1635587ccf589157890290ffd79af9526958644d7bbaec634438adabb"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/calendar.tsx",
+      "sha256": "3fb50cb6ed6a78b1ec149916a762e5c4fd801043c7732f6a2b03fa1248865137"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/forms.tsx",
+      "sha256": "df997111340d4c39cc0876d8b15c77257c2befd85c89cb36abc204068b8be1e3"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/inspectors.tsx",
+      "sha256": "71934d3d0e66172153ddb3c46be91b33d43cd52eddde6731981a9828c5e79730"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/workspace.tsx",
+      "sha256": "b22888ce80cc270f4bad6ca299b5b18778326993ffae2b316fc1ce13c0429ad4"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/work-entry.tsx",
+      "sha256": "54bca1be4f18ad9a05cac3d5e1f993c64145bc0d01259f7d8cb24256544262c6"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/workspace.module.css",
+      "sha256": "0fb2d47e42586b5be3e8121a22e9cfadb4cdbef9c4cc554e56d7ad49f6741889"
+    },
+    {
+      "file": "apps/web/components/merchant/availability/model.test.ts",
+      "sha256": "f84484988284587c7e0062381f9fed4c342fb856091bde8b6f61e4e69162a681"
+    }
+  ],
+  "pictures": [
+    {
+      "file": "availability-hours-desktop.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "7dc1ae17342210e4cb27fbed635cc52f49332341c3fd8c821e1d78b8ad78791f"
+    },
+    {
+      "file": "availability-appointments-desktop.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "aaee63788c338ad30cfb64097bcb54f41bd310789c1c5a0c47cc37e5b9efc9b9"
+    },
+    {
+      "file": "availability-rental-conflict-desktop.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "8a1a401c93052bd528e405fa38ab2532a25c146e8229ff720f1adcaf952cdfbf"
+    },
+    {
+      "file": "availability-hours-short-viewport.png",
+      "width": 1920,
+      "height": 950,
+      "sha256": "82f8ba769969302c9acf701dd00e14dbe8b7b66dbeb54839a8a0ef69f3c839b7"
+    },
+    {
+      "file": "availability-calendar-short-viewport.png",
+      "width": 1920,
+      "height": 950,
+      "sha256": "b86940018f0c88152cf2d3710320e98599597f56415ca3a0e5eb15a27322b020"
+    },
+    {
+      "file": "availability-rental-docked-short-viewport.png",
+      "width": 1920,
+      "height": 950,
+      "sha256": "4b637faef776fb6248215866c8071c5350e13fbe03704d98cb2586303a706eb9"
+    }
+  ],
+  "notes": [
+    "No backend, Supabase, auth, live Google/ERP, discovery or onboarding changes in this task",
+    "128/193/18 is registered-context coverage, distinct from testing every future policy permutation",
+    "Source roles, failures, fees and confirmation are local simulations",
+    "The earlier design verification.json remains a design-only artifact"
+  ]
+}

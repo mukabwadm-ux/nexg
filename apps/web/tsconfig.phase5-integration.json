@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": [
+    "next-env.d.ts",
+    "lib/merchant-home-source.ts",
+    "lib/merchant-home-source.test.ts",
+    "lib/merchant-application-load.ts",
+    "lib/merchant-registration-entry.test.tsx",
+    "app/api/merchant/application/route.ts",
+    "app/api/merchant/application/route.phase5.test.ts",
+    "lib/merchant-home-host.test.tsx",
+    "lib/merchant-frame-source.test.ts",
+    "components/onboarding/connected-application.tsx",
+    "components/onboarding/demo-entry.tsx",
+    "app/merchant/page.tsx",
+    "app/merchant/layout.tsx",
+    "app/(customer)/merchants/page.tsx",
+    "app/(customer)/merchants/register/page.tsx",
+    "app/(customer)/sign-in/actions.ts",
+    "components/merchant/frame.tsx",
+    "components/merchant/workspace/merchant-workspace-shell.tsx"
+  ]
+}

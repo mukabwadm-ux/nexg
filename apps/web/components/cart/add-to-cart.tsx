@@ -80,6 +80,10 @@ export function CartBar() {
 
   if (!cart.ready || cart.count === 0) return null;
   if (
+    pathname === '/merchant-live-preview/offerings' ||
+    pathname === '/merchant-live-preview/availability' ||
+    pathname === '/merchant-live-preview/money' ||
+    pathname === '/merchant-live-preview/promotions' ||
     pathname.startsWith('/checkout') ||
     pathname.startsWith('/pay') ||
     pathname.startsWith('/orders')

@@ -4,6 +4,7 @@
  * Consistent response shapes: `jsonOk` for success, `jsonError` for failures.
  */
 import { NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
 import type { z } from 'zod';
 import { parse } from '@nexg/contracts';
 import type { ApiError } from '@nexg/contracts/api';
@@ -48,9 +49,10 @@ export function jsonError(
   options?: {
     status?: number;
     fields?: Record<string, string>;
+    retryAfter?: number;
   },
 ) {
-  const { status = 400, fields } = options ?? {};
+  const { status = 400, fields, retryAfter } = options ?? {};
 
   const error: ApiError = {
     ok: false,
@@ -62,7 +64,14 @@ export function jsonError(
     meta: { api_version: 'v1' },
   };
 
-  return NextResponse.json(error, { status });
+  return NextResponse.json(error, {
+    status,
+    headers: {
+      'Cache-Control': 'no-store',
+      'X-Request-Id': randomUUID(),
+      ...(retryAfter !== undefined ? { 'Retry-After': String(Math.max(1, Math.ceil(retryAfter))) } : {}),
+    },
+  });
 }
 
 /**

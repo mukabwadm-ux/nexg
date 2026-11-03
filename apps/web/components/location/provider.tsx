@@ -7,6 +7,9 @@ import {
   type ResolutionStep,
 } from '@nexg/location';
 import * as React from 'react';
+import { usePathname } from 'next/navigation';
+import { isBookingPage } from '@/lib/booking/routes';
+import { isMerchantRegistrationPath } from '@/lib/merchant-journey-navigation';
 
 import {
   cityFromConnection,
@@ -42,6 +45,7 @@ export function SiteLocationProvider({
   children: React.ReactNode;
   initial: { place: Place | null; step: ResolutionStep } | null;
 }) {
+  const pathname = usePathname();
   const sessionRef = React.useRef<string>('');
 
   const actions = React.useMemo<LocationActions>(
@@ -102,7 +106,17 @@ export function SiteLocationProvider({
   );
 
   return (
-    <LocationProvider actions={actions} initial={initial} maps={MAPS}>
+    <LocationProvider
+      actions={actions}
+      initial={initial}
+      maps={MAPS}
+      passive={
+        isBookingPage(pathname) ||
+        isMerchantRegistrationPath(pathname) ||
+        pathname === '/merchant-live-preview' ||
+        pathname.startsWith('/merchant-live-preview/')
+      }
+    >
       {children}
     </LocationProvider>
   );

@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-01",
+  "tool": "built-in image_gen",
+  "reason": "User identified a missing transition between selected statement and acknowledged case.",
+  "id": "DA08",
+  "input": "08-money-contextual-support.png",
+  "selectedReplacement": "08-money-report-issue-form.png",
+  "supersededRetained": "08-money-contextual-support.png",
+  "prompt": "Use case: ui-mockup, precise interface-state correction.\nEDIT TARGET: supplied actual-Money-based screenshot with the centered Issue FIN-1103 / Under review modal. Preserve the entire underlying Money/Statements screenshot, its dim overlay, sidebar, merchant Nairobi Collective, Westlands, ZM avatar, selected STM-1103, two statement rows, existing report inspector, both fee entries, all totals and original proportions. Preserve the modal's white rounded styling, typeface, close X, border/shadow treatment and positioning. Change ONLY the modal contents from the already-submitted case into the PRE-SUBMISSION issue form opened by the existing \"Report an issue\" button at the bottom of the selected statement's right-hand inspector.\nTHIS IS THE MISSING INTERACTION: Select STM-1103, click \"Report an issue\", this form opens with context attached. It has NOT been sent. Do not display FIN-1103, Under review, Received, Case timeline, Assigned to Finance, View case, or any success confirmation in this pre-submit form. Those only exist AFTER successful submission.\nModal title EXACTLY \"Report an issue\". Small neutral badge \"Draft\". Subtitle \"Opened from statement STM-1103\". Keep close X.\nThe body must clearly expose real form controls, not a read-only case summary. Use existing Money field/group styles and readable normal spacing:\nA read-only context group with small label \"Statement context · attached automatically\":\nStatement \"STM-1103 · 1–3 Nov 2026\"\nBusiness \"Nairobi Collective · Westlands · KES\"\nSnapshot \"Revision 0 · 36 postings\"\nBelow, a labeled select \"Issue type\" showing \"Possible duplicate fee\" with dropdown caret.\nA labeled select \"Posting to check\" showing \"TX-6116 · KES 1,200\" with dropdown caret.\nA compact attached-evidence group \"Evidence included\" with two clear list entries: \"Statement STM-1103, revision 0\" and \"Fee entries TX-6116 and TX-6400\". Secondary text \"Related posting TX-6400 · KES 6,800\".\nAn editable multiline text area labeled \"Describe the issue\" containing the merchant's draft: \"Please check whether TX-6116 repeats a fee included in TX-6400.\" It must LOOK EDITABLE with the existing textarea border, not like a posted message.\nA small neutral notice \"Nothing has been sent. Statement totals are unchanged.\" Optional concise helper \"Finance support receives this statement and evidence when you send.\"\nFooter has exactly TWO buttons: outlined \"Cancel\" and gold primary \"Send to Finance support\". All form fields, the helper and BOTH footer buttons must be fully visible in the screenshot. No fake cursor clicking, no extraneous arrows or outside annotations.\nUnderlying statement remains the same: 36 postings, posted sales KES 200,000, confirmed refunds KES 10,000, posted fees KES 8,000, net payable in period KES 182,000. Its existing Report an issue trigger stays visible behind the overlay. No financial figures change, no payout, no customer refund and no claim of actual external messaging. The background Sample preview designation remains visible. Output one corrected full screenshot, maintaining the input framing and close visual fidelity.",
+  "transition": [
+    "Select statement STM-1103",
+    "Click Report an issue in the selected statement's right inspector",
+    "Review auto-attached context/evidence and editable draft",
+    "Send to Finance support",
+    "Submitting, with duplicate prevention",
+    "Confirmed case creation returns FIN-1103 and View case action on the same statement",
+    "Later Finance resolution appears in image09"
+  ],
+  "failure": "Retain draft and explain recoverable submission failure. Do not invent a case ID or successful send.",
+  "cancel": "Return to the same selected statement and unchanged financial values."
+}
