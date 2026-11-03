@@ -9,3 +9,14 @@ allowBuilds:
   esbuild: true # Vitest's bundler
   sharp: true # Payload image processor; pinned by the isolated booking runtime
   unrs-resolver: true # ESLint import resolution
+
+# React types: the apps use @types/react 18, the isolated booking engine (Payload)
+# uses 19. Libraries such as next@14 and lucide-react import `react` in their type
+# declarations without declaring @types/react, so they got whichever copy pnpm
+# hoisted, and builds failed whenever that was 19. Keep React types out of the
+# shared hoist; those libraries then resolve the root's pinned 18 copy, and the
+# booking engine keeps its own 19 through its direct dependency.
+hoistPattern:
+  - '*'
+  - '!@types/react'
+  - '!@types/react-dom'
