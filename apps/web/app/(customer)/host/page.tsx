@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
  * amount of filled-in forms substitutes for that — which is why
  * the gate is a status a host cannot set themselves.
  */
-export default async function HostHomePage() {
+export default async function HostHomePage(): Promise<import('react').ReactNode> {
   const me = await requireHost();
   const supabase = createClient();
 

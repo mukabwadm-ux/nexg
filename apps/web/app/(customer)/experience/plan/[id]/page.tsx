@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = { title: 'Your day' };
 export const dynamic = 'force-dynamic';
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: { id: string } }): Promise<import('react').ReactNode> {
   const supabase = createClient();
   const { data } = await supabase.rpc('fn_plan_view', { p_plan_id: params.id });
   const view = (data as PlanView | null) ?? null;

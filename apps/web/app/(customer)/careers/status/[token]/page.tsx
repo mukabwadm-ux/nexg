@@ -57,7 +57,7 @@ interface Status {
  * stages and nothing else — no note, no score, no interviewer
  * surname, nothing about anybody else.
  */
-export default async function StatusPage({ params }: { params: { token: string } }) {
+export default async function StatusPage({ params }: { params: { token: string } }): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   const { data } = await supabase.rpc('rpc_careers_status', { p_token: params.token });

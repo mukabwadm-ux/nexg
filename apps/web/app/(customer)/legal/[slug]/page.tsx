@@ -19,7 +19,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   return { title: document.title, description: document.intro };
 }
 
-export default function LegalPage({ params }: { params: { slug: string } }) {
+export default function LegalPage({ params }: { params: { slug: string } }): import('react').ReactNode {
   const document = findDocument(params.slug);
   if (!document) notFound();
 

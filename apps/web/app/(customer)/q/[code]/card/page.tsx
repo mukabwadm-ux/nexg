@@ -27,7 +27,7 @@ export default async function CardPage({
 }: {
   params: { code: string };
   searchParams?: { n?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const code = normaliseCode(params.code);
   if (!code) notFound();
 

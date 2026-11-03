@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * Merchants set and change their own prices here. Checkout reads the price
  * from the same row, so an edit is live for the next order.
  */
-export default async function MerchantMenu() {
+export default async function MerchantMenu(): Promise<import('react').ReactNode> {
   const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 

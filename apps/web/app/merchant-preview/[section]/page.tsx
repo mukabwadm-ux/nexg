@@ -305,7 +305,7 @@ const sections: Record<
   },
 };
 
-export default function MerchantPreviewSectionPage({ params }: { params: { section: string } }) {
+export default function MerchantPreviewSectionPage({ params }: { params: { section: string } }): import('react').ReactNode {
   if (process.env.NODE_ENV !== 'development') notFound();
 
   if (params.section === 'dashboard') {

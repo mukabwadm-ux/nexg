@@ -46,7 +46,7 @@ function day(iso: string): string {
  * the rota. It also shows how to give a shift back, because the
  * alternative to an easy release is a quiet no-show.
  */
-export default async function RiderShifts() {
+export default async function RiderShifts(): Promise<import('react').ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

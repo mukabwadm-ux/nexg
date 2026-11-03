@@ -28,7 +28,7 @@ const TONE: Record<string, string> = {
  * the other — a rider who thinks the cash in their pocket is
  * theirs is in for a bad Friday.
  */
-export default async function RiderEarnings() {
+export default async function RiderEarnings(): Promise<import('react').ReactNode> {
   const me = await requireRider();
   const supabase = createClient();
 

@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
  * listed, or describe what you need and let somebody come back. The
  * second is the one NexG is actually good at, so it gets the hero.
  */
-export default async function StaysPage() {
+export default async function StaysPage(): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   const { data: properties } = await supabase

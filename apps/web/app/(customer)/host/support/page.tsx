@@ -48,7 +48,7 @@ const TOPIC: Record<string, string> = {
  * hour" next to a thread that waited two days is worse than no
  * promise at all.
  */
-export default async function HostSupportPage() {
+export default async function HostSupportPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, photoUrl, me } = await hostContext();
   if (!home) return null;
 

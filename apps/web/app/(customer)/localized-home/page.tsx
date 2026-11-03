@@ -6,7 +6,7 @@ import { getTranslations } from '@/lib/i18n';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function PersonalizedHomePage() {
+export default async function PersonalizedHomePage(): Promise<import('react').ReactNode> {
   const { locale, t } = await getTranslations();
   return <HomePageContent locale={locale} translate={t} />;
 }

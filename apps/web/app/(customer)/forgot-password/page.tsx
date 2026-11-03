@@ -13,7 +13,7 @@ export default function ForgotPasswordPage({
   searchParams,
 }: {
   searchParams?: { error?: string };
-}) {
+}): import('react').ReactNode {
   return (
     <main className="bg-surface flex min-h-dvh flex-col items-center justify-center px-4 py-10">
       <Link href="/" aria-label="NexG Concierge home" className="mb-8">

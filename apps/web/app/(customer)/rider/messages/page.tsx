@@ -8,7 +8,7 @@ import { markMessagesRead } from '../actions';
 export const metadata = { title: 'Messages' };
 export const dynamic = 'force-dynamic';
 
-export default async function RiderMessages() {
+export default async function RiderMessages(): Promise<import('react').ReactNode> {
   const me = await requireRider();
   const supabase = createClient();
 

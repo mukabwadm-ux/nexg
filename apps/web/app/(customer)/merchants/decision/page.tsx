@@ -40,7 +40,7 @@ async function currentDecision(): Promise<Decision> {
   }
 }
 
-export default async function MerchantDecisionPage() {
+export default async function MerchantDecisionPage(): Promise<import('react').ReactNode> {
   const decision = await currentDecision();
   if (decision === 'sign-in') redirect('/sign-in?reason=workspace-session');
   if (decision === 'workspace') redirect('/merchant');

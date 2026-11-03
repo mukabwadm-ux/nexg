@@ -13,7 +13,7 @@ export default function ResetPasswordPage({
   searchParams,
 }: {
   searchParams?: { next?: string };
-}) {
+}): import('react').ReactNode {
   const redirectTo = searchParams?.next === '/merchant' ? '/merchant' : '/';
   return (
     <main className="bg-surface flex min-h-dvh flex-col items-center justify-center px-4 py-10">

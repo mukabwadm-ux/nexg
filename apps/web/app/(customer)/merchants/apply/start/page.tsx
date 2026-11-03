@@ -13,7 +13,7 @@ export default function StartPage({
   searchParams,
 }: {
   searchParams?: { trading_name?: string; contact_name?: string; phone?: string; email?: string };
-}) {
+}): import('react').ReactNode {
   // Once the connected V1 journey is enabled, the old six-step intake must not
   // remain an alternate merchant-registration entry point.
   if (process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false')

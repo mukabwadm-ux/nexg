@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 export const metadata = { title: 'Transaction' };
 export const dynamic = 'force-dynamic';
 
-export default async function MerchantTransaction({ params }: { params: { id: string } }) {
+export default async function MerchantTransaction({ params }: { params: { id: string } }): Promise<import('react').ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
 

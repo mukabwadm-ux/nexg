@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function MerchantPage({ params }: { params: { id: string } }) {
+export default async function MerchantPage({ params }: { params: { id: string } }): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   /*

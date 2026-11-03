@@ -44,7 +44,7 @@ const ENOUGH = 20;
  * writes one, because a reply that silently never appears is
  * worse than no reply button at all.
  */
-export default async function ReviewsPage({ searchParams }: { searchParams?: { tab?: string } }) {
+export default async function ReviewsPage({ searchParams }: { searchParams?: { tab?: string } }): Promise<import('react').ReactNode> {
   const { m } = await merchantContext();
   if (!m) return null;
 

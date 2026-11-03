@@ -54,7 +54,7 @@ interface PackageOrderRow {
  * would be a number that means nothing, so they are never added
  * together — the page shows both and says which is which.
  */
-export default async function HostEarningsPage() {
+export default async function HostEarningsPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

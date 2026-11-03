@@ -14,7 +14,7 @@ export default async function Registration({
   searchParams,
 }: {
   searchParams: { merchantId?: string; operationId?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   if (process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'false')
     return (
       <MerchantRegistrationPage>

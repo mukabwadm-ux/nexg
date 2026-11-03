@@ -35,7 +35,7 @@ export default async function ExperienceHome({
   searchParams,
 }: {
   searchParams?: { city?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
   const { t } = await getTranslations();
 

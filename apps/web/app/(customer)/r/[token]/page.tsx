@@ -7,6 +7,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function RiderResumePage({ params }: { params: { token: string } }) {
+export default function RiderResumePage({ params }: { params: { token: string } }): import('react').ReactNode {
   return <RiderResumeClaim token={params.token} />;
 }

@@ -38,7 +38,7 @@ interface ReferralRow {
  * are enough to recognise your own referral; they are not
  * enough to identify a stranger's.
  */
-export default async function HostReferPage() {
+export default async function HostReferPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

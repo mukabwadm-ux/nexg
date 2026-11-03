@@ -50,7 +50,7 @@ interface UnitRow {
  * island. A front desk loading this on a tired tablet gets the
  * list without waiting for JavaScript.
  */
-export default async function HostQrPage() {
+export default async function HostQrPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

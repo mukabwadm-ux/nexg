@@ -29,7 +29,7 @@ export const dynamic = 'force-dynamic';
  * delivery with them and switched them over — a checklist
  * cannot substitute for somebody having met them.
  */
-export default async function RiderDashboard() {
+export default async function RiderDashboard(): Promise<import('react').ReactNode> {
   const { h, active, supabase, me } = await riderContext();
 
   if (!h) {

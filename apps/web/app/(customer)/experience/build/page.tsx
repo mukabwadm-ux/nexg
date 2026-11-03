@@ -24,7 +24,7 @@ export default async function BuildPage({
   searchParams,
 }: {
   searchParams?: { event?: string; from?: string; city?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
   const slug = searchParams?.city ?? getCityPreference() ?? 'nairobi';
 

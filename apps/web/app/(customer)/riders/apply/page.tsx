@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/server';
  */
 export const dynamic = 'force-dynamic';
 
-export default async function RiderApplyIndex() {
+export default async function RiderApplyIndex(): Promise<import('react').ReactNode> {
   const supabase = createClient();
 
   const { data } = await supabase

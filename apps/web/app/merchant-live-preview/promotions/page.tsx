@@ -8,7 +8,7 @@ export default function PromotionsPreview({
   searchParams,
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
-}) {
+}): import('react').ReactNode {
   if (process.env.NODE_ENV !== 'development') notFound();
   const demoContext = searchParams ? parseMerchantOnboardingDemoContext(searchParams) : null;
   const profile = typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId;

@@ -156,7 +156,7 @@ const CHANNELS = [
   },
 ] as const;
 
-export default function HelpPage() {
+export default function HelpPage(): import('react').ReactNode {
   return (
     <>
       <SiteHeader />

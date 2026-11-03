@@ -8,6 +8,6 @@ export const metadata: Metadata = {
     'Apply to deliver for NexG. Five short steps, about six minutes, and nothing is shared until our team verifies you.',
 };
 
-export default function Page({ searchParams }: { searchParams?: { invite?: string } }) {
+export default function Page({ searchParams }: { searchParams?: { invite?: string } }): import('react').ReactNode {
   return <RiderStartStep fleetToken={searchParams?.invite ?? null} />;
 }

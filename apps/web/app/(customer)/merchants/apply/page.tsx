@@ -21,7 +21,7 @@ export default async function ApplyIndex({
   searchParams,
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
-}) {
+}): Promise<import('react').ReactNode> {
   if (process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false') {
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(searchParams ?? {})) {

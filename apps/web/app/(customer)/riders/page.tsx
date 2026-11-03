@@ -123,7 +123,7 @@ const FAQ = [
  */
 export const revalidate = 3600;
 
-export default async function RidersPage() {
+export default async function RidersPage(): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   // The cities open for applications (section 4.2). The card adds an

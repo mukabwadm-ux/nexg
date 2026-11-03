@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
  * deliberate: the whole value of verification is that it was
  * not self-service.
  */
-export default async function HostVerifyPage() {
+export default async function HostVerifyPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, progress, photoUrl } = await hostContext();
   if (!home || !progress) return null;
 

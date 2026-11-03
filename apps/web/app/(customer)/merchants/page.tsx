@@ -142,7 +142,7 @@ const FAQ = [
  */
 export const dynamic = 'force-dynamic';
 
-export default async function MerchantsPage() {
+export default async function MerchantsPage(): Promise<import('react').ReactNode> {
   const connectedRegistrationEnabled = process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false';
   const registrationHref = '/merchants/apply';
   const supabase = createPublicClient();

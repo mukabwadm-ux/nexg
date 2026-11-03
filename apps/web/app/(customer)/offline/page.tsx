@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: 'No connection' };
  * cannot do rather than offering a cached page that might be
  * telling somebody a shop is open when it closed an hour ago.
  */
-export default function Offline() {
+export default function Offline(): import('react').ReactNode {
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 text-center">
       <h1 className="text-2xl font-extrabold tracking-tight">You are offline</h1>

@@ -7,6 +7,6 @@ import { redirect } from 'next/navigation';
  * but a separate rider login would be a second place to keep correct for no
  * benefit — the role buttons on /sign-in already decide where you land.
  */
-export default function RiderSignInRedirect() {
+export default function RiderSignInRedirect(): import('react').ReactNode {
   redirect('/sign-in');
 }

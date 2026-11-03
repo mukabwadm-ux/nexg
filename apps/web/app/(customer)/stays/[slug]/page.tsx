@@ -79,7 +79,7 @@ export async function generateMetadata({
  * to leak: where exactly it is comes after somebody is actually
  * coming.
  */
-export default async function PropertyPage({ params }: { params: { slug: string } }) {
+export default async function PropertyPage({ params }: { params: { slug: string } }): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   const { data: property } = await supabase

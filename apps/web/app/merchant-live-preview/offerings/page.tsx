@@ -12,7 +12,7 @@ export default function OfferingsPage({
   searchParams,
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
-}) {
+}): import('react').ReactNode {
   const initialProfileId =
     typeof searchParams?.profile === 'string' ? searchParams.profile : undefined;
   const initialOfferingId =

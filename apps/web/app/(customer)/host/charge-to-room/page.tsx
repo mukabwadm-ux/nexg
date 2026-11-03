@@ -66,7 +66,7 @@ function when(iso: string): string {
  * nothing, which is the rule doing its job rather than the
  * page failing.
  */
-export default async function ChargeToRoom() {
+export default async function ChargeToRoom(): Promise<import('react').ReactNode> {
   const { home, live, nav, photoUrl } = await hostContext();
   if (!home) return null;
 

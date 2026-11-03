@@ -47,7 +47,7 @@ function when(iso: string): string {
  * so before anybody shares a code, rather than after they have
  * brought five people who never rode.
  */
-export default async function RiderRefer() {
+export default async function RiderRefer(): Promise<import('react').ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

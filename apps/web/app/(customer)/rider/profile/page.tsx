@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
  * all — so the page says so rather than letting a rider widen it
  * and wonder why the evening changed.
  */
-export default async function RiderProfilePage() {
+export default async function RiderProfilePage(): Promise<import('react').ReactNode> {
   const me = await requireRider();
   const supabase = createClient();
 

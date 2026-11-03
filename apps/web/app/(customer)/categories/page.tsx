@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 /**
  * All categories explorer.
  */
-export default async function CategoriesPage() {
+export default async function CategoriesPage(): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('category_config')

@@ -7,6 +7,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function ResumePage({ params }: { params: { token: string } }) {
+export default function ResumePage({ params }: { params: { token: string } }): import('react').ReactNode {
   return <ResumeClaim token={params.token} />;
 }

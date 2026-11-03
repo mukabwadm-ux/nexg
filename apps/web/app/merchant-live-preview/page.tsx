@@ -90,7 +90,7 @@ const money: WeekMoney = {
   net_cents: 5157000,
 };
 
-export default function LiveHomePreview({ searchParams }: { searchParams?: Record<string, string | string[] | undefined> }) {
+export default function LiveHomePreview({ searchParams }: { searchParams?: Record<string, string | string[] | undefined> }): import('react').ReactNode {
   if (process.env.NODE_ENV !== 'development') notFound();
   const onboardingDemo = searchParams ? parseMerchantOnboardingDemoContext(searchParams) : null;
   const businessName = onboardingDemo?.businessName ?? 'Nairobi Collective';

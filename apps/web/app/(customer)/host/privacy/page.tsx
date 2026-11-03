@@ -46,7 +46,7 @@ const KIND: Record<string, string> = {
  * statutory one, not an internal target, which is why an
  * overdue row is red rather than amber.
  */
-export default async function HostPrivacyPage() {
+export default async function HostPrivacyPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, photoUrl } = await hostContext();
   if (!home) return null;
 

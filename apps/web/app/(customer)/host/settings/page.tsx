@@ -29,7 +29,7 @@ function maskPhone(p: string | null): string {
  * input. A disabled field is an invitation to click it and
  * conclude something is broken.
  */
-export default async function HostSettingsPage() {
+export default async function HostSettingsPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

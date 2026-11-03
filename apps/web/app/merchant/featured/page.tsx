@@ -25,7 +25,7 @@ function mondayOf(d: Date): string {
  * same function the staff console uses, and put the merchant in the
  * queue with a person to call them.
  */
-export default async function MerchantFeatured() {
+export default async function MerchantFeatured(): Promise<import('react').ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
 

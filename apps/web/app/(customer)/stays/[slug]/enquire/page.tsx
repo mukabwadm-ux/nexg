@@ -25,7 +25,7 @@ export default async function EnquirePage({
 }: {
   params: { slug: string };
   searchParams?: { unit?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   const { data: property } = await supabase

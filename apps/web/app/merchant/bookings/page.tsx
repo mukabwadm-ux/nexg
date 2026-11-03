@@ -13,7 +13,7 @@ import { createClient } from '@/lib/supabase/server';
 export const metadata = { title: 'Bookings' };
 export const dynamic = 'force-dynamic';
 
-export default async function MerchantBookings() {
+export default async function MerchantBookings(): Promise<import('react').ReactNode> {
   const me = await requireMerchant();
   // The booking tables are newer than the generated database types.
   const db = createClient() as unknown as SupabaseClient;

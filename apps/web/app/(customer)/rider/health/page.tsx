@@ -69,7 +69,7 @@ function when(iso: string): string {
  * with — and the whole point of showing it is so they can see
  * which one thing to change.
  */
-export default async function RiderHealth() {
+export default async function RiderHealth(): Promise<import('react').ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

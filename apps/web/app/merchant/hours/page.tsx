@@ -28,7 +28,7 @@ interface OverrideRow {
  * question a merchant opens this to answer, which is "are we
  * shown as open right now".
  */
-export default async function HoursPage({ searchParams }: { searchParams?: { branch?: string } }) {
+export default async function HoursPage({ searchParams }: { searchParams?: { branch?: string } }): Promise<import('react').ReactNode> {
   const { m } = await merchantContext({ draft: true });
   if (!m) return null;
 

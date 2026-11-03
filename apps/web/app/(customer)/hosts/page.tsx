@@ -91,7 +91,7 @@ const FAQ = [
   },
 ] as const;
 
-export default async function HostsPage() {
+export default async function HostsPage(): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   /*

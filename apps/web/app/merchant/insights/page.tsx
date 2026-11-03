@@ -11,7 +11,7 @@ export default async function MerchantInsightsPage({
   searchParams,
 }: {
   searchParams: { from?: string; to?: string; tab?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   try {
     const { snapshot, policy, range } = await loadMerchantInsights(searchParams);
     return (

@@ -110,7 +110,7 @@ export default async function ExplorePage({
     /** "lat,lng": only merchants that deliver to this spot, nearest first. */
     near?: string;
   };
-}) {
+}): Promise<import('react').ReactNode> {
   /*
    * The city has to be known before the cache key, and the city list is part
    * of what is cached — so resolve it from the default city first, then use

@@ -60,7 +60,7 @@ export default async function HostAnalyticsPage({
   searchParams,
 }: {
   searchParams?: { range?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

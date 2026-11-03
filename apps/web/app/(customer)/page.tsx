@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default function HomePage() {
+export default function HomePage(): import('react').ReactNode {
   return <HomePageContent locale="en" />;
 }

@@ -79,7 +79,7 @@ export async function generateMetadata({
  * hiring manager chose to publish it, or "shared at the intro call"
  * when they did not. It never shows a guess.
  */
-export default async function JobPage({ params }: { params: { slug: string } }) {
+export default async function JobPage({ params }: { params: { slug: string } }): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   const [{ data: job }, { data: others }] = await Promise.all([

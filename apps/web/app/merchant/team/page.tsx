@@ -28,7 +28,7 @@ const CAN: Record<string, string> = {
  * that blurred the two would have somebody believe their new
  * manager already has access.
  */
-export default async function TeamPage() {
+export default async function TeamPage(): Promise<import('react').ReactNode> {
   const { m } = await merchantContext();
   if (!m) return null;
 

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function RiderStatusPage() {
+export default async function RiderStatusPage(): Promise<import('react').ReactNode> {
   const supabase = createClient();
 
   const { data: row } = await supabase

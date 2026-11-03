@@ -40,7 +40,7 @@ export default async function MerchantOrders({
   searchParams,
 }: {
   searchParams?: { show?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const me = await requireMerchant();
   const show = searchParams?.show === 'all' ? 'all' : 'live';
   const supabase = createClient();

@@ -42,7 +42,7 @@ interface Message {
  * colleague is not something a query here could show even if
  * somebody wrote one that tried.
  */
-export default async function HostThreadPage({ params }: { params: { id: string } }) {
+export default async function HostThreadPage({ params }: { params: { id: string } }): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, photoUrl } = await hostContext();
   if (!home) return null;
 

@@ -43,7 +43,7 @@ interface Resolved {
  *     instead — because the alternative is somebody standing in a
  *     kitchen holding a dead link.
  */
-export default function ScanPage() {
+export default function ScanPage(): import('react').ReactNode {
   const raw = headers().get(SCAN_HEADER);
 
   /* Base64 — see the note in middleware.ts: a header is latin-1 and

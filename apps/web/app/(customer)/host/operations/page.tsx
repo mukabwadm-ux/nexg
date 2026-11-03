@@ -63,7 +63,7 @@ const HANDOFF: Record<string, { label: string; needs: string }> = {
  * wrong, so an unconfirmed caretaker is flagged rather than
  * silently trusted.
  */
-export default async function HostOperationsPage() {
+export default async function HostOperationsPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

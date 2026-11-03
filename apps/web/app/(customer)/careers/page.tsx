@@ -21,7 +21,7 @@ export const metadata: Metadata = {
  */
 export const revalidate = 3600;
 
-export default async function CareersPage() {
+export default async function CareersPage(): Promise<import('react').ReactNode> {
   const supabase = createPublicClient();
 
   const [{ count: cityCount }, { data: roles }, { data: teams }] = await Promise.all([

@@ -42,7 +42,7 @@ function when(iso: string | null): string {
  * published target. A promise of "under two minutes" beside a
  * thread that waited two days is worse than no promise.
  */
-export default async function SupportPage() {
+export default async function SupportPage(): Promise<import('react').ReactNode> {
   const { m } = await merchantContext({ setup: true });
   if (!m) return null;
 

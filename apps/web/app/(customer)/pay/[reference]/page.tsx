@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic';
  * sooner without anybody having to refresh — but even then, it is
  * the provider being asked, not the browser being believed.
  */
-export default async function PaymentReturn({ params }: { params: { reference: string } }) {
+export default async function PaymentReturn({ params }: { params: { reference: string } }): Promise<import('react').ReactNode> {
   const supabase = createClient();
 
   const { data } = await supabase

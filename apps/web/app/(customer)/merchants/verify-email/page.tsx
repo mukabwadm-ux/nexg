@@ -37,7 +37,7 @@ async function emailConfirmationRequired(): Promise<boolean> {
   }
 }
 
-export default async function VerifyMerchantEmail() {
+export default async function VerifyMerchantEmail(): Promise<import('react').ReactNode> {
   if (process.env.MERCHANT_EMAIL_OTP_ENABLED === 'false' || !(await emailConfirmationRequired()))
     return <Unavailable message="Email verification is not available yet. Your saved application is still available from Home." />;
 

@@ -5,7 +5,7 @@ import { SiteHeader } from '@/components/site-header';
 
 export const metadata: Metadata = { title: 'Checkout' };
 
-export default function CheckoutPage() {
+export default function CheckoutPage(): import('react').ReactNode {
   return (
     <>
       <SiteHeader />

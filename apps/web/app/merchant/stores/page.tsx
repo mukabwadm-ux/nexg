@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
  * it is saved, and a refusal says what to do about it rather than
  * just saying no.
  */
-export default async function StoresPage() {
+export default async function StoresPage(): Promise<import('react').ReactNode> {
   const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 

@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 export const metadata = { title: 'Documents' };
 export const dynamic = 'force-dynamic';
 
-export default async function RiderDocuments() {
+export default async function RiderDocuments(): Promise<import('react').ReactNode> {
   const me = await requireRider();
   const supabase = createClient();
 

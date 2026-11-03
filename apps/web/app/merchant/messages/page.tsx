@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
  * believe they had told us something. The page says where to reach
  * a person instead.
  */
-export default async function MerchantMessages() {
+export default async function MerchantMessages(): Promise<import('react').ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
 

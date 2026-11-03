@@ -8,7 +8,7 @@ export default function MerchantAnalytics({
   searchParams,
 }: {
   searchParams: { from?: string; to?: string; tab?: string };
-}) {
+}): import('react').ReactNode {
   const params = new URLSearchParams();
   for (const key of ['from', 'to', 'tab'] as const) {
     const value = searchParams[key];

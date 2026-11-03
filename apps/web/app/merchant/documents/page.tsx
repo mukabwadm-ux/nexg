@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 export const metadata = { title: 'Documents' };
 export const dynamic = 'force-dynamic';
 
-export default async function MerchantDocuments() {
+export default async function MerchantDocuments(): Promise<import('react').ReactNode> {
   const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 

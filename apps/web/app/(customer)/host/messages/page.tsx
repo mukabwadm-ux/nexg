@@ -54,7 +54,7 @@ export default async function HostMessagesPage({
   searchParams,
 }: {
   searchParams?: { tab?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, photoUrl, me } = await hostContext();
   if (!home) return null;
 

@@ -15,7 +15,7 @@ export default async function MerchantTransactions({
   searchParams,
 }: {
   searchParams?: { page?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
   const page = Math.max(0, Number(searchParams?.page ?? 0) || 0);

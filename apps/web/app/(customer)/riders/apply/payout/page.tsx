@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Page() {
+export default async function Page(): Promise<import('react').ReactNode> {
   const supabase = createClient();
 
   /* The rider's own city, next sessions first, full ones left out. */

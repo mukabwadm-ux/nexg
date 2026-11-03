@@ -21,7 +21,7 @@ export default function SignInPage({
   searchParams,
 }: {
   searchParams?: { tab?: string; next?: string; role?: string; email?: string; setup?: string };
-}) {
+}): import('react').ReactNode {
   const next =
     searchParams?.next && /^\/(?!\/)/.test(searchParams.next) ? searchParams.next : undefined;
   const initialRole = authRoleFromRequest(searchParams?.role, next);

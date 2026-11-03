@@ -22,7 +22,7 @@ function maskEmail(email: string | undefined) {
   return local?.slice(0, 1) + '••••@' + domain;
 }
 
-export default async function SettingsPage() {
+export default async function SettingsPage(): Promise<import('react').ReactNode> {
   const { m, supabase } = await merchantContext();
   if (!m) return null;
   const [{ data, error }, auth] = await Promise.all([

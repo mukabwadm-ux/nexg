@@ -24,7 +24,7 @@ const STEPS: [string, string][] = [
  * whoever opens this, and the only thing separating them is how
  * long is left to reply.
  */
-export default async function DisputesPage({ searchParams }: { searchParams?: { tab?: string } }) {
+export default async function DisputesPage({ searchParams }: { searchParams?: { tab?: string } }): Promise<import('react').ReactNode> {
   const { m } = await merchantContext();
   if (!m) return null;
 

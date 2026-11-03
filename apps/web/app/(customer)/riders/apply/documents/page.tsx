@@ -1,5 +1,5 @@
 import { RiderDocumentsStep } from '@/components/rider-onboarding/step-documents';
 
-export default function Page() {
+export default function Page(): import('react').ReactNode {
   return <RiderDocumentsStep />;
 }

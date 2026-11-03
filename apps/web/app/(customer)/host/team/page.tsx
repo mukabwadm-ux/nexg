@@ -19,7 +19,7 @@ interface Member {
  * decision somebody should be able to see they made rather
  * than discover later.
  */
-export default async function HostTeamPage() {
+export default async function HostTeamPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

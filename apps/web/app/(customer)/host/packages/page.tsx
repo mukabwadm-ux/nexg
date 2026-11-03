@@ -56,7 +56,7 @@ interface OrderRow {
  * than being told now. Nothing here can be scheduled inside its
  * own lead time.
  */
-export default async function HostPackagesPage() {
+export default async function HostPackagesPage(): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

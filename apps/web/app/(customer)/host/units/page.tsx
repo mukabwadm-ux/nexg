@@ -61,7 +61,7 @@ export default async function HostUnitsPage({
   searchParams,
 }: {
   searchParams?: { view?: string; tab?: string; property?: string };
-}) {
+}): Promise<import('react').ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

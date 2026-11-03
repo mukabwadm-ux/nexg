@@ -66,7 +66,7 @@ function when(iso: string): string {
  * that shows a balance without the movements behind it is one
  * a rider cannot argue with when it is wrong.
  */
-export default async function RiderCash() {
+export default async function RiderCash(): Promise<import('react').ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

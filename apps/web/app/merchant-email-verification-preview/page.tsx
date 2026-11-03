@@ -32,7 +32,7 @@ async function currentApplicationEmail(): Promise<string | null> {
   }
 }
 
-export default async function MerchantEmailVerificationPreview() {
+export default async function MerchantEmailVerificationPreview(): Promise<import('react').ReactNode> {
   if (process.env.NODE_ENV !== 'development') notFound();
   const savedEmail = await currentApplicationEmail();
   const email = savedEmail ?? 'hello@yourbusiness.com';

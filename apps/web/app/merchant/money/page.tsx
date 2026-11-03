@@ -24,7 +24,7 @@ const TONE: Record<string, string> = {
  * cannot follow that arithmetic on the page will not trust the
  * number at the bottom.
  */
-export default async function MerchantMoney() {
+export default async function MerchantMoney(): Promise<import('react').ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
 
