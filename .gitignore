@@ -66,6 +66,7 @@ nexgcr.txt
 *secret*
 *.pem
 *.key
+!supabase/migrations/20260101021800_staff_reset_credentials.sql
 
 # Dev-server output, kept separate from the production build.
 .next-dev/
