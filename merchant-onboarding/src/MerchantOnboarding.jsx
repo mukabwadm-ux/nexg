@@ -114,26 +114,52 @@ function CheckGroup({ label, options, value = [], onChange, error, required = fa
 }
 
 function SubcategoryPicker({ options, value = [], onChange, error, required = false }) {
-  const selected = options.filter(option => value.includes(option.id));
   const toggle = id => onChange(value.includes(id) ? value.filter(item => item !== id) : [...value, id]);
-  return <fieldset className={`mo-fieldset mo-subcategory-field ${error ? "has-error" : ""}`}>
-    <legend>Subcategories (select all that apply){required && <span className="mo-required"> *</span>}</legend>
-    <details className="mo-subcategory-picker">
-      <summary aria-label="Choose business subcategories">
-        <span className="mo-subcategory-selection">
-          {selected.length ? selected.map(option => <span className="mo-subcategory-chip" key={option.id}>{option.label}</span>) : <span className="mo-subcategory-placeholder">Choose one or more subcategories</span>}
-        </span>
-        <span className="mo-subcategory-chevron" aria-hidden="true">⌄</span>
-      </summary>
-      <div className="mo-subcategory-options">
-        {options.map(option => <label className="mo-check" key={option.id}>
-          <input type="checkbox" checked={value.includes(option.id)} onChange={() => toggle(option.id)} />
-          <span>{option.label}</span>
-        </label>)}
-      </div>
-    </details>
+  const count = options.filter(option => value.includes(option.id)).length;
+  return <fieldset className={`mo-subcategory-field ${error ? "has-error" : ""}`} aria-invalid={Boolean(error)}>
+    <legend>Subcategories{required && <span className="mo-required"> *</span>} <span className="mo-subcategory-count">{count ? `· ${count} selected` : "· select all that apply"}</span></legend>
+    <div className="mo-subcategory-options">
+      {options.map(option => <label className={`mo-subcategory-option ${value.includes(option.id) ? "is-selected" : ""}`} key={option.id}>
+        <input type="checkbox" checked={value.includes(option.id)} onChange={() => toggle(option.id)} />
+        <span>{option.label}</span>
+      </label>)}
+    </div>
     {error && <span className="mo-error" role="alert">{error}</span>}
   </fieldset>;
+}
+
+/* Registration sections and the validation paths that belong to each. */
+const REGISTRATION_SECTIONS = [
+  { id: "identity", title: "Your business and name", keys: ["business.name", "business.firstName", "business.lastName"] },
+  { id: "activities", title: "Business activities", keys: ["categoryId", "subcategories"] },
+  { id: "contact", title: "Contact details", keys: ["business.email", "business.phone", "business.branchCount", "business.businessPhone"] },
+  { id: "policies", title: "Registration and policies", keys: ["business.registered", "policies.terms"] },
+];
+const registrationSectionFor = errorKeys => REGISTRATION_SECTIONS.find(section => section.keys.some(key => errorKeys.includes(key)))?.id;
+
+function RegistrationSection({ section, number, open, onOpen, onContinue, children }) {
+  const bodyId = `mo-section-${section.id}`;
+  const state = section.done ? "done" : section.attention ? "attention" : open || section.started ? "progress" : "todo";
+  const badge = { done: "Complete", attention: "Needs attention", progress: "In progress", todo: "To do" }[state];
+  return <section className={`mo-section is-${state} ${open ? "is-open" : ""}`} aria-labelledby={`${bodyId}-title`}>
+    <div className="mo-section-head">
+      <span className="mo-section-marker" aria-hidden="true">{section.done
+        ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2"><path d="M5 12.5 10 17 19 7" /></svg>
+        : number}</span>
+      <div className="mo-section-title">
+        <h2 id={`${bodyId}-title`}>{section.title}</h2>
+        {!open && section.summary && <p>{section.summary}</p>}
+      </div>
+      {open || !section.done ? <span className="mo-section-badge">{badge}</span> : null}
+      {!open && <button type="button" className="mo-section-edit" aria-expanded="false" aria-controls={bodyId} onClick={onOpen}>
+        {section.done ? "Edit" : "Open"}<span className="mo-sr-only"> {section.title}</span>
+      </button>}
+    </div>
+    <div id={bodyId} className="mo-section-body" hidden={!open}>
+      {children}
+      {onContinue && <div className="mo-section-actions"><button type="button" className="mo-button mo-section-continue" onClick={onContinue}>Continue</button></div>}
+    </div>
+  </section>;
 }
 
 function StatusPanel({ status: suppliedStatus, onStatusChange, needsResubmission = false }) {
@@ -204,6 +230,9 @@ export default function MerchantOnboarding({
     otpVerified: setupSession, signedIn: setupSession
   }), [selection, form.answersBySubcategory, setupSession]);
   const visibleStatus = applicationStatus || submittedStatus;
+  const registrationErrors = validateRegistration(form, category);
+  const [openSection, setOpenSection] = useState(() => REGISTRATION_SECTIONS.find(section =>
+    section.keys.some(key => registrationErrors[key]) || (section.id === "contact" && !canSubmit))?.id ?? null);
 
   const fulfillmentOptions = useMemo(() => (category?.fulfillment || []).map(id => ({
     id, label: FULFILLMENT_LABELS[id] || id
@@ -327,6 +356,7 @@ export default function MerchantOnboarding({
     const allErrors = taskEditing ? stepErrors(step, false) : validateRegistration(form, category);
     setErrors(allErrors);
     if (Object.keys(allErrors).length) {
+      if (!taskEditing) setOpenSection(registrationSectionFor(Object.keys(allErrors)) ?? openSection);
       setNotice(taskEditing ? "Check the highlighted details you entered. Unfinished setup can wait." : "Complete the highlighted business and contact details to continue.");
       return;
     }
@@ -383,53 +413,86 @@ export default function MerchantOnboarding({
       {emailVerificationContent}
     </div>;
   }
+  function registrationSections() {
+    const has = keys => keys.some(key => registrationErrors[key]);
+    const filled = keys => keys.some(key => {
+      const [group, field] = key.split(".");
+      const value = field ? form[group]?.[field] : form[group];
+      return Array.isArray(value) ? value.length > 0 : value !== null && value !== undefined && value !== "" && value !== false;
+    });
+    const business = form.business;
+    const subNames = category ? category.subcategoryOptions.filter(item => form.subcategories.includes(item.id)).map(item => item.name) : [];
+    const summaries = {
+      identity: [business.name, [business.firstName, business.lastName].filter(Boolean).join(" ")],
+      activities: [category?.name, subNames.join(", ")],
+      contact: [business.email, business.phone],
+      policies: [business.registered === true ? "Registered" : business.registered === false ? "Not registered" : "", form.policies.terms ? "Terms accepted" : ""],
+    };
+    return REGISTRATION_SECTIONS.map(section => ({
+      ...section,
+      done: !has(section.keys) && (section.id !== "contact" || canSubmit),
+      started: filled(section.keys.filter(key => key !== "business.branchCount")),
+      attention: section.keys.some(key => errors[key]),
+      summary: summaries[section.id].filter(Boolean).join(" · "),
+    }));
+  }
   function renderRegistration() {
-    return <>
-    <section className="mo-panel mo-registration">
-      <fieldset className="mo-fieldset mo-registration-identity">
-        <legend>Your business and name</legend>
-        <div className="mo-grid mo-registration-identity-grid">
-          {renderField({id:"business-name",label:"Business name",entryRequired:true},form.business.name,v=>setGroup("business","name",v),"business.name")}
+    const sections = registrationSections();
+    const doneCount = sections.filter(section => section.done).length;
+    const continueFrom = index => () => {
+      const section = sections[index];
+      const sectionErrors = Object.fromEntries(section.keys.filter(key => registrationErrors[key]).map(key => [key, registrationErrors[key]]));
+      if (Object.keys(sectionErrors).length) { setErrors(current => ({ ...current, ...sectionErrors })); return; }
+      const next = sections.find((item, position) => position > index && !item.done) ?? sections.find(item => !item.done && item.id !== section.id);
+      setOpenSection(next?.id ?? null);
+    };
+    const sectionProps = index => ({ section: sections[index], number: index + 1, open: openSection === sections[index].id,
+      onOpen: () => setOpenSection(sections[index].id), onContinue: continueFrom(index) });
+    return <section className="mo-registration" aria-label="Business registration">
+      <div className="mo-registration-progress">
+        <div className="mo-registration-progress-label"><strong>Your application</strong><span>{doneCount} of {sections.length} complete</span></div>
+        <div className="mo-registration-progress-bar" aria-hidden="true">{sections.map(section => <span key={section.id} className={section.done ? "is-done" : openSection === section.id ? "is-open" : ""} />)}</div>
+      </div>
+      <RegistrationSection {...sectionProps(0)}>
+        {renderField({id:"business-name",label:"Business name",entryRequired:true},form.business.name,v=>setGroup("business","name",v),"business.name")}
+        <div className="mo-section-pair">
           {renderField({id:"first-name",label:"First name",entryRequired:true},form.business.firstName,v=>setGroup("business","firstName",v),"business.firstName")}
           {renderField({id:"last-name",label:"Last name",entryRequired:true},form.business.lastName,v=>setGroup("business","lastName",v),"business.lastName")}
         </div>
-      </fieldset>
-      <fieldset className="mo-fieldset mo-registration-activities">
-        <legend>Business activities</legend>
-        <div className="mo-field mo-registration-category">
+      </RegistrationSection>
+      <RegistrationSection {...sectionProps(1)}>
+        <div className={`mo-field ${fieldError("categoryId") ? "has-error" : ""}`}>
           <label htmlFor="category">Business category <span className="mo-required">*</span></label>
           <select id="category" value={form.categoryId} required aria-invalid={Boolean(fieldError("categoryId"))} onChange={e=>changeCategory(e.target.value)}><option value="">Select a category</option>{MERCHANT_CATEGORIES.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select>
           {fieldError("categoryId")&&<span className="mo-error">{fieldError("categoryId")}</span>}
         </div>
-        {category&&<SubcategoryPicker required options={category.subcategoryOptions.map(item=>({id:item.id,label:item.name}))} value={form.subcategories} onChange={updateSubcategories} error={fieldError("subcategories")} />}
-      </fieldset>
-      <fieldset className="mo-fieldset mo-registration-contact">
-        <legend>Contact details</legend>
-        <div className="mo-grid mo-registration-contact-grid">
+        {category ? <SubcategoryPicker required options={category.subcategoryOptions.map(item=>({id:item.id,label:item.name}))} value={form.subcategories} onChange={updateSubcategories} error={fieldError("subcategories")} />
+          : fieldError("subcategories") ? <span className="mo-error">{fieldError("subcategories")}</span> : <p className="mo-help">Choose a category to see its subcategories.</p>}
+      </RegistrationSection>
+      <RegistrationSection {...sectionProps(2)}>
+        {renderBusinessEmailField()}
+        {renderField({id:"phone",label:"Mobile phone",type:"tel",entryRequired:true,help:"Kenyan mobile number, e.g. 0712 345 678"},form.business.phone,v=>setGroup("business","phone",v),"business.phone")}
+        <div className="mo-section-narrow">
           {renderField({id:"branch-count",label:"Number of branches",type:"number",entryRequired:true},form.business.branchCount,v=>setGroup("business","branchCount",v),"business.branchCount")}
-          {renderBusinessEmailField()}
-          {renderField({id:"phone",label:"Mobile phone",type:"tel",entryRequired:true,help:"Kenyan mobile number, e.g. 0712 345 678"},form.business.phone,v=>setGroup("business","phone",v),"business.phone")}
         </div>
-      </fieldset>
-      <fieldset className="mo-fieldset mo-registration-phone">
-        <legend>Business contact number</legend>
         <label className="mo-check"><input type="checkbox" checked={form.business.sameBusinessPhone} onChange={e=>setGroup("business","sameBusinessPhone",e.target.checked)} /><span>Use my mobile number as the business contact number.</span></label>
         {!form.business.sameBusinessPhone&&renderField({id:"business-phone",label:"Business contact number",type:"tel",entryRequired:true},form.business.businessPhone,v=>setGroup("business","businessPhone",v),"business.businessPhone")}
-      </fieldset>
-      <fieldset className="mo-fieldset mo-registration-policy">
-        <legend>Registration and policies</legend>
-        <div className="mo-field"><label htmlFor="business-registered">Is your business registered? <span className="mo-required">*</span></label><select id="business-registered" value={form.business.registered === null ? "" : String(form.business.registered)} required aria-invalid={Boolean(fieldError("business.registered"))} onChange={e=>setGroup("business","registered",e.target.value === "" ? null : e.target.value === "true")}><option value="">Choose Yes or No</option><option value="true">Yes</option><option value="false">No</option></select>{fieldError("business.registered")&&<span className="mo-error">{fieldError("business.registered")}</span>}<small>Either answer can continue.</small></div>
-      </fieldset>
-      <div className="mo-registration-terms">
-        <div className="mo-check"><input id="merchant-terms-accepted" type="checkbox" checked={form.policies.terms} required aria-labelledby="merchant-terms-copy" aria-invalid={Boolean(fieldError("policies.terms"))} onChange={e=>setGroup("policies","terms",e.target.checked)} /><span id="merchant-terms-copy"><label htmlFor="merchant-terms-accepted">I accept the merchant platform </label><a href="/legal/terms">terms</a><label htmlFor="merchant-terms-accepted"> and data processing notice.</label></span></div>
-        {fieldError("policies.terms")&&<span className="mo-error">{fieldError("policies.terms")}</span>}
-      </div>
-    </section>
-      <fieldset className="mo-fieldset mo-registration-marketing">
-        <legend>Product updates</legend>
+      </RegistrationSection>
+      <RegistrationSection {...sectionProps(3)} onContinue={undefined}>
+        <fieldset className={`mo-segment-field ${fieldError("business.registered") ? "has-error" : ""}`} aria-invalid={Boolean(fieldError("business.registered"))}>
+          <legend>Is your business registered? <span className="mo-required">*</span></legend>
+          <div className="mo-segment">
+            {[["true","Yes"],["false","No"]].map(([value,label])=><label key={value}><input type="radio" name="business-registered" value={value} checked={form.business.registered === (value === "true")} onChange={()=>setGroup("business","registered",value === "true")} /><span>{label}</span></label>)}
+          </div>
+          {fieldError("business.registered")?<span className="mo-error">{fieldError("business.registered")}</span>:<small className="mo-help">Either answer can continue.</small>}
+        </fieldset>
+        <div className="mo-registration-terms">
+          <div className="mo-check"><input id="merchant-terms-accepted" type="checkbox" checked={form.policies.terms} required aria-labelledby="merchant-terms-copy" aria-invalid={Boolean(fieldError("policies.terms"))} onChange={e=>setGroup("policies","terms",e.target.checked)} /><span id="merchant-terms-copy"><label htmlFor="merchant-terms-accepted">I accept the merchant platform </label><a href="/legal/terms">terms</a><label htmlFor="merchant-terms-accepted"> and data processing notice.</label> <span className="mo-required">*</span></span></div>
+          {fieldError("policies.terms")&&<span className="mo-error">{fieldError("policies.terms")}</span>}
+        </div>
         <label className="mo-check"><input type="checkbox" checked={form.business.marketing} onChange={e=>setGroup("business","marketing",e.target.checked)} /><span>Send me product updates and marketing messages. Optional.</span></label>
-      </fieldset>
-    </>;
+      </RegistrationSection>
+    </section>;
   }
   function renderStep() {
     if (!previewMode && step === 0) return renderRegistration();
@@ -630,7 +693,7 @@ export default function MerchantOnboarding({
       });
     }}>Try demo · sample data</button>}
     <div className="mo-topline"><div><span className="mo-kicker">Merchant registration · Kenya{previewMode ? " · Preview" : ""}</span><h1>Onboard your business</h1><p>Tell us the essentials. You can finish your operational setup from Home.</p></div><div className="mo-registration-badges"><span className="mo-currency">KES · Kenya</span><span className="mo-page-badge"><span aria-hidden="true" />One page</span></div></div>
-    <form noValidate onSubmit={event=>{event.preventDefault();void submit();}}>
+    <form className="mo-registration-form" noValidate onSubmit={event=>{event.preventDefault();void submit();}}>
       {notice&&<div className={Object.keys(errors).length?"mo-alert":"mo-notice"} role={Object.keys(errors).length?"alert":"status"}>{notice}</div>}
       {renderRegistration()}
       {visibleStatus&&<StatusPanel status={visibleStatus} needsResubmission={savedHome?.review.needsResubmission} onStatusChange={previewMode ? onStatusChange : undefined} />}

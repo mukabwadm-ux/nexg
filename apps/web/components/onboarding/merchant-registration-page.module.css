@@ -126,40 +126,10 @@
   font-size: 12px;
 }
 
-.form :global(.merchant-onboarding form > .mo-registration-marketing) {
-  margin: 16px 0;
-  padding: 12px clamp(16px, 2vw, 24px) 0;
-}
-
 .form :global(.merchant-onboarding .mo-registration-terms .mo-check a:focus-visible) {
   border-radius: 2px;
   outline: 3px solid var(--gold-text);
   outline-offset: 3px;
-}
-
-.form :global(.merchant-onboarding .mo-registration-contact-grid) {
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.15fr) minmax(0, 1.05fr);
-}
-
-.form :global(.merchant-onboarding .mo-subcategory-options) {
-  box-sizing: border-box;
-  min-width: 0;
-  z-index: 50;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
-}
-
-.form :global(.merchant-onboarding .mo-subcategory-options .mo-check) {
-  min-width: 0;
-  align-items: flex-start;
-}
-
-.form :global(.merchant-onboarding .mo-subcategory-options .mo-check input) {
-  flex: 0 0 auto;
-}
-
-.form :global(.merchant-onboarding .mo-subcategory-options .mo-check span) {
-  min-width: 0;
-  overflow-wrap: anywhere;
 }
 
 .form :global(.merchant-onboarding input::placeholder),
@@ -383,11 +353,6 @@
     grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
     gap: 32px;
   }
-
-  .form :global(.merchant-onboarding .mo-registration-identity-grid),
-  .form :global(.merchant-onboarding .mo-registration-contact-grid) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 800px) {
@@ -514,41 +479,5 @@
 @media (prefers-reduced-motion: reduce) {
   .footerAction {
     transition: none;
-  }
-}
-
-@container registration-form (max-width: 600px) {
-  .form :global(.merchant-onboarding .mo-registration-activities) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .form :global(.merchant-onboarding .mo-registration-identity-grid),
-  .form :global(.merchant-onboarding .mo-registration-contact-grid) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .form :global(.merchant-onboarding .mo-registration-identity-grid > :first-child) {
-    grid-column: 1 / -1;
-  }
-
-  .form :global(.merchant-onboarding .mo-registration-contact-grid > :nth-child(3)) {
-    grid-column: 1 / -1;
-  }
-}
-
-@container registration-form (max-width: 460px) {
-  .form :global(.merchant-onboarding .mo-registration-identity-grid),
-  .form :global(.merchant-onboarding .mo-registration-contact-grid) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@container registration-form (min-width: 601px) {
-  .form :global(.merchant-onboarding .mo-registration-identity-grid) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .form :global(.merchant-onboarding .mo-registration-contact-grid) {
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.15fr) minmax(0, 1.05fr);
   }
 }
