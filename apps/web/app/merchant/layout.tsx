@@ -75,7 +75,7 @@ export interface MerchantHome {
  * `MerchantHome` stays exported from here because every board
  * reads it and one declaration beats fifteen.
  */
-export default async function MerchantLayout({ children }: { children: React.ReactNode }): Promise<import('react').ReactNode> {
+export default async function MerchantLayout({ children }: { children: import('react').ReactNode }): Promise<import('react').ReactNode> {
   const { m, live, nav, me } = await merchantContext({ setup: true });
 
   /* `merchantContext` has already established who is asking. A

@@ -28,7 +28,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }): import('react').ReactNode {
+export default function RootLayout({ children }: { children: import('react').ReactNode }): import('react').ReactNode {
   return (
     <html lang="en">
       <head>

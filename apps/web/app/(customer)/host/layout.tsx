@@ -67,7 +67,7 @@ export interface Attention {
  * disjoint sets of data and fetching both in a shared layout
  * would mean every page pays for the half it does not use.
  */
-export default async function HostLayout({ children }: { children: React.ReactNode }): Promise<import('react').ReactNode> {
+export default async function HostLayout({ children }: { children: import('react').ReactNode }): Promise<import('react').ReactNode> {
   await requireHost();
   /* Touch the client here so an expired session is refreshed
      once per navigation rather than per query below. */
