@@ -1,4 +1,4 @@
-export const REAL_REGISTRATION_PATH = "/merchants/register";
+export const REAL_REGISTRATION_PATH = "/merchants/apply";
 export const DEMO_PORTAL_PATH = "/merchant-live-preview?state=setup";
 
 // A configured platform origin is public routing information, never a token.

@@ -30,7 +30,7 @@ Verified against it directly: the public reads the site needs all work, the
 raw `merchant` table is denied to anonymous callers, `rider` and `staff_user`
 return nothing, and a careers application inserts.
 
-### Two settings you must flip
+### Supabase Auth settings
 
 Both are in **Authentication → Sign In / Providers**. Without them the site
 looks broken in ways that give no useful error.
@@ -38,10 +38,20 @@ looks broken in ways that give no useful error.
 1. **Anonymous sign-ins → ON.** Currently off. Every document upload fails
    without it: the storage policies ask whether the caller owns the
    application, and an applicant with no session owns nothing.
-2. **Email → "Confirm email" → OFF.** Currently on. With it on, an account is
-   created and then cannot sign in — `email_not_confirmed` — because no SMTP
-   is configured and Supabase's built-in sender is rate-limited to a couple of
-   messages an hour. Turn it back on when you have real email set up.
+2. **Configure custom Auth SMTP before enabling email confirmations.** Merchant
+   registration and email-code sign-in rely on Supabase Auth sending OTPs.
+   The web app's `RESEND_API_KEY` does not configure Supabase Auth delivery.
+   For Resend, verify a sender domain and set the hosted project's SMTP host to
+   `smtp.resend.com`, port `465` or `587`, username `resend`, password to the
+   Resend API key, and sender address to an address on that verified domain.
+   Store the key only in Supabase's protected SMTP settings.
+3. **Authentication → Sign In / Providers → Email → Confirm email → ON** after
+   SMTP works. Set the **Change email address** template to include
+   `{{ .Token }}` for merchant registration, and the separate **Magic link or
+   OTP** template to `{{ .Token }}` for email-code sign-in. The registration
+   form accepts six- or eight-digit Auth tokens. Keep the password-recovery email as a one-time
+   `{{ .ConfirmationURL }}` link. See the [merchant email verification
+   guide](./merchant-email-otp.md) for the full setup and acceptance checklist.
 
 ### A gotcha worth knowing
 
@@ -104,16 +114,18 @@ Five minutes, in order. Each one exercises a different layer.
 1. `/` loads and the city carousel shows photographs → **static assets fine**
 2. `/explore` lists nothing at all → **database reachable, and correctly
    empty**, since no seed ran
-3. `/sign-in?tab=create` → create an account with a **real** email domain →
-   you land on `/` → **auth working**. Fails with `email_not_confirmed` if you
-   have not turned confirmations off.
+3. `/sign-in?tab=create` → create an account with a **real** email domain,
+   receive and confirm the email, then sign in → **auth and email delivery
+   working**. If the confirmation message does not arrive, check Supabase Auth
+   and email-provider delivery logs before continuing.
 4. `/riders/apply` → complete step one, upload one document → **storage and
    RLS working**. This is the one that catches a missed anonymous-sign-ins
    setting.
 5. `/careers` → apply for a role → **public insert working**
 
 If step 4 fails with a policy error, anonymous sign-ins are off. If step 3
-fails, email confirmations are on.
+fails, inspect Supabase Auth SMTP settings, email templates, and provider
+delivery logs.
 
 ---
 

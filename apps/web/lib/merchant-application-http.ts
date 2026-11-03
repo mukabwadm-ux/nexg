@@ -3,7 +3,20 @@ import { MerchantApplicationCommand } from '@nexg/contracts/merchant-application
 
 export type ApplicationPorts = {
   enabled: boolean;
-  authenticate: () => Promise<boolean | { authenticated: boolean; anonymous: boolean }>;
+  emailVerificationRequired?: boolean;
+  authenticate: () => Promise<
+    boolean | {
+      authenticated: boolean;
+      anonymous: boolean;
+      email?: string | null;
+      emailConfirmed?: boolean;
+    }
+  >;
+  verifyApplicationEmail?: (
+    merchantId: string,
+    email: string,
+    signal: AbortSignal,
+  ) => Promise<boolean>;
   rpc: (
     name: string,
     args: Record<string, unknown>,
@@ -138,6 +151,8 @@ export function applicationHandler(ports: ApplicationPorts) {
       ]);
       const authenticated = typeof actor === 'boolean' ? actor : actor.authenticated;
       const anonymous = typeof actor === 'boolean' ? false : actor.anonymous;
+      const email = typeof actor === 'boolean' ? undefined : actor.email;
+      const emailConfirmed = typeof actor === 'boolean' ? false : actor.emailConfirmed === true;
       if (!authenticated)
         return problem(401, 'sign_in_required', 'Sign in to save or open your application.');
       let name: string, args: Record<string, unknown>;
@@ -177,6 +192,26 @@ export function applicationHandler(ports: ApplicationPorts) {
         const input = command.data;
         if (anonymous && (input.command === 'payout' || input.command === 'activity'))
           return problem(403, 'access_denied', 'Create your merchant account before using this workspace action.');
+        if (input.command === 'submit' && ports.emailVerificationRequired) {
+          if (anonymous || !email || !emailConfirmed)
+            return problem(
+              403,
+              'email_verification_required',
+              'Verify the business email address before submitting this application.',
+            );
+          if (!ports.verifyApplicationEmail)
+            return problem(
+              503,
+              'application_unavailable',
+              'Email verification could not be confirmed. Reload before retrying.',
+            );
+          if (!(await ports.verifyApplicationEmail(input.merchantId, email, controller.signal)))
+            return problem(
+              403,
+              'email_verification_required',
+              'Verify the email address saved on this application before submitting.',
+            );
+        }
         if (input.command === 'start') {
           name = 'rpc_merchant_application_start';
           args = {

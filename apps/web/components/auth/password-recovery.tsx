@@ -83,7 +83,7 @@ export function ForgotPasswordForm({ invalidLink = false }: { invalidLink?: bool
   );
 }
 
-export function ResetPasswordForm() {
+export function ResetPasswordForm({ redirectTo = '/' }: { redirectTo?: string }) {
   const { toast } = useToast();
   const router = useRouter();
   const [pending, setPending] = React.useState(false);
@@ -102,7 +102,7 @@ export function ResetPasswordForm() {
     }
 
     toast({ title: 'Password updated', description: result.message, tone: 'success' });
-    router.push('/');
+    router.push(redirectTo);
     router.refresh();
   };
 

@@ -42,7 +42,7 @@ export default async function MerchantDashboard() {
           <p>Registration setup is managed by the business owner.</p>
         </main>
       );
-    if (process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'true')
+    if (process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'false')
       return (
         <main className="p-6">
           <h1>Your saved application is safe</h1>
@@ -58,7 +58,7 @@ export default async function MerchantDashboard() {
           key={`${me.userId}:${saved.record.merchant_id}:${saved.record.revision}:${saved.record.review.state}:${saved.payout.version}`}
           actorId={me.userId}
           anonymousSession={me.isAnonymous}
-          emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true'}
+          emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'}
           initialRecord={saved.record}
           initialPayout={saved.payout}
           savedHome={saved.home}

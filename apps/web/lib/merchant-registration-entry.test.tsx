@@ -10,8 +10,8 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({ auth: { getUser: mocks.getUser }, rpc: mocks.rpc }),
 }));
 vi.mock('@/components/onboarding/connected-application', () => ({
-  ConnectedApplication: (props: { actorId: string; home?: boolean; anonymousSession?: boolean }) => (
-    <div data-connected-registration={props.actorId} data-home={String(props.home ?? false)} data-anonymous={String(props.anonymousSession ?? false)}>
+  ConnectedApplication: (props: { actorId: string; home?: boolean; anonymousSession?: boolean; emailOtpEnabled?: boolean }) => (
+    <div data-connected-registration={props.actorId} data-home={String(props.home ?? false)} data-anonymous={String(props.anonymousSession ?? false)} data-otp={String(props.emailOtpEnabled ?? false)}>
       Real registration
     </div>
   ),
@@ -31,7 +31,7 @@ vi.mock('next/link', () => ({
   default: ({
     href,
     children,
-    prefetch,
+    prefetch: _prefetch,
     ...props
   }: {
     href: string;
@@ -78,6 +78,13 @@ describe('real onboarding entry and resume', () => {
     expect(html).toContain('/merchant-live-preview?state=setup');
     expect(mocks.getUser).not.toHaveBeenCalled();
   });
+  it('uses connected registration and inline email verification when flags are unset', async () => {
+    vi.stubEnv('MERCHANT_ONBOARDING_V1_ENABLED', '');
+    vi.stubEnv('MERCHANT_EMAIL_OTP_ENABLED', '');
+    const html = renderToStaticMarkup(await Registration({ searchParams: {} }));
+    expect(html).toContain(`data-connected-registration="${actorId}"`);
+    expect(html).toContain('data-otp="true"');
+  });
   it('prepares a secure session before showing the existing form to an unsigned visitor', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
@@ -111,7 +118,8 @@ describe('real onboarding entry and resume', () => {
     expect(html).toContain(`data-connected-registration="${actorId}"`);
     expect(html).toContain('data-anonymous="true"');
   });
-  it('routes the old apply entry to the same short form when the rollout is enabled', async () => {
+  it('routes the canonical apply entry to the connected form with default flags', async () => {
+    vi.stubEnv('MERCHANT_ONBOARDING_V1_ENABLED', '');
     await expect(ApplyIndex({ searchParams: { city: 'nairobi' } })).rejects.toThrow(
       'redirect:/merchants/register?city=nairobi',
     );

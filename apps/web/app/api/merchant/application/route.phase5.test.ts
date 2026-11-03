@@ -36,4 +36,12 @@ describe('merchant application route with connected entry disabled', () => {
     expect(response.headers.get('content-type')).toContain('application/problem+json');
     expect((await response.json()).title).toBe('application_unavailable');
   });
+
+  it('defaults the connected API to enabled unless explicitly rolled back', async () => {
+    vi.stubEnv('MERCHANT_ONBOARDING_V1_ENABLED', '');
+    createClient.mockImplementation(() => { throw new Error('private backend configuration'); });
+    const response = await GET(new Request('http://localhost/api/merchant/application'));
+    expect(response.status).toBe(503);
+    expect((await response.json()).title).toBe('application_unavailable');
+  });
 });

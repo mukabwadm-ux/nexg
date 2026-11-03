@@ -9,13 +9,18 @@ export const metadata: Metadata = {
   description: 'Set a new password for your NexG account.',
 };
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams?: { next?: string };
+}) {
+  const redirectTo = searchParams?.next === '/merchant' ? '/merchant' : '/';
   return (
     <main className="bg-surface flex min-h-dvh flex-col items-center justify-center px-4 py-10">
       <Link href="/" aria-label="NexG Concierge home" className="mb-8">
         <Logo className="h-20 w-auto" />
       </Link>
-      <ResetPasswordForm />
+      <ResetPasswordForm redirectTo={redirectTo} />
     </main>
   );
 }

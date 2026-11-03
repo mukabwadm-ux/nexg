@@ -14,8 +14,9 @@ import { MerchantEmailVerification } from './merchant-email-verification';
 describe('email verification screen', () => {
   it('shows the full code card immediately while the first email is being sent', () => {
     const html = renderToStaticMarkup(<MerchantEmailVerification actorId="owner" email="owner@example.test" />);
-    expect(html).toContain('Sending a 6-digit code to');
+    expect(html).toContain('Sending a verification code to');
     expect(html).toContain('name="verification-code"');
+    expect(html).toContain('maxLength="8"');
     expect(html.match(/<button[^>]*type="submit"[^>]*>/)?.[0]).toMatch(/\sdisabled(?:="")?(?:\s|>)/);
   });
 
@@ -29,7 +30,9 @@ describe('email verification screen', () => {
 
   it('allows the code to be verified after the email request succeeds', () => {
     const html = renderToStaticMarkup(<EmailVerificationCard email="owner@example.test" onVerify={async () => {}} />);
-    expect(html).toContain('Enter the 6-digit code sent to');
+    expect(html).toContain('Enter the verification code sent to');
+    expect(html).toContain('Enter the 6- or 8-digit code from the email.');
+    expect(html.match(/<span class="contents">/g)).toHaveLength(8);
     const submit = html.match(/<button[^>]*type="submit"[^>]*>/)?.[0];
     expect(submit).toContain('type="submit"');
     expect(submit).not.toMatch(/\sdisabled(?:="")?(?:\s|>)/);

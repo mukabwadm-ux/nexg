@@ -8,8 +8,8 @@ describe('post-auth navigation', () => {
   });
 
   it('returns a merchant without a saved workspace to onboarding', () => {
-    expect(authDestination('merchant', '/merchants/register', '/merchants/register')).toBe(
-      '/merchants/register',
+    expect(authDestination('merchant', '/merchants/apply', '/merchants/apply')).toBe(
+      '/merchants/apply',
     );
   });
 
@@ -19,5 +19,6 @@ describe('post-auth navigation', () => {
 
   it('infers merchant intent from an existing merchant return URL without a role query', () => {
     expect(authRoleFromRequest(undefined, '/merchants/register')).toBe('merchant');
+    expect(authRoleFromRequest(undefined, '/merchants/apply')).toBe('merchant');
   });
 });

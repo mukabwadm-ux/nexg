@@ -9,6 +9,7 @@ import {
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
 import { isBookingPage } from '@/lib/booking/routes';
+import { isMerchantRegistrationPath } from '@/lib/merchant-journey-navigation';
 
 import {
   cityFromConnection,
@@ -111,6 +112,7 @@ export function SiteLocationProvider({
       maps={MAPS}
       passive={
         isBookingPage(pathname) ||
+        isMerchantRegistrationPath(pathname) ||
         pathname === '/merchant-live-preview' ||
         pathname.startsWith('/merchant-live-preview/')
       }

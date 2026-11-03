@@ -17,7 +17,7 @@ Use one short page containing only:
 
 Do not show a six-step wizard, operating questions, listings, locations, legal-entity details, hours, documents, payouts or specialty-attribute questions before Home. Category/subcategory membership configures the starting portal and its applicable tasks. It does not verify readiness or approve the merchant.
 
-When `MERCHANT_ONBOARDING_V1_ENABLED=true`, the legacy `/merchants/apply/start` URL forwards to `/merchants/register` so old entry links reach the connected short form. The old handler remains only behind the disabled rollout path.
+Unless `MERCHANT_ONBOARDING_V1_ENABLED=false`, the legacy `/merchants/apply/start` URL forwards to `/merchants/register` so old entry links reach the connected short form. Setting the flag to `false` restores the old handler for rollback.
 
 ## Boundaries and verification
 

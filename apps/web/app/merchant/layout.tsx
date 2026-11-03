@@ -116,8 +116,8 @@ export default async function MerchantLayout({ children }: { children: React.Rea
             locked: item.label !== 'Home' && !me.access.operations,
           }))}
           headerEnd={me.isAnonymous ? (
-            <Link href={process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true' ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'} className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold">
-              {process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true' ? 'Verify email' : 'Create account'}
+            <Link href={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false' ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'} className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold">
+              {process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false' ? 'Verify email' : 'Create account'}
             </Link>
           ) : (
             <span className="bg-ink inline-flex rounded-lg px-1 py-0.5"><SignOut /></span>

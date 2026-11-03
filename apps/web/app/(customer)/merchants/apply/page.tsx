@@ -22,7 +22,7 @@ export default async function ApplyIndex({
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
 }) {
-  if (process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'true') {
+  if (process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false') {
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(searchParams ?? {})) {
       if (typeof value === 'string' && value) query.set(key, value);

@@ -143,10 +143,8 @@ const FAQ = [
 export const dynamic = 'force-dynamic';
 
 export default async function MerchantsPage() {
-  const registrationHref =
-    process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'true'
-      ? '/merchants/register'
-      : '/merchants/apply';
+  const connectedRegistrationEnabled = process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false';
+  const registrationHref = '/merchants/apply';
   const supabase = createPublicClient();
 
   const [
@@ -431,7 +429,7 @@ export default async function MerchantsPage() {
               </ul>
             </div>
 
-            {registrationHref === '/merchants/register' ? (
+            {connectedRegistrationEnabled ? (
               <Card className="p-6">
                 <h2 className="text-2xl font-extrabold">Register your business</h2>
                 <p className="text-muted mt-3">

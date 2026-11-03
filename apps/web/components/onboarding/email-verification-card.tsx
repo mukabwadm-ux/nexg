@@ -4,6 +4,7 @@ import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader } fr
 import { ArrowRight, RefreshCw, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState, type ClipboardEvent, type FormEvent } from 'react';
+import { isMerchantEmailCode } from '../../lib/merchant-email-otp';
 
 type Feedback = { kind: 'error' | 'notice'; message: string } | null;
 
@@ -41,10 +42,10 @@ export function EmailVerificationCard({
   const [cursor, setCursor] = useState(0);
   const [pending, setPending] = useState<'verify' | 'resend' | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
-  const activeSlot = Math.min(cursor, 5);
+  const activeSlot = Math.min(cursor, 7);
 
   function updateCode(value: string, selectionStart: number | null) {
-    const digits = value.replace(/[^0-9]/g, '').slice(0, 6);
+    const digits = value.replace(/[^0-9]/g, '').slice(0, 8);
     setCode(digits);
     setCursor(Math.min(value.slice(0, selectionStart ?? value.length).replace(/[^0-9]/g, '').length, digits.length));
     setFeedback(null);
@@ -55,7 +56,7 @@ export function EmailVerificationCard({
     const digits = event.clipboardData.getData('text').replace(/[^0-9]/g, '');
     const start = event.currentTarget.selectionStart ?? code.length;
     const end = event.currentTarget.selectionEnd ?? start;
-    const next = `${code.slice(0, start)}${digits}${code.slice(end)}`.slice(0, 6);
+    const next = `${code.slice(0, start)}${digits}${code.slice(end)}`.slice(0, 8);
     const nextCursor = Math.min(start + digits.length, next.length);
     setCode(next);
     setCursor(nextCursor);
@@ -66,8 +67,8 @@ export function EmailVerificationCard({
   async function verify(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending || requestStatus !== 'ready') return;
-    if (code.length !== 6) {
-      setFeedback({ kind: 'error', message: 'Enter the complete 6-digit code.' });
+    if (!isMerchantEmailCode(code)) {
+      setFeedback({ kind: 'error', message: 'Enter the complete 6- or 8-digit code.' });
       input.current?.focus();
       return;
     }
@@ -115,7 +116,7 @@ export function EmailVerificationCard({
           Verify your email
         </h1>
         <CardDescription className="mt-2 text-center text-[15px] leading-6">
-          {descriptionPrefix ?? (preview ? 'A 6-digit code will be sent to ' : requestStatus === 'sending' ? 'Sending a 6-digit code to ' : requestStatus === 'error' ? 'We could not send a code to ' : 'Enter the 6-digit code sent to ')}
+          {descriptionPrefix ?? (preview ? 'A verification code will be sent to ' : requestStatus === 'sending' ? 'Sending a verification code to ' : requestStatus === 'error' ? 'We could not send a code to ' : 'Enter the verification code sent to ')}
           <strong className="text-ink break-all font-bold">{email}</strong>.
         </CardDescription>
       </CardHeader>
@@ -139,9 +140,9 @@ export function EmailVerificationCard({
             </Button>
           </div>
 
-          <div className="relative mt-3" onClick={() => input.current?.focus()}>
+          <div className="relative mt-3">
             <div className="flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
-              {Array.from({ length: 6 }, (_, index) => (
+              {Array.from({ length: 8 }, (_, index) => (
                 <span key={index} className="contents">
                   {index === 3 ? <span className="text-muted-light px-0.5 text-lg">–</span> : null}
                   <span
@@ -163,7 +164,7 @@ export function EmailVerificationCard({
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              maxLength={6}
+              maxLength={8}
               value={code}
               onChange={(event) => updateCode(event.currentTarget.value, event.currentTarget.selectionStart)}
               onPaste={pasteCode}
@@ -179,7 +180,7 @@ export function EmailVerificationCard({
             />
           </div>
           <p id="merchant-email-code-help" className="text-muted-light mt-3 text-xs leading-5">
-            Enter all 6 digits from the email.
+            Enter the 6- or 8-digit code from the email.
           </p>
           <p
             id="merchant-email-code-feedback"

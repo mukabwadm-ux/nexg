@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 
+import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
 import { createClient } from '@/lib/supabase/server';
 
 export interface AuthResult {
@@ -26,10 +27,7 @@ export type AccountRole = 'guest' | 'rider' | 'merchant' | 'host';
 const START: Record<AccountRole, string> = {
   guest: '/',
   rider: '/riders/apply',
-  merchant:
-    process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'true'
-      ? '/merchants/register'
-      : '/merchants/register',
+  merchant: '/merchants/apply',
   /*
    * Hosts land on the public page, not an application form.
    * Their onboarding lives inside the portal once an account
@@ -138,6 +136,54 @@ export async function requestPasswordRecovery(formData: FormData): Promise<AuthR
     ok: true,
     message: 'If an account uses that email, a password recovery link is on its way.',
   };
+}
+
+export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
+  if (
+    process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'false' ||
+    process.env.MERCHANT_EMAIL_OTP_ENABLED === 'false'
+  )
+    return { ok: false, message: 'Merchant password setup is not available yet.' };
+
+  const supabase = createClient();
+  const { data: auth, error: authError } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (authError || !user || user.is_anonymous || !user.email || !user.email_confirmed_at)
+    return { ok: false, message: 'Verify your business email before setting up a password.' };
+
+  const { data: home, error: homeError } = await supabase.rpc('fn_partner_home');
+  const partner = home as { kind?: string; id?: string } | null;
+  if (homeError || partner?.kind !== 'merchant' || !partner.id)
+    return { ok: false, message: 'We could not confirm your merchant application. Please contact support.' };
+
+  const rpc = supabase.rpc as unknown as (
+    name: string,
+    args: Record<string, unknown>,
+  ) => PromiseLike<{ data: unknown; error: unknown }>;
+  const result = await rpc.call(supabase, 'rpc_merchant_application_read', {
+    p_merchant_id: partner.id,
+  });
+  const application = MerchantApplicationRecord.safeParse(result.data);
+  if (
+    result.error ||
+    !application.success ||
+    application.data.review.submitted_revision !== application.data.revision ||
+    application.data.review.needs_resubmission ||
+    !['pending', 'approved'].includes(application.data.review.state) ||
+    application.data.payload.business.email.trim().toLowerCase() !== user.email.trim().toLowerCase()
+  )
+    return { ok: false, message: 'We could not confirm the submitted application for this email. Please contact support.' };
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nexgapp.com';
+  const redirectTo = new URL('/auth/callback', siteUrl);
+  redirectTo.searchParams.set('next', '/reset-password?next=%2Fmerchant');
+  const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+    redirectTo: redirectTo.toString(),
+  });
+  if (error)
+    return { ok: false, message: 'Your application was submitted, but we could not send the password setup link. Please retry.' };
+
+  return { ok: true, message: 'A secure password setup link has been sent to your verified email.' };
 }
 
 export async function updateRecoveredPassword(formData: FormData): Promise<AuthResult> {

@@ -80,7 +80,7 @@ function mergeForm(base, incoming) {
 
 function Field({ spec, value, onChange, error, id }) {
   const controlId = id || spec.id;
-  const common = { id: controlId, name: controlId, value: value ?? "", onChange: e => onChange(e.target.value), required: spec.required, "aria-required": spec.required, "aria-invalid": Boolean(error), "aria-describedby": error ? `${controlId}-error` : undefined };
+  const common = { id: controlId, name: controlId, value: value ?? "", onChange: e => onChange(e.target.value), required: spec.required, disabled: spec.disabled, "aria-required": spec.required, "aria-invalid": Boolean(error), "aria-describedby": error ? `${controlId}-error` : undefined };
   return <div className={`mo-field ${error ? "has-error" : ""}`}>
     {spec.type === "checkbox" ? <label className="mo-check"><input id={controlId} type="checkbox" checked={Boolean(value)} onChange={e => onChange(e.target.checked)} aria-invalid={Boolean(error)} /><span>{spec.label}{spec.required && <span className="mo-required"> *</span>}{spec.help ? ` - ${spec.help}` : ""}</span></label>
       : <><label htmlFor={controlId}>{spec.label}{spec.required && <span className="mo-required"> *</span>}</label>
@@ -172,6 +172,11 @@ export default function MerchantOnboarding({
   onBackToMarketplace,
   previewMode = false,
   authenticatedSession,
+  canSubmit = true,
+  emailFieldDisabled = false,
+  emailVerificationAction = /** @type {import('react').ReactNode} */ (null),
+  emailVerificationContent = /** @type {import('react').ReactNode} */ (null),
+  onBusinessEmailChange = /** @type {(email: string) => void} */ (() => {}),
   className = ""
 }) {
   const [form, setForm] = useState(() => mergeForm(initialForm(), normalizeInitialCapture(initialData)));
@@ -344,6 +349,10 @@ export default function MerchantOnboarding({
     setNotice("");
     try {
       const result = await onSubmit(payload(true));
+      if (result?.verificationRequired) {
+        setNotice("Verify the business email below before submitting your application.");
+        return;
+      }
       if (result?.preview === true) {
         setShowHome(true);
         setNotice("");
@@ -365,8 +374,18 @@ export default function MerchantOnboarding({
     const fieldSpec = { ...spec, required: Boolean(spec.entryRequired || (setupSession && spec.required)) };
     return <Field key={path} id={`field-${path.replace(/[^a-zA-Z0-9_-]/g, "-")}`} spec={fieldSpec} value={value} onChange={onChange} error={fieldError(path)} />;
   }
+  function renderBusinessEmailField() {
+    return <div className="mo-business-email">
+      <div className="mo-business-email-row">
+        {renderField({ id:"email",label:"Business email",type:"email",entryRequired:true,disabled:emailFieldDisabled },form.business.email,v=>{setGroup("business","email",v);onBusinessEmailChange?.(v);},"business.email")}
+        {emailVerificationAction}
+      </div>
+      {emailVerificationContent}
+    </div>;
+  }
   function renderRegistration() {
-    return <section className="mo-panel mo-registration">
+    return <>
+    <section className="mo-panel mo-registration">
       <fieldset className="mo-fieldset mo-registration-identity">
         <legend>Your business and name</legend>
         <div className="mo-grid mo-registration-identity-grid">
@@ -388,7 +407,7 @@ export default function MerchantOnboarding({
         <legend>Contact details</legend>
         <div className="mo-grid mo-registration-contact-grid">
           {renderField({id:"branch-count",label:"Number of branches",type:"number",entryRequired:true},form.business.branchCount,v=>setGroup("business","branchCount",v),"business.branchCount")}
-          {renderField({id:"email",label:"Business email",type:"email",entryRequired:true},form.business.email,v=>setGroup("business","email",v),"business.email")}
+          {renderBusinessEmailField()}
           {renderField({id:"phone",label:"Mobile phone",type:"tel",entryRequired:true,help:"Kenyan mobile number, e.g. 0712 345 678"},form.business.phone,v=>setGroup("business","phone",v),"business.phone")}
         </div>
       </fieldset>
@@ -400,14 +419,17 @@ export default function MerchantOnboarding({
       <fieldset className="mo-fieldset mo-registration-policy">
         <legend>Registration and policies</legend>
         <div className="mo-field"><label htmlFor="business-registered">Is your business registered? <span className="mo-required">*</span></label><select id="business-registered" value={form.business.registered === null ? "" : String(form.business.registered)} required aria-invalid={Boolean(fieldError("business.registered"))} onChange={e=>setGroup("business","registered",e.target.value === "" ? null : e.target.value === "true")}><option value="">Choose Yes or No</option><option value="true">Yes</option><option value="false">No</option></select>{fieldError("business.registered")&&<span className="mo-error">{fieldError("business.registered")}</span>}<small>Either answer can continue.</small></div>
-        <label className="mo-check"><input type="checkbox" checked={form.policies.terms} required aria-invalid={Boolean(fieldError("policies.terms"))} onChange={e=>setGroup("policies","terms",e.target.checked)} /><span>I accept the merchant platform terms and data processing notice.</span></label>
-        {fieldError("policies.terms")&&<span className="mo-error">{fieldError("policies.terms")}</span>}
       </fieldset>
+      <div className="mo-registration-terms">
+        <div className="mo-check"><input id="merchant-terms-accepted" type="checkbox" checked={form.policies.terms} required aria-labelledby="merchant-terms-copy" aria-invalid={Boolean(fieldError("policies.terms"))} onChange={e=>setGroup("policies","terms",e.target.checked)} /><span id="merchant-terms-copy"><label htmlFor="merchant-terms-accepted">I accept the merchant platform </label><a href="/legal/terms">terms</a><label htmlFor="merchant-terms-accepted"> and data processing notice.</label></span></div>
+        {fieldError("policies.terms")&&<span className="mo-error">{fieldError("policies.terms")}</span>}
+      </div>
+    </section>
       <fieldset className="mo-fieldset mo-registration-marketing">
         <legend>Product updates</legend>
         <label className="mo-check"><input type="checkbox" checked={form.business.marketing} onChange={e=>setGroup("business","marketing",e.target.checked)} /><span>Send me product updates and marketing messages. Optional.</span></label>
       </fieldset>
-    </section>;
+    </>;
   }
   function renderStep() {
     if (!previewMode && step === 0) return renderRegistration();
@@ -418,7 +440,7 @@ export default function MerchantOnboarding({
         {renderField({ id:"first-name",label:"First name",entryRequired:true },form.business.firstName,v=>setGroup("business","firstName",v),"business.firstName")}
         {renderField({ id:"last-name",label:"Last name",entryRequired:true },form.business.lastName,v=>setGroup("business","lastName",v),"business.lastName")}
         {renderField({ id:"phone",label:"Mobile phone",entryRequired:true,help:"Kenyan mobile number, e.g. 0712 345 678" },form.business.phone,v=>setGroup("business","phone",v),"business.phone")}
-        {renderField({ id:"email",label:"Business email",type:"email",entryRequired:true },form.business.email,v=>setGroup("business","email",v),"business.email")}
+        {renderBusinessEmailField()}
         {renderField({ id:"branch-count",label:"Number of branches",type:"number",entryRequired:true },form.business.branchCount,v=>setGroup("business","branchCount",v),"business.branchCount")}
         <div className="mo-field"><label htmlFor="business-registered">Is your business registered? <span className="mo-required">*</span></label><select id="business-registered" value={form.business.registered === null ? "" : String(form.business.registered)} onChange={e=>setGroup("business","registered",e.target.value === "" ? null : e.target.value === "true")} aria-invalid={Boolean(fieldError("business.registered"))}><option value="">Choose Yes or No</option><option value="true">Yes</option><option value="false">No</option></select>{fieldError("business.registered")&&<span className="mo-error">{fieldError("business.registered")}</span>}<small>Either answer can continue. This does not verify registration.</small></div>
         <div className="mo-field"><label htmlFor="business-type">Business structure <span className="mo-optional">Optional</span></label><select id="business-type" value={form.business.type} onChange={e=>setGroup("business","type",e.target.value)}><option value="">Choose later</option>{BUSINESS_TYPES.map(t=><option key={t.id} value={t.id}>{t.label}</option>)}</select></div>
@@ -620,7 +642,8 @@ export default function MerchantOnboarding({
             setSubmitting(true);setNotice("");try{const result=await onSaveDraft(payload(false));setNotice(result?.preview ? "Preview only. Entries remain in this tab and have not been saved to an account." : "Draft saved. You can return after signing in.");}
             catch(error){setNotice(error?.message || "Your draft could not be saved. Your edits are still here.");}finally{setSubmitting(false);}
           }}>Save draft</button>}
-          <button type="submit" className="mo-button mo-button-primary" disabled={submitting}>{submitting?"Saving…":previewMode ? "Preview setup Home" : initialHome ? "Save and return Home" : "Submit and open Home"}</button>
+          {!canSubmit && <p className="mo-submit-requirement" role="status">Verify your business email before continuing.</p>}
+          <button type="submit" className="mo-button mo-button-primary" disabled={submitting || !canSubmit}>{submitting?"Saving…":previewMode ? "Preview setup Home" : initialHome ? "Save and return Home" : "Submit"}</button>
         </div>
       </div>
     </form>
@@ -640,7 +663,8 @@ export default function MerchantOnboarding({
       {notice&&<div className={Object.keys(errors).length?"mo-alert":"mo-notice"} role={Object.keys(errors).length?"alert":"status"}>{notice}</div>}
       <div className="mo-note">{previewMode ? "Your edits stay in this tab." : "Save changes before leaving this task."} Saving details does not verify or activate any service.</div>
       {renderStep()}
-      <div className="mo-actions"><div /><button type="submit" className="mo-button mo-button-primary" disabled={submitting}>{submitting ? "Saving…" : previewMode ? "Save and return to Home preview" : "Save and return Home"}</button></div>
+      {!canSubmit && step === 0 && <p className="mo-submit-requirement" role="status">Verify your business email before saving these changes.</p>}
+      <div className="mo-actions"><div /><button type="submit" className="mo-button mo-button-primary" disabled={submitting || (!canSubmit && step === 0)}>{submitting ? "Saving…" : previewMode ? "Save and return to Home preview" : "Save and return Home"}</button></div>
     </form>
   </main></WorkspaceShell>;
 }

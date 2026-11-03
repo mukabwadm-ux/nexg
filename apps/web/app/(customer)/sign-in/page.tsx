@@ -20,11 +20,17 @@ const PROMISES = [
 export default function SignInPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; next?: string; role?: string };
+  searchParams?: { tab?: string; next?: string; role?: string; email?: string; setup?: string };
 }) {
   const next =
     searchParams?.next && /^\/(?!\/)/.test(searchParams.next) ? searchParams.next : undefined;
   const initialRole = authRoleFromRequest(searchParams?.role, next);
+  const setupEmail =
+    searchParams?.setup === 'sent' &&
+    searchParams.email &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(searchParams.email)
+      ? searchParams.email
+      : undefined;
   return (
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       {/* The dark half. Hidden on phones, where it would push the form off
@@ -89,7 +95,9 @@ export default function SignInPage({
             initialTab={searchParams?.tab === 'create' ? 'create' : 'signin'}
             initialRole={initialRole}
             next={next}
-            emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true'}
+            emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'}
+            initialEmail={setupEmail}
+            setupEmail={setupEmail}
           />
           {process.env.NODE_ENV === 'development' ? (
             <div className="w-full max-w-md px-1 text-center">

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { loadApplicationView } from '@/lib/merchant-application-load';
 import { OnboardingDemoEntry } from '@/components/onboarding/demo-entry';
 import { ApplicationSessionBootstrap } from '@/components/onboarding/application-session-bootstrap';
+import { MerchantRegistrationPage } from '@/components/onboarding/merchant-registration-page';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,38 +15,44 @@ export default async function Registration({
 }: {
   searchParams: { merchantId?: string; operationId?: string };
 }) {
-  if (process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'true')
+  if (process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'false')
     return (
-      <main className="mx-auto max-w-xl p-6">
-        <h1 className="text-2xl font-extrabold">Merchant onboarding</h1>
-        <p className="mt-3">
-          Real registration is temporarily unavailable. You can still explore the demo.
-        </p>
-        <OnboardingDemoEntry />
-      </main>
+      <MerchantRegistrationPage>
+        <main className="mx-auto max-w-xl p-6">
+          <h2 className="text-2xl font-extrabold">Merchant onboarding</h2>
+          <p className="mt-3">
+            Real registration is temporarily unavailable. You can still explore the demo.
+          </p>
+          <OnboardingDemoEntry />
+        </main>
+      </MerchantRegistrationPage>
     );
   const client = createClient();
   const { data, error } = await client.auth.getUser();
   if (error || !data.user)
     return (
-      <main className="mx-auto max-w-xl p-6">
-        <h1 className="text-2xl font-extrabold">Merchant onboarding</h1>
-        <p className="mt-3">Start with the short form. You can secure your account from Home.</p>
-        <div className="mt-5"><ApplicationSessionBootstrap /></div>
-        <OnboardingDemoEntry />
-      </main>
+      <MerchantRegistrationPage>
+        <main className="mx-auto max-w-xl p-6">
+          <h2 className="text-2xl font-extrabold">Merchant onboarding</h2>
+          <p className="mt-3">Start with the short form. You can secure your account from Home.</p>
+          <div className="mt-5"><ApplicationSessionBootstrap /></div>
+          <OnboardingDemoEntry />
+        </main>
+      </MerchantRegistrationPage>
     );
   if (!searchParams.merchantId && !searchParams.operationId) {
     const existing = await client.rpc('fn_partner_home');
     if (existing.error)
       return (
-        <main className="mx-auto max-w-xl p-6">
-          <h1>We could not check your saved workspace</h1>
-          <p>
-            Refresh before starting another registration. Your existing records have not changed.
-          </p>
-          <OnboardingDemoEntry />
-        </main>
+        <MerchantRegistrationPage>
+          <main className="mx-auto max-w-xl p-6">
+            <h2>We could not check your saved workspace</h2>
+            <p>
+              Refresh before starting another registration. Your existing records have not changed.
+            </p>
+            <OnboardingDemoEntry />
+          </main>
+        </MerchantRegistrationPage>
       );
     const home = existing.data as { kind?: string; id?: string } | null;
     if (
@@ -54,13 +61,15 @@ export default async function Registration({
       (home.kind === 'merchant' && (!home.id || !uuid.test(home.id)))
     )
       return (
-        <main className="mx-auto max-w-xl p-6">
-          <h1>We could not check your saved workspace</h1>
-          <p>
-            Refresh before starting another registration. Your existing records have not changed.
-          </p>
-          <OnboardingDemoEntry />
-        </main>
+        <MerchantRegistrationPage>
+          <main className="mx-auto max-w-xl p-6">
+            <h2>We could not check your saved workspace</h2>
+            <p>
+              Refresh before starting another registration. Your existing records have not changed.
+            </p>
+            <OnboardingDemoEntry />
+          </main>
+        </MerchantRegistrationPage>
       );
     if (home?.kind === 'merchant' && home.id) redirect('/merchant');
   }
@@ -81,10 +90,12 @@ export default async function Registration({
     );
     if (result.error)
       return (
-        <main className="p-6">
-          <h1>We could not load your application</h1>
-          <p>Your saved data has not been replaced. Refresh or contact support.</p>
-        </main>
+        <MerchantRegistrationPage>
+          <main className="p-6">
+            <h2>We could not load your application</h2>
+            <p>Your saved data has not been replaced. Refresh or contact support.</p>
+          </main>
+        </MerchantRegistrationPage>
       );
     if (result.data) {
       const parsed = MerchantApplicationRecord.safeParse(result.data);
@@ -98,13 +109,15 @@ export default async function Registration({
       })
     : undefined;
   return (
-    <ConnectedApplication
-      key={`${data.user.id}:${saved?.record.merchant_id ?? 'new'}:${saved?.record.revision ?? 0}:${saved?.record.review.state ?? 'draft'}`}
-      actorId={data.user.id}
-      anonymousSession={data.user.is_anonymous}
-      emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true'}
-      initialRecord={saved?.record}
-      initialPayout={saved?.payout}
-    />
+    <MerchantRegistrationPage>
+      <ConnectedApplication
+        key={`${data.user.id}:${saved?.record.merchant_id ?? 'new'}:${saved?.record.revision ?? 0}:${saved?.record.review.state ?? 'draft'}`}
+        actorId={data.user.id}
+        anonymousSession={data.user.is_anonymous}
+        emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'}
+        initialRecord={saved?.record}
+        initialPayout={saved?.payout}
+      />
+    </MerchantRegistrationPage>
   );
 }

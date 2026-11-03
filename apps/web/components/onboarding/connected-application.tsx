@@ -10,11 +10,17 @@ import {
   payoutDeclaration,
   payoutForm,
 } from '@/lib/merchant-application-client';
+import { sendMerchantPasswordSetupLink } from '@/app/(customer)/sign-in/actions';
 import { createClient } from '@/lib/supabase/client';
 import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 import type { MerchantSavedHomeSource } from '@/lib/merchant-home-source';
 import { merchantSessionSignInHref } from '@/lib/merchant-journey-navigation';
 import { browserUuid } from '@/lib/browser-uuid';
+import {
+  requestMerchantEmailCode,
+  resendMerchantEmailCode,
+  verifyMerchantEmailCode,
+} from '@/lib/merchant-email-otp';
 import {
   createMerchantOnboardingDemoContext,
   merchantOnboardingDemoHref,
@@ -43,14 +49,24 @@ export function ConnectedApplication({
   const router = useRouter();
   const record = useRef(initialRecord);
   const payout = useRef(initialPayout);
-  const [applicationStarted, setApplicationStarted] = useState(Boolean(initialRecord));
   const [status, setStatus] = useState(initialRecord?.review.state ?? 'draft');
   const [expired, setExpired] = useState(false);
+  const [businessEmail, setBusinessEmail] = useState(initialRecord?.payload.business.email ?? '');
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<'sending' | 'ready' | 'error'>('ready');
+  const [verificationMessage, setVerificationMessage] = useState('');
+  const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verifyingEmail, setVerifyingEmail] = useState(false);
+  const [resendingCode, setResendingCode] = useState(false);
+  const codeInput = useRef<HTMLInputElement>(null);
   const alive = useRef(true);
   const abort = useRef(new AbortController());
   const tail = useRef<Promise<unknown>>(Promise.resolve());
   const keys = useRef(new Map<string, string>());
   const lastActivity = useRef(0);
+  const currentEmail = useRef('');
+  const setupLinkSent = useRef(false);
   useEffect(() => {
     alive.current = true;
     abort.current = new AbortController();
@@ -145,6 +161,190 @@ export function ConnectedApplication({
     tail.current = pending.catch(() => {});
     return pending;
   }
+  async function requestEmailCode(email: string) {
+    const address = email.trim().toLowerCase();
+    currentEmail.current = address;
+    setVerificationEmail(address);
+    setVerificationStatus('sending');
+    setVerificationMessage('');
+    try {
+      const result = await requestMerchantEmailCode(createClient().auth, actorId, address);
+      if (currentEmail.current !== address) return false;
+      if (result === 'verified') {
+        setVerifiedEmail(address);
+        setVerificationEmail(null);
+        setVerificationStatus('ready');
+        setVerificationCode('');
+        return true;
+      }
+      setVerificationCode('');
+      setVerificationStatus('ready');
+      setVerificationMessage('Enter the code sent to your email.');
+      return false;
+    } catch (error) {
+      if (currentEmail.current === address) {
+        setVerificationStatus('error');
+        setVerificationMessage(error instanceof Error ? error.message : 'We could not send a verification code.');
+      }
+      throw error;
+    }
+  }
+  async function verifyEmailCode(email: string, code: string) {
+    const address = email.trim().toLowerCase();
+    if (currentEmail.current !== address)
+      throw new Error('The business email changed. Request a new code for the current address.');
+    await verifyMerchantEmailCode(createClient().auth, actorId, address, code);
+    if (currentEmail.current !== address)
+      throw new Error('The business email changed. Request a new code for the current address.');
+    setVerifiedEmail(address);
+    setVerificationEmail(null);
+    setVerificationStatus('ready');
+    setVerificationCode('');
+    setVerificationMessage('');
+  }
+  async function verifyInlineEmailCode() {
+    if (!/^(?:\d{6}|\d{8})$/.test(verificationCode) || verifyingEmail) return;
+    setVerifyingEmail(true);
+    setVerificationMessage('');
+    try {
+      await verifyEmailCode(normalizedBusinessEmail, verificationCode);
+    } catch (error) {
+      setVerificationMessage(error instanceof Error ? error.message : 'We could not verify this code.');
+    } finally {
+      setVerifyingEmail(false);
+    }
+  }
+  const normalizedBusinessEmail = businessEmail.trim().toLowerCase();
+  const emailVerificationPending = verificationEmail === normalizedBusinessEmail;
+  const emailIsVerified = verifiedEmail === normalizedBusinessEmail && normalizedBusinessEmail.length > 0;
+  const businessEmailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedBusinessEmail);
+  function emailVerificationAction() {
+    if (!emailOtpEnabled || !businessEmailIsValid) return null;
+    if (emailIsVerified)
+      return <span className="mo-email-verified" role="status">Email verified</span>;
+    if (emailVerificationPending && verificationStatus === 'sending')
+      return <button type="button" className="mo-button mo-button-secondary mo-email-verify-button" disabled>Sending code…</button>;
+    if (emailVerificationPending && verificationStatus === 'error')
+      return (
+        <button
+          type="button"
+          className="mo-button mo-button-secondary mo-email-verify-button"
+          onClick={() => void requestEmailCode(normalizedBusinessEmail).catch(() => {})}
+        >
+          Try again
+        </button>
+      );
+    if (emailVerificationPending)
+      return (
+        <button
+          type="button"
+          className="mo-button mo-button-secondary mo-email-verify-button"
+          onClick={() => codeInput.current?.focus()}
+        >
+          Enter verification code
+        </button>
+      );
+    return (
+      <button
+        type="button"
+        className="mo-button mo-button-secondary mo-email-verify-button"
+        onClick={() => void requestEmailCode(normalizedBusinessEmail).catch(() => {})}
+      >
+        Verify email
+      </button>
+    );
+  }
+  function emailVerificationContent() {
+    if (!emailOtpEnabled || !emailVerificationPending) return null;
+    if (verificationStatus === 'sending')
+      return <p className="mo-email-code-message" role="status">Sending a verification code…</p>;
+    if (verificationStatus === 'error')
+      return <p className="mo-email-code-message mo-email-code-error" role="alert">{verificationMessage}</p>;
+    return (
+      <div className="mo-email-code-panel">
+        <label htmlFor="merchant-registration-email-code">Enter verification code</label>
+        <div className="mo-email-code-row">
+          <input
+            ref={codeInput}
+            id="merchant-registration-email-code"
+            name="merchant-registration-email-code"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={8}
+            value={verificationCode}
+            disabled={verifyingEmail || resendingCode}
+            aria-describedby="merchant-registration-email-code-message"
+            onChange={(event) => {
+              setVerificationCode(event.currentTarget.value.replace(/\D/g, '').slice(0, 8));
+              setVerificationMessage('');
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                void verifyInlineEmailCode();
+              }
+            }}
+          />
+          <button
+            type="button"
+            className="mo-button mo-button-primary mo-email-code-verify"
+            disabled={verifyingEmail || resendingCode || !/^(?:\d{6}|\d{8})$/.test(verificationCode)}
+            onClick={() => void verifyInlineEmailCode()}
+          >
+            {verifyingEmail ? 'Checking…' : 'Verify code'}
+          </button>
+          <button
+            type="button"
+            className="mo-button mo-button-ghost mo-email-code-resend"
+            disabled={resendingCode || verifyingEmail}
+            onClick={async () => {
+              setResendingCode(true);
+              setVerificationMessage('');
+              try {
+                await resendMerchantEmailCode(createClient().auth, actorId, normalizedBusinessEmail);
+                setVerificationMessage('A new code has been sent.');
+              } catch (error) {
+                setVerificationMessage(error instanceof Error ? error.message : 'We could not send a new code.');
+              } finally {
+                setResendingCode(false);
+              }
+            }}
+          >
+            {resendingCode ? 'Sending…' : 'Resend code'}
+          </button>
+        </div>
+        <p
+          id="merchant-registration-email-code-message"
+          className={`mo-email-code-message ${verificationMessage && !verificationMessage.startsWith('A new code') ? 'mo-email-code-error' : ''}`}
+          role={verificationMessage && !verificationMessage.startsWith('A new code') ? 'alert' : 'status'}
+        >
+          {verificationMessage}
+        </p>
+      </div>
+    );
+  }
+  async function completeSubmission(email: string) {
+    if (anonymousSession && emailOtpEnabled) {
+      if (!setupLinkSent.current) {
+        const result = await sendMerchantPasswordSetupLink();
+        if (!result.ok) throw new Error(result.message);
+        setupLinkSent.current = true;
+      }
+      const { error } = await createClient().auth.signOut();
+      if (error) throw new Error('Your password setup link was sent, but we could not sign out. Please try again.');
+      const params = new URLSearchParams({
+        role: 'merchant',
+        next: '/merchant',
+        setup: 'sent',
+        email,
+      });
+      router.push(`/sign-in?${params.toString()}`);
+    } else {
+      router.push('/merchant');
+    }
+    router.refresh();
+  }
   async function save(input: Record<string, unknown>) {
     let capture;
     try {
@@ -167,22 +367,31 @@ export function ConnectedApplication({
     );
     const saved = MerchantApplicationRecord.parse(result);
     record.current = saved;
-    setApplicationStarted(true);
     setStatus(saved.review.state);
     if (!home)
       window.history.replaceState(null, '', `/merchants/register?merchantId=${saved.merchant_id}`);
     return saved;
   }
   async function submit(input: Record<string, unknown>) {
+    if (emailOtpEnabled) {
+      const email = String((input.business as { email?: unknown } | undefined)?.email ?? '')
+        .trim()
+        .toLowerCase();
+      if (verifiedEmail !== email) return { verificationRequired: true };
+      currentEmail.current = email;
+      const { data, error } = await createClient().auth.getUser();
+      if (error || !data.user || data.user.id !== actorId)
+        throw new Error('Your registration session changed. Sign in again before submitting.');
+      if (data.user.is_anonymous || data.user.email?.trim().toLowerCase() !== email || !data.user.email_confirmed_at)
+        throw new Error('Verify the business email above before submitting your application.');
+    }
     return serialize(async () => {
       const saved = await save(input);
-      const next = anonymousSession && emailOtpEnabled ? '/merchants/verify-email' : '/merchant';
       if (
         saved.review.submitted_revision === saved.revision &&
         ['pending', 'approved'].includes(saved.review.state)
       ) {
-        router.push(next);
-        router.refresh();
+        await completeSubmission(String((input.business as { email?: unknown } | undefined)?.email ?? '').trim().toLowerCase());
         return { applicationId: saved.merchant_id, status: saved.review.state, redirecting: true };
       }
       const submitted = MerchantApplicationRecord.parse(
@@ -194,8 +403,7 @@ export function ConnectedApplication({
       );
       record.current = submitted;
       setStatus(submitted.review.state);
-      router.push(next);
-      router.refresh();
+      await completeSubmission(String((input.business as { email?: unknown } | undefined)?.email ?? '').trim().toLowerCase());
       return {
         applicationId: submitted.merchant_id,
         status: submitted.review.state,
@@ -203,9 +411,21 @@ export function ConnectedApplication({
       };
     });
   }
-  async function saveTask(input: Record<string, any>, { step }: { step: number }) {
+  async function saveTask(
+    input: Record<string, unknown> & {
+      business?: { email?: unknown };
+      policies?: { cancellation?: unknown; complaintContact?: unknown };
+      payout: Record<string, string | number | boolean | undefined>;
+    },
+    { step }: { step: number },
+  ) {
     return serialize(async () => {
       if (step === 0) {
+        const email = String((input.business as { email?: unknown } | undefined)?.email ?? '')
+          .trim()
+          .toLowerCase();
+        if (emailOtpEnabled && verifiedEmail !== email)
+          throw new Error('Verify the business email above before saving these changes.');
         const saved = await save(input);
         router.refresh();
         return saved;
@@ -250,19 +470,6 @@ export function ConnectedApplication({
     );
   return (
     <>
-      {!home && anonymousSession && !applicationStarted ? (
-        <p className="text-muted mx-4 mt-4 text-sm sm:mx-6 lg:mx-7">
-          Already have a NEXG account?{' '}
-          <Link
-            href="/sign-in?role=merchant&next=%2Fmerchants%2Fregister"
-            prefetch={false}
-            className="font-bold underline"
-          >
-            Sign in before filling this form
-          </Link>{' '}
-          so the application is saved to that account.
-        </p>
-      ) : null}
       {home && anonymousSession ? (
         <aside
           className="border-border bg-surface mx-4 mt-4 rounded-xl border p-4 sm:mx-6 lg:mx-7"
@@ -296,6 +503,25 @@ export function ConnectedApplication({
         authenticatedSession={undefined}
         onSaveDraft={(input: Record<string, unknown>) => serialize(() => save(input))}
         onSubmit={submit}
+        canSubmit={!emailOtpEnabled || emailIsVerified}
+        emailFieldDisabled={emailOtpEnabled && (verificationStatus === 'sending' || verifyingEmail || resendingCode)}
+        emailVerificationAction={emailVerificationAction()}
+        emailVerificationContent={emailVerificationContent()}
+        onBusinessEmailChange={(email: string) => {
+          const address = email.trim().toLowerCase();
+          setBusinessEmail(email);
+          currentEmail.current = address;
+          if (verifiedEmail && verifiedEmail !== address) {
+            setVerifiedEmail(null);
+            setVerificationCode('');
+          }
+          if (verificationEmail && verificationEmail !== address) {
+            setVerificationEmail(null);
+            setVerificationStatus('ready');
+            setVerificationMessage('');
+            setVerificationCode('');
+          }
+        }}
         onSaveTask={saveTask}
         onTaskNavigation={(step: number, rowId?: string) => {
           // The Team page and its invite actions require operational access.

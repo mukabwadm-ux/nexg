@@ -135,7 +135,7 @@ describe('saved Home host and connected entry copy', () => {
         authenticatedSession={undefined}
       />,
     );
-    expect(html).toContain('Submit and open Home');
+    expect(html).toContain('>Submit</button>');
     expect(html).not.toContain('Continue to email verification');
     expect(html).toContain('Your workspace is approved');
     expect(html).toContain('Try demo');

@@ -52,11 +52,15 @@ export function AuthPanel({
   initialRole = 'guest',
   next,
   emailOtpEnabled = false,
+  initialEmail,
+  setupEmail,
 }: {
   initialTab?: 'signin' | 'create';
   initialRole?: AccountRole;
   next?: string;
   emailOtpEnabled?: boolean;
+  initialEmail?: string;
+  setupEmail?: string;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -120,6 +124,12 @@ export function AuthPanel({
         <h1 className="mt-6 text-3xl font-extrabold tracking-tight">
           {tab === 'signin' ? 'Welcome back' : 'Create your account'}
         </h1>
+        {setupEmail ? (
+          <p role="status" className="bg-gold-soft text-ink mt-4 rounded-xl p-4 text-sm leading-6">
+            We sent a secure, single-use password setup link to <strong className="break-all">{setupEmail}</strong>.
+            Open it to choose your password, then sign in here.
+          </p>
+        ) : null}
         <p className="text-muted mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
           {tab === 'signin'
             ? 'Sign in with your email and password.'
@@ -195,6 +205,7 @@ export function AuthPanel({
             label="Email"
             autoComplete="email"
             placeholder="you@example.com"
+            defaultValue={initialEmail}
             required
           />
 
@@ -337,7 +348,7 @@ export function AuthPanel({
             asChild
             className="border-gold/50 text-gold hover:bg-gold/10"
           >
-            <Link href="/merchants/register">Register Your Business</Link>
+            <Link href="/merchants/apply">Register Your Business</Link>
           </Button>
           <Button
             variant="outline"

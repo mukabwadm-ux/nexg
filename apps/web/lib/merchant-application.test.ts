@@ -165,6 +165,80 @@ describe('merchant application transport', () => {
       expect.any(AbortSignal),
     );
   });
+  it('rejects anonymous and unverified application submissions when verification is enabled', async () => {
+    const anonymous = ports({
+      emailVerificationRequired: true,
+      authenticate: async () => ({ authenticated: true, anonymous: true }),
+    });
+    const anonymousResponse = await applicationHandler(anonymous)(
+      request({ command: 'submit', merchantId, expectedRevision: 1, operationId }),
+    );
+    expect(anonymousResponse.status).toBe(403);
+    expect((await anonymousResponse.json()).title).toBe('email_verification_required');
+    expect(anonymous.rpc).not.toHaveBeenCalled();
+
+    const unverified = ports({
+      emailVerificationRequired: true,
+      authenticate: async () => ({
+        authenticated: true,
+        anonymous: false,
+        email: 'amina@example.test',
+        emailConfirmed: false,
+      }),
+    });
+    expect(
+      (
+        await applicationHandler(unverified)(
+          request({ command: 'submit', merchantId, expectedRevision: 1, operationId }),
+        )
+      ).status,
+    ).toBe(403);
+    expect(unverified.rpc).not.toHaveBeenCalled();
+  });
+  it('requires the saved application email to match the confirmed account before submission', async () => {
+    const p = ports({
+      emailVerificationRequired: true,
+      authenticate: async () => ({
+        authenticated: true,
+        anonymous: false,
+        email: 'amina@example.test',
+        emailConfirmed: true,
+      }),
+      verifyApplicationEmail: vi.fn(async () => false),
+    });
+    const response = await applicationHandler(p)(
+      request({ command: 'submit', merchantId, expectedRevision: 1, operationId }),
+    );
+    expect(response.status).toBe(403);
+    expect((await response.json()).title).toBe('email_verification_required');
+    expect(p.verifyApplicationEmail).toHaveBeenCalledWith(
+      merchantId,
+      'amina@example.test',
+      expect.any(AbortSignal),
+    );
+    expect(p.rpc).not.toHaveBeenCalled();
+  });
+  it('submits only after the confirmed account email matches the saved application', async () => {
+    const p = ports({
+      emailVerificationRequired: true,
+      authenticate: async () => ({
+        authenticated: true,
+        anonymous: false,
+        email: 'amina@example.test',
+        emailConfirmed: true,
+      }),
+      verifyApplicationEmail: vi.fn(async () => true),
+    });
+    const response = await applicationHandler(p)(
+      request({ command: 'submit', merchantId, expectedRevision: 1, operationId }),
+    );
+    expect(response.status).toBe(200);
+    expect(p.rpc).toHaveBeenCalledWith(
+      'rpc_merchant_application_submit',
+      { p_merchant_id: merchantId, p_expected_revision: 1, p_operation_id: operationId },
+      expect.any(AbortSignal),
+    );
+  });
   it('bounds bytes before parsing and rejects malformed data', async () => {
     const p = ports();
     expect((await applicationHandler(p)(request('x'.repeat(100000)))).status).toBe(413);
