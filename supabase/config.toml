@@ -259,7 +259,7 @@ content_path = "./supabase/templates/otp-code.html"
 # content_path = "./supabase/templates/invite.html"
 
 [auth.email.template.recovery]
-subject = "Set up or reset your NexG password"
+subject = "Your NexG account: set your password"
 content_path = "./supabase/templates/password-recovery.html"
 
 # Uncomment to customize notification email template
