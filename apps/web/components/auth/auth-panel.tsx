@@ -125,10 +125,22 @@ export function AuthPanel({
           {tab === 'signin' ? 'Welcome back' : 'Create your account'}
         </h1>
         {setupEmail ? (
-          <p role="status" className="bg-gold-soft text-ink mt-4 rounded-xl p-4 text-sm leading-6">
-            We sent a secure, single-use password setup link to <strong className="break-all">{setupEmail}</strong>.
-            Open it to choose your password, then sign in here.
-          </p>
+          <div
+            role="status"
+            className="bg-gold-soft text-ink border-gold mt-4 rounded-xl border-l-4 p-4 text-sm leading-6"
+          >
+            <p className="text-base font-extrabold">Application received. Check your email.</p>
+            <p className="mt-1">
+              We sent a welcome email to <strong className="break-all">{setupEmail}</strong>.
+            </p>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              <li>
+                Your username is <strong className="break-all">{setupEmail}</strong>.
+              </li>
+              <li>Open the email and choose <strong>Set your password</strong>, then sign in here.</li>
+              <li>Not there after a few minutes? Check spam or Promotions. The link works once.</li>
+            </ul>
+          </div>
         ) : null}
         <p className="text-muted mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
           {tab === 'signin'
