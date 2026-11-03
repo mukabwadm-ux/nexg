@@ -11,6 +11,7 @@ import {
   clearedWelcomeMetadata,
   welcomeMetadata,
 } from './merchant-welcome';
+import { safeAuthNext } from './auth-next';
 
 describe('welcomeMetadata', () => {
   it('flags the merchant and carries a clean first name and business name', () => {
@@ -53,8 +54,22 @@ describe('password recovery template', () => {
     expect(template).toMatch(
       /\{\{ if \.Data\.nexg_welcome \}\}[\s\S]*\{\{ \.Email \}\}[\s\S]*\{\{ else \}\}[\s\S]*\{\{ end \}\}/,
     );
-    expect(template.match(/\{\{ \.ConfirmationURL \}\}/g)).toHaveLength(2);
     expect(template).not.toMatch(/password:\s*\S+@/i);
+  });
+
+  it('links straight to /auth/confirm so the button works in any browser', () => {
+    // The PKCE ConfirmationURL needs a verifier in the requesting browser and
+    // failed when the email was opened anywhere else.
+    expect(template).not.toContain('.ConfirmationURL');
+    const links = template.match(
+      /href="\{\{ \.SiteURL \}\}\/auth\/confirm\?token_hash=\{\{ \.TokenHash \}\}&amp;type=recovery&amp;next=[^"]+"/g,
+    );
+    expect(links).toHaveLength(2);
+    const nexts = links!.map((link) =>
+      new URLSearchParams(link.replace(/&amp;/g, '&').split('?')[1]!.replace(/"$/, '')).get('next'),
+    );
+    expect(nexts).toEqual(['/reset-password?next=%2Fmerchant', '/reset-password']);
+    for (const next of nexts) expect(safeAuthNext(next)).toBe(next);
   });
 });
 
