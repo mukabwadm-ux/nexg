@@ -1,12 +1,16 @@
+'use client';
+
 import {
   Box,
   Check,
+  ChevronUp,
   CircleHelp,
   Clock,
   CreditCard,
   FileText,
   MapPin,
   PauseCircle,
+  Pencil,
   PlayCircle,
   Store,
   Users,
@@ -28,6 +32,15 @@ export interface HomeSetupRow {
   required?: boolean;
   /** Allows a host to wrap its action in a drawer or a link. */
   renderAction?: React.ReactNode;
+  /** Accessible name for the pencil edit button; defaults to actionLabel. */
+  editLabel?: string;
+  /**
+   * Grouped rows (for example one per selected business category). The row's
+   * pencil expands them inline, each with its own status and action.
+   */
+  subRows?: HomeSetupRow[];
+  /** Shown under the expanded subRows, e.g. a link to change the selection. */
+  subRowsFooter?: React.ReactNode;
 }
 
 export interface HomeSetupStatusItem {
@@ -83,6 +96,14 @@ export function HomeSetupView({
   locationAction,
   helpAction,
 }: HomeSetupViewProps) {
+  const [expanded, setExpanded] = React.useState<ReadonlySet<string>>(() => new Set());
+  const toggle = (id: string) =>
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   const requiredRows = rows.filter((row) => row.required !== false);
   const completed = requiredRows.filter((row) => row.status === 'complete').length;
   const total = requiredRows.length;
@@ -144,14 +165,34 @@ export function HomeSetupView({
         <ol className="divide-border divide-y px-3">
           {rows.map((row, index) => {
             const Icon = rowIcons[row.icon ?? 'business'];
-            const numberColor = row.status === 'complete' ? 'bg-green-100 text-green-800' : row.status === 'waiting' ? 'bg-gray-100 text-gray-600' : row.status === 'invalid' ? 'bg-red-100 text-red-800' : row.status === 'provided' ? 'bg-blue-100 text-blue-900' : 'bg-orange-100 text-amber-900';
+            const grouped = Boolean(row.subRows?.length);
+            const open = grouped && expanded.has(row.id);
+            const panelId = `setup-row-${row.id.replace(/[^a-z0-9_-]/gi, '-')}-items`;
+            // A grouped row's pencil opens its items inline instead of navigating.
+            const shown: HomeSetupRow = grouped ? { ...row, onAction: () => toggle(row.id) } : row;
             return (
-              <li key={row.id} className="grid min-h-[48px] grid-cols-[30px_24px_1fr_auto] items-center gap-2 py-1.5 sm:grid-cols-[30px_24px_140px_1fr_145px]">
-                <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${numberColor}`}>{index + 1}</span>
-                <Icon className="h-4 w-4" aria-hidden="true" />
-                <span className="text-xs font-extrabold">{row.title}</span>
-                <span className="text-muted col-start-3 text-xs sm:col-auto">{row.description}</span>
-                {row.renderAction !== undefined ? row.renderAction : <RowAction row={row} />}
+              <li key={row.id} className="py-1.5">
+                <div className="grid min-h-[48px] grid-cols-[30px_24px_1fr_auto] items-center gap-2 sm:grid-cols-[30px_24px_140px_1fr_145px]">
+                  <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${numberColors[row.status]}`}>{index + 1}</span>
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  <span className="text-xs font-extrabold">{row.title}</span>
+                  <span className="text-muted col-start-3 text-xs sm:col-auto">{row.description}</span>
+                  {row.renderAction !== undefined ? row.renderAction : <RowAction row={shown} expanded={grouped ? open : undefined} controls={grouped ? panelId : undefined} />}
+                </div>
+                {open ? (
+                  <div id={panelId} className="border-border bg-canvas mb-1 ml-0 mt-2 rounded-lg border sm:ml-[62px]">
+                    <ul className="divide-border divide-y">
+                      {row.subRows!.map((item) => (
+                        <li key={item.id} className="grid grid-cols-[1fr_auto] items-center gap-2 px-3 py-2 sm:grid-cols-[180px_1fr_145px]">
+                          <span className="text-xs font-extrabold">{item.title}</span>
+                          <span className="text-muted col-start-1 text-xs sm:col-auto">{item.description}</span>
+                          {item.renderAction !== undefined ? item.renderAction : <RowAction row={item} />}
+                        </li>
+                      ))}
+                    </ul>
+                    {row.subRowsFooter ? <div className="border-border border-t px-3 py-2">{row.subRowsFooter}</div> : null}
+                  </div>
+                ) : null}
               </li>
             );
           })}
@@ -180,19 +221,68 @@ export function HomeSetupView({
   );
 }
 
-function RowAction({ row }: { row: HomeSetupRow }) {
-  const action = <button type="button" onClick={row.onAction} disabled={!row.onAction} className="bg-gold text-ink rounded-lg px-2 py-2 text-xs font-bold focus-visible:outline focus-visible:outline-2 disabled:cursor-default disabled:opacity-60">{row.actionLabel} →</button>;
-  if (row.status === 'complete' || row.status === 'waiting') {
-    const complete = row.status === 'complete';
-    const badgeClass = complete ? 'inline-flex items-center justify-center gap-1 rounded-full bg-green-100 px-2 py-1.5 text-xs font-bold text-green-800' : 'rounded-lg bg-gray-100 px-2 py-2 text-center text-xs text-gray-600';
-    const badge = <span className={`${row.onAction ? '' : 'col-start-4 sm:col-auto '}${badgeClass}`}>{complete ? <Check className="h-3 w-3" aria-hidden="true" /> : null}{row.statusLabel ?? (complete ? 'Completed' : 'Pending')}</span>;
-    return row.onAction ? <div className="col-start-4 grid gap-1 sm:col-auto">{badge}{action}</div> : badge;
+const numberColors: Record<HomeSetupRowStatus, string> = {
+  complete: 'bg-green-100 text-green-800',
+  waiting: 'bg-gray-100 text-gray-600',
+  invalid: 'bg-red-100 text-red-800',
+  provided: 'bg-blue-100 text-blue-900',
+  missing: 'bg-orange-100 text-amber-900',
+};
+
+const pillColors: Record<HomeSetupRowStatus, string> = {
+  complete: 'bg-green-600 text-white',
+  provided: 'bg-blue-100 text-blue-900',
+  invalid: 'bg-red-100 text-red-800',
+  waiting: 'bg-gray-100 text-gray-600',
+  missing: 'bg-gold-soft text-gold-text',
+};
+
+/** A waiting row whose label only restates what its button does ("Add when needed"). */
+function labelIsInstruction(row: HomeSetupRow) {
+  return !row.statusLabel || row.statusLabel === row.actionLabel || /^(add|set up|choose)\b/i.test(row.statusLabel);
+}
+
+/**
+ * One control per row, never the same words twice:
+ * - something to do: a single button ("Add offerings →");
+ * - something saved or pending: a status pill, plus a pencil to edit when the row is editable.
+ */
+function RowAction({ row, expanded, controls }: { row: HomeSetupRow; expanded?: boolean; controls?: string }) {
+  const cell = 'col-start-4 flex items-center justify-end gap-1.5 sm:col-auto sm:justify-start';
+  if (row.onAction && (row.status === 'missing' || (row.status === 'waiting' && labelIsInstruction(row)))) {
+    const tone = row.status === 'missing' ? 'bg-gold text-ink' : 'border-border text-ink border bg-surface';
+    return (
+      <div className={cell}>
+        <button type="button" onClick={row.onAction} className={`${tone} w-full rounded-lg px-2 py-2 text-xs font-bold focus-visible:outline focus-visible:outline-2`}>
+          {row.actionLabel} →
+        </button>
+      </div>
+    );
   }
-  const label = row.statusLabel ?? (row.status === 'provided' ? 'Provided · awaiting review' : row.status === 'invalid' ? 'Needs changes' : undefined);
+  const complete = row.status === 'complete';
+  const label =
+    row.statusLabel ??
+    (complete ? 'Completed' : row.status === 'provided' ? 'Provided · awaiting review' : row.status === 'invalid' ? 'Needs changes' : row.status === 'missing' ? row.actionLabel : 'Pending');
+  const Toggle = expanded ? ChevronUp : Pencil;
   return (
-    <div className="col-start-4 grid gap-1 sm:col-auto">
-      {label ? <span className={`rounded-lg px-2 py-1 text-center text-xs font-bold ${row.status === 'invalid' ? 'bg-red-100 text-red-800' : 'bg-gold-soft text-gold-text'}`}>{label}</span> : null}
-      {row.status !== 'provided' || row.onAction ? action : null}
+    <div className={cell}>
+      <span className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full px-2 py-1.5 text-center text-xs font-bold ${pillColors[row.status]}`}>
+        {complete ? <Check className="h-3 w-3 shrink-0" aria-hidden="true" /> : null}
+        {label}
+      </span>
+      {row.onAction ? (
+        <button
+          type="button"
+          onClick={row.onAction}
+          aria-label={row.editLabel ?? row.actionLabel}
+          title={row.editLabel ?? row.actionLabel}
+          aria-expanded={expanded}
+          aria-controls={controls}
+          className="border-border text-ink hover:bg-gold-soft bg-surface flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border focus-visible:outline focus-visible:outline-2"
+        >
+          <Toggle className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+      ) : null}
     </div>
   );
 }
