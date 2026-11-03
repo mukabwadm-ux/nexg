@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
 import { EmailVerificationCard } from './email-verification-card';
+import { EMAIL_RATE_LIMIT_MESSAGE } from '@/lib/merchant-welcome';
 import { createClient } from '@/lib/supabase/client';
 
 /** Do not abandon an application owned by the current temporary identity. */
@@ -30,7 +31,7 @@ async function sendSignInCode(email: string) {
   });
   // Respond the same way for a missing account so addresses cannot be enumerated.
   if (error && error.code !== 'user_not_found' && error.code !== 'otp_disabled')
-    throw new Error(error.status === 429 ? 'Too many requests. Please wait a minute and try again.' : 'We could not send a code. Please try again.');
+    throw new Error(error.status === 429 ? EMAIL_RATE_LIMIT_MESSAGE : 'We could not send a code. Please try again.');
 }
 
 export function MerchantEmailSignIn() {
