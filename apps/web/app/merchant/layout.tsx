@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -75,7 +76,11 @@ export interface MerchantHome {
  * `MerchantHome` stays exported from here because every board
  * reads it and one declaration beats fifteen.
  */
-export default async function MerchantLayout({ children }: { children: import('react').ReactNode }): Promise<import('react').ReactNode> {
+export default async function MerchantLayout({
+  children,
+}: {
+  children: ReactNode;
+}): Promise<ReactNode> {
   const { m, live, nav, me } = await merchantContext({ setup: true });
 
   /* `merchantContext` has already established who is asking. A
@@ -102,7 +107,12 @@ export default async function MerchantLayout({ children }: { children: import('r
           ? 'Changes requested'
           : 'Waiting for admin approval';
     return (
-      <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
+      <MerchantAuthBoundary
+        merchantId={me.id}
+        actorId={me.userId}
+        access={me.access}
+        isAnonymous={me.isAnonymous}
+      >
         <MerchantWorkspaceShell
           businessName={m.name}
           approvalLabel={approvalLabel}
@@ -115,13 +125,26 @@ export default async function MerchantLayout({ children }: { children: import('r
             ...item,
             locked: item.label !== 'Home' && !me.access.operations,
           }))}
-          headerEnd={me.isAnonymous ? (
-            <Link href={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false' ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'} className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold">
-              {process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false' ? 'Verify email' : 'Create account'}
-            </Link>
-          ) : (
-            <span className="bg-ink inline-flex rounded-lg px-1 py-0.5"><SignOut /></span>
-          )}
+          headerEnd={
+            me.isAnonymous ? (
+              <Link
+                href={
+                  process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'
+                    ? '/merchants/verify-email'
+                    : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'
+                }
+                className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold"
+              >
+                {process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'
+                  ? 'Verify email'
+                  : 'Create account'}
+              </Link>
+            ) : (
+              <span className="bg-ink inline-flex rounded-lg px-1 py-0.5">
+                <SignOut />
+              </span>
+            )
+          }
         >
           {children}
         </MerchantWorkspaceShell>
@@ -130,7 +153,12 @@ export default async function MerchantLayout({ children }: { children: import('r
   }
 
   return (
-    <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
+    <MerchantAuthBoundary
+      merchantId={me.id}
+      actorId={me.userId}
+      access={me.access}
+      isAnonymous={me.isAnonymous}
+    >
       <MerchantShell
         businessName={m.name}
         personName={firstName(m.contact_name, m.name)}

@@ -1,7 +1,15 @@
 'use client';
 
 import { Button, Card, Input, useToast } from '@nexg/ui';
-import { Bed, Music, PartyPopper, Sparkles, Ticket, UtensilsCrossed } from 'lucide-react';
+import {
+  Bed,
+  Music,
+  PartyPopper,
+  Sparkles,
+  Ticket,
+  UtensilsCrossed,
+  type LucideIcon,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -36,7 +44,7 @@ const MOODS: {
   key: Mood;
   label: string;
   blurb: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
 }[] = [
   { key: 'wild', label: 'Wild', blurb: 'Game park, giraffes, elephants, Karura', icon: Sparkles },
   {

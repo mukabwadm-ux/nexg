@@ -26,10 +26,17 @@ const contextKeys = [
   'contactName',
 ] as const;
 
+function stripControlCharacters(value: string): string {
+  let cleaned = '';
+  for (const character of value) {
+    const code = character.charCodeAt(0);
+    if (code >= 0x20 && code !== 0x7f) cleaned += character;
+  }
+  return cleaned;
+}
+
 const cleanText = (value: unknown, maxLength: number): string =>
-  typeof value === 'string'
-    ? value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, maxLength)
-    : '';
+  typeof value === 'string' ? stripControlCharacters(value).trim().slice(0, maxLength) : '';
 
 const cleanId = (value: unknown): string => {
   const id = cleanText(value, 100);
@@ -167,8 +174,6 @@ export function appendMerchantOnboardingDemoContext(
   return `${pathname}?${params.toString()}`;
 }
 
-export function merchantOnboardingDemoHref(
-  context: MerchantOnboardingDemoContext,
-): string {
+export function merchantOnboardingDemoHref(context: MerchantOnboardingDemoContext): string {
   return appendMerchantOnboardingDemoContext('/merchant-live-preview?state=setup', context);
 }

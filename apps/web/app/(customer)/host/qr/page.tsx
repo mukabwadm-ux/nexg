@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH, when } from '@/components/host/bits';
 import { HowItWorks, Kpi, KpiRow, Pill, Table, Td, Tr, TwoColumn } from '@/components/host/module';
 import {
@@ -50,7 +51,7 @@ interface UnitRow {
  * island. A front desk loading this on a tired tablet gets the
  * list without waiting for JavaScript.
  */
-export default async function HostQrPage(): Promise<import('react').ReactNode> {
+export default async function HostQrPage(): Promise<ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

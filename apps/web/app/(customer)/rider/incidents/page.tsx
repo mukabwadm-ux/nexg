@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile, kesh } from '@/components/rider/bits';
 import { RiderBoard, RiderPageHead, riderContext } from '@/components/rider/frame';
 
@@ -70,7 +71,7 @@ function gap(from: string, to: string): string {
  * reporting accidents, and then the first anybody at NexG
  * hears of one is from a guest or a hospital.
  */
-export default async function RiderIncidents(): Promise<import('react').ReactNode> {
+export default async function RiderIncidents(): Promise<ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

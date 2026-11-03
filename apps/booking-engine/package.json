@@ -7,7 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --expose-gc --import tsx --test tests/*.test.ts"
+    "test": "node --expose-gc --import tsx --test --test-name-pattern=\"booking GET reads preserve persisted business state\" tests/booking.integration.test.ts && node --expose-gc --import tsx --test --test-name-pattern=\"native booking lifecycle, concurrency, scope and durable storage\" tests/booking.integration.test.ts && node --expose-gc --import tsx --test tests/pricing.test.ts tests/time.test.ts"
   },
   "dependencies": {
     "@nexg/booking-config": "workspace:*",

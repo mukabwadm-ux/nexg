@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH, Empty, Panel, Pill, clock, day, kesWhole, plural } from '@/components/partner/bits';
 import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
@@ -27,7 +28,11 @@ const WORD: Record<string, string> = {
  * was earned. On a cash order those are two different numbers and
  * confusing them is how a rider's float goes wrong.
  */
-export default async function RiderJobs({ searchParams }: { searchParams?: { show?: string } }): Promise<import('react').ReactNode> {
+export default async function RiderJobs({
+  searchParams,
+}: {
+  searchParams?: { show?: string };
+}): Promise<ReactNode> {
   const me = await requireRider();
   const show = searchParams?.show === 'all' ? 'all' : 'live';
   const supabase = createClient();

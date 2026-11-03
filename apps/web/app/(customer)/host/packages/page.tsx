@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH } from '@/components/host/bits';
 import {
   Fact,
@@ -56,7 +57,7 @@ interface OrderRow {
  * than being told now. Nothing here can be scheduled inside its
  * own lead time.
  */
-export default async function HostPackagesPage(): Promise<import('react').ReactNode> {
+export default async function HostPackagesPage(): Promise<ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

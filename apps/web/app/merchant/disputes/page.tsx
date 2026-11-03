@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { DisputeReply, type DisputeRow } from '@/components/merchant/board-client';
 import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
@@ -24,7 +25,11 @@ const STEPS: [string, string][] = [
  * whoever opens this, and the only thing separating them is how
  * long is left to reply.
  */
-export default async function DisputesPage({ searchParams }: { searchParams?: { tab?: string } }): Promise<import('react').ReactNode> {
+export default async function DisputesPage({
+  searchParams,
+}: {
+  searchParams?: { tab?: string };
+}): Promise<ReactNode> {
   const { m } = await merchantContext();
   if (!m) return null;
 

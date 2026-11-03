@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH, when } from '@/components/host/bits';
 import { HowItWorks, Pill, Table, Td, Tr, TwoColumn } from '@/components/host/module';
 import { Settings, type SettingsRow, type ThemeRow } from '@/components/host/settings-client';
@@ -29,7 +30,7 @@ function maskPhone(p: string | null): string {
  * input. A disabled field is an invitation to click it and
  * conclude something is broken.
  */
-export default async function HostSettingsPage(): Promise<import('react').ReactNode> {
+export default async function HostSettingsPage(): Promise<ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

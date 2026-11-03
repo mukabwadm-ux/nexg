@@ -51,6 +51,14 @@ from public.role r where r.key = 'ops_manager' on conflict do nothing;
 
 insert into t (k, v) select 'city', (select id::text from public.city where name = 'Nairobi');
 
+-- Isolate the unpublished-change assertions from the live global fallback.
+update settings.version
+   set status = 'superseded',
+       superseded_at = now() - interval '1 minute'
+ where key = 'fees.commission'
+   and scope_kind = 'global'
+   and status = 'active';
+
 -- ══════════════════════════════════ the registry is the gate
 
 select ok(

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Empty, Panel, ago } from '@/components/partner/bits';
 import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
@@ -8,7 +9,7 @@ import { markMessagesRead } from '../actions';
 export const metadata = { title: 'Messages' };
 export const dynamic = 'force-dynamic';
 
-export default async function RiderMessages(): Promise<import('react').ReactNode> {
+export default async function RiderMessages(): Promise<ReactNode> {
   const me = await requireRider();
   const supabase = createClient();
 

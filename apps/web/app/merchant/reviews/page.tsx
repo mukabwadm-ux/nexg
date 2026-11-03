@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { ReviewReply } from '@/components/merchant/board-client';
 import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
@@ -44,7 +45,11 @@ const ENOUGH = 20;
  * writes one, because a reply that silently never appears is
  * worse than no reply button at all.
  */
-export default async function ReviewsPage({ searchParams }: { searchParams?: { tab?: string } }): Promise<import('react').ReactNode> {
+export default async function ReviewsPage({
+  searchParams,
+}: {
+  searchParams?: { tab?: string };
+}): Promise<ReactNode> {
   const { m } = await merchantContext();
   if (!m) return null;
 

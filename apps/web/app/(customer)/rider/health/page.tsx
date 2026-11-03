@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile } from '@/components/rider/bits';
 import { RiderBoard, RiderPageHead, riderContext } from '@/components/rider/frame';
 
@@ -69,7 +70,7 @@ function when(iso: string): string {
  * with — and the whole point of showing it is so they can see
  * which one thing to change.
  */
-export default async function RiderHealth(): Promise<import('react').ReactNode> {
+export default async function RiderHealth(): Promise<ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

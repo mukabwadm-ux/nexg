@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { MerchantLivePreviewShell } from '@/components/merchant/live-preview-shell';
 import { OfferingsWorkspace } from '@/components/merchant/offerings/workspace';
@@ -12,7 +13,7 @@ export default function OfferingsPage({
   searchParams,
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
-}): import('react').ReactNode {
+}): ReactNode {
   const initialProfileId =
     typeof searchParams?.profile === 'string' ? searchParams.profile : undefined;
   const initialOfferingId =
@@ -30,7 +31,12 @@ export default function OfferingsPage({
     : undefined;
   if (process.env.NODE_ENV !== 'development') notFound();
   return (
-    <MerchantLivePreviewShell active="Offerings" businessName={demoContext?.businessName} accountInitials={demoContext?.initials} demoContext={demoContext}>
+    <MerchantLivePreviewShell
+      active="Offerings"
+      businessName={demoContext?.businessName}
+      accountInitials={demoContext?.initials}
+      demoContext={demoContext}
+    >
       <OfferingsWorkspace
         initialProfileId={profileId}
         initialOfferingId={initialOfferingId}

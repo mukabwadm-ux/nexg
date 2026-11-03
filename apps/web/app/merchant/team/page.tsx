@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row } from '@/components/merchant/bits';
 import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { InviteMember, MemberActions, type MemberRow } from '@/components/merchant/team-client';
@@ -28,7 +29,7 @@ const CAN: Record<string, string> = {
  * that blurred the two would have somebody believe their new
  * manager already has access.
  */
-export default async function TeamPage(): Promise<import('react').ReactNode> {
+export default async function TeamPage(): Promise<ReactNode> {
   const { m } = await merchantContext();
   if (!m) return null;
 

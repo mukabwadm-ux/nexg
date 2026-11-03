@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { FileText, Monitor, Phone } from 'lucide-react';
 import Link from 'next/link';
 
@@ -21,7 +22,7 @@ export const dynamic = 'force-dynamic';
  * deliberate: the whole value of verification is that it was
  * not self-service.
  */
-export default async function HostVerifyPage(): Promise<import('react').ReactNode> {
+export default async function HostVerifyPage(): Promise<ReactNode> {
   const { home, live, nav, progress, photoUrl } = await hostContext();
   if (!home || !progress) return null;
 

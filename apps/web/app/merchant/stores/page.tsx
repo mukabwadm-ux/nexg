@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { maps as mapsCapability } from '@nexg/ui/capabilities';
 
 import { AddBranch, OpenBranch, type BranchRow } from '@/components/merchant/branch-client';
@@ -19,7 +20,7 @@ export const dynamic = 'force-dynamic';
  * it is saved, and a refusal says what to do about it rather than
  * just saying no.
  */
-export default async function StoresPage(): Promise<import('react').ReactNode> {
+export default async function StoresPage(): Promise<ReactNode> {
   const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 

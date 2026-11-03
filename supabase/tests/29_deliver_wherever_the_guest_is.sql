@@ -14,6 +14,14 @@ begin;
 create extension if not exists pgtap with schema extensions;
 select plan(13);
 
+-- Exercise the missing-price behavior despite the agreed global band-4 rate.
+update settings.version
+   set status = 'superseded',
+       superseded_at = now() - interval '1 minute'
+ where key = 'fees.delivery.band_4'
+   and scope_kind = 'global'
+   and status = 'active';
+
 create temp table p (k text primary key, g extensions.geography);
 insert into p (k, g) values
   /* Syokimau: no zone, 17 km from the centre of Nairobi. */

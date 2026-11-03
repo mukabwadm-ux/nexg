@@ -188,8 +188,8 @@ select is(
      join ledger.transaction tx on tx.id = e.transaction_id
     where tx.order_id = 'bb000000-0000-4000-8000-000000000001'
       and e.account_code like 'revenue.%')::bigint,
-  48000::bigint,
-  'And ours is 180 commission + 250 delivery + 50 service = 480.');
+  41379::bigint,
+  'And platform revenue is 180 commission + 250 delivery + 50 service, excluding the VAT liability.');
 
 select is(
   (select merchant_net_cents from public.order_money_v

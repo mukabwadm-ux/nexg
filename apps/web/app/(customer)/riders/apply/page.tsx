@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 
 import { riderPathForStep } from '@/components/rider-onboarding/types';
@@ -9,7 +10,7 @@ import { createClient } from '@/lib/supabase/server';
  */
 export const dynamic = 'force-dynamic';
 
-export default async function RiderApplyIndex(): Promise<import('react').ReactNode> {
+export default async function RiderApplyIndex(): Promise<ReactNode> {
   const supabase = createClient();
 
   const { data } = await supabase

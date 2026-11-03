@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Empty, Panel, Pill, clock, day, kes, plural } from '@/components/partner/bits';
 import { LiveOrders } from '@/components/partner/live-orders';
 import { PageHead } from '@/components/merchant/frame';
@@ -40,7 +41,7 @@ export default async function MerchantOrders({
   searchParams,
 }: {
   searchParams?: { show?: string };
-}): Promise<import('react').ReactNode> {
+}): Promise<ReactNode> {
   const me = await requireMerchant();
   const show = searchParams?.show === 'all' ? 'all' : 'live';
   const supabase = createClient();

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 
 import { DASH, when } from '@/components/host/bits';
@@ -61,7 +62,7 @@ export default async function HostUnitsPage({
   searchParams,
 }: {
   searchParams?: { view?: string; tab?: string; property?: string };
-}): Promise<import('react').ReactNode> {
+}): Promise<ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

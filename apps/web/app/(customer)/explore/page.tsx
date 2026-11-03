@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button, EmptyState } from '@nexg/ui';
 import { MapPin, Store } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -110,7 +111,7 @@ export default async function ExplorePage({
     /** "lat,lng": only merchants that deliver to this spot, nearest first. */
     near?: string;
   };
-}): Promise<import('react').ReactNode> {
+}): Promise<ReactNode> {
   /*
    * The city has to be known before the cache key, and the city list is part
    * of what is cached — so resolve it from the default city first, then use
@@ -447,9 +448,7 @@ export default async function ExplorePage({
                           {pick.trading_name}
                         </span>
                         <span className="mt-1 block text-xs font-semibold text-white/60">
-                          {pick.category_label ??
-                            CATEGORY_LABEL[pickCategory] ??
-                            pickCategory}
+                          {pick.category_label ?? CATEGORY_LABEL[pickCategory] ?? pickCategory}
                           {pick.branch_name && ` · ${pick.branch_name}`}
                         </span>
                       </span>

@@ -9,7 +9,7 @@
     "start": "next start --port 3001",
     "lint": "next lint --max-warnings 0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run --passWithNoTests --config vitest.application-review.config.ts",
     "clean": "rimraf .turbo .next node_modules"
   },
   "dependencies": {

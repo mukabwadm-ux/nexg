@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { HomeLive, type ArrivingRow, type QrActivityRow } from '@/components/host/home-live';
 import { HomeSetup } from '@/components/host/home-setup';
 import { HostShell, hostNav } from '@/components/host/shell';
@@ -18,7 +19,7 @@ export const dynamic = 'force-dynamic';
  * amount of filled-in forms substitutes for that — which is why
  * the gate is a status a host cannot set themselves.
  */
-export default async function HostHomePage(): Promise<import('react').ReactNode> {
+export default async function HostHomePage(): Promise<ReactNode> {
   const me = await requireHost();
   const supabase = createClient();
 

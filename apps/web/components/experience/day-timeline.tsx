@@ -10,6 +10,7 @@ import {
   Sun,
   Ticket,
   UtensilsCrossed,
+  type LucideIcon,
 } from 'lucide-react';
 import * as React from 'react';
 
@@ -34,7 +35,7 @@ import {
  * fills with what is actually known and no further.
  */
 
-const ICON: Record<string, React.ComponentType<{ className?: string }>> = {
+const ICON: Record<string, LucideIcon> = {
   activity: Sun,
   meal: UtensilsCrossed,
   venue: PartyPopper,

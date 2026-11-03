@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 
 import { HomePageContent } from '@/components/home/home-page';
@@ -10,6 +11,6 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default function HomePage(): import('react').ReactNode {
+export default function HomePage(): ReactNode {
   return <HomePageContent locale="en" />;
 }

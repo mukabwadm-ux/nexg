@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { HostSection, hostContext } from '@/components/host/section';
 
 export const metadata = { title: 'Team' };
@@ -19,7 +20,7 @@ interface Member {
  * decision somebody should be able to see they made rather
  * than discover later.
  */
-export default async function HostTeamPage(): Promise<import('react').ReactNode> {
+export default async function HostTeamPage(): Promise<ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { callbackSecretValid } from '@/lib/daraja';
-import { createPublicClient } from '@/lib/supabase/public';
+import { createServiceClient } from '@/lib/supabase/service';
 
 interface Item {
   Name: string;
@@ -43,7 +43,14 @@ export async function POST(request: Request) {
   const receipt = pick('MpesaReceiptNumber');
   const phone = pick('PhoneNumber');
 
-  const client = createPublicClient();
+  let client: ReturnType<typeof createServiceClient>;
+  try {
+    client = createServiceClient();
+  } catch (error) {
+    console.error('M-Pesa callback service client is unavailable:', error);
+    return NextResponse.json({ ResultCode: 1, ResultDesc: 'Retry' }, { status: 500 });
+  }
+
   const { error } = (await client.rpc(
     'rpc_payment_mpesa_callback' as never,
     {

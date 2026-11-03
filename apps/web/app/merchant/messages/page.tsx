@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Empty, Panel, ago } from '@/components/partner/bits';
 import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
@@ -19,7 +20,7 @@ export const dynamic = 'force-dynamic';
  * believe they had told us something. The page says where to reach
  * a person instead.
  */
-export default async function MerchantMessages(): Promise<import('react').ReactNode> {
+export default async function MerchantMessages(): Promise<ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
 

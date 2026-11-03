@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { PageHead } from '@/components/merchant/frame';
 import { Menu, type ItemRow, type SectionRow } from '@/components/partner/merchant-menu';
 import { requireMerchant } from '@/lib/partner';
@@ -13,7 +14,7 @@ export const dynamic = 'force-dynamic';
  * Merchants set and change their own prices here. Checkout reads the price
  * from the same row, so an edit is live for the next order.
  */
-export default async function MerchantMenu(): Promise<import('react').ReactNode> {
+export default async function MerchantMenu(): Promise<ReactNode> {
   const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 

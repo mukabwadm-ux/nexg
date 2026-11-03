@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile, kesh } from '@/components/rider/bits';
 import { RiderBoard, RiderPageHead, riderContext } from '@/components/rider/frame';
 
@@ -47,7 +48,7 @@ function when(iso: string): string {
  * so before anybody shares a code, rather than after they have
  * brought five people who never rode.
  */
-export default async function RiderRefer(): Promise<import('react').ReactNode> {
+export default async function RiderRefer(): Promise<ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

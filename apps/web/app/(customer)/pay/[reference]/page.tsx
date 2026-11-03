@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -25,7 +26,11 @@ export const dynamic = 'force-dynamic';
  * sooner without anybody having to refresh — but even then, it is
  * the provider being asked, not the browser being believed.
  */
-export default async function PaymentReturn({ params }: { params: { reference: string } }): Promise<import('react').ReactNode> {
+export default async function PaymentReturn({
+  params,
+}: {
+  params: { reference: string };
+}): Promise<ReactNode> {
   const supabase = createClient();
 
   const { data } = await supabase
@@ -100,8 +105,8 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     <Shell title="Waiting for your payment.">
       <meta httpEquiv="refresh" content="5" />
       <p>
-        {amount} is being confirmed. If you were sent an M-Pesa prompt, enter your PIN on your
-        phone — this page updates by itself.
+        {amount} is being confirmed. If you were sent an M-Pesa prompt, enter your PIN on your phone
+        — this page updates by itself.
       </p>
       <p className="text-muted-light mt-3 text-[0.8125rem] font-semibold">
         Reference {payment.reference}. If money has left your account and this has not changed

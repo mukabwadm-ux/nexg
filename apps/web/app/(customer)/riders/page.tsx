@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button, Card } from '@nexg/ui';
 import {
   ArrowRight,
@@ -123,7 +124,7 @@ const FAQ = [
  */
 export const revalidate = 3600;
 
-export default async function RidersPage(): Promise<import('react').ReactNode> {
+export default async function RidersPage(): Promise<ReactNode> {
   const supabase = createPublicClient();
 
   // The cities open for applications (section 4.2). The card adds an

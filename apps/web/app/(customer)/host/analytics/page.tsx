@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH, kes } from '@/components/host/bits';
 import {
   Bar,
@@ -60,7 +61,7 @@ export default async function HostAnalyticsPage({
   searchParams,
 }: {
   searchParams?: { range?: string };
-}): Promise<import('react').ReactNode> {
+}): Promise<ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

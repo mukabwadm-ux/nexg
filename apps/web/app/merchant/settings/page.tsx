@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, type ReactNode } from 'react';
 
 import { MerchantSettings } from '@/components/merchant/board-client';
 import { merchantContext } from '@/components/merchant/frame';
@@ -22,7 +22,7 @@ function maskEmail(email: string | undefined) {
   return local?.slice(0, 1) + '••••@' + domain;
 }
 
-export default async function SettingsPage(): Promise<import('react').ReactNode> {
+export default async function SettingsPage(): Promise<ReactNode> {
   const { m, supabase } = await merchantContext();
   if (!m) return null;
   const [{ data, error }, auth] = await Promise.all([

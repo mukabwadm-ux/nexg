@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { BusinessWorkspace } from '@/components/merchant/business/workspace';
 import type { Section } from '@/components/merchant/business/model';
@@ -7,13 +8,15 @@ export default function BusinessPage({
   searchParams,
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
-}): import('react').ReactNode {
+}): ReactNode {
   if (process.env.NODE_ENV !== 'development') notFound();
   const demoContext = searchParams ? parseMerchantOnboardingDemoContext(searchParams) : null;
   return (
     <BusinessWorkspace
-      initialProfileId={typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId}
-      initialTab={typeof searchParams?.tab === 'string' ? searchParams.tab as Section : undefined}
+      initialProfileId={
+        typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId
+      }
+      initialTab={typeof searchParams?.tab === 'string' ? (searchParams.tab as Section) : undefined}
       demoContext={demoContext}
     />
   );

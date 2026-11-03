@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
 import { Check } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
  */
 export const revalidate = 3600;
 
-export default async function CareersPage(): Promise<import('react').ReactNode> {
+export default async function CareersPage(): Promise<ReactNode> {
   const supabase = createPublicClient();
 
   const [{ count: cityCount }, { data: roles }, { data: teams }] = await Promise.all([

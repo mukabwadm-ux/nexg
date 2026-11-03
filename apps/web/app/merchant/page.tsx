@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 
 import { HomeLive } from '@/components/merchant/home-live';
@@ -29,7 +30,7 @@ export const dynamic = 'force-dynamic';
  * filled-in forms substitutes for that, and a dashboard that
  * decided for itself would be the one place that disagreed.
  */
-export default async function MerchantDashboard(): Promise<import('react').ReactNode> {
+export default async function MerchantDashboard(): Promise<ReactNode> {
   const { m, live, supabase, me } = await merchantContext({ setup: true });
 
   // New applications render from their revisioned owner record before any

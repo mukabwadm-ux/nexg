@@ -132,14 +132,21 @@ export function OfferingsWorkspace({
   returnTo?: string;
 }) {
   const demoContext = useMerchantOnboardingDemoContext();
+  const demoProfileId = demoContext?.profileId;
   const profiles = useMemo(() => extendOfferingProfiles(additionalProfiles), [additionalProfiles]);
-  const initialId = suppliedConfiguration?.subcategoryId ?? initialProfileId ?? demoContext?.profileId ?? 'makeup';
+  const initialId =
+    suppliedConfiguration?.subcategoryId ?? initialProfileId ?? demoProfileId ?? 'makeup';
   const [profileId, setProfileId] = useState(initialId);
   const profile = profiles.find((p) => p.id === profileId) ?? profiles[0]!;
   useEffect(() => {
-    if (!suppliedConfiguration && !initialProfileId && demoContext && profiles.some((item) => item.id === demoContext.profileId))
-      setProfileId(demoContext.profileId);
-  }, [suppliedConfiguration, initialProfileId, demoContext?.profileId, profiles]);
+    if (
+      !suppliedConfiguration &&
+      !initialProfileId &&
+      demoProfileId &&
+      profiles.some((item) => item.id === demoProfileId)
+    )
+      setProfileId(demoProfileId);
+  }, [suppliedConfiguration, initialProfileId, demoProfileId, profiles]);
   const [source, setSource] = useState<OfferingsSource | null>(suppliedSource ?? null);
   const [catalogue, setCatalogue] = useState<Catalogue | null>(null);
   const [, refreshPriceTime] = useState(0);

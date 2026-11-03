@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -65,7 +66,11 @@ export interface RiderHome {
  * The dashboard's hero still differs between an applicant and a
  * working rider; that is page content, not the frame.
  */
-export default async function RiderLayout({ children }: { children: import('react').ReactNode }): Promise<import('react').ReactNode> {
+export default async function RiderLayout({
+  children,
+}: {
+  children: ReactNode;
+}): Promise<ReactNode> {
   const { h, active, nav } = await riderContext();
 
   if (!h) redirect('/riders/apply');

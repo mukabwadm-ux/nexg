@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH, Panel, Pill } from '@/components/partner/bits';
 import { RiderProfile } from '@/components/partner/rider-profile';
 import { RiderPageHead } from '@/components/rider/frame';
@@ -17,7 +18,7 @@ export const dynamic = 'force-dynamic';
  * all — so the page says so rather than letting a rider widen it
  * and wonder why the evening changed.
  */
-export default async function RiderProfilePage(): Promise<import('react').ReactNode> {
+export default async function RiderProfilePage(): Promise<ReactNode> {
   const me = await requireRider();
   const supabase = createClient();
 

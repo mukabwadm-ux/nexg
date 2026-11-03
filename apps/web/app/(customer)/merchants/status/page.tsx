@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function StatusPage(): Promise<import('react').ReactNode> {
+export default async function StatusPage(): Promise<ReactNode> {
   const supabase = createClient();
 
   const { data: merchant } = await supabase
@@ -39,10 +40,7 @@ export default async function StatusPage(): Promise<import('react').ReactNode> {
     { count: branchCount },
     { data: callTimes },
   ] = await Promise.all([
-    supabase
-      .from('category_config')
-      .select('*')
-      .order('sort'),
+    supabase.from('category_config').select('*').order('sort'),
     supabase.rpc('fn_merchant_readiness', { p_merchant_id: draft.id }),
     supabase.rpc('fn_merchant_required_docs', { p_merchant_id: draft.id }),
     supabase
@@ -77,7 +75,8 @@ export default async function StatusPage(): Promise<import('react').ReactNode> {
       categoryConfigFromRow(
         category,
         category.image_path
-          ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data.publicUrl
+          ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data
+              .publicUrl
           : null,
       ),
     );

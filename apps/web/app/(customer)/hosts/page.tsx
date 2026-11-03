@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button, Card } from '@nexg/ui';
 import { ArrowRight, Check, QrCode } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -91,7 +92,7 @@ const FAQ = [
   },
 ] as const;
 
-export default async function HostsPage(): Promise<import('react').ReactNode> {
+export default async function HostsPage(): Promise<ReactNode> {
   const supabase = createPublicClient();
 
   /*

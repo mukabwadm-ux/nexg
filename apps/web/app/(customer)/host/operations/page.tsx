@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH } from '@/components/host/bits';
 import {
   Fact,
@@ -63,7 +64,7 @@ const HANDOFF: Record<string, { label: string; needs: string }> = {
  * wrong, so an unconfirmed caretaker is flagged rather than
  * silently trusted.
  */
-export default async function HostOperationsPage(): Promise<import('react').ReactNode> {
+export default async function HostOperationsPage(): Promise<ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

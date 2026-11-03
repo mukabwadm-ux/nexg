@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { CloseEarly, CopyHours, HoursSlot } from '@/components/merchant/hours-client';
@@ -28,7 +29,11 @@ interface OverrideRow {
  * question a merchant opens this to answer, which is "are we
  * shown as open right now".
  */
-export default async function HoursPage({ searchParams }: { searchParams?: { branch?: string } }): Promise<import('react').ReactNode> {
+export default async function HoursPage({
+  searchParams,
+}: {
+  searchParams?: { branch?: string };
+}): Promise<ReactNode> {
   const { m } = await merchantContext({ draft: true });
   if (!m) return null;
 

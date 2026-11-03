@@ -115,8 +115,22 @@ select is(
 
 select is(
   (select sum(gross_cents) from public.fin_kpi_daily where city_id is not null),
-  (select sum(merchant_cost_cents + revenue_cents) from public.fin_kpi_daily where city_id is not null),
-  'Gross is exactly the merchant share plus ours — the tile cannot drift from its parts.');
+  (select sum(merchant_cost_cents + revenue_cents) from public.fin_kpi_daily where city_id is not null)
+  + coalesce((
+      select sum(e.credit - e.debit)
+        from ledger.entry e
+        join ledger.account a on a.code = e.account_code
+        join ledger.transaction tx on tx.id = e.transaction_id
+        left join ledger.transaction reversed on reversed.id = tx.reversal_of
+       where a.base = 'tax.vat_output'
+         and (tx.kind = 'order_sale_recognised' or reversed.kind = 'order_sale_recognised')
+         and tx.city_id is not null
+         and e.effective_at >= (select min(day)::timestamp at time zone 'Africa/Nairobi'
+                                  from public.fin_kpi_daily where city_id is not null)
+         and e.effective_at < ((select max(day) + 1 from public.fin_kpi_daily where city_id is not null)
+                                ::timestamp at time zone 'Africa/Nairobi')
+    ), 0),
+  'Guest gross is merchant share plus platform revenue and VAT, not the VAT-exclusive revenue alone.');
 
 select is(
   (select coalesce(sum(amount_cents), 0) from public.fin_revenue_line),
