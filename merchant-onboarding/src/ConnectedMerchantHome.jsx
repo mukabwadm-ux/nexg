@@ -22,13 +22,39 @@ export default function ConnectedMerchantHome({ form, files, selection, onEdit, 
     return { ...row, title: display(row.title), description: display(row.description),
       onAction: row.editorStep === null ? undefined : () => onEdit(row.editorStep,row.id) };
   });
+  // The registration's sub-categories each produce an operating-setup row.
+  // Show them as one "Business categories and operations" row whose pencil
+  // opens the individual categories inline.
+  const modelRows = rows.filter(row => row.id.startsWith('model:'));
+  const firstModel = rows.findIndex(row => row.id.startsWith('model:'));
+  const homeRows = rows.filter(row => !row.id.startsWith('model:'));
+  if(firstModel >= 0){
+    const statuses = modelRows.map(row => row.status);
+    const status = statuses.includes('invalid') ? 'invalid' : statuses.every(value => value === 'complete') ? 'complete' : statuses.every(value => value === 'complete' || value === 'provided') ? 'provided' : 'waiting';
+    const names = modelRows.map(row => row.title.replace(/ operating setup$/i, ''));
+    homeRows.splice(firstModel, 0, {
+      id: 'categories',
+      title: 'Business categories and operations',
+      icon: 'specialty',
+      editorStep: null,
+      required: modelRows.some(row => row.required),
+      status,
+      statusLabel: `${modelRows.length} ${modelRows.length === 1 ? 'category' : 'categories'}`,
+      actionLabel: 'Update categories',
+      editLabel: 'Update business categories and operations',
+      description: names.join(' · '),
+      onAction: () => {},
+      subRows: modelRows,
+      subRowsFooter: <button type="button" className="text-sm font-bold underline" onClick={() => previewMode ? onEdit(1) : onRegistration()}>Change categories</button>,
+    });
+  }
   const reviewState=previewMode?applicationStatus:savedHome.review.state;
   const needsResubmission=!previewMode&&savedHome.review.needsResubmission;
   const approved = reviewState === "approved" && !needsResubmission;
   const published = !previewMode && savedHome.publication.status==='live';
   const content = openHelp => <HomeSetupView
       businessName={projection.businessName}
-      rows={rows}
+      rows={homeRows}
       previewLabel={previewMode ? "Demo · setup" : approved ? "Workspace approved · setup" : "Application · setup"}
       reviewState="setup"
       greeting="Welcome"

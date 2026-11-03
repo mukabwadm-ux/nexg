@@ -98,6 +98,23 @@ describe('saved Home host and connected entry copy', () => {
     expect(html).not.toContain('Welcome, Acacia Kitchen');
     expect(html).not.toContain('Setup progress');
   });
+  it('labels submitted business details and groups the selected categories into one row', () => {
+    const multi = { ...record, payload: { ...record.payload, subcategories: ['restaurant', 'cafe', 'bakery'] } };
+    const savedHome = saved(multi);
+    const html = renderToStaticMarkup(
+      <SavedHome form={multi.payload} files={{}} selection={resolveOnboardingSelection('restaurants_food', ['restaurant', 'cafe', 'bakery'])}
+        previewMode={false} embedded applicationStatus="approved" savedHome={savedHome}
+        onExitDemo={undefined} onEdit={() => {}} onRegistration={() => {}} />,
+    );
+    const rows = html.match(/<li\b[^>]*>[\s\S]*?<\/li>/g) ?? [];
+    const titles = rows.map((row) => row.match(/<h3[^>]*>([^<]*)</)?.[1] ?? row.match(/font-extrabold[^>]*>([^<]*)</)?.[1]);
+    expect(rows[0]).toContain('Details submitted');
+    expect(rows[0]).toContain('bg-green-600');
+    expect(rows.filter((row) => row.includes('Business categories and operations'))).toHaveLength(1);
+    expect(html).not.toContain('operating setup');
+    expect(html).toContain('3 categories');
+    expect(new Set(titles).size).toBe(titles.length);
+  });
   it('respects published state without claiming unpublished or adding a portal demo control', () => {
     const html = renderToStaticMarkup(
       <SavedHome

@@ -157,6 +157,10 @@ export function projectMerchantSavedHome(input: SavedHomeInput): MerchantSavedHo
   // Merchants complete those details inside the workspace module that owns
   // the resulting record (catalogue, branches, hours, documents, or calendar).
   const rows = projection.rows.filter((row) => !row.id.startsWith('specialty:'));
+  // Reaching the saved Home means the business details were submitted.
+  const business = rows.find((row) => row.id === 'business');
+  if (business?.status === 'complete' && record.review.submitted_revision !== null)
+    Object.assign(business, { statusLabel: 'Details submitted', actionLabel: 'Edit details' });
   const replace = (row: OnboardingHomeRow) => {
     const index = rows.findIndex((item) => item.id === row.id);
     if (index < 0) rows.splice(Math.max(0, rows.length - 3), 0, row);
