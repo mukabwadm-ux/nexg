@@ -2,6 +2,8 @@ import { Card } from '@nexg/ui';
 import { BedDouble, MapPin, Users } from 'lucide-react';
 import Link from 'next/link';
 
+import midnight from './midnight.module.css';
+
 /** Shared pieces of the stays listing, used by /stays and the /hosts teaser. */
 
 export interface PropertyCardRow {
@@ -86,7 +88,15 @@ export function PhotoSlot({
   );
 }
 
-export function PropertyCard({ property }: { property: PropertyCardRow }) {
+export function PropertyCard({
+  property,
+  tone = 'light',
+}: {
+  property: PropertyCardRow;
+  /** `midnight` is the dark card used on the /stays page. */
+  tone?: 'light' | 'midnight';
+}) {
+  if (tone === 'midnight') return <MidnightPropertyCard property={property} />;
   return (
     <Card className="group overflow-hidden p-0 transition-shadow hover:shadow-md">
       <Link href={`/stays/${property.slug}`} className="block">
@@ -145,5 +155,66 @@ export function PropertyCard({ property }: { property: PropertyCardRow }) {
         </span>
       </Link>
     </Card>
+  );
+}
+
+/** The same card for the dark /stays page: glass panel, inset photo. */
+function MidnightPropertyCard({ property }: { property: PropertyCardRow }) {
+  return (
+    <Link href={`/stays/${property.slug}`} className={`group ${midnight.card}`}>
+      <PhotoSlot
+        seed={property.slug}
+        caption={property.photos[0]?.caption}
+        className="h-44 w-full rounded-[10px]"
+      />
+
+      <span className="block px-2 pb-2 pt-4">
+        <span className="flex flex-wrap items-center gap-1.5">
+          <span className="rounded-full border border-white/30 px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide text-white/85">
+            {KIND_LABEL[property.kind] ?? property.kind}
+          </span>
+          <span className="inline-flex items-center gap-1 text-[0.6875rem] font-semibold text-white/70">
+            <MapPin aria-hidden="true" className="h-3 w-3" />
+            {property.area ?? property.city_name ?? '—'}
+          </span>
+        </span>
+
+        <span className="mt-2 block text-[1rem] font-extrabold leading-tight text-white">
+          {property.name}
+        </span>
+
+        {property.summary && (
+          <span className="mt-1.5 line-clamp-2 block text-[0.8125rem] font-semibold leading-[1.6] text-white/75">
+            {property.summary}
+          </span>
+        )}
+
+        <span className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.6875rem] font-bold text-white/70">
+          <span className="inline-flex items-center gap-1">
+            <BedDouble aria-hidden="true" className="h-3.5 w-3.5" />
+            {bedroomLabel(property.bedrooms_min, property.bedrooms_max)}
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Users aria-hidden="true" className="h-3.5 w-3.5" />
+            sleeps {property.sleeps_max ?? '—'}
+          </span>
+          <span>
+            {property.units_available} unit{property.units_available === 1 ? '' : 's'}
+          </span>
+        </span>
+
+        <span className="mt-3 flex items-center justify-between gap-2 border-t border-white/15 pt-3">
+          <span className="text-[0.875rem] font-extrabold text-white">
+            {rateLabel(property.from_rate_kes)}
+            {property.from_rate_kes !== null && (
+              <span className="text-[0.6875rem] font-semibold text-white/70"> / night</span>
+            )}
+          </span>
+          <span className="text-[0.75rem] font-extrabold text-[#F2C94C] group-hover:underline">
+            See units →
+          </span>
+        </span>
+      </span>
+    </Link>
   );
 }

@@ -6,6 +6,8 @@ import * as React from 'react';
 
 import { requestStay } from '@/app/(customer)/stays/actions';
 
+import midnight from './midnight.module.css';
+
 /**
  * "Tell us what you need" — three steps rather than one long column.
  *
@@ -50,14 +52,18 @@ export function TailorForm({
   compact,
   subject,
   heading,
+  tone = 'light',
 }: {
   areas: string[];
+  /** `midnight` is the frosted-glass card on the dark /stays hero. */
+  tone?: 'light' | 'midnight';
   compact?: boolean;
   /** The property or unit this enquiry is about, if it came from one. */
   subject?: string;
   heading?: string;
 }) {
   const { toast } = useToast();
+  const dark = tone === 'midnight';
   const [step, setStep] = React.useState(0);
 
   const [name, setName] = React.useState('');
@@ -142,7 +148,13 @@ export function TailorForm({
 
   if (reference) {
     return (
-      <div className="border-border rounded-2xl border bg-white p-6 sm:p-8">
+      <div
+        className={
+          dark
+            ? `${midnight.glass} p-6 sm:p-8`
+            : 'border-border rounded-2xl border bg-white p-6 sm:p-8'
+        }
+      >
         <span
           aria-hidden="true"
           className="bg-gold flex h-10 w-10 items-center justify-center rounded-full"
@@ -152,12 +164,16 @@ export function TailorForm({
         <h3 className="mt-4 text-[1.375rem] font-extrabold leading-tight tracking-tight">
           We have it. Reference {reference}.
         </h3>
-        <p className="text-muted mt-3 text-sm font-semibold leading-[1.8]">
+        <p
+          className={`mt-3 text-sm font-semibold leading-[1.8] ${dark ? midnight.muted : 'text-muted'}`}
+        >
           Somebody on the desk reads this — it is not a search. They will come back with two or
           three places that actually fit what you said, with what each one costs and why they picked
           it.
         </p>
-        <p className="text-muted-light mt-3 text-[0.75rem] font-semibold leading-relaxed">
+        <p
+          className={`mt-3 text-[0.75rem] font-semibold leading-relaxed ${dark ? midnight.muted : 'text-muted-light'}`}
+        >
           Quote the reference if you call. Nothing is booked and nothing is charged yet.
         </p>
       </div>
@@ -169,11 +185,21 @@ export function TailorForm({
   return (
     <form
       onSubmit={submit}
-      className="border-border rounded-2xl border bg-white p-5 sm:p-7"
+      className={
+        dark
+          ? `${midnight.glass} p-5 sm:p-7`
+          : 'border-border rounded-2xl border bg-white p-5 sm:p-7'
+      }
       noValidate
     >
       {!compact && (
-        <p className="text-gold-text text-[0.6875rem] font-extrabold uppercase tracking-[0.12em]">
+        <p
+          className={
+            dark
+              ? midnight.eyebrow
+              : 'text-gold-text text-[0.6875rem] font-extrabold uppercase tracking-[0.12em]'
+          }
+        >
           {heading ?? 'Tell us what you need'}
         </p>
       )}
@@ -185,12 +211,20 @@ export function TailorForm({
             key={label}
             aria-hidden="true"
             className={`h-1 flex-1 rounded-full transition-colors ${
-              i <= step ? 'bg-gold' : 'bg-border'
+              dark
+                ? i <= step
+                  ? 'bg-[#F2C94C]'
+                  : 'bg-white/[0.22]'
+                : i <= step
+                  ? 'bg-gold'
+                  : 'bg-border'
             }`}
           />
         ))}
       </div>
-      <p className="text-muted-light mt-2 text-[0.6875rem] font-bold">
+      <p
+        className={`mt-2 font-bold ${dark ? `${midnight.muted} text-[0.8125rem]` : 'text-muted-light text-[0.6875rem]'}`}
+      >
         Step {step + 1} of {STEPS.length} · {STEPS[step]}
       </p>
 
@@ -231,7 +265,9 @@ export function TailorForm({
               onChange={(e) => setBedrooms(e.target.value)}
             />
           </div>
-          <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold">
+          <p
+            className={`mt-3 font-semibold ${dark ? `${midnight.muted} text-[0.8125rem]` : 'text-muted-light text-[0.6875rem]'}`}
+          >
             Not fixed yet? Leave them blank — we will work around it.
           </p>
         </div>
@@ -242,10 +278,13 @@ export function TailorForm({
         <div className="mt-4">
           {areas.length > 0 && (
             <fieldset>
-              <legend className="text-muted text-[0.75rem] font-bold">Where, roughly?</legend>
+              <legend className={`text-[0.75rem] font-bold ${dark ? '' : 'text-muted'}`}>
+                Where, roughly?
+              </legend>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {areas.map((area) => (
                   <Toggle
+                    dark={dark}
                     key={area}
                     on={pickedAreas.includes(area)}
                     onClick={() => toggle(pickedAreas, setPickedAreas, area)}
@@ -269,12 +308,13 @@ export function TailorForm({
           </div>
 
           <fieldset className="mt-4">
-            <legend className="text-muted text-[0.75rem] font-bold">
+            <legend className={`text-[0.75rem] font-bold ${dark ? '' : 'text-muted'}`}>
               Anything that would make it wrong without it?
             </legend>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {MUST_HAVES.map((m) => (
                 <Toggle
+                  dark={dark}
                   key={m}
                   on={picked.includes(m)}
                   onClick={() => toggle(picked, setPicked, m)}
@@ -337,22 +377,44 @@ export function TailorForm({
 
       {/* ───────────────────────────────────────────── controls */}
       <div className="mt-5 flex items-center gap-2">
-        {step > 0 && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setStep((s) => Math.max(s - 1, 0))}
-          >
-            <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-            Back
-          </Button>
-        )}
+        {step > 0 &&
+          (dark ? (
+            <button
+              type="button"
+              className={midnight.back}
+              onClick={() => setStep((s) => Math.max(s - 1, 0))}
+            >
+              <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+              Back
+            </button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setStep((s) => Math.max(s - 1, 0))}
+            >
+              <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+              Back
+            </Button>
+          ))}
 
         {last ? (
-          <Button type="submit" className="flex-1" disabled={pending}>
-            {pending ? 'Sending…' : 'Find me a place'}
+          dark ? (
+            <button type="submit" className={midnight.continue} disabled={pending}>
+              {pending ? 'Sending…' : 'Find me a place'}
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            </button>
+          ) : (
+            <Button type="submit" className="flex-1" disabled={pending}>
+              {pending ? 'Sending…' : 'Find me a place'}
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            </Button>
+          )
+        ) : dark ? (
+          <button type="button" className={midnight.continue} onClick={next}>
+            Continue
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
-          </Button>
+          </button>
         ) : (
           /*
            * A button, not a submit: pressing Enter on step one should
@@ -365,7 +427,9 @@ export function TailorForm({
         )}
       </div>
 
-      <p className="text-muted-light mt-3 text-center text-[0.6875rem] font-semibold leading-relaxed">
+      <p
+        className={`mt-3 text-center font-semibold leading-relaxed ${dark ? `${midnight.muted} text-[0.75rem]` : 'text-muted-light text-[0.6875rem]'}`}
+      >
         No account, no payment, no obligation. We use these details to answer you and nothing else.
       </p>
     </form>
@@ -376,7 +440,9 @@ function Toggle({
   on,
   onClick,
   children,
+  dark = false,
 }: {
+  dark?: boolean;
   on: boolean;
   onClick: () => void;
   children: React.ReactNode;
@@ -387,7 +453,13 @@ function Toggle({
       aria-pressed={on}
       onClick={onClick}
       className={`rounded-full px-3 py-1.5 text-[0.75rem] font-bold transition-colors ${
-        on ? 'bg-ink text-white' : 'border-border-strong text-ink hover:border-ink border bg-white'
+        dark
+          ? on
+            ? 'bg-[#F2C94C] text-[#16120A]'
+            : 'border border-white/30 text-white hover:border-white/60'
+          : on
+            ? 'bg-ink text-white'
+            : 'border-border-strong text-ink hover:border-ink border bg-white'
       }`}
     >
       {children}
