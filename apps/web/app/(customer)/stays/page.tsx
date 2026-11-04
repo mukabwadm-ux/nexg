@@ -1,3 +1,4 @@
+import { Card } from '@nexg/ui';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 
@@ -44,10 +45,9 @@ export default async function StaysPage() {
 
       <main id="main">
         {/*
-         * Design A, "Midnight Hero". One dark ground for the hero and the
-         * listings: the homepage's sunset photograph on the right, fading
-         * to black on the left where the copy sits, and into solid black
-         * at the bottom so the cards sit on a clean background.
+         * Design A, "Midnight Hero": the homepage's sunset photograph on
+         * the right, fading to black on the left where the copy sits and
+         * to solid black at the bottom. The listings below are on cream.
          */}
         <div className="relative isolate overflow-hidden bg-[#0B0906] text-white">
           <div className="relative isolate">
@@ -117,47 +117,48 @@ export default async function StaysPage() {
               </div>
             </section>
           </div>
+        </div>
 
-          {/* ─────────────────────────────────────────── listings */}
-          <section className="mx-auto max-w-[96rem] px-4 pb-20 sm:px-8 lg:px-16">
+        {/* ─────────────────────────────────────────── listings
+            Back on the site's cream, with the standard light cards. */}
+        <section className="bg-bg">
+          <div className="mx-auto max-w-[96rem] px-4 pb-16 pt-14 sm:px-8 lg:px-16">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <p className="text-[0.75rem] font-extrabold uppercase tracking-[0.14em] text-white/65">
+                <p className="text-muted-light text-[0.75rem] font-extrabold uppercase tracking-[0.14em]">
                   Listed now
                 </p>
-                <h2 className="mt-2 text-[1.875rem] font-extrabold tracking-[-0.02em] text-white sm:text-[2.375rem]">
+                <h2 className="text-ink mt-2 text-[1.875rem] font-extrabold tracking-[-0.02em] sm:text-[2.375rem]">
                   {rows.length === 0
                     ? 'Nothing listed yet.'
                     : `${rows.length} ${rows.length === 1 ? 'place' : 'places'}, each with its units.`}
                 </h2>
               </div>
               {rows.length > 0 && (
-                <p className="max-w-[26rem] text-[0.8125rem] font-semibold leading-relaxed text-white/70 sm:text-right">
+                <p className="text-muted-light max-w-[26rem] text-[0.8125rem] font-semibold leading-relaxed sm:text-right">
                   Open one to see the individual flats, what each sleeps and what it costs.
                 </p>
               )}
             </div>
 
             {rows.length === 0 ? (
-              <div className="mt-6 rounded-2xl border border-white/15 bg-white/[0.06] p-8 text-center">
-                <p className="text-[0.9375rem] font-extrabold text-white">
-                  No places are listed yet.
-                </p>
-                <p className="mx-auto mt-2 max-w-[32rem] text-[0.8125rem] font-semibold leading-[1.8] text-white/75">
+              <Card className="mt-6 p-8 text-center">
+                <p className="text-[0.9375rem] font-extrabold">No places are listed yet.</p>
+                <p className="text-muted mx-auto mt-2 max-w-[32rem] text-[0.8125rem] font-semibold leading-[1.8]">
                   We only list a property once the host is verified and the hand-off rule is set, so
                   this page stays empty rather than showing you somewhere nobody can actually let
                   you in. Leave a request above and we will go and find you one.
                 </p>
-              </div>
+              </Card>
             ) : (
               <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {rows.map((p) => (
-                  <PropertyCard key={p.id} property={p} tone="midnight" />
+                  <PropertyCard key={p.id} property={p} />
                 ))}
               </div>
             )}
-          </section>
-        </div>
+          </div>
+        </section>
 
         {/* ─────────────────────────────────────── how this works */}
         <section className="bg-ink py-14 text-white">
