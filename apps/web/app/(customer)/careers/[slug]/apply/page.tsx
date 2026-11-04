@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
+import type { ReactElement } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -17,7 +18,7 @@ export default async function ApplyPage({
 }: {
   params: { slug: string };
   searchParams?: { src?: string };
-}) {
+}): Promise<ReactElement> {
   const supabase = createPublicClient();
 
   const { data: job } = await supabase

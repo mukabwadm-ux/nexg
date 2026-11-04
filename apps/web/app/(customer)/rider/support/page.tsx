@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile } from '@/components/rider/bits';
 import { RiderBoard, RiderPageHead, riderContext } from '@/components/rider/frame';
 
@@ -39,7 +40,7 @@ function when(iso: string): string {
  * minutes" above a thread that waited two days is worse than
  * no promise at all.
  */
-export default async function RiderSupport() {
+export default async function RiderSupport(): Promise<ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Card } from '@nexg/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -57,7 +58,11 @@ interface Status {
  * stages and nothing else — no note, no score, no interviewer
  * surname, nothing about anybody else.
  */
-export default async function StatusPage({ params }: { params: { token: string } }) {
+export default async function StatusPage({
+  params,
+}: {
+  params: { token: string };
+}): Promise<ReactNode> {
   const supabase = createPublicClient();
 
   const { data } = await supabase.rpc('rpc_careers_status', { p_token: params.token });

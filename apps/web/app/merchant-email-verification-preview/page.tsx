@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -32,7 +33,7 @@ async function currentApplicationEmail(): Promise<string | null> {
   }
 }
 
-export default async function MerchantEmailVerificationPreview() {
+export default async function MerchantEmailVerificationPreview(): Promise<ReactNode> {
   if (process.env.NODE_ENV !== 'development') notFound();
   const savedEmail = await currentApplicationEmail();
   const email = savedEmail ?? 'hello@yourbusiness.com';
@@ -40,7 +41,10 @@ export default async function MerchantEmailVerificationPreview() {
   return (
     <main className="bg-bg flex min-h-dvh items-center justify-center px-4 py-10 sm:px-6">
       <div className="w-full max-w-[460px]">
-        <div className="border-border bg-surface mb-4 rounded-xl border px-4 py-3 text-xs leading-5" role="note">
+        <div
+          className="border-border bg-surface mb-4 rounded-xl border px-4 py-3 text-xs leading-5"
+          role="note"
+        >
           <strong className="text-ink block">Design preview</strong>
           <span className="text-muted">No verification email is sent or checked here.</span>
         </div>
@@ -51,7 +55,10 @@ export default async function MerchantEmailVerificationPreview() {
               ? 'Showing the email from your saved application.'
               : 'Showing an example email. The finished step will use the email from onboarding.'}
           </p>
-          <Link href="/merchants/register" className="text-ink mt-2 inline-block font-bold underline underline-offset-4 hover:text-gold-text">
+          <Link
+            href="/merchants/register"
+            className="text-ink hover:text-gold-text mt-2 inline-block font-bold underline underline-offset-4"
+          >
             Back to onboarding
           </Link>
         </div>

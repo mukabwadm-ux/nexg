@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
+import { Suspense, type ReactElement } from 'react';
 
 import { LeadForm } from '@/components/home/lead-form';
 import { SiteFooter } from '@/components/site-footer';
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
  * requests and an empty search — comes here. `?need=` prefills the form,
  * as it always has.
  */
-export default async function AskPage() {
+export default async function AskPage(): Promise<ReactElement> {
   const { t } = await getTranslations();
 
   return (

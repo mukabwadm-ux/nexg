@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Empty, Panel, Pill, day, kes, kesWhole } from '@/components/partner/bits';
 import { PageHead } from '@/components/merchant/frame';
 import { requireMerchant } from '@/lib/partner';
@@ -24,7 +25,7 @@ const TONE: Record<string, string> = {
  * cannot follow that arithmetic on the page will not trust the
  * number at the bottom.
  */
-export default async function MerchantMoney() {
+export default async function MerchantMoney(): Promise<ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
 

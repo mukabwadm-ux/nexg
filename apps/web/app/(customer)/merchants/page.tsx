@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button, Card, VALUE_PLACEHOLDER } from '@nexg/ui';
 import {
   ArrowRight,
@@ -26,10 +27,10 @@ import {
   UtensilsCrossed,
   Wine,
   Wrench,
+  type LucideIcon,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import type { ComponentType } from 'react';
 
 import { DashboardPreview } from '@/components/merchants/dashboard-preview';
 import { FeaturedSlots } from '@/components/merchants/featured-slots';
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
 
 /* Copy from the `Merchants` artboard, signed off (ground rule 6). */
 
-const CATEGORY_ICONS: Record<string, ComponentType<{ className?: string }>> = {
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
   Activity,
   BellRing,
   Car,
@@ -142,7 +143,7 @@ const FAQ = [
  */
 export const dynamic = 'force-dynamic';
 
-export default async function MerchantsPage() {
+export default async function MerchantsPage(): Promise<ReactNode> {
   const connectedRegistrationEnabled = process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false';
   const registrationHref = '/merchants/apply';
   const supabase = createPublicClient();
@@ -172,10 +173,8 @@ export default async function MerchantsPage() {
   ]);
 
   if (citiesError) throw new Error(`Could not load merchant cities: ${citiesError.message}`);
-  if (cityCountError)
-    throw new Error(`Could not count merchant cities: ${cityCountError.message}`);
-  if (commissionError)
-    throw new Error(`Could not load merchant fees: ${commissionError.message}`);
+  if (cityCountError) throw new Error(`Could not count merchant cities: ${cityCountError.message}`);
+  if (commissionError) throw new Error(`Could not load merchant fees: ${commissionError.message}`);
   if (categoriesError)
     throw new Error(`Could not load merchant categories: ${categoriesError.message}`);
 
@@ -276,7 +275,9 @@ export default async function MerchantsPage() {
                     >
                       <Icon className="h-6 w-6" />
                     </span>
-                    <span className="text-[0.6875rem] font-bold leading-tight">{category.label}</span>
+                    <span className="text-[0.6875rem] font-bold leading-tight">
+                      {category.label}
+                    </span>
                   </li>
                 );
               })}

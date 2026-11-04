@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Card } from '@nexg/ui';
 import { Clock, UserRound, Wallet } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -35,7 +36,7 @@ export default async function ExperienceHome({
   searchParams,
 }: {
   searchParams?: { city?: string };
-}) {
+}): Promise<ReactNode> {
   const supabase = createPublicClient();
   const { t } = await getTranslations();
 

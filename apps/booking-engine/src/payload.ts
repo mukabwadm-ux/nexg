@@ -211,7 +211,7 @@ export async function createPayload(
     closed = true;
     await destroy();
     if (pg) await (payload.db as any).pool?.end();
-    else (payload.db as any).client?.close();
+    else await (payload.db as any).client?.close();
   };
   return payload;
 }

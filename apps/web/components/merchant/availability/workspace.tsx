@@ -134,14 +134,21 @@ export function AvailabilityWorkspace({
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const activeDemo = demoContext ?? inheritedDemo;
+  const activeDemoProfileId = activeDemo?.profileId;
   const profiles = useMemo(() => extendOfferingProfiles(additionalProfiles), [additionalProfiles]);
-  const [profileId, setProfileId] = useState(initialProfileId ?? demoContext?.profileId ?? 'restaurant'),
+  const [profileId, setProfileId] = useState(
+      initialProfileId ?? demoContext?.profileId ?? 'restaurant',
+    ),
     [location, setLocation] = useState<string>('Westlands');
   const profile = profiles.find((p) => p.id === profileId) ?? profiles[0]!;
   useEffect(() => {
-    if (!initialProfileId && activeDemo && profiles.some((item) => item.id === activeDemo.profileId))
-      setProfileId(activeDemo.profileId);
-  }, [initialProfileId, activeDemo?.profileId, profiles]);
+    if (
+      !initialProfileId &&
+      activeDemoProfileId &&
+      profiles.some((item) => item.id === activeDemoProfileId)
+    )
+      setProfileId(activeDemoProfileId);
+  }, [initialProfileId, activeDemoProfileId, profiles]);
   const [catalogue, setCatalogue] = useState<Catalogue | null>(null),
     [offeringId, setOfferingId] = useState(''),
     [method, setMethod] = useState('');
@@ -815,7 +822,10 @@ export function AvailabilityWorkspace({
               Before/travel {beforeBuffer(ctx)} min · After/turnover {afterBuffer(ctx)} min · Notice{' '}
               {snapshot.settings.noticeMinutes} min
             </span>
-            <a className="av-link" href={appendMerchantOnboardingDemoContext(offeringHref(ctx), activeDemo)}>
+            <a
+              className="av-link"
+              href={appendMerchantOnboardingDemoContext(offeringHref(ctx), activeDemo)}
+            >
               Edit in Offerings
             </a>
           </div>
@@ -1039,7 +1049,13 @@ export function AvailabilityWorkspace({
               title="No configured activity"
               text="Choose a sample specialty or configure an actual offering in Offerings. Onboarding will be handled later."
             >
-              <a className="av-button" href={appendMerchantOnboardingDemoContext('/merchant-live-preview/offerings', activeDemo)}>
+              <a
+                className="av-button"
+                href={appendMerchantOnboardingDemoContext(
+                  '/merchant-live-preview/offerings',
+                  activeDemo,
+                )}
+              >
                 Open Offerings
               </a>
             </Empty>
@@ -1430,7 +1446,13 @@ export function AvailabilityWorkspace({
                               Book each covered trainer, class or service against its own
                               availability. Existing accepted child bookings keep their rights.
                             </p>
-                            <a className="av-link" href={appendMerchantOnboardingDemoContext(offeringHref(ctx), activeDemo)}>
+                            <a
+                              className="av-link"
+                              href={appendMerchantOnboardingDemoContext(
+                                offeringHref(ctx),
+                                activeDemo,
+                              )}
+                            >
                               View covered-service configuration
                             </a>
                           </section>
@@ -1620,7 +1642,10 @@ export function AvailabilityWorkspace({
                       >
                         Edit applicable rules
                       </button>
-                      <a className="av-link" href={appendMerchantOnboardingDemoContext(offeringHref(ctx), activeDemo)}>
+                      <a
+                        className="av-link"
+                        href={appendMerchantOnboardingDemoContext(offeringHref(ctx), activeDemo)}
+                      >
                         Edit service definition in Offerings
                       </a>
                     </section>
@@ -1699,7 +1724,10 @@ export function AvailabilityWorkspace({
                         </div>
                       ))
                     )}
-                    <a className="av-button" href={appendMerchantOnboardingDemoContext(offeringHref(ctx), activeDemo)}>
+                    <a
+                      className="av-button"
+                      href={appendMerchantOnboardingDemoContext(offeringHref(ctx), activeDemo)}
+                    >
                       Manage offering resource links
                     </a>
                   </section>

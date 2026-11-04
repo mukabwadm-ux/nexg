@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { ReportProblem } from '@/components/merchant/board-client';
 import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
@@ -42,7 +43,7 @@ function when(iso: string | null): string {
  * published target. A promise of "under two minutes" beside a
  * thread that waited two days is worse than no promise.
  */
-export default async function SupportPage() {
+export default async function SupportPage(): Promise<ReactNode> {
   const { m } = await merchantContext({ setup: true });
   if (!m) return null;
 

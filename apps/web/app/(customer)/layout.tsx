@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { CartBar } from '@/components/cart/add-to-cart';
 import { CartProvider } from '@/components/cart/cart-provider';
 import { PersonalizedChrome } from '@/components/consent/personalized-chrome';
@@ -7,7 +8,7 @@ import { SiteLocationProvider } from '@/components/location/provider';
 import { DEFAULT_LOCALE } from '@/lib/i18n/dictionaries';
 import { canMachineTranslate } from '@/lib/i18n/translate';
 
-export default function CustomerLayout({ children }: { children: React.ReactNode }) {
+export default function CustomerLayout({ children }: { children: ReactNode }): ReactNode {
   return (
     <SiteLocationProvider initial={null}>
       <CartProvider>

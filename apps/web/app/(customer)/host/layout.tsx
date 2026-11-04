@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 
 import { HostThemeFrame, type Theme } from '@/components/host/theme';
@@ -67,7 +68,11 @@ export interface Attention {
  * disjoint sets of data and fetching both in a shared layout
  * would mean every page pays for the half it does not use.
  */
-export default async function HostLayout({ children }: { children: React.ReactNode }) {
+export default async function HostLayout({
+  children,
+}: {
+  children: ReactNode;
+}): Promise<ReactNode> {
   await requireHost();
   /* Touch the client here so an expired session is refreshed
      once per navigation rather than per query below. */

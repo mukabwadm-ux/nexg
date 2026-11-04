@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -25,7 +26,7 @@ export default async function EnquirePage({
 }: {
   params: { slug: string };
   searchParams?: { unit?: string };
-}) {
+}): Promise<ReactNode> {
   const supabase = createPublicClient();
 
   const { data: property } = await supabase

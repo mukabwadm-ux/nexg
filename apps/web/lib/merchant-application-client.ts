@@ -3,8 +3,15 @@ import {
   MerchantPayoutDeclaration,
 } from '@nexg/contracts/merchant-application';
 
-export function applicationCapture(input: Record<string, any>) {
-  const b = input.business ?? {};
+type InputRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is InputRecord {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+export function applicationCapture(input: InputRecord) {
+  const b = isRecord(input.business) ? input.business : {};
+  const policies = isRecord(input.policies) ? input.policies : {};
   const normalize = (value: unknown) => {
     const valueText = String(value ?? '').replace(/[\s()-]/g, '');
     if (!valueText) return '';
@@ -33,10 +40,10 @@ export function applicationCapture(input: Record<string, any>) {
     categoryId: input.categoryId || null,
     subcategories: input.subcategories ?? [],
     answersBySubcategory: input.answersBySubcategory ?? {},
-    policies: { terms: input.policies?.terms === true },
+    policies: { terms: policies.terms === true },
   });
 }
-export function payoutDeclaration(input: Record<string, any>) {
+export function payoutDeclaration(input: InputRecord) {
   if (input.method === 'mobile_money')
     throw new Error(
       'Your previous phone number is retained. Choose Till, PayBill or bank before saving.',

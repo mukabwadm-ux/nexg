@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button, Card } from '@nexg/ui';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -79,7 +80,11 @@ export async function generateMetadata({
  * hiring manager chose to publish it, or "shared at the intro call"
  * when they did not. It never shows a guess.
  */
-export default async function JobPage({ params }: { params: { slug: string } }) {
+export default async function JobPage({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<ReactNode> {
   const supabase = createPublicClient();
 
   const [{ data: job }, { data: others }] = await Promise.all([

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 
 import { Board, PageHead } from '@/components/merchant/frame';
@@ -11,7 +12,7 @@ export default async function MerchantInsightsPage({
   searchParams,
 }: {
   searchParams: { from?: string; to?: string; tab?: string };
-}) {
+}): Promise<ReactNode> {
   try {
     const { snapshot, policy, range } = await loadMerchantInsights(searchParams);
     return (

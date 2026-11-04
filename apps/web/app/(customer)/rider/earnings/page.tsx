@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH, Empty, Panel, Pill, Stat, day, kesWhole, plural } from '@/components/partner/bits';
 import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
@@ -28,7 +29,7 @@ const TONE: Record<string, string> = {
  * the other — a rider who thinks the cash in their pocket is
  * theirs is in for a bad Friday.
  */
-export default async function RiderEarnings() {
+export default async function RiderEarnings(): Promise<ReactNode> {
   const me = await requireRider();
   const supabase = createClient();
 

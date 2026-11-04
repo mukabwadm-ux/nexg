@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 
 import type { MerchantHome } from '@/app/merchant/layout';
@@ -305,7 +306,11 @@ const sections: Record<
   },
 };
 
-export default function MerchantPreviewSectionPage({ params }: { params: { section: string } }) {
+export default function MerchantPreviewSectionPage({
+  params,
+}: {
+  params: { section: string };
+}): ReactNode {
   if (process.env.NODE_ENV !== 'development') notFound();
 
   if (params.section === 'dashboard') {

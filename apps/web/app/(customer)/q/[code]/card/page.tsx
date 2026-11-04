@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
@@ -27,7 +28,7 @@ export default async function CardPage({
 }: {
   params: { code: string };
   searchParams?: { n?: string };
-}) {
+}): Promise<ReactNode> {
   const code = normaliseCode(params.code);
   if (!code) notFound();
 

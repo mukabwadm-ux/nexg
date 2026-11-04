@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button, Card } from '@nexg/ui';
 import { ArrowLeft, BedDouble, Bath, MapPin, Maximize, Users } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -79,7 +80,11 @@ export async function generateMetadata({
  * to leak: where exactly it is comes after somebody is actually
  * coming.
  */
-export default async function PropertyPage({ params }: { params: { slug: string } }) {
+export default async function PropertyPage({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<ReactNode> {
   const supabase = createPublicClient();
 
   const { data: property } = await supabase

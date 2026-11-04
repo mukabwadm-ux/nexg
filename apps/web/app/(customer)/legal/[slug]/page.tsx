@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button } from '@nexg/ui';
 import { Info } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -19,7 +20,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   return { title: document.title, description: document.intro };
 }
 
-export default function LegalPage({ params }: { params: { slug: string } }) {
+export default function LegalPage({ params }: { params: { slug: string } }): ReactNode {
   const document = findDocument(params.slug);
   if (!document) notFound();
 

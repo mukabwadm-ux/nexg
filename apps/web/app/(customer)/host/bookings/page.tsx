@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DASH, when } from '@/components/host/bits';
 import {
   Fact,
@@ -68,7 +69,7 @@ export default async function HostBookingsPage({
   searchParams,
 }: {
   searchParams?: { tab?: string };
-}) {
+}): Promise<ReactNode> {
   const { home, live, nav, supabase, me, photoUrl } = await hostContext();
   if (!home) return null;
 

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 
 import { CategoryExplorer } from '@/components/categories/category-explorer';
@@ -14,13 +15,11 @@ export const dynamic = 'force-dynamic';
 /**
  * All categories explorer.
  */
-export default async function CategoriesPage() {
+export default async function CategoriesPage(): Promise<ReactNode> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('category_config')
-    .select(
-      'category, label, description, icon, card_kind, sort, color, image_path, subcategories',
-    )
+    .select('category, label, description, icon, card_kind, sort, color, image_path, subcategories')
     .eq('is_active', true)
     .order('sort')
     .order('label');
@@ -52,9 +51,7 @@ export default async function CategoriesPage() {
                 ? subcategory.fields.filter((field): field is string => typeof field === 'string')
                 : [],
               fulfillmentHint:
-                typeof subcategory.fulfillmentHint === 'string'
-                  ? subcategory.fulfillmentHint
-                  : '',
+                typeof subcategory.fulfillmentHint === 'string' ? subcategory.fulfillmentHint : '',
             },
           ];
         })

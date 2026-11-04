@@ -74,6 +74,8 @@ export function BusinessWorkspace({
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const activeDemo = demoContext ?? inheritedDemo;
+  const activeDemoProfileId = activeDemo?.profileId;
+  const activeDemoBusinessName = activeDemo?.businessName;
   const [profileId, setProfileId] = useState(
     category(initialProfileId) ? initialProfileId : 'haircare',
   );
@@ -94,9 +96,9 @@ export function BusinessWorkspace({
   const [notice, setNotice] = useState('');
   const [reload, setReload] = useState(0);
   useEffect(() => {
-    if (!demoContext && activeDemo && category(activeDemo.profileId))
-      setProfileId(activeDemo.profileId);
-  }, [demoContext, activeDemo?.profileId]);
+    if (!demoContext && activeDemoProfileId && category(activeDemoProfileId))
+      setProfileId(activeDemoProfileId);
+  }, [demoContext, activeDemoProfileId]);
   const [locationScope, setLocationScope] = useState('all');
   const source = useMemo(
     () =>
@@ -144,7 +146,10 @@ export function BusinessWorkspace({
         } catch {
           setNotice('Browser drafts are unavailable. Confirmed sample data is still displayed.');
         }
-        setProfileDraft({ ...(restored ?? value.profile), ...(activeDemo ? { name: activeDemo.businessName } : {}) });
+        setProfileDraft({
+          ...(restored ?? value.profile),
+          ...(activeDemoBusinessName !== undefined ? { name: activeDemoBusinessName } : {}),
+        });
         if (restored) setNotice('Recovered your unsaved public-profile draft.');
       })
       .catch((e) => {
@@ -156,7 +161,7 @@ export function BusinessWorkspace({
     return () => {
       active = false;
     };
-  }, [profileId, source, reload, activeDemo?.businessName]);
+  }, [profileId, source, reload, activeDemoBusinessName]);
   const showPreview = useCallback((title: string, description: string) => {
     setPreview({ title, description });
     setDialog('preview');
@@ -452,7 +457,9 @@ export function BusinessWorkspace({
         <div className="bu-title">
           <div>
             <h1>Business</h1>
-            <p className="bu-subtitle">{activeDemo?.businessName ?? data?.profile.name ?? 'Your business'}</p>
+            <p className="bu-subtitle">
+              {activeDemo?.businessName ?? data?.profile.name ?? 'Your business'}
+            </p>
           </div>
           {notice && (
             <div className="bu-banner bu-notice" role="status">
@@ -586,7 +593,10 @@ export function BusinessWorkspace({
                     save({ ...data, profile: profileDraft }, 'Public profile updated', true)
                   }
                   onCancel={() => {
-                    setProfileDraft({ ...data.profile, ...(activeDemo ? { name: activeDemo.businessName } : {}) });
+                    setProfileDraft({
+                      ...data.profile,
+                      ...(activeDemo ? { name: activeDemo.businessName } : {}),
+                    });
                     writeDraft(localStorage, profileId, null);
                     setNotice('Profile draft discarded.');
                   }}

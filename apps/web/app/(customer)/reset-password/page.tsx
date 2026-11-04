@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -13,7 +14,7 @@ export default function ResetPasswordPage({
   searchParams,
 }: {
   searchParams?: { next?: string };
-}) {
+}): ReactNode {
   const redirectTo = searchParams?.next === '/merchant' ? '/merchant' : '/';
   return (
     <main className="bg-surface flex min-h-dvh flex-col items-center justify-center px-4 py-10">

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function RiderStatusPage() {
+export default async function RiderStatusPage(): Promise<ReactNode> {
   const supabase = createClient();
 
   const { data: row } = await supabase

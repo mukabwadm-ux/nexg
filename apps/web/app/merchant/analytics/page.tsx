@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 
 export const metadata = { title: 'Insights' };
@@ -8,7 +9,7 @@ export default function MerchantAnalytics({
   searchParams,
 }: {
   searchParams: { from?: string; to?: string; tab?: string };
-}) {
+}): ReactNode {
   const params = new URLSearchParams();
   for (const key of ['from', 'to', 'tab'] as const) {
     const value = searchParams[key];

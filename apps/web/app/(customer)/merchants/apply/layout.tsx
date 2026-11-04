@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { OnboardingProvider } from '@/components/onboarding/store';
 import type { Draft, Readiness } from '@/components/onboarding/types';
 import { categoryConfigFromRow } from '@/lib/category-config';
@@ -13,7 +14,11 @@ import { createClient } from '@/lib/supabase/server';
  */
 export const dynamic = 'force-dynamic';
 
-export default async function ApplyLayout({ children }: { children: React.ReactNode }) {
+export default async function ApplyLayout({
+  children,
+}: {
+  children: ReactNode;
+}): Promise<ReactNode> {
   const supabase = createClient();
   const {
     data: { user },

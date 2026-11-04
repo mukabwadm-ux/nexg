@@ -24,6 +24,7 @@ import {
   Wine,
   Wrench,
   X,
+  type LucideIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -49,7 +50,7 @@ export interface ExplorerCategory {
   }[];
 }
 
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   Utensils: UtensilsCrossed,
   UtensilsCrossed: UtensilsCrossed,
   Wine: Wine,
@@ -108,8 +109,8 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
         const matchSub = c.subcategories.some(
           (s) =>
             s.name.toLowerCase().includes(trimmed) ||
-              s.fields?.some((f) => f.toLowerCase().includes(trimmed)) ||
-              s.fulfillmentHint?.toLowerCase().includes(trimmed),
+            s.fields?.some((f) => f.toLowerCase().includes(trimmed)) ||
+            s.fulfillmentHint?.toLowerCase().includes(trimmed),
         );
         return matchCat || matchSub;
       });

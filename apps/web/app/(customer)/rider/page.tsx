@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DashboardActive } from '@/components/rider/dashboard-active';
 import { DashboardPending } from '@/components/rider/dashboard-pending';
 import { riderContext } from '@/components/rider/frame';
@@ -29,7 +30,7 @@ export const dynamic = 'force-dynamic';
  * delivery with them and switched them over — a checklist
  * cannot substitute for somebody having met them.
  */
-export default async function RiderDashboard() {
+export default async function RiderDashboard(): Promise<ReactNode> {
   const { h, active, supabase, me } = await riderContext();
 
   if (!h) {

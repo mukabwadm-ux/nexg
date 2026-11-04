@@ -1,10 +1,11 @@
+import type { ReactNode } from 'react';
 import { RiderPayoutStep } from '@/components/rider-onboarding/step-payout';
 import type { SlotOption } from '@/components/rider-onboarding/types';
 import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Page() {
+export default async function Page(): Promise<ReactNode> {
   const supabase = createClient();
 
   /* The rider's own city, next sessions first, full ones left out. */

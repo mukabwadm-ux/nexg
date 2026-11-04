@@ -207,6 +207,7 @@ export function PromotionsWorkspace({
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const activeDemo = demoContext ?? inheritedDemo;
+  const activeDemoProfileId = activeDemo?.profileId;
   const [profileId, setProfileId] = useState(
     profiles.some((p) => p.id === (initialProfileId ?? demoContext?.profileId))
       ? (initialProfileId ?? demoContext!.profileId)
@@ -214,9 +215,13 @@ export function PromotionsWorkspace({
   );
   const profile = profiles.find((p) => p.id === profileId) ?? profiles[0]!;
   useEffect(() => {
-    if (!initialProfileId && activeDemo && profiles.some((item) => item.id === activeDemo.profileId))
-      setProfileId(activeDemo.profileId);
-  }, [initialProfileId, activeDemo?.profileId]);
+    if (
+      !initialProfileId &&
+      activeDemoProfileId &&
+      profiles.some((item) => item.id === activeDemoProfileId)
+    )
+      setProfileId(activeDemoProfileId);
+  }, [initialProfileId, activeDemoProfileId]);
   const [source, setSource] = useState<PromotionSource | null>(suppliedSource ?? null);
   const [catalogue, setCatalogue] = useState<PromotionCatalogue | null>(null);
   const [data, setData] = useState<PromotionData | null>(null);
@@ -457,7 +462,13 @@ export function PromotionsWorkspace({
     loading || (!!catalogue && catalogue.configuration.subcategoryId !== profile.id);
 
   return (
-    <MerchantLivePreviewShell active="Promotions" businessName={activeDemo?.businessName} accountInitials={activeDemo?.initials} demoContext={activeDemo} sampleControl={sampleControl}>
+    <MerchantLivePreviewShell
+      active="Promotions"
+      businessName={activeDemo?.businessName}
+      accountInitials={activeDemo?.initials}
+      demoContext={activeDemo}
+      sampleControl={sampleControl}
+    >
       <main
         className={`${styles.root} ${styles.workspace}`}
         data-promotions-workspace
@@ -473,7 +484,10 @@ export function PromotionsWorkspace({
                   : 'Create promotion'
                 : 'Promotions'}
             </h1>
-            <p>{activeDemo?.businessName ?? (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)}</p>
+            <p>
+              {activeDemo?.businessName ??
+                (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)}
+            </p>
           </div>
           {mode === 'list' && (
             <button
@@ -870,7 +884,10 @@ export function PromotionsWorkspace({
                       The offering, availability or discount changed.{' '}
                       <a
                         className="pm-link"
-                        href={appendMerchantOnboardingDemoContext(`/merchant-live-preview/offerings?profile=${encodeURIComponent(profile.id)}&offering=${encodeURIComponent(selected.campaign.offeringId)}`, activeDemo)}
+                        href={appendMerchantOnboardingDemoContext(
+                          `/merchant-live-preview/offerings?profile=${encodeURIComponent(profile.id)}&offering=${encodeURIComponent(selected.campaign.offeringId)}`,
+                          activeDemo,
+                        )}
                       >
                         Review in Offerings
                       </a>
@@ -1420,8 +1437,11 @@ export function PromotionsWorkspace({
                           <div className="pm-app-content">
                             <h3>{snapshot.name}</h3>
                             <p className="pm-muted">
-                              {activeDemo?.businessName ?? (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)} ·{' '}
-                              {previewLocation}
+                              {activeDemo?.businessName ??
+                                (profile.id === 'makeup'
+                                  ? 'Nairobi Collective'
+                                  : profile.name)}{' '}
+                              · {previewLocation}
                             </p>
                             {screen === 'Offering details' && (
                               <p className="pm-muted pm-app-description">{snapshot.description}</p>

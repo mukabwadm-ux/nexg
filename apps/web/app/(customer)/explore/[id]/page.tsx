@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
 import { Clock, Info, MapPin, MessageSquare, Store } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -40,7 +41,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function MerchantPage({ params }: { params: { id: string } }) {
+export default async function MerchantPage({
+  params,
+}: {
+  params: { id: string };
+}): Promise<ReactNode> {
   const supabase = createPublicClient();
 
   /*

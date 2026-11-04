@@ -84,10 +84,12 @@ jobs:
   verify:
     name: Install, build, lint, typecheck, test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -105,6 +107,11 @@ jobs:
         uses: supabase/setup-cli@v1
         with:
           version: 2.121.0
+
+      - name: Set up isolated PGlite test dependency
+        run: |
+          npm install --prefix "$RUNNER_TEMP/nexg-phase4-pglite" --no-audit --no-fund --package-lock=false @electric-sql/pglite@0.5.14
+          echo "PHASE4_PGLITE_PATH=$RUNNER_TEMP/nexg-phase4-pglite/node_modules/@electric-sql/pglite/dist/index.js" >> "$GITHUB_ENV"
 
       - name: Start Supabase
         run: supabase start
@@ -133,6 +140,8 @@ jobs:
         run: pnpm test
 
       - name: Check formatting
+        env:
+          FORMAT_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: pnpm format:check
 
       - name: Stop Supabase

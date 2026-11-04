@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Fact, Kpi, KpiRow, Pill, Table, Td, Tr } from '@/components/host/module';
 import { HostSection, hostContext } from '@/components/host/section';
 import { createClient } from '@/lib/supabase/server';
@@ -66,7 +67,7 @@ function when(iso: string): string {
  * nothing, which is the rule doing its job rather than the
  * page failing.
  */
-export default async function ChargeToRoom() {
+export default async function ChargeToRoom(): Promise<ReactNode> {
   const { home, live, nav, photoUrl } = await hostContext();
   if (!home) return null;
 

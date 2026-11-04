@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel } from '@/components/partner/bits';
 import { Featured, type Booking, type Placement } from '@/components/partner/merchant-featured';
 import { PageHead } from '@/components/merchant/frame';
@@ -25,7 +26,7 @@ function mondayOf(d: Date): string {
  * same function the staff console uses, and put the merchant in the
  * queue with a person to call them.
  */
-export default async function MerchantFeatured() {
+export default async function MerchantFeatured(): Promise<ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
 

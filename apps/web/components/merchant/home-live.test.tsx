@@ -36,7 +36,8 @@ describe('live merchant Home', () => {
   it('shows an honest empty queue and names the earnings measure', () => {
     const html = home();
     expect(html).toContain('No orders in the displayed queue need your attention right now');
-    expect(html).toContain('Delivered sales after fees today');
+    expect(html).toContain('Today at a glance');
+    expect(html).toContain('Delivered sales after fees');
     expect(html).toContain('KES 1,200');
     expect(html).toContain('Performance data is not available yet');
   });
@@ -56,16 +57,18 @@ describe('live merchant Home', () => {
 });
 
 describe('Home performance', () => {
-  it('provides the real daily figures as text as well as a chart', () => {
+  it('keeps daily figures behind the explicit expansion control', () => {
     const html = renderToStaticMarkup(
       <HomePerformance
         unavailable={false}
         bars={[{ day: '2026-10-28', dow: 'Wed', delivered: 4, gross_cents: 150000 }]}
       />,
     );
-    expect(html).toContain('Show daily figures');
-    expect(html).toContain('2026-10-28');
-    expect(html).toContain('Days shown are those with recorded orders');
+    expect(html).toContain('Only days with recorded orders are shown. Sales amounts are KES.');
+    expect(html).toContain('Show more metrics');
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).not.toContain('Show daily figures');
+    expect(html).not.toContain('2026-10-28');
   });
 
   it('does not turn an invalid value into a zero', () => {

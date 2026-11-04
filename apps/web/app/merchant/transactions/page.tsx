@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 
 import { PageHead } from '@/components/merchant/frame';
@@ -15,7 +16,7 @@ export default async function MerchantTransactions({
   searchParams,
 }: {
   searchParams?: { page?: string };
-}) {
+}): Promise<ReactNode> {
   const me = await requireMerchant();
   const supabase = createClient();
   const page = Math.max(0, Number(searchParams?.page ?? 0) || 0);
@@ -39,19 +40,28 @@ export default async function MerchantTransactions({
       )}
       <Panel title="Your orders">
         {rows.length === 0 ? (
-          <Empty title="No transactions yet." body="Orders appear here as soon as they are placed." />
+          <Empty
+            title="No transactions yet."
+            body="Orders appear here as soon as they are placed."
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[40rem] text-left text-[0.8125rem]">
               <thead className="text-muted-light border-border border-b text-[0.6875rem] uppercase">
                 <tr>
-                  {['Order', 'Placed', 'Basket', 'Commission', 'You receive', 'Payment', 'Settlement'].map(
-                    (h) => (
-                      <th key={h} className="px-2 py-2 font-extrabold">
-                        {h}
-                      </th>
-                    ),
-                  )}
+                  {[
+                    'Order',
+                    'Placed',
+                    'Basket',
+                    'Commission',
+                    'You receive',
+                    'Payment',
+                    'Settlement',
+                  ].map((h) => (
+                    <th key={h} className="px-2 py-2 font-extrabold">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-border divide-y">
@@ -67,7 +77,9 @@ export default async function MerchantTransactions({
                     </td>
                     <td className="px-2 py-2.5 font-semibold">{dateTime(r.placed_at)}</td>
                     <td className="px-2 py-2.5 font-bold tabular-nums">{kes(r.subtotal_cents)}</td>
-                    <td className="px-2 py-2.5 font-bold tabular-nums">− {kes(r.commission_cents)}</td>
+                    <td className="px-2 py-2.5 font-bold tabular-nums">
+                      − {kes(r.commission_cents)}
+                    </td>
                     <td className="px-2 py-2.5 font-extrabold tabular-nums">
                       {kes(r.merchant_net_cents)}
                     </td>

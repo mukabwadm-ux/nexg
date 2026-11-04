@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import '@nexg/ui/globals.css';
 
 import { ToastProvider } from '@nexg/ui';
@@ -28,7 +29,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }): ReactNode {
   return (
     <html lang="en">
       <head>

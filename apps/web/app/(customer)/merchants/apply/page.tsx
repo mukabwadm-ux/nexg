@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 
 import { pathForStep } from '@/components/onboarding/types';
@@ -21,7 +22,7 @@ export default async function ApplyIndex({
   searchParams,
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
-}) {
+}): Promise<ReactNode> {
   if (process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false') {
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(searchParams ?? {})) {

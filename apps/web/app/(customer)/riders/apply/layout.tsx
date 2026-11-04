@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { RiderOnboardingProvider } from '@/components/rider-onboarding/store';
 import type { CityOption, RiderDraft, RiderReadiness } from '@/components/rider-onboarding/types';
 import { createClient } from '@/lib/supabase/server';
@@ -12,7 +13,11 @@ import { createClient } from '@/lib/supabase/server';
  */
 export const dynamic = 'force-dynamic';
 
-export default async function RiderApplyLayout({ children }: { children: React.ReactNode }) {
+export default async function RiderApplyLayout({
+  children,
+}: {
+  children: ReactNode;
+}): Promise<ReactNode> {
   const supabase = createClient();
 
   const [{ data: cities }, { data: drafts }] = await Promise.all([

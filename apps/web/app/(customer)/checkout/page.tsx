@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 
 import { CheckoutForm } from '@/components/cart/checkout-form';
@@ -5,7 +6,7 @@ import { SiteHeader } from '@/components/site-header';
 
 export const metadata: Metadata = { title: 'Checkout' };
 
-export default function CheckoutPage() {
+export default function CheckoutPage(): ReactNode {
   return (
     <>
       <SiteHeader />

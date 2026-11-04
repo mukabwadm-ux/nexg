@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile } from '@/components/rider/bits';
 import { RiderBoard, RiderPageHead, riderContext } from '@/components/rider/frame';
 
@@ -46,7 +47,7 @@ function day(iso: string): string {
  * the rota. It also shows how to give a shift back, because the
  * alternative to an easy release is a quiet no-show.
  */
-export default async function RiderShifts() {
+export default async function RiderShifts(): Promise<ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 

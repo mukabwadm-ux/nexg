@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -21,7 +22,7 @@ export default function SignInPage({
   searchParams,
 }: {
   searchParams?: { tab?: string; next?: string; role?: string; email?: string; setup?: string };
-}) {
+}): ReactNode {
   const next =
     searchParams?.next && /^\/(?!\/)/.test(searchParams.next) ? searchParams.next : undefined;
   const initialRole = authRoleFromRequest(searchParams?.role, next);

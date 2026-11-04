@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 
 import { Builder } from '@/components/experience/builder';
@@ -24,7 +25,7 @@ export default async function BuildPage({
   searchParams,
 }: {
   searchParams?: { event?: string; from?: string; city?: string };
-}) {
+}): Promise<ReactNode> {
   const supabase = createPublicClient();
   const slug = searchParams?.city ?? getCityPreference() ?? 'nairobi';
 

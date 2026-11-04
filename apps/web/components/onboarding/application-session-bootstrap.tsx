@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -10,7 +10,7 @@ export function ApplicationSessionBootstrap() {
   const pending = useRef<Promise<void> | null>(null);
   const [message, setMessage] = useState('Preparing your secure registration…');
 
-  async function start() {
+  const start = useCallback(async () => {
     const client = createClient();
     try {
       const current = await client.auth.getSession();
@@ -29,11 +29,11 @@ export function ApplicationSessionBootstrap() {
       pending.current = null;
       setMessage('We could not start a secure registration session. Please try again.');
     }
-  }
+  }, [router]);
 
   useEffect(() => {
     void start();
-  }, []);
+  }, [start]);
 
   return (
     <section className="border-border bg-surface rounded-xl border p-6" aria-live="polite">

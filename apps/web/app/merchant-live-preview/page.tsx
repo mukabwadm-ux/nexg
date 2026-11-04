@@ -1,10 +1,17 @@
+import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 
 import type { MerchantHome } from '@/app/merchant/layout';
 import { HomeLive } from '@/components/merchant/home-live';
 import { HomeSetup } from '@/components/merchant/home-setup';
 import { MerchantLivePreviewShell } from '@/components/merchant/live-preview-shell';
-import type { BranchCard, OrderRow, SetupProgress, WeekBar, WeekMoney } from '@/components/merchant/types';
+import type {
+  BranchCard,
+  OrderRow,
+  SetupProgress,
+  WeekBar,
+  WeekMoney,
+} from '@/components/merchant/types';
 import {
   merchantOnboardingDemoQuery,
   parseMerchantOnboardingDemoContext,
@@ -21,10 +28,23 @@ const merchant = {
   earned_today_cents: 2480000,
 } as MerchantHome;
 const setupProgress: SetupProgress = {
-  merchant_id: 'sample', trading_name: 'Nairobi Collective', status: 'documents_pending',
-  submitted_at: null, went_live_at: null, step_profile: true, step_hours: true,
-  step_team: true, step_catalogue: false, step_documents: false, step_payout: false,
-  step_live: false, done_count: 3, of_count: 7, next_step: 4, can_go_live: false, is_live: false,
+  merchant_id: 'sample',
+  trading_name: 'Nairobi Collective',
+  status: 'documents_pending',
+  submitted_at: null,
+  went_live_at: null,
+  step_profile: true,
+  step_hours: true,
+  step_team: true,
+  step_catalogue: false,
+  step_documents: false,
+  step_payout: false,
+  step_live: false,
+  done_count: 3,
+  of_count: 7,
+  next_step: 4,
+  can_go_live: false,
+  is_live: false,
 };
 const branches: BranchCard[] = [
   {
@@ -90,26 +110,65 @@ const money: WeekMoney = {
   net_cents: 5157000,
 };
 
-export default function LiveHomePreview({ searchParams }: { searchParams?: Record<string, string | string[] | undefined> }) {
+export default function LiveHomePreview({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}): ReactNode {
   if (process.env.NODE_ENV !== 'development') notFound();
   const onboardingDemo = searchParams ? parseMerchantOnboardingDemoContext(searchParams) : null;
   const businessName = onboardingDemo?.businessName ?? 'Nairobi Collective';
   const contactName = onboardingDemo?.contactName ?? businessName;
-  const requestedState = Array.isArray(searchParams?.state) ? searchParams.state[0] ?? '' : searchParams?.state ?? '';
-  const sampleState = requestedState === 'review' || requestedState === 'changes' ? requestedState : 'setup';
+  const requestedState = Array.isArray(searchParams?.state)
+    ? (searchParams.state[0] ?? '')
+    : (searchParams?.state ?? '');
+  const sampleState =
+    requestedState === 'review' || requestedState === 'changes' ? requestedState : 'setup';
   const showSetup = ['setup', 'review', 'changes'].includes(requestedState);
-  const liveState = requestedState === 'paused' || requestedState === 'mixed' || requestedState === 'unavailable' ? requestedState : 'live';
-  const selectedBranches = branches.map((branch, index) => ({ ...branch, state: liveState === 'paused' || (liveState === 'mixed' && index === 1) ? 'paused' : branch.state }));
+  const liveState =
+    requestedState === 'paused' || requestedState === 'mixed' || requestedState === 'unavailable'
+      ? requestedState
+      : 'live';
+  const selectedBranches = branches.map((branch, index) => ({
+    ...branch,
+    state:
+      liveState === 'paused' || (liveState === 'mixed' && index === 1) ? 'paused' : branch.state,
+  }));
   const identityProgress = { ...setupProgress, trading_name: businessName };
-  const displayedProgress = sampleState === 'setup' ? identityProgress : {
-    ...identityProgress, step_catalogue: true, step_payout: true, done_count: 5, next_step: 5,
-  };
+  const displayedProgress =
+    sampleState === 'setup'
+      ? identityProgress
+      : {
+          ...identityProgress,
+          step_catalogue: true,
+          step_payout: true,
+          done_count: 5,
+          next_step: 5,
+        };
   const identityMerchant = { ...merchant, name: businessName };
   const demoQuery = onboardingDemo ? merchantOnboardingDemoQuery(onboardingDemo) : '';
 
   return (
-    <MerchantLivePreviewShell active="Home" businessName={businessName} accountInitials={onboardingDemo?.initials} demoContext={onboardingDemo}>
-        {showSetup ? <HomeSetup businessName={businessName} businessCategory={onboardingDemo?.categoryName} businessSubcategories={onboardingDemo?.subcategories.map((item) => item.name)} previewBase={onboardingDemo ? '/merchant-live-preview' : undefined} previewQuery={demoQuery} progress={displayedProgress} branches={[branches[0]!]} preview sampleState={sampleState} /> : <HomeLive
+    <MerchantLivePreviewShell
+      active="Home"
+      businessName={businessName}
+      accountInitials={onboardingDemo?.initials}
+      demoContext={onboardingDemo}
+    >
+      {showSetup ? (
+        <HomeSetup
+          businessName={businessName}
+          businessCategory={onboardingDemo?.categoryName}
+          businessSubcategories={onboardingDemo?.subcategories.map((item) => item.name)}
+          previewBase={onboardingDemo ? '/merchant-live-preview' : undefined}
+          previewQuery={demoQuery}
+          progress={displayedProgress}
+          branches={[branches[0]!]}
+          preview
+          sampleState={sampleState}
+        />
+      ) : (
+        <HomeLive
           m={{ ...identityMerchant, accepting_orders: liveState !== 'paused' }}
           personName={contactName}
           branches={selectedBranches}
@@ -127,7 +186,8 @@ export default function LiveHomePreview({ searchParams }: { searchParams?: Recor
           preview
           previewState={liveState}
           previewDemo={merchantOnboardingDemoDashboard(onboardingDemo)}
-        />}
+        />
+      )}
     </MerchantLivePreviewShell>
   );
 }

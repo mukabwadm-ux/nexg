@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Card, VALUE_PLACEHOLDER } from '@nexg/ui';
 import {
   Bike,
@@ -156,7 +157,7 @@ const CHANNELS = [
   },
 ] as const;
 
-export default function HelpPage() {
+export default function HelpPage(): ReactNode {
   return (
     <>
       <SiteHeader />

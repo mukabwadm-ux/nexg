@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Panel, Row, Tile, kesh } from '@/components/rider/bits';
 import { RiderBoard, RiderPageHead, riderContext } from '@/components/rider/frame';
 
@@ -66,7 +67,7 @@ function when(iso: string): string {
  * that shows a balance without the movements behind it is one
  * a rider cannot argue with when it is wrong.
  */
-export default async function RiderCash() {
+export default async function RiderCash(): Promise<ReactNode> {
   const { h, supabase } = await riderContext();
   if (!h) return null;
 
