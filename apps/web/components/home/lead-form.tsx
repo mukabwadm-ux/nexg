@@ -9,6 +9,9 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { type ActionResult, submitLead } from '@/app/actions';
 import { StayingAtField } from '@/components/location/staying-at-field';
 
+/** Inputs on this card: 46px, rounder, warm border (Design B). Errors keep the red. */
+export const askControl = 'h-[46px] rounded-xl [&:not([aria-invalid=true])]:border-[#DDD6C6]';
+
 /**
  * The "Start your order" card from the `BookingFirst` artboard.
  *
@@ -83,14 +86,14 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
     <form
       action={formAction}
       id="start"
-      className="border-border bg-surface shadow-raised rounded-2xl border p-4 sm:p-5"
+      className="rounded-[22px] border border-t-4 border-[#ECE5D3] border-t-[#E8B422] bg-white p-5 shadow-[0_24px_60px_rgba(60,40,10,.12)] sm:p-[30px]"
     >
-      <h2 className="text-lg font-extrabold tracking-tight">Start your order</h2>
-      <p className="text-muted-light mt-0.5 text-xs font-semibold">
+      <h2 className="text-[1.3125rem] font-bold tracking-tight">Start your order</h2>
+      <p className="text-muted-light mt-1 text-[0.8125rem] font-semibold">
         Takes about a minute. No account needed to ask.
       </p>
 
-      <div className="mt-4">
+      <div className="mt-5">
         {/* Fills itself from the resolved delivery location, and
             is the picker when there is not one yet. */}
         <StayingAtField />
@@ -104,7 +107,7 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
        * them it was on the way. WhatsApp because that is where
        * the reply goes.
        */}
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <Input
           id="phone"
           name="phone"
@@ -114,6 +117,7 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
           inputMode="tel"
           autoComplete="tel"
           required
+          className={askControl}
         />
         <Input
           id="full_name"
@@ -121,10 +125,11 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
           label="Your name"
           placeholder="So we know who we are helping"
           autoComplete="given-name"
+          className={askControl}
         />
       </div>
 
-      <fieldset className="mt-4">
+      <fieldset className="mt-5">
         <legend className="text-ink text-sm font-bold">What do you need?</legend>
         <input type="hidden" name="need" value={need} />
         <div className="mt-2 flex flex-wrap gap-2">
@@ -135,11 +140,11 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
               aria-pressed={need === option}
               onClick={() => setNeed(option)}
               className={cn(
-                'min-h-[2.25rem] rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors',
-                'focus-visible:ring-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                'min-h-[2.5rem] rounded-full border px-4 py-1.5 text-sm transition-colors',
+                'focus-visible:ring-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                 need === option
-                  ? 'border-gold bg-gold text-ink'
-                  : 'border-border-strong bg-surface text-ink hover:bg-bg',
+                  ? 'text-ink border-[#D4A72C] bg-[#D4A72C] font-semibold'
+                  : 'text-ink hover:bg-bg border-[#DDD6C6] bg-white font-medium',
               )}
             >
               {option}
@@ -148,7 +153,7 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
         </div>
       </fieldset>
 
-      <fieldset className="mt-4">
+      <fieldset className="mt-5">
         <legend className="text-ink text-sm font-bold">When?</legend>
         <input type="hidden" name="when" value={when} />
         <div className="mt-2 grid grid-cols-2 gap-2">
@@ -164,11 +169,11 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
               aria-pressed={when === option.value}
               onClick={() => setWhen(option.value)}
               className={cn(
-                'min-h-[2.75rem] rounded-lg border px-3 py-2 text-sm font-semibold transition-colors',
+                'min-h-[2.875rem] rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
                 'focus-visible:ring-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                 when === option.value
-                  ? 'border-ink bg-surface text-ink shadow-card'
-                  : 'border-border-strong bg-surface text-muted hover:bg-bg',
+                  ? 'border-ink text-ink border-2 bg-white'
+                  : 'text-muted hover:bg-bg border border-[#DDD6C6] bg-white',
               )}
             >
               {option.label}
@@ -184,6 +189,7 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
             name="when_detail"
             label="What time suits you?"
             placeholder="e.g. tonight at 8pm"
+            className={askControl}
           />
         </div>
       )}
@@ -194,14 +200,15 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
           name="notes"
           label="Anything else we should know?"
           placeholder="Room number, allergies, a budget, a brand you like…"
+          className={askControl}
         />
       </div>
 
-      <div className="mt-4">
+      <div className="mt-6">
         <SubmitButton />
       </div>
 
-      <p className="text-muted-light mt-2 text-center text-[0.6875rem] font-semibold">
+      <p className="text-muted-light mt-3 text-center text-[0.71875rem] font-semibold">
         You&apos;ll see the price and delivery time before you confirm.
       </p>
     </form>
@@ -215,6 +222,7 @@ function SubmitButton() {
       type="submit"
       block
       size="lg"
+      className="h-[52px] rounded-xl"
       loading={pending}
       loadingText="Sending…"
       trailingIcon={<ArrowRight className="h-4 w-4" />}
@@ -248,7 +256,7 @@ function ThankYou({
 }) {
   return (
     <div
-      className="border-border bg-surface shadow-raised rounded-2xl border p-5 sm:p-6"
+      className="rounded-[22px] border border-t-4 border-[#ECE5D3] border-t-[#E8B422] bg-white p-5 shadow-[0_24px_60px_rgba(60,40,10,.12)] sm:p-[30px]"
       role="status"
       aria-live="polite"
     >
