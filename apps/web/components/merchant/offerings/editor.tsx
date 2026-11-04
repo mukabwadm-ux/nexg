@@ -138,6 +138,8 @@ export function OfferingEditor({
   onConnections,
   onReload,
   onAdd,
+  setupDraftOnly = false,
+  onUploadImage,
 }: {
   item: Offering;
   profile: OfferingProfile;
@@ -155,10 +157,14 @@ export function OfferingEditor({
   onConnections: () => void;
   onReload: () => void;
   onAdd: () => void;
+  setupDraftOnly?: boolean;
+  onUploadImage?: (item: Offering, file: File) => Promise<{ path: string; url: string }>;
 }) {
   const schema = schemas[item.schemaId]!;
   const uploadRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const itemRef = useRef(item);
+  itemRef.current = item;
   const patch = (update: Partial<Offering>) => change({ ...item, ...update });
   const lockedDetails = item.sources.details === 'external' || item.publication === 'archived';
   const lockedPrice = item.sources.price === 'external' || item.publication === 'archived';
@@ -174,6 +180,20 @@ export function OfferingEditor({
         input.setCustomValidity('Choose a JPG, PNG or WebP smaller than 2 MB.');
         input.reportValidity();
         input.value = '';
+      }
+      return;
+    }
+    if (onUploadImage) {
+      try {
+        const uploaded = await onUploadImage(item, file);
+        if (itemRef.current.id === item.id)
+          change({ ...itemRef.current, image: uploaded.url, imageStoragePath: uploaded.path, imageAlt: itemRef.current.imageAlt ?? '' });
+      } catch (error) {
+        if (input) {
+          input.setCustomValidity(error instanceof Error ? error.message : 'Could not upload the photo.');
+          input.reportValidity();
+          input.value = '';
+        }
       }
       return;
     }
@@ -417,7 +437,7 @@ export function OfferingEditor({
                       <button
                         type="button"
                         className="of-link"
-                        onClick={() => patch({ image: undefined, imageAlt: undefined })}
+                        onClick={() => patch({ image: undefined, imageStoragePath: undefined, imageAlt: undefined })}
                       >
                         Remove photo
                       </button>
@@ -429,6 +449,7 @@ export function OfferingEditor({
                       <input
                         ref={uploadRef}
                         type="file"
+                        disabled={setupDraftOnly && !onUploadImage}
                         accept="image/jpeg,image/png,image/webp"
                         onChange={(e) => {
                           e.target.setCustomValidity('');
@@ -997,7 +1018,7 @@ export function OfferingEditor({
             <button type="button" className="of-button" disabled={busy} onClick={() => onSave()}>
               {busy ? 'Saving…' : item.publication === 'published' ? 'Save changes' : 'Save draft'}
             </button>
-            <button
+            {!setupDraftOnly && <button
               type="button"
               className="of-button of-primary"
               disabled={busy}
@@ -1010,7 +1031,7 @@ export function OfferingEditor({
                   ? 'Publish changes'
                   : 'Unpublish'
                 : 'Publish offering'}
-            </button>
+            </button>}
           </>
         )}
       </div>

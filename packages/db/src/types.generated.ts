@@ -45771,6 +45771,10 @@ export type Database = {
     };
     Functions: {
       authz_outbox_readable: { Args: Record<PropertyKey, never>; Returns: boolean };
+      rpc_merchant_setup_offerings: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_setup_offering_save: { Args: { p_merchant_id: string; p_data: Json }; Returns: Json };
+      rpc_merchant_setup_legacy_offerings: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_setup_adopt_offering: { Args: { p_merchant_id: string; p_item_id: string; p_expected_updated_at: string; p_data: Json }; Returns: Json };
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_expire: { Args: Record<PropertyKey, never>; Returns: Json };

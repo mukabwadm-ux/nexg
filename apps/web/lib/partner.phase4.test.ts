@@ -57,8 +57,19 @@ describe('merchant page entry', () => {
     await expect(requireMerchant({ access: 'shell' })).resolves.toMatchObject({ id: 'merchant-1' });
     await expect(requireMerchant({ access: 'setup' })).rejects.toMatchObject({ status: 403 });
   });
-  it('denies a live new-flow business at the draft editor entry', async () => {
+  it('lets an approved live owner reopen setup drafts only with explicit setup permission', async () => {
     state.status = 'live';
+    state.access = { state: 'approved', setup: true, operations: true, review_state: 'approved',
+      revision: 2, needs_resubmission: false, expires_at: expiry };
+    await expect(requireMerchant({ access: 'setup' })).resolves.toMatchObject({
+      id: 'merchant-1', userId: 'user-1', access: { state: 'approved', setup: true },
+    });
+    state.access = { state: 'approved', setup: false, operations: true, review_state: 'approved',
+      revision: 2, needs_resubmission: false, expires_at: expiry };
+    await expect(requireMerchant({ access: 'setup' })).rejects.toMatchObject({ status: 403 });
+  });
+  it.each(['paused', 'delisted', 'rejected'])('keeps a %s business outside setup even with a stale setup permission', async status => {
+    state.status = status;
     await expect(requireMerchant({ access: 'setup' })).rejects.toMatchObject({ status: 403 });
   });
   it('fails closed on unknown permissions, removed membership and a supplied foreign tenant', async () => {

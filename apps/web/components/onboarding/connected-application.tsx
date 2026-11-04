@@ -15,6 +15,11 @@ import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 import type { MerchantSavedHomeSource } from '@/lib/merchant-home-source';
 import { merchantSessionSignInHref } from '@/lib/merchant-journey-navigation';
 import { browserUuid } from '@/lib/browser-uuid';
+import { SetupOfferings } from '@/components/merchant/offerings/setup-offerings';
+import { SetupLocationEditor } from '@/components/merchant/business/setup-location';
+import { SetupDocuments } from '@/components/merchant/setup-documents';
+import { SetupPayout } from '@/components/merchant/setup-payout';
+import { SetupHours } from '@/components/merchant/availability/setup-hours';
 import {
   createMerchantOnboardingDemoContext,
   merchantOnboardingDemoHref,
@@ -45,6 +50,11 @@ export function ConnectedApplication({
   const payout = useRef(initialPayout);
   const [applicationStarted, setApplicationStarted] = useState(Boolean(initialRecord));
   const [status, setStatus] = useState(initialRecord?.review.state ?? 'draft');
+  const [offeringOpen, setOfferingOpen] = useState(false);
+  const [locationOpen, setLocationOpen] = useState(false);
+  const [documentsOpen, setDocumentsOpen] = useState(false);
+  const [payoutOpen, setPayoutOpen] = useState(false);
+  const [hoursOpen, setHoursOpen] = useState(false);
   const [expired, setExpired] = useState(false);
   const alive = useRef(true);
   const abort = useRef(new AbortController());
@@ -248,6 +258,7 @@ export function ConnectedApplication({
         Your session ended. Sign in again to open your saved application.
       </p>
     );
+  const savedPayoutForm = payoutForm(payout.current?.payout ?? null);
   return (
     <>
       {!home && anonymousSession && !applicationStarted ? (
@@ -298,6 +309,26 @@ export function ConnectedApplication({
         onSubmit={submit}
         onSaveTask={saveTask}
         onTaskNavigation={(step: number, rowId?: string) => {
+          if (rowId === 'offerings') {
+            setOfferingOpen(true);
+            return true;
+          }
+          if (rowId === 'location' || (!rowId && step === 2)) {
+            setLocationOpen(true);
+            return true;
+          }
+          if (rowId === 'documents') {
+            setDocumentsOpen(true);
+            return true;
+          }
+          if (rowId === 'payout') {
+            setPayoutOpen(true);
+            return true;
+          }
+          if (rowId === 'hours') {
+            setHoursOpen(true);
+            return true;
+          }
           // The Team page and its invite actions require operational access.
           // Keep the pre-approval Home row informational until that access is
           // granted rather than sending the merchant to a page that redirects.
@@ -332,6 +363,16 @@ export function ConnectedApplication({
         }
         onExitDemo={undefined}
       />
+      {home && savedHome && <SetupOfferings open={offeringOpen} onClose={() => setOfferingOpen(false)} onSaved={() => router.refresh()}
+        activities={savedHome.projection.profiles.map((profile) => ({ id: profile.subcategoryId, name: profile.name }))} />}
+      {home && savedHome && <SetupLocationEditor open={locationOpen} onClose={() => setLocationOpen(false)} onSaved={() => router.refresh()}
+        activities={savedHome.projection.profiles.map((profile) => ({ id: profile.subcategoryId, name: profile.name }))} />}
+      {home && <SetupDocuments open={documentsOpen} onClose={() => setDocumentsOpen(false)} onSaved={() => router.refresh()} />}
+      {home && savedHome && <SetupHours open={hoursOpen} onClose={() => setHoursOpen(false)} onSaved={() => router.refresh()}
+        activities={savedHome.projection.profiles.map((profile) => ({ id: profile.subcategoryId, name: profile.name }))} />}
+      {home && <SetupPayout open={payoutOpen} onClose={() => setPayoutOpen(false)}
+        initialValue={{ tillNumber: '', paybillNumber: '', accountReference: '', bankName: '', holderName: '', bankAccount: '', mobileNumber: '', ...savedPayoutForm, method: savedPayoutForm?.method ?? '' }}
+        onSave={async (value) => { await saveTask({ payout: value, policies: {} }, { step: 5 }); }} />}
     </>
   );
 }

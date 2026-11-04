@@ -68,12 +68,14 @@ export function Documents({
   requirements,
   onFile,
   asked,
+  onUploaded,
 }: {
   ownerType: OwnerType;
   ownerId: string;
   requirements: Requirement[];
   onFile: OnFile[];
   asked: Asked[];
+  onUploaded?: () => void;
 }) {
   const router = useRouter();
   const [busyKind, setBusyKind] = React.useState<string | null>(null);
@@ -129,6 +131,7 @@ export function Documents({
       return;
     }
     setDone((d) => ({ ...d, [key]: true }));
+    onUploaded?.();
     router.refresh();
   }
 

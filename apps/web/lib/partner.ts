@@ -85,7 +85,7 @@ export async function requireMerchant(
     const { data: merchant, error: merchantError } = await client.from('merchant')
       .select('status').eq('id', me.id).maybeSingle();
     if (merchantError) throw new MerchantAccessError('Your business setup could not be checked.', 503);
-    if (!merchant || !['applied', 'documents_pending', 'under_review'].includes(merchant.status))
+    if (!merchant || !['applied', 'documents_pending', 'under_review', 'live'].includes(merchant.status))
       throw new MerchantAccessError('Draft setup is not available for this business.', 403);
   }
   if (options.access !== 'setup' && options.access !== 'shell' && !access.operations) redirect('/merchant');

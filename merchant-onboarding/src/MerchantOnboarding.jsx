@@ -11,6 +11,7 @@ import {
 import { assessOnboardingAnswers, resolveOnboardingSelection } from "../../packages/booking-config/src/onboarding";
 import { capturedOffers, hasOfferDetails, normalizePhone, validateCapture, validateRegistration } from "./capture";
 import RegistryQuestions from "./RegistryQuestions";
+import PayoutFields from "./PayoutFields";
 import OnboardingHome from "./OnboardingHome";
 import OnboardingWorkspace from "./OnboardingWorkspace";
 import "./merchant-onboarding.css";
@@ -549,21 +550,7 @@ export default function MerchantOnboarding({
 
     return <section className="mo-panel">
       <div className="mo-panel-heading"><span className="mo-kicker">Setup details</span><h2>Payout and policies</h2><p>Add settlement details and applicable customer policies. Entered details still need verification.</p></div>
-      <div className="mo-grid">
-        <div className="mo-field"><label htmlFor="payout-method">Payout method <span className="mo-optional">Optional for now</span></label><select id="payout-method" value={form.payout.method} onChange={e=>setGroup("payout","method",e.target.value)}><option value="">Choose later</option><option value="mpesa_till">M-Pesa Till / Buy Goods</option><option value="mpesa_paybill">M-Pesa PayBill</option><option value="bank">Bank account</option>{form.payout.method==="mobile_money"&&<option value="mobile_money">Previous mobile number · choose a supported destination</option>}</select></div>
-        {form.payout.method==="mpesa_till"&&renderField({id:"payout-till",label:"Till number"},form.payout.tillNumber,v=>setGroup("payout","tillNumber",v),"payout.tillNumber")}
-        {form.payout.method==="mpesa_paybill"&&<>
-          {renderField({id:"payout-paybill",label:"PayBill / business number"},form.payout.paybillNumber,v=>setGroup("payout","paybillNumber",v),"payout.paybillNumber")}
-          {renderField({id:"payout-reference",label:"Account number / reference",help:"Use the reference supplied for this PayBill account. Letters are allowed."},form.payout.accountReference,v=>setGroup("payout","accountReference",v),"payout.accountReference")}
-        </>}
-        {form.payout.method==="mobile_money"&&<p className="mo-note">Your previous number {form.payout.mobileNumber} is retained. Choose Till, PayBill or bank before saving a payout destination.</p>}
-        {form.payout.method==="bank"&&<>
-          {renderField({id:"payout-holder",label:"Account holder name"},form.payout.holderName,v=>setGroup("payout","holderName",v),"payout.holderName")}
-          {renderField({id:"bank-name",label:"Bank name",required:true},form.payout.bankName,v=>setGroup("payout","bankName",v),"payout.bankName")}
-          {previewMode && renderField({id:"bank-branch",label:"Branch"},form.payout.bankBranch,v=>setGroup("payout","bankBranch",v),"payout.bankBranch")}
-          {renderField({id:"bank-account",label:"Account number",required:true},form.payout.bankAccount,v=>setGroup("payout","bankAccount",v),"payout.bankAccount")}
-        </>}
-      </div>
+      <PayoutFields value={form.payout} onChange={value=>{const key=Object.keys(value).find(key=>value[key]!==form.payout[key]);if(key)setGroup("payout",key,value[key]);}} renderField={renderField} previewMode={previewMode} />
       {previewMode && <div className="mo-grid">
         {renderField({id:"cancellation-policy",label:"Cancellation, refund, returns or claims policy",type:"textarea",required:true},form.policies.cancellation,v=>setGroup("policies","cancellation",v),"policies.cancellation")}
         {renderField({id:"complaint-contact",label:"Customer support / claims contact",required:true},form.policies.complaintContact,v=>setGroup("policies","complaintContact",v),"policies.complaintContact")}
