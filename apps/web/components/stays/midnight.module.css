@@ -1,0 +1,182 @@
+/*
+ * Stays · "Midnight Hero" (Design A).
+ *
+ * Scoped to the /stays listing page. The shared form controls from
+ * @nexg/ui keep their own styles everywhere else; inside `.glass` the
+ * labels, hints and errors are re-coloured for a dark ground and the
+ * controls get the taller, rounder shape of the design. Inputs keep an
+ * opaque near-white fill, so their own text contrast is unchanged.
+ */
+
+.glass {
+  --stays-glass-fill: rgb(255 255 255 / 10%);
+  --stays-glass-border: rgb(255 255 255 / 22%);
+  --stays-glass-fallback: rgb(20 16 10 / 78%);
+
+  border: 1px solid var(--stays-glass-border);
+  border-radius: 22px;
+  /* Solid fallback first; the frosted fill only where blur works. */
+  background: var(--stays-glass-fallback);
+  color: #fff;
+  box-shadow: 0 30px 60px rgb(0 0 0 / 35%);
+}
+
+@supports ((backdrop-filter: blur(18px)) or (-webkit-backdrop-filter: blur(18px))) {
+  .glass {
+    /* A dark layer under the white tint keeps every text pair at 4.5:1
+       or better even where the sunset behind the card is brightest. */
+    background: linear-gradient(var(--stays-glass-fill), var(--stays-glass-fill)),
+      rgb(14 11 7 / 72%);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+  }
+}
+
+.glass :global(label[for]) {
+  color: #fff;
+  font-size: 0.875rem;
+}
+
+.glass :global(legend) {
+  color: rgb(255 255 255 / 85%);
+}
+
+.glass :global(input:not([type='checkbox']):not([type='radio'])) {
+  height: 46px;
+  border-radius: 12px;
+  border-color: transparent;
+  background-color: rgb(255 255 255 / 95%);
+  color: #16120a;
+}
+
+.glass :global(input:focus),
+.glass :global(button:focus-visible) {
+  outline: 2px solid #f2c94c;
+  outline-offset: 2px;
+  --tw-ring-shadow: 0 0 #0000;
+  box-shadow: none;
+}
+
+/* Hints, and the red error text, re-coloured so they read on glass. */
+.glass :global([id$='-hint']) {
+  color: rgb(255 255 255 / 75%);
+}
+
+.glass :global([role='alert']) {
+  color: #ffb4a6;
+}
+
+.glass :global([aria-invalid='true']) {
+  border-color: #ff8a75;
+  box-shadow: 0 0 0 1px #ff8a75;
+}
+
+.eyebrow {
+  color: #f2c94c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.muted {
+  color: rgb(255 255 255 / 75%);
+}
+
+.continue {
+  display: inline-flex;
+  min-height: 52px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f6c945, #d9a21b);
+  color: #16120a;
+  font-weight: 800;
+  transition: filter 0.15s ease;
+}
+
+.continue:hover {
+  filter: brightness(1.05);
+}
+
+.continue:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.back {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 12px;
+  padding: 0 1rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.back:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+/* ─────────────────────────────────────── the listing cards */
+
+.card {
+  display: block;
+  height: 100%;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 16px;
+  background: rgb(255 255 255 / 8%);
+  padding: 10px;
+  color: #fff;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.card:hover {
+  border-color: rgb(255 255 255 / 32%);
+  background: rgb(255 255 255 / 11%);
+}
+
+.card:focus-visible {
+  outline: 2px solid #f2c94c;
+  outline-offset: 3px;
+}
+
+/* ───────────────────────────────────────────── the hero */
+
+.photo {
+  /* Transparent on the left, where the copy sits; the photograph only
+     shows from the middle of the page to the right edge. */
+  -webkit-mask-image: linear-gradient(to right, transparent 15%, #000 70%);
+  mask-image: linear-gradient(to right, transparent 15%, #000 70%);
+}
+
+.glow {
+  background: radial-gradient(60% 55% at 85% 0%, rgb(232 140 50 / 25%), transparent 70%);
+}
+
+.fade {
+  background: linear-gradient(to bottom, rgb(11 9 6 / 10%) 0%, rgb(11 9 6 / 30%) 60%, #0b0906 100%);
+}
+
+@media (max-width: 1023px) {
+  /* One column: the photograph stays as a dimmed backdrop behind the
+     copy rather than a panel to one side of it. */
+  .photo {
+    -webkit-mask-image: none;
+    mask-image: none;
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .continue {
+    transition: none;
+  }
+}
