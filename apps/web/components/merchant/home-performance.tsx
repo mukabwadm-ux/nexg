@@ -29,15 +29,18 @@ export function HomePerformance({
   insightsHref = '/merchant/analytics',
   workHref = '/merchant-live-preview/work',
   demo,
+  defaultExpanded = false,
 }: {
   bars: WeekBar[];
   unavailable: boolean;
   insightsHref?: string;
   workHref?: string;
   demo?: HomePerformanceDemo;
+  /** Starts with the extra metrics open. Home leaves it closed; tests open it. */
+  defaultExpanded?: boolean;
 }) {
   const [measure, setMeasure] = React.useState<'orders' | 'sales' | 'bookings' | 'activity' | 'secondary' | 'revenue'>('orders');
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(defaultExpanded);
   const liveMeasures = ['orders', 'sales'] as const;
   const demoMeasures = ['activity', 'secondary', 'revenue'] as const;
   const activeMeasure = demo
