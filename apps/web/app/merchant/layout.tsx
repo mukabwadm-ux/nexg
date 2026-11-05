@@ -9,7 +9,6 @@ import {
   MerchantWorkspaceShell,
   type MerchantWorkspaceNavItem,
 } from '@/components/merchant/workspace/merchant-workspace-shell';
-import { openBeforeApproval, verificationNotice } from '@/lib/merchant-verification';
 import { SignOut } from '@/components/partner/sign-out';
 
 export const metadata: Metadata = {
@@ -90,7 +89,6 @@ export default async function MerchantLayout({ children }: { children: React.Rea
       { label: 'Offerings', href: '/merchant/offerings' },
       { label: 'Availability', href: '/merchant/availability' },
       { label: 'Business', href: '/merchant/business' },
-      { label: 'Documents', href: '/merchant/documents' },
       { label: 'Money', href: '/merchant/money' },
       { label: 'Promotions', href: '/merchant/promotions' },
       { label: 'Insights', href: '/merchant/insights' },
@@ -118,10 +116,9 @@ export default async function MerchantLayout({ children }: { children: React.Rea
               ? ['/merchant/menu', '/merchant/stores', '/merchant/hours', '/merchant/documents']
               : []
           }
-          notice={verificationNotice(me.access, me.id, me.isAnonymous)}
           nav={destinations.map((item) => ({
             ...item,
-            locked: !me.access.operations && !openBeforeApproval(item.label, me.access),
+            locked: item.label !== 'Home' && !me.access.operations,
           }))}
           headerEnd={
             me.isAnonymous ? (

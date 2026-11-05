@@ -206,67 +206,6 @@
 .navLock {
   font-size: 10px;
 }
-/* Locked until approval: greyed out, still focusable so it can explain why. */
-.navLocked {
-  opacity: 0.5;
-}
-.navLocked:hover,
-.navLocked:focus-visible {
-  opacity: 0.75;
-}
-.verificationNotice {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 20px;
-  margin: 16px 16px 0;
-  padding: 14px 16px;
-  border: 1px solid #e9d38f;
-  border-left: 4px solid #d4a72c;
-  border-radius: 12px;
-  background: #fbf6e6;
-  color: #17130b;
-}
-.verificationNotice[data-tone='waiting'] {
-  border-color: #cfdcef;
-  border-left-color: #3b6fb6;
-  background: #f1f6fd;
-}
-.verificationNotice[data-tone='attention'] {
-  border-color: #f1c7bf;
-  border-left-color: #b42318;
-  background: #fdf1ef;
-}
-.verificationNotice strong {
-  display: block;
-  font-size: 15px;
-  font-weight: 800;
-}
-.verificationNotice p {
-  margin: 4px 0 0;
-  max-width: 68ch;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #4d4a44;
-}
-.noticeAction {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  border-radius: 10px;
-  background: #17130b;
-  padding: 0 16px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 750;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.noticeAction:focus-visible {
-  outline: 2px solid #d4a72c;
-  outline-offset: 2px;
-}
 .workspaceStatus {
   margin-left: auto;
   min-width: 0;

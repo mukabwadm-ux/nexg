@@ -229,4 +229,45 @@ describe('shared merchant setup Home', () => {
     expect(html).toContain('aria-expanded="false"');
     expect(html).not.toContain('Salon operating setup');
   });
+
+  it('greys out locked steps and leaves them out of the progress count', () => {
+    const html = renderToStaticMarkup(
+      <HomeSetupView
+        businessName="Kilimani Clinic"
+        rows={[
+          {
+            id: 'business',
+            title: 'Business profile',
+            description: 'Details submitted.',
+            actionLabel: 'Edit details',
+            status: 'complete',
+            onAction: () => {},
+          },
+          {
+            id: 'documents',
+            title: 'Documents and evidence',
+            description: 'Upload your documents.',
+            actionLabel: 'Add documents',
+            status: 'missing',
+            onAction: () => {},
+            icon: 'documents',
+          },
+          {
+            id: 'offerings',
+            title: 'Offerings',
+            description: 'Add what you sell.',
+            actionLabel: 'Add offerings',
+            status: 'waiting',
+            statusLabel: 'After approval',
+            icon: 'offerings',
+            locked: true,
+          },
+        ]}
+      />,
+    );
+    expect(html).toContain('1 of 2 completed · 1 remaining');
+    expect(html.match(/data-locked="true"/g)).toHaveLength(1);
+    expect(html).toMatch(/opacity-50" data-locked="true">[\s\S]*Offerings/);
+    expect(html).not.toContain('Add offerings →');
+  });
 });

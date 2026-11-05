@@ -59,7 +59,7 @@ describe('managed real workspace shell', () => {
     route.pathname = '/merchant/orders';
     const html = renderShell();
     expect(html).toContain('id="workspace-approval-title">Waiting for admin approval');
-    expect(html).toContain('Work unlocks once an admin');
+    expect(html).toContain('Work will be available');
     expect(html).toContain('Back to Home');
     expect(html).not.toContain('Saved setup record');
     route.pathname = '/merchant';
@@ -100,7 +100,7 @@ describe('managed real workspace shell', () => {
     route.pathname = '/merchant/menu/nested';
     expect(renderShell(pendingNav, ['/merchant/menu'])).toContain('id="workspace-approval-title"');
     route.pathname = '/merchant/orders';
-    expect(renderShell(pendingNav, ['/merchant/menu'])).toContain('Work unlocks once an admin');
+    expect(renderShell(pendingNav, ['/merchant/menu'])).toContain('Work will be available');
   });
 
   it('uses server-approved actual destinations without prefetch or activation controls', () => {
@@ -161,37 +161,5 @@ describe('workspace route validation', () => {
   ])('rejects %s while retaining the real Home destination', (value) => {
     expect(safeMerchantWorkspaceHref(value)).toBeNull();
     expect(safeMerchantWorkspaceHref('/merchant')).toBe('/merchant');
-  });
-});
-
-describe('verification notice and Documents', () => {
-  it('shows the verification notice above the page and greys out locked items', () => {
-    route.pathname = '/merchant';
-    const html = renderToStaticMarkup(
-      <MerchantWorkspaceShell
-        businessName="Acacia Kitchen"
-        nav={[
-          { label: 'Home', href: '/merchant' },
-          { label: 'Business', href: '/merchant/business' },
-          { label: 'Documents', href: '/merchant/documents' },
-          { label: 'Money', href: '/merchant/money', locked: true },
-        ]}
-        approvalLabel="Waiting for admin approval"
-        notice={{
-          tone: 'action',
-          title: 'Please submit your details for verification',
-          body: 'Complete your Business profile and upload your documents.',
-          action: { label: 'Review and submit', href: '/merchants/register?merchantId=m-1' },
-        }}
-      >
-        <p>Saved setup record</p>
-      </MerchantWorkspaceShell>,
-    );
-    expect(html).toContain('Please submit your details for verification');
-    expect(html).toContain('href="/merchants/register?merchantId=m-1"');
-    expect(html).toContain('href="/merchant/documents"');
-    expect(html).toContain('Money, approval required');
-    expect(html).toMatch(/navLocked/);
-    expect(html).toContain('Saved setup record');
   });
 });

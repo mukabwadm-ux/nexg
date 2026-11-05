@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, CircleHelp, FileCheck2, Lock } from 'lucide-react';
+import { ChevronRight, CircleHelp, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -11,26 +11,10 @@ import { WorkspaceFrame } from './workspace-frame';
 import { safeMerchantWorkspaceHref } from './workspace-href';
 import styles from './workspace.module.css';
 
-/** The real workspace adds Documents beside the preview's sections. */
-export type MerchantWorkspaceNavLabel = MerchantWorkspaceSection | 'Documents';
-
 export interface MerchantWorkspaceNavItem {
-  label: MerchantWorkspaceNavLabel;
+  label: MerchantWorkspaceSection;
   href: string;
   locked?: boolean;
-}
-
-/** The verification message shown above every page until approval. */
-export interface MerchantWorkspaceNotice {
-  tone: 'action' | 'waiting' | 'attention';
-  title: string;
-  body: string;
-  action?: { label: string; href: string };
-}
-
-function navIcon(label: MerchantWorkspaceNavLabel) {
-  if (label === 'Documents') return FileCheck2;
-  return merchantWorkspaceNavigation.find((entry) => entry.label === label)!.icon;
 }
 
 export interface MerchantWorkspaceShellProps {
@@ -41,8 +25,6 @@ export interface MerchantWorkspaceShellProps {
   /** Exact setup editor routes authorized by the authenticated server layout. */
   setupDestinations?: readonly string[];
   approvalLabel: string;
-  /** Shown above the page until the account is approved. */
-  notice?: MerchantWorkspaceNotice | null;
   /** The authenticated layout supplies account/sign-out controls. */
   headerEnd?: ReactNode;
   children: ReactNode;
@@ -59,13 +41,12 @@ export function MerchantWorkspaceShell({
   nav,
   setupDestinations = [],
   approvalLabel,
-  notice,
   headerEnd,
   children,
 }: MerchantWorkspaceShellProps) {
   const pathname = usePathname() ?? '/merchant';
   const [lockSelection, setLockSelection] = useState<{
-    label: MerchantWorkspaceNavLabel;
+    label: MerchantWorkspaceSection;
     pathname: string;
   } | null>(null);
   useEffect(() => setLockSelection(null), [pathname]);
@@ -82,7 +63,7 @@ export function MerchantWorkspaceShell({
   const navigation = (
     <nav aria-label="Merchant workspace navigation" className={styles.nav}>
       {nav.map((item) => {
-        const Icon = navIcon(item.label);
+        const Icon = merchantWorkspaceNavigation.find((entry) => entry.label === item.label)!.icon;
         const content = (
           <>
             <Icon size={18} strokeWidth={1.7} aria-hidden="true" />
@@ -94,7 +75,7 @@ export function MerchantWorkspaceShell({
           <button
             key={item.label}
             type="button"
-            className={`${styles.navLink} ${styles.navButton} ${styles.navLocked}`}
+            className={`${styles.navLink} ${styles.navButton}`}
             aria-current={activeLabel === item.label ? 'page' : undefined}
             aria-label={`${item.label}, approval required`}
             data-workspace-navigation-action
@@ -181,23 +162,6 @@ export function MerchantWorkspaceShell({
         </>
       }
     >
-      {notice ? (
-        <aside
-          className={styles.verificationNotice}
-          data-tone={notice.tone}
-          role={notice.tone === 'attention' ? 'alert' : 'status'}
-        >
-          <div>
-            <strong>{notice.title}</strong>
-            <p>{notice.body}</p>
-          </div>
-          {notice.action ? (
-            <Link href={notice.action.href} prefetch={false} className={styles.noticeAction}>
-              {notice.action.label}
-            </Link>
-          ) : null}
-        </aside>
-      ) : null}
       {lockedItem ? (
         <section className={styles.lockedSection} aria-labelledby="workspace-approval-title">
           <div className={styles.lockedBackdrop} aria-hidden="true">
@@ -209,8 +173,8 @@ export function MerchantWorkspaceShell({
             <Lock size={20} aria-hidden="true" />
             <h1 id="workspace-approval-title">{approvalLabel}</h1>
             <p>
-              {lockedItem.label} unlocks once an admin has verified your documents and approved your
-              account. Until then you can update Business and Documents.
+              {lockedItem.label} will be available when your account has the required access.
+              Continue setup from Home.
             </p>
             <Link
               href="/merchant"
