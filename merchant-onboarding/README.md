@@ -50,14 +50,14 @@ Vite shows a local URL. The demo uses `/api/merchant-onboarding/draft` and `/api
 Copy `src/MerchantOnboarding.jsx`, `src/merchantCategories.js` and `src/merchant-onboarding.css`, then import:
 
 ```jsx
-import MerchantOnboarding from "./MerchantOnboarding";
+import MerchantOnboarding from './MerchantOnboarding';
 
 <MerchantOnboarding
   initialData={savedDraft}
   onSaveDraft={async (draft) => api.saveDraft(draft)}
   onSubmit={async (payload) => api.submitMerchant(payload)}
   applicationStatus={merchantStatus}
-/>
+/>;
 ```
 
 Props:

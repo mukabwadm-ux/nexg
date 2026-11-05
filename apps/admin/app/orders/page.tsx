@@ -194,17 +194,20 @@ export default async function OrdersPage({
         } action`}
         action={
           <div className="flex items-center gap-4">
-            <Link href="/transactions" className="text-gold-text text-sm font-extrabold hover:underline">
+            <Link
+              href="/transactions"
+              className="text-gold-text text-sm font-extrabold hover:underline"
+            >
               Transactions
             </Link>
             <ManualOrder
-            cityId={city.id}
-            merchants={
-              (merchants as
-                | { id: string; trading_name: string | null; legal_name: string }[]
-                | null) ?? []
-            }
-          />
+              cityId={city.id}
+              merchants={
+                (merchants as
+                  | { id: string; trading_name: string | null; legal_name: string }[]
+                  | null) ?? []
+              }
+            />
           </div>
         }
       />

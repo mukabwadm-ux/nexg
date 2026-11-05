@@ -84,7 +84,7 @@ function fakeSource(): State {
   };
   mocked.createClient.mockImplementation(() => ({
     auth: { getUser: async () => ({ data: { user: state.user }, error: null }) },
-    rpc: async (name: string) => name === 'fn_partner_home' ? state.home : state.access,
+    rpc: async (name: string) => (name === 'fn_partner_home' ? state.home : state.access),
     from: (table: string) => {
       const query: Record<string, unknown> = {};
       for (const method of ['select', 'eq', 'in', 'is', 'or', 'order', 'limit', 'maybeSingle'])
@@ -131,8 +131,15 @@ describe('live Insights period boundaries', () => {
 describe('server-resolved merchant access', () => {
   it('denies pending and unavailable workspace access before reading any reporting source', async () => {
     const source = fakeSource();
-    source.access = { data: { state: 'pending', setup: true, operations: false,
-      expires_at: '2026-11-02T05:00:00Z' }, error: null };
+    source.access = {
+      data: {
+        state: 'pending',
+        setup: true,
+        operations: false,
+        expires_at: '2026-11-02T05:00:00Z',
+      },
+      error: null,
+    };
     await expect(loadMerchantInsights(RANGE)).rejects.toMatchObject({ status: 403 });
     expect(source.calls).toEqual([]);
     source.access = { data: null, error: { message: 'Unavailable' } };

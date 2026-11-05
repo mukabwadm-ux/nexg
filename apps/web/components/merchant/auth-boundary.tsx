@@ -3,13 +3,22 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { resumeProtectedBrowserRequests, stopProtectedBrowserRequests } from '@/lib/supabase/protected-request';
+import {
+  resumeProtectedBrowserRequests,
+  stopProtectedBrowserRequests,
+} from '@/lib/supabase/protected-request';
 import { loadMerchantWorkspaceAccess, type MerchantWorkspaceAccess } from '@/lib/merchant-access';
 import { watchMerchantWorkspaceAccess } from '@/lib/merchant-workspace-watch';
 import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 
 /** Auth events contain no merchant authority. Every refresh checks the server again. */
-export function MerchantAuthBoundary({ children, merchantId, actorId, access, isAnonymous = false }: {
+export function MerchantAuthBoundary({
+  children,
+  merchantId,
+  actorId,
+  access,
+  isAnonymous = false,
+}: {
   children: React.ReactNode;
   merchantId: string;
   actorId: string;
@@ -43,13 +52,16 @@ export function MerchantAuthBoundary({ children, merchantId, actorId, access, is
       if (expiryTimer) clearTimeout(expiryTimer);
       // Another tab may have advanced the shared session's idle deadline.
       // This read never records activity or extends the session by itself.
-      expiryTimer = setTimeout(() => {
-        void loadMerchantWorkspaceAccess(client, merchantId).then(access => {
-          if (!active) return;
-          if ((!access.setup && !access.operations) || !access.expires_at) end();
-          else armExpiry(access.expires_at);
-        }, end);
-      }, Math.max(0, Date.parse(value) - Date.now()));
+      expiryTimer = setTimeout(
+        () => {
+          void loadMerchantWorkspaceAccess(client, merchantId).then((access) => {
+            if (!active) return;
+            if ((!access.setup && !access.operations) || !access.expires_at) end();
+            else armExpiry(access.expires_at);
+          }, end);
+        },
+        Math.max(0, Date.parse(value) - Date.now()),
+      );
     };
     if (expiresAt) armExpiry(expiresAt);
     const unsubscribeActor = subscribeProtectedActor(client, actorId, end);
@@ -61,27 +73,45 @@ export function MerchantAuthBoundary({ children, merchantId, actorId, access, is
       setEnded(true);
       router.refresh();
     };
-    watcher = watchMerchantWorkspaceAccess({ client, merchantId, initial: access,
-      visible: () => document.visibilityState === 'visible', onChange: invalidate, onInvalid: invalidate });
+    watcher = watchMerchantWorkspaceAccess({
+      client,
+      merchantId,
+      initial: access,
+      visible: () => document.visibilityState === 'visible',
+      onChange: invalidate,
+      onInvalid: invalidate,
+    });
     void watcher.check();
     // A refresh/prefetch is not activity. Only actual input advances the existing
     // Auth session's idle deadline, and the database bounds the absolute expiry.
     const activity = (event: Event) => {
       if (!active || !expiresAt || !event.isTrusted || Date.now() - lastActivity < 300_000) return;
       lastActivity = Date.now();
-      void (client as unknown as { rpc: (name: string, args: { p_merchant_id: string }) =>
-        PromiseLike<{ data: unknown; error: { code?: string } | null }> })
+      void (
+        client as unknown as {
+          rpc: (
+            name: string,
+            args: { p_merchant_id: string },
+          ) => PromiseLike<{ data: unknown; error: { code?: string } | null }>;
+        }
+      )
         .rpc('rpc_merchant_session_activity', { p_merchant_id: merchantId })
-        .then(result => {
-          if (!active) return;
-          if (result.error?.code === '42501') end();
-          else if (result.error) router.refresh();
-          else {
-            const deadline = (result.data as { expires_at?: unknown } | null)?.expires_at;
-            if (typeof deadline === 'string' && Number.isFinite(Date.parse(deadline))) armExpiry(deadline);
-            else router.refresh();
-          }
-        }, () => { if (active) router.refresh(); });
+        .then(
+          (result) => {
+            if (!active) return;
+            if (result.error?.code === '42501') end();
+            else if (result.error) router.refresh();
+            else {
+              const deadline = (result.data as { expires_at?: unknown } | null)?.expires_at;
+              if (typeof deadline === 'string' && Number.isFinite(Date.parse(deadline)))
+                armExpiry(deadline);
+              else router.refresh();
+            }
+          },
+          () => {
+            if (active) router.refresh();
+          },
+        );
     };
     const refresh = () => {
       if (active && document.visibilityState === 'visible') {

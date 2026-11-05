@@ -18,7 +18,16 @@ import {
 import * as React from 'react';
 
 export type HomeSetupRowStatus = 'complete' | 'missing' | 'provided' | 'waiting' | 'invalid';
-export type HomeSetupIcon = 'business' | 'hours' | 'team' | 'offerings' | 'documents' | 'payout' | 'launch' | 'specialty' | 'location';
+export type HomeSetupIcon =
+  | 'business'
+  | 'hours'
+  | 'team'
+  | 'offerings'
+  | 'documents'
+  | 'payout'
+  | 'launch'
+  | 'specialty'
+  | 'location';
 
 export interface HomeSetupRow {
   id: string;
@@ -113,7 +122,11 @@ export function HomeSetupView({
   const changes = reviewState === 'changes';
   const business = status?.business ?? {
     value: review ? 'Under review' : changes ? 'Changes needed' : 'Setting up',
-    note: review ? 'Your submitted information is being reviewed.' : changes ? 'Your submitted information needs updates.' : 'Complete your setup to go live.',
+    note: review
+      ? 'Your submitted information is being reviewed.'
+      : changes
+        ? 'Your submitted information needs updates.'
+        : 'Complete your setup to go live.',
   };
   const location = status?.location ?? {
     value: previewLabel ? 'Not visible' : 'Setup in progress',
@@ -128,34 +141,74 @@ export function HomeSetupView({
     <main className="mx-auto w-full max-w-[100rem] space-y-2.5 px-4 py-2.5 sm:px-6 lg:px-7">
       <header className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h1 className="text-[22px] font-extrabold leading-tight tracking-tight sm:text-[24px]">{changes ? 'One document needs your attention' : `${greeting ?? 'Welcome'}, ${businessName}`}</h1>
+          <h1 className="text-[22px] font-extrabold leading-tight tracking-tight sm:text-[24px]">
+            {changes
+              ? 'One document needs your attention'
+              : `${greeting ?? 'Welcome'}, ${businessName}`}
+          </h1>
           <p className="text-muted mt-0.5 text-[12px]">Let’s get your business set up.</p>
         </div>
-        {previewLabel ? <span className="bg-gold-soft text-gold-text rounded-full px-3 py-1 text-xs font-bold">{previewLabel}</span> : null}
+        {previewLabel ? (
+          <span className="bg-gold-soft text-gold-text rounded-full px-3 py-1 text-xs font-bold">
+            {previewLabel}
+          </span>
+        ) : null}
       </header>
 
       {headerNotice}
 
-      <section aria-label="Business status" className="border-border bg-surface grid gap-3 rounded-xl border px-4 py-3 sm:grid-cols-3 sm:gap-0">
+      <section
+        aria-label="Business status"
+        className="border-border bg-surface grid gap-3 rounded-xl border px-4 py-3 sm:grid-cols-3 sm:gap-0"
+      >
         <SetupStatus icon={Store} label="Business" {...business} />
         <SetupStatus icon={MapPin} label="Location" {...location} divider />
         <SetupStatus icon={PauseCircle} label="Accepting work" {...acceptingWork} divider />
       </section>
 
-      <section className="border-border bg-surface overflow-hidden rounded-xl border" aria-labelledby="setup-title">
+      <section
+        className="border-border bg-surface overflow-hidden rounded-xl border"
+        aria-labelledby="setup-title"
+      >
         <div className="bg-ink flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-white">
           <div>
-            <h2 id="setup-title" className="text-base font-extrabold">{review ? 'Your business is under review' : changes ? 'Review and update your documents' : 'Finish setting up to go live'}</h2>
-            <p className="mt-0.5 text-xs text-white/70">{review ? 'Your submitted information is being reviewed.' : changes ? 'One submitted document needs your attention.' : 'Complete the remaining steps to get ready.'}</p>
+            <h2 id="setup-title" className="text-base font-extrabold">
+              {review
+                ? 'Your business is under review'
+                : changes
+                  ? 'Review and update your documents'
+                  : 'Finish setting up to go live'}
+            </h2>
+            <p className="mt-0.5 text-xs text-white/70">
+              {review
+                ? 'Your submitted information is being reviewed.'
+                : changes
+                  ? 'One submitted document needs your attention.'
+                  : 'Complete the remaining steps to get ready.'}
+            </p>
           </div>
           {review || changes ? (
-            <span className="rounded-lg bg-blue-100 px-3 py-2 text-xs font-bold text-blue-900">{review ? 'Submitted · awaiting review' : 'Submitted · changes needed'}</span>
+            <span className="rounded-lg bg-blue-100 px-3 py-2 text-xs font-bold text-blue-900">
+              {review ? 'Submitted · awaiting review' : 'Submitted · changes needed'}
+            </span>
           ) : (
             <div className="min-w-[180px] text-xs">
-              <p>{completed} of {total} completed · {remaining} remaining</p>
+              <p>
+                {completed} of {total} completed · {remaining} remaining
+              </p>
               <div className="mt-2 flex items-center gap-2">
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/20" role="progressbar" aria-label="Setup progress" aria-valuemin={0} aria-valuemax={total} aria-valuenow={completed}>
-                  <div className="bg-gold h-full rounded-full" style={{ width: `${percentage}%` }} />
+                <div
+                  className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/20"
+                  role="progressbar"
+                  aria-label="Setup progress"
+                  aria-valuemin={0}
+                  aria-valuemax={total}
+                  aria-valuenow={completed}
+                >
+                  <div
+                    className="bg-gold h-full rounded-full"
+                    style={{ width: `${percentage}%` }}
+                  />
                 </div>
                 <span className="text-gold font-bold">{percentage}%</span>
               </div>
@@ -173,24 +226,52 @@ export function HomeSetupView({
             return (
               <li key={row.id} className="py-1.5">
                 <div className="grid min-h-[48px] grid-cols-[30px_24px_1fr_auto] items-center gap-2 sm:grid-cols-[30px_24px_140px_1fr_145px]">
-                  <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${numberColors[row.status]}`}>{index + 1}</span>
+                  <span
+                    className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${numberColors[row.status]}`}
+                  >
+                    {index + 1}
+                  </span>
                   <Icon className="h-4 w-4" aria-hidden="true" />
                   <span className="text-xs font-extrabold">{row.title}</span>
-                  <span className="text-muted col-start-3 text-xs sm:col-auto">{row.description}</span>
-                  {row.renderAction !== undefined ? row.renderAction : <RowAction row={shown} expanded={grouped ? open : undefined} controls={grouped ? panelId : undefined} />}
+                  <span className="text-muted col-start-3 text-xs sm:col-auto">
+                    {row.description}
+                  </span>
+                  {row.renderAction !== undefined ? (
+                    row.renderAction
+                  ) : (
+                    <RowAction
+                      row={shown}
+                      expanded={grouped ? open : undefined}
+                      controls={grouped ? panelId : undefined}
+                    />
+                  )}
                 </div>
                 {open ? (
-                  <div id={panelId} className="border-border bg-canvas mb-1 ml-0 mt-2 rounded-lg border sm:ml-[62px]">
+                  <div
+                    id={panelId}
+                    className="border-border bg-canvas mb-1 ml-0 mt-2 rounded-lg border sm:ml-[62px]"
+                  >
                     <ul className="divide-border divide-y">
                       {row.subRows!.map((item) => (
-                        <li key={item.id} className="grid grid-cols-[1fr_auto] items-center gap-2 px-3 py-2 sm:grid-cols-[180px_1fr_145px]">
+                        <li
+                          key={item.id}
+                          className="grid grid-cols-[1fr_auto] items-center gap-2 px-3 py-2 sm:grid-cols-[180px_1fr_145px]"
+                        >
                           <span className="text-xs font-extrabold">{item.title}</span>
-                          <span className="text-muted col-start-1 text-xs sm:col-auto">{item.description}</span>
-                          {item.renderAction !== undefined ? item.renderAction : <RowAction row={item} />}
+                          <span className="text-muted col-start-1 text-xs sm:col-auto">
+                            {item.description}
+                          </span>
+                          {item.renderAction !== undefined ? (
+                            item.renderAction
+                          ) : (
+                            <RowAction row={item} />
+                          )}
                         </li>
                       ))}
                     </ul>
-                    {row.subRowsFooter ? <div className="border-border border-t px-3 py-2">{row.subRowsFooter}</div> : null}
+                    {row.subRowsFooter ? (
+                      <div className="border-border border-t px-3 py-2">{row.subRowsFooter}</div>
+                    ) : null}
                   </div>
                 ) : null}
               </li>
@@ -201,17 +282,37 @@ export function HomeSetupView({
 
       <div className="grid gap-2.5 sm:grid-cols-2">
         {locationAction ?? (
-          <button type="button" onClick={onLocation} disabled={!onLocation} className="border-border bg-surface flex items-center gap-3 rounded-xl border p-3 text-left focus-visible:outline focus-visible:outline-2 disabled:cursor-default">
+          <button
+            type="button"
+            onClick={onLocation}
+            disabled={!onLocation}
+            className="border-border bg-surface flex items-center gap-3 rounded-xl border p-3 text-left focus-visible:outline focus-visible:outline-2 disabled:cursor-default"
+          >
             <MapPin className="h-5 w-5 shrink-0" aria-hidden="true" />
-            <span className="min-w-0 flex-1"><span className="block text-sm font-extrabold">Your location</span><span className="text-muted block text-xs">View your location details.</span></span>
-            <span className="bg-gold-soft text-gold-text rounded-full px-3 py-1 text-xs font-bold">{location.value}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-extrabold">Your location</span>
+              <span className="text-muted block text-xs">View your location details.</span>
+            </span>
+            <span className="bg-gold-soft text-gold-text rounded-full px-3 py-1 text-xs font-bold">
+              {location.value}
+            </span>
           </button>
         )}
         {helpAction ?? (
-          <button type="button" onClick={onHelp} disabled={!onHelp} className="border-border bg-surface flex items-center gap-3 rounded-xl border p-3 text-left focus-visible:outline focus-visible:outline-2 disabled:cursor-default">
+          <button
+            type="button"
+            onClick={onHelp}
+            disabled={!onHelp}
+            className="border-border bg-surface flex items-center gap-3 rounded-xl border p-3 text-left focus-visible:outline focus-visible:outline-2 disabled:cursor-default"
+          >
             <CircleHelp className="h-5 w-5 shrink-0" aria-hidden="true" />
-            <span className="min-w-0 flex-1"><span className="block text-sm font-extrabold">Need help?</span><span className="text-muted block text-xs">Get support with your setup.</span></span>
-            <span className="bg-gold text-ink rounded-lg px-3 py-2 text-xs font-bold">Contact support →</span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-extrabold">Need help?</span>
+              <span className="text-muted block text-xs">Get support with your setup.</span>
+            </span>
+            <span className="bg-gold text-ink rounded-lg px-3 py-2 text-xs font-bold">
+              Contact support →
+            </span>
           </button>
         )}
       </div>
@@ -239,7 +340,11 @@ const pillColors: Record<HomeSetupRowStatus, string> = {
 
 /** A waiting row whose label only restates what its button does ("Add when needed"). */
 function labelIsInstruction(row: HomeSetupRow) {
-  return !row.statusLabel || row.statusLabel === row.actionLabel || /^(add|set up|choose)\b/i.test(row.statusLabel);
+  return (
+    !row.statusLabel ||
+    row.statusLabel === row.actionLabel ||
+    /^(add|set up|choose)\b/i.test(row.statusLabel)
+  );
 }
 
 /**
@@ -247,13 +352,29 @@ function labelIsInstruction(row: HomeSetupRow) {
  * - something to do: a single button ("Add offerings →");
  * - something saved or pending: a status pill, plus a pencil to edit when the row is editable.
  */
-function RowAction({ row, expanded, controls }: { row: HomeSetupRow; expanded?: boolean; controls?: string }) {
+function RowAction({
+  row,
+  expanded,
+  controls,
+}: {
+  row: HomeSetupRow;
+  expanded?: boolean;
+  controls?: string;
+}) {
   const cell = 'col-start-4 flex items-center justify-end gap-1.5 sm:col-auto sm:justify-start';
-  if (row.onAction && (row.status === 'missing' || (row.status === 'waiting' && labelIsInstruction(row)))) {
-    const tone = row.status === 'missing' ? 'bg-gold text-ink' : 'border-border text-ink border bg-surface';
+  if (
+    row.onAction &&
+    (row.status === 'missing' || (row.status === 'waiting' && labelIsInstruction(row)))
+  ) {
+    const tone =
+      row.status === 'missing' ? 'bg-gold text-ink' : 'border-border text-ink border bg-surface';
     return (
       <div className={cell}>
-        <button type="button" onClick={row.onAction} className={`${tone} w-full rounded-lg px-2 py-2 text-xs font-bold focus-visible:outline focus-visible:outline-2`}>
+        <button
+          type="button"
+          onClick={row.onAction}
+          className={`${tone} w-full rounded-lg px-2 py-2 text-xs font-bold focus-visible:outline focus-visible:outline-2`}
+        >
           {row.actionLabel} →
         </button>
       </div>
@@ -262,11 +383,21 @@ function RowAction({ row, expanded, controls }: { row: HomeSetupRow; expanded?: 
   const complete = row.status === 'complete';
   const label =
     row.statusLabel ??
-    (complete ? 'Completed' : row.status === 'provided' ? 'Provided · awaiting review' : row.status === 'invalid' ? 'Needs changes' : row.status === 'missing' ? row.actionLabel : 'Pending');
+    (complete
+      ? 'Completed'
+      : row.status === 'provided'
+        ? 'Provided · awaiting review'
+        : row.status === 'invalid'
+          ? 'Needs changes'
+          : row.status === 'missing'
+            ? row.actionLabel
+            : 'Pending');
   const Toggle = expanded ? ChevronUp : Pencil;
   return (
     <div className={cell}>
-      <span className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full px-2 py-1.5 text-center text-xs font-bold ${pillColors[row.status]}`}>
+      <span
+        className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full px-2 py-1.5 text-center text-xs font-bold ${pillColors[row.status]}`}
+      >
         {complete ? <Check className="h-3 w-3 shrink-0" aria-hidden="true" /> : null}
         {label}
       </span>
@@ -287,6 +418,27 @@ function RowAction({ row, expanded, controls }: { row: HomeSetupRow; expanded?: 
   );
 }
 
-function SetupStatus({ icon: Icon, label, value, note, divider }: HomeSetupStatusItem & { icon: typeof Store; label: string; divider?: boolean }) {
-  return <div className={`flex items-center gap-3 ${divider ? 'sm:border-border sm:border-l sm:pl-4' : ''}`}><Icon className="h-5 w-5 shrink-0" aria-hidden="true" /><div><div className="flex flex-wrap items-center gap-2"><span className="text-xs font-extrabold">{label}</span><span className="bg-gold-soft text-gold-text rounded-full px-2.5 py-1 text-xs font-bold">{value}</span></div><p className="text-muted mt-1 text-xs">{note}</p></div></div>;
+function SetupStatus({
+  icon: Icon,
+  label,
+  value,
+  note,
+  divider,
+}: HomeSetupStatusItem & { icon: typeof Store; label: string; divider?: boolean }) {
+  return (
+    <div
+      className={`flex items-center gap-3 ${divider ? 'sm:border-border sm:border-l sm:pl-4' : ''}`}
+    >
+      <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-extrabold">{label}</span>
+          <span className="bg-gold-soft text-gold-text rounded-full px-2.5 py-1 text-xs font-bold">
+            {value}
+          </span>
+        </div>
+        <p className="text-muted mt-1 text-xs">{note}</p>
+      </div>
+    </div>
+  );
 }

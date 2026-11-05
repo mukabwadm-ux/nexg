@@ -11,6 +11,7 @@ export default function PromotionsPreview({
 }) {
   if (process.env.NODE_ENV !== 'development') notFound();
   const demoContext = searchParams ? parseMerchantOnboardingDemoContext(searchParams) : null;
-  const profile = typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId;
+  const profile =
+    typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId;
   return <PromotionsWorkspace initialProfileId={profile} demoContext={demoContext} />;
 }

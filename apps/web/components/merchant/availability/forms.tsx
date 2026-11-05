@@ -168,18 +168,20 @@ export function HoursEditor({
                   <Plus size={17} />
                 </button>
               )}
-              {!singleIntervalOnly && <button
-                className="av-link"
-                type="button"
-                onClick={() =>
-                  patch(h.day, {
-                    state: 'open',
-                    intervals: [{ start: '00:00', end: '00:00', nextDay: true }],
-                  })
-                }
-              >
-                24 hours
-              </button>}
+              {!singleIntervalOnly && (
+                <button
+                  className="av-link"
+                  type="button"
+                  onClick={() =>
+                    patch(h.day, {
+                      state: 'open',
+                      intervals: [{ start: '00:00', end: '00:00', nextDay: true }],
+                    })
+                  }
+                >
+                  24 hours
+                </button>
+              )}
             </div>
             {h.state === 'open' &&
               h.intervals.map((i, n) => (
@@ -209,29 +211,33 @@ export function HoursEditor({
                       })
                     }
                   />
-                  {!singleIntervalOnly && <label className="av-check">
-                    <input
-                      type="checkbox"
-                      checked={i.nextDay}
-                      onChange={(e) =>
-                        patch(h.day, {
-                          intervals: h.intervals.map((x, k) =>
-                            k === n ? { ...x, nextDay: e.target.checked } : x,
-                          ),
-                        })
+                  {!singleIntervalOnly && (
+                    <label className="av-check">
+                      <input
+                        type="checkbox"
+                        checked={i.nextDay}
+                        onChange={(e) =>
+                          patch(h.day, {
+                            intervals: h.intervals.map((x, k) =>
+                              k === n ? { ...x, nextDay: e.target.checked } : x,
+                            ),
+                          })
+                        }
+                      />
+                      Ends next day
+                    </label>
+                  )}
+                  {!singleIntervalOnly && (
+                    <button
+                      className="av-icon"
+                      aria-label={'Remove ' + DAYS[h.day] + ' interval ' + (n + 1)}
+                      onClick={() =>
+                        patch(h.day, { intervals: h.intervals.filter((_, k) => k !== n) })
                       }
-                    />
-                    Ends next day
-                  </label>}
-                  {!singleIntervalOnly && <button
-                    className="av-icon"
-                    aria-label={'Remove ' + DAYS[h.day] + ' interval ' + (n + 1)}
-                    onClick={() =>
-                      patch(h.day, { intervals: h.intervals.filter((_, k) => k !== n) })
-                    }
-                  >
-                    <Trash2 size={16} />
-                  </button>}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
               ))}
           </fieldset>

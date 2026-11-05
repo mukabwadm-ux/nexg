@@ -4,9 +4,15 @@ import { createClient } from './supabase/server';
 
 /** Page layouts do not authorize directly invoked server actions. */
 export async function merchantActionClient(
-  options: { access?: 'operations' | 'setup' | 'workspace-setup' | 'support'; merchantId?: string } = {},
+  options: {
+    access?: 'operations' | 'setup' | 'workspace-setup' | 'support';
+    merchantId?: string;
+  } = {},
 ): Promise<{ client: ReturnType<typeof createClient>; merchantId: string }> {
-  const me = await requireMerchant({ ...options, access: options.access === 'support' ? 'shell' : options.access });
+  const me = await requireMerchant({
+    ...options,
+    access: options.access === 'support' ? 'shell' : options.access,
+  });
   const client = createClient();
   return { client, merchantId: me.id };
 }
@@ -25,8 +31,12 @@ export async function requireMerchantActionObject(
   id: string,
   merchantId: string,
 ) {
-  const { data, error } = await client.from(table).select('id').eq('id', id)
-    .eq('merchant_id', merchantId).maybeSingle();
+  const { data, error } = await client
+    .from(table)
+    .select('id')
+    .eq('id', id)
+    .eq('merchant_id', merchantId)
+    .maybeSingle();
   if (error) throw new MerchantAccessError('The workspace record could not be checked.', 503);
   if (!data) throw new MerchantAccessError('This record is not in your current workspace.', 403);
 }

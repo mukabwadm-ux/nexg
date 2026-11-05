@@ -57,7 +57,9 @@ function RouteCard({ route }: { route: EmailRouteRow }) {
 
   function save() {
     startTransition(async () => {
-      setResult(await saveEmailRoute({ key: route.key, fromName, fromEmail, replyTo, recipient, enabled }));
+      setResult(
+        await saveEmailRoute({ key: route.key, fromName, fromEmail, replyTo, recipient, enabled }),
+      );
     });
   }
 
@@ -94,20 +96,44 @@ function RouteCard({ route }: { route: EmailRouteRow }) {
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className={label}>
           Sender name
-          <input className={input} value={fromName} disabled={!route.can_edit} onChange={(e) => setFromName(e.target.value)} />
+          <input
+            className={input}
+            value={fromName}
+            disabled={!route.can_edit}
+            onChange={(e) => setFromName(e.target.value)}
+          />
         </label>
         <label className={label}>
           Send from
-          <input className={input} type="email" value={fromEmail} disabled={!route.can_edit} onChange={(e) => setFromEmail(e.target.value)} />
+          <input
+            className={input}
+            type="email"
+            value={fromEmail}
+            disabled={!route.can_edit}
+            onChange={(e) => setFromEmail(e.target.value)}
+          />
         </label>
         <label className={label}>
           Replies go to
-          <input className={input} type="email" value={replyTo} placeholder="same as sender" disabled={!route.can_edit} onChange={(e) => setReplyTo(e.target.value)} />
+          <input
+            className={input}
+            type="email"
+            value={replyTo}
+            placeholder="same as sender"
+            disabled={!route.can_edit}
+            onChange={(e) => setReplyTo(e.target.value)}
+          />
         </label>
         {HAS_INBOX.has(route.key) ? (
           <label className={label}>
             Deliver team copies to
-            <input className={input} type="email" value={recipient} disabled={!route.can_edit} onChange={(e) => setRecipient(e.target.value)} />
+            <input
+              className={input}
+              type="email"
+              value={recipient}
+              disabled={!route.can_edit}
+              onChange={(e) => setRecipient(e.target.value)}
+            />
           </label>
         ) : null}
       </div>

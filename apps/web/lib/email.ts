@@ -26,20 +26,30 @@ const FALLBACK_REPLY_TO = process.env.EMAIL_REPLY_TO ?? 'info@nexgapp.com';
  * so it can be changed without a deploy. If the lookup fails the environment
  * values above are used, because a missing setting must not stop a reply.
  */
-async function senderFor(routeKey: string): Promise<{ from: string; replyTo: string; enabled: boolean }> {
+async function senderFor(
+  routeKey: string,
+): Promise<{ from: string; replyTo: string; enabled: boolean }> {
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (url && anon) {
       const res = await fetch(`${url}/rest/v1/rpc/rpc_email_route_public`, {
         method: 'POST',
-        headers: { apikey: anon, Authorization: `Bearer ${anon}`, 'Content-Type': 'application/json' },
+        headers: {
+          apikey: anon,
+          Authorization: `Bearer ${anon}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ p_key: routeKey }),
         cache: 'no-store',
         signal: AbortSignal.timeout(3_000),
       });
       if (res.ok) {
-        const r = (await res.json()) as { from?: string; reply_to?: string | null; enabled?: boolean } | null;
+        const r = (await res.json()) as {
+          from?: string;
+          reply_to?: string | null;
+          enabled?: boolean;
+        } | null;
         if (r?.from) {
           return {
             from: r.from,
@@ -67,7 +77,10 @@ async function deliver(to: string, subject: string, text: string): Promise<SendO
 
   const sender = await senderFor('support');
   if (!sender.enabled) {
-    return { status: 'skipped', error: 'Support emails are switched off in Settings > Email routing.' };
+    return {
+      status: 'skipped',
+      error: 'Support emails are switched off in Settings > Email routing.',
+    };
   }
 
   try {
@@ -77,7 +90,13 @@ async function deliver(to: string, subject: string, text: string): Promise<SendO
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: sender.from, to: [to], reply_to: sender.replyTo, subject, text }),
+      body: JSON.stringify({
+        from: sender.from,
+        to: [to],
+        reply_to: sender.replyTo,
+        subject,
+        text,
+      }),
       // A slow provider must not hold a guest's form open.
       signal: AbortSignal.timeout(10_000),
     });

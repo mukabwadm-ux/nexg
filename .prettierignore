@@ -7,3 +7,10 @@ coverage
 playwright-report
 test-results
 docs/
+
+# Vendored third-party agent skill (kept as shipped upstream).
+.github/agents/
+.github/skills/
+# Written by the booking-config sync scripts; formatting them by hand would be
+# undone on the next sync.
+packages/booking-config/src/data/

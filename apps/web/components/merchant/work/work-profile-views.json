@@ -4,9 +4,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -15,24 +13,15 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -41,9 +30,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -52,9 +39,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -63,9 +48,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -74,9 +57,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -85,9 +66,7 @@
     "views": [
       {
         "modelId": "TRANSFER",
-        "workflowIds": [
-          "WF_TRANSFER"
-        ]
+        "workflowIds": ["WF_TRANSFER"]
       }
     ]
   },
@@ -96,9 +75,7 @@
     "views": [
       {
         "modelId": "TRANSFER",
-        "workflowIds": [
-          "WF_TRANSFER"
-        ]
+        "workflowIds": ["WF_TRANSFER"]
       }
     ]
   },
@@ -107,9 +84,7 @@
     "views": [
       {
         "modelId": "TRANSFER",
-        "workflowIds": [
-          "WF_TRANSFER"
-        ]
+        "workflowIds": ["WF_TRANSFER"]
       }
     ]
   },
@@ -118,9 +93,7 @@
     "views": [
       {
         "modelId": "TRANSFER",
-        "workflowIds": [
-          "WF_TRANSFER"
-        ]
+        "workflowIds": ["WF_TRANSFER"]
       }
     ]
   },
@@ -129,9 +102,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -140,9 +111,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -151,9 +120,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -162,9 +129,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -173,9 +138,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -184,9 +147,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -195,22 +156,15 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "PRODUCTION_DUE",
-        "workflowIds": [
-          "WF_MADE_TO_ORDER"
-        ]
+        "workflowIds": ["WF_MADE_TO_ORDER"]
       }
     ]
   },
@@ -219,22 +173,15 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "PRODUCTION_DUE",
-        "workflowIds": [
-          "WF_MADE_TO_ORDER"
-        ]
+        "workflowIds": ["WF_MADE_TO_ORDER"]
       }
     ]
   },
@@ -243,9 +190,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -254,9 +199,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -265,9 +208,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -276,9 +217,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -287,9 +226,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -298,24 +235,15 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -324,24 +252,15 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -350,24 +269,15 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -376,9 +286,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -387,9 +295,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -398,9 +304,7 @@
     "views": [
       {
         "modelId": "ASSET_INTERVAL",
-        "workflowIds": [
-          "WF_RENTAL"
-        ]
+        "workflowIds": ["WF_RENTAL"]
       }
     ]
   },
@@ -409,9 +313,7 @@
     "views": [
       {
         "modelId": "ASSET_INTERVAL",
-        "workflowIds": [
-          "WF_RENTAL"
-        ]
+        "workflowIds": ["WF_RENTAL"]
       }
     ]
   },
@@ -420,9 +322,7 @@
     "views": [
       {
         "modelId": "ASSET_INTERVAL",
-        "workflowIds": [
-          "WF_RENTAL"
-        ]
+        "workflowIds": ["WF_RENTAL"]
       }
     ]
   },
@@ -431,9 +331,7 @@
     "views": [
       {
         "modelId": "ASSET_INTERVAL",
-        "workflowIds": [
-          "WF_RENTAL"
-        ]
+        "workflowIds": ["WF_RENTAL"]
       }
     ]
   },
@@ -442,9 +340,7 @@
     "views": [
       {
         "modelId": "ASSET_INTERVAL",
-        "workflowIds": [
-          "WF_RENTAL"
-        ]
+        "workflowIds": ["WF_RENTAL"]
       }
     ]
   },
@@ -453,10 +349,7 @@
     "views": [
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -465,10 +358,7 @@
     "views": [
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -477,10 +367,7 @@
     "views": [
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -489,10 +376,7 @@
     "views": [
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -501,18 +385,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -521,10 +398,7 @@
     "views": [
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -533,16 +407,11 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -551,16 +420,11 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -569,10 +433,7 @@
     "views": [
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -581,17 +442,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -600,17 +455,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -619,17 +468,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -638,17 +481,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -657,17 +494,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -676,17 +507,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -695,17 +520,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -714,15 +533,11 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -731,15 +546,11 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "PRODUCTION_DUE",
-        "workflowIds": [
-          "WF_MADE_TO_ORDER"
-        ]
+        "workflowIds": ["WF_MADE_TO_ORDER"]
       }
     ]
   },
@@ -748,9 +559,7 @@
     "views": [
       {
         "modelId": "PRODUCTION_DUE",
-        "workflowIds": [
-          "WF_MADE_TO_ORDER"
-        ]
+        "workflowIds": ["WF_MADE_TO_ORDER"]
       }
     ]
   },
@@ -759,9 +568,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -770,9 +577,7 @@
     "views": [
       {
         "modelId": "PRODUCTION_DUE",
-        "workflowIds": [
-          "WF_MADE_TO_ORDER"
-        ]
+        "workflowIds": ["WF_MADE_TO_ORDER"]
       }
     ]
   },
@@ -781,9 +586,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -792,15 +595,11 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "SPACE_RESERVATION",
-        "workflowIds": [
-          "WF_SPACE_RESERVATION_V1"
-        ]
+        "workflowIds": ["WF_SPACE_RESERVATION_V1"]
       }
     ]
   },
@@ -809,9 +608,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -820,9 +617,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -831,15 +626,11 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "PRODUCTION_DUE",
-        "workflowIds": [
-          "WF_MADE_TO_ORDER"
-        ]
+        "workflowIds": ["WF_MADE_TO_ORDER"]
       }
     ]
   },
@@ -848,15 +639,11 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "PRODUCTION_DUE",
-        "workflowIds": [
-          "WF_MADE_TO_ORDER"
-        ]
+        "workflowIds": ["WF_MADE_TO_ORDER"]
       }
     ]
   },
@@ -865,9 +652,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -876,9 +661,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -887,10 +670,7 @@
     "views": [
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -899,9 +679,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -910,9 +688,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -921,15 +697,11 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -938,9 +710,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -949,9 +719,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -960,9 +728,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -971,9 +737,7 @@
     "views": [
       {
         "modelId": "LINKED_WINDOWS",
-        "workflowIds": [
-          "WF_PICKUP_RETURN"
-        ]
+        "workflowIds": ["WF_PICKUP_RETURN"]
       }
     ]
   },
@@ -982,9 +746,7 @@
     "views": [
       {
         "modelId": "LINKED_WINDOWS",
-        "workflowIds": [
-          "WF_PICKUP_RETURN"
-        ]
+        "workflowIds": ["WF_PICKUP_RETURN"]
       }
     ]
   },
@@ -993,9 +755,7 @@
     "views": [
       {
         "modelId": "LINKED_WINDOWS",
-        "workflowIds": [
-          "WF_PICKUP_RETURN"
-        ]
+        "workflowIds": ["WF_PICKUP_RETURN"]
       }
     ]
   },
@@ -1004,17 +764,11 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1023,17 +777,11 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1042,9 +790,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1053,17 +799,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1072,17 +812,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1091,9 +825,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1102,9 +834,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1113,22 +843,15 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "PRODUCTION_DUE",
-        "workflowIds": [
-          "WF_MADE_TO_ORDER"
-        ]
+        "workflowIds": ["WF_MADE_TO_ORDER"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1137,9 +860,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1148,9 +869,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1159,9 +878,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1170,9 +887,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1181,9 +896,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1192,15 +905,11 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1209,9 +918,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1220,18 +927,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1240,10 +940,7 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       }
     ]
   },
@@ -1252,18 +949,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1272,10 +962,7 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       }
     ]
   },
@@ -1284,17 +971,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -1303,15 +984,11 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "SERVICE_JOB",
-        "workflowIds": [
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1320,9 +997,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1331,15 +1006,11 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "SERVICE_JOB",
-        "workflowIds": [
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1348,9 +1019,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1359,9 +1028,7 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1370,15 +1037,11 @@
     "views": [
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       },
       {
         "modelId": "SERVICE_JOB",
-        "workflowIds": [
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1387,17 +1050,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "ORDER",
-        "workflowIds": [
-          "WF_ORDER"
-        ]
+        "workflowIds": ["WF_ORDER"]
       }
     ]
   },
@@ -1406,9 +1063,7 @@
     "views": [
       {
         "modelId": "TOUR",
-        "workflowIds": [
-          "WF_TOUR"
-        ]
+        "workflowIds": ["WF_TOUR"]
       }
     ]
   },
@@ -1417,9 +1072,7 @@
     "views": [
       {
         "modelId": "TOUR",
-        "workflowIds": [
-          "WF_TOUR"
-        ]
+        "workflowIds": ["WF_TOUR"]
       }
     ]
   },
@@ -1428,9 +1081,7 @@
     "views": [
       {
         "modelId": "TOUR",
-        "workflowIds": [
-          "WF_TOUR"
-        ]
+        "workflowIds": ["WF_TOUR"]
       }
     ]
   },
@@ -1439,9 +1090,7 @@
     "views": [
       {
         "modelId": "TOUR",
-        "workflowIds": [
-          "WF_TOUR"
-        ]
+        "workflowIds": ["WF_TOUR"]
       }
     ]
   },
@@ -1450,9 +1099,7 @@
     "views": [
       {
         "modelId": "TOUR",
-        "workflowIds": [
-          "WF_TOUR"
-        ]
+        "workflowIds": ["WF_TOUR"]
       }
     ]
   },
@@ -1461,9 +1108,7 @@
     "views": [
       {
         "modelId": "TOUR",
-        "workflowIds": [
-          "WF_TOUR"
-        ]
+        "workflowIds": ["WF_TOUR"]
       }
     ]
   },
@@ -1472,10 +1117,7 @@
     "views": [
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1484,23 +1126,15 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "SERVICE_JOB",
-        "workflowIds": [
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1509,17 +1143,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "SERVICE_JOB",
-        "workflowIds": [
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1528,17 +1156,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "SERVICE_JOB",
-        "workflowIds": [
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1547,11 +1169,7 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1560,18 +1178,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1580,24 +1191,15 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1606,18 +1208,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       }
     ]
   },
@@ -1626,16 +1221,11 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       }
     ]
   },
@@ -1644,25 +1234,15 @@
     "views": [
       {
         "modelId": "APPOINTMENT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_REMOTE_SESSION"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_REMOTE_SESSION"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "SESSION_CAPACITY",
-        "workflowIds": [
-          "WF_EVENT_SESSION",
-          "WF_GROUP_ACTIVITY"
-        ]
+        "workflowIds": ["WF_EVENT_SESSION", "WF_GROUP_ACTIVITY"]
       }
     ]
   },
@@ -1671,18 +1251,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1691,24 +1264,15 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1717,18 +1281,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1737,18 +1294,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1757,18 +1307,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1777,18 +1320,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1797,18 +1333,11 @@
     "views": [
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1817,24 +1346,15 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1843,24 +1363,15 @@
     "views": [
       {
         "modelId": "ENTITLEMENT",
-        "workflowIds": [
-          "WF_MEMBERSHIP"
-        ]
+        "workflowIds": ["WF_MEMBERSHIP"]
       },
       {
         "modelId": "FIELD_VISIT",
-        "workflowIds": [
-          "WF_APPOINTMENT",
-          "WF_FIELD_SERVICE",
-          "WF_SERVICE_JOB"
-        ]
+        "workflowIds": ["WF_APPOINTMENT", "WF_FIELD_SERVICE", "WF_SERVICE_JOB"]
       },
       {
         "modelId": "REQUEST_QUOTE",
-        "workflowIds": [
-          "WF_REGULATED_ENQUIRY",
-          "WF_REQUEST_QUOTE"
-        ]
+        "workflowIds": ["WF_REGULATED_ENQUIRY", "WF_REQUEST_QUOTE"]
       }
     ]
   },
@@ -1869,9 +1380,7 @@
     "views": [
       {
         "modelId": "FREIGHT",
-        "workflowIds": [
-          "WF_FREIGHT"
-        ]
+        "workflowIds": ["WF_FREIGHT"]
       }
     ]
   },
@@ -1880,9 +1389,7 @@
     "views": [
       {
         "modelId": "FREIGHT",
-        "workflowIds": [
-          "WF_FREIGHT"
-        ]
+        "workflowIds": ["WF_FREIGHT"]
       }
     ]
   },
@@ -1891,9 +1398,7 @@
     "views": [
       {
         "modelId": "FREIGHT",
-        "workflowIds": [
-          "WF_FREIGHT"
-        ]
+        "workflowIds": ["WF_FREIGHT"]
       }
     ]
   },
@@ -1902,9 +1407,7 @@
     "views": [
       {
         "modelId": "STORAGE",
-        "workflowIds": [
-          "WF_STORAGE"
-        ]
+        "workflowIds": ["WF_STORAGE"]
       }
     ]
   }

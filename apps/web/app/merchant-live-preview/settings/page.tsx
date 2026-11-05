@@ -10,14 +10,23 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function SettingsPreviewPage({ searchParams }: { searchParams?: Record<string, string | string[] | undefined> }) {
+export default function SettingsPreviewPage({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   if (process.env.NODE_ENV !== 'development') notFound();
   const demoContext = searchParams ? parseMerchantOnboardingDemoContext(searchParams) : null;
   const identity = demoContext
     ? { ...SAMPLE_IDENTITY, businessName: demoContext.businessName, name: demoContext.contactName }
     : SAMPLE_IDENTITY;
   return (
-    <MerchantLivePreviewShell active="Settings" businessName={demoContext?.businessName} accountInitials={demoContext?.initials} demoContext={demoContext}>
+    <MerchantLivePreviewShell
+      active="Settings"
+      businessName={demoContext?.businessName}
+      accountInitials={demoContext?.initials}
+      demoContext={demoContext}
+    >
       <Suspense fallback={<p className="p-6">Loading Settings…</p>}>
         <SettingsWorkspace identity={identity} />
       </Suspense>

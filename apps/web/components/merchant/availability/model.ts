@@ -453,7 +453,10 @@ export function fitsHours(hours: DayHours[], start: string, end: string): boolea
       spans.push({ start: dateAdd(week, -1) + 'T' + i.start, end: week + 'T' + i.end });
   return spans.some((i) => stamp(start) >= stamp(i.start) && stamp(end) <= stamp(i.end));
 }
-export function hoursForDate(s: Pick<Snapshot, 'scheduleVersions' | 'baseHours' | 'hours'>, date: string): DayHours[] {
+export function hoursForDate(
+  s: Pick<Snapshot, 'scheduleVersions' | 'baseHours' | 'hours'>,
+  date: string,
+): DayHours[] {
   const version = [...(s.scheduleVersions ?? [])]
     .reverse()
     .filter((v) => v.effectiveFrom <= date)
@@ -480,7 +483,10 @@ export function fitsSchedule(s: Snapshot, start: string, end: string): boolean {
   }
   return fitsHours(h, start, end);
 }
-export type HoursSchedule = Pick<Snapshot, 'hours' | 'baseHours' | 'scheduleVersions' | 'dateHours' | 'events'>;
+export type HoursSchedule = Pick<
+  Snapshot,
+  'hours' | 'baseHours' | 'scheduleVersions' | 'dateHours' | 'events'
+>;
 
 export function effectiveIntervals(s: HoursSchedule, date: string): Interval[] {
   const index = (new Date(date + 'T12:00Z').getUTCDay() + 6) % 7;

@@ -151,12 +151,12 @@ describe('merchant application transport', () => {
     );
     expect(submit.status).toBe(200);
     const payout = await applicationHandler(p)(
-      new Request(`https://merchant.example/api/merchant/application?merchantId=${merchantId}&view=payout`),
+      new Request(
+        `https://merchant.example/api/merchant/application?merchantId=${merchantId}&view=payout`,
+      ),
     );
     expect(payout.status).toBe(403);
-    const activity = await applicationHandler(p)(
-      request({ command: 'activity', merchantId }),
-    );
+    const activity = await applicationHandler(p)(request({ command: 'activity', merchantId }));
     expect(activity.status).toBe(403);
     expect(p.rpc).toHaveBeenCalledTimes(1);
     expect(p.rpc).toHaveBeenCalledWith(

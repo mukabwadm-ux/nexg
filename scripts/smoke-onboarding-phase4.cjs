@@ -1,53 +1,133 @@
-const {chromium,expect}=require('@playwright/test');
-const fs=require('node:fs');const path=require('node:path');
-const output=path.join(__dirname,'../docs/merchant-portal-plan/onboarding-integration/implementation');
-(async()=>{
-  const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1000}});
-  const errors=[],writes=[],checks=[];
-  page.on('pageerror',error=>errors.push(error.message));
-  page.on('request',request=>{if(!['GET','HEAD'].includes(request.method()))writes.push(request.url());});
-  const payoutRow=()=>page.locator('[aria-labelledby="setup-title"] li').filter({has:page.getByText('Payout details',{exact:true})});
-  const edit=()=>payoutRow().getByRole('button').click();
-  const save=()=>page.getByRole('button',{name:'Save and return to Home preview',exact:true}).click();
-  try{
-    await page.goto('http://127.0.0.1:5181/',{waitUntil:'networkidle'});
-    for(const [label,value] of [['Business name','Acacia Kitchen'],['First name','Amina'],['Last name','Otieno'],['Business email','amina@example.test'],['Mobile phone','0712345678']])await page.getByLabel(label,{exact:false}).fill(value);
-    await page.getByLabel('Business category',{exact:false}).selectOption('restaurants_food');
-    await page.getByRole('checkbox',{name:'Restaurant',exact:true}).check();
+const { chromium, expect } = require('@playwright/test');
+const fs = require('node:fs');
+const path = require('node:path');
+const output = path.join(
+  __dirname,
+  '../docs/merchant-portal-plan/onboarding-integration/implementation',
+);
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = [],
+    writes = [],
+    checks = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('request', (request) => {
+    if (!['GET', 'HEAD'].includes(request.method())) writes.push(request.url());
+  });
+  const payoutRow = () =>
+    page
+      .locator('[aria-labelledby="setup-title"] li')
+      .filter({ has: page.getByText('Payout details', { exact: true }) });
+  const edit = () => payoutRow().getByRole('button').click();
+  const save = () =>
+    page.getByRole('button', { name: 'Save and return to Home preview', exact: true }).click();
+  try {
+    await page.goto('http://127.0.0.1:5181/', { waitUntil: 'networkidle' });
+    for (const [label, value] of [
+      ['Business name', 'Acacia Kitchen'],
+      ['First name', 'Amina'],
+      ['Last name', 'Otieno'],
+      ['Business email', 'amina@example.test'],
+      ['Mobile phone', '0712345678'],
+    ])
+      await page.getByLabel(label, { exact: false }).fill(value);
+    await page.getByLabel('Business category', { exact: false }).selectOption('restaurants_food');
+    await page.getByRole('checkbox', { name: 'Restaurant', exact: true }).check();
     await page.locator('#business-registered').selectOption('false');
-    await page.getByRole('checkbox',{name:/I accept/}).check();
-    await page.getByRole('button',{name:'Save draft',exact:true}).click();
-    await expect(page.getByText('Preview only. Entries remain in this tab and have not been saved to an account.',{exact:true})).toBeVisible();
-    await page.getByRole('button',{name:'Preview setup Home',exact:true}).click();
-    await expect(page.getByRole('heading',{name:'Welcome, Acacia Kitchen'})).toBeVisible();
-    checks.push('Preview draft save explicitly confirms no account persistence; short registration still opens shared Home.');
-    await edit();await page.locator('#payout-method').selectOption('mpesa_paybill');
-    await page.getByLabel('PayBill / business number',{exact:false}).fill('001234');
-    await page.getByLabel('Account number / reference',{exact:false}).fill('jkl03');
-    await expect(page.getByLabel('Payout mobile number',{exact:false})).toHaveCount(0);
-    await save();await edit();
-    await expect(page.getByLabel('PayBill / business number',{exact:false})).toHaveValue('001234');
-    await expect(page.getByLabel('Account number / reference',{exact:false})).toHaveValue('jkl03');
-    checks.push('PayBill retains a separate business number, leading zeros and an alphanumeric reference.');
+    await page.getByRole('checkbox', { name: /I accept/ }).check();
+    await page.getByRole('button', { name: 'Save draft', exact: true }).click();
+    await expect(
+      page.getByText(
+        'Preview only. Entries remain in this tab and have not been saved to an account.',
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Preview setup Home', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Welcome, Acacia Kitchen' })).toBeVisible();
+    checks.push(
+      'Preview draft save explicitly confirms no account persistence; short registration still opens shared Home.',
+    );
+    await edit();
+    await page.locator('#payout-method').selectOption('mpesa_paybill');
+    await page.getByLabel('PayBill / business number', { exact: false }).fill('001234');
+    await page.getByLabel('Account number / reference', { exact: false }).fill('jkl03');
+    await expect(page.getByLabel('Payout mobile number', { exact: false })).toHaveCount(0);
+    await save();
+    await edit();
+    await expect(page.getByLabel('PayBill / business number', { exact: false })).toHaveValue(
+      '001234',
+    );
+    await expect(page.getByLabel('Account number / reference', { exact: false })).toHaveValue(
+      'jkl03',
+    );
+    checks.push(
+      'PayBill retains a separate business number, leading zeros and an alphanumeric reference.',
+    );
     await page.locator('#payout-method').selectOption('mpesa_till');
-    await expect(page.getByLabel('Account number / reference',{exact:false})).toHaveCount(0);
-    await page.getByLabel('Till number',{exact:false}).fill('not-a-till');await save();
-    await expect(page.getByText('Use the digits of the destination number, keeping any leading zeros.',{exact:true})).toBeVisible();
-    await page.getByLabel('Till number',{exact:false}).fill('000321');await save();await edit();
-    await expect(page.getByLabel('Till number',{exact:false})).toHaveValue('000321');
-    checks.push('Till has no PayBill reference; invalid supplied digits retain the editor and corrected leading zeros survive.');
+    await expect(page.getByLabel('Account number / reference', { exact: false })).toHaveCount(0);
+    await page.getByLabel('Till number', { exact: false }).fill('not-a-till');
+    await save();
+    await expect(
+      page.getByText('Use the digits of the destination number, keeping any leading zeros.', {
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page.getByLabel('Till number', { exact: false }).fill('000321');
+    await save();
+    await edit();
+    await expect(page.getByLabel('Till number', { exact: false })).toHaveValue('000321');
+    checks.push(
+      'Till has no PayBill reference; invalid supplied digits retain the editor and corrected leading zeros survive.',
+    );
     await page.locator('#payout-method').selectOption('bank');
-    await page.getByLabel('Account holder name',{exact:false}).fill('Acacia Kitchen');
-    await page.getByLabel('Bank name',{exact:false}).fill('Example bank');
-    await page.getByLabel('Account number',{exact:false}).fill('001122');await save();
+    await page.getByLabel('Account holder name', { exact: false }).fill('Acacia Kitchen');
+    await page.getByLabel('Bank name', { exact: false }).fill('Example bank');
+    await page.getByLabel('Account number', { exact: false }).fill('001122');
+    await save();
     await expect(payoutRow()).not.toContainText('Verified');
-    await expect(page.getByRole('progressbar',{name:'Setup progress'})).toHaveAttribute('aria-valuenow','1');
-    checks.push('Bank remains separate; supplied payout data does not become verification or inflate required progress.');
-    await page.setViewportSize({width:390,height:844});
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+2)).toBe(true);
-    expect(errors).toEqual([]);expect(writes).toEqual([]);
-    fs.mkdirSync(output,{recursive:true});await page.screenshot({path:path.join(output,'phase-4-payout-phone.png'),fullPage:true});
-    fs.writeFileSync(path.join(output,'phase-4-browser-verification.json'),JSON.stringify({clientDate:'2026-11-02',status:'PASS',scope:'Isolated preview UI only; connected Supabase browser acceptance remains open.',checks,pageErrors:errors,serverWrites:writes},null,2)+'\n');
-    process.stdout.write(JSON.stringify({status:'PASS',checks:checks.length,pageErrors:errors.length,serverWrites:writes.length})+'\n');
-  }finally{await browser.close();}
-})().catch(error=>{process.stderr.write(String(error)+'\n');process.exitCode=1;});
+    await expect(page.getByRole('progressbar', { name: 'Setup progress' })).toHaveAttribute(
+      'aria-valuenow',
+      '1',
+    );
+    checks.push(
+      'Bank remains separate; supplied payout data does not become verification or inflate required progress.',
+    );
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2),
+    ).toBe(true);
+    expect(errors).toEqual([]);
+    expect(writes).toEqual([]);
+    fs.mkdirSync(output, { recursive: true });
+    await page.screenshot({ path: path.join(output, 'phase-4-payout-phone.png'), fullPage: true });
+    fs.writeFileSync(
+      path.join(output, 'phase-4-browser-verification.json'),
+      JSON.stringify(
+        {
+          clientDate: '2026-11-02',
+          status: 'PASS',
+          scope: 'Isolated preview UI only; connected Supabase browser acceptance remains open.',
+          checks,
+          pageErrors: errors,
+          serverWrites: writes,
+        },
+        null,
+        2,
+      ) + '\n',
+    );
+    process.stdout.write(
+      JSON.stringify({
+        status: 'PASS',
+        checks: checks.length,
+        pageErrors: errors.length,
+        serverWrites: writes.length,
+      }) + '\n',
+    );
+  } finally {
+    await browser.close();
+  }
+})().catch((error) => {
+  process.stderr.write(String(error) + '\n');
+  process.exitCode = 1;
+});

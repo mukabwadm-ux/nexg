@@ -53,24 +53,48 @@ export const config = {
    * the number they are previewing. The guard for that is the first
    * thing in the function.
    */
-  matcher: ['/', '/q/:code*', '/merchant/:path*', '/merchants/register/:path*', '/merchants/verify-email/:path*', '/merchants/decision/:path*', '/api/merchant/:path*',
-    '/sign-in/:path*', '/auth/:path*', '/merchants/sign-in/:path*', '/riders/sign-in/:path*',
-    '/forgot-password/:path*', '/reset-password/:path*'],
+  matcher: [
+    '/',
+    '/q/:code*',
+    '/merchant/:path*',
+    '/merchants/register/:path*',
+    '/merchants/verify-email/:path*',
+    '/merchants/decision/:path*',
+    '/api/merchant/:path*',
+    '/sign-in/:path*',
+    '/auth/:path*',
+    '/merchants/sign-in/:path*',
+    '/riders/sign-in/:path*',
+    '/forgot-password/:path*',
+    '/reset-password/:path*',
+  ],
 };
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  if (pathname === '/merchant' || pathname.startsWith('/merchant/') ||
-      pathname === '/merchants/register' || pathname.startsWith('/merchants/register/') ||
-      pathname === '/merchants/verify-email' || pathname.startsWith('/merchants/verify-email/') ||
-      pathname === '/merchants/decision' || pathname.startsWith('/merchants/decision/') ||
-      pathname === '/sign-in' || pathname.startsWith('/sign-in/') ||
-      pathname === '/auth' || pathname.startsWith('/auth/') ||
-      pathname === '/merchants/sign-in' || pathname.startsWith('/merchants/sign-in/') ||
-      pathname === '/riders/sign-in' || pathname.startsWith('/riders/sign-in/') ||
-      pathname === '/forgot-password' || pathname.startsWith('/forgot-password/') ||
-      pathname === '/reset-password' || pathname.startsWith('/reset-password/') ||
-      pathname.startsWith('/api/merchant/')) {
+  if (
+    pathname === '/merchant' ||
+    pathname.startsWith('/merchant/') ||
+    pathname === '/merchants/register' ||
+    pathname.startsWith('/merchants/register/') ||
+    pathname === '/merchants/verify-email' ||
+    pathname.startsWith('/merchants/verify-email/') ||
+    pathname === '/merchants/decision' ||
+    pathname.startsWith('/merchants/decision/') ||
+    pathname === '/sign-in' ||
+    pathname.startsWith('/sign-in/') ||
+    pathname === '/auth' ||
+    pathname.startsWith('/auth/') ||
+    pathname === '/merchants/sign-in' ||
+    pathname.startsWith('/merchants/sign-in/') ||
+    pathname === '/riders/sign-in' ||
+    pathname.startsWith('/riders/sign-in/') ||
+    pathname === '/forgot-password' ||
+    pathname.startsWith('/forgot-password/') ||
+    pathname === '/reset-password' ||
+    pathname.startsWith('/reset-password/') ||
+    pathname.startsWith('/api/merchant/')
+  ) {
     return refreshMerchantSession(request);
   }
   if (request.nextUrl.pathname === '/') {
@@ -207,7 +231,9 @@ async function refreshMerchantSession(request: NextRequest) {
             refreshed.set(cookie.name, cookie);
           });
           response = NextResponse.next({ request });
-          refreshed.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+          refreshed.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
         },
       },
     });

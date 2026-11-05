@@ -18,9 +18,7 @@ export default async function CategoriesPage() {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('category_config')
-    .select(
-      'category, label, description, icon, card_kind, sort, color, image_path, subcategories',
-    )
+    .select('category, label, description, icon, card_kind, sort, color, image_path, subcategories')
     .eq('is_active', true)
     .order('sort')
     .order('label');
@@ -52,9 +50,7 @@ export default async function CategoriesPage() {
                 ? subcategory.fields.filter((field): field is string => typeof field === 'string')
                 : [],
               fulfillmentHint:
-                typeof subcategory.fulfillmentHint === 'string'
-                  ? subcategory.fulfillmentHint
-                  : '',
+                typeof subcategory.fulfillmentHint === 'string' ? subcategory.fulfillmentHint : '',
             },
           ];
         })

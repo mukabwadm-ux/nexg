@@ -4,7 +4,11 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { EmailVerificationCard } from './email-verification-card';
-import { requestMerchantEmailCode, resendMerchantEmailCode, verifyMerchantEmailCode } from '@/lib/merchant-email-otp';
+import {
+  requestMerchantEmailCode,
+  resendMerchantEmailCode,
+  verifyMerchantEmailCode,
+} from '@/lib/merchant-email-otp';
 import { createClient } from '@/lib/supabase/client';
 
 export function MerchantEmailVerification({ actorId, email }: { actorId: string; email: string }) {

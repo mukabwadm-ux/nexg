@@ -49,9 +49,7 @@ export async function issueApiKey(formData: FormData): Promise<IssueResult> {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookies().set(name, value, options),
-            );
+            cookiesToSet.forEach(({ name, value, options }) => cookies().set(name, value, options));
           } catch {
             /* Server action: cookies are writable, so this only fires in
                a context where they are not. */
@@ -150,9 +148,11 @@ export async function issueApiKey(formData: FormData): Promise<IssueResult> {
     return { ok: false, message: error.message };
   }
 
-  const row = (Array.isArray(data) ? data[0] : data) as
-    | { raw_key: string; key_id: string; key_prefix: string }
-    | null;
+  const row = (Array.isArray(data) ? data[0] : data) as {
+    raw_key: string;
+    key_id: string;
+    key_prefix: string;
+  } | null;
 
   if (!row) {
     return { ok: false, message: 'The key could not be issued.' };

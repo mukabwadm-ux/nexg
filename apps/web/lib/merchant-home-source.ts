@@ -413,8 +413,10 @@ export function projectMerchantSavedHome(input: SavedHomeInput): MerchantSavedHo
       currentRevision,
       submittedRevision: record.review.submitted_revision,
       needsResubmission: record.review.needs_resubmission,
-      reason: typeof record.review.reason === 'string' && record.review.reason.length <= 2000
-        ? record.review.reason.trim() || null : null,
+      reason:
+        typeof record.review.reason === 'string' && record.review.reason.length <= 2000
+          ? record.review.reason.trim() || null
+          : null,
     },
     publication: { status: record.publication.status, acceptingWork: false },
     access,

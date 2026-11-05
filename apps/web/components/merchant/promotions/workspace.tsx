@@ -453,24 +453,39 @@ export function PromotionsWorkspace({
     loading || (!!catalogue && catalogue.configuration.subcategoryId !== profile.id);
 
   return (
-    <MerchantLivePreviewShell active="Promotions" businessName={activeDemo?.businessName} accountInitials={activeDemo?.initials} demoContext={activeDemo} sampleControl={sampleControl}>
+    <MerchantLivePreviewShell
+      active="Promotions"
+      businessName={activeDemo?.businessName}
+      accountInitials={activeDemo?.initials}
+      demoContext={activeDemo}
+      sampleControl={sampleControl}
+    >
       <PromotionsFrame
-        title={mode === 'edit' || mode === 'review'
-          ? (liveEdit ? 'Edit promotion' : 'Create promotion')
-          : 'Promotions'}
-        businessName={activeDemo?.businessName ?? (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)}
+        title={
+          mode === 'edit' || mode === 'review'
+            ? liveEdit
+              ? 'Edit promotion'
+              : 'Create promotion'
+            : 'Promotions'
+        }
+        businessName={
+          activeDemo?.businessName ??
+          (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)
+        }
         profileId={profile.id}
         busy={isLoading}
-        action={mode === 'list' && (
-          <button
-            type="button"
-            className="pm-button pm-primary"
-            onClick={newOffer}
-            disabled={!catalogue || isLoading}
-          >
-            <Plus size={16} /> Create promotion
-          </button>
-        )}
+        action={
+          mode === 'list' && (
+            <button
+              type="button"
+              className="pm-button pm-primary"
+              onClick={newOffer}
+              disabled={!catalogue || isLoading}
+            >
+              <Plus size={16} /> Create promotion
+            </button>
+          )
+        }
       >
         {error && (
           <div className="pm-note pm-error" role="alert">
@@ -599,52 +614,49 @@ export function PromotionsWorkspace({
                 </div>
                 {visible.length ? (
                   <PromotionTable tab={tab}>
-                        {visible.map(({ campaign, item, state }) => (
-                          <tr
-                            key={campaign.id}
-                            data-selected={selected?.campaign.id === campaign.id}
+                    {visible.map(({ campaign, item, state }) => (
+                      <tr key={campaign.id} data-selected={selected?.campaign.id === campaign.id}>
+                        <td>
+                          <div className="pm-campaign-cell">
+                            <CampaignIcon campaign={campaign} item={item} />
+                            <button
+                              type="button"
+                              className="pm-row-button"
+                              aria-label={`Open ${campaign.name}`}
+                              onClick={() => setSelectedId(campaign.id)}
+                            >
+                              {campaign.name}
+                            </button>
+                          </div>
+                        </td>
+                        <td>
+                          {tab === 'History'
+                            ? campaign.kind === 'featured'
+                              ? 'Featured placement'
+                              : 'Automatic offer'
+                            : benefitLabel(campaign)}
+                        </td>
+                        <td className="pm-desktop-column">
+                          {tab === 'History'
+                            ? periodLabel(campaign)
+                            : (item?.name ??
+                              (campaign.kind === 'featured' ? 'Business' : 'Not selected'))}
+                        </td>
+                        <td>
+                          <State value={state} />
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            className="pm-icon"
+                            aria-label={`Open ${campaign.name}`}
+                            onClick={() => setSelectedId(campaign.id)}
                           >
-                            <td>
-                              <div className="pm-campaign-cell">
-                                <CampaignIcon campaign={campaign} item={item} />
-                                <button
-                                  type="button"
-                                  className="pm-row-button"
-                                  aria-label={`Open ${campaign.name}`}
-                                  onClick={() => setSelectedId(campaign.id)}
-                                >
-                                  {campaign.name}
-                                </button>
-                              </div>
-                            </td>
-                            <td>
-                              {tab === 'History'
-                                ? campaign.kind === 'featured'
-                                  ? 'Featured placement'
-                                  : 'Automatic offer'
-                                : benefitLabel(campaign)}
-                            </td>
-                            <td className="pm-desktop-column">
-                              {tab === 'History'
-                                ? periodLabel(campaign)
-                                : (item?.name ??
-                                  (campaign.kind === 'featured' ? 'Business' : 'Not selected'))}
-                            </td>
-                            <td>
-                              <State value={state} />
-                            </td>
-                            <td>
-                              <button
-                                type="button"
-                                className="pm-icon"
-                                aria-label={`Open ${campaign.name}`}
-                                onClick={() => setSelectedId(campaign.id)}
-                              >
-                                <ChevronRight size={16} />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                            <ChevronRight size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                   </PromotionTable>
                 ) : (
                   <div className="pm-empty">
@@ -811,7 +823,10 @@ export function PromotionsWorkspace({
                       The offering, availability or discount changed.{' '}
                       <a
                         className="pm-link"
-                        href={appendMerchantOnboardingDemoContext(`/merchant-live-preview/offerings?profile=${encodeURIComponent(profile.id)}&offering=${encodeURIComponent(selected.campaign.offeringId)}`, activeDemo)}
+                        href={appendMerchantOnboardingDemoContext(
+                          `/merchant-live-preview/offerings?profile=${encodeURIComponent(profile.id)}&offering=${encodeURIComponent(selected.campaign.offeringId)}`,
+                          activeDemo,
+                        )}
                       >
                         Review in Offerings
                       </a>
@@ -1361,8 +1376,11 @@ export function PromotionsWorkspace({
                           <div className="pm-app-content">
                             <h3>{snapshot.name}</h3>
                             <p className="pm-muted">
-                              {activeDemo?.businessName ?? (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)} ·{' '}
-                              {previewLocation}
+                              {activeDemo?.businessName ??
+                                (profile.id === 'makeup'
+                                  ? 'Nairobi Collective'
+                                  : profile.name)}{' '}
+                              · {previewLocation}
                             </p>
                             {screen === 'Offering details' && (
                               <p className="pm-muted pm-app-description">{snapshot.description}</p>

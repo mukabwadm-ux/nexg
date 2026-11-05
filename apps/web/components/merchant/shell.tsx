@@ -190,13 +190,16 @@ export function MerchantShell({
           <p className="mt-1.5 text-[0.6875rem] font-semibold leading-[1.6] text-white/50">
             Featured slots put your business at the top of Explore in your zone for a week.
           </p>
-          {operationsAllowed ? <Link
-            href={sectionHref('featured')}
-            className="bg-gold text-ink mt-3 block rounded-lg px-3 py-2 text-center text-[0.75rem] font-extrabold"
-          >
-            See featured slots →
-          </Link>
-          : <p className="mt-3 text-[0.75rem] text-white/60">Available after workspace approval.</p>}
+          {operationsAllowed ? (
+            <Link
+              href={sectionHref('featured')}
+              className="bg-gold text-ink mt-3 block rounded-lg px-3 py-2 text-center text-[0.75rem] font-extrabold"
+            >
+              See featured slots →
+            </Link>
+          ) : (
+            <p className="mt-3 text-[0.75rem] text-white/60">Available after workspace approval.</p>
+          )}
         </div>
       </aside>
 
@@ -221,21 +224,22 @@ export function MerchantShell({
 
             <span className="flex-1" />
 
-            {operationsAllowed ? <Link
-              href={sectionHref('messages')}
-              className="text-muted hover:text-ink relative inline-flex h-11 w-11 items-center justify-center rounded-lg p-2"
-              aria-label={
-                unreadCount > 0 ? `Messages, ${unreadCount} unread` : 'Messages, nothing new'
-              }
-            >
-              <Bell className="h-4 w-4" aria-hidden="true" />
-              {unreadCount > 0 ? (
-                <span className="bg-danger ring-surface absolute right-0.5 top-0.5 flex h-[1rem] min-w-[1rem] items-center justify-center rounded-full px-1 text-[0.5625rem] font-extrabold text-white ring-2">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              ) : null}
-            </Link>
-            : null}
+            {operationsAllowed ? (
+              <Link
+                href={sectionHref('messages')}
+                className="text-muted hover:text-ink relative inline-flex h-11 w-11 items-center justify-center rounded-lg p-2"
+                aria-label={
+                  unreadCount > 0 ? `Messages, ${unreadCount} unread` : 'Messages, nothing new'
+                }
+              >
+                <Bell className="h-4 w-4" aria-hidden="true" />
+                {unreadCount > 0 ? (
+                  <span className="bg-danger ring-surface absolute right-0.5 top-0.5 flex h-[1rem] min-w-[1rem] items-center justify-center rounded-full px-1 text-[0.5625rem] font-extrabold text-white ring-2">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                ) : null}
+              </Link>
+            ) : null}
             <Link
               href={sectionHref('support')}
               className="text-muted hover:text-ink inline-flex h-11 w-11 items-center justify-center rounded-lg p-2"

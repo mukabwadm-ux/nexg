@@ -609,7 +609,6 @@ export function LocationStep() {
           </div>
         </div>
       )}
-
     </OnboardingShell>
   );
 }

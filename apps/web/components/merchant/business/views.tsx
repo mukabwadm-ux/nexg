@@ -161,7 +161,11 @@ export function ProfileView({
           <div className="bu-card-heading">
             <div>
               <h2>{live ? 'Business profile' : 'Public profile'}</h2>
-              <p>{live ? 'Business details currently available in your workspace.' : 'This information is shown to customers on your public profile.'}</p>
+              <p>
+                {live
+                  ? 'Business details currently available in your workspace.'
+                  : 'This information is shown to customers on your public profile.'}
+              </p>
             </div>
           </div>
           <div className="bu-profile-form">
@@ -331,93 +335,97 @@ export function ProfileView({
               <p className="bu-small">Changes to registered business details require a review.</p>
             </div>
           </div>
-          {!live && <Button soft disabled={readOnly} onClick={() => request('Registered identity change')}>
-            Request change
-          </Button>}
+          {!live && (
+            <Button soft disabled={readOnly} onClick={() => request('Registered identity change')}>
+              Request change
+            </Button>
+          )}
         </section>
         {!live && <Note>Public profile changes do not alter active bookings.</Note>}
       </div>
-      {!live && <div className="bu-profile-right">
-        <aside className="bu-card">
-          <div className="bu-card-heading">
-            <div>
-              <h2>Customer view</h2>
-              <p>This is how your business appears to customers.</p>
+      {!live && (
+        <div className="bu-profile-right">
+          <aside className="bu-card">
+            <div className="bu-card-heading">
+              <div>
+                <h2>Customer view</h2>
+                <p>This is how your business appears to customers.</p>
+              </div>
             </div>
-          </div>
-          {draft.cover ? (
-            <Image
-              unoptimized
-              width={600}
-              height={200}
-              className="bu-preview-cover"
-              src={draft.cover}
-              alt="Business banner photo"
-            />
-          ) : (
-            <div className="bu-banner-placeholder bu-preview-cover">
-              <Building2 size={24} />
-              <span>No banner photo</span>
-            </div>
-          )}
-          <div className="bu-customer-title">
-            {draft.logo ? (
+            {draft.cover ? (
               <Image
                 unoptimized
-                width={52}
-                height={52}
-                className="bu-logo-image"
-                src={draft.logo}
-                alt="Business logo"
+                width={600}
+                height={200}
+                className="bu-preview-cover"
+                src={draft.cover}
+                alt="Business banner photo"
               />
             ) : (
-              <span className="bu-logo-image">{initials(draft.name)}</span>
+              <div className="bu-banner-placeholder bu-preview-cover">
+                <Building2 size={24} />
+                <span>No banner photo</span>
+              </div>
             )}
-            <div>
-              <h3>{draft.name || 'Your business name'}</h3>
-              <p className="bu-muted">{draft.description}</p>
+            <div className="bu-customer-title">
+              {draft.logo ? (
+                <Image
+                  unoptimized
+                  width={52}
+                  height={52}
+                  className="bu-logo-image"
+                  src={draft.logo}
+                  alt="Business logo"
+                />
+              ) : (
+                <span className="bu-logo-image">{initials(draft.name)}</span>
+              )}
+              <div>
+                <h3>{draft.name || 'Your business name'}</h3>
+                <p className="bu-muted">{draft.description}</p>
+              </div>
             </div>
+            <div>
+              {data.activities
+                .filter((a) => a.enabled)
+                .map((a) => (
+                  <span className="bu-chip" key={a.id}>
+                    {a.name}
+                  </span>
+                ))}
+            </div>
+            <p className="bu-row-name" style={{ margin: '10px 0' }}>
+              <MapPin size={15} />
+              {data.locations
+                .filter((l) => l.published)
+                .map((l) => l.name)
+                .join(' · ') || 'No published location'}
+            </p>
+            <button
+              className="bu-link"
+              onClick={() =>
+                preview(
+                  'Public profile preview',
+                  `${draft.name}\n${draft.description}\n${data.locations
+                    .filter((l) => l.published)
+                    .map((l) => l.name)
+                    .join(
+                      ' · ',
+                    )}\n\nDisplay preview only. No public profile is published by this frontend.`,
+                )
+              }
+            >
+              View public profile ↗
+            </button>
+          </aside>
+          <div className="bu-profile-actions">
+            <Button onClick={onCancel}>Cancel</Button>
+            <Button primary disabled={readOnly} onClick={onSave}>
+              Save profile
+            </Button>
           </div>
-          <div>
-            {data.activities
-              .filter((a) => a.enabled)
-              .map((a) => (
-                <span className="bu-chip" key={a.id}>
-                  {a.name}
-                </span>
-              ))}
-          </div>
-          <p className="bu-row-name" style={{ margin: '10px 0' }}>
-            <MapPin size={15} />
-            {data.locations
-              .filter((l) => l.published)
-              .map((l) => l.name)
-              .join(' · ') || 'No published location'}
-          </p>
-          <button
-            className="bu-link"
-            onClick={() =>
-              preview(
-                'Public profile preview',
-                `${draft.name}\n${draft.description}\n${data.locations
-                  .filter((l) => l.published)
-                  .map((l) => l.name)
-                  .join(
-                    ' · ',
-                  )}\n\nDisplay preview only. No public profile is published by this frontend.`,
-              )
-            }
-          >
-            View public profile ↗
-          </button>
-        </aside>
-        <div className="bu-profile-actions">
-          <Button onClick={onCancel}>Cancel</Button>
-          <Button primary disabled={readOnly} onClick={onSave}>
-            Save profile
-          </Button>
         </div>
-      </div>}
+      )}
     </div>
   );
 }
@@ -442,12 +450,18 @@ export function ActivitiesView(p: ViewProps) {
           <div className="bu-card-heading">
             <div>
               <h2>Your activities</h2>
-              <p>{p.live ? 'Activities recorded in your merchant registration.' : 'Manage the different ways you serve customers.'}</p>
+              <p>
+                {p.live
+                  ? 'Activities recorded in your merchant registration.'
+                  : 'Manage the different ways you serve customers.'}
+              </p>
             </div>
-            {!p.live && <Button primary disabled={readOnly} onClick={() => edit('activities', 'new', null)}>
-              <Plus />
-              Add activity
-            </Button>}
+            {!p.live && (
+              <Button primary disabled={readOnly} onClick={() => edit('activities', 'new', null)}>
+                <Plus />
+                Add activity
+              </Button>
+            )}
           </div>
           <div className="bu-toolbar">
             <SearchBox value={search} onChange={setSearch} placeholder="Search activities…" />
@@ -485,16 +499,19 @@ export function ActivitiesView(p: ViewProps) {
                         ? 'Customer location'
                         : x.methods.includes('DIGITAL')
                           ? 'Digital operation'
-                          : locations(x.locationIds) || (p.live ? 'No linked location' : 'Location needed')}
+                          : locations(x.locationIds) ||
+                            (p.live ? 'No linked location' : 'Location needed')}
                     </td>
                     <td>
                       <Status
                         value={
-                          p.live ? 'Declared' : x.enabled
-                            ? 'Configured'
-                            : activityIssues(x, data).length
-                              ? 'Coverage needed'
-                              : 'Draft'
+                          p.live
+                            ? 'Declared'
+                            : x.enabled
+                              ? 'Configured'
+                              : activityIssues(x, data).length
+                                ? 'Coverage needed'
+                                : 'Draft'
                         }
                       />
                     </td>
@@ -536,79 +553,98 @@ export function ActivitiesView(p: ViewProps) {
             ))}
           </section>
         )}
-        {!p.live && <Note>
-          Configured activities determine the relevant fields, fulfilment and workflow across your
-          workspace.
-        </Note>}
+        {!p.live && (
+          <Note>
+            Configured activities determine the relevant fields, fulfilment and workflow across your
+            workspace.
+          </Note>
+        )}
       </div>
       {a ? (
         <Panel
           title={a.name}
           status={p.live ? 'Declared' : a.enabled ? 'Configured' : 'Draft'}
-          subtitle={locations(a.locationIds) || (p.live ? 'No linked location' : 'Customer location')}
+          subtitle={
+            locations(a.locationIds) || (p.live ? 'No linked location' : 'Customer location')
+          }
           onClose={() => setSelected(null)}
-          footer={p.live ? undefined :
-            <>
-              <Button
-                onClick={() =>
-                  p.preview(
-                    'Configuration preview',
-                    `${a.name}\n${modelLabels[a.model]}\n${a.methods.map((m) => methodLabels[m]).join(', ')}\n${activityIssues(a, data).join('\n') || 'Business setup complete. Booking, stock and publication have separate readiness checks.'}`,
-                  )
-                }
-              >
-                <Eye />
-                Preview configuration
-              </Button>
-              <Button primary disabled={readOnly} onClick={() => edit('activities', a.id, a)}>
-                Edit setup
-              </Button>
-            </>
+          footer={
+            p.live ? undefined : (
+              <>
+                <Button
+                  onClick={() =>
+                    p.preview(
+                      'Configuration preview',
+                      `${a.name}\n${modelLabels[a.model]}\n${a.methods.map((m) => methodLabels[m]).join(', ')}\n${activityIssues(a, data).join('\n') || 'Business setup complete. Booking, stock and publication have separate readiness checks.'}`,
+                    )
+                  }
+                >
+                  <Eye />
+                  Preview configuration
+                </Button>
+                <Button primary disabled={readOnly} onClick={() => edit('activities', a.id, a)}>
+                  Edit setup
+                </Button>
+              </>
+            )
           }
         >
           <Facts
-            rows={p.live ? [
-              { label: 'Activity', value: a.name },
-              { label: 'Default operation', value: modelLabels[a.model] },
-              { label: 'Linked locations', value: locations(a.locationIds) || 'None recorded' },
-            ] : [
-              {
-                label: 'Service location',
-                value: a.methods.includes('DIGITAL')
-                  ? 'Digital operation'
-                  : a.methods.includes('CUSTOMER_LOCATION')
-                    ? 'At the customer location'
-                    : 'At the merchant venue',
-                hint: a.methods.includes('CUSTOMER_LOCATION')
-                  ? 'Services happen at the customer location.'
-                  : a.methods.includes('DIGITAL')
-                    ? 'Services are delivered remotely.'
-                    : 'Customers visit your business.',
-              },
-              {
-                label: 'Scheduled appointments',
-                value: a.bookingEnabled ? 'Enabled · optional' : 'Not enabled for this activity',
-              },
-              { label: 'Location', value: locations(a.locationIds) || 'No venue required' },
-              {
-                label: 'Team & resources',
-                value: `${a.resourceCount} linked resources`,
-                hint: 'Manage scheduling resources in Availability.',
-              },
-              {
-                label: 'Schedule source',
-                value: a.source === 'NEXG' ? 'NEXG booking' : 'External system',
-              },
-              {
-                label: 'Fulfilment',
-                value: a.methods.map((m) => methodLabels[m] || m).join(' · '),
-              },
-            ]}
+            rows={
+              p.live
+                ? [
+                    { label: 'Activity', value: a.name },
+                    { label: 'Default operation', value: modelLabels[a.model] },
+                    {
+                      label: 'Linked locations',
+                      value: locations(a.locationIds) || 'None recorded',
+                    },
+                  ]
+                : [
+                    {
+                      label: 'Service location',
+                      value: a.methods.includes('DIGITAL')
+                        ? 'Digital operation'
+                        : a.methods.includes('CUSTOMER_LOCATION')
+                          ? 'At the customer location'
+                          : 'At the merchant venue',
+                      hint: a.methods.includes('CUSTOMER_LOCATION')
+                        ? 'Services happen at the customer location.'
+                        : a.methods.includes('DIGITAL')
+                          ? 'Services are delivered remotely.'
+                          : 'Customers visit your business.',
+                    },
+                    {
+                      label: 'Scheduled appointments',
+                      value: a.bookingEnabled
+                        ? 'Enabled · optional'
+                        : 'Not enabled for this activity',
+                    },
+                    { label: 'Location', value: locations(a.locationIds) || 'No venue required' },
+                    {
+                      label: 'Team & resources',
+                      value: `${a.resourceCount} linked resources`,
+                      hint: 'Manage scheduling resources in Availability.',
+                    },
+                    {
+                      label: 'Schedule source',
+                      value: a.source === 'NEXG' ? 'NEXG booking' : 'External system',
+                    },
+                    {
+                      label: 'Fulfilment',
+                      value: a.methods.map((m) => methodLabels[m] || m).join(' · '),
+                    },
+                  ]
+            }
           />
-          {!p.live && <><p className="bu-small bu-muted" style={{ marginTop: 8 }}>
-            Current configuration · Revision {data.revision}
-          </p>
-          <Note>Changes affect future work. Existing bookings retain their agreed setup.</Note></>}
+          {!p.live && (
+            <>
+              <p className="bu-small bu-muted" style={{ marginTop: 8 }}>
+                Current configuration · Revision {data.revision}
+              </p>
+              <Note>Changes affect future work. Existing bookings retain their agreed setup.</Note>
+            </>
+          )}
         </Panel>
       ) : (
         <Empty title="Select an activity" text="Choose an activity to inspect its setup." />
@@ -638,10 +674,12 @@ export function LocationsView(p: ViewProps) {
               <h2>Locations</h2>
               <p>Manage your operating places and service coverage.</p>
             </div>
-            {!p.live && <Button primary disabled={readOnly} onClick={() => edit('locations', 'new', null)}>
-              <Plus />
-              Add location
-            </Button>}
+            {!p.live && (
+              <Button primary disabled={readOnly} onClick={() => edit('locations', 'new', null)}>
+                <Plus />
+                Add location
+              </Button>
+            )}
           </div>
           <div className="bu-toolbar">
             <SearchBox value={search} onChange={setSearch} placeholder="Search locations…" />
@@ -721,28 +759,32 @@ export function LocationsView(p: ViewProps) {
           title={l.name}
           status={l.liveStatus ?? (l.published ? 'Published' : 'Draft')}
           subtitle={
-            p.live ? 'Saved business location.' : l.published
-              ? 'This location is visible to customers.'
-              : 'Complete setup before publishing.'
+            p.live
+              ? 'Saved business location.'
+              : l.published
+                ? 'This location is visible to customers.'
+                : 'Complete setup before publishing.'
           }
           onClose={() => setSelected(null)}
-          footer={p.live ? undefined :
-            <>
-              <Button
-                onClick={() =>
-                  p.preview(
-                    'Public location preview',
-                    `${l.name}\n${l.address || 'Digital operation'}\n${activityNames(l.activityIds).join(', ')}`,
-                  )
-                }
-              >
-                <Eye />
-                Preview location
-              </Button>
-              <Button primary disabled={readOnly} onClick={() => edit('locations', l.id, l)}>
-                Edit location
-              </Button>
-            </>
+          footer={
+            p.live ? undefined : (
+              <>
+                <Button
+                  onClick={() =>
+                    p.preview(
+                      'Public location preview',
+                      `${l.name}\n${l.address || 'Digital operation'}\n${activityNames(l.activityIds).join(', ')}`,
+                    )
+                  }
+                >
+                  <Eye />
+                  Preview location
+                </Button>
+                <Button primary disabled={readOnly} onClick={() => edit('locations', l.id, l)}>
+                  Edit location
+                </Button>
+              </>
+            )
           }
         >
           <Facts
@@ -776,31 +818,41 @@ export function LocationsView(p: ViewProps) {
               { label: 'Timezone', value: 'Africa/Nairobi' },
               {
                 label: 'Opening hours',
-                value: <Link href={p.live ? '/merchant/availability' : '/merchant-live-preview/availability'}>View availability →</Link>,
+                value: (
+                  <Link
+                    href={p.live ? '/merchant/availability' : '/merchant-live-preview/availability'}
+                  >
+                    View availability →
+                  </Link>
+                ),
                 hint: 'Opening hours are managed in Availability.',
               },
             ]}
           />
-          {!p.live && <div className="bu-public-location">
-            <h3>Public location preview</h3>
-            <div className="bu-location-preview">
-              <div
-                className="bu-map"
-                role="img"
-                aria-label="Illustrative location preview, not a verified map pin"
-              >
-                <MapPin />
+          {!p.live && (
+            <div className="bu-public-location">
+              <h3>Public location preview</h3>
+              <div className="bu-location-preview">
+                <div
+                  className="bu-map"
+                  role="img"
+                  aria-label="Illustrative location preview, not a verified map pin"
+                >
+                  <MapPin />
+                </div>
+                <div>
+                  <strong>{l.name}</strong>
+                  <p className="bu-small bu-muted">{l.address || 'Digital operation'}</p>
+                  <p className="bu-small bu-muted">
+                    This is how your location appears to customers.
+                  </p>
+                </div>
               </div>
-              <div>
-                <strong>{l.name}</strong>
-                <p className="bu-small bu-muted">{l.address || 'Digital operation'}</p>
-                <p className="bu-small bu-muted">This is how your location appears to customers.</p>
-              </div>
+              <p className="bu-small bu-muted bu-location-source">
+                Source · NEXG · Current configuration
+              </p>
             </div>
-            <p className="bu-small bu-muted bu-location-source">
-              Source · NEXG · Current configuration
-            </p>
-          </div>}
+          )}
         </Panel>
       ) : (
         <Empty title="Select a location" />
@@ -844,10 +896,12 @@ export function TeamView(p: ViewProps) {
                 pending
               </p>
             </div>
-            {!p.live && <Button primary disabled={readOnly} onClick={() => edit('team', 'new', null)}>
-              <Plus />
-              Invite member
-            </Button>}
+            {!p.live && (
+              <Button primary disabled={readOnly} onClick={() => edit('team', 'new', null)}>
+                <Plus />
+                Invite member
+              </Button>
+            )}
           </div>
           <div className="bu-toolbar">
             <SearchBox value={search} onChange={setSearch} placeholder="Search team members…" />
@@ -931,9 +985,13 @@ export function TeamView(p: ViewProps) {
           footer={
             <>
               <Button onClick={() => setSelected(null)}>Cancel</Button>
-              {p.live ? p.liveMemberTools?.[m.id] : <Button primary disabled={readOnly} onClick={() => edit('team', m.id, m)}>
-                Edit access
-              </Button>}
+              {p.live ? (
+                p.liveMemberTools?.[m.id]
+              ) : (
+                <Button primary disabled={readOnly} onClick={() => edit('team', m.id, m)}>
+                  Edit access
+                </Button>
+              )}
             </>
           }
         >
@@ -957,7 +1015,13 @@ export function TeamView(p: ViewProps) {
                     {m.resource || 'No linked scheduling resource'}
                     {m.resource && (
                       <p>
-                        <Link href={p.live ? '/merchant/availability' : '/merchant-live-preview/availability'}>
+                        <Link
+                          href={
+                            p.live
+                              ? '/merchant/availability'
+                              : '/merchant-live-preview/availability'
+                          }
+                        >
                           View linked resource ↗
                         </Link>
                       </p>
@@ -980,13 +1044,15 @@ export function TeamView(p: ViewProps) {
             Team access and scheduling availability are managed separately. The linked
             resource&apos;s schedule is edited in Availability.
           </Note>
-          {!p.live && <div style={{ marginTop: 10 }}>
-            <h3>Changes require access review</h3>
-            <p className="bu-small bu-muted">
-              Updating access may affect assignments and visible information. This preview does not
-              send invitations.
-            </p>
-          </div>}
+          {!p.live && (
+            <div style={{ marginTop: 10 }}>
+              <h3>Changes require access review</h3>
+              <p className="bu-small bu-muted">
+                Updating access may affect assignments and visible information. This preview does
+                not send invitations.
+              </p>
+            </div>
+          )}
         </Panel>
       ) : (
         <Empty title="Select a team member" />
@@ -1072,10 +1138,12 @@ export function DocumentsView(p: ViewProps) {
               <h2>Business documents</h2>
               <p>Requirements for your configured business activities.</p>
             </div>
-            {!p.live && <Button primary disabled={readOnly} onClick={() => p.edit('documents', 'new', null)}>
-              <Plus />
-              Add document
-            </Button>}
+            {!p.live && (
+              <Button primary disabled={readOnly} onClick={() => p.edit('documents', 'new', null)}>
+                <Plus />
+                Add document
+              </Button>
+            )}
           </div>
           <div className="bu-toolbar">
             <SearchBox value={search} onChange={setSearch} placeholder="Search documents…" />
@@ -1310,7 +1378,8 @@ export function FeedbackView(p: ViewProps) {
             <div>
               <h2>Customer feedback</h2>
               <p>
-                {average} / 5 · {data.reviews.length} {p.live ? 'reviews' : 'sample reviews'} · Source: NEXG
+                {average} / 5 · {data.reviews.length} {p.live ? 'reviews' : 'sample reviews'} ·
+                Source: NEXG
               </p>
             </div>
           </div>
@@ -1424,65 +1493,81 @@ export function FeedbackView(p: ViewProps) {
       {r ? (
         <Panel
           title={`Review from ${r.name}`}
-          subtitle={[data.locations.find((l) => l.id === r.locationId)?.name, r.at].filter(Boolean).join(' · ')}
+          subtitle={[data.locations.find((l) => l.id === r.locationId)?.name, r.at]
+            .filter(Boolean)
+            .join(' · ')}
           onClose={() => setSelected(null)}
-          footer={p.live ? <ReviewReply ratingId={r.id} stars={r.rating} comment={r.text || null} /> :
-            <>
-              <Button disabled={readOnly} onClick={() => saveReply(false)}>
-                Save reply draft
-              </Button>
-              <Button primary disabled={readOnly} onClick={() => saveReply(true)}>
-                Post reply
-              </Button>
-            </>
+          footer={
+            p.live ? (
+              <ReviewReply ratingId={r.id} stars={r.rating} comment={r.text || null} />
+            ) : (
+              <>
+                <Button disabled={readOnly} onClick={() => saveReply(false)}>
+                  Save reply draft
+                </Button>
+                <Button primary disabled={readOnly} onClick={() => saveReply(true)}>
+                  Post reply
+                </Button>
+              </>
+            )
           }
         >
           <span className="bu-stars" aria-label={`${r.rating} out of 5`}>
             {'★'.repeat(r.rating)}
           </span>
           <blockquote className="bu-review-quote">“{r.text}”</blockquote>
-          {r.reply && <Note>{p.live ? 'Current public reply' : 'Current public sample reply'}: {r.reply}</Note>}
-          {!p.live && <><Field label={`Reply as ${data.profile.name}`}>
-            <textarea
-              className="bu-reply"
-              disabled={readOnly}
-              maxLength={1000}
-              value={text}
-              onChange={(e) => {
-                setDrafts({ ...drafts, [r.id]: e.target.value });
-                try {
-                  writeDraft(localStorage, data.profileId, {
-                    section: 'feedback',
-                    id: r.id,
-                    value: e.target.value,
-                    baseRevision: data.revision,
-                  });
-                } catch {
-                  p.message('Your reply draft could not be stored. Keep this page open.');
+          {r.reply && (
+            <Note>
+              {p.live ? 'Current public reply' : 'Current public sample reply'}: {r.reply}
+            </Note>
+          )}
+          {!p.live && (
+            <>
+              <Field label={`Reply as ${data.profile.name}`}>
+                <textarea
+                  className="bu-reply"
+                  disabled={readOnly}
+                  maxLength={1000}
+                  value={text}
+                  onChange={(e) => {
+                    setDrafts({ ...drafts, [r.id]: e.target.value });
+                    try {
+                      writeDraft(localStorage, data.profileId, {
+                        section: 'feedback',
+                        id: r.id,
+                        value: e.target.value,
+                        baseRevision: data.revision,
+                      });
+                    } catch {
+                      p.message('Your reply draft could not be stored. Keep this page open.');
+                    }
+                  }}
+                />
+              </Field>
+              <p className="bu-small bu-muted" style={{ margin: '8px 0 20px' }}>
+                Your reply will be visible to customers. In this preview it stays in your browser.
+              </p>
+              <button
+                className="bu-link bu-row-name"
+                disabled={readOnly || r.reported}
+                onClick={() =>
+                  p.save(
+                    {
+                      ...data,
+                      reviews: data.reviews.map((x) =>
+                        x.id === r.id ? { ...x, reported: true } : x,
+                      ),
+                    },
+                    'Review reported in preview',
+                    true,
+                  )
                 }
-              }}
-            />
-          </Field>
-          <p className="bu-small bu-muted" style={{ margin: '8px 0 20px' }}>
-            Your reply will be visible to customers. In this preview it stays in your browser.
-          </p>
-          <button
-            className="bu-link bu-row-name"
-            disabled={readOnly || r.reported}
-            onClick={() =>
-              p.save(
-                {
-                  ...data,
-                  reviews: data.reviews.map((x) => (x.id === r.id ? { ...x, reported: true } : x)),
-                },
-                'Review reported in preview',
-                true,
-              )
-            }
-          >
-            <Flag size={15} />
-            {r.reported ? 'Report recorded in preview' : 'Report review'}
-          </button></>}
+              >
+                <Flag size={15} />
+                {r.reported ? 'Report recorded in preview' : 'Report review'}
+              </button>
+            </>
+          )}
         </Panel>
       ) : (
         <Empty title="Select a review" />

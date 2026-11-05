@@ -111,120 +111,140 @@ export function MerchantLivePreviewShell({
 
   return (
     <MerchantOnboardingDemoScope value={activeDemo}>
-    <WorkspaceFrame
-      activeLabel={active}
-      businessName={activeBusinessName}
-      accountInitials={activeInitials}
-      navigation={navigation}
-      bounded={bounded}
-      sidebarHome={
-        <Link
-          href={withDemo('/merchant-live-preview')}
-          className={styles.sidebarContext}
-          aria-label="Merchant workspace Home"
-        >
-          <span className={styles.businessAvatar} aria-hidden="true">
-            {activeInitials}
-          </span>
-          <div>
-            <strong>{activeBusinessName}</strong>
-            <small>Merchant workspace</small>
-          </div>
-        </Link>
-      }
-      headerStart={
-        <>
-          <WorkspaceMobileNavigation homeHref={withDemo('/merchant-live-preview')}>{navigation}</WorkspaceMobileNavigation>
-          <div className={styles.breadcrumb} aria-label="Breadcrumb">
-            <Link href={withDemo('/merchant-live-preview')}>Workspace</Link>
-            <ChevronRight size={13} aria-hidden="true" />
-            <span>{active}</span>
-          </div>
-          <span
-            className={styles.sampleBadge}
-            role="note"
-            aria-label={activeDemo ? `Demo for ${activeDemo.categoryName}: ${activeDemo.subcategories.map((item) => item.name).join(', ')}` : 'Demo using sample data'}
-            title={activeDemo ? `${activeDemo.categoryName} · ${activeDemo.subcategories.map((item) => item.name).join(', ')}` : undefined}
+      <WorkspaceFrame
+        activeLabel={active}
+        businessName={activeBusinessName}
+        accountInitials={activeInitials}
+        navigation={navigation}
+        bounded={bounded}
+        sidebarHome={
+          <Link
+            href={withDemo('/merchant-live-preview')}
+            className={styles.sidebarContext}
+            aria-label="Merchant workspace Home"
           >
-            {activeDemo ? `Demo · ${activeDemo.categoryName} · ${activeDemo.subcategories.length} ${activeDemo.subcategories.length === 1 ? 'activity' : 'activities'}` : 'Demo · sample data'}
-          </span>
-          <a className={styles.exitDemo} href="/merchants/register" onClick={() => sessionStorage.removeItem(MERCHANT_ONBOARDING_DEMO_STORAGE_KEY)}>
-            Exit demo
-          </a>
-          <WorkspaceSearch availableSections={availableSections} demoContext={activeDemo} />
-        </>
-      }
-      headerMiddle={
-        <div className={styles.sampleControl}>
-          {sampleControl ?? (
-            <details className="relative">
-              <summary>
-                Sample state <ChevronDown size={13} aria-hidden="true" />
-              </summary>
-              <div className={styles.sampleChoices}>
-                {sampleStates.map(([label, href]) => (
-                  <Link key={label} href={withDemo(href)}>
-                    {label}
-                  </Link>
-                ))}
-              </div>
-            </details>
-          )}
-        </div>
-      }
-      headerEnd={
-        <>
-          <div className={styles.location}>
-            {locationControl ?? (
-              <div className={styles.defaultLocation}>
-                <MapPin size={16} aria-hidden="true" />
-                <span>All sample locations</span>
-              </div>
+            <span className={styles.businessAvatar} aria-hidden="true">
+              {activeInitials}
+            </span>
+            <div>
+              <strong>{activeBusinessName}</strong>
+              <small>Merchant workspace</small>
+            </div>
+          </Link>
+        }
+        headerStart={
+          <>
+            <WorkspaceMobileNavigation homeHref={withDemo('/merchant-live-preview')}>
+              {navigation}
+            </WorkspaceMobileNavigation>
+            <div className={styles.breadcrumb} aria-label="Breadcrumb">
+              <Link href={withDemo('/merchant-live-preview')}>Workspace</Link>
+              <ChevronRight size={13} aria-hidden="true" />
+              <span>{active}</span>
+            </div>
+            <span
+              className={styles.sampleBadge}
+              role="note"
+              aria-label={
+                activeDemo
+                  ? `Demo for ${activeDemo.categoryName}: ${activeDemo.subcategories.map((item) => item.name).join(', ')}`
+                  : 'Demo using sample data'
+              }
+              title={
+                activeDemo
+                  ? `${activeDemo.categoryName} · ${activeDemo.subcategories.map((item) => item.name).join(', ')}`
+                  : undefined
+              }
+            >
+              {activeDemo
+                ? `Demo · ${activeDemo.categoryName} · ${activeDemo.subcategories.length} ${activeDemo.subcategories.length === 1 ? 'activity' : 'activities'}`
+                : 'Demo · sample data'}
+            </span>
+            <a
+              className={styles.exitDemo}
+              href="/merchants/register"
+              onClick={() => sessionStorage.removeItem(MERCHANT_ONBOARDING_DEMO_STORAGE_KEY)}
+            >
+              Exit demo
+            </a>
+            <WorkspaceSearch availableSections={availableSections} demoContext={activeDemo} />
+          </>
+        }
+        headerMiddle={
+          <div className={styles.sampleControl}>
+            {sampleControl ?? (
+              <details className="relative">
+                <summary>
+                  Sample state <ChevronDown size={13} aria-hidden="true" />
+                </summary>
+                <div className={styles.sampleChoices}>
+                  {sampleStates.map(([label, href]) => (
+                    <Link key={label} href={withDemo(href)}>
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </details>
             )}
           </div>
-          <HomeSamplePanel
-            kind="notifications"
-            trigger={
-              <button type="button" aria-label="Notifications" className={styles.iconButton}>
-                <Bell size={18} aria-hidden="true" />
-              </button>
-            }
-          />
-          <HomeSamplePanel
-            kind="help"
-            trigger={
-              <button type="button" className={styles.helpButton} aria-label="Help">
-                <CircleHelp size={18} aria-hidden="true" />
-                <span>Help</span>
-              </button>
-            }
-          />
-          <HomePanel
-            title="Account"
-            description={activeContactName ? `${activeBusinessName} · ${activeContactName}` : activeBusinessName}
-            trigger={
-              <button type="button" aria-label="Account" className={styles.accountButton}>
-                {activeInitials}
-              </button>
-            }
-          >
-            <p className="text-muted text-sm">
-              You are viewing a demo with sample data. Exit demo to return to onboarding.
-            </p>
-            {nav.some((item) => item.label === 'Settings') && (
-              <Link
-                href={withDemo('/merchant-live-preview/settings')}
-                className="border-border hover:bg-bg flex min-h-11 items-center justify-between rounded-lg border px-4 py-3 text-sm font-semibold"
-              >
-                Workspace settings <ChevronRight size={16} aria-hidden="true" />
-              </Link>
-            )}
-          </HomePanel>
-        </>
-      }
-    >
-      {children}
-    </WorkspaceFrame>
+        }
+        headerEnd={
+          <>
+            <div className={styles.location}>
+              {locationControl ?? (
+                <div className={styles.defaultLocation}>
+                  <MapPin size={16} aria-hidden="true" />
+                  <span>All sample locations</span>
+                </div>
+              )}
+            </div>
+            <HomeSamplePanel
+              kind="notifications"
+              trigger={
+                <button type="button" aria-label="Notifications" className={styles.iconButton}>
+                  <Bell size={18} aria-hidden="true" />
+                </button>
+              }
+            />
+            <HomeSamplePanel
+              kind="help"
+              trigger={
+                <button type="button" className={styles.helpButton} aria-label="Help">
+                  <CircleHelp size={18} aria-hidden="true" />
+                  <span>Help</span>
+                </button>
+              }
+            />
+            <HomePanel
+              title="Account"
+              description={
+                activeContactName
+                  ? `${activeBusinessName} · ${activeContactName}`
+                  : activeBusinessName
+              }
+              trigger={
+                <button type="button" aria-label="Account" className={styles.accountButton}>
+                  {activeInitials}
+                </button>
+              }
+            >
+              <p className="text-muted text-sm">
+                You are viewing a demo with sample data. Exit demo to return to onboarding.
+              </p>
+              {nav.some((item) => item.label === 'Settings') && (
+                <Link
+                  href={withDemo('/merchant-live-preview/settings')}
+                  className="border-border hover:bg-bg flex min-h-11 items-center justify-between rounded-lg border px-4 py-3 text-sm font-semibold"
+                >
+                  Workspace settings <ChevronRight size={16} aria-hidden="true" />
+                </Link>
+              )}
+            </HomePanel>
+          </>
+        }
+      >
+        {children}
+      </WorkspaceFrame>
     </MerchantOnboardingDemoScope>
   );
 }

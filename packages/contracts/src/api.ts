@@ -127,7 +127,7 @@ export type ErrorCode = keyof typeof ERROR_CODES;
  * Every field here is a column of `merchant_public`. There is
  * no legal name, no contact phone, no contact email and no
  * settlement account, because the view does not publish them.
- * 
+ *
  * `listed_at` is guaranteed non-null: a merchant has status='live'
  * if and only if went_live_at is set (DB constraint).
  */
@@ -309,9 +309,7 @@ export const ServiceBooking = z
       .max(60)
       .optional(),
     /** How they want to pay. */
-    payment_method: z
-      .enum(['on_account', 'mpesa_stk', 'card'])
-      .default('on_account'),
+    payment_method: z.enum(['on_account', 'mpesa_stk', 'card']).default('on_account'),
     /** Anything the driver should know. */
     note: z.string().max(1000).optional(),
   })

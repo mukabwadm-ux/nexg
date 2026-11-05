@@ -1,4 +1,7 @@
-import { protectedBrowserFetch, registerProtectedBrowserCleanup } from '../../../lib/supabase/protected-request';
+import {
+  protectedBrowserFetch,
+  registerProtectedBrowserCleanup,
+} from '../../../lib/supabase/protected-request';
 
 export class BookingApiError extends Error {
   constructor(

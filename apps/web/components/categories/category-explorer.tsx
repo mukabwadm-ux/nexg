@@ -108,8 +108,8 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
         const matchSub = c.subcategories.some(
           (s) =>
             s.name.toLowerCase().includes(trimmed) ||
-              s.fields?.some((f) => f.toLowerCase().includes(trimmed)) ||
-              s.fulfillmentHint?.toLowerCase().includes(trimmed),
+            s.fields?.some((f) => f.toLowerCase().includes(trimmed)) ||
+            s.fulfillmentHint?.toLowerCase().includes(trimmed),
         );
         return matchCat || matchSub;
       });

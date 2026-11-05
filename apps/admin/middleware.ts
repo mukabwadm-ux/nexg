@@ -20,14 +20,31 @@ import { STAFF_SEEN_COOKIE, STAFF_IDLE_TIMEOUT_MS, isStaffIdle } from '@/lib/idl
  */
 export async function middleware(request: NextRequest) {
   let budget: ReturnType<typeof setTimeout> | undefined;
-  const response = request.nextUrl.pathname === '/api/merchant-applications/review'
-    ? await Promise.race([
-        staffSessionMiddleware(request).catch(() => reviewProblem(503, 'session_unavailable', 'Session verification is temporarily unavailable.')),
-        new Promise<NextResponse>((resolve) => {
-          budget = setTimeout(() => resolve(reviewProblem(504, 'session_timeout', 'Session verification timed out. No decision was sent.')), 8000);
-        }),
-      ]).finally(() => clearTimeout(budget))
-    : await staffSessionMiddleware(request);
+  const response =
+    request.nextUrl.pathname === '/api/merchant-applications/review'
+      ? await Promise.race([
+          staffSessionMiddleware(request).catch(() =>
+            reviewProblem(
+              503,
+              'session_unavailable',
+              'Session verification is temporarily unavailable.',
+            ),
+          ),
+          new Promise<NextResponse>((resolve) => {
+            budget = setTimeout(
+              () =>
+                resolve(
+                  reviewProblem(
+                    504,
+                    'session_timeout',
+                    'Session verification timed out. No decision was sent.',
+                  ),
+                ),
+              8000,
+            );
+          }),
+        ]).finally(() => clearTimeout(budget))
+      : await staffSessionMiddleware(request);
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');
   response.headers.set('CDN-Cache-Control', 'no-store');
   response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
@@ -42,7 +59,14 @@ export async function middleware(request: NextRequest) {
 function reviewProblem(status: number, code: string, detail: string) {
   const requestId = crypto.randomUUID();
   return NextResponse.json(
-    { type: 'about:blank', title: status === 401 ? 'Session expired' : 'Session unavailable', status, code, detail, request_id: requestId },
+    {
+      type: 'about:blank',
+      title: status === 401 ? 'Session expired' : 'Session unavailable',
+      status,
+      code,
+      detail,
+      request_id: requestId,
+    },
     { status, headers: { 'Content-Type': 'application/problem+json', 'X-Request-ID': requestId } },
   );
 }

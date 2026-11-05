@@ -17,7 +17,10 @@ export async function POST(request: Request) {
       return !error && data.user && !data.user.is_anonymous ? data.user.id : null;
     },
     rpc: async (name, args, signal) => {
-      const rpc = client.rpc as unknown as (name: string, args: Record<string, unknown>) => {
+      const rpc = client.rpc as unknown as (
+        name: string,
+        args: Record<string, unknown>,
+      ) => {
         abortSignal(signal: AbortSignal): PromiseLike<ReviewRpcResult>;
       };
       return await rpc.call(client, name, args).abortSignal(signal);

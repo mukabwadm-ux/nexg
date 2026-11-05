@@ -41,22 +41,15 @@ export function SignInForm({ next }: { next?: string }) {
   };
 
   return (
-    <Card className="p-6 sm:p-8 w-full max-w-md">
+    <Card className="w-full max-w-md p-6 sm:p-8">
       <h1 className="text-2xl font-extrabold tracking-tight">Sign in</h1>
       <p className="text-muted mt-2 text-sm font-semibold leading-relaxed">
-        Use the same NexG account you use everywhere else. We need to know
-        who you are so a key can be tied to your merchant.
+        Use the same NexG account you use everywhere else. We need to know who you are so a key can
+        be tied to your merchant.
       </p>
 
       <form onSubmit={submit} className="mt-6 space-y-4">
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          label="Email"
-          autoComplete="email"
-          required
-        />
+        <Input id="email" name="email" type="email" label="Email" autoComplete="email" required />
 
         <Input
           id="password"
@@ -68,7 +61,10 @@ export function SignInForm({ next }: { next?: string }) {
         />
 
         {error && (
-          <p role="alert" className="text-sm font-semibold text-danger border border-danger/40 bg-danger/5 rounded px-3 py-2">
+          <p
+            role="alert"
+            className="text-danger border-danger/40 bg-danger/5 rounded border px-3 py-2 text-sm font-semibold"
+          >
             {error}
           </p>
         )}
@@ -79,8 +75,8 @@ export function SignInForm({ next }: { next?: string }) {
       </form>
 
       <p className="text-muted-light mt-6 text-xs font-semibold leading-relaxed">
-        No account yet? A merchant account is created from the NexG site.
-        Once you are signed in here, your merchants appear by name.
+        No account yet? A merchant account is created from the NexG site. Once you are signed in
+        here, your merchants appear by name.
       </p>
     </Card>
   );

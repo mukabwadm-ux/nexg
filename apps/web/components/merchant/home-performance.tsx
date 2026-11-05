@@ -39,13 +39,19 @@ export function HomePerformance({
   /** Starts with the extra metrics open. Home leaves it closed; tests open it. */
   defaultExpanded?: boolean;
 }) {
-  const [measure, setMeasure] = React.useState<'orders' | 'sales' | 'bookings' | 'activity' | 'secondary' | 'revenue'>('orders');
+  const [measure, setMeasure] = React.useState<
+    'orders' | 'sales' | 'bookings' | 'activity' | 'secondary' | 'revenue'
+  >('orders');
   const [expanded, setExpanded] = React.useState(defaultExpanded);
   const liveMeasures = ['orders', 'sales'] as const;
   const demoMeasures = ['activity', 'secondary', 'revenue'] as const;
   const activeMeasure = demo
-    ? (demoMeasures.includes(measure as (typeof demoMeasures)[number]) ? measure as (typeof demoMeasures)[number] : 'activity')
-    : (liveMeasures.includes(measure as (typeof liveMeasures)[number]) ? measure as (typeof liveMeasures)[number] : 'orders');
+    ? demoMeasures.includes(measure as (typeof demoMeasures)[number])
+      ? (measure as (typeof demoMeasures)[number])
+      : 'activity'
+    : liveMeasures.includes(measure as (typeof liveMeasures)[number])
+      ? (measure as (typeof liveMeasures)[number])
+      : 'orders';
   const measureOptions = demo
     ? [
         { id: 'activity' as const, label: demo.activityLabel },
@@ -63,14 +69,18 @@ export function HomePerformance({
       : activeMeasure === 'secondary'
         ? demo.secondaryLabel.toLowerCase()
         : demo.revenueLabel.toLowerCase()
-    : activeMeasure === 'orders' ? 'delivered orders' : 'gross sales';
+    : activeMeasure === 'orders'
+      ? 'delivered orders'
+      : 'gross sales';
   const visibleMeasureLabel = demo
     ? activeMeasure === 'activity'
       ? demo.activityLabel
       : activeMeasure === 'secondary'
         ? demo.secondaryLabel
         : demo.revenueLabel
-    : activeMeasure === 'orders' ? 'Orders' : 'Sales';
+    : activeMeasure === 'orders'
+      ? 'Orders'
+      : 'Sales';
   const rawValues = bars.map((day, index) => {
     if (!demo) return activeMeasure === 'sales' ? day.gross_cents : day.delivered;
     if (activeMeasure === 'activity') return demo.activitySeries[index];
@@ -104,8 +114,7 @@ export function HomePerformance({
         <div>
           <h3 className="text-[0.9375rem] font-extrabold leading-tight">Performance</h3>
           <p className="text-muted text-xs">
-            {visibleMeasureLabel} ·{' '}
-            {demo ? 'Last 7 days' : 'This week'}
+            {visibleMeasureLabel} · {demo ? 'Last 7 days' : 'This week'}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

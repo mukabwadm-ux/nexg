@@ -19,7 +19,10 @@ import type { MerchantHome } from '@/app/merchant/layout';
 import { DASH, kes } from './bits';
 import { HomePerformance } from './home-performance';
 import { HomeSamplePanel, type SamplePanelKind } from './home-sample-panel';
-import type { DemoPanelContent, MerchantOnboardingDemoDashboard } from '@/lib/merchant-onboarding-demo-dashboard';
+import type {
+  DemoPanelContent,
+  MerchantOnboardingDemoDashboard,
+} from '@/lib/merchant-onboarding-demo-dashboard';
 import type { AttentionRow, BranchCard, OrderRow, WeekBar, WeekMoney } from './types';
 import { merchantWorkspaceNavigation, type MerchantWorkspaceSection } from './workspace/navigation';
 
@@ -67,11 +70,18 @@ export function HomeLive({
   const destination = (section: string) => {
     if (!preview) return `/merchant/${section}`;
     const sections: Record<string, MerchantWorkspaceSection> = {
-      orders: 'Work', menu: 'Offerings', stores: 'Business', money: 'Money',
-      analytics: 'Insights', featured: 'Promotions', settings: 'Settings',
+      orders: 'Work',
+      menu: 'Offerings',
+      stores: 'Business',
+      money: 'Money',
+      analytics: 'Insights',
+      featured: 'Promotions',
+      settings: 'Settings',
     };
     const href = merchantWorkspaceNavigation.find((item) => item.label === sections[section])?.href;
-    const base = href ? `${href}${section === 'stores' ? '?tab=locations' : ''}` : '/merchant-live-preview';
+    const base = href
+      ? `${href}${section === 'stores' ? '?tab=locations' : ''}`
+      : '/merchant-live-preview';
     return demo?.demoQuery
       ? `${base}${base.includes('?') ? '&' : '?'}${demo.demoQuery.slice(1)}`
       : base;
@@ -80,7 +90,9 @@ export function HomeLive({
     (order) =>
       order.needs_your_ack || order.what_now === 'to_cook' || order.what_now === 'you_are_late',
   );
-  const attentionCount = demo ? demo.attentionItems.length + attention.length : actionable.length + attention.length;
+  const attentionCount = demo
+    ? demo.attentionItems.length + attention.length
+    : actionable.length + attention.length;
   const stateLabels: Record<string, string> = {
     open: 'Open',
     busy: 'Busy',
@@ -104,12 +116,39 @@ export function HomeLive({
         aria-label="Business status"
         className={`${panel} grid gap-2 px-4 py-2 sm:grid-cols-3 sm:gap-0`}
       >
-        {demo && previewState !== 'unavailable' ? <HomeSamplePanel kind="business" trigger={<button type="button" className="text-left focus-visible:outline focus-visible:outline-2"><Status icon={<FileText />} label="Business" value="Approved" note="Your business is all set up." /></button>} /> : <Status
-          icon={<FileText />}
-          label="Business"
-          value={demo && previewState === 'unavailable' ? 'Unavailable' : demo ? 'Approved' : 'Live'}
-          note={demo && previewState === 'unavailable' ? 'Current status could not be loaded.' : demo ? 'Your business is all set up.' : 'Your business is live on NexG.'}
-        />}
+        {demo && previewState !== 'unavailable' ? (
+          <HomeSamplePanel
+            kind="business"
+            trigger={
+              <button
+                type="button"
+                className="text-left focus-visible:outline focus-visible:outline-2"
+              >
+                <Status
+                  icon={<FileText />}
+                  label="Business"
+                  value="Approved"
+                  note="Your business is all set up."
+                />
+              </button>
+            }
+          />
+        ) : (
+          <Status
+            icon={<FileText />}
+            label="Business"
+            value={
+              demo && previewState === 'unavailable' ? 'Unavailable' : demo ? 'Approved' : 'Live'
+            }
+            note={
+              demo && previewState === 'unavailable'
+                ? 'Current status could not be loaded.'
+                : demo
+                  ? 'Your business is all set up.'
+                  : 'Your business is live on NexG.'
+            }
+          />
+        )}
         <Status
           icon={<MapPin />}
           label="Locations"
@@ -118,7 +157,11 @@ export function HomeLive({
             unavailable.branches
               ? 'Refresh to try again.'
               : demo
-                ? previewState === 'paused' ? 'Both sample locations are paused.' : previewState === 'mixed' ? 'Locations have different statuses.' : `${branches.length} sample locations are open.`
+                ? previewState === 'paused'
+                  ? 'Both sample locations are paused.'
+                  : previewState === 'mixed'
+                    ? 'Locations have different statuses.'
+                    : `${branches.length} sample locations are open.`
                 : 'See each location below.'
           }
           divider
@@ -131,17 +174,25 @@ export function HomeLive({
               ? 'Unavailable'
               : demo && previewState === 'mixed'
                 ? 'Mixed'
-              : m.accepting_orders == null
-              ? 'Unavailable'
-              : m.accepting_orders
-                ? demo
-                  ? 'Open'
-                  : 'On'
-                : demo ? 'Paused' : 'Off'
+                : m.accepting_orders == null
+                  ? 'Unavailable'
+                  : m.accepting_orders
+                    ? demo
+                      ? 'Open'
+                      : 'On'
+                    : demo
+                      ? 'Paused'
+                      : 'Off'
           }
           note={
             demo
-              ? previewState === 'unavailable' ? 'Current status could not be loaded.' : previewState === 'paused' ? `Not accepting new ${demo.activityLabel.toLowerCase()}.` : previewState === 'mixed' ? 'Check each location below.' : `You’re accepting new ${demo.activityLabel.toLowerCase()}.`
+              ? previewState === 'unavailable'
+                ? 'Current status could not be loaded.'
+                : previewState === 'paused'
+                  ? `Not accepting new ${demo.activityLabel.toLowerCase()}.`
+                  : previewState === 'mixed'
+                    ? 'Check each location below.'
+                    : `You’re accepting new ${demo.activityLabel.toLowerCase()}.`
               : 'Location hours and availability may differ.'
           }
           divider
@@ -156,9 +207,15 @@ export function HomeLive({
               title="Needs attention"
               subtitle="Keep things running smoothly across your locations."
               href={destination('orders')}
-              action={demo && previewState !== 'unavailable' ? `View all (${attentionCount})` : 'View orders'}
+              action={
+                demo && previewState !== 'unavailable'
+                  ? `View all (${attentionCount})`
+                  : 'View orders'
+              }
               samplePanel={demo && previewState !== 'unavailable' ? 'attention' : undefined}
-              sampleContent={demo && previewState !== 'unavailable' ? demo.attentionPanel : undefined}
+              sampleContent={
+                demo && previewState !== 'unavailable' ? demo.attentionPanel : undefined
+              }
             />
             <div className="border-border divide-border mt-2 divide-y border-t">
               {unavailable.orders ? (
@@ -171,9 +228,21 @@ export function HomeLive({
                 demo.attentionItems.map((item, index) => (
                   <ActionRow
                     key={`${item.title}-${index}`}
-                    icon={index === 0 ? <ShoppingBag /> : index === 1 ? <AlertCircle /> : <CalendarDays />}
+                    icon={
+                      index === 0 ? (
+                        <ShoppingBag />
+                      ) : index === 1 ? (
+                        <AlertCircle />
+                      ) : (
+                        <CalendarDays />
+                      )
+                    }
                     tone={index === 1 ? 'orange' : index === 2 ? 'blue' : 'green'}
-                    title={previewState === 'paused' && index === 0 ? `Existing ${demo.activitySingular}` : item.title}
+                    title={
+                      previewState === 'paused' && index === 0
+                        ? `Existing ${demo.activitySingular}`
+                        : item.title
+                    }
                     detail={item.detail}
                     meta={item.meta}
                     href={destination('orders')}
@@ -226,7 +295,7 @@ export function HomeLive({
               subtitle={
                 unavailable.branches
                   ? 'Locations unavailable.'
-                  : `${branches.length} ${branches.length === 1 ? 'location' : 'locations'}${demo ? previewState === 'paused' ? ' · All paused.' : previewState === 'mixed' ? ' · Different statuses.' : ' · All open and accepting work.' : ''}`
+                  : `${branches.length} ${branches.length === 1 ? 'location' : 'locations'}${demo ? (previewState === 'paused' ? ' · All paused.' : previewState === 'mixed' ? ' · Different statuses.' : ' · All open and accepting work.') : ''}`
               }
               href={destination('stores')}
               action="View locations"
@@ -239,27 +308,65 @@ export function HomeLive({
               <ul className="border-border divide-border mt-2 divide-y border-t">
                 {branches.map((branch) => (
                   <li key={branch.branch_id}>
-                    {demo ? <HomeSamplePanel kind="location" location={branch.name} trigger={<button type="button" className="flex min-h-[43px] w-full items-center gap-2 py-1 text-left focus-visible:outline focus-visible:outline-2">
-                      <IconBubble tone="orange"><Store /></IconBubble><span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-extrabold">{branch.name || 'Unnamed location'}</span><span className={`${subtle} block truncate`} title={demo.activitySummary}>{demo.activitySummary}</span></span><span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${branch.state === 'open' ? 'bg-green-100 text-green-800' : 'bg-bg text-muted'}`}>{stateLabels[branch.state] ?? 'Unavailable'}</span><span className={`hidden md:inline ${subtle}`}>{branch.state === 'paused' ? 'Not accepting new work' : `Accepting ${demo.activityLabel.toLowerCase()}`}</span><ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    </button>} /> : <Link href={destination('stores')} className="flex min-h-[43px] items-center gap-2 py-1 focus-visible:outline focus-visible:outline-2">
-                      <IconBubble tone="orange">
-                        <Store />
-                      </IconBubble>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[13px] font-extrabold">
-                          {branch.name || 'Unnamed location'}
-                        </span>
-                        <span className={subtle}>
-                          {branch.address_text || 'Address not set'}
-                        </span>
-                      </span>
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${branch.state === 'open' ? 'bg-green-100 text-green-800' : 'bg-bg text-muted'}`}
+                    {demo ? (
+                      <HomeSamplePanel
+                        kind="location"
+                        location={branch.name}
+                        trigger={
+                          <button
+                            type="button"
+                            className="flex min-h-[43px] w-full items-center gap-2 py-1 text-left focus-visible:outline focus-visible:outline-2"
+                          >
+                            <IconBubble tone="orange">
+                              <Store />
+                            </IconBubble>
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-[13px] font-extrabold">
+                                {branch.name || 'Unnamed location'}
+                              </span>
+                              <span
+                                className={`${subtle} block truncate`}
+                                title={demo.activitySummary}
+                              >
+                                {demo.activitySummary}
+                              </span>
+                            </span>
+                            <span
+                              className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${branch.state === 'open' ? 'bg-green-100 text-green-800' : 'bg-bg text-muted'}`}
+                            >
+                              {stateLabels[branch.state] ?? 'Unavailable'}
+                            </span>
+                            <span className={`hidden md:inline ${subtle}`}>
+                              {branch.state === 'paused'
+                                ? 'Not accepting new work'
+                                : `Accepting ${demo.activityLabel.toLowerCase()}`}
+                            </span>
+                            <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                          </button>
+                        }
+                      />
+                    ) : (
+                      <Link
+                        href={destination('stores')}
+                        className="flex min-h-[43px] items-center gap-2 py-1 focus-visible:outline focus-visible:outline-2"
                       >
-                        {stateLabels[branch.state] ?? 'Unavailable'}
-                      </span>
-                      <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    </Link>}
+                        <IconBubble tone="orange">
+                          <Store />
+                        </IconBubble>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[13px] font-extrabold">
+                            {branch.name || 'Unnamed location'}
+                          </span>
+                          <span className={subtle}>{branch.address_text || 'Address not set'}</span>
+                        </span>
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${branch.state === 'open' ? 'bg-green-100 text-green-800' : 'bg-bg text-muted'}`}
+                        >
+                          {stateLabels[branch.state] ?? 'Unavailable'}
+                        </span>
+                        <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -283,7 +390,15 @@ export function HomeLive({
                 icon={<ShoppingCart />}
                 tone="orange"
                 label={demo?.activityLabel ?? 'Orders'}
-                value={unavailable.orders ? DASH : demo ? String(demo.activityCount) : m.orders_today == null ? DASH : String(m.orders_today)}
+                value={
+                  unavailable.orders
+                    ? DASH
+                    : demo
+                      ? String(demo.activityCount)
+                      : m.orders_today == null
+                        ? DASH
+                        : String(m.orders_today)
+                }
                 samplePanel={demo && !unavailable.orders ? 'orders' : undefined}
                 sampleContent={demo && !unavailable.orders ? demo.activityPanel : undefined}
               />
@@ -302,7 +417,13 @@ export function HomeLive({
                 icon={<CircleDollarSign />}
                 tone="green"
                 label={demo?.revenueLabel ?? 'Delivered sales after fees'}
-                value={unavailable.money ? DASH : demo ? kes(demo.revenueCents) : kes(m.earned_today_cents)}
+                value={
+                  unavailable.money
+                    ? DASH
+                    : demo
+                      ? kes(demo.revenueCents)
+                      : kes(m.earned_today_cents)
+                }
                 samplePanel={demo && !unavailable.money ? 'sales' : undefined}
                 sampleContent={demo && !unavailable.money ? demo.revenuePanel : undefined}
               />
@@ -343,12 +464,26 @@ export function HomeLive({
                     : 'See available options and their terms.'}
                 </p>
               </div>
-              {demo ? <HomeSamplePanel kind="promotions" trigger={<button type="button" className="bg-gold text-ink rounded-lg px-3 py-2 text-[12px] font-extrabold focus-visible:outline focus-visible:outline-2">Explore promotions</button>} /> : <Link
-                href={destination('featured')}
-                className="bg-gold text-ink rounded-lg px-3 py-2 text-[12px] font-extrabold focus-visible:outline focus-visible:outline-2"
-              >
-                {demo ? 'Explore promotions' : 'View featured'}
-              </Link>}
+              {demo ? (
+                <HomeSamplePanel
+                  kind="promotions"
+                  trigger={
+                    <button
+                      type="button"
+                      className="bg-gold text-ink rounded-lg px-3 py-2 text-[12px] font-extrabold focus-visible:outline focus-visible:outline-2"
+                    >
+                      Explore promotions
+                    </button>
+                  }
+                />
+              ) : (
+                <Link
+                  href={destination('featured')}
+                  className="bg-gold text-ink rounded-lg px-3 py-2 text-[12px] font-extrabold focus-visible:outline focus-visible:outline-2"
+                >
+                  {demo ? 'Explore promotions' : 'View featured'}
+                </Link>
+              )}
             </div>
           </section>
           {!demo && money && !unavailable.money ? (
@@ -454,7 +589,17 @@ function ActionRow({
         <p className={`${subtle} mt-0.5`}>{detail}</p>
         {meta ? <p className={`${subtle} mt-0.5`}>{meta}</p> : null}
       </div>
-      {samplePanel ? <HomeSamplePanel kind={samplePanel} content={sampleContent} trigger={<button type="button" className={style}>{button}</button>} /> : disabled ? (
+      {samplePanel ? (
+        <HomeSamplePanel
+          kind={samplePanel}
+          content={sampleContent}
+          trigger={
+            <button type="button" className={style}>
+              {button}
+            </button>
+          }
+        />
+      ) : disabled ? (
         <details className="relative">
           <summary className={`${style} cursor-pointer list-none`}>{button}</summary>
           <div className="border-border bg-surface absolute right-0 top-full z-20 mt-2 w-64 rounded-lg border p-3 shadow-lg">
@@ -507,7 +652,17 @@ function Metric({
   );
   const style =
     'border-border flex min-h-[52px] min-w-0 items-center gap-1.5 rounded-lg border p-1.5 focus-visible:outline focus-visible:outline-2';
-  return samplePanel ? <HomeSamplePanel kind={samplePanel} content={sampleContent} trigger={<button type="button" className={`${style} w-full text-left`}>{content}</button>} /> : disabled ? (
+  return samplePanel ? (
+    <HomeSamplePanel
+      kind={samplePanel}
+      content={sampleContent}
+      trigger={
+        <button type="button" className={`${style} w-full text-left`}>
+          {content}
+        </button>
+      }
+    />
+  ) : disabled ? (
     <details className="relative">
       <summary className={`${style} cursor-pointer list-none`}>{content}</summary>
       <div className="border-border bg-surface absolute right-0 top-full z-20 mt-2 w-56 rounded-lg border p-3 text-[12px] shadow-lg">
@@ -551,9 +706,21 @@ function SectionHead({
         </h2>
         <p className={`${subtle} mt-0.5 pl-7`}>{subtitle}</p>
       </div>
-      {samplePanel ? <HomeSamplePanel kind={samplePanel} content={sampleContent} trigger={<button type="button" className={`${action} shrink-0 pt-1`}>{label} <ChevronRight className="h-4 w-4" aria-hidden="true" /></button>} /> : <Link href={href} className={`${action} shrink-0 pt-1`}>
-        {label} <ChevronRight className="h-4 w-4" aria-hidden="true" />
-      </Link>}
+      {samplePanel ? (
+        <HomeSamplePanel
+          kind={samplePanel}
+          content={sampleContent}
+          trigger={
+            <button type="button" className={`${action} shrink-0 pt-1`}>
+              {label} <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            </button>
+          }
+        />
+      ) : (
+        <Link href={href} className={`${action} shrink-0 pt-1`}>
+          {label} <ChevronRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      )}
     </div>
   );
 }

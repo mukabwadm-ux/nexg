@@ -447,9 +447,7 @@ export default async function ExplorePage({
                           {pick.trading_name}
                         </span>
                         <span className="mt-1 block text-xs font-semibold text-white/60">
-                          {pick.category_label ??
-                            CATEGORY_LABEL[pickCategory] ??
-                            pickCategory}
+                          {pick.category_label ?? CATEGORY_LABEL[pickCategory] ?? pickCategory}
                           {pick.branch_name && ` · ${pick.branch_name}`}
                         </span>
                       </span>

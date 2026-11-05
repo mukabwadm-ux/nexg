@@ -52,11 +52,17 @@ const waitForProfile = (page, id) =>
         visible: element.clientHeight,
         content: element.scrollHeight,
       }));
-      check(size.content <= size.visible + 1, `${label} does not fit compact desktop: ${JSON.stringify(size)}`);
+      check(
+        size.content <= size.visible + 1,
+        `${label} does not fit compact desktop: ${JSON.stringify(size)}`,
+      );
     };
     await page.setViewportSize({ width: 1280, height: 632 });
     await compactCheck('Campaigns');
-    await page.screenshot({ path: path.join(os.tmpdir(), 'nexg-promotions-compact.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(os.tmpdir(), 'nexg-promotions-compact.png'),
+      fullPage: true,
+    });
     await page.getByRole('button', { name: 'Create promotion', exact: true }).click();
     await compactCheck('Create promotion');
     await page.getByRole('button', { name: 'Back to campaigns' }).click();
@@ -73,7 +79,10 @@ const waitForProfile = (page, id) =>
     });
     await page.getByRole('button', { name: 'Preview in app', exact: true }).click();
     await page.getByRole('heading', { name: 'Discovery', exact: true }).waitFor();
-    await page.screenshot({ path: path.join(os.tmpdir(), 'nexg-promotions-app-compact.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(os.tmpdir(), 'nexg-promotions-app-compact.png'),
+      fullPage: true,
+    });
     await compactCheck('Customer preview');
     await page.getByRole('button', { name: 'Back to History' }).click();
     await page.getByRole('tab', { name: 'Campaigns' }).click();
@@ -204,7 +213,14 @@ const waitForProfile = (page, id) =>
     const overflow = await page.evaluate(() => ({
       width: document.documentElement.clientWidth,
       scroll: document.documentElement.scrollWidth,
-      outliers: [...document.querySelectorAll('main *')].map((element) => ({ tag: element.tagName, className: String(element.className), right: Math.round(element.getBoundingClientRect().right) })).filter((entry) => entry.right > innerWidth + 2).slice(0, 8),
+      outliers: [...document.querySelectorAll('main *')]
+        .map((element) => ({
+          tag: element.tagName,
+          className: String(element.className),
+          right: Math.round(element.getBoundingClientRect().right),
+        }))
+        .filter((entry) => entry.right > innerWidth + 2)
+        .slice(0, 8),
     }));
     check(
       overflow.scroll <= overflow.width + 1,

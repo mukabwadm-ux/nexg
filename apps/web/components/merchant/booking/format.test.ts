@@ -1,12 +1,31 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'vitest';
-import { addMonths, displayQuantity, fromKenyaInput, kenyaDate, kesInputToMinor, localDateTime, overlapsDay, quantityInputToMinor } from './format';
+import {
+  addMonths,
+  displayQuantity,
+  fromKenyaInput,
+  kenyaDate,
+  kesInputToMinor,
+  localDateTime,
+  overlapsDay,
+  quantityInputToMinor,
+} from './format';
 import type { BookingRecord } from './types';
 
 const reservation: BookingRecord = {
-  id: 'test-booking', offeringId: 'test-offering', offeringName: 'Test interval', model: 'ASSET_INTERVAL',
-  resourceIds: ['test-asset'], startTime: '2026-10-31T21:00:00+03:00', endTime: '2026-11-01T00:00:00+03:00',
-  quantity: 1, customer: { name: 'Test customer' }, status: 'confirmed', version: 1, priceMinor: 10000, currency: 'KES',
+  id: 'test-booking',
+  offeringId: 'test-offering',
+  offeringName: 'Test interval',
+  model: 'ASSET_INTERVAL',
+  resourceIds: ['test-asset'],
+  startTime: '2026-10-31T21:00:00+03:00',
+  endTime: '2026-11-01T00:00:00+03:00',
+  quantity: 1,
+  customer: { name: 'Test customer' },
+  status: 'confirmed',
+  version: 1,
+  priceMinor: 10000,
+  currency: 'KES',
 };
 
 describe('merchant booking date and amount entry', () => {
@@ -32,8 +51,14 @@ describe('merchant booking date and amount entry', () => {
   });
 
   it('keeps indicative intervals out of reserved calendar capacity', () => {
-    assert.equal(overlapsDay({ ...reservation, executionMode: 'request_capture' }, '2026-10-31'), false);
-    assert.equal(overlapsDay({ ...reservation, startTime: null, endTime: null }, '2026-10-31'), false);
+    assert.equal(
+      overlapsDay({ ...reservation, executionMode: 'request_capture' }, '2026-10-31'),
+      false,
+    );
+    assert.equal(
+      overlapsDay({ ...reservation, startTime: null, endTime: null }, '2026-10-31'),
+      false,
+    );
   });
 
   it('preserves decimal money and measured storage quantities in integer units', () => {

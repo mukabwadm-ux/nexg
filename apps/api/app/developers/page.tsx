@@ -37,18 +37,18 @@ export default async function DevelopersPage() {
   const merchants = await listDeveloperMerchants(supabase);
 
   return (
-    <main className="max-w-3xl mx-auto px-6 py-12">
+    <main className="mx-auto max-w-3xl px-6 py-12">
       <header className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight mb-2">Developer console</h1>
+        <h1 className="mb-2 text-3xl font-extrabold tracking-tight">Developer console</h1>
         <p className="text-ink/70">
-          Issue a key for the NexG API. The key is shown once and cannot be
-          recovered, so copy it before you close this page.
+          Issue a key for the NexG API. The key is shown once and cannot be recovered, so copy it
+          before you close this page.
         </p>
       </header>
 
       <DeveloperConsole merchants={merchants} email={user.email ?? null} />
 
-      <p className="mt-8 text-xs text-ink/50">
+      <p className="text-ink/50 mt-8 text-xs">
         Not ready to wire an integration yet?{' '}
         <Link href="/docs" className="underline">
           Read the reference

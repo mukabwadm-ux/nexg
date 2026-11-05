@@ -97,7 +97,11 @@ export function ShellFrame({
                   </span>
                 ) : null;
                 return (
-                  <li key={n} aria-current={n === step ? 'step' : undefined} className="w-8 sm:w-14">
+                  <li
+                    key={n}
+                    aria-current={n === step ? 'step' : undefined}
+                    className="w-8 sm:w-14"
+                  >
                     {named && n < step ? (
                       <Link
                         href={named.href}

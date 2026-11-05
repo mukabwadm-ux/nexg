@@ -16,8 +16,7 @@ export default function StartPage({
 }) {
   // Once the connected V1 journey is enabled, the old six-step intake must not
   // remain an alternate merchant-registration entry point.
-  if (process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false')
-    redirect('/merchants/register');
+  if (process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false') redirect('/merchants/register');
 
   return (
     <StartStep

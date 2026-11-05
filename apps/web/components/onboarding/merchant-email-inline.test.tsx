@@ -22,7 +22,9 @@ describe('merchant inline email verification', () => {
         authenticatedSession={undefined}
         canSubmit={false}
         emailVerificationAction={<button type="button">Verify email</button>}
-        emailVerificationContent={<label htmlFor="verification-code">Enter verification code</label>}
+        emailVerificationContent={
+          <label htmlFor="verification-code">Enter verification code</label>
+        }
       />,
     );
     const emailField = html.indexOf('type="email"');
@@ -53,7 +55,11 @@ describe('merchant inline email verification', () => {
         onBackToMarketplace={undefined}
         authenticatedSession={undefined}
         canSubmit
-        emailVerificationAction={<span className="mo-email-verified" role="status">Email verified</span>}
+        emailVerificationAction={
+          <span className="mo-email-verified" role="status">
+            Email verified
+          </span>
+        }
       />,
     );
     const submitButton = html.match(/<button[^>]*type="submit"[^>]*>Submit<\/button>/)?.[0];

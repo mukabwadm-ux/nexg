@@ -9,6 +9,7 @@ import {
   MerchantWorkspaceShell,
   type MerchantWorkspaceNavItem,
 } from '@/components/merchant/workspace/merchant-workspace-shell';
+import { openBeforeApproval, verificationNotice } from '@/lib/merchant-verification';
 import { SignOut } from '@/components/partner/sign-out';
 
 export const metadata: Metadata = {
@@ -89,6 +90,7 @@ export default async function MerchantLayout({ children }: { children: React.Rea
       { label: 'Offerings', href: '/merchant/offerings' },
       { label: 'Availability', href: '/merchant/availability' },
       { label: 'Business', href: '/merchant/business' },
+      { label: 'Documents', href: '/merchant/documents' },
       { label: 'Money', href: '/merchant/money' },
       { label: 'Promotions', href: '/merchant/promotions' },
       { label: 'Insights', href: '/merchant/insights' },
@@ -102,7 +104,12 @@ export default async function MerchantLayout({ children }: { children: React.Rea
           ? 'Changes requested'
           : 'Waiting for admin approval';
     return (
-      <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
+      <MerchantAuthBoundary
+        merchantId={me.id}
+        actorId={me.userId}
+        access={me.access}
+        isAnonymous={me.isAnonymous}
+      >
         <MerchantWorkspaceShell
           businessName={m.name}
           approvalLabel={approvalLabel}
@@ -111,17 +118,31 @@ export default async function MerchantLayout({ children }: { children: React.Rea
               ? ['/merchant/menu', '/merchant/stores', '/merchant/hours', '/merchant/documents']
               : []
           }
+          notice={verificationNotice(me.access, me.id, me.isAnonymous)}
           nav={destinations.map((item) => ({
             ...item,
-            locked: item.label !== 'Home' && !me.access.operations,
+            locked: !me.access.operations && !openBeforeApproval(item.label, me.access),
           }))}
-          headerEnd={me.isAnonymous ? (
-            <Link href={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false' ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'} className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold">
-              {process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false' ? 'Verify email' : 'Create account'}
-            </Link>
-          ) : (
-            <span className="bg-ink inline-flex rounded-lg px-1 py-0.5"><SignOut /></span>
-          )}
+          headerEnd={
+            me.isAnonymous ? (
+              <Link
+                href={
+                  process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'
+                    ? '/merchants/verify-email'
+                    : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'
+                }
+                className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold"
+              >
+                {process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'
+                  ? 'Verify email'
+                  : 'Create account'}
+              </Link>
+            ) : (
+              <span className="bg-ink inline-flex rounded-lg px-1 py-0.5">
+                <SignOut />
+              </span>
+            )
+          }
         >
           {children}
         </MerchantWorkspaceShell>
@@ -130,7 +151,12 @@ export default async function MerchantLayout({ children }: { children: React.Rea
   }
 
   return (
-    <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
+    <MerchantAuthBoundary
+      merchantId={me.id}
+      actorId={me.userId}
+      access={me.access}
+      isAnonymous={me.isAnonymous}
+    >
       <MerchantShell
         businessName={m.name}
         personName={firstName(m.contact_name, m.name)}
