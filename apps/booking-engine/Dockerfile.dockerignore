@@ -1,0 +1,9 @@
+**/node_modules
+**/.next
+**/.data
+**/.turbo
+docs
+apps/web
+apps/admin
+apps/api
+merchant-onboarding

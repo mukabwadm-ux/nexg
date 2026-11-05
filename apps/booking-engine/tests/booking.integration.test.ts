@@ -18,16 +18,47 @@ import type { Identity, OfferingInput } from '../src/types.js';
 // tables ("no such table: booking_operations"). Force a push for every one.
 process.env.PAYLOAD_FORCE_DRIZZLE_PUSH = 'true';
 
+// Set BOOKING_TEST_POSTGRES_URL (a server where this user may create databases)
+// to run the same suite against PostgreSQL, the production storage, instead of
+// SQLite. Each test gets its own disposable database, dropped afterwards.
+const testPostgres = process.env.BOOKING_TEST_POSTGRES_URL;
+const sqlite = !testPostgres;
+async function testDatabase(directory: string) {
+  if (!testPostgres)
+    return {
+      options: { sqliteUrl: 'file:' + path.join(directory, 'test.db').replaceAll('\\', '/') },
+      drop: async () => undefined,
+    };
+  const { default: pg } = await import('pg');
+  const name = 'nexg_booking_test_' + randomUUID().replaceAll('-', '');
+  const admin = new pg.Client({ connectionString: testPostgres });
+  await admin.connect();
+  await admin.query(`create database "${name}"`);
+  await admin.end();
+  const url = new URL(testPostgres);
+  url.pathname = '/' + name;
+  return {
+    options: { postgresUrl: url.toString(), push: true },
+    drop: async () => {
+      const client = new pg.Client({ connectionString: testPostgres });
+      await client.connect();
+      await client.query(`drop database if exists "${name}" with (force)`);
+      await client.end();
+    },
+  };
+}
+
 test('booking GET reads preserve persisted business state', async (t) => {
   const directory = await mkdtemp(path.join(tmpdir(), 'nexg-read-only-'));
-  const sqliteUrl = 'file:' + path.join(directory, 'test.db').replaceAll('\\', '/');
+  const database = await testDatabase(directory);
+  t.after(database.drop);
   const payloadOptions = {
-    sqliteUrl,
+    ...database.options,
     secret: 'read-only-test-secret-is-not-production-123456789',
   };
   let now = Date.parse('2030-01-01T00:00:00Z');
   let payload = await createPayload({ ...payloadOptions, cacheKey: randomUUID() });
-  let engine = new BookingEngine(payload, true, () => now);
+  let engine = new BookingEngine(payload, sqlite, () => now);
   const owner: Identity = {
     businessId: 'phase4-read-owner',
     userId: 'read-owner',
@@ -268,7 +299,7 @@ test('booking GET reads preserve persisted business state', async (t) => {
         globalThis.gc?.();
         await new Promise<void>((resolve) => setImmediate(resolve));
         payload = await createPayload({ ...payloadOptions, cacheKey: randomUUID() });
-        engine = new BookingEngine(payload, true, () => now);
+        engine = new BookingEngine(payload, sqlite, () => now);
         server = createBookingServer(engine, secret);
         await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
         base = 'http://127.0.0.1:' + (server.address() as any).port;
@@ -439,15 +470,16 @@ test('booking GET reads preserve persisted business state', async (t) => {
 // They check user outcomes, transaction rollback and tenant boundaries.
 test('native booking lifecycle, concurrency, scope and durable storage', async (t) => {
   const directory = await mkdtemp(path.join(tmpdir(), 'nexg-reserve-'));
-  const sqliteUrl = 'file:' + path.join(directory, 'test.db').replaceAll('\\', '/');
+  const database = await testDatabase(directory);
+  t.after(database.drop);
   let now = Date.parse('2030-01-01T00:00:00Z');
   const payload = await createPayload({
-    sqliteUrl,
+    ...database.options,
     cacheKey: randomUUID(),
     secret: 'test-secret-is-long-and-not-production-123456789',
   });
   let payloadClosed = false;
-  const engine = new BookingEngine(payload, true, () => now);
+  const engine = new BookingEngine(payload, sqlite, () => now);
   const owner: Identity = {
     businessId: 'test-hair-a',
     userId: 'owner-a',
@@ -1921,12 +1953,12 @@ test('native booking lifecycle, concurrency, scope and durable storage', async (
       globalThis.gc?.();
       await new Promise<void>((resolve) => setImmediate(resolve));
       const reopened = await createPayload({
-        sqliteUrl,
+        ...database.options,
         cacheKey: randomUUID(),
         secret: 'test-secret-is-long-and-not-production-123456789',
       });
       try {
-        const persisted = new BookingEngine(reopened, true, () => now);
+        const persisted = new BookingEngine(reopened, sqlite, () => now);
         assert.ok((await persisted.workspace(owner)).bookings.some((b) => b.id === booking.id));
       } finally {
         console.log('[native-lifecycle] closing restarted database');
