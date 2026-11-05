@@ -22,7 +22,7 @@ describe('adaptive Money views', () => {
       const view = resolveMoneyView(profile, offering, [schema]);
       return { profile: profile.id, schema, model: view.modelId, workflow: view.workflowIds[0] };
     }));
-    expect(new Set(resolutions.map((r) => r.profile)).size).toBe(128);
+    expect(new Set(resolutions.map((r) => r.profile)).size).toBe(141);
     expect(new Set(resolutions.map((r) => r.schema)).size).toBe(18);
     expect(resolutions.find((r) => r.profile === 'restaurant' && r.schema === 'SPACE_RESERVATION_V1')).toEqual({ profile: 'restaurant', schema: 'SPACE_RESERVATION_V1', model: 'SPACE_RESERVATION', workflow: 'WF_SPACE_RESERVATION_V1' });
     expect(resolutions.find((r) => r.profile === 'self_drive' && r.schema === 'RENTAL_ASSET_V1')?.workflow).toBe('WF_RENTAL');
@@ -31,7 +31,7 @@ describe('adaptive Money views', () => {
       const offering = seedCatalogue({ ...profile, schema }).offerings[0]!;
       return { model, resolved: resolveMoneyView(profile, offering, [schema]).modelId };
     }));
-    expect(bindings.length).toBe(193);
+    expect(bindings.length).toBe(206);
     expect(bindings.filter((binding) => binding.model !== binding.resolved)).toEqual([]);
   });
   it('does not activate a candidate without an enabled offering and accepts a registered future specialty', () => {

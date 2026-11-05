@@ -73,7 +73,17 @@ export const MERCHANT_CATEGORIES = listOnboardingCategories().map(canonical => {
   // The historical compiled snapshot has a double-encoded café label. Keep its
   // canonical ID/rules and display the spelling in contracts/src/taxonomy.ts.
   const subcategoryOptions = canonical.subcategories.map(item => item.id === "cafe" ? { ...item, name: "Café" } : item);
-  return { ...legacy, id: canonical.id, name: canonical.name, legacyId: legacy?.id,
+  const setup = canonical.id === "activities_games_sports" ? {
+    model: "booking", booking: "required", packaging: "none",
+    fulfillment: ["facility_booking", "class_booking", "ticket_or_session"],
+    offer: "Set up bookable activities, session capacity, venue spaces and instructor availability.",
+    operations: "Set participant eligibility, equipment, supervision and cancellation terms for each offering.",
+    offerFields: [],
+    documents: ["Venue and operator evidence where requested", "Instructor or safety evidence where requested"],
+    review: ["Review venue, activity scope and applicable operating evidence"],
+    after: "Configure actual spaces, instructors and session capacity before accepting work.",
+  } : legacy;
+  return { ...setup, id: canonical.id, name: canonical.name, legacyId: legacy?.id,
     subcategoryOptions, subcategories: canonical.subcategories.map(item => item.id), bookingWhen };
 });
 export function normalizeInitialCapture(data) {

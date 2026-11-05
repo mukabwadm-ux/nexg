@@ -10,8 +10,8 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({ auth: { getUser: mocks.getUser }, rpc: mocks.rpc }),
 }));
 vi.mock('@/components/onboarding/connected-application', () => ({
-  ConnectedApplication: (props: { actorId: string; home?: boolean; anonymousSession?: boolean }) => (
-    <div data-connected-registration={props.actorId} data-home={String(props.home ?? false)} data-anonymous={String(props.anonymousSession ?? false)}>
+  ConnectedApplication: (props: { actorId: string; home?: boolean; anonymousSession?: boolean; initialRecord?: { merchant_id: string } }) => (
+    <div data-connected-registration={props.actorId} data-home={String(props.home ?? false)} data-anonymous={String(props.anonymousSession ?? false)} data-application={props.initialRecord?.merchant_id ?? 'new'}>
       Real registration
     </div>
   ),
@@ -44,6 +44,21 @@ vi.mock('next/link', () => ({
   ),
 }));
 const actorId = '0194b62d-4ff0-7b09-8519-d7597b8312b1';
+const merchantId = '0194b62d-4ff0-7b09-8519-d7597b8312bf';
+const savedApplication = {
+  merchant_id: merchantId,
+  revision: 1,
+  payload: {
+    registryRevision: 'nexg-booking-2026-10-31.1',
+    business: { name: 'Maua Cafe', firstName: 'Amina', lastName: 'Owino', email: 'amina@example.test',
+      phone: '+254712345678', branchCount: 1, registered: true, sameBusinessPhone: true,
+      businessPhone: '', marketing: false },
+    categoryId: 'restaurants_food', subcategories: ['cafe'], answersBySubcategory: {}, policies: { terms: true },
+  },
+  review: { state: 'pending', submitted_revision: 1, submitted_at: '2026-11-02T10:00:00Z', needs_resubmission: false },
+  access: { state: 'pending', setup: true, operations: false },
+  publication: { status: 'applied' },
+};
 beforeEach(() => {
   vi.stubEnv('MERCHANT_ONBOARDING_V1_ENABLED', 'true');
   mocks.getUser.mockReset();
@@ -56,11 +71,12 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllEnvs());
 describe('real onboarding entry and resume', () => {
-  it('treats malformed existing ownership as unavailable rather than a new account', async () => {
+  it('opens fresh registration without depending on a workspace lookup', async () => {
     mocks.rpc.mockResolvedValue({ data: null, error: null });
     const html = renderToStaticMarkup(await Registration({ searchParams: {} }));
-    expect(html).toContain('Refresh before starting another registration');
-    expect(html).not.toContain('data-connected-registration');
+    expect(html).toContain('data-application="new"');
+    expect(html).toContain('data-home="false"');
+    expect(mocks.rpc).not.toHaveBeenCalled();
   });
   it('returns an expired registrant to onboarding and an owner to Home after sign-in', () => {
     const registration = new URL(merchantSessionSignInHref(false), 'https://nexg.example');
@@ -88,13 +104,41 @@ describe('real onboarding entry and resume', () => {
     expect(html).toContain('/merchant-live-preview?state=setup');
     expect(mocks.rpc).not.toHaveBeenCalled();
   });
-  it('resumes an existing owned workspace instead of starting a second registration', async () => {
-    mocks.rpc.mockResolvedValue({
-      data: { kind: 'merchant', id: '0194b62d-4ff0-7b09-8519-d7597b8312bf' },
-      error: null,
+  it('opens a saved short form only through its explicit resume link', async () => {
+    mocks.rpc.mockImplementation(async (name: string) => {
+      if (name === 'fn_partner_home') return { data: { kind: 'merchant', id: merchantId }, error: null };
+      if (name === 'rpc_merchant_application_payout_read') return {
+        data: { merchant_id: merchantId, version: 0, payout: null, verification: 'declared' }, error: null,
+      };
+      return { data: savedApplication, error: null };
     });
-    await expect(Registration({ searchParams: {} })).rejects.toThrow('redirect:/merchant');
-    expect(mocks.rpc).toHaveBeenCalledTimes(1);
+    const html = renderToStaticMarkup(await Registration({ searchParams: { merchantId } }));
+    expect(html).toContain('data-home="false"');
+    expect(html).toContain(`data-application="${merchantId}"`);
+    expect(mocks.rpc).toHaveBeenCalledWith('rpc_merchant_application_read', { p_merchant_id: merchantId });
+    expect(mocks.rpc).not.toHaveBeenCalledWith('rpc_merchant_application_start', expect.anything());
+    expect(mocks.rpc).not.toHaveBeenCalledWith('fn_partner_home');
+  });
+  it('opens the short form when an older workspace has no short-form application', async () => {
+    mocks.rpc.mockResolvedValueOnce({ data: { kind: 'merchant', id: merchantId }, error: null })
+      .mockResolvedValueOnce({ data: null, error: { code: 'P0002' } });
+    const html = renderToStaticMarkup(await Registration({ searchParams: {} }));
+    expect(html).toContain('data-home="false"');
+    expect(html).toContain('data-application="new"');
+    expect(mocks.rpc).not.toHaveBeenCalled();
+  });
+  it('preserves an existing application when its read fails', async () => {
+    mocks.rpc.mockResolvedValue({ data: null, error: { code: 'service_unavailable' } });
+    const html = renderToStaticMarkup(await Registration({ searchParams: { merchantId } }));
+    expect(html).toContain('Your saved data has not been replaced');
+    expect(html).not.toContain('data-connected-registration');
+  });
+  it('does not turn a missing explicit application into a new registration', async () => {
+    mocks.rpc.mockResolvedValue({ data: null, error: { code: 'P0002' } });
+    const html = renderToStaticMarkup(await Registration({ searchParams: { merchantId } }));
+    expect(html).toContain('Your saved data has not been replaced');
+    expect(html).not.toContain('data-connected-registration');
+    expect(mocks.rpc).not.toHaveBeenCalledWith('fn_partner_home');
   });
   it('shows the real authenticated form for a new account', async () => {
     const html = renderToStaticMarkup(await Registration({ searchParams: {} }));
@@ -116,10 +160,11 @@ describe('real onboarding entry and resume', () => {
       'redirect:/merchants/register?city=nairobi',
     );
   });
-  it('does not create an empty registration when existing ownership cannot be checked', async () => {
+  it('shows the public form even when an unrelated workspace lookup would fail', async () => {
     mocks.rpc.mockResolvedValue({ data: null, error: { code: 'service_unavailable' } });
     const html = renderToStaticMarkup(await Registration({ searchParams: {} }));
-    expect(html).toContain('Refresh before starting another registration');
-    expect(html).not.toContain('data-connected-registration');
+    expect(html).toContain('data-application="new"');
+    expect(html).toContain('data-home="false"');
+    expect(mocks.rpc).not.toHaveBeenCalled();
   });
 });

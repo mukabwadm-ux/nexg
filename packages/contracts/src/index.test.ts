@@ -136,10 +136,10 @@ describe('parse shapes the error for a response', () => {
 });
 
 describe('merchant taxonomy', () => {
-  it('has 21 categories and 128 subcategories', async () => {
+  it('has 22 categories and 141 subcategories', async () => {
     const { ALL_CATEGORIES, ALL_SUBCATEGORIES } = await import('./taxonomy');
-    expect(ALL_CATEGORIES.length).toBe(21);
-    expect(ALL_SUBCATEGORIES.length).toBe(128);
+    expect(ALL_CATEGORIES.length).toBe(22);
+    expect(ALL_SUBCATEGORIES.length).toBe(141);
   });
 
   it('gives each Adults Only specialty a distinct, staged workflow', async () => {
@@ -203,7 +203,7 @@ describe('merchant taxonomy', () => {
 
   it('provides a unique image for all 21 categories', async () => {
     const { ALL_CATEGORIES, getCategoryImage } = await import('./taxonomy');
-    expect(ALL_CATEGORIES.length).toBe(21);
+    expect(ALL_CATEGORIES.length).toBe(22);
     for (const cat of ALL_CATEGORIES) {
       expect(cat.image).toBeDefined();
       expect(cat.image?.startsWith('/images/categories/')).toBe(true);

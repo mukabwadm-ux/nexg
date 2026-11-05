@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarDays, ChevronLeft, ChevronRight, Pencil, Plus, Search } from 'lucide-react';
+import type { CSSProperties, ReactNode } from 'react';
 import {
   CalendarLegend,
   PRESENTATION,
@@ -27,6 +28,29 @@ import {
   type Context,
   type Snapshot,
 } from './model';
+
+export type ResourceSchedule = Pick<Snapshot, 'resources' | 'events' | 'now' | 'coverageEnd'>;
+
+export function AvailabilityHeading({
+  description,
+  scope,
+  actions,
+}: {
+  description: string;
+  scope: ReactNode;
+  actions: ReactNode;
+}) {
+  return (
+    <div className="av-page-heading">
+      <div>
+        <h1>Availability</h1>
+        <p>{description}</p>
+        <small>{scope}</small>
+      </div>
+      <div className="av-actions">{actions}</div>
+    </div>
+  );
+}
 
 export function HoursView({
   s,
@@ -138,7 +162,7 @@ function EventButton({
   draggable = false,
 }: {
   e: Commitment;
-  s: Snapshot;
+  s: Pick<Snapshot, 'now'>;
   onSelect: (e: Commitment) => void;
   style?: React.CSSProperties;
   draggable?: boolean;
@@ -406,9 +430,12 @@ export function TimelineView({
   onMove,
   editable = false,
   dayCount = 7,
+  dayHours,
+  resourceLabel = 'Resource',
+  footnote,
 }: {
-  s: Snapshot;
-  c: Context;
+  s: ResourceSchedule;
+  c?: Context;
   date: string;
   resourceFilter: string;
   onSelect: (e: Commitment) => void;
@@ -416,11 +443,23 @@ export function TimelineView({
   onMove?: (event: Commitment, start: string, end: string, resourceId?: string) => void;
   editable?: boolean;
   dayCount?: number;
+  dayHours?: { start: number; end: number };
+  resourceLabel?: string;
+  footnote?: string;
 }) {
-  const week = dayCount === 1 ? date : monday(date),
-    start = stamp(week + 'T00:00'),
-    end = stamp(dateAdd(week, dayCount) + 'T00:00'),
-    width = end - start;
+  const week = dayCount === 1 ? date : monday(date);
+  const hourly = dayCount === 1 ? dayHours : undefined;
+  const dayStart = week + 'T00:00';
+  const from = hourly ? addMinutes(dayStart, hourly.start * 60) : dayStart;
+  const start = stamp(from);
+  const end = hourly
+    ? stamp(addMinutes(dayStart, hourly.end * 60))
+    : stamp(dateAdd(week, dayCount) + 'T00:00');
+  const width = end - start;
+  const columns = hourly ? hourly.end - hourly.start : dayCount;
+  const minuteAt = (x: number, box: DOMRect) =>
+    Math.max(0, Math.min(width / 60000 - 15,
+      Math.floor(((x - box.left) / box.width) * width / 900000) * 15));
   const pc = (v: string) => Math.max(0, Math.min(100, ((stamp(v) - start) / width) * 100));
   const resources = s.resources.filter((r) => resourceFilter === 'all' || r.id === resourceFilter);
   if (!resources.length)
@@ -433,14 +472,20 @@ export function TimelineView({
   return (
     <section className="av-card av-timeline-card">
       <div className="av-table-wrap">
-        <div className="av-timeline">
+        <div
+          className="av-timeline"
+          data-hourly={hourly ? 'true' : undefined}
+          style={hourly ? ({ '--av-timeline-columns': columns } as CSSProperties) : undefined}
+        >
           <div className="av-timeline-heading">
-            <strong>Resource</strong>
+            <strong>{resourceLabel}</strong>
             <div
               className="av-days"
-              style={{ gridTemplateColumns: 'repeat(' + dayCount + ',1fr)' }}
+              style={{ gridTemplateColumns: 'repeat(' + columns + ',1fr)' }}
             >
-              {Array.from({ length: dayCount }, (_, i) => (
+              {hourly ? Array.from({ length: columns }, (_, i) => (
+                <span key={i}>{String(hourly.start + i).padStart(2, '0')}:00</span>
+              )) : Array.from({ length: dayCount }, (_, i) => (
                 <span key={i} className={dateAdd(week, i) === localDate(s.now) ? 'av-today' : ''}>
                   {prettyDate(dateAdd(week, i))}
                 </span>
@@ -464,10 +509,7 @@ export function TimelineView({
                     (x) => x.id === e.dataTransfer.getData('application/x-nexg-event'),
                   );
                   if (!event) return;
-                  const b = e.currentTarget.getBoundingClientRect(),
-                    minutes =
-                      Math.floor((((e.clientX - b.left) / b.width) * dayCount * 1440) / 15) * 15,
-                    start = addMinutes(week + 'T00:00', minutes);
+                  const start = addMinutes(from, minuteAt(e.clientX, e.currentTarget.getBoundingClientRect()));
                   onMove?.(
                     event,
                     start,
@@ -482,14 +524,10 @@ export function TimelineView({
                   disabled={!editable || r.state !== 'current'}
                   aria-label={'Plan time for ' + r.name}
                   onClick={(e) => {
-                    const box = e.currentTarget.getBoundingClientRect(),
-                      minutes =
-                        e.detail === 0
-                          ? 540
-                          : Math.floor(
-                              (((e.clientX - box.left) / box.width) * dayCount * 1440) / 15,
-                            ) * 15;
-                    onSlot?.(localInput(addMinutes(week + 'T00:00', minutes)), r.id);
+                    const minutes = e.detail === 0
+                      ? hourly ? Math.max(0, (9 - hourly.start) * 60) : 540
+                      : minuteAt(e.clientX, e.currentTarget.getBoundingClientRect());
+                    onSlot?.(localInput(addMinutes(from, minutes)), r.id);
                   }}
                 />
                 {r.state === 'unknown' ? (
@@ -530,7 +568,7 @@ export function TimelineView({
                           s={s}
                           onSelect={onSelect}
                           draggable={
-                            editable && !e.ongoing && !e.ownerScope && e.role !== 'Session anchor'
+                            editable && Boolean(onMove) && !e.ongoing && !e.ownerScope && e.role !== 'Session anchor'
                           }
                           style={{
                             position: 'absolute',
@@ -575,10 +613,12 @@ export function TimelineView({
         </div>
       </div>
       <Legend s={s} />
-      <p className="av-footnote">
-        Exclusive intervals include configured turnover ({afterBuffer(c)} min). Actual return is
-        recorded in Work.
-      </p>
+      {footnote ? <p className="av-footnote">{footnote}</p> : c ? (
+        <p className="av-footnote">
+          Exclusive intervals include configured turnover ({afterBuffer(c)} min). Actual return is
+          recorded in Work.
+        </p>
+      ) : null}
     </section>
   );
 }
@@ -698,7 +738,7 @@ export function Agenda({
   search = '',
   resourceFilter = 'all',
 }: {
-  s: Snapshot;
+  s: ResourceSchedule;
   date: string;
   onSelect: (e: Commitment) => void;
   allDates?: boolean;
@@ -772,7 +812,7 @@ export function Agenda({
     </section>
   );
 }
-export function Legend({ s }: { s?: Snapshot }) {
+export function Legend({ s }: { s?: Pick<Snapshot, 'events' | 'resources'> }) {
   const statuses = s ? [...new Set(s.events.map((e) => e.status))] : undefined;
   return (
     <CalendarLegend
@@ -805,6 +845,7 @@ export function DateToolbar({
   date,
   mode,
   modes = ['day', 'week', 'month', 'list'],
+  listDays = 7,
   setDate,
   setMode,
   now,
@@ -817,6 +858,7 @@ export function DateToolbar({
   date: string;
   mode: string;
   modes?: string[];
+  listDays?: number;
   setDate: (d: string) => void;
   setMode: (m: string) => void;
   now: string;
@@ -826,6 +868,7 @@ export function DateToolbar({
   search: string;
   setSearch: (s: string) => void;
 }) {
+  const periodDays = mode === 'day' ? 1 : mode === 'list' ? listDays : 7;
   return (
     <div className="av-date-toolbar">
       <div className="av-actions">
@@ -838,7 +881,7 @@ export function DateToolbar({
                 ? new Date(Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)) - 2, 1))
                     .toISOString()
                     .slice(0, 10)
-                : dateAdd(date, mode === 'day' ? -1 : -7),
+                : dateAdd(date, -periodDays),
             )
           }
         >
@@ -862,7 +905,7 @@ export function DateToolbar({
                 ? new Date(Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)), 1))
                     .toISOString()
                     .slice(0, 10)
-                : dateAdd(date, mode === 'day' ? 1 : 7),
+                : dateAdd(date, periodDays),
             )
           }
         >

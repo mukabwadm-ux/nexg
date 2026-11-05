@@ -536,10 +536,12 @@ export function seedSnapshot(c: Context): Snapshot {
             'Toyota Corolla · COR-04',
           ]
     ).map((n, i) => named(n, 'Asset', i === 3 ? 'unknown' : 'current'));
-  if (model === 'SPACE_RESERVATION' && resources.length)
-    resources = ['Table 1 · seats 4', 'Table 2 · seats 4', 'Table 3 · seats 6'].map((n) =>
-      named(n, 'Space'),
-    );
+  if (model === 'SPACE_RESERVATION' && resources.length) {
+    const names = c.profile.categoryId === 'activities_games_sports'
+      ? resources.map((resource) => resource.name)
+      : ['Table 1 · seats 4', 'Table 2 · seats 4', 'Table 3 · seats 6'];
+    resources = names.map((name) => named(name, 'Space'));
+  }
   if (model === 'TRANSFER')
     resources =
       c.offering.fields.transport_mode === 'Greeter only'
@@ -879,7 +881,7 @@ export function expandProposal(p: Proposal): { start: string; end: string }[] {
   }
   return dates;
 }
-export function activeEvents(s: Snapshot) {
+export function activeEvents(s: Pick<Snapshot, 'events'>) {
   return s.events.filter((e) => e.status !== 'tentative' && e.status !== 'completed');
 }
 export function poolUsage(s: Snapshot, id: string, start?: string, end?: string) {

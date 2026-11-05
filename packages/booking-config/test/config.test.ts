@@ -148,9 +148,9 @@ function readyAppointment(): ResolveBookingInput {
 describe('reconciled source inventory', () => {
   it('preserves every category and subtype with registered question and model bindings', () => {
     const profiles = listBookingProfiles();
-    expect(profiles).toHaveLength(128);
-    expect(new Set(profiles.map((profile) => profile.categoryId)).size).toBe(21);
-    expect(new Set(profiles.map((profile) => profile.subcategoryId)).size).toBe(128);
+    expect(profiles).toHaveLength(141);
+    expect(new Set(profiles.map((profile) => profile.categoryId)).size).toBe(22);
+    expect(new Set(profiles.map((profile) => profile.subcategoryId)).size).toBe(141);
     const models = new Set(listBookingModels().map((model) => model.id));
     for (const profile of profiles) {
       expect(models.has(profile.defaultModelId)).toBe(true);

@@ -46,6 +46,7 @@ import { ReportEvidence } from './report-evidence';
 import {
   BarReport,
   EvidenceTable,
+  InsightsHeading,
   MetricCards,
   money,
   number,
@@ -892,7 +893,10 @@ export function InsightsWorkspace({
   const isOrder = view.models.length === 1 && view.models[0] === 'ORDER';
   const genericMetricIds = view.models.flatMap((id) => [MODEL_REPORTS[id].metricId]);
   const domainMetrics = [
-    ...new Set(['work_requested', ...genericMetricIds, 'work_completed']),
+    ...new Set([
+      'work_requested', ...genericMetricIds, 'work_completed',
+      ...(view.metrics.accepted_quote_value ? ['accepted_quote_value'] : []),
+    ]),
   ].slice(0, 4);
   const offeringUnits = [...new Set(view.menuRows.map(row => row.unit))];
   const currentOfferingUnit = offeringUnits.includes(offeringUnit) ? offeringUnit : offeringUnits[0];
@@ -2069,15 +2073,9 @@ export function InsightsWorkspace({
           className="in-ready-fieldset"
           aria-label="Insights controls"
         >
-          <div className="in-page-heading">
-            <div>
-              <h1>Insights</h1>
-              <p className="in-subtitle">
-                {(activeDemo?.businessName ?? view.merchantName) || 'Your business'} · Understand your activity and the evidence
-                behind it.
-              </p>
-            </div>
-            <div className="in-heading-actions">
+          <InsightsHeading
+            description={`${(activeDemo?.businessName ?? view.merchantName) || 'Your business'} · Understand your activity and the evidence behind it.`}
+            actions={<>
               <button
                 type="button"
                 className="in-button"
@@ -2095,8 +2093,8 @@ export function InsightsWorkspace({
                 <Download size={15} />
                 Export report
               </button>
-            </div>
-          </div>
+            </>}
+          />
           <div className="in-scope">
             <button
               className="in-button"
@@ -2359,8 +2357,9 @@ export function InsightsWorkspace({
         .map((word) => word[0])
         .join('')}
       demoContext={activeDemo}
+      adaptedPreview={Boolean(initialSnapshot)}
       locationControl={locationControl}
-      sampleControl={
+      sampleControl={initialSnapshot ? undefined : (
         <button
           type="button"
           className="text-gold-text inline-flex min-h-11 items-center gap-2 rounded-lg px-2 text-xs font-semibold"
@@ -2370,7 +2369,7 @@ export function InsightsWorkspace({
           <Settings2 size={14} />
           Sample business
         </button>
-      }
+      )}
     >
       {body}
     </MerchantLivePreviewShell>

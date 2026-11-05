@@ -30,6 +30,7 @@ import { localOfferingsSource, type OfferingsSource } from '../offerings/source'
 import { schemas } from '../offerings/schemas';
 import {
   Agenda,
+  AvailabilityHeading,
   CalendarView,
   ResourceWeekView,
   CapacityView,
@@ -848,15 +849,10 @@ export function AvailabilityWorkspace({
           data-schema={offering?.schemaId ?? ''}
           aria-busy={loading}
         >
-          <div className="av-page-heading">
-            <div>
-              <h1>Availability</h1>
-              <p>{view?.subtitle ?? 'Configure when each activity can accept work.'}</p>
-              <small>
-                {profile.name} · {location}
-              </small>
-            </div>
-            <div className="av-actions">
+          <AvailabilityHeading
+            description={view?.subtitle ?? 'Configure when each activity can accept work.'}
+            scope={`${profile.name} · ${location}`}
+            actions={<>
               <button className="av-button" onClick={() => show('sample')}>
                 <Settings2 size={16} />
                 Sample specialty
@@ -902,8 +898,8 @@ export function AvailabilityWorkspace({
                   </button>
                 </>
               )}
-            </div>
-          </div>
+            </>}
+          />
           {notice && (
             <p className="av-notice" role="status">
               <Check size={16} />

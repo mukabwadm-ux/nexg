@@ -2,9 +2,15 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import type { ValidateFunction } from 'ajv';
 import data from './data/registry.generated';
+import { activityProfiles } from './activity-profiles';
 import type { JSONSchema, QuestionDefinition, Registry } from './types';
 
-export const registry = data as unknown as Registry;
+const compiled = data as Registry;
+export const registry: Registry = {
+  ...compiled,
+  revision: `${compiled.revision}+activities.1`,
+  profiles: [...compiled.profiles, ...activityProfiles],
+};
 export const questions = new Map(registry.questions.map((question) => [question.id, question]));
 export const aliases = new Map(
   registry.aliases.map((alias) => [alias.sourceQuestionId, alias.targetQuestionId]),

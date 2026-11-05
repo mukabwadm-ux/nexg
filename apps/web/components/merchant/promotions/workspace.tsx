@@ -21,12 +21,13 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { MerchantLivePreviewShell } from '../live-preview-shell';
+import { PromotionsEmpty, PromotionsHeading } from './presentation';
 import { useMerchantOnboardingDemoContext } from '../merchant-onboarding-demo-provider';
 import {
   appendMerchantOnboardingDemoContext,
   type MerchantOnboardingDemoContext,
 } from '@/lib/merchant-onboarding-demo';
-import { money, profiles } from '../offerings/model';
+import { extendOfferingProfiles, money, type OfferingProfile } from '../offerings/model';
 import {
   benefitLabel,
   campaignState,
@@ -196,17 +197,24 @@ function PreviewCard({
   );
 }
 
+const noProfiles: OfferingProfile[] = [];
+
 export function PromotionsWorkspace({
   initialProfileId,
   source: suppliedSource,
   demoContext,
+  additionalProfiles = noProfiles,
+  defaultKind = 'offer',
 }: {
   initialProfileId?: string;
   source?: PromotionSource;
   demoContext?: MerchantOnboardingDemoContext | null;
+  additionalProfiles?: OfferingProfile[];
+  defaultKind?: 'offer' | 'featured';
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const activeDemo = demoContext ?? inheritedDemo;
+  const profiles = useMemo(() => extendOfferingProfiles(additionalProfiles), [additionalProfiles]);
   const [profileId, setProfileId] = useState(
     profiles.some((p) => p.id === (initialProfileId ?? demoContext?.profileId))
       ? (initialProfileId ?? demoContext!.profileId)
@@ -347,13 +355,14 @@ export function PromotionsWorkspace({
     setNotice('');
   };
   const newOffer = () =>
-    beginEdit(
-      emptyCampaign(
+    beginEdit({
+      ...emptyCampaign(
         profile,
         catalogue?.offerings.find((o) => o.publication === 'published')?.id ?? '',
         newCampaignId(),
       ),
-    );
+      kind: defaultKind,
+    });
   const save = async (action: PromotionAction, campaign: Campaign) => {
     if (!source || !data || !catalogue || busy) return;
     setBusy(true);
@@ -456,26 +465,17 @@ export function PromotionsWorkspace({
   const isLoading =
     loading || (!!catalogue && catalogue.configuration.subcategoryId !== profile.id);
 
-  return (
-    <MerchantLivePreviewShell active="Promotions" businessName={activeDemo?.businessName} accountInitials={activeDemo?.initials} demoContext={activeDemo} sampleControl={sampleControl}>
+  const body = (
       <main
         className={`${styles.root} ${styles.workspace}`}
         data-promotions-workspace
         data-profile={profile.id}
         aria-busy={isLoading}
       >
-        <div className="pm-header">
-          <div>
-            <h1>
-              {mode === 'edit' || mode === 'review'
-                ? liveEdit
-                  ? 'Edit promotion'
-                  : 'Create promotion'
-                : 'Promotions'}
-            </h1>
-            <p>{activeDemo?.businessName ?? (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)}</p>
-          </div>
-          {mode === 'list' && (
+        <PromotionsHeading
+          title={mode === 'edit' || mode === 'review' ? (liveEdit ? 'Edit promotion' : 'Create promotion') : 'Promotions'}
+          description={activeDemo?.businessName ?? (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)}
+          actions={mode === 'list' && (
             <button
               type="button"
               className="pm-button pm-primary"
@@ -485,7 +485,7 @@ export function PromotionsWorkspace({
               <Plus size={16} /> Create promotion
             </button>
           )}
-        </div>
+        />
         {error && (
           <div className="pm-note pm-error" role="alert">
             <AlertCircle size={16} />
@@ -706,10 +706,10 @@ export function PromotionsWorkspace({
                     </table>
                   </TableViewport>
                 ) : (
-                  <div className="pm-empty">
-                    <strong>No matching promotions</strong>
-                    <p>Change your filters or create a promotion.</p>
-                  </div>
+                  <PromotionsEmpty
+                    title="No matching promotions"
+                    description="Change your filters or create a promotion."
+                  />
                 )}
                 {records.some((r) => r.state === 'Needs attention') && tab === 'Campaigns' && (
                   <div className="pm-note pm-warning">
@@ -1474,6 +1474,10 @@ export function PromotionsWorkspace({
           </>
         ) : null}
       </main>
+  );
+  return (
+    <MerchantLivePreviewShell active="Promotions" businessName={activeDemo?.businessName} accountInitials={activeDemo?.initials} demoContext={activeDemo} sampleControl={suppliedSource ? undefined : sampleControl} adaptedPreview={Boolean(suppliedSource)}>
+      {body}
     </MerchantLivePreviewShell>
   );
 }

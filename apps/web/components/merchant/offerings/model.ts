@@ -1,4 +1,4 @@
-import type { BookingModel } from '@nexg/booking-config/profiles';
+import { activityProfiles, type BookingModel } from '@nexg/booking-config/profiles';
 import type { BookingOffering } from '../booking/types';
 import config from './config.json';
 import { modelSchema, schemas } from './schemas';
@@ -19,7 +19,17 @@ export type OfferingProfile = {
   models: string[];
   attributes: Attribute[];
 };
-export const profiles = config.profiles as OfferingProfile[];
+export const profiles: OfferingProfile[] = [
+  ...(config.profiles as OfferingProfile[]),
+  ...activityProfiles.map((profile) => ({
+    categoryId: profile.categoryId,
+    id: profile.subcategoryId,
+    name: profile.name,
+    schema: modelSchema[profile.defaultModelId],
+    models: profile.candidateModelIds,
+    attributes: [],
+  })),
+];
 export type MerchantOfferingConfiguration = {
   subcategoryId: string;
   /** Explicitly enabled by scoped onboarding/configuration, never by a category candidate alone. */
@@ -562,6 +572,7 @@ export function bookingOfferingProjection(item: Offering): Partial<BookingOfferi
 
 export function seedCatalogue(profile: OfferingProfile): Catalogue {
   const configuration = defaultConfiguration(profile);
+  const activity = activityProfiles.find((item) => item.subcategoryId === profile.id);
   const build = (schemaId: string, name: string, n: number, published = true): Offering => {
     const item = createOffering(profile, schemaId, `${profile.id}-sample-${n}`);
     const schema = schemas[schemaId]!;
@@ -572,6 +583,19 @@ export function seedCatalogue(profile: OfferingProfile): Catalogue {
     if (profile.id === 'meet_greet' && schemaId === 'TRANSFER_ROUTE_V1')
       item.fields.transport_mode = 'Greeter only';
     item.resources = [...schema.resources];
+    if (activity) {
+      item.description = activity.specialtyNeeds;
+      if (schema.model === 'SPACE_RESERVATION') {
+        const space = activity.vocabulary.offeringSingular ?? 'Space';
+        const label = space.charAt(0).toUpperCase() + space.slice(1);
+        item.resources = [`${label} 1`, `${label} 2`, `${label} 3`];
+        item.fields.space_policy_id = activity.specialtyNeeds;
+      } else if (schema.model === 'APPOINTMENT') {
+        item.resources = ['Swim instructor 01', 'Swim instructor 02'];
+      } else if (schema.model === 'REQUEST_QUOTE') {
+        item.fields.request_fields = 'Preferred date, party size, age and eligibility details for operator review';
+      }
+    }
     item.availabilityLinked = true;
     if (schema.capacity === 'stock') {
       item.stock = 12;

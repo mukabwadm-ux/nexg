@@ -1,6 +1,7 @@
 'use client';
 
 import { Bell, ChevronDown, ChevronRight, CircleHelp, MapPin } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEffect, type ReactNode } from 'react';
 
@@ -28,11 +29,17 @@ import {
 
 export type { MerchantWorkspaceSection } from './workspace/navigation';
 
+const AviationWorkspace = dynamic(() =>
+  import('./aviation/workspace').then((module) => module.AviationWorkspace),
+);
+const aviationWorkspaceFrames: MerchantWorkspaceSection[] = ['Business', 'Money', 'Promotions', 'Insights'];
+
 const sampleStates = [
   ['Setting up', '/merchant-live-preview?state=setup'],
   ['Under review', '/merchant-live-preview?state=review'],
   ['Changes needed', '/merchant-live-preview?state=changes'],
   ['Live', '/merchant-live-preview'],
+  ['Live · nothing needs attention', '/merchant-live-preview?state=clear'],
   ['Paused', '/merchant-live-preview?state=paused'],
   ['Mixed locations', '/merchant-live-preview?state=mixed'],
   ['Data unavailable', '/merchant-live-preview?state=unavailable'],
@@ -47,6 +54,7 @@ export function MerchantLivePreviewShell({
   businessName = 'Merchant workspace',
   availableSections,
   demoContext,
+  adaptedPreview = false,
 }: {
   children: ReactNode;
   active: MerchantWorkspaceSection;
@@ -55,11 +63,13 @@ export function MerchantLivePreviewShell({
   accountInitials?: string;
   businessName?: string;
   demoContext?: DemoContext | null;
+  adaptedPreview?: boolean;
   /** Configured preview capabilities only. Production authorization stays server-owned. */
   availableSections?: readonly MerchantWorkspaceSection[];
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const activeDemo = demoContext ?? inheritedDemo;
+  const isAviationDemo = activeDemo?.categoryId === 'flights_aviation';
   const activeBusinessName = activeDemo?.businessName ?? businessName;
   const activeContactName = activeDemo?.contactName;
   const activeInitials = activeDemo?.initials ?? accountInitials;
@@ -109,6 +119,14 @@ export function MerchantLivePreviewShell({
     </nav>
   );
 
+  if (isAviationDemo && !adaptedPreview && aviationWorkspaceFrames.includes(active)) {
+    return (
+      <MerchantOnboardingDemoScope value={activeDemo}>
+        <AviationWorkspace key={active} section={active} />
+      </MerchantOnboardingDemoScope>
+    );
+  }
+
   return (
     <MerchantOnboardingDemoScope value={activeDemo}>
     <WorkspaceFrame
@@ -146,7 +164,7 @@ export function MerchantLivePreviewShell({
             aria-label={activeDemo ? `Demo for ${activeDemo.categoryName}: ${activeDemo.subcategories.map((item) => item.name).join(', ')}` : 'Demo using sample data'}
             title={activeDemo ? `${activeDemo.categoryName} · ${activeDemo.subcategories.map((item) => item.name).join(', ')}` : undefined}
           >
-            {activeDemo ? `Demo · ${activeDemo.categoryName} · ${activeDemo.subcategories.length} ${activeDemo.subcategories.length === 1 ? 'activity' : 'activities'}` : 'Demo · sample data'}
+            {isAviationDemo ? 'Demo · Flights & aviation' : activeDemo ? `Demo · ${activeDemo.categoryName} · ${activeDemo.subcategories.length} ${activeDemo.subcategories.length === 1 ? 'activity' : 'activities'}` : 'Demo · sample data'}
           </span>
           <a className={styles.exitDemo} href="/merchants/register" onClick={() => sessionStorage.removeItem(MERCHANT_ONBOARDING_DEMO_STORAGE_KEY)}>
             Exit demo
@@ -154,7 +172,7 @@ export function MerchantLivePreviewShell({
           <WorkspaceSearch availableSections={availableSections} demoContext={activeDemo} />
         </>
       }
-      headerMiddle={
+      headerMiddle={isAviationDemo && !sampleControl ? undefined : (
         <div className={styles.sampleControl}>
           {sampleControl ?? (
             <details className="relative">
@@ -171,14 +189,14 @@ export function MerchantLivePreviewShell({
             </details>
           )}
         </div>
-      }
+      )}
       headerEnd={
         <>
           <div className={styles.location}>
             {locationControl ?? (
               <div className={styles.defaultLocation}>
                 <MapPin size={16} aria-hidden="true" />
-                <span>All sample locations</span>
+                <span>{isAviationDemo ? 'Wilson Airport' : 'All sample locations'}</span>
               </div>
             )}
           </div>
@@ -223,7 +241,9 @@ export function MerchantLivePreviewShell({
         </>
       }
     >
-      {children}
+      {isAviationDemo && !adaptedPreview ? (
+        <AviationWorkspace key={active} section={active} />
+      ) : children}
     </WorkspaceFrame>
     </MerchantOnboardingDemoScope>
   );

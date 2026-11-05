@@ -21,10 +21,13 @@ export interface BusinessSource {
   reset(profileId: string): Promise<Business>;
 }
 const key = (id: string) => `nexg.business.preview.v1.${id}`;
-export function localBusinessSource(storage: StorageLike): BusinessSource {
+export function localBusinessSource(
+  storage: StorageLike,
+  seed: (profileId: string) => Business = seedBusiness,
+): BusinessSource {
   function load(id: string): Business {
     const raw = storage.getItem(key(id));
-    if (!raw) return seedBusiness(id);
+    if (!raw) return seed(id);
     let value: unknown;
     try {
       value = JSON.parse(raw);
@@ -108,7 +111,7 @@ export function localBusinessSource(storage: StorageLike): BusinessSource {
     async reset(id) {
       storage.removeItem(key(id));
       storage.removeItem(`${key(id)}.draft`);
-      return seedBusiness(id);
+      return seed(id);
     },
   };
 }

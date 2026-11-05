@@ -65,7 +65,7 @@ describe('source-scoped sample payouts', () => {
   });
 
   it('requires an explicit example source and supports that source for all registered specialties', async () => {
-    expect(profiles).toHaveLength(128);
+    expect(profiles).toHaveLength(141);
     for (const profile of profiles) {
       const { context, source } = setup(profile.id);
       let snapshot = await source.load(context);

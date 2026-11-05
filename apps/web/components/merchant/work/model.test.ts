@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { candidateWorkflows, createSampleRecords, defaultWorkflow, inTab, sampleSource, templates, workActivitiesFromBooking } from './model';
 
 describe('Work preview configuration', () => {
-  it('offers a supported explicitly selected activity for each of the 128 shared booking profiles', () => {
+  it('offers a supported explicitly selected activity for each of the 141 shared booking profiles', () => {
     const profiles = listBookingProfiles();
-    expect(profiles).toHaveLength(128);
+    expect(profiles).toHaveLength(141);
     for (const profile of profiles) {
       expect(candidateWorkflows(profile).length, profile.subcategoryId).toBeGreaterThan(0);
       expect(defaultWorkflow(profile), profile.subcategoryId).toBeDefined();

@@ -98,7 +98,7 @@ export default function LiveHomePreview({ searchParams }: { searchParams?: Recor
   const requestedState = Array.isArray(searchParams?.state) ? searchParams.state[0] ?? '' : searchParams?.state ?? '';
   const sampleState = requestedState === 'review' || requestedState === 'changes' ? requestedState : 'setup';
   const showSetup = ['setup', 'review', 'changes'].includes(requestedState);
-  const liveState = requestedState === 'paused' || requestedState === 'mixed' || requestedState === 'unavailable' ? requestedState : 'live';
+  const liveState = requestedState === 'paused' || requestedState === 'mixed' || requestedState === 'unavailable' || requestedState === 'clear' ? requestedState : 'live';
   const selectedBranches = branches.map((branch, index) => ({ ...branch, state: liveState === 'paused' || (liveState === 'mixed' && index === 1) ? 'paused' : branch.state }));
   const identityProgress = { ...setupProgress, trading_name: businessName };
   const displayedProgress = sampleState === 'setup' ? identityProgress : {
@@ -106,6 +106,7 @@ export default function LiveHomePreview({ searchParams }: { searchParams?: Recor
   };
   const identityMerchant = { ...merchant, name: businessName };
   const demoQuery = onboardingDemo ? merchantOnboardingDemoQuery(onboardingDemo) : '';
+  const dashboard = merchantOnboardingDemoDashboard(onboardingDemo);
 
   return (
     <MerchantLivePreviewShell active="Home" businessName={businessName} accountInitials={onboardingDemo?.initials} demoContext={onboardingDemo}>
@@ -114,7 +115,7 @@ export default function LiveHomePreview({ searchParams }: { searchParams?: Recor
           personName={contactName}
           branches={selectedBranches}
           attention={[]}
-          orders={orders}
+          orders={liveState === 'clear' ? [] : orders}
           money={money}
           bars={bars}
           unavailable={{
@@ -126,7 +127,7 @@ export default function LiveHomePreview({ searchParams }: { searchParams?: Recor
           }}
           preview
           previewState={liveState}
-          previewDemo={merchantOnboardingDemoDashboard(onboardingDemo)}
+          previewDemo={liveState === 'clear' ? { ...dashboard, attentionItems: [] } : dashboard}
         />}
     </MerchantLivePreviewShell>
   );

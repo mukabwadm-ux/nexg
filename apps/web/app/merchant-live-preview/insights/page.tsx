@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { AviationDemoPage } from '@/components/merchant/aviation/demo-page';
 import { InsightsWorkspace } from '@/components/merchant/insights/workspace';
 import { parseMerchantOnboardingDemoContext } from '@/lib/merchant-onboarding-demo';
 
@@ -11,6 +12,7 @@ export default function InsightsPreview({
 }) {
   if (process.env.NODE_ENV !== 'development') notFound();
   const demoContext = searchParams ? parseMerchantOnboardingDemoContext(searchParams) : null;
+  if (demoContext?.categoryId === 'flights_aviation') return <AviationDemoPage active="Insights" demoContext={demoContext} />;
   return (
     <InsightsWorkspace
       mode="sample"

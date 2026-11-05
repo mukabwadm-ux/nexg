@@ -24,9 +24,9 @@ const memory = () => {
   };
 };
 describe('Business frontend configuration', () => {
-  it('validates representative configured samples and every source question for all 128 specialties', () => {
-    expect(profiles).toHaveLength(128);
-    expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(21);
+  it('validates representative configured samples and every source question for all 141 specialties', () => {
+    expect(profiles).toHaveLength(141);
+    expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(22);
     for (const profile of profiles) {
       expect(validateBusiness(seedBusiness(profile.id)), profile.id).toEqual([]);
       for (const id of profile.questions) expect(fields[id], id).toBeDefined();

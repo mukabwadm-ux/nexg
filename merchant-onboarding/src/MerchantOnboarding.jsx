@@ -127,10 +127,15 @@ function SubcategoryPicker({ options, value = [], onChange, error, required = fa
         <span className="mo-subcategory-chevron" aria-hidden="true">⌄</span>
       </summary>
       <div className="mo-subcategory-options">
-        {options.map(option => <label className="mo-check" key={option.id}>
-          <input type="checkbox" checked={value.includes(option.id)} onChange={() => toggle(option.id)} />
-          <span>{option.label}</span>
-        </label>)}
+        {options.map((option, index) => <React.Fragment key={option.id}>
+          {option.group && option.group !== options[index - 1]?.group && (
+            <p className="mo-subcategory-group">{option.group}</p>
+          )}
+          <label className="mo-check">
+            <input type="checkbox" checked={value.includes(option.id)} onChange={() => toggle(option.id)} />
+            <span>{option.label}</span>
+          </label>
+        </React.Fragment>)}
       </div>
     </details>
     {error && <span className="mo-error" role="alert">{error}</span>}
@@ -157,6 +162,9 @@ function StatusPanel({ status: suppliedStatus, onStatusChange, needsResubmission
   </section>;
 }
 
+/** @type {Array<{ id: string, name: string, subcategoryOptions: Array<{ id: string, name: string }> }>} */
+const EMPTY_DEMO_CATEGORIES = [];
+
 export default function MerchantOnboarding({
   initialData,
   onSubmit,
@@ -164,6 +172,7 @@ export default function MerchantOnboarding({
   onSaveTask,
   onTaskNavigation,
   onDemo,
+  demoCategories = EMPTY_DEMO_CATEGORIES,
   onExitDemo,
   savedHome,
   initialHome = false,
@@ -184,12 +193,34 @@ export default function MerchantOnboarding({
   const [submittedStatus, setSubmittedStatus] = useState("");
   const [showReview, setShowReview] = useState(false);
   const [showHome, setShowHome] = useState(initialHome);
+  const [demoCategoryId, setDemoCategoryId] = useState("");
+  const [demoSubcategories, setDemoSubcategories] = useState([]);
   const [taskEditing, setTaskEditing] = useState(false);
   const categoryDrafts = useRef({});
   const savedForm = useRef(form);
   const WorkspaceShell = embedded ? EmbeddedWorkspace : OnboardingWorkspace;
   const setupSession = authenticatedSession?.otpVerified === true && authenticatedSession?.signedIn === true;
   const category = CATEGORY_BY_ID[form.categoryId];
+  const demoCategory = onDemo ? demoCategories.find(item => item.id === demoCategoryId) : undefined;
+  function chooseRegistrationCategory(id) {
+    const demo = onDemo && demoCategories.find(item => item.id === id);
+    setDemoCategoryId(demo ? id : "");
+    setDemoSubcategories([]);
+    setNotice("");
+    if (!demo) changeCategory(id);
+  }
+  function openTailoredDemo() {
+    const selectedCategory = demoCategory || category;
+    const selectedIds = demoCategory ? demoSubcategories : form.subcategories;
+    const selected = selectedCategory?.subcategoryOptions.filter(item => selectedIds.includes(item.id)) || [];
+    if (!selectedCategory || !selected.length) {
+      setNotice("Choose a business category and at least one subcategory before opening its tailored demo.");
+      document.getElementById("category")?.focus();
+      return;
+    }
+    onDemo?.({ categoryId: selectedCategory.id, categoryName: selectedCategory.name,
+      subcategories: selected.map(({ id, name }) => ({ id, name })) });
+  }
   const selection = useMemo(() => {
     const resolved = resolveOnboardingSelection(form.categoryId, form.subcategories);
     return { ...resolved, profiles: resolved.profiles.map(profile => ({ ...profile,
@@ -380,10 +411,10 @@ export default function MerchantOnboarding({
         <legend>Business activities</legend>
         <div className="mo-field mo-registration-category">
           <label htmlFor="category">Business category <span className="mo-required">*</span></label>
-          <select id="category" value={form.categoryId} required aria-invalid={Boolean(fieldError("categoryId"))} onChange={e=>changeCategory(e.target.value)}><option value="">Select a category</option>{MERCHANT_CATEGORIES.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select>
+          <select id="category" value={demoCategory?.id || form.categoryId} required aria-invalid={Boolean(fieldError("categoryId"))} onChange={e=>chooseRegistrationCategory(e.target.value)}><option value="">Select a category</option>{MERCHANT_CATEGORIES.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}{onDemo && demoCategories.length > 0 && <optgroup label="Meeting demos">{demoCategories.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</optgroup>}</select>
           {fieldError("categoryId")&&<span className="mo-error">{fieldError("categoryId")}</span>}
         </div>
-        {category&&<SubcategoryPicker required options={category.subcategoryOptions.map(item=>({id:item.id,label:item.name}))} value={form.subcategories} onChange={updateSubcategories} error={fieldError("subcategories")} />}
+        {demoCategory ? <><SubcategoryPicker required options={demoCategory.subcategoryOptions.map(item=>({id:item.id,label:item.name}))} value={demoSubcategories} onChange={setDemoSubcategories} /><p className="mo-help">Explore Heliflight Africa with sample flights, quotes and fleet availability.</p></> : category&&<SubcategoryPicker required options={category.subcategoryOptions.map(item=>({id:item.id,label:item.name,group:item.group}))} value={form.subcategories} onChange={updateSubcategories} error={fieldError("subcategories")} />}
       </fieldset>
       <fieldset className="mo-fieldset mo-registration-contact">
         <legend>Contact details</legend>
@@ -581,21 +612,9 @@ export default function MerchantOnboarding({
 
   if (!taskEditing) return <main className={`merchant-onboarding ${className}`}>
     {previewMode&&onExitDemo&&<button type="button" className="mo-button mo-button-secondary" onClick={onExitDemo}>Exit demo</button>}
-    {onDemo&&<button type="button" className="mo-button mo-button-secondary" onClick={()=>{
-      const selected = category?.subcategoryOptions.filter(item=>form.subcategories.includes(item.id)) || [];
-      if (!category || selected.length === 0) {
-        setNotice("Choose a business category and at least one subcategory before opening its tailored demo.");
-        document.getElementById("category")?.focus();
-        return;
-      }
-      onDemo({
-        categoryId: category.id,
-        categoryName: category.name,
-        subcategories: selected.map(({ id, name }) => ({ id, name }))
-      });
-    }}>Try demo · sample data</button>}
+    {onDemo&&<button type="button" className="mo-button mo-button-secondary" onClick={openTailoredDemo}>Try demo · sample data</button>}
     <div className="mo-topline"><div><span className="mo-kicker">Merchant registration · Kenya{previewMode ? " · Preview" : ""}</span><h1>Onboard your business</h1><p>Tell us the essentials. You can finish your operational setup from Home.</p></div><div className="mo-registration-badges"><span className="mo-currency">KES · Kenya</span><span className="mo-page-badge"><span aria-hidden="true" />One page</span></div></div>
-    <form noValidate onSubmit={event=>{event.preventDefault();void submit();}}>
+    <form noValidate onSubmit={event=>{event.preventDefault();if (demoCategory) openTailoredDemo(); else void submit();}}>
       {notice&&<div className={Object.keys(errors).length?"mo-alert":"mo-notice"} role={Object.keys(errors).length?"alert":"status"}>{notice}</div>}
       {renderRegistration()}
       {visibleStatus&&<StatusPanel status={visibleStatus} needsResubmission={savedHome?.review.needsResubmission} onStatusChange={previewMode ? onStatusChange : undefined} />}
@@ -603,11 +622,11 @@ export default function MerchantOnboarding({
       <div className="mo-actions">
         <div>{onBackToMarketplace&&<button type="button" className="mo-button mo-button-ghost" onClick={onBackToMarketplace}>Exit onboarding</button>}</div>
         <div className="mo-action-right">
-          {onSaveDraft && <button type="button" className="mo-button mo-button-secondary" disabled={submitting} onClick={async()=>{
+          {onSaveDraft && <button type="button" className="mo-button mo-button-secondary" disabled={submitting || Boolean(demoCategory)} onClick={async()=>{
             setSubmitting(true);setNotice("");try{const result=await onSaveDraft(payload(false));setNotice(result?.preview ? "Preview only. Entries remain in this tab and have not been saved to an account." : "Draft saved. You can return after signing in.");}
             catch(error){setNotice(error?.message || "Your draft could not be saved. Your edits are still here.");}finally{setSubmitting(false);}
           }}>Save draft</button>}
-          <button type="submit" className="mo-button mo-button-primary" disabled={submitting}>{submitting?"Saving…":previewMode ? "Preview setup Home" : initialHome ? "Save and return Home" : "Submit and open Home"}</button>
+          <button type="submit" className="mo-button mo-button-primary" disabled={submitting}>{demoCategory ? "Open Heliflight demo" : submitting?"Saving…":previewMode ? "Preview setup Home" : initialHome ? "Save and return Home" : "Submit and open Home"}</button>
         </div>
       </div>
     </form>

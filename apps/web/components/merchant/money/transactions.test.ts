@@ -21,7 +21,7 @@ describe('transaction-specific summaries', () => {
       return source.load(adapted).then((snapshot) => ({ id: profile.id, label: workLabel(view.modelId), work: transactionRecords(view, snapshot)[0]!.work }));
     });
     return Promise.all(examples).then((results) => {
-      expect(results).toHaveLength(128);
+      expect(results).toHaveLength(141);
       expect(results.every((entry) => entry.work === `${entry.label} #4612`)).toBe(true);
       expect(results.find((entry) => entry.id === 'airport_pickup')?.work).toBe('Trip #4612');
       expect(results.find((entry) => entry.id === 'gym')?.work).toBe('Membership #4612');

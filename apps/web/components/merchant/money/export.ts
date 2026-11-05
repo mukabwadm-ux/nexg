@@ -5,6 +5,19 @@ import type { Period, Tab } from './views';
 
 /** Export the visible sample scope as a report, never as an issued invoice or statement. */
 export function sampleCsv(c: Context, view: Descriptor, s: Snapshot, tab: Tab, search: string, filter: string, period: Period = 'range') {
+  if (s.report) {
+    const rows = s.report.records.filter((record) =>
+      (period === 'range' || record.date === s.report!.date) && matchesTransaction(record, search, filter),
+    );
+    return '\ufeff' + [
+      ['Flight reference', 'Guest', 'Flight date', 'Departure (EAT)', 'Type', 'Amount', 'Payment status', 'Source'],
+      ...rows.map((record) => [
+        record.work, record.customer, record.date, record.time,
+        record.type === 'Sale' ? 'Recorded payment' : 'Quote',
+        formatAmount(record.amount, c.currency), record.status, record.source,
+      ]),
+    ].map((row) => row.map(csvCell).join(',')).join('\r\n');
+  }
   const periodLabel = ['Overview', 'Transactions', 'Statements'].includes(tab) ? (period === 'today' ? '3 Nov 2026' : '1–3 Nov 2026') : tab === 'Security' ? 'Security cohort · 1–3 Nov 2026' : 'As of 3 Nov 2026';
   const rows: (string | number)[][] = [
     ['NEXG Money sample report', 'Not a fiscal document'],

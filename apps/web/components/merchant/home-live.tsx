@@ -37,6 +37,75 @@ const subtle = 'text-muted text-[12px] leading-snug';
 const action =
   'text-gold-text inline-flex items-center gap-1 text-[12px] font-extrabold hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2';
 
+export function HomeSection({ children }: { children: React.ReactNode }) {
+  return <section className={`${panel} p-3`}>{children}</section>;
+}
+
+export function HomeGlance({ caption, children }: { caption: string; children: React.ReactNode }) {
+  return (
+    <HomeSection>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 text-[16px] font-extrabold">
+          <BarChart3 className="h-5 w-5" aria-hidden="true" /> Today at a glance
+        </h2>
+        <span className="text-muted text-[11px]">{caption}</span>
+      </div>
+      {children}
+    </HomeSection>
+  );
+}
+
+export function HomeOverview({
+  name,
+  description = 'Here’s what’s happening across your business today.',
+  actions,
+  status,
+  attention,
+  glance,
+  locations,
+  extras,
+}: {
+  name: string;
+  description?: string;
+  actions?: React.ReactNode;
+  status: React.ReactNode;
+  attention?: React.ReactNode;
+  glance: React.ReactNode;
+  locations: React.ReactNode;
+  extras: React.ReactNode;
+}) {
+  return (
+    <main className="mx-auto w-full max-w-[100rem] space-y-2 px-4 py-2.5 sm:px-6 lg:px-7">
+      <header className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h1 className="text-[22px] font-extrabold leading-tight tracking-tight sm:text-[24px]">
+            Good {partOfDay()}, {name}
+          </h1>
+          <p className="text-muted mt-0.5 text-[12px]">{description}</p>
+        </div>
+        {actions}
+      </header>
+      <section
+        aria-label="Business status"
+        className={`${panel} grid gap-2 px-4 py-2 sm:grid-cols-3 sm:gap-0`}
+      >
+        {status}
+      </section>
+      {!attention && glance}
+      <div className="grid items-start gap-2.5 lg:grid-cols-2">
+        <div className="space-y-2.5">
+          {attention}
+          {locations}
+        </div>
+        <div className="space-y-2.5">
+          {attention && glance}
+          {extras}
+        </div>
+      </div>
+    </main>
+  );
+}
+
 /** Actual account data stays separate from explicitly labelled preview-only examples. */
 export function HomeLive({
   m,
@@ -61,7 +130,7 @@ export function HomeLive({
   unavailable: Unavailable;
   preview?: boolean;
   previewDemo?: PreviewDemo;
-  previewState?: 'live' | 'paused' | 'mixed' | 'unavailable';
+  previewState?: 'live' | 'paused' | 'mixed' | 'unavailable' | 'clear';
 }) {
   const demo = preview ? previewDemo : undefined;
   const destination = (section: string) => {
@@ -88,22 +157,54 @@ export function HomeLive({
     closed: 'Closed',
     setting_up: 'Setting up',
   };
+  const clearState = preview && previewState === 'clear';
+  const glanceCard = (
+    <HomeGlance caption={demo ? 'Sample data · Wed, 12 Jun 2024' : 'Business-wide summary'}>
+      <div className={`mt-2 grid gap-2 ${demo ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
+        <Metric
+          href={destination('orders')}
+          icon={<ShoppingCart />}
+          tone="orange"
+          label={demo?.activityLabel ?? 'Orders'}
+          value={unavailable.orders ? DASH : demo ? String(demo.activityCount) : m.orders_today == null ? DASH : String(m.orders_today)}
+          samplePanel={demo && !unavailable.orders ? 'orders' : undefined}
+          sampleContent={demo && !unavailable.orders ? demo.activityPanel : undefined}
+        />
+        {demo ? (
+          <Metric
+            icon={<CalendarDays />}
+            tone="blue"
+            label={demo.secondaryLabel}
+            value={previewState === 'unavailable' ? DASH : String(demo.secondaryCount)}
+            samplePanel={previewState !== 'unavailable' ? 'bookings' : undefined}
+            sampleContent={previewState !== 'unavailable' ? demo.secondaryPanel : undefined}
+          />
+        ) : null}
+        <Metric
+          href={destination('money')}
+          icon={<CircleDollarSign />}
+          tone="green"
+          label={demo?.revenueLabel ?? 'Delivered sales after fees'}
+          value={unavailable.money ? DASH : demo ? kes(demo.revenueCents) : kes(m.earned_today_cents)}
+          samplePanel={demo && !unavailable.money ? 'sales' : undefined}
+          sampleContent={demo && !unavailable.money ? demo.revenuePanel : undefined}
+        />
+      </div>
+      <HomePerformance
+        bars={bars}
+        unavailable={unavailable.bars}
+        insightsHref={destination('analytics')}
+        workHref={demo ? destination('orders') : undefined}
+        demo={demo}
+      />
+    </HomeGlance>
+  );
 
   return (
-    <main className="mx-auto w-full max-w-[100rem] space-y-2 px-4 py-2.5 sm:px-6 lg:px-7">
-      <header>
-        <h1 className="text-[22px] font-extrabold leading-tight tracking-tight sm:text-[24px]">
-          Good {partOfDay()}, {preview ? m.name : personName}
-        </h1>
-        <p className="text-muted mt-0.5 text-[12px]">
-          Here’s what’s happening across your business today.
-        </p>
-      </header>
-
-      <section
-        aria-label="Business status"
-        className={`${panel} grid gap-2 px-4 py-2 sm:grid-cols-3 sm:gap-0`}
-      >
+    <HomeOverview
+      name={preview ? m.name : personName}
+      glance={glanceCard}
+      status={<>
         {demo && previewState !== 'unavailable' ? <HomeSamplePanel kind="business" trigger={<button type="button" className="text-left focus-visible:outline focus-visible:outline-2"><Status icon={<FileText />} label="Business" value="Approved" note="Your business is all set up." /></button>} /> : <Status
           icon={<FileText />}
           label="Business"
@@ -146,11 +247,9 @@ export function HomeLive({
           }
           divider
         />
-      </section>
-
-      <div className="grid items-start gap-2.5 lg:grid-cols-2">
-        <div className="space-y-2.5">
-          <section className={`${panel} p-3`}>
+      </>}
+      attention={!clearState && (
+          <HomeSection>
             <SectionHead
               icon={<AlertCircle className="text-orange-600" />}
               title="Needs attention"
@@ -217,9 +316,10 @@ export function HomeLive({
                 ))
               )}
             </div>
-          </section>
-
-          <section className={`${panel} p-3`}>
+          </HomeSection>
+      )}
+      locations={(
+          <HomeSection>
             <SectionHead
               icon={<MapPin />}
               title="Your locations"
@@ -264,59 +364,10 @@ export function HomeLive({
                 ))}
               </ul>
             )}
-          </section>
-        </div>
-
-        <div className="space-y-2.5">
-          <section className={`${panel} p-3`}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="flex items-center gap-2 text-[16px] font-extrabold">
-                <BarChart3 className="h-5 w-5" aria-hidden="true" /> Today at a glance
-              </h2>
-              <span className="text-muted text-[11px]">
-                {demo ? 'Sample data · Wed, 12 Jun 2024' : 'Business-wide summary'}
-              </span>
-            </div>
-            <div className={`mt-2 grid gap-2 ${demo ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
-              <Metric
-                href={destination('orders')}
-                icon={<ShoppingCart />}
-                tone="orange"
-                label={demo?.activityLabel ?? 'Orders'}
-                value={unavailable.orders ? DASH : demo ? String(demo.activityCount) : m.orders_today == null ? DASH : String(m.orders_today)}
-                samplePanel={demo && !unavailable.orders ? 'orders' : undefined}
-                sampleContent={demo && !unavailable.orders ? demo.activityPanel : undefined}
-              />
-              {demo ? (
-                <Metric
-                  icon={<CalendarDays />}
-                  tone="blue"
-                  label={demo.secondaryLabel}
-                  value={previewState === 'unavailable' ? DASH : String(demo.secondaryCount)}
-                  samplePanel={previewState !== 'unavailable' ? 'bookings' : undefined}
-                  sampleContent={previewState !== 'unavailable' ? demo.secondaryPanel : undefined}
-                />
-              ) : null}
-              <Metric
-                href={destination('money')}
-                icon={<CircleDollarSign />}
-                tone="green"
-                label={demo?.revenueLabel ?? 'Delivered sales after fees'}
-                value={unavailable.money ? DASH : demo ? kes(demo.revenueCents) : kes(m.earned_today_cents)}
-                samplePanel={demo && !unavailable.money ? 'sales' : undefined}
-                sampleContent={demo && !unavailable.money ? demo.revenuePanel : undefined}
-              />
-            </div>
-            <HomePerformance
-              bars={bars}
-              unavailable={unavailable.bars}
-              insightsHref={destination('analytics')}
-              workHref={demo ? destination('orders') : undefined}
-              demo={demo}
-            />
-          </section>
-
-          <section className={`${panel} p-3`}>
+          </HomeSection>
+      )}
+      extras={<>
+          <HomeSection>
             <SectionHead
               icon={<ShoppingBag />}
               title="Promotions"
@@ -350,20 +401,19 @@ export function HomeLive({
                 {demo ? 'Explore promotions' : 'View featured'}
               </Link>}
             </div>
-          </section>
+          </HomeSection>
           {!demo && money && !unavailable.money ? (
             <Link href={destination('money')} className={`${action} px-1`}>
               This week’s money: {kes(money.net_cents)}{' '}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           ) : null}
-        </div>
-      </div>
-    </main>
+      </>}
+    />
   );
 }
 
-function Status({
+export function Status({
   icon,
   label,
   value,
@@ -420,7 +470,7 @@ function IconBubble({
   );
 }
 
-function ActionRow({
+export function ActionRow({
   icon,
   tone,
   title,
@@ -474,7 +524,7 @@ function ActionRow({
   );
 }
 
-function Metric({
+export function Metric({
   href,
   icon,
   tone,
@@ -523,7 +573,7 @@ function Metric({
   );
 }
 
-function SectionHead({
+export function SectionHead({
   title,
   subtitle,
   icon,

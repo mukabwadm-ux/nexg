@@ -2,11 +2,11 @@
 import Link from 'next/link';
 import {
   allowedMethods,
+  businessSpecialties,
   category,
   fields,
   methodLabels,
   modelLabels,
-  profiles,
   type Activity,
   type Business,
   type BusinessDocument,
@@ -138,7 +138,7 @@ export function ActivityEditor({ value: a, onChange, data }: EditProps<Activity>
               });
             }}
           >
-            {profiles.map((p) => (
+            {businessSpecialties(data.profileId).map((p) => (
               <option key={p.id} value={p.id}>
                 {p.categoryName} · {p.name}
               </option>

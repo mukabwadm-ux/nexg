@@ -9,12 +9,12 @@ import * as React from 'react';
 import { AccountScreen } from './account';
 import { ConnectionsScreen } from './connections';
 import { DeveloperScreen } from './developer';
-import { SECTIONS, type Section, type SettingsIdentity } from './model';
+import { SECTIONS, type Section, type SettingsIdentity, type SettingsState } from './model';
 import { NotificationsScreen } from './notifications';
 import { PreferencesScreen } from './preferences';
 import { PrivacyScreen } from './privacy';
 import { SettingsProvider, useSettings } from './store';
-import { Action, Modal, Note } from './ui';
+import { Action, Modal, Note, SettingsHeading } from './ui';
 import { appendMerchantOnboardingDemoContext } from '@/lib/merchant-onboarding-demo';
 import { useMerchantOnboardingDemoContext } from '../merchant-onboarding-demo-provider';
 import s from './settings.module.css';
@@ -22,13 +22,17 @@ import s from './settings.module.css';
 export function SettingsWorkspace({
   identity,
   routingEditor,
+  initialSample,
+  preferencesContent,
 }: {
   identity: SettingsIdentity;
   routingEditor?: React.ReactNode;
+  initialSample?: SettingsState;
+  preferencesContent?: React.ReactNode;
 }) {
   return (
-    <SettingsProvider identity={identity}>
-      <Workspace routingEditor={routingEditor} />
+    <SettingsProvider identity={identity} initialSample={initialSample}>
+      <Workspace routingEditor={routingEditor} preferencesContent={preferencesContent} />
     </SettingsProvider>
   );
 }
@@ -41,7 +45,7 @@ function selectionFromParams(params: { get: (name: string) => string | null }) {
   return { section, routing: params.get('scope') === 'business' };
 }
 
-function Workspace({ routingEditor }: { routingEditor?: React.ReactNode }) {
+function Workspace({ routingEditor, preferencesContent }: { routingEditor?: React.ReactNode; preferencesContent?: React.ReactNode }) {
   const { identity, state, message, dirty, setDirty, ready } = useSettings();
   const demoContext = useMerchantOnboardingDemoContext();
   const router = useRouter();
@@ -163,18 +167,13 @@ function Workspace({ routingEditor }: { routingEditor?: React.ReactNode }) {
       )}
       aria-label="Settings workspace"
     >
-      <div className={s.pageHead}>
-        <div>
-          <h1>Settings</h1>
-          <p>
-            {section === 'account'
+      <SettingsHeading
+        description={section === 'account'
               ? 'Manage your account and workspace settings.'
               : section === 'connections'
                 ? 'Configure your workspace, integrations and data.'
-                : 'Manage your account, preferences and integrations.'}
-          </p>
-        </div>
-        {scopeLabel && (
+              : 'Manage your account, preferences and integrations.'}
+        scope={scopeLabel && (
           <div className={s.scope}>
             <span className={s.scopeLabel}>
               {personal ? <UserRound size={21} /> : <Building2 size={20} />} {scopeLabel}
@@ -182,7 +181,7 @@ function Workspace({ routingEditor }: { routingEditor?: React.ReactNode }) {
             <span className={s.scopeHint}>{scopeHint}</span>
           </div>
         )}
-      </div>
+      />
       <div className={cn(s.searchBox, section === 'notifications' && s.searchNarrow)}>
         <Search size={20} aria-hidden="true" />
         <input
@@ -288,7 +287,7 @@ function Workspace({ routingEditor }: { routingEditor?: React.ReactNode }) {
                 onScopeChange={(business) => navigate(hrefFor('notifications', business))}
               />
             )}
-            {section === 'preferences' && <PreferencesScreen />}
+            {section === 'preferences' && <PreferencesScreen>{preferencesContent}</PreferencesScreen>}
             {section === 'connections' && <ConnectionsScreen />}
             {section === 'api' && <DeveloperScreen />}
             {section === 'privacy' && <PrivacyScreen />}

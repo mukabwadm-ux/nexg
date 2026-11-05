@@ -373,8 +373,8 @@ describe('adaptive model and source evidence', () => {
         };
       }),
     );
-    expect(new Set(observed.map((row) => row.profile)).size).toBe(128);
-    expect(observed.length).toBe(193);
+    expect(new Set(observed.map((row) => row.profile)).size).toBe(141);
+    expect(observed.length).toBe(206);
     expect(new Set(observed.map((row) => row.model)).size).toBe(15);
     expect(
       observed.find((row) => row.profile === 'restaurant' && row.model === 'SPACE_RESERVATION'),

@@ -7,6 +7,24 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { compareMetric, formatInsightValue } from './model';
 import type { InsightMetric } from './types';
 
+export function InsightsHeading({
+  description,
+  actions,
+}: {
+  description: string;
+  actions?: ReactNode;
+}) {
+  return (
+    <div className="in-page-heading">
+      <div>
+        <h1>Insights</h1>
+        <p className="in-subtitle">{description}</p>
+      </div>
+      {actions && <div className="in-heading-actions">{actions}</div>}
+    </div>
+  );
+}
+
 export function ReportPanel({
   title,
   description,

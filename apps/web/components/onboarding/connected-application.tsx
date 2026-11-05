@@ -15,6 +15,7 @@ import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 import type { MerchantSavedHomeSource } from '@/lib/merchant-home-source';
 import { merchantSessionSignInHref } from '@/lib/merchant-journey-navigation';
 import { browserUuid } from '@/lib/browser-uuid';
+import { AVIATION_DEMO_CATEGORY, aviationDemoHref } from '@/lib/aviation-demo';
 import { SetupOfferings } from '@/components/merchant/offerings/setup-offerings';
 import { SetupLocationEditor } from '@/components/merchant/business/setup-location';
 import { SetupDocuments } from '@/components/merchant/setup-documents';
@@ -293,6 +294,7 @@ export function ConnectedApplication({
         </aside>
       ) : null}
       <Form
+        demoCategories={process.env.NODE_ENV === 'development' && !home ? [AVIATION_DEMO_CATEGORY] : []}
         initialData={
           initialRecord
             ? { ...initialRecord.payload, payout: payoutForm(initialPayout?.payout ?? null) }
@@ -357,6 +359,10 @@ export function ConnectedApplication({
           home
             ? undefined
             : (selection: MerchantOnboardingDemoSelection) => {
+                if (selection.categoryId === AVIATION_DEMO_CATEGORY.id) {
+                  window.location.assign(aviationDemoHref(selection));
+                  return;
+                }
                 const context = createMerchantOnboardingDemoContext(selection);
                 if (context) window.location.assign(merchantOnboardingDemoHref(context));
               }

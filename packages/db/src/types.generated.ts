@@ -53349,7 +53349,8 @@ export type Database = {
         | 'vehicle_services'
         | 'wellness'
         | 'concierge_services'
-        | 'logistics_shipping';
+        | 'logistics_shipping'
+        | 'activities_games_sports';
       merchant_control_source: 'merchant' | 'staff' | 'system';
       merchant_user_role: 'owner' | 'manager';
       mood: 'wild' | 'taste' | 'night' | 'slow' | 'stay' | 'events';
@@ -55128,6 +55129,7 @@ export const Constants = {
         'wellness',
         'concierge_services',
         'logistics_shipping',
+        'activities_games_sports',
       ],
       merchant_control_source: ['merchant', 'staff', 'system'],
       merchant_user_role: ['owner', 'manager'],

@@ -1,13 +1,17 @@
 'use client';
 
 import { CalendarDays, Clock3 } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { appendMerchantOnboardingDemoContext } from '@/lib/merchant-onboarding-demo';
 
+import { useMerchantOnboardingDemoContext } from '../merchant-onboarding-demo-provider';
 import { useDraft, useSettings } from './store';
 import { Card, SaveBar, Switch, TextLink } from './ui';
 import s from './settings.module.css';
 
-export function PreferencesScreen() {
+export function PreferencesScreen({ children }: { children?: ReactNode }) {
   const { state, savePreferences, identity } = useSettings();
+  const demoContext = useMerchantOnboardingDemoContext();
   const { draft, setDraft, dirty, reset } = useDraft(state.preferences);
   return (
     <>
@@ -120,7 +124,10 @@ export function PreferencesScreen() {
             </div>
           </div>
           <hr className={s.divider} />
-          <TextLink href="/merchant/hours">Manage opening hours in Availability</TextLink>
+          <TextLink href={identity.sample && demoContext?.categoryId === 'flights_aviation'
+            ? appendMerchantOnboardingDemoContext('/merchant-live-preview/availability', demoContext)
+            : '/merchant/hours'
+          }>{demoContext?.categoryId === 'flights_aviation' ? 'Manage fleet availability' : 'Manage opening hours in Availability'}</TextLink>
           {!identity.sample && (
             <p className={s.small}>
               Display preferences are saved on this device for your account.
@@ -128,6 +135,7 @@ export function PreferencesScreen() {
           )}
         </Card>
       </div>
+      {children}
       <SaveBar
         dirty={dirty}
         scope="Your account"

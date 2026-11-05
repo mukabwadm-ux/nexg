@@ -36,8 +36,8 @@ const profile = profiles.find((p) => p.id === 'makeup')!;
 
 describe('adaptive promotions', () => {
   it('resolves every registered specialty through its actual offering schema', () => {
-    expect(profiles).toHaveLength(128);
-    expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(21);
+    expect(profiles).toHaveLength(141);
+    expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(22);
     const models = new Set<string>();
     for (const entry of profiles) {
       const item = seedCatalogue(entry).offerings[0]!;

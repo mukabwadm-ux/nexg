@@ -1,4 +1,4 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
 import { ConnectedApplication } from '@/components/onboarding/connected-application';
 import { createClient } from '@/lib/supabase/server';
@@ -35,49 +35,24 @@ export default async function Registration({
         <OnboardingDemoEntry />
       </main>
     );
-  if (!searchParams.merchantId && !searchParams.operationId) {
-    const existing = await client.rpc('fn_partner_home');
-    if (existing.error)
-      return (
-        <main className="mx-auto max-w-xl p-6">
-          <h1>We could not check your saved workspace</h1>
-          <p>
-            Refresh before starting another registration. Your existing records have not changed.
-          </p>
-          <OnboardingDemoEntry />
-        </main>
-      );
-    const home = existing.data as { kind?: string; id?: string } | null;
-    if (
-      !home ||
-      !['guest', 'merchant', 'rider', 'host', 'staff'].includes(home.kind ?? '') ||
-      (home.kind === 'merchant' && (!home.id || !uuid.test(home.id)))
-    )
-      return (
-        <main className="mx-auto max-w-xl p-6">
-          <h1>We could not check your saved workspace</h1>
-          <p>
-            Refresh before starting another registration. Your existing records have not changed.
-          </p>
-          <OnboardingDemoEntry />
-        </main>
-      );
-    if (home?.kind === 'merchant' && home.id) redirect('/merchant');
-  }
+  // Register always starts at the existing short form. Existing workspace
+  // membership must not select a different application or skip onboarding.
+  // Saved applications are loaded only by their explicit resume links.
   let record: MerchantApplicationRecord | undefined;
   const rpc = client.rpc as unknown as (
     name: string,
     args: Record<string, unknown>,
-  ) => PromiseLike<{ data: unknown; error: unknown }>;
-  if (searchParams.merchantId || searchParams.operationId) {
-    const id = searchParams.merchantId ?? searchParams.operationId!;
+  ) => PromiseLike<{ data: unknown; error: { code?: string } | null }>;
+  const merchantId = searchParams.merchantId;
+  if (merchantId || searchParams.operationId) {
+    const id = merchantId ?? searchParams.operationId!;
     if (!uuid.test(id)) notFound();
     const result = await rpc.call(
       client,
-      searchParams.merchantId
+      merchantId
         ? 'rpc_merchant_application_read'
         : 'rpc_merchant_application_operation_read',
-      searchParams.merchantId ? { p_merchant_id: id } : { p_operation_id: id },
+      merchantId ? { p_merchant_id: id } : { p_operation_id: id },
     );
     if (result.error)
       return (

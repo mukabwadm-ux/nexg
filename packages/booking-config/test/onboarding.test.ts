@@ -10,10 +10,10 @@ const signedIn = { otpVerified: true, signedIn: true };
 const capturing = { otpVerified: false, signedIn: false };
 
 describe('compiled onboarding inventory', () => {
-  it('exposes all 128 registered input configurations under their existing categories', () => {
+  it('exposes all 141 registered input configurations under their existing categories', () => {
     const categories = listOnboardingCategories();
-    expect(categories).toHaveLength(21);
-    expect(categories.flatMap((category) => category.subcategories)).toHaveLength(128);
+    expect(categories).toHaveLength(22);
+    expect(categories.flatMap((category) => category.subcategories)).toHaveLength(141);
     expect(
       categories.flatMap((category) =>
         category.subcategories.map((subcategory) => ({

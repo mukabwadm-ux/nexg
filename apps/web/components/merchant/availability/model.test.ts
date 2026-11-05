@@ -74,8 +74,8 @@ describe('Availability merchant decisions', () => {
         expect(p.models.includes(view.model)).toBe(true);
         rendered.push(p.id + ':' + view.model);
       }
-    expect(new Set(rendered.map((x) => x.split(':')[0])).size).toBe(128);
-    expect(new Set(rendered).size).toBe(193);
+    expect(new Set(rendered.map((x) => x.split(':')[0])).size).toBe(141);
+    expect(new Set(rendered).size).toBe(206);
     const c = context('restaurant', 'SPACE_RESERVATION_V1');
     expect(() => resolveView(c.profile, c.offering, ['PRODUCT_CATALOG_V1'])).toThrow(
       'Availability setup unresolved',

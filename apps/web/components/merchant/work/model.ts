@@ -1,11 +1,11 @@
-import type { BookingModel, BookingProfileSummary } from '@nexg/booking-config/profiles';
+import { activityProfiles, getBookingProfile, type BookingModel, type BookingProfileSummary } from '@nexg/booking-config/profiles';
 import type { ResolvedBookingConfiguration } from '@nexg/booking-config';
 import profileViews from './work-profile-views.json';
 
 export type WorkflowId = 'WF_ORDER' | 'WF_MADE_TO_ORDER' | 'WF_APPOINTMENT' | 'WF_REMOTE_SESSION' | 'WF_FIELD_SERVICE' | 'WF_RENTAL' | 'WF_TRANSFER' | 'WF_EVENT_SESSION' | 'WF_GROUP_ACTIVITY' | 'WF_TOUR' | 'WF_REQUEST_QUOTE' | 'WF_PICKUP_RETURN' | 'WF_MEMBERSHIP' | 'WF_FREIGHT' | 'WF_STORAGE' | 'WF_REGULATED_ENQUIRY' | 'WF_SERVICE_JOB' | 'WF_SPACE_RESERVATION_V1';
 export type WorkTab = 'attention' | 'upcoming' | 'progress' | 'history';
 export type WorkTemplate = { label: string; singular: string; itemLabel: string; item: string; contextLabel: string; context: string; milestoneLabel: string; milestone: string; stages: string[]; actions: string[]; confirmation: string; source: string };
-export type WorkRecord = { id: string; workflowId: WorkflowId; customer: string; item: string; context: string; milestone: string; operator: string; stage: number; attention: boolean; upcoming: boolean; history: string[]; confirmation: string; sourceLabel: string; nextAction?: { id: string; label: string }; lines?: { name: string; quantity: number; amount: string }[]; readOnly?: boolean };
+export type WorkRecord = { id: string; workflowId: WorkflowId; customer: string; item: string; context: string; milestone: string; operator: string; stage: number; attention: boolean; upcoming: boolean; history: string[]; confirmation: string; sourceLabel: string; nextAction?: { id: string; label: string }; lines?: { name: string; quantity: number; amount: string }[]; readOnly?: boolean; sampleProfileId?: string };
 
 // Work consumes an explicitly selected workflow. Candidate profiles alone do not activate work.
 export interface WorkSource {
@@ -61,17 +61,34 @@ const modelViews: Record<BookingModel, WorkflowId[]> = {
 };
 
 export function candidateWorkflows(profile: BookingProfileSummary): WorkflowId[] {
+  const activity = activityProfiles.find((item) => item.subcategoryId === profile.subcategoryId);
+  if (activity) return [activity.sourceWorkflowId].filter((id): id is WorkflowId => id in templates);
   const entry = profileViews.find((item) => item.subcategoryId === profile.subcategoryId);
   const choices = entry ? entry.views.flatMap((view) => view.workflowIds) : profile.candidateModels.flatMap((model) => modelViews[model] ?? []);
   return [...new Set(choices)].filter((id): id is WorkflowId => id in templates);
 }
 export function defaultWorkflow(profile: BookingProfileSummary): WorkflowId | undefined {
+  if (profile.categoryId === 'activities_games_sports') return candidateWorkflows(profile)[0];
   const entry = profileViews.find((item) => item.subcategoryId === profile.subcategoryId);
   const model = entry?.views.find((view) => view.modelId === profile.defaultModelId);
   return model?.workflowIds.find((id): id is WorkflowId => id in templates) ?? (!entry ? modelViews[profile.defaultModelId]?.[0] : undefined);
 }
 export function modelForWorkflow(profile: BookingProfileSummary, workflow: WorkflowId): BookingModel | undefined {
+  if (profile.categoryId === 'activities_games_sports' && defaultWorkflow(profile) === workflow) return profile.defaultModelId;
   return profileViews.find((item) => item.subcategoryId === profile.subcategoryId)?.views.find((view) => view.workflowIds.includes(workflow))?.modelId as BookingModel | undefined;
+}
+
+export function workTemplate(workflow: WorkflowId, profile?: BookingProfileSummary): WorkTemplate {
+  const template = templates[workflow];
+  if (profile?.categoryId !== 'activities_games_sports') return template;
+  const scoped = { ...template, item: profile.name, label: `${profile.name} · ${template.label.toLowerCase()}` };
+  if (workflow !== 'WF_SPACE_RESERVATION_V1') return scoped;
+  return {
+    ...scoped,
+    label: `${profile.name} · reservations`,
+    stages: ['Confirmed', 'Checked in', 'In use', 'Released'],
+    actions: ['Check in party', 'Start reservation', 'Release space'],
+  };
 }
 export function inTab(record: WorkRecord, tab: WorkTab): boolean {
   const done = record.stage >= templates[record.workflowId].stages.length - 1;
@@ -89,7 +106,7 @@ function sampleMilestone(value: string, index: number): string {
 }
 
 export function createSampleRecords(workflowId: WorkflowId, profile?: BookingProfileSummary): WorkRecord[] {
-  const template = templates[workflowId];
+  const template = workTemplate(workflowId, profile);
   const isRental = workflowId === 'WF_RENTAL';
   const isGrocery = profile?.categoryId === 'groceries_essentials';
   const item = isRental && profile?.subcategoryId === 'bike_rental' ? 'Bicycle · BIKE 012'
@@ -123,6 +140,7 @@ export function createSampleRecords(workflowId: WorkflowId, profile?: BookingPro
     return {
       id: `${workflowId === 'WF_ORDER' ? 'ORD' : isRental ? 'RNT' : 'WRK'}-${2048 - index}`,
       workflowId, customer, item: rentalItem, context: isRental && profile ? rentalContext[profile.subcategoryId] ?? template.context : template.context,
+      ...(profile?.categoryId === 'activities_games_sports' ? { sampleProfileId: profile.subcategoryId } : {}),
       milestone: sampleMilestone(template.milestone, index), lines,
       confirmation: template.confirmation, sourceLabel: template.source,
       operator: ['Maya', 'John', 'Aisha'][index % 3]!,
@@ -135,7 +153,7 @@ export function createSampleRecords(workflowId: WorkflowId, profile?: BookingPro
 export const sampleSource: WorkSource = {
   async list(workflowId, profile) { return createSampleRecords(workflowId, profile); },
   async advance(record, actionId) {
-    const template = templates[record.workflowId];
+    const template = workTemplate(record.workflowId, record.sampleProfileId ? getBookingProfile(record.sampleProfileId) : undefined);
     if (record.readOnly || record.stage >= template.stages.length - 1 || record.nextAction?.id !== actionId) return record;
     const action = template.actions[record.stage];
     if (!action) return record;

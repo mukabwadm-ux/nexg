@@ -5,7 +5,7 @@ import type { BookingModel, JSONSchema, ProfileDefinition, QuestionDefinition } 
 export type OnboardingCategory = {
   id: string;
   name: string;
-  subcategories: { id: string; name: string }[];
+  subcategories: { id: string; name: string; group?: string }[];
 };
 export type OnboardingProfile = {
   categoryId: string;
@@ -53,7 +53,11 @@ export function listOnboardingCategories(): OnboardingCategory[] {
       category = { id: profile.categoryId, name: profile.categoryName, subcategories: [] };
       categories.set(category.id, category);
     }
-    category.subcategories.push({ id: profile.subcategoryId, name: profile.name });
+    category.subcategories.push({
+      id: profile.subcategoryId,
+      name: profile.name,
+      ...(profile.group ? { group: profile.group } : {}),
+    });
   }
   return [...categories.values()];
 }

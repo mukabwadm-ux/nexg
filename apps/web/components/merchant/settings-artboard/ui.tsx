@@ -10,6 +10,24 @@ import type { Tone } from './model';
 import { useSettings } from './store';
 import s from './settings.module.css';
 
+export function SettingsHeading({
+  description,
+  scope,
+}: {
+  description: string;
+  scope?: React.ReactNode;
+}) {
+  return (
+    <div className={s.pageHead}>
+      <div>
+        <h1>Settings</h1>
+        <p>{description}</p>
+      </div>
+      {scope}
+    </div>
+  );
+}
+
 export function Action({
   children,
   onClick,

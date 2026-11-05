@@ -76,6 +76,7 @@ export type InsightRecord = {
   collectionAt?: string | null;
   collectionDueAt?: string | null;
   quoteAccepted?: boolean;
+  quoteAmountMinor?: number;
   cancellationReason?: string | null;
   bookedPlaces?: number | null;
   attendedPlaces?: number | null;

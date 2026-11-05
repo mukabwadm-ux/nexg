@@ -202,6 +202,7 @@ export type ProfileDefinition = {
   categoryName: string;
   subcategoryId: string;
   name: string;
+  group?: string;
   sourceWorkflowId: string;
   defaultModelId: BookingModel;
   sourceQuestionIds: string[];

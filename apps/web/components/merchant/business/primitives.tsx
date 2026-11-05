@@ -10,6 +10,19 @@ import {
   type ReactNode,
 } from 'react';
 import styles from './workspace.module.css';
+
+export function BusinessHeading({ name, actions }: { name: string; actions?: ReactNode }) {
+  return (
+    <div className="bu-title">
+      <div>
+        <h1>Business</h1>
+        <p className="bu-subtitle">{name}</p>
+      </div>
+      {actions}
+    </div>
+  );
+}
+
 export function Button({
   children,
   onClick,

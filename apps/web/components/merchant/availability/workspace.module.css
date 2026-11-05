@@ -731,6 +731,9 @@
   border-bottom: 1px solid var(--av-border);
   min-height: 119px;
 }
+.root :global(.av-timeline[data-hourly='true'] .av-timeline-row) {
+  min-height: 80px;
+}
 .root :global(.av-resource-name) {
   padding: 16px 12px;
   display: flex;
@@ -749,9 +752,9 @@
   background: repeating-linear-gradient(
     to right,
     transparent 0,
-    transparent calc(100% / 7 - 1px),
-    #eeeae3 calc(100% / 7 - 1px),
-    #eeeae3 calc(100% / 7)
+    transparent calc(100% / var(--av-timeline-columns, 7) - 1px),
+    #eeeae3 calc(100% / var(--av-timeline-columns, 7) - 1px),
+    #eeeae3 calc(100% / var(--av-timeline-columns, 7))
   );
   min-width: 0;
 }

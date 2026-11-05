@@ -129,6 +129,7 @@ export function OfferingsWorkspace({
   onSetupSaved,
   onSetupDirtyChange,
   onUploadImage,
+  renderItemAction,
 }: {
   source?: OfferingsSource;
   configuration?: MerchantOfferingConfiguration;
@@ -143,6 +144,7 @@ export function OfferingsWorkspace({
   onSetupSaved?: () => void;
   onSetupDirtyChange?: (dirty: boolean) => void;
   onUploadImage?: (item: Offering, file: File) => Promise<{ path: string; url: string }>;
+  renderItemAction?: (item: Offering) => ReactNode;
 }) {
   const demoContext = useMerchantOnboardingDemoContext();
   const profiles = useMemo(() => extendOfferingProfiles(additionalProfiles), [additionalProfiles]);
@@ -520,7 +522,7 @@ export function OfferingsWorkspace({
               {returnTo.startsWith('/merchant-live-preview/money?') ? 'Money' : 'Availability'}
             </a>
           )}
-          {preview && (
+          {preview && !suppliedConfiguration && (
             <button
               type="button"
               className="of-sample"
@@ -945,6 +947,7 @@ export function OfferingsWorkspace({
                 onDuplicate={() => create(draft.schemaId, draft)}
                 onConnections={() => guard(() => openPanel('connections'))}
                 onReload={() => guard(() => void load())}
+                itemAction={baseline && baseline.version > 0 ? renderItemAction?.(baseline) : undefined}
               />
             </>
           ) : (

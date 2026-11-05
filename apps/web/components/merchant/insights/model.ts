@@ -649,6 +649,17 @@ export const METRIC_DEFINITIONS: MetricDefinition[] = [
     'percent',
   ),
   def(
+    'accepted_quote_value',
+    'Accepted quote value',
+    ['REQUEST_QUOTE'],
+    'money',
+    'requested',
+    ['work'],
+    'RPT_REQUEST_QUOTES',
+    'Total quoted amount for accepted requests in the selected cohort.',
+    'currency',
+  ),
+  def(
     'linked_windows_on_time',
     'Collection and return promises met',
     ['LINKED_WINDOWS'],
@@ -1360,6 +1371,15 @@ export function buildInsights(
         );
       case 'request_with_accepted_quote_rate':
         return ratio(rows.filter((row) => row.quoteAccepted === true).length, rows.length);
+      case 'accepted_quote_value': {
+        const accepted = rows.filter((row) => row.quoteAccepted === true);
+        return {
+          value: accepted.every((row) => Number.isSafeInteger(row.quoteAmountMinor))
+            ? accepted.reduce((total, row) => total + row.quoteAmountMinor!, 0)
+            : null,
+          sampleSize: accepted.length,
+        };
+      }
       case 'linked_windows_on_time': {
         const eligible = rows.filter((row) =>
           [row.collectionAt, row.collectionDueAt, row.returnAt, row.returnDueAt].every(
@@ -1393,6 +1413,8 @@ export function buildInsights(
   };
   const metrics: Record<string, InsightMetric> = {};
   for (const definition of METRIC_DEFINITIONS) {
+    if (definition.id === 'accepted_quote_value' && !snapshot.records.some((record) => record.quoteAmountMinor !== undefined))
+      continue;
     const gate = statusFor(definition);
     const result: Calculation =
       gate.status === 'unavailable' ? { value: null } : calculate(definition);
@@ -1878,6 +1900,7 @@ export function exportInsightsCsv(
       session_attendance: ['attendedPlaces'],
       production_on_time: ['completedOn', 'dueOn'],
       request_with_accepted_quote_rate: ['quoteAccepted'],
+      accepted_quote_value: ['quoteAccepted', 'quoteAmountMinor'],
       linked_windows_on_time: ['collectionAt', 'collectionDueAt', 'returnAt', 'returnDueAt'],
       entitlement_redemptions: ['entitlementUses'],
     };

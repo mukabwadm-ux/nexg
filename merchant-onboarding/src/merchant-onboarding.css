@@ -38,6 +38,8 @@
 .mo-subcategory-picker[open] .mo-subcategory-chevron{transform:rotate(180deg)}
 .mo-subcategory-options{position:absolute;z-index:20;top:calc(100% + 6px);left:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;width:100%;max-height:280px;overflow:auto;padding:14px;border:1px solid var(--mo-border);border-radius:12px;background:var(--mo-paper);box-shadow:0 12px 30px rgba(19,47,28,.14)}
 .mo-subcategory-options .mo-check{padding:5px 2px}
+.mo-subcategory-group{grid-column:1/-1;margin:5px 0 0;padding-top:7px;border-top:1px solid var(--mo-border);font-size:.78rem;font-weight:700}
+.mo-subcategory-group:first-child{margin-top:0;padding-top:0;border-top:0}
 @media(max-width:1100px){
   .mo-registration-phone,.mo-registration-policy{grid-column:span 6}
   .mo-registration-marketing{grid-column:1/-1}

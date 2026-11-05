@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { activityProfiles } from '@nexg/booking-config/profiles';
+import { AVIATION_DEMO_CATEGORY } from '@/lib/aviation-demo';
 import config from './config.json';
 
 export type Model =
@@ -36,7 +38,31 @@ export type BusinessCategory = {
   questions: string[];
   vocabulary: Record<string, string>;
 };
-export const profiles = config.profiles as unknown as BusinessCategory[];
+export const profiles: BusinessCategory[] = [
+  ...(config.profiles as unknown as BusinessCategory[]),
+  ...activityProfiles.map((profile): BusinessCategory => ({
+    id: profile.subcategoryId,
+    categoryId: profile.categoryId,
+    categoryName: profile.categoryName,
+    name: profile.name,
+    defaultModel: profile.defaultModelId,
+    models: profile.candidateModelIds,
+    needs: profile.specialtyNeeds,
+    questions: profile.sourceQuestionIds,
+    vocabulary: { ...profile.vocabulary },
+  })),
+];
+const aviationProfiles = AVIATION_DEMO_CATEGORY.subcategoryOptions.map((activity): BusinessCategory => ({
+    id: activity.id,
+    categoryId: AVIATION_DEMO_CATEGORY.id,
+    categoryName: AVIATION_DEMO_CATEGORY.name,
+    name: activity.name,
+    defaultModel: 'REQUEST_QUOTE',
+    models: ['REQUEST_QUOTE'],
+    needs: 'Confirm the itinerary, aircraft and operator requirements for each charter.',
+    questions: [],
+    vocabulary: {},
+}));
 export const fields = config.fields as Record<string, FieldDefinition>;
 export const sections: { id: Section; label: string }[] = [
   { id: 'profile', label: 'Profile' },
@@ -236,7 +262,12 @@ export function parseEditorDraft(section: string, value: unknown): unknown | nul
   const result = schema.safeParse(value);
   return result.success ? result.data : null;
 }
-export const category = (id: string) => profiles.find((p) => p.id === id);
+export const category = (id: string) =>
+  profiles.find((profile) => profile.id === id) ?? aviationProfiles.find((profile) => profile.id === id);
+
+export function businessSpecialties(profileId: string) {
+  return aviationProfiles.some((profile) => profile.id === profileId) ? aviationProfiles : profiles;
+}
 export function extendBusinessProfiles(extra: BusinessCategory[]): BusinessCategory[] {
   const all = [...profiles];
   for (const p of extra) {

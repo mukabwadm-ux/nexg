@@ -82,11 +82,14 @@ function validOptions(o: Offering) {
         typeof o.discount.endsAt === 'string'))
   );
 }
-export function localOfferingsSource(storage: StorageLike): OfferingsSource {
+export function localOfferingsSource(
+  storage: StorageLike,
+  seed: (profile: OfferingProfile) => Catalogue = seedCatalogue,
+): OfferingsSource {
   function load(profile: OfferingProfile): Catalogue {
     try {
       const raw = storage.getItem(key(profile.id));
-      if (!raw) return seedCatalogue(profile);
+      if (!raw) return seed(profile);
       const data = JSON.parse(raw) as Catalogue;
       const allowed = availableSchemas(profile);
       if (
@@ -174,7 +177,7 @@ export function localOfferingsSource(storage: StorageLike): OfferingsSource {
     },
     async reset(profile) {
       storage.removeItem(key(profile.id));
-      return seedCatalogue(profile);
+      return seed(profile);
     },
     async save(profile, item, publication) {
       const data = load(profile);

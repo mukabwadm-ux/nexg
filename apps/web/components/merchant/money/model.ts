@@ -27,7 +27,16 @@ export function formatAmount(value: number, currency: Currency = KES, includeCod
 }
 export type Scenario = 'current' | 'stale' | 'partial' | 'unknown' | 'offline' | 'external' | 'empty' | 'error';
 export type Role = 'manager' | 'viewer';
-export type Context = { profile: OfferingProfile; offering: Offering; location: string; method: string; scenario: Scenario; role: Role };
+export type Context = {
+  profile: OfferingProfile;
+  offering: Offering;
+  location: string;
+  method: string;
+  scenario: Scenario;
+  role: Role;
+  currency?: Currency;
+  workLink?: (reference: string) => string;
+};
 export type Descriptor = (typeof config.descriptors)[number];
 export type ProfileInfo = (typeof config.profiles)[number];
 export function profileInfo(id: string): ProfileInfo | undefined {
@@ -35,14 +44,15 @@ export function profileInfo(id: string): ProfileInfo | undefined {
 }
 export function resolveMoneyView(profile: OfferingProfile, offering: Offering, enabled: string[]): Descriptor {
   const schema = schemas[offering.schemaId];
-  const descriptor = config.descriptors.find((d) => d.schemaId === offering.schemaId);
+  const descriptorId = offering.schemaId === 'FLIGHT_CHARTER_QUOTE_V1' ? 'REQUEST_QUOTE_V1' : offering.schemaId;
+  const descriptor = config.descriptors.find((d) => d.schemaId === descriptorId);
   if (offering.profileId !== profile.id || !availableSchemas(profile).includes(offering.schemaId) || !enabled.includes(offering.schemaId)) {
     throw new Error('This activity is not enabled for the selected specialty.');
   }
   if (!schema || !descriptor || descriptor.modelId !== schema.model || !descriptor.workflowIds.length) {
     throw new Error('This activity needs a registered Money workflow before it can be shown.');
   }
-  return descriptor;
+  return { ...descriptor, schemaId: offering.schemaId };
 }
 export const isReservation = (schema: string) => [
   'SERVICE_APPOINTMENT_V1', 'REMOTE_SESSION_V1', 'FIELD_SERVICE_V1', 'RENTAL_ASSET_V1',
@@ -66,6 +76,7 @@ export function workflowCopy(schema: string): { heading: string; charges: string
     SPACE_RESERVATION_V1: { heading: 'Follow table and space reservation payments.', charges: 'Posted reservation charges', reminder: 'A minimum spend is charged only when posted.' },
     TOUR_PACKAGE_V1: { heading: 'Follow tour payments and agreed charges.', charges: 'Posted tour charges', reminder: 'Supplier funds need their own agreed treatment.' },
     REQUEST_QUOTE_V1: { heading: 'Follow quoted work and issued charges.', charges: 'Posted work charges', reminder: 'A quote is not itself an invoice, payment or revenue.' },
+    FLIGHT_CHARTER_QUOTE_V1: { heading: 'Follow charter quotes and recorded payments.', charges: 'Payments recorded', reminder: 'Flight confirmation and payment are tracked separately.' },
     MADE_TO_ORDER_V1: { heading: 'Follow custom work and issued charges.', charges: 'Posted work charges', reminder: 'Unapproved changes do not create a payment.' },
     PICKUP_RETURN_V1: { heading: 'Follow service charges and collections.', charges: 'Posted service charges', reminder: 'Collection, processing and return do not create three sales.' },
     SERVICE_JOB_V1: { heading: 'Follow invoices, collections and customer balances.', charges: 'Posted job charges', reminder: 'An estimate is not an issued invoice or debt.' },
@@ -95,6 +106,11 @@ export function activitySummary(c: Context, s: Snapshot): { title: string; facts
     SPACE_RESERVATION_V1: { title: 'Table and space money', facts: [['Capacity use', field('capacity_mode')], ['Reservation terms', terms]], note: 'A minimum spend is a commitment until a charge is posted.' },
     TOUR_PACKAGE_V1: { title: 'Tour payments', facts: [['Departure', field('departure_mode')], ['Transport', field('tour_transport_mode')]], note: 'Supplier or pass-through amounts require their own agreement.' },
     REQUEST_QUOTE_V1: { title: 'Sample quote · Q-1049', facts: [['Quote value', formatAmount(minor(15000))], ['Status', 'Awaiting decision'], ['Invoice', 'Not issued'], ['Payment', 'Not recorded']], note: 'This sample quote is excluded from sales and customer debt.' },
+    FLIGHT_CHARTER_QUOTE_V1: {
+      title: 'Charter quotes and payments',
+      facts: [['Operating base', c.location], ['Quote currency', c.currency?.code ?? 'USD']],
+      note: 'Sample quotes and recorded payments come from the flight records in Work.',
+    },
     MADE_TO_ORDER_V1: { title: 'Custom work', facts: [['Pricing', c.offering.priceMode === 'quote' ? 'By quotation' : 'Agreed offering price'], ['Handover', field('handover_methods')]], note: 'A requested change does not create a charge until agreed and issued.' },
     PICKUP_RETURN_V1: { title: 'Collection service', facts: [['Intake unit', field('intake_unit')], ['Commercial root', 'One service']], note: 'Collection, processing and return are not three separate sales.' },
     SERVICE_JOB_V1: { title: 'Service job money', facts: [['Work', 'One agreed job'], ['Invoice source', s.features.balances ? 'Enabled in sample' : 'Not enabled in sample']], note: 'An estimate is not an issued invoice or customer debt.' },
@@ -107,9 +123,10 @@ export function activitySummary(c: Context, s: Snapshot): { title: string; facts
 }
 export type Features = { payouts: boolean; balances: boolean; security: boolean; reservation: boolean; refunds: boolean };
 export type Transaction = {
-  id: string; work: string; type: 'Sale' | 'Refund' | 'Fee'; amount: number; status: string;
+  id: string; work: string; type: 'Sale' | 'Refund' | 'Fee' | 'Quote'; amount: number; status: string;
   source: string; date: string; time: string; method: 'M-Pesa' | 'Card' | 'Not recorded' | 'Not applicable';
   customer: string; originalReference?: string;
+  details?: [string, string][];
 };
 export type Invoice = { id: string; work: string; total: number; applied: number; credit: number; dueDate: string; state: 'Overdue' | 'Not due'; parts?: number; labour?: number };
 export type Security = { id: string; work: string; asset: string; collected: number; allocation: number; refunded: number; refundRequested: number; state: 'unknown' | 'collected' | 'refunded'; policyVersion: string; operationId?: string };
@@ -124,7 +141,12 @@ export type RefundDraft = { id: string; kind: RefundKind; recordId: string; amou
 export type History = { revision: number; description: string; at: string };
 export type StatementPeriod = { gross: number; refunds: number; fees: number; netCollections: number; netPayable: number };
 export type SampleStatement = StatementPeriod & { eligible: number; today: StatementPeriod; reflectedOperations: string[] };
-export type Snapshot = { scope: string; revision: number; offeringVersion: number; features: Features; security: Security[]; operations: SampleOperation[]; drafts: RefundDraft[]; policy: ReservationPolicy | null; statement: SampleStatement; history: History[] };
+export type Snapshot = {
+  scope: string; revision: number; offeringVersion: number; features: Features; security: Security[];
+  operations: SampleOperation[]; drafts: RefundDraft[]; policy: ReservationPolicy | null;
+  statement: SampleStatement; history: History[];
+  report?: { date: string; records: Transaction[]; acceptedQuoteMinor: number };
+};
 export function initialStatement(): SampleStatement {
   return { gross: minor(200000), refunds: minor(10000), fees: minor(8000), netCollections: minor(190000), netPayable: minor(182000), eligible: minor(30000), today: { gross: minor(64600), refunds: minor(4000), fees: minor(1200), netCollections: minor(60600), netPayable: minor(59400) }, reflectedOperations: [] };
 }
@@ -188,6 +210,7 @@ export function transactions(view: Descriptor): Transaction[] {
 }
 /** One normalized local record per sample fact; unknown/refused requests remain distinct from confirmed refunds. */
 export function transactionRecords(view: Descriptor, snapshot: Snapshot): Transaction[] {
+  if (snapshot.report) return snapshot.report.records;
   const base = transactions(view);
   const refunds = snapshot.operations.filter((o) => o.kind === 'sale-refund').map((o): Transaction => {
     const original = base.find((t) => t.id === o.recordId);

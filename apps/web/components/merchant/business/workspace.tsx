@@ -1,16 +1,16 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { AlertCircle, Download, FileText, MapPin, Package } from 'lucide-react';
 import { MerchantLivePreviewShell } from '../live-preview-shell';
 import { useMerchantOnboardingDemoContext } from '../merchant-onboarding-demo-provider';
 import { ActivityEditor, DocumentEditor, LocationEditor, MemberEditor } from './editors';
 import {
   blockingImpact,
+  businessSpecialties,
   category,
   changeImpact,
   createActivity,
   parseEditorDraft,
-  profiles,
   sections,
   validateBusiness,
   type Activity,
@@ -20,7 +20,7 @@ import {
   type Member,
   type Section,
 } from './model';
-import { Button, Empty, Field, Modal, Note } from './primitives';
+import { BusinessHeading, Button, Empty, Field, Modal, Note } from './primitives';
 import {
   BusinessConflict,
   localBusinessSource,
@@ -66,17 +66,20 @@ export function BusinessWorkspace({
   initialTab = 'activities',
   source: providedSource,
   demoContext,
+  locationDetails,
 }: {
   initialProfileId?: string;
   initialTab?: Section;
   source?: BusinessSource;
   demoContext?: MerchantOnboardingDemoContext | null;
+  locationDetails?: ReactNode;
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const activeDemo = demoContext ?? inheritedDemo;
   const [profileId, setProfileId] = useState(
     category(initialProfileId) ? initialProfileId : 'haircare',
   );
+  const sampleProfiles = businessSpecialties(profileId);
   const [data, setData] = useState<Business | null>(null);
   const [profileDraft, setProfileDraft] = useState<Business['profile'] | null>(null);
   const [tab, setTab] = useState<Section>(
@@ -439,21 +442,11 @@ export function BusinessWorkspace({
       </select>
     </label>
   );
-  return (
-    <MerchantLivePreviewShell
-      active="Business"
-      businessName={activeDemo?.businessName}
-      accountInitials={activeDemo?.initials}
-      demoContext={activeDemo}
-      sampleControl={sampleControl}
-      locationControl={locationControl}
-    >
+  const body = (
       <div className={styles.root}>
-        <div className="bu-title">
-          <div>
-            <h1>Business</h1>
-            <p className="bu-subtitle">{activeDemo?.businessName ?? data?.profile.name ?? 'Your business'}</p>
-          </div>
+        <BusinessHeading
+          name={activeDemo?.businessName ?? data?.profile.name ?? 'Your business'}
+          actions={<>
           {notice && (
             <div className="bu-banner bu-notice" role="status">
               <span>{notice}</span>
@@ -469,7 +462,8 @@ export function BusinessWorkspace({
           >
             Revision {data?.revision ?? '—'}
           </button>
-        </div>
+          </>}
+        />
         <div className="bu-summary">
           <div>
             <FileText />
@@ -597,7 +591,10 @@ export function BusinessWorkspace({
               ) : tab === 'activities' ? (
                 <ActivitiesView {...viewProps} />
               ) : tab === 'locations' ? (
-                <LocationsView {...viewProps} />
+                <>
+                  <LocationsView {...viewProps} />
+                  {locationDetails}
+                </>
               ) : tab === 'team' ? (
                 <TeamView {...viewProps} />
               ) : tab === 'documents' ? (
@@ -630,9 +627,9 @@ export function BusinessWorkspace({
                     setCandidate(null);
                   }}
                 >
-                  {[...new Set(profiles.map((p) => p.categoryName))].map((name) => (
+                  {[...new Set(sampleProfiles.map((p) => p.categoryName))].map((name) => (
                     <optgroup key={name} label={name}>
-                      {profiles
+                      {sampleProfiles
                         .filter((p) => p.categoryName === name)
                         .map((p) => (
                           <option key={p.id} value={p.id}>
@@ -945,6 +942,18 @@ export function BusinessWorkspace({
           </Modal>
         )}
       </div>
+  );
+  return (
+    <MerchantLivePreviewShell
+      active="Business"
+      businessName={activeDemo?.businessName}
+      accountInitials={activeDemo?.initials}
+      demoContext={activeDemo}
+      adaptedPreview={Boolean(providedSource)}
+      sampleControl={sampleControl}
+      locationControl={locationControl}
+    >
+      {body}
     </MerchantLivePreviewShell>
   );
 }

@@ -1,11 +1,9 @@
 'use client';
 
 import { listBookingProfiles } from '@nexg/booking-config/profiles';
-import { TableViewport } from '@nexg/ui/table-viewport';
-import { ArrowLeft, Check, ChevronRight, Search, X } from 'lucide-react';
-import { useEffect, useMemo, useState, type KeyboardEvent } from 'react';
-import offeringStyles from '../offerings/workspace.module.css';
-import workspaceStyles from '../workspace/workspace.module.css';
+import { Check } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { WorkHeading, WorkLayout, WorkQueue, WorkQueueRow, WorkRecordPanel, WorkSearch, WorkTabs } from './presentation';
 import { WorkSteps } from './work-steps';
 import { useMerchantOnboardingDemoContext } from '../merchant-onboarding-demo-provider';
 import {
@@ -13,7 +11,7 @@ import {
   defaultWorkflow,
   inTab,
   sampleSource,
-  templates,
+  workTemplate,
   type WorkRecord,
   type WorkSource,
   type WorkTab,
@@ -56,10 +54,10 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
   const [search, setSearch] = useState('');
   const [operator, setOperator] = useState('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectionVersion, setSelectionVersion] = useState(0);
   const [mobileDetail, setMobileDetail] = useState(false);
   const [notice, setNotice] = useState('');
   const [reload, setReload] = useState(0);
-  const [detailTab, setDetailTab] = useState<'activity' | 'details'>('details');
 
   useEffect(() => {
     if (!demoContext) return;
@@ -109,7 +107,7 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
         .includes(search.toLowerCase().trim()),
   );
   const selected = filtered.find((record) => record.id === selectedId);
-  const template = workflow ? templates[workflow] : undefined;
+  const template = workflow ? workTemplate(workflow, profile) : undefined;
   const counts = Object.fromEntries(
     tabs.map(({ id }) => [id, records.filter((record) => inTab(record, id)).length]),
   ) as Record<WorkTab, number>;
@@ -131,20 +129,6 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
     setOperator('all');
     setMobileDetail(false);
   }
-  function handleDetailTabKey(event: KeyboardEvent<HTMLButtonElement>) {
-    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-    event.preventDefault();
-    const next =
-      event.key === 'Home'
-        ? 'details'
-        : event.key === 'End'
-          ? 'activity'
-          : detailTab === 'details'
-            ? 'activity'
-            : 'details';
-    setDetailTab(next);
-    document.getElementById(`work-tab-${next}`)?.focus();
-  }
   async function advance() {
     if (!selected?.nextAction || pending) return;
     setPending(true);
@@ -153,7 +137,7 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
       const updated = await source.advance(selected, selected.nextAction.id);
       setRecords((current) => current.map((item) => (item.id === updated.id ? updated : item)));
       setNotice(
-        `Preview updated: ${templates[updated.workflowId].stages[updated.stage]}. Changes are not saved.`,
+        `Preview updated: ${workTemplate(updated.workflowId, profile).stages[updated.stage]}. Changes are not saved.`,
       );
       if (!inTab(updated, tab)) {
         setTab(
@@ -172,401 +156,261 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
     }
   }
 
+  if (!template) {
+    return (
+      <WorkLayout>
+        <WorkHeading description="This activity needs a supported workflow before it can be shown." />
+      </WorkLayout>
+    );
+  }
+
+  function closeDetails() {
+    setSelectedId(null);
+    setMobileDetail(false);
+  }
+
   return (
-    <div className={workspaceStyles.workRoot}>
-      {!template ? (
-        <div className="p-8">
-          <h1 className="text-2xl font-bold">Work</h1>
-          <p className="mt-3">This activity needs a supported workflow before it can be shown.</p>
-        </div>
-      ) : (
-        <div
-          data-work-layout
-          className={`${workspaceStyles.workLayout} ${selected ? workspaceStyles.workSplit : ''}`}
-        >
-          <main
-            data-work-main
-            data-mobile-detail={mobileDetail ? 'true' : 'false'}
-            className={workspaceStyles.workMain}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h1 className="text-[28px] font-bold tracking-tight">Work</h1>
-                <p className="mt-1 text-sm text-[#626675]">{template.label}</p>
-              </div>
-              <details className="relative">
-                <summary className="cursor-pointer rounded-md border border-[#e1d7c3] bg-white px-3 py-2 text-xs font-semibold text-[#805c1d]">
-                  Choose sample specialty
-                </summary>
-                <div className="absolute right-0 z-40 mt-2 grid w-72 gap-3 rounded-lg border border-[#e6e4df] bg-white p-4 shadow-lg">
-                  <p className="text-xs leading-relaxed text-[#667384]">
-                    Preview possibilities only. Sample changes are not saved.
-                  </p>
-                  <label className="text-xs font-semibold text-[#526071]">
-                    Sample specialty
-                    <select
-                      value={profileId}
-                      onChange={(event) => changeProfile(event.target.value)}
-                      className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
-                    >
-                      {[...new Set(availableProfiles.map((p) => p.categoryName))].map((category) => (
-                        <optgroup key={category} label={category}>
-                          {availableProfiles
-                            .filter((p) => p.categoryName === category)
-                            .map((p) => (
-                              <option key={p.subcategoryId} value={p.subcategoryId}>
-                                {p.name.replace('CafÃƒÂ©', 'Café')}
-                              </option>
-                            ))}
-                        </optgroup>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="text-xs font-semibold text-[#526071]">
-                    Sample activity
-                    <select
-                      value={workflow ?? ''}
-                      onChange={(event) => changeWorkflow(event.target.value)}
-                      className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
-                    >
-                      {candidates.length === 0 && <option value="">No supported activity</option>}
-                      {candidates.map((id) => (
-                        <option key={id} value={id}>
-                          {templates[id].label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </details>
-            </div>
-            <div
-              role="tablist"
-              aria-label="Work views"
-              className="mt-2 flex overflow-x-auto overflow-y-hidden border-b border-[#e2e2df]"
-            >
-              {tabs.map(({ id, label }) => (
+    <WorkLayout
+      mobileDetail={mobileDetail}
+      detail={selected && (
+        <WorkRecordPanel
+          key={`${selected.id}:${selectionVersion}`}
+          title={selected.id}
+          subtitle={`${selected.customer} · Sample record`}
+          stage={
+            <span className="rounded-full bg-[#e4f0fa] px-2 py-1 text-xs font-semibold text-[#23669b]">
+              {template.stages[selected.stage]}
+            </span>
+          }
+          onBack={() => setMobileDetail(false)}
+          onClose={closeDetails}
+          history={selected.history}
+          busy={pending}
+          footer={
+            <div className="w-full">
+              <p className="mb-2 text-xs text-[#72808e]">{selected.sourceLabel} · sample</p>
+              {selected.readOnly ? (
+                <p className="rounded-md bg-[#f2f4f5] p-3 text-sm">
+                  This record is read-only in this workspace.
+                </p>
+              ) : selected.nextAction ? (
                 <button
                   type="button"
-                  role="tab"
-                  aria-selected={tab === id}
-                  key={id}
-                  onClick={() => {
-                    setTab(id);
-                    setSelectedId(null);
-                    setMobileDetail(false);
-                  }}
-                  className={`flex shrink-0 items-center gap-2 border-b-2 px-3 pb-2 text-sm font-semibold ${tab === id ? 'border-[#b68a35] text-[#14243a]' : 'border-transparent text-[#6b7583]'}`}
+                  disabled={pending}
+                  onClick={advance}
+                  className="w-full rounded-md bg-[#d4a72c] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
                 >
-                  {label}
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${tab === id ? 'bg-[#f2e3c3] text-[#72551b]' : 'bg-[#eeefef] text-[#606b78]'}`}
-                  >
-                    {loading || error ? '–' : counts[id]}
-                  </span>
+                  {pending ? 'Updating preview…' : selected.nextAction.label}
                 </button>
-              ))}
-            </div>
-            <div className="my-2 flex flex-wrap gap-2">
-              <label className="relative min-w-[12rem] flex-1">
-                <span className="sr-only">Search {template.label.toLowerCase()}</span>
-                <Search size={17} className="absolute left-3 top-3 text-[#6a7787]" />
-                <input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder={`Search ${template.label.toLowerCase()}`}
-                  className="w-full rounded-md border border-[#dedfdf] bg-white py-2 pl-10 pr-3 text-sm outline-[#b68a35]"
-                />
-              </label>
-              <label className="sr-only" htmlFor="work-operator">
-                Filter by operator
-              </label>
-              <select
-                id="work-operator"
-                value={operator}
-                onChange={(event) => setOperator(event.target.value)}
-                className="rounded-md border border-[#dedfdf] bg-white px-3 py-2 text-sm"
-              >
-                <option value="all">All operators</option>
-                {[...new Set(records.map((record) => record.operator))].map((name) => (
-                  <option key={name}>{name}</option>
-                ))}
-              </select>
-            </div>
-            {loading ? (
-              <p role="status" className="rounded-lg bg-white p-6 text-sm text-[#5e6b79]">
-                Loading sample work…
-              </p>
-            ) : error ? (
-              <div role="alert" className="rounded-lg bg-white p-6 text-sm">
-                {error}{' '}
-                <button
-                  className="font-bold text-[#936a1b] underline"
-                  onClick={() => setReload((value) => value + 1)}
-                >
-                  Try again
-                </button>
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="rounded-lg border border-[#e9e8e5] bg-white p-8 text-center">
-                <h2 className="font-semibold">Nothing to show here</h2>
-                <p className="mt-2 text-sm text-[#667384]">
-                  {search || operator !== 'all'
-                    ? 'Try another search or operator.'
-                    : `There are no sample ${template.label.toLowerCase()} in this view.`}
+              ) : (
+                <p className="rounded-md bg-[#edf5ee] p-3 text-sm font-semibold text-[#397348]">
+                  {selected.stage >= template.stages.length - 1
+                    ? 'This sample work is complete.'
+                    : 'No action is available in this preview.'}
                 </p>
-              </div>
-            ) : (
-              <TableViewport
-                label="Work queue"
-                data-testid="work-queue"
-                className={workspaceStyles.workQueue}
-              >
+              )}
+              {notice && (
+                <p role="status" className="mt-3 text-sm text-[#536779]">
+                  {notice}
+                </p>
+              )}
+            </div>
+          }
+        >
+          <p className="flex items-start gap-2 text-sm text-[#48596c]">
+            <Check size={16} className="mt-0.5 shrink-0 text-[#92712f]" />{' '}
+            {selected.confirmation}
+          </p>
+          <WorkSteps stages={template.stages} current={selected.stage} />
+          <h3 className="border-b border-[#e8e7e4] pb-2 text-base font-bold">
+            {template.itemLabel}
+            {selected.lines ? ` (${selected.lines.length})` : ''}
+          </h3>
+          {selected.lines ? (
+            <div>
+              {selected.lines.map((line) => (
                 <div
-                  data-work-queue-header
-                  className={`${workspaceStyles.workQueueHeader} hidden grid-cols-[1.2fr_.7fr_1.6fr_.8fr_.7fr] gap-3 border-b border-[#ecebe8] px-3 py-2 text-xs font-semibold text-[#687585] md:grid`}
+                  key={line.name}
+                  className="flex justify-between gap-3 border-b border-[#e8e7e4] py-1 text-sm"
                 >
-                  <span>Reference</span>
-                  <span>{template.itemLabel}</span>
-                  <span>
-                    {template.contextLabel} &amp; {template.milestoneLabel.toLowerCase()}
+                  <span className="font-semibold">{line.name}</span>
+                  <span className="text-[#617080]">
+                    {line.quantity} · {line.amount}
                   </span>
-                  <span>Stage</span>
-                  <span>Operator</span>
                 </div>
-                {filtered.map((record) => (
-                  <button
-                    type="button"
-                    key={record.id}
-                    onClick={() => {
-                      setSelectedId(record.id);
-                      setMobileDetail(true);
-                      setDetailTab('details');
-                    }}
-                    className={`grid min-h-[2rem] w-full grid-cols-[1fr_auto] items-center gap-2 border-b border-[#eeedea] px-3 py-2 text-left last:border-b-0 hover:bg-[#fbf7ee] md:grid-cols-[1.2fr_.7fr_1.6fr_.8fr_.7fr] md:gap-3 md:py-1 ${selectedId === record.id ? 'border-l-4 border-l-[#bd9343] bg-[#fbf1dc]' : 'border-l-4 border-l-transparent'}`}
-                  >
-                    <span
-                      className="min-w-0 truncate text-xs"
-                      title={`${record.id} · ${record.customer}`}
-                    >
-                      <strong>{record.id}</strong>
-                      <span className="ml-1.5 text-[#667384]">{record.customer}</span>
-                    </span>
-                    <span className="hidden min-w-0 truncate text-xs md:block" title={record.item}>
-                      {record.item}
-                    </span>
-                    <span
-                      className="hidden min-w-0 truncate text-xs md:block"
-                      title={`${record.context} · ${record.milestone}`}
-                    >
-                      {record.context === 'Customer pickup' ? 'Pickup' : record.context}{' '}
-                      <span className="text-[#667384]">
-                        · {record.milestone.replace('Today, ', 'Today ')}
-                      </span>
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <span className="rounded-md bg-[#e4f0fa] px-2 py-0.5 text-xs font-semibold text-[#23669b]">
-                        {template.stages[record.stage]}
-                      </span>
-                      <ChevronRight size={16} className="text-[#6d7885] md:hidden" />
-                    </span>
-                    <span className="hidden min-w-0 items-center justify-between gap-1 text-xs md:flex">
-                      <span className="truncate">{record.operator}</span>
-                      <ChevronRight size={14} className="shrink-0 text-[#6d7885]" />
-                    </span>
-                  </button>
-                ))}
-              </TableViewport>
-            )}
-            {!loading && !error && (
-              <p className="mt-3 text-xs text-[#75808c]">
-                {filtered.length}{' '}
-                {filtered.length === 1 ? template.singular : template.label.toLowerCase()} · sample
-                records
-              </p>
-            )}
-          </main>
-          {selected && (
-            <div
-              className={`${offeringStyles.root} ${workspaceStyles.workDetail} min-h-0 min-w-0 px-5 pb-3 pt-3 xl:flex xl:px-3 ${mobileDetail ? 'block' : 'hidden xl:flex'}`}
-            >
-              <aside className="of-editor" aria-label="Selected work detail" aria-busy={pending}>
-                <div className="of-editor-heading" style={{ padding: '10px 14px 4px' }}>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => setMobileDetail(false)}
-                      className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#806124] xl:hidden"
-                    >
-                      <ArrowLeft size={16} /> Back to work
-                    </button>
-                    <div className="of-title-row">
-                      <h2>{selected.id}</h2>
-                      <span className="rounded-full bg-[#e4f0fa] px-2 py-1 text-xs font-semibold text-[#23669b]">
-                        {template.stages[selected.stage]}
-                      </span>
-                    </div>
-                    <p>{selected.customer} · Sample record</p>
-                  </div>
-                  <button
-                    type="button"
-                    className="of-icon"
-                    aria-label="Close work details"
-                    onClick={() => {
-                      setSelectedId(null);
-                      setMobileDetail(false);
-                    }}
-                  >
-                    <X size={19} />
-                  </button>
-                </div>
-                <div
-                  className="of-editor-tabs"
-                  style={{ margin: '0 14px' }}
-                  role="tablist"
-                  aria-label="Work detail sections"
-                >
-                  <button
-                    type="button"
-                    role="tab"
-                    id="work-tab-details"
-                    style={{ padding: '6px 8px' }}
-                    aria-controls="work-panel-details"
-                    aria-selected={detailTab === 'details'}
-                    tabIndex={detailTab === 'details' ? 0 : -1}
-                    onKeyDown={handleDetailTabKey}
-                    onClick={() => setDetailTab('details')}
-                  >
-                    Details
-                  </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    id="work-tab-activity"
-                    style={{ padding: '6px 8px' }}
-                    aria-controls="work-panel-activity"
-                    aria-selected={detailTab === 'activity'}
-                    tabIndex={detailTab === 'activity' ? 0 : -1}
-                    onKeyDown={handleDetailTabKey}
-                    onClick={() => setDetailTab('activity')}
-                  >
-                    Activity
-                  </button>
-                </div>
-                <div
-                  className="of-editor-body"
-                  style={{ padding: '8px 14px' }}
-                  role="tabpanel"
-                  id={`work-panel-${detailTab}`}
-                  aria-labelledby={`work-tab-${detailTab}`}
-                  tabIndex={0}
-                >
-                  {detailTab === 'details' ? (
-                    <>
-                      <p className="flex items-start gap-2 text-sm text-[#48596c]">
-                        <Check size={16} className="mt-0.5 shrink-0 text-[#92712f]" />{' '}
-                        {selected.confirmation}
-                      </p>
-                      <WorkSteps stages={template.stages} current={selected.stage} />
-                      <h3 className="border-b border-[#e8e7e4] pb-2 text-base font-bold">
-                        {template.itemLabel}
-                        {selected.lines ? ` (${selected.lines.length})` : ''}
-                      </h3>
-                      {selected.lines ? (
-                        <div>
-                          {selected.lines.map((line) => (
-                            <div
-                              key={line.name}
-                              className="flex justify-between gap-3 border-b border-[#e8e7e4] py-1 text-sm"
-                            >
-                              <span className="font-semibold">{line.name}</span>
-                              <span className="text-[#617080]">
-                                {line.quantity} · {line.amount}
-                              </span>
-                            </div>
-                          ))}
-                          <div className="flex justify-between border-b border-[#e8e7e4] py-1 text-sm font-bold">
-                            <span>Sample order total</span>
-                            <span>KES 1,210</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-start justify-between gap-3 border-b border-[#e8e7e4] py-1.5 text-sm">
-                          <span className="font-semibold">{selected.item}</span>
-                          <span className="text-[#617080]">{selected.context}</span>
-                        </div>
-                      )}
-                      <dl className="grid grid-cols-2 gap-x-3 gap-y-1 border-b border-[#e8e7e4] py-2 text-xs">
-                        <div>
-                          <dt className="inline text-[#78828e]">{template.milestoneLabel}: </dt>
-                          <dd className="inline font-semibold">{selected.milestone}</dd>
-                        </div>
-                        <div>
-                          <dt className="inline text-[#78828e]">Operator: </dt>
-                          <dd className="inline font-semibold">{selected.operator}</dd>
-                        </div>
-                        <div>
-                          <dt className="inline text-[#78828e]">{template.contextLabel}: </dt>
-                          <dd className="inline">{selected.context}</dd>
-                        </div>
-                        <div>
-                          <dt className="inline text-[#78828e]">Specialty: </dt>
-                          <dd className="inline">{profile.name.replace('CafÃƒÂ©', 'Café')}</dd>
-                        </div>
-                      </dl>
-                    </>
-                  ) : (
-                    <div>
-                      <h3 className="text-base font-semibold">Activity history</h3>
-                      <p className="mt-1 text-xs text-[#72808e]">Sample events for this record</p>
-                      <ol className="mt-4 space-y-3">
-                        {selected.history.map((entry, index) => (
-                          <li key={`${entry}-${index}`} className="flex gap-3 text-sm">
-                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#b58a38] text-white">
-                              <Check size={12} />
-                            </span>
-                            <span>{entry}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-                </div>
-                <div className="of-editor-footer" style={{ padding: '8px 14px' }}>
-                  <div className="w-full">
-                    <p className="mb-2 text-xs text-[#72808e]">{selected.sourceLabel} · sample</p>
-                    {selected.readOnly ? (
-                      <p className="rounded-md bg-[#f2f4f5] p-3 text-sm">
-                        This record is read-only in this workspace.
-                      </p>
-                    ) : selected.nextAction ? (
-                      <button
-                        type="button"
-                        disabled={pending}
-                        onClick={advance}
-                        className="w-full rounded-md bg-[#d4a72c] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
-                      >
-                        {pending ? 'Updating preview…' : selected.nextAction.label}
-                      </button>
-                    ) : (
-                      <p className="rounded-md bg-[#edf5ee] p-3 text-sm font-semibold text-[#397348]">
-                        {selected.stage >= template.stages.length - 1
-                          ? 'This sample work is complete.'
-                          : 'No action is available in this preview.'}
-                      </p>
-                    )}
-                    {notice && (
-                      <p role="status" className="mt-3 text-sm text-[#536779]">
-                        {notice}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </aside>
+              ))}
+              <div className="flex justify-between border-b border-[#e8e7e4] py-1 text-sm font-bold">
+                <span>Sample order total</span>
+                <span>KES 1,210</span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start justify-between gap-3 border-b border-[#e8e7e4] py-1.5 text-sm">
+              <span className="font-semibold">{selected.item}</span>
+              <span className="text-[#617080]">{selected.context}</span>
             </div>
           )}
-        </div>
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-1 border-b border-[#e8e7e4] py-2 text-xs">
+            <div>
+              <dt className="inline text-[#78828e]">{template.milestoneLabel}: </dt>
+              <dd className="inline font-semibold">{selected.milestone}</dd>
+            </div>
+            <div>
+              <dt className="inline text-[#78828e]">Operator: </dt>
+              <dd className="inline font-semibold">{selected.operator}</dd>
+            </div>
+            <div>
+              <dt className="inline text-[#78828e]">{template.contextLabel}: </dt>
+              <dd className="inline">{selected.context}</dd>
+            </div>
+            <div>
+              <dt className="inline text-[#78828e]">Specialty: </dt>
+              <dd className="inline">{profile.name.replace('CafÃƒÂ©', 'Café')}</dd>
+            </div>
+          </dl>
+        </WorkRecordPanel>
       )}
-    </div>
+    >
+      <WorkHeading
+        description={template.label}
+        actions={
+          <details className="relative">
+            <summary className="cursor-pointer rounded-md border border-[#e1d7c3] bg-white px-3 py-2 text-xs font-semibold text-[#805c1d]">
+              Choose sample specialty
+            </summary>
+            <div className="absolute right-0 z-40 mt-2 grid w-72 gap-3 rounded-lg border border-[#e6e4df] bg-white p-4 shadow-lg">
+              <p className="text-xs leading-relaxed text-[#667384]">
+                Preview possibilities only. Sample changes are not saved.
+              </p>
+              <label className="text-xs font-semibold text-[#526071]">
+                Sample specialty
+                <select
+                  value={profileId}
+                  onChange={(event) => changeProfile(event.target.value)}
+                  className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
+                >
+                  {[...new Set(availableProfiles.map((p) => p.categoryName))].map((category) => (
+                    <optgroup key={category} label={category}>
+                      {availableProfiles
+                        .filter((p) => p.categoryName === category)
+                        .map((p) => (
+                          <option key={p.subcategoryId} value={p.subcategoryId}>
+                            {p.name.replace('CafÃƒÂ©', 'Café')}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </label>
+              <label className="text-xs font-semibold text-[#526071]">
+                Sample activity
+                <select
+                  value={workflow ?? ''}
+                  onChange={(event) => changeWorkflow(event.target.value)}
+                  className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
+                >
+                  {candidates.length === 0 && <option value="">No supported activity</option>}
+                  {candidates.map((id) => (
+                    <option key={id} value={id}>
+                      {workTemplate(id, profile).label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </details>
+        }
+      />
+      <WorkTabs
+        tabs={tabs.map(({ id, label }) => ({ id, label, count: loading || error ? '–' : counts[id] }))}
+        value={tab}
+        onChange={(id) => {
+          setTab(id);
+          closeDetails();
+        }}
+      />
+      <WorkSearch
+        value={search}
+        onChange={setSearch}
+        placeholder={`Search ${template.label.toLowerCase()}`}
+      >
+        <label className="sr-only" htmlFor="work-operator">
+          Filter by operator
+        </label>
+        <select
+          id="work-operator"
+          value={operator}
+          onChange={(event) => setOperator(event.target.value)}
+          className="rounded-md border border-[#dedfdf] bg-white px-3 py-2 text-sm"
+        >
+          <option value="all">All operators</option>
+          {[...new Set(records.map((record) => record.operator))].map((name) => (
+            <option key={name}>{name}</option>
+          ))}
+        </select>
+      </WorkSearch>
+      {loading ? (
+        <p role="status" className="rounded-lg bg-white p-6 text-sm text-[#5e6b79]">
+          Loading sample work…
+        </p>
+      ) : error ? (
+        <div role="alert" className="rounded-lg bg-white p-6 text-sm">
+          {error}{' '}
+          <button
+            type="button"
+            className="font-bold text-[#936a1b] underline"
+            onClick={() => setReload((value) => value + 1)}
+          >
+            Try again
+          </button>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="rounded-lg border border-[#e9e8e5] bg-white p-8 text-center">
+          <h2 className="font-semibold">Nothing to show here</h2>
+          <p className="mt-2 text-sm text-[#667384]">
+            {search || operator !== 'all'
+              ? 'Try another search or operator.'
+              : `There are no sample ${template.label.toLowerCase()} in this view.`}
+          </p>
+        </div>
+      ) : (
+        <WorkQueue columns={[
+          'Reference',
+          template.itemLabel,
+          `${template.contextLabel} & ${template.milestoneLabel.toLowerCase()}`,
+          'Stage',
+          'Operator',
+        ]}>
+          {filtered.map((record) => (
+            <WorkQueueRow
+              key={record.id}
+              id={record.id}
+              customer={record.customer}
+              item={record.item}
+              context={record.context === 'Customer pickup' ? 'Pickup' : record.context}
+              milestone={record.milestone.replace('Today, ', 'Today ')}
+              stage={
+                <span className="rounded-md bg-[#e4f0fa] px-2 py-0.5 text-xs font-semibold text-[#23669b]">
+                  {template.stages[record.stage]}
+                </span>
+              }
+              operator={record.operator}
+              selected={selectedId === record.id}
+              onSelect={() => {
+                setSelectedId(record.id);
+                setSelectionVersion((version) => version + 1);
+                setMobileDetail(true);
+              }}
+            />
+          ))}
+        </WorkQueue>
+      )}
+      {!loading && !error && (
+        <p className="mt-3 text-xs text-[#75808c]">
+          {filtered.length}{' '}
+          {filtered.length === 1 ? template.singular : template.label.toLowerCase()} · sample records
+        </p>
+      )}
+    </WorkLayout>
   );
 }

@@ -138,6 +138,7 @@ export function OfferingEditor({
   onConnections,
   onReload,
   onAdd,
+  itemAction,
   setupDraftOnly = false,
   onUploadImage,
 }: {
@@ -157,6 +158,7 @@ export function OfferingEditor({
   onConnections: () => void;
   onReload: () => void;
   onAdd: () => void;
+  itemAction?: ReactNode;
   setupDraftOnly?: boolean;
   onUploadImage?: (item: Offering, file: File) => Promise<{ path: string; url: string }>;
 }) {
@@ -215,6 +217,7 @@ export function OfferingEditor({
             {dirty ? ' · Unsaved' : ''}
           </p>
           <div className="of-editor-shortcuts">
+            {itemAction}
             <button
               type="button"
               className="of-button of-discount-action"

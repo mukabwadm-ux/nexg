@@ -12,6 +12,7 @@ import {
   MapPin,
   Package,
   PauseCircle,
+  Plane,
   Plus,
   ShieldQuestion,
   Truck,
@@ -696,7 +697,9 @@ export function OccurrenceInspector({
   );
 }
 export function ResourceIdentity({ name, kind }: { name: string; kind: string }) {
-  const Icon = /bicycle|bike/i.test(name)
+  const Icon = /aircraft/i.test(kind)
+    ? Plane
+    : /bicycle|bike/i.test(name)
     ? Bike
     : /toyota|vehicle|car/i.test(name)
       ? CarFront

@@ -219,6 +219,7 @@ export function offeringsHref(c: Context, state: Record<string, string> = {}) {
   return '/merchant-live-preview/offerings?' + new URLSearchParams({ profile: c.profile.id, offering: c.offering.id, returnTo: moneyHref(c, state) });
 }
 export function workHref(c: Context, work: string, state: Record<string, string> = {}) {
+  if (c.workLink) return c.workLink(work);
   return '/merchant-live-preview/work?' + new URLSearchParams({ moneyProfile: c.profile.id, offering: c.offering.id, location: c.location, method: c.method, work, returnTo: moneyHref(c, state) });
 }
 export function csvCell(value: string | number) {

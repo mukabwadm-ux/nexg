@@ -1,0 +1,336 @@
+.builder {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.85fr);
+  gap: 20px;
+  align-items: start;
+  color: var(--ink, #141414);
+  font-size: 13px;
+}
+.formColumn {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.section,
+.summary {
+  overflow: hidden;
+}
+.section {
+  padding: 20px;
+}
+.sectionHeading,
+.summaryHeading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.sectionHeading h2,
+.summaryHeading h2 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.sectionHeading > span,
+.summaryHeading > span {
+  font-size: 11px;
+  color: var(--muted-light, #6f6a61);
+}
+.sectionHeading > svg {
+  color: var(--muted-light, #6f6a61);
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.builder input[aria-invalid='true'] {
+  border-color: var(--danger, #b42318);
+}
+.fullWidth {
+  grid-column: 1 / -1;
+}
+.note {
+  margin: 0;
+  color: var(--muted-light, #6f6a61);
+  font-size: 11px;
+  line-height: 1.65;
+  font-weight: 450;
+}
+.dangerText {
+  color: var(--danger, #b42318);
+}
+.route {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stop {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding-top: 17px;
+}
+.stop > label {
+  flex: 1;
+}
+.routeArrow {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  color: var(--muted-light, #6f6a61);
+}
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  border: 1px solid var(--border-strong, #ddd8cc);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--muted, #4d4a44);
+  cursor: pointer;
+}
+.iconButton:hover {
+  color: var(--danger, #b42318);
+  background: var(--danger-bg, #fdecea);
+}
+.textButton {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  background: transparent;
+  border: none;
+  padding: 0 3px;
+  color: var(--ink, #141414);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.textButton:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.durationFields {
+  margin: 10px 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border, #ece8df);
+}
+.summaryColumn {
+  min-width: 0;
+  position: sticky;
+  top: 16px;
+}
+.summary {
+  padding: 20px;
+}
+.sampleLabel {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  color: var(--warning, #8a6a10);
+  background: var(--gold-soft, #fbf7ea);
+  border: 1px solid #eee3bd;
+  border-radius: 7px;
+  padding: 10px;
+  margin-bottom: 22px;
+  font-size: 10px;
+  line-height: 1.6;
+  font-weight: 650;
+}
+.sampleLabel svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.summaryHeading {
+  margin-bottom: 14px;
+}
+.summaryHeading > span {
+  font-size: 10px;
+}
+.aircraftName {
+  font-size: 13px;
+  font-weight: 750;
+  margin: 0 0 7px;
+}
+.routeSummary {
+  margin: 0 0 20px;
+  color: var(--muted, #4d4a44);
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.itemization {
+  margin: 0;
+  display: grid;
+  gap: 13px;
+  font-size: 11px;
+}
+.itemization > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+.itemization dt {
+  color: var(--muted, #4d4a44);
+}
+.itemization dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.flightLine {
+  border-top: 1px solid var(--border, #ece8df);
+  padding-top: 13px;
+}
+.total {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 20px 0 12px;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--border-strong, #ddd8cc);
+}
+.total > span {
+  color: var(--muted, #4d4a44);
+  font-size: 11px;
+}
+.total strong {
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.validity {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-top: 20px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border, #ece8df);
+  border-bottom: 1px solid var(--border, #ece8df);
+  color: var(--muted, #4d4a44);
+}
+.validity svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.validity p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.validity strong {
+  display: block;
+  font-weight: 750;
+  color: var(--ink, #141414);
+}
+.validity span {
+  display: block;
+}
+.confirmationNote {
+  margin: 15px 0;
+  color: var(--muted-light, #6f6a61);
+  font-size: 11px;
+  line-height: 1.65;
+}
+.actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 7px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.primaryButton {
+  color: var(--ink, #141414);
+  border: 1px solid var(--gold, #d4a72c);
+  background: var(--gold, #d4a72c);
+}
+.primaryButton:hover {
+  filter: brightness(0.96);
+}
+.secondaryButton {
+  color: var(--ink, #141414);
+  border: 1px solid var(--border-strong, #ddd8cc);
+  background: #fff;
+}
+.secondaryButton:hover {
+  background: var(--bg, #f6f3ec);
+}
+.error,
+.feedback {
+  display: flex;
+  gap: 7px;
+  margin: 14px 0 0;
+  padding: 10px;
+  border-radius: 7px;
+  font-size: 11px;
+  line-height: 1.65;
+}
+.error {
+  color: var(--danger, #b42318);
+  background: var(--danger-bg, #fdecea);
+}
+.feedback {
+  color: var(--success, #1f7a3a);
+  background: var(--success-bg, #e9f5ec);
+}
+.error svg,
+.feedback svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+@media (max-width: 1050px) {
+  .builder {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .summaryColumn {
+    position: static;
+  }
+  .summary {
+    max-width: none;
+  }
+}
+@media (max-width: 560px) {
+  .builder {
+    gap: 16px;
+  }
+  .section,
+  .summary {
+    padding: 16px;
+  }
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .total strong {
+    font-size: 28px;
+  }
+  .sectionHeading {
+    margin-bottom: 15px;
+  }
+}

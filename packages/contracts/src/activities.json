@@ -1,0 +1,130 @@
+{
+  "id": "activities_games_sports",
+  "name": "Activities, Games & Sports",
+  "icon": "Trophy",
+  "color": "#0f766e",
+  "bg": "#f0fdfa",
+  "desc": "Indoor games, outdoor sports, adrenaline activities and swimming.",
+  "cardKind": "services",
+  "etaStyle": "turnaround",
+  "sort": 22,
+  "subcategories": [
+    {
+      "id": "bowling",
+      "name": "Bowling",
+      "group": "Indoor",
+      "model": "SPACE_RESERVATION",
+      "icon": "CircleDot",
+      "unit": "lane",
+      "needs": "Reserve actual bowling lanes by party size and time. Set lane capacity, game duration and equipment terms."
+    },
+    {
+      "id": "arcade_games",
+      "name": "Arcade & timed play",
+      "group": "Indoor",
+      "model": "SESSION_CAPACITY",
+      "icon": "Gamepad2",
+      "unit": "play session",
+      "needs": "Set timed entry capacity, age guidance and equipment availability."
+    },
+    {
+      "id": "escape_rooms",
+      "name": "Escape rooms",
+      "group": "Indoor",
+      "model": "SPACE_RESERVATION",
+      "icon": "KeyRound",
+      "unit": "escape room",
+      "needs": "Reserve an exclusive room for the party. Set age limits, duration and reset time."
+    },
+    {
+      "id": "indoor_courts",
+      "name": "Indoor sports courts",
+      "group": "Indoor",
+      "model": "SPACE_RESERVATION",
+      "icon": "Trophy",
+      "unit": "court",
+      "needs": "Reserve a compatible indoor court by sport, duration and group size."
+    },
+    {
+      "id": "outdoor_courts",
+      "name": "Outdoor sports courts",
+      "group": "Outdoor",
+      "model": "SPACE_RESERVATION",
+      "icon": "Trophy",
+      "unit": "court",
+      "needs": "Reserve a compatible court and define rain or unsafe-surface cancellation terms."
+    },
+    {
+      "id": "football_pitches",
+      "name": "Football pitches",
+      "group": "Outdoor",
+      "model": "SPACE_RESERVATION",
+      "icon": "Goal",
+      "unit": "pitch",
+      "needs": "Reserve a pitch by size, availability and playing time. Set floodlight and equipment terms."
+    },
+    {
+      "id": "outdoor_team_games",
+      "name": "Outdoor team games",
+      "group": "Outdoor",
+      "model": "SESSION_CAPACITY",
+      "icon": "Trees",
+      "unit": "team session",
+      "needs": "Schedule dated team sessions with participant limits, equipment and supervision."
+    },
+    {
+      "id": "go_karting",
+      "name": "Go-karting",
+      "group": "Adrenaline",
+      "model": "SESSION_CAPACITY",
+      "icon": "Flag",
+      "unit": "track session",
+      "needs": "Manage heat capacity, available karts and marshals. Record height, age and safety briefing requirements."
+    },
+    {
+      "id": "paintball",
+      "name": "Paintball",
+      "group": "Adrenaline",
+      "model": "SESSION_CAPACITY",
+      "icon": "Target",
+      "unit": "paintball session",
+      "needs": "Schedule games with player capacity, protective equipment and briefing requirements."
+    },
+    {
+      "id": "ziplining",
+      "name": "Ziplining & high ropes",
+      "group": "Adrenaline",
+      "model": "REQUEST_QUOTE",
+      "icon": "Mountain",
+      "unit": "adventure request",
+      "needs": "Review party size, age and weight limits, operator supervision and weather before offering a confirmed slot."
+    },
+    {
+      "id": "swimming_sessions",
+      "name": "Public swim sessions",
+      "group": "Swimming",
+      "model": "SESSION_CAPACITY",
+      "icon": "Waves",
+      "unit": "swim session",
+      "needs": "Set timed pool capacity, lifeguard cover and supervision requirements."
+    },
+    {
+      "id": "swimming_lessons",
+      "name": "Swimming lessons",
+      "group": "Swimming",
+      "model": "APPOINTMENT",
+      "icon": "Waves",
+      "unit": "swim lesson",
+      "needs": "Match the swimmer to an eligible instructor, suitable pool space and lesson duration."
+    },
+    {
+      "id": "pool_lane_hire",
+      "name": "Pool lane hire",
+      "group": "Swimming",
+      "model": "SPACE_RESERVATION",
+      "icon": "Waves",
+      "unit": "pool lane",
+      "needs": "Reserve the actual lane and time. Set party size, allowed use and pool supervision terms."
+    }
+  ]
+}

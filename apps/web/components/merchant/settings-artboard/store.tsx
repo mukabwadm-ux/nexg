@@ -36,11 +36,13 @@ const Context = React.createContext<SettingsContextValue | null>(null);
 export function SettingsProvider({
   identity,
   children,
+  initialSample,
 }: {
   identity: SettingsIdentity;
   children: React.ReactNode;
+  initialSample?: SettingsState;
 }) {
-  const [state, setState] = React.useState(() => initialState(identity));
+  const [state, setState] = React.useState(() => initialSample ?? initialState(identity));
   const stateRef = React.useRef(state);
   const [busy, setBusy] = React.useState(false);
   const locked = React.useRef(false);
@@ -48,7 +50,9 @@ export function SettingsProvider({
   const [dirty, setDirty] = React.useState(false);
   const [message, setMessage] = React.useState<SettingsContextValue['message']>(null);
   const storageKey = identity.sample
-    ? 'nexg.settings.sample.v1'
+    ? identity.merchantId === 'sample-karibu'
+      ? 'nexg.settings.sample.v1'
+      : `nexg.settings.sample.v1.${identity.merchantId}`
     : `nexg.settings.preferences.v1.${identity.userId}`;
   React.useEffect(() => {
     try {

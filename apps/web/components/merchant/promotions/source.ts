@@ -114,12 +114,15 @@ export function newCampaignId() {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-export function localPromotionSource(storage: StorageLike): PromotionSource {
-  const offerings = localOfferingsSource(storage);
+export function localPromotionSource(
+  storage: StorageLike,
+  offerings = localOfferingsSource(storage),
+  seed = initialPromotions,
+): PromotionSource {
   async function load(profile: OfferingProfile) {
     const catalogue = (await offerings.load(profile)) as PromotionCatalogue;
     if (catalogue.promotionsPreview === undefined) {
-      const initial = initialPromotions(profile, catalogue);
+      const initial = seed(profile, catalogue);
       await offerings.replace(profile, initial.catalogue);
       return initial;
     }

@@ -1,16 +1,17 @@
 /**
  * @nexg/contracts/taxonomy — The authoritative NexG Merchant Taxonomy.
  *
- * 21 Top-Level Merchant Verticals and 128 Subcategories.
- * Derived from the official NexG Nairobi Merchant Seed Catalog & Taxonomy spec.
+ * Derived from the NexG Nairobi Merchant Seed Catalog and category extensions.
  */
 import { z } from 'zod';
+import activities from './activities.json';
 
 export const MerchantSubcategorySchema = z.object({
   id: z.string(),
   name: z.string(),
   icon: z.string(),
   categoryId: z.string(),
+  group: z.string().optional(),
   fulfillmentHint: z.string(),
   workflowHint: z.string(),
   fields: z.array(z.string()),
@@ -244,6 +245,13 @@ export function getCatalogueExample(
     : undefined;
   return specialtyExample ?? CATEGORY_CATALOGUE_EXAMPLES[category.id];
 }
+
+const activityWorkflows: Record<string, string> = {
+  SPACE_RESERVATION: 'Choose a venue and time → check space and party limits → confirm reservation → check in',
+  SESSION_CAPACITY: 'Choose a dated session → check places and eligibility → confirm booking → check in',
+  APPOINTMENT: 'Choose a lesson → check instructor and pool availability → confirm appointment → attend',
+  REQUEST_QUOTE: 'Send activity requirements → operator reviews eligibility and conditions → accept quote → confirm with operator',
+};
 
 export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
   {
@@ -2648,6 +2656,23 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
           'Shipment quote → cargo details → origin/destination → dimensions/weight → documentation → pickup → tracking → delivery',
       },
     ],
+  },
+  {
+    ...activities,
+    cardKind: 'services',
+    etaStyle: 'turnaround',
+    subcategories: activities.subcategories.map(({ id, name, icon, group, model }) => ({
+      id,
+      name,
+      icon,
+      group,
+      categoryId: activities.id,
+      fulfillmentHint: 'merchant_venue',
+      workflowHint: model,
+      fields: [],
+      suggestedItemCount: 10,
+      defaultWorkflow: activityWorkflows[model]!,
+    })),
   },
 ] as const;
 

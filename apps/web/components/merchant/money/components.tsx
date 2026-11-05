@@ -6,6 +6,24 @@ import { Info, X, type LucideIcon } from 'lucide-react';
 import { useRef, type ReactNode } from 'react';
 import styles from './workspace.module.css';
 
+export function MoneyHeading({
+  description,
+  actions,
+}: {
+  description: string;
+  actions?: ReactNode;
+}) {
+  return (
+    <div className="mo-heading">
+      <div>
+        <h1>Money</h1>
+        <p>{description}</p>
+      </div>
+      {actions && <div className="mo-heading-actions">{actions}</div>}
+    </div>
+  );
+}
+
 export function Modal({
   title,
   description,
