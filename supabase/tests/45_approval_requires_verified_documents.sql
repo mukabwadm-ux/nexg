@@ -49,7 +49,7 @@ select ok(
 
 select ok(
   (select prosrc from pg_proc where proname = 'rpc_merchant_application_review')
-    ~ 'p_decision=''approved'' and not authz\\.merchant_documents_verified\\(p_merchant_id\\)',
+    ~ 'p_decision=''approved'' and not authz\.merchant_documents_verified\(p_merchant_id\)',
   'The review command refuses approval until the documents are verified.');
 
 select ok(
