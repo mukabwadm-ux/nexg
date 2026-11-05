@@ -9,13 +9,26 @@ const output = path.join(__dirname, '../docs/merchant-portal-plan/money-concept/
 
 async function main() {
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({ viewport: { width: 1280, height: 633 }, deviceScaleFactor: 1.5 });
-  const page = await context.newPage(), errors = [], mutations = [];
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 633 },
+    deviceScaleFactor: 1.5,
+  });
+  const page = await context.newPage(),
+    errors = [],
+    mutations = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  page.on('request', (request) => { if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) mutations.push(`${request.method()} ${request.url()}`); });
+  page.on('request', (request) => {
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method()))
+      mutations.push(`${request.method()} ${request.url()}`);
+  });
   async function visit(profile) {
-    await page.goto(`${base}/merchant-live-preview/money?profile=${encodeURIComponent(profile)}`, { waitUntil: 'domcontentloaded', timeout: 90000 });
-    await expect(page.getByTestId('money-workspace')).toHaveAttribute('data-profile', profile, { timeout: 30000 });
+    await page.goto(`${base}/merchant-live-preview/money?profile=${encodeURIComponent(profile)}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 90000,
+    });
+    await expect(page.getByTestId('money-workspace')).toHaveAttribute('data-profile', profile, {
+      timeout: 30000,
+    });
     await expect(page.getByTestId('money-table-card')).toBeVisible({ timeout: 30000 });
   }
   async function layout(name) {
@@ -23,13 +36,29 @@ async function main() {
       const table = document.querySelector('[data-testid="money-table-scroll"]');
       const inspector = document.querySelector('.mo-inspector-content');
       const box = table.getBoundingClientRect();
-      return { tableClient: table.clientHeight, tableScroll: table.scrollHeight, inspectorClient: inspector.clientHeight, inspectorScroll: inspector.scrollHeight, rows: [...table.querySelectorAll('tbody tr')].map((r) => r.getBoundingClientRect().bottom <= box.bottom + 1), documentWidth: document.documentElement.scrollWidth, viewportWidth: innerWidth };
+      return {
+        tableClient: table.clientHeight,
+        tableScroll: table.scrollHeight,
+        inspectorClient: inspector.clientHeight,
+        inspectorScroll: inspector.scrollHeight,
+        rows: [...table.querySelectorAll('tbody tr')].map(
+          (r) => r.getBoundingClientRect().bottom <= box.bottom + 1,
+        ),
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: innerWidth,
+      };
     });
-    assert.equal(dimensions.documentWidth, dimensions.viewportWidth, `${name}: body horizontal overflow`);
+    assert.equal(
+      dimensions.documentWidth,
+      dimensions.viewportWidth,
+      `${name}: body horizontal overflow`,
+    );
     assert.equal(dimensions.rows.length, 6, `${name}: expected six visible rows`);
     assert.ok(dimensions.rows.every(Boolean), `${name}: a table row is clipped`);
     await page.screenshot({ path: path.join(output, `${name}-preview.png`) });
-    console.log(`${name} layout: table ${dimensions.tableClient}/${dimensions.tableScroll}px; detail ${dimensions.inspectorClient}/${dimensions.inspectorScroll}px; six rows visible`);
+    console.log(
+      `${name} layout: table ${dimensions.tableClient}/${dimensions.tableScroll}px; detail ${dimensions.inspectorClient}/${dimensions.inspectorScroll}px; six rows visible`,
+    );
   }
   await visit('restaurant');
   await expect(page.getByText('KES 200,000')).toBeVisible();
@@ -42,10 +71,26 @@ async function main() {
   await expect(summary).toContainText('36');
   await expect(summary).toContainText('30 confirmed');
   await expect(summary).toContainText('4 confirmed');
-  await expect(page.getByTestId('money-inspector').getByRole('heading', { name: 'Order payment' })).toBeVisible();
+  await expect(
+    page.getByTestId('money-inspector').getByRole('heading', { name: 'Order payment' }),
+  ).toBeVisible();
   await expect(page.getByTestId('money-inspector')).toContainText('M-Pesa');
-  const txLayout = await page.evaluate(() => { const t = document.querySelector('[data-testid="money-table-scroll"]'), box = t.getBoundingClientRect(); return { width: t.clientWidth, scrollWidth: t.scrollWidth, firstSixFit: [...t.querySelectorAll('tbody tr')].slice(0, 6).every((r) => r.getBoundingClientRect().bottom <= box.bottom + 1) }; });
-  assert.equal(txLayout.width, txLayout.scrollWidth, 'Transaction columns should fit the short desktop viewport');
+  const txLayout = await page.evaluate(() => {
+    const t = document.querySelector('[data-testid="money-table-scroll"]'),
+      box = t.getBoundingClientRect();
+    return {
+      width: t.clientWidth,
+      scrollWidth: t.scrollWidth,
+      firstSixFit: [...t.querySelectorAll('tbody tr')]
+        .slice(0, 6)
+        .every((r) => r.getBoundingClientRect().bottom <= box.bottom + 1),
+    };
+  });
+  assert.equal(
+    txLayout.width,
+    txLayout.scrollWidth,
+    'Transaction columns should fit the short desktop viewport',
+  );
   assert.ok(txLayout.firstSixFit, 'Six transaction rows should remain visible');
   await page.screenshot({ path: path.join(output, 'transactions-refined.png') });
   await page.getByLabel('Filter transactions').selectOption('M-Pesa');
@@ -59,18 +104,36 @@ async function main() {
   await page.getByRole('button', { name: 'Clear filters' }).click();
   await expect(page.getByRole('button', { name: 'Open TX-6112' })).toBeVisible();
   await expect(summary).toContainText('KES 200,000');
-  console.log('Transactions: details, full-scope search, method filter, changing summaries and clear recovery passed');
-  const [exported] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export', exact: true }).click()]);
+  console.log(
+    'Transactions: details, full-scope search, method filter, changing summaries and clear recovery passed',
+  );
+  const [exported] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Export', exact: true }).click(),
+  ]);
   const report = await fs.readFile(await exported.path(), 'utf8');
-  assert.ok(report.includes('TX-6112') && report.includes('KES 24,800') && report.includes('Not a fiscal document'), 'Sample export must contain scoped records and its basis');
+  assert.ok(
+    report.includes('TX-6112') &&
+      report.includes('KES 24,800') &&
+      report.includes('Not a fiscal document'),
+    'Sample export must contain scoped records and its basis',
+  );
   console.log('Export: scoped sample transactions and source basis included');
   await page.getByLabel('Reporting period').selectOption('today');
   await expect(page.getByText('KES 64,600')).toBeVisible();
   await expect(page.getByText('6 records shown')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Open TX-6200' })).toHaveCount(0);
-  const [todayExport] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export', exact: true }).click()]);
+  const [todayExport] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Export', exact: true }).click(),
+  ]);
   const todayReport = await fs.readFile(await todayExport.path(), 'utf8');
-  assert.ok(todayReport.includes('3 Nov 2026') && todayReport.includes('TX-6112') && !todayReport.includes('TX-6200'), 'Today export must match the selected period');
+  assert.ok(
+    todayReport.includes('3 Nov 2026') &&
+      todayReport.includes('TX-6112') &&
+      !todayReport.includes('TX-6200'),
+    'Today export must match the selected period',
+  );
   await page.getByRole('tab', { name: 'Overview' }).click();
   await expect(page.getByText('KES 59,400')).toBeVisible();
   await page.getByLabel('Reporting period').selectOption('range');
@@ -81,9 +144,17 @@ async function main() {
   await page.getByRole('button', { name: 'Open STM-TODAY' }).click();
   await expect(page.getByTestId('money-inspector')).toContainText('3 Nov 2026');
   await expect(page.getByTestId('money-inspector')).toContainText('KES 64,600');
-  const [statementExport] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download CSV report' }).click()]);
+  const [statementExport] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Download CSV report' }).click(),
+  ]);
   const statementReport = await fs.readFile(await statementExport.path(), 'utf8');
-  assert.ok(statementReport.includes('3 Nov 2026') && statementReport.includes('TX-6112') && !statementReport.includes('TX-6200'), 'The selected statement must export its own period');
+  assert.ok(
+    statementReport.includes('3 Nov 2026') &&
+      statementReport.includes('TX-6112') &&
+      !statementReport.includes('TX-6200'),
+    'The selected statement must export its own period',
+  );
   await page.screenshot({ path: path.join(output, 'statements-refined.png') });
   await page.getByRole('tab', { name: 'Overview' }).click();
   await expect(page.getByRole('heading', { name: 'Recent activity' })).toBeVisible();
@@ -95,7 +166,11 @@ async function main() {
   await page.getByRole('button', { name: 'Save and review' }).click();
   await page.getByRole('button', { name: 'Submit sample result' }).click();
   await expect(page.getByText('Needs refresh').first()).toBeVisible();
-  await expect(page.getByText('A refund result is unknown. Do not submit another refund or credit against it.')).toBeVisible();
+  await expect(
+    page.getByText(
+      'A refund result is unknown. Do not submit another refund or credit against it.',
+    ),
+  ).toBeVisible();
   await page.getByRole('tab', { name: 'Statements' }).click();
   await expect(page.getByRole('button', { name: 'Download CSV report' })).toBeDisabled();
   await page.getByRole('tab', { name: 'Transactions' }).click();
@@ -112,17 +187,34 @@ async function main() {
   await expect(page.getByText('KES 181,900')).toBeVisible();
   await page.getByRole('tab', { name: 'Payouts' }).click();
   await expect(page.getByText('KES 29,900').first()).toBeVisible();
-  console.log('Sale refund: draft, unknown, duplicate protection, confirmation and sample statement refresh passed');
+  console.log(
+    'Sale refund: draft, unknown, duplicate protection, confirmation and sample statement refresh passed',
+  );
 
   const other = await context.newPage();
   other.on('pageerror', (error) => errors.push(error.message));
-  other.on('request', (request) => { if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) mutations.push(`${request.method()} ${request.url()}`); });
+  other.on('request', (request) => {
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method()))
+      mutations.push(`${request.method()} ${request.url()}`);
+  });
   const scopeUrl = `${base}/merchant-live-preview/money?profile=restaurant&location=Kilimani`;
-  await Promise.all([page.goto(scopeUrl, { waitUntil: 'domcontentloaded', timeout: 90000 }), other.goto(scopeUrl, { waitUntil: 'domcontentloaded', timeout: 90000 })]);
-  for (const p of [page, other]) { await expect(p.getByTestId('money-table-card')).toBeVisible({ timeout: 30000 }); await p.getByRole('button', { name: 'Open TX-6112' }).click(); await p.getByRole('button', { name: 'Review sample refund' }).click(); await p.getByLabel('Refund reason').fill(p === page ? 'Keep this input' : 'Other view'); }
+  await Promise.all([
+    page.goto(scopeUrl, { waitUntil: 'domcontentloaded', timeout: 90000 }),
+    other.goto(scopeUrl, { waitUntil: 'domcontentloaded', timeout: 90000 }),
+  ]);
+  for (const p of [page, other]) {
+    await expect(p.getByTestId('money-table-card')).toBeVisible({ timeout: 30000 });
+    await p.getByRole('button', { name: 'Open TX-6112' }).click();
+    await p.getByRole('button', { name: 'Review sample refund' }).click();
+    await p.getByLabel('Refund reason').fill(p === page ? 'Keep this input' : 'Other view');
+  }
   await other.getByRole('button', { name: 'Save and review' }).click();
   await page.getByRole('button', { name: 'Save and review' }).click();
-  await expect(page.getByText('This sample changed in another view. Reload and review again; your input is kept.')).toBeVisible();
+  await expect(
+    page.getByText(
+      'This sample changed in another view. Reload and review again; your input is kept.',
+    ),
+  ).toBeVisible();
   await expect(page.getByLabel('Refund reason')).toHaveValue('Keep this input');
   await page.getByRole('button', { name: 'Reload current sample and keep input' }).click();
   await expect(page.getByLabel('Refund reason')).toHaveValue('Keep this input');
@@ -133,12 +225,18 @@ async function main() {
   console.log('Concurrent review: stale changes are rejected and the user input is preserved');
 
   await visit('self_drive');
-  await expect(page.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true', { timeout: 30000 });
+  await expect(page.getByRole('tab', { name: 'Security' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+    { timeout: 30000 },
+  );
   await expect(page.getByText('KES 64,000')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Submit another refund' })).toBeDisabled();
   await layout('rental');
   await page.getByLabel('Search customer security').fill('BK-2071');
-  await expect(page.getByTestId('money-inspector').getByRole('heading', { name: 'BK-2071' })).toBeVisible();
+  await expect(
+    page.getByTestId('money-inspector').getByRole('heading', { name: 'BK-2071' }),
+  ).toBeVisible();
   await page.getByLabel('Search customer security').fill('');
   await expect(page.getByRole('button', { name: 'Check refund status' })).toBeVisible();
   await page.getByRole('button', { name: 'Check refund status' }).click();
@@ -154,23 +252,38 @@ async function main() {
   await expect(page.getByText('KES 39,000')).toBeVisible();
   await page.getByRole('link', { name: /Open in Work/ }).click();
   await expect(page.getByRole('heading', { name: 'Work', exact: true })).toBeVisible();
-  await expect(page.getByText('Its operational source is not linked to this preview yet.', { exact: false })).toBeVisible({ timeout: 90000 });
+  await expect(
+    page.getByText('Its operational source is not linked to this preview yet.', { exact: false }),
+  ).toBeVisible({ timeout: 90000 });
   await page.getByRole('link', { name: /Back to Money/ }).click();
-  await expect(page.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true', { timeout: 30000 });
+  await expect(page.getByRole('tab', { name: 'Security' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+    { timeout: 30000 },
+  );
   await expect(page.getByText('KES 13,000')).toBeVisible();
   await page.getByRole('link', { name: 'View in Offerings' }).click();
   await page.getByRole('link', { name: 'Back to Money' }).click();
-  await expect(page.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true', { timeout: 30000 });
+  await expect(page.getByRole('tab', { name: 'Security' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+    { timeout: 30000 },
+  );
   await expect(page.getByText('KES 13,000')).toBeVisible();
   console.log('Security: source reconciliation, partial refund and contextual return passed');
 
   await visit('tire_service');
-  await expect(page.getByRole('tab', { name: 'Balances' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: 'Balances' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
   await expect(page.getByText('KES 50,000')).toBeVisible();
   await expect(page.getByText('KES 12,000')).toBeVisible();
   await layout('workshop');
   await page.getByRole('button', { name: 'View invoice' }).click();
-  await expect(page.getByText('The invoice owner supplies payment allocations and corrections.')).toBeVisible();
+  await expect(
+    page.getByText('The invoice owner supplies payment allocations and corrections.'),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Close dialog' }).click();
   await expect(page.getByRole('button', { name: 'Mark paid' })).toHaveCount(0);
   console.log('Workshop: owner-issued invoices and read-only source passed');
@@ -179,7 +292,10 @@ async function main() {
   await page.getByRole('button', { name: 'Sample specialty' }).click();
   await page.getByLabel('Candidate offering type').selectOption('SPACE_RESERVATION_V1');
   await page.getByRole('button', { name: 'Create sample activity' }).click();
-  await expect(page.getByTestId('money-workspace')).toHaveAttribute('data-schema', 'SPACE_RESERVATION_V1');
+  await expect(page.getByTestId('money-workspace')).toHaveAttribute(
+    'data-schema',
+    'SPACE_RESERVATION_V1',
+  );
   await page.getByLabel('Accepted reservation money policy').check();
   await page.getByLabel('Separate booking fee · KES 100').check();
   await page.getByLabel('Refundable guarantee · KES 1,000').check();
@@ -196,14 +312,18 @@ async function main() {
   await expect(page.getByText('Advance refund confirmed')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Review advance refund' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Other reservation refunds' }).click();
-  await expect(page.getByText('Refund eligibility is unknown because terms are not configured.')).toBeVisible();
+  await expect(
+    page.getByText('Refund eligibility is unknown because terms are not configured.'),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Review guarantee refund' }).click();
   await page.getByLabel('Refund reason').fill('Return the guarantee');
   await page.getByRole('button', { name: 'Save and review' }).click();
   await page.getByLabel('Simulated source outcome').selectOption('confirmed');
   await page.getByRole('button', { name: 'Submit sample result' }).click();
   await expect(page.getByText('Guarantee refund confirmed')).toBeVisible();
-  console.log('Reservations: combined advance, booking fee, guarantee and cancellation allocation/refund passed');
+  console.log(
+    'Reservations: combined advance, booking fee, guarantee and cancellation allocation/refund passed',
+  );
 
   await page.getByRole('button', { name: 'Sample specialty' }).click();
   await page.getByRole('button', { name: 'Reset this Money sample' }).click();
@@ -216,30 +336,49 @@ async function main() {
   await page.getByRole('tab', { name: 'Reservations' }).click();
   await expect(page.getByText(/refund terms are not configured/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Review advance refund' })).toHaveCount(0);
-  console.log('Reservations: absent refund terms do not become a refund or a non-refundable policy');
+  console.log(
+    'Reservations: absent refund terms do not become a refund or a non-refundable policy',
+  );
 
   await page.getByRole('button', { name: 'Sample specialty' }).click();
   for (const [index, profile] of config.profiles.entries()) {
     await page.getByLabel('Sample specialty', { exact: true }).selectOption(profile.id);
-    await expect(page.getByTestId('money-workspace')).toHaveAttribute('data-profile', profile.id, { timeout: 15000 });
-    await expect(page.getByTestId('money-workspace')).toHaveAttribute('data-schema', profile.schema, { timeout: 15000 });
+    await expect(page.getByTestId('money-workspace')).toHaveAttribute('data-profile', profile.id, {
+      timeout: 15000,
+    });
+    await expect(page.getByTestId('money-workspace')).toHaveAttribute(
+      'data-schema',
+      profile.schema,
+      { timeout: 15000 },
+    );
     await expect(page.getByTestId('money-table-card')).toBeVisible({ timeout: 15000 });
-    if ((index + 1) % 32 === 0) console.log(`Specialties checked: ${index + 1}/${config.profiles.length}`);
+    if ((index + 1) % 32 === 0)
+      console.log(`Specialties checked: ${index + 1}/${config.profiles.length}`);
   }
   await page.getByRole('button', { name: 'Done', exact: true }).click();
 
-  await page.goto(`${base}/merchant-live-preview/money?profile=not_registered`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+  await page.goto(`${base}/merchant-live-preview/money?profile=not_registered`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 90000,
+  });
   await expect(page.locator('.mo-note[role="alert"]')).toContainText('specialty is not registered');
   await expect(page.getByTestId('money-table-card')).toHaveCount(0);
   await page.getByRole('button', { name: 'Sample specialty' }).click();
   await page.getByLabel('Sample specialty', { exact: true }).selectOption('restaurant');
   await expect(page.getByTestId('money-table-card')).toBeVisible();
   await page.getByRole('button', { name: 'Done', exact: true }).click();
-  await page.goto(`${base}/merchant-live-preview/money?profile=restaurant&offering=missing`, { waitUntil: 'domcontentloaded', timeout: 90000 });
-  await expect(page.locator('.mo-note[role="alert"]')).toContainText('selected offering is no longer available');
+  await page.goto(`${base}/merchant-live-preview/money?profile=restaurant&offering=missing`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 90000,
+  });
+  await expect(page.locator('.mo-note[role="alert"]')).toContainText(
+    'selected offering is no longer available',
+  );
   await page.getByLabel('Offering').selectOption('restaurant-sample-1');
   await expect(page.getByTestId('money-table-card')).toBeVisible();
-  console.log('Unsupported specialty and missing offering: explicit recovery without showing another merchant context');
+  console.log(
+    'Unsupported specialty and missing offering: explicit recovery without showing another merchant context',
+  );
 
   await visit('self_drive');
   await page.getByRole('button', { name: 'Sample specialty' }).click();
@@ -258,16 +397,42 @@ async function main() {
   await page.getByRole('button', { name: 'Sample specialty' }).click();
   await expect(page.getByLabel('Sample role')).toHaveValue('viewer');
   await page.getByRole('button', { name: 'Done', exact: true }).click();
-  console.log('Offline and viewer: unavailable values, disabled actions and preserved Work return context');
+  console.log(
+    'Offline and viewer: unavailable values, disabled actions and preserved Work return context',
+  );
 
-  const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  const mobile = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+  });
   const phone = await mobile.newPage();
-  await phone.goto(`${base}/merchant-live-preview/money?profile=self_drive`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+  await phone.goto(`${base}/merchant-live-preview/money?profile=self_drive`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 90000,
+  });
   await expect(phone.getByTestId('money-table-card')).toBeVisible({ timeout: 30000 });
-  const mobileDimensions = await phone.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth, table: document.querySelector('[data-testid="money-table-scroll"]').scrollWidth, tableClient: document.querySelector('[data-testid="money-table-scroll"]').clientWidth, contextBottom: document.querySelector('.mo-context').getBoundingClientRect().bottom, tabsTop: document.querySelector('.mo-tabs').getBoundingClientRect().top }));
-  assert.equal(mobileDimensions.document, mobileDimensions.viewport, 'Mobile document should not overflow horizontally');
-  assert.equal(mobileDimensions.table, mobileDimensions.tableClient, 'Mobile records should not require horizontal scrolling');
-  assert.ok(mobileDimensions.contextBottom <= mobileDimensions.tabsTop, 'Mobile controls should not overlap the tabs');
+  const mobileDimensions = await phone.evaluate(() => ({
+    viewport: innerWidth,
+    document: document.documentElement.scrollWidth,
+    table: document.querySelector('[data-testid="money-table-scroll"]').scrollWidth,
+    tableClient: document.querySelector('[data-testid="money-table-scroll"]').clientWidth,
+    contextBottom: document.querySelector('.mo-context').getBoundingClientRect().bottom,
+    tabsTop: document.querySelector('.mo-tabs').getBoundingClientRect().top,
+  }));
+  assert.equal(
+    mobileDimensions.document,
+    mobileDimensions.viewport,
+    'Mobile document should not overflow horizontally',
+  );
+  assert.equal(
+    mobileDimensions.table,
+    mobileDimensions.tableClient,
+    'Mobile records should not require horizontal scrolling',
+  );
+  assert.ok(
+    mobileDimensions.contextBottom <= mobileDimensions.tabsTop,
+    'Mobile controls should not overlap the tabs',
+  );
   await phone.screenshot({ path: path.join(output, 'mobile-preview.png') });
   await phone.getByRole('button', { name: 'Open SEC-2070' }).click();
   await expect(phone.getByTestId('money-inspector')).toBeInViewport();
@@ -276,7 +441,14 @@ async function main() {
 
   assert.deepEqual(errors, [], `Browser errors: ${errors.join('; ')}`);
   assert.deepEqual(mutations, [], `Unexpected non-read network requests: ${mutations.join('; ')}`);
-  console.log(`PASS: ${config.profiles.length} specialties, three desktop layouts, mobile and financial sample journeys; no browser errors or non-read requests`);
-  await mobile.close(); await context.close(); await browser.close();
+  console.log(
+    `PASS: ${config.profiles.length} specialties, three desktop layouts, mobile and financial sample journeys; no browser errors or non-read requests`,
+  );
+  await mobile.close();
+  await context.close();
+  await browser.close();
 }
-main().catch((error) => { console.error(error); process.exitCode = 1; });
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

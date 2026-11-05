@@ -10,16 +10,29 @@ export function subscribeProtectedActor(
   onInvalid: () => void,
 ): () => void {
   let active = true;
-  const auth = (client as { auth: { onAuthStateChange: (
-    callback: (event: AuthChangeEvent, session: Session | null) => void,
-  ) => { data: { subscription: { unsubscribe: () => void } } } } }).auth;
+  const auth = (
+    client as {
+      auth: {
+        onAuthStateChange: (
+          callback: (event: AuthChangeEvent, session: Session | null) => void,
+        ) => { data: { subscription: { unsubscribe: () => void } } };
+      };
+    }
+  ).auth;
   const { data } = auth.onAuthStateChange((event, session) => {
     if (!active) return;
-    if (event === 'SIGNED_OUT' || (event === 'INITIAL_SESSION' && !session) || (session?.user.id && session.user.id !== actorId)) {
+    if (
+      event === 'SIGNED_OUT' ||
+      (event === 'INITIAL_SESSION' && !session) ||
+      (session?.user.id && session.user.id !== actorId)
+    ) {
       active = false;
       stopProtectedBrowserRequests();
       onInvalid();
     }
   });
-  return () => { active = false; data.subscription.unsubscribe(); };
+  return () => {
+    active = false;
+    data.subscription.unsubscribe();
+  };
 }

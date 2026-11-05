@@ -1,6 +1,9 @@
 import { listBookingProfiles, type BookingModel } from '@nexg/booking-config/profiles';
 
-import { merchantOnboardingDemoQuery, type MerchantOnboardingDemoContext } from './merchant-onboarding-demo';
+import {
+  merchantOnboardingDemoQuery,
+  type MerchantOnboardingDemoContext,
+} from './merchant-onboarding-demo';
 
 export type DemoPanelContent = {
   title: string;
@@ -42,88 +45,183 @@ export type MerchantOnboardingDemoDashboard = {
 
 const profiles = listBookingProfiles();
 
-const modelCopy: Record<BookingModel, {
-  activityLabel: string;
-  activitySingular: string;
-  secondaryLabel: string;
-  revenueLabel: string;
-  secondaryCount: number;
-  items: [string, string, string];
-  attention: [string, string, string];
-}> = {
+const modelCopy: Record<
+  BookingModel,
+  {
+    activityLabel: string;
+    activitySingular: string;
+    secondaryLabel: string;
+    revenueLabel: string;
+    secondaryCount: number;
+    items: [string, string, string];
+    attention: [string, string, string];
+  }
+> = {
   ORDER: {
-    activityLabel: 'Orders', activitySingular: 'order', secondaryLabel: 'Items in catalogue', revenueLabel: 'Net sales', secondaryCount: 18,
+    activityLabel: 'Orders',
+    activitySingular: 'order',
+    secondaryLabel: 'Items in catalogue',
+    revenueLabel: 'Net sales',
+    secondaryCount: 18,
     items: ['Sample product · 2 items', 'New customer order · 3 items', 'Pickup order · 1 item'],
     attention: ['New order', 'Offering to review', 'Order ready soon'],
   },
   APPOINTMENT: {
-    activityLabel: 'Appointments', activitySingular: 'appointment', secondaryLabel: 'Appointments today', revenueLabel: 'Service revenue', secondaryCount: 6,
-    items: ['Consultation · Westlands', 'Follow-up session · Kilimani', 'New service booking · Westlands'],
+    activityLabel: 'Appointments',
+    activitySingular: 'appointment',
+    secondaryLabel: 'Appointments today',
+    revenueLabel: 'Service revenue',
+    secondaryCount: 6,
+    items: [
+      'Consultation · Westlands',
+      'Follow-up session · Kilimani',
+      'New service booking · Westlands',
+    ],
     attention: ['Appointment to confirm', 'Provider schedule to review', 'Upcoming appointment'],
   },
   FIELD_VISIT: {
-    activityLabel: 'Customer visits', activitySingular: 'visit', secondaryLabel: 'Visits scheduled', revenueLabel: 'Service revenue', secondaryCount: 5,
+    activityLabel: 'Customer visits',
+    activitySingular: 'visit',
+    secondaryLabel: 'Visits scheduled',
+    revenueLabel: 'Service revenue',
+    secondaryCount: 5,
     items: ['Home service · Kilimani', 'Site visit · Westlands', 'Customer visit · Lavington'],
     attention: ['Visit window approaching', 'New service request', 'Upcoming customer visit'],
   },
   ASSET_INTERVAL: {
-    activityLabel: 'Rentals', activitySingular: 'rental', secondaryLabel: 'Fleet available', revenueLabel: 'Rental revenue', secondaryCount: 8,
+    activityLabel: 'Rentals',
+    activitySingular: 'rental',
+    secondaryLabel: 'Fleet available',
+    revenueLabel: 'Rental revenue',
+    secondaryCount: 8,
     items: ['Toyota RAV4 · 3 days', 'Honda Fit · 1 day', 'Nissan X-Trail · 2 days'],
     attention: ['New rental request', 'Vehicle return due', 'Upcoming vehicle pickup'],
   },
   TRANSFER: {
-    activityLabel: 'Transfers', activitySingular: 'transfer', secondaryLabel: 'Pickups today', revenueLabel: 'Trip revenue', secondaryCount: 6,
-    items: ['Airport to Westlands · 2 passengers', 'JKIA pickup · 3 passengers', 'CBD drop-off · 1 passenger'],
+    activityLabel: 'Transfers',
+    activitySingular: 'transfer',
+    secondaryLabel: 'Pickups today',
+    revenueLabel: 'Trip revenue',
+    secondaryCount: 6,
+    items: [
+      'Airport to Westlands · 2 passengers',
+      'JKIA pickup · 3 passengers',
+      'CBD drop-off · 1 passenger',
+    ],
     attention: ['New transfer request', 'Pickup approaching', 'Upcoming transfer'],
   },
   SESSION_CAPACITY: {
-    activityLabel: 'Sessions', activitySingular: 'session', secondaryLabel: 'Places booked', revenueLabel: 'Booking revenue', secondaryCount: 24,
+    activityLabel: 'Sessions',
+    activitySingular: 'session',
+    secondaryLabel: 'Places booked',
+    revenueLabel: 'Booking revenue',
+    secondaryCount: 24,
     items: ['Workshop · 2 places', 'Class session · 4 places', 'Event booking · 3 places'],
     attention: ['New session booking', 'Capacity to review', 'Upcoming session'],
   },
   SPACE_RESERVATION: {
-    activityLabel: 'Reservations', activitySingular: 'reservation', secondaryLabel: 'Arrivals today', revenueLabel: 'Reservation revenue', secondaryCount: 7,
+    activityLabel: 'Reservations',
+    activitySingular: 'reservation',
+    secondaryLabel: 'Arrivals today',
+    revenueLabel: 'Reservation revenue',
+    secondaryCount: 7,
     items: ['Table for 4 · 7:00 PM', 'Private space · 5 guests', 'Meeting room · 10:00 AM'],
     attention: ['New reservation', 'Arrival approaching', 'Upcoming reservation'],
   },
   TOUR: {
-    activityLabel: 'Tour bookings', activitySingular: 'tour booking', secondaryLabel: 'Departures today', revenueLabel: 'Tour revenue', secondaryCount: 4,
+    activityLabel: 'Tour bookings',
+    activitySingular: 'tour booking',
+    secondaryLabel: 'Departures today',
+    revenueLabel: 'Tour revenue',
+    secondaryCount: 4,
     items: ['Nairobi day tour · 2 guests', 'Safari drive · 4 guests', 'City walk · 3 guests'],
     attention: ['New tour booking', 'Departure approaching', 'Upcoming tour'],
   },
   PRODUCTION_DUE: {
-    activityLabel: 'Production jobs', activitySingular: 'production job', secondaryLabel: 'Due today', revenueLabel: 'Production revenue', secondaryCount: 5,
-    items: ['Custom order · collection today', 'Made-to-order item · 2 pieces', 'Personalised order · 1 item'],
+    activityLabel: 'Production jobs',
+    activitySingular: 'production job',
+    secondaryLabel: 'Due today',
+    revenueLabel: 'Production revenue',
+    secondaryCount: 5,
+    items: [
+      'Custom order · collection today',
+      'Made-to-order item · 2 pieces',
+      'Personalised order · 1 item',
+    ],
     attention: ['New production job', 'Due date approaching', 'Upcoming collection'],
   },
   REQUEST_QUOTE: {
-    activityLabel: 'Requests', activitySingular: 'request', secondaryLabel: 'Quotes awaiting reply', revenueLabel: 'Agreed value', secondaryCount: 3,
-    items: ['Customer request · details supplied', 'Quote requested · Westlands', 'New enquiry · Kilimani'],
+    activityLabel: 'Requests',
+    activitySingular: 'request',
+    secondaryLabel: 'Quotes awaiting reply',
+    revenueLabel: 'Agreed value',
+    secondaryCount: 3,
+    items: [
+      'Customer request · details supplied',
+      'Quote requested · Westlands',
+      'New enquiry · Kilimani',
+    ],
     attention: ['New customer request', 'Quote needs a reply', 'Upcoming follow-up'],
   },
   LINKED_WINDOWS: {
-    activityLabel: 'Collection jobs', activitySingular: 'collection job', secondaryLabel: 'Returns due', revenueLabel: 'Service revenue', secondaryCount: 4,
+    activityLabel: 'Collection jobs',
+    activitySingular: 'collection job',
+    secondaryLabel: 'Returns due',
+    revenueLabel: 'Service revenue',
+    secondaryCount: 4,
     items: ['Laundry · 4 items', 'Dry cleaning · 2 items', 'Ironing · 3 items'],
     attention: ['New collection job', 'Return due soon', 'Upcoming collection'],
   },
   SERVICE_JOB: {
-    activityLabel: 'Service jobs', activitySingular: 'service job', secondaryLabel: 'Jobs in progress', revenueLabel: 'Service revenue', secondaryCount: 7,
-    items: ['Device assessment · Westlands', 'Repair job · Kilimani', 'Customer service · Lavington'],
+    activityLabel: 'Service jobs',
+    activitySingular: 'service job',
+    secondaryLabel: 'Jobs in progress',
+    revenueLabel: 'Service revenue',
+    secondaryCount: 7,
+    items: [
+      'Device assessment · Westlands',
+      'Repair job · Kilimani',
+      'Customer service · Lavington',
+    ],
     attention: ['New service job', 'Job ready for review', 'Upcoming handover'],
   },
   ENTITLEMENT: {
-    activityLabel: 'Memberships', activitySingular: 'membership', secondaryLabel: 'Renewals due', revenueLabel: 'Membership revenue', secondaryCount: 3,
-    items: ['Monthly access · current period', 'Training membership · renews soon', 'Member plan · active'],
+    activityLabel: 'Memberships',
+    activitySingular: 'membership',
+    secondaryLabel: 'Renewals due',
+    revenueLabel: 'Membership revenue',
+    secondaryCount: 3,
+    items: [
+      'Monthly access · current period',
+      'Training membership · renews soon',
+      'Member plan · active',
+    ],
     attention: ['New membership', 'Renewal due', 'Upcoming member session'],
   },
   FREIGHT: {
-    activityLabel: 'Shipments', activitySingular: 'shipment', secondaryLabel: 'In transit', revenueLabel: 'Freight revenue', secondaryCount: 9,
-    items: ['Nairobi to Mombasa · 3 cartons', 'Air freight · 2 packages', 'Road freight · 1 pallet'],
+    activityLabel: 'Shipments',
+    activitySingular: 'shipment',
+    secondaryLabel: 'In transit',
+    revenueLabel: 'Freight revenue',
+    secondaryCount: 9,
+    items: [
+      'Nairobi to Mombasa · 3 cartons',
+      'Air freight · 2 packages',
+      'Road freight · 1 pallet',
+    ],
     attention: ['New shipment', 'Delivery milestone due', 'Upcoming collection'],
   },
   STORAGE: {
-    activityLabel: 'Storage allocations', activitySingular: 'storage allocation', secondaryLabel: 'Units occupied', revenueLabel: 'Storage revenue', secondaryCount: 12,
-    items: ['Storage unit A12 · 4 containers', 'Cold storage · 2 crates', 'Warehouse bay B04 · 1 pallet'],
+    activityLabel: 'Storage allocations',
+    activitySingular: 'storage allocation',
+    secondaryLabel: 'Units occupied',
+    revenueLabel: 'Storage revenue',
+    secondaryCount: 12,
+    items: [
+      'Storage unit A12 · 4 containers',
+      'Cold storage · 2 crates',
+      'Warehouse bay B04 · 1 pallet',
+    ],
     attention: ['New storage request', 'Allocation to review', 'Upcoming release'],
   },
 };
@@ -147,10 +245,21 @@ const activitySeriesByModel: Record<BookingModel, number[]> = {
 };
 
 const revenuePerActivityCents: Record<BookingModel, number> = {
-  ORDER: 200_000, APPOINTMENT: 260_000, FIELD_VISIT: 320_000, ASSET_INTERVAL: 420_000,
-  TRANSFER: 300_000, SESSION_CAPACITY: 180_000, SPACE_RESERVATION: 220_000, TOUR: 480_000,
-  PRODUCTION_DUE: 350_000, REQUEST_QUOTE: 520_000, LINKED_WINDOWS: 240_000,
-  SERVICE_JOB: 280_000, ENTITLEMENT: 160_000, FREIGHT: 600_000, STORAGE: 400_000,
+  ORDER: 200_000,
+  APPOINTMENT: 260_000,
+  FIELD_VISIT: 320_000,
+  ASSET_INTERVAL: 420_000,
+  TRANSFER: 300_000,
+  SESSION_CAPACITY: 180_000,
+  SPACE_RESERVATION: 220_000,
+  TOUR: 480_000,
+  PRODUCTION_DUE: 350_000,
+  REQUEST_QUOTE: 520_000,
+  LINKED_WINDOWS: 240_000,
+  SERVICE_JOB: 280_000,
+  ENTITLEMENT: 160_000,
+  FREIGHT: 600_000,
+  STORAGE: 400_000,
 };
 
 const secondarySeriesByModel: Record<BookingModel, number[]> = {
@@ -173,22 +282,44 @@ const secondarySeriesByModel: Record<BookingModel, number[]> = {
 
 const rentalItemsBySubcategory: Record<string, [string, string, string]> = {
   car_rental: ['Toyota RAV4 · 3 days', 'Honda Fit · 1 day', 'Nissan X-Trail · 2 days'],
-  self_drive: ['Toyota RAV4 · self-drive · 3 days', 'Honda Fit · self-drive · 1 day', 'Nissan X-Trail · self-drive · 2 days'],
-  corporate_rental: ['Toyota Corolla · corporate fleet', 'Nissan X-Trail · monthly agreement', 'Toyota HiAce · company booking'],
-  long_term_rental: ['Toyota Fortuner · 3 months', 'Honda Fit · 6 months', 'Nissan X-Trail · 1 year'],
-  bike_rental: ['Bicycle · BIKE 012 · 1 day', 'Bicycle · BIKE 013 · 2 days', 'Bicycle · BIKE 014 · 1 day'],
+  self_drive: [
+    'Toyota RAV4 · self-drive · 3 days',
+    'Honda Fit · self-drive · 1 day',
+    'Nissan X-Trail · self-drive · 2 days',
+  ],
+  corporate_rental: [
+    'Toyota Corolla · corporate fleet',
+    'Nissan X-Trail · monthly agreement',
+    'Toyota HiAce · company booking',
+  ],
+  long_term_rental: [
+    'Toyota Fortuner · 3 months',
+    'Honda Fit · 6 months',
+    'Nissan X-Trail · 1 year',
+  ],
+  bike_rental: [
+    'Bicycle · BIKE 012 · 1 day',
+    'Bicycle · BIKE 013 · 2 days',
+    'Bicycle · BIKE 014 · 1 day',
+  ],
 };
 
 /** One category-aware source for the sample Home summary, attention cards and charts. */
 export function merchantOnboardingDemoDashboard(
   context: MerchantOnboardingDemoContext | null,
 ): MerchantOnboardingDemoDashboard {
-  const selected = context?.subcategories ?? [{ id: 'restaurant', name: 'Restaurant' }, { id: 'supermarket', name: 'Supermarket' }];
+  const selected = context?.subcategories ?? [
+    { id: 'restaurant', name: 'Restaurant' },
+    { id: 'supermarket', name: 'Supermarket' },
+  ];
   const selectedProfiles = selected.flatMap((item) => {
     const profile = profiles.find((candidate) => candidate.subcategoryId === item.id);
     return profile ? [profile] : [];
   });
-  const profile = selectedProfiles[0] ?? profiles.find((candidate) => candidate.subcategoryId === 'restaurant') ?? profiles[0]!;
+  const profile =
+    selectedProfiles[0] ??
+    profiles.find((candidate) => candidate.subcategoryId === 'restaurant') ??
+    profiles[0]!;
   const model = profile.defaultModelId;
   const copy = modelCopy[model];
   const selectedModels = [...new Set(selectedProfiles.map((item) => item.defaultModelId))];
@@ -204,7 +335,11 @@ export function merchantOnboardingDemoDashboard(
     : sumSeries(secondarySeriesByModel);
   const revenueSeriesCents = models.reduce<number[]>(
     (series, selectedModel) =>
-      series.map((value, index) => value + activitySeriesByModel[selectedModel][index]! * revenuePerActivityCents[selectedModel]),
+      series.map(
+        (value, index) =>
+          value +
+          activitySeriesByModel[selectedModel][index]! * revenuePerActivityCents[selectedModel],
+      ),
     Array(activitySeries.length).fill(0),
   );
   const activityCount = activitySeries.at(-1) ?? 0;
@@ -221,11 +356,12 @@ export function merchantOnboardingDemoDashboard(
     const itemProfile = selectedProfiles[index] ?? profile;
     const itemModel = itemProfile.defaultModelId;
     const itemCopy = modelCopy[itemModel];
-    const item = itemModel === 'ORDER' && index === 0
-      ? `Sample ${itemProfile.name} offering · 2 items`
-      : itemModel === 'ASSET_INTERVAL'
-        ? rentalItemsBySubcategory[itemProfile.subcategoryId]?.[index] ?? itemCopy.items[index]!
-        : itemCopy.items[index]!;
+    const item =
+      itemModel === 'ORDER' && index === 0
+        ? `Sample ${itemProfile.name} offering · 2 items`
+        : itemModel === 'ASSET_INTERVAL'
+          ? (rentalItemsBySubcategory[itemProfile.subcategoryId]?.[index] ?? itemCopy.items[index]!)
+          : itemCopy.items[index]!;
     return {
       title: itemCopy.attention[index]!,
       detail: `${item} · ${place}`,
@@ -234,7 +370,11 @@ export function merchantOnboardingDemoDashboard(
       panel: {
         title: itemCopy.attention[index]!,
         description: item,
-        details: [item, `Activity: ${itemProfile.name}`, `Business: ${context?.businessName ?? 'Nairobi Collective'}`],
+        details: [
+          item,
+          `Activity: ${itemProfile.name}`,
+          `Business: ${context?.businessName ?? 'Nairobi Collective'}`,
+        ],
       },
     };
   });
@@ -249,7 +389,9 @@ export function merchantOnboardingDemoDashboard(
     revenueLabel,
     revenueCents,
     activitySummary,
-    completedLabel: mixedActivities ? 'Completed work items' : `Completed ${copy.activityLabel.toLowerCase()}`,
+    completedLabel: mixedActivities
+      ? 'Completed work items'
+      : `Completed ${copy.activityLabel.toLowerCase()}`,
     completedCount: Math.max(activityCount - 3, 0),
     openLabel: mixedActivities ? 'Open work items' : `Open ${copy.activityLabel.toLowerCase()}`,
     openCount: 2,
@@ -281,7 +423,10 @@ export function merchantOnboardingDemoDashboard(
     revenuePanel: {
       title: `${revenueLabel} today`,
       description: 'Sample data',
-      details: [`KES ${Math.round(revenueCents / 100).toLocaleString('en-KE')}`, `${activityCount} ${activityLabel.toLowerCase()} represented.`],
+      details: [
+        `KES ${Math.round(revenueCents / 100).toLocaleString('en-KE')}`,
+        `${activityCount} ${activityLabel.toLowerCase()} represented.`,
+      ],
     },
   };
 }

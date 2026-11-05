@@ -335,7 +335,17 @@ describe('adaptive offering behaviour', () => {
     expect(rows[0]?.price).toBe('1200.50');
     expect(rows[0]?.publication).toBe('draft');
     expect(rows[0]?.availabilityLinked).toBe(false);
-    const discounted = { ...seedCatalogue(retail).offerings[0]!, name:'Imported discount', discount:{enabled:true,kind:'percentage' as const,value:'20',startsAt:'',endsAt:''} };
+    const discounted = {
+      ...seedCatalogue(retail).offerings[0]!,
+      name: 'Imported discount',
+      discount: {
+        enabled: true,
+        kind: 'percentage' as const,
+        value: '20',
+        startsAt: '',
+        endsAt: '',
+      },
+    };
     const imported = prepareImport(catalogueCsv([discounted]), retail, ['PRODUCT_CATALOG_V1'], []);
     expect(priceLabel(imported[0]!)).toBe('KES 2,800 / item');
     expect(() => prepareImport(file, retail, ['PRODUCT_CATALOG_V1'], rows)).toThrow(

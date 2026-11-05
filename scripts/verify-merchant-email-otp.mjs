@@ -20,10 +20,16 @@ let started = false;
 const received = [];
 
 function docker(args, options = {}) {
-  return execFileSync('docker', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], ...options });
+  return execFileSync('docker', args, {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    ...options,
+  });
 }
 function listen(server) {
-  return new Promise((resolve, reject) => server.once('error', reject).listen(0, '0.0.0.0', () => resolve(server.address().port)));
+  return new Promise((resolve, reject) =>
+    server.once('error', reject).listen(0, '0.0.0.0', () => resolve(server.address().port)),
+  );
 }
 const templateServer = http.createServer((_, response) => {
   response.writeHead(200, { 'content-type': 'text/html' });
@@ -40,13 +46,20 @@ const smtpServer = net.createServer((socket) => {
       const line = buffer.slice(0, end);
       buffer = buffer.slice(end + 2);
       if (message !== null) {
-        if (line === '.') { received.push(message); message = null; socket.write('250 queued\r\n'); }
-        else message += `${line}\n`;
+        if (line === '.') {
+          received.push(message);
+          message = null;
+          socket.write('250 queued\r\n');
+        } else message += `${line}\n`;
       } else if (/^EHLO /i.test(line)) socket.write('250-local-test\r\n250 8BITMIME\r\n');
       else if (/^HELO |^MAIL FROM:|^RCPT TO:|^RSET/i.test(line)) socket.write('250 OK\r\n');
-      else if (/^DATA$/i.test(line)) { message = ''; socket.write('354 send data\r\n'); }
-      else if (/^QUIT$/i.test(line)) { socket.write('221 bye\r\n'); socket.end(); }
-      else socket.write('250 OK\r\n');
+      else if (/^DATA$/i.test(line)) {
+        message = '';
+        socket.write('354 send data\r\n');
+      } else if (/^QUIT$/i.test(line)) {
+        socket.write('221 bye\r\n');
+        socket.end();
+      } else socket.write('250 OK\r\n');
     }
   });
 });
@@ -62,10 +75,12 @@ async function waitFor(predicate, message) {
 
 try {
   const config = JSON.parse(docker(['inspect', sourceContainer]))[0];
-  const environment = Object.fromEntries(config.Config.Env.map((entry) => {
-    const index = entry.indexOf('=');
-    return [entry.slice(0, index), entry.slice(index + 1)];
-  }));
+  const environment = Object.fromEntries(
+    config.Config.Env.map((entry) => {
+      const index = entry.indexOf('=');
+      return [entry.slice(0, index), entry.slice(index + 1)];
+    }),
+  );
   // The image provides its own PATH; never replace the Windows host PATH.
   delete environment.PATH;
   const templatePort = await listen(templateServer);
@@ -80,23 +95,47 @@ try {
     GOTRUE_MAILER_OTP_LENGTH: '6',
     GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGE: `http://host.docker.internal:${templatePort}/otp`,
     GOTRUE_MAILER_TEMPLATES_MAGIC_LINK: `http://host.docker.internal:${templatePort}/otp`,
-    GOTRUE_SMTP_HOST: 'host.docker.internal', GOTRUE_SMTP_PORT: String(smtpPort),
-    GOTRUE_SMTP_USER: '', GOTRUE_SMTP_PASS: '', GOTRUE_SMTP_MAX_FREQUENCY: '1s',
+    GOTRUE_SMTP_HOST: 'host.docker.internal',
+    GOTRUE_SMTP_PORT: String(smtpPort),
+    GOTRUE_SMTP_USER: '',
+    GOTRUE_SMTP_PASS: '',
+    GOTRUE_SMTP_MAX_FREQUENCY: '1s',
     API_EXTERNAL_URL: `http://127.0.0.1:${authPort}`,
   });
-  const args = ['run', '-d', '--rm', '--name', name, '--network', config.HostConfig.NetworkMode,
-    '-p', `127.0.0.1:${authPort}:9999`];
+  const args = [
+    'run',
+    '-d',
+    '--rm',
+    '--name',
+    name,
+    '--network',
+    config.HostConfig.NetworkMode,
+    '-p',
+    `127.0.0.1:${authPort}:9999`,
+  ];
   for (const key of Object.keys(environment)) args.push('-e', key);
   args.push(config.Config.Image, ...config.Config.Cmd);
   docker(args, { env: { ...process.env, ...environment } });
   started = true;
   await waitFor(async () => {
-    try { return (await fetch(`http://127.0.0.1:${authPort}/health`, { signal: AbortSignal.timeout(1000) })).ok; }
-    catch { return false; }
+    try {
+      return (
+        await fetch(`http://127.0.0.1:${authPort}/health`, { signal: AbortSignal.timeout(1000) })
+      ).ok;
+    } catch {
+      return false;
+    }
   }, 'The isolated Auth service did not become ready.');
 
   const local = fs.readFileSync(path.join(root, 'apps/web/.env.local'), 'utf8');
-  const key = local.split(/\r?\n/).find((line) => line.startsWith('NEXT_PUBLIC_SUPABASE_ANON_KEY='))?.split('=').slice(1).join('=').trim().replace(/^['"]|['"]$/g, '');
+  const key = local
+    .split(/\r?\n/)
+    .find((line) => line.startsWith('NEXT_PUBLIC_SUPABASE_ANON_KEY='))
+    ?.split('=')
+    .slice(1)
+    .join('=')
+    .trim()
+    .replace(/^['"]|['"]$/g, '');
   assert.ok(key, 'The local public Supabase key is missing.');
   const client = createClient(`http://127.0.0.1:${authPort}`, key, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -129,9 +168,15 @@ try {
   const refreshed = await client.auth.refreshSession();
   assert.equal(refreshed.data.user?.id, userId);
   assert.equal(refreshed.data.user?.is_anonymous, false);
-  const claims = JSON.parse(Buffer.from(refreshed.data.session.access_token.split('.')[1], 'base64url').toString());
+  const claims = JSON.parse(
+    Buffer.from(refreshed.data.session.access_token.split('.')[1], 'base64url').toString(),
+  );
   assert.equal(claims.sub, userId);
-  assert.equal(claims.is_anonymous, false, 'The refreshed token still identifies the owner as anonymous.');
+  assert.equal(
+    claims.is_anonymous,
+    false,
+    'The refreshed token still identifies the owner as anonymous.',
+  );
   await client.auth.signOut();
   await new Promise((resolve) => setTimeout(resolve, 1200));
   const signIn = await client.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
@@ -142,15 +187,37 @@ try {
   const signedIn = await client.auth.verifyOtp({ type: 'email', email, token: signInCode });
   assert.equal(signedIn.error, null, 'The sign-in code was rejected.');
   assert.equal(signedIn.data.user?.id, userId);
-  console.log('Isolated Auth check passed: request, resend, verification, same account and later email sign-in. No real email was sent.');
+  console.log(
+    'Isolated Auth check passed: request, resend, verification, same account and later email sign-in. No real email was sent.',
+  );
 } catch (error) {
   console.error(error instanceof Error ? error.message : 'The isolated Auth check failed.');
   process.exitCode = 1;
 } finally {
-  if (started) try { docker(['rm', '-f', name]); } catch { console.error('Could not remove the isolated test Auth container.'); process.exitCode = 1; }
+  if (started)
+    try {
+      docker(['rm', '-f', name]);
+    } catch {
+      console.error('Could not remove the isolated test Auth container.');
+      process.exitCode = 1;
+    }
   if (userId && /^[0-9a-f-]{36}$/i.test(userId)) {
-    try { docker(['exec', databaseContainer, 'psql', '-U', 'postgres', '-d', 'postgres', '-c', `delete from auth.users where id = '${userId}'::uuid`]); }
-    catch { console.error('Could not remove the synthetic test account.'); process.exitCode = 1; }
+    try {
+      docker([
+        'exec',
+        databaseContainer,
+        'psql',
+        '-U',
+        'postgres',
+        '-d',
+        'postgres',
+        '-c',
+        `delete from auth.users where id = '${userId}'::uuid`,
+      ]);
+    } catch {
+      console.error('Could not remove the synthetic test account.');
+      process.exitCode = 1;
+    }
   }
   templateServer.close();
   smtpServer.close();

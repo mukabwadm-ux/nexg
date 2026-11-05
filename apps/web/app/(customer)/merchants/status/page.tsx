@@ -39,10 +39,7 @@ export default async function StatusPage() {
     { count: branchCount },
     { data: callTimes },
   ] = await Promise.all([
-    supabase
-      .from('category_config')
-      .select('*')
-      .order('sort'),
+    supabase.from('category_config').select('*').order('sort'),
     supabase.rpc('fn_merchant_readiness', { p_merchant_id: draft.id }),
     supabase.rpc('fn_merchant_required_docs', { p_merchant_id: draft.id }),
     supabase
@@ -77,7 +74,8 @@ export default async function StatusPage() {
       categoryConfigFromRow(
         category,
         category.image_path
-          ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data.publicUrl
+          ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data
+              .publicUrl
           : null,
       ),
     );

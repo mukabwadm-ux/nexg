@@ -6,10 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import {
-  requestPasswordRecovery,
-  updateRecoveredPassword,
-} from '@/app/(customer)/sign-in/actions';
+import { requestPasswordRecovery, updateRecoveredPassword } from '@/app/(customer)/sign-in/actions';
 
 export function ForgotPasswordForm({ invalidLink = false }: { invalidLink?: boolean }) {
   const [pending, setPending] = React.useState(false);

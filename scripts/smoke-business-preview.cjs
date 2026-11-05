@@ -51,13 +51,11 @@ const { tmpdir } = require('node:os');
       await page.getByText('No banner photo', { exact: true }).isVisible(),
       'Banner removal did not update the customer preview',
     );
-    await page
-      .getByLabel('Upload banner photo', { exact: true })
-      .setInputFiles({
-        name: 'not-an-image.pdf',
-        mimeType: 'application/pdf',
-        buffer: Buffer.from('not an image'),
-      });
+    await page.getByLabel('Upload banner photo', { exact: true }).setInputFiles({
+      name: 'not-an-image.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('not an image'),
+    });
     assert(
       await page.getByRole('status').filter({ hasText: 'Choose a PNG, JPEG or WebP' }).isVisible(),
       'Unsupported banner files were not rejected',

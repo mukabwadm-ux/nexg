@@ -34,10 +34,9 @@ export async function loadMerchantWorkspaceAccess(
 ): Promise<MerchantWorkspaceAccess> {
   let result: { data: unknown; error: unknown };
   try {
-    result = await (client as MerchantAccessClient).rpc(
-      'rpc_merchant_workspace_access',
-      { p_merchant_id: merchantId },
-    );
+    result = await (client as MerchantAccessClient).rpc('rpc_merchant_workspace_access', {
+      p_merchant_id: merchantId,
+    });
   } catch {
     throw new MerchantAccessError('Your workspace permissions could not be checked.', 503);
   }
@@ -46,19 +45,27 @@ export async function loadMerchantWorkspaceAccess(
     throw new MerchantAccessError('Your workspace permissions could not be checked.', 503);
   const value = data as Partial<MerchantWorkspaceAccess>;
   if (
-    !['legacy', 'blocked', 'pending', 'approved', 'changes_requested', 'rejected'].includes(value.state ?? '') ||
+    !['legacy', 'blocked', 'pending', 'approved', 'changes_requested', 'rejected'].includes(
+      value.state ?? '',
+    ) ||
     typeof value.setup !== 'boolean' ||
     typeof value.operations !== 'boolean' ||
     (value.operations && value.state !== 'approved' && value.state !== 'legacy') ||
     ((value.state === 'blocked' || value.state === 'rejected') && value.setup) ||
-    (value.revision !== undefined && value.revision !== null &&
+    (value.revision !== undefined &&
+      value.revision !== null &&
       (!Number.isSafeInteger(value.revision) || value.revision < 1)) ||
     (value.needs_resubmission !== undefined && typeof value.needs_resubmission !== 'boolean') ||
     (value.operations && value.needs_resubmission === true) ||
-    (value.state !== 'legacy' && value.operations &&
-      (value.review_state !== 'approved' || !Number.isSafeInteger(value.revision) || value.needs_resubmission !== false)) ||
-    (value.state !== 'legacy' && (value.setup || value.operations) &&
-      (typeof value.expires_at !== 'string' || !Number.isFinite(Date.parse(value.expires_at)) ||
+    (value.state !== 'legacy' &&
+      value.operations &&
+      (value.review_state !== 'approved' ||
+        !Number.isSafeInteger(value.revision) ||
+        value.needs_resubmission !== false)) ||
+    (value.state !== 'legacy' &&
+      (value.setup || value.operations) &&
+      (typeof value.expires_at !== 'string' ||
+        !Number.isFinite(Date.parse(value.expires_at)) ||
         Date.parse(value.expires_at) <= Date.now()))
   )
     throw new MerchantAccessError('Your workspace permissions could not be checked.', 503);

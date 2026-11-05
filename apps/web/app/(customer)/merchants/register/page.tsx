@@ -35,7 +35,9 @@ export default async function Registration({
         <main className="mx-auto max-w-xl p-6">
           <h2 className="text-2xl font-extrabold">Merchant onboarding</h2>
           <p className="mt-3">Start with the short form. You can secure your account from Home.</p>
-          <div className="mt-5"><ApplicationSessionBootstrap /></div>
+          <div className="mt-5">
+            <ApplicationSessionBootstrap />
+          </div>
           <OnboardingDemoEntry />
         </main>
       </MerchantRegistrationPage>

@@ -89,7 +89,11 @@ export function Featured({
         router.refresh();
       }
     } catch {
-      setSaid({ ok: false, message: 'The featured placement request could not be updated. Reload Promotions and try again.' });
+      setSaid({
+        ok: false,
+        message:
+          'The featured placement request could not be updated. Reload Promotions and try again.',
+      });
     } finally {
       setBusy(false);
     }

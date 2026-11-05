@@ -27,10 +27,7 @@ function serviceRoleClient() {
   );
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id?: string } },
-) {
+export async function GET(request: Request, { params }: { params: { id?: string } }) {
   let credential;
   try {
     credential = await authenticate(request);
@@ -80,9 +77,11 @@ export async function GET(
       );
     }
 
-    const result = (Array.isArray(data) ? data[0] : data) as
-      | { ok: boolean; items: unknown; next_cursor: unknown }
-      | null;
+    const result = (Array.isArray(data) ? data[0] : data) as {
+      ok: boolean;
+      items: unknown;
+      next_cursor: unknown;
+    } | null;
 
     if (!result || !result.ok) {
       return jsonError('internal_error', 'The order could not be read.');
@@ -154,9 +153,11 @@ export async function GET(
     );
   }
 
-  const result = (Array.isArray(data) ? data[0] : data) as
-    | { ok: boolean; items: unknown[]; next_cursor: { created_at: string; id: string } | null }
-    | null;
+  const result = (Array.isArray(data) ? data[0] : data) as {
+    ok: boolean;
+    items: unknown[];
+    next_cursor: { created_at: string; id: string } | null;
+  } | null;
 
   if (!result || !result.ok) {
     return jsonError('internal_error', 'The orders could not be read.');
@@ -164,9 +165,9 @@ export async function GET(
 
   let nextCursor: string | null = null;
   if (result.next_cursor) {
-    nextCursor = Buffer.from(
-      `${result.next_cursor.created_at}|${result.next_cursor.id}`,
-    ).toString('base64url');
+    nextCursor = Buffer.from(`${result.next_cursor.created_at}|${result.next_cursor.id}`).toString(
+      'base64url',
+    );
   }
 
   return NextResponse.json(

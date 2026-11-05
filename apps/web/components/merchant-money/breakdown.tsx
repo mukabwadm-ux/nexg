@@ -47,7 +47,10 @@ export interface Breakdown {
 export function kes(cents: number | string | null | undefined): string {
   const n = Number(cents);
   if (cents === null || cents === undefined || !Number.isFinite(n)) return 'KES —';
-  return 'KES ' + (n / 100).toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  return (
+    'KES ' +
+    (n / 100).toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+  );
 }
 
 function when(iso: string | null): string {
@@ -253,9 +256,7 @@ export function BreakdownView({ b }: { b: Breakdown }) {
         {staff && (
           <Box title="Payment attempts">
             {b.payments.length === 0 ? (
-              <p className="text-muted text-[0.8125rem] font-semibold">
-                No payment attempt yet.
-              </p>
+              <p className="text-muted text-[0.8125rem] font-semibold">No payment attempt yet.</p>
             ) : (
               <ul className="divide-border divide-y">
                 {b.payments.map((p) => (
@@ -285,7 +286,10 @@ export function BreakdownView({ b }: { b: Breakdown }) {
         <Box title="Refunds">
           <ul className="divide-border divide-y">
             {b.refunds.map((r, i) => (
-              <li key={i} className="flex justify-between gap-3 py-2 text-[0.8125rem] font-semibold">
+              <li
+                key={i}
+                className="flex justify-between gap-3 py-2 text-[0.8125rem] font-semibold"
+              >
                 <span>
                   {r.status} · {r.method.replace(/_/g, ' ')} · {r.reason}
                 </span>

@@ -12,9 +12,16 @@ fs.mkdirSync(output, { recursive: true });
   const pageErrors = [];
   const writes = [];
   const steps = [];
-  page.on('pageerror', error => pageErrors.push(error.message));
-  page.on('request', request => { if (!['GET', 'HEAD'].includes(request.method())) writes.push(request.url()); });
-  const navigate = index => page.getByRole('navigation', { name: 'Onboarding steps' }).getByRole('button').nth(index).click();
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('request', (request) => {
+    if (!['GET', 'HEAD'].includes(request.method())) writes.push(request.url());
+  });
+  const navigate = (index) =>
+    page
+      .getByRole('navigation', { name: 'Onboarding steps' })
+      .getByRole('button')
+      .nth(index)
+      .click();
   const previewHome = async () => {
     await navigate(5);
     await page.getByRole('checkbox', { name: /I confirm/ }).check();
@@ -23,7 +30,9 @@ fs.mkdirSync(output, { recursive: true });
     await expect(page.getByRole('heading', { name: 'Welcome, Acacia Kitchen' })).toBeVisible();
   };
   try {
-    await page.goto(process.env.ONBOARDING_PREVIEW_URL || 'http://127.0.0.1:5181/', { waitUntil: 'networkidle' });
+    await page.goto(process.env.ONBOARDING_PREVIEW_URL || 'http://127.0.0.1:5181/', {
+      waitUntil: 'networkidle',
+    });
     await expect(page.getByRole('heading', { name: 'Onboard your business' })).toBeVisible();
     await page.getByLabel('Business name', { exact: false }).fill('Acacia Kitchen');
     await page.getByLabel('First name', { exact: false }).fill('Amina');
@@ -38,12 +47,19 @@ fs.mkdirSync(output, { recursive: true });
     await previewHome();
     await expect(page.getByText('Waiting for admin approval', { exact: true })).toBeVisible();
     await expect(page.getByText('No sign-in or admin decision has taken place.')).toBeVisible();
-    steps.push('Basic registration reaches Home with operational details entirely omitted; no fake authentication or approval.');
+    steps.push(
+      'Basic registration reaches Home with operational details entirely omitted; no fake authentication or approval.',
+    );
     await page.screenshot({ path: path.join(output, 'home-preview-desktop.png'), fullPage: true });
 
-    await page.getByRole('navigation', { name: 'Workspace sections' }).getByRole('button', { name: 'Work Locked' }).click();
+    await page
+      .getByRole('navigation', { name: 'Workspace sections' })
+      .getByRole('button', { name: 'Work Locked' })
+      .click();
     await expect(page.getByRole('heading', { name: 'Waiting for admin approval' })).toBeVisible();
-    await expect(page.getByText('This visual preview contains no restricted operational data.')).toBeVisible();
+    await expect(
+      page.getByText('This visual preview contains no restricted operational data.'),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
     steps.push('Operational section shows a safe approval lock and returns to Home.');
 
@@ -51,13 +67,22 @@ fs.mkdirSync(output, { recursive: true });
     await navigate(1);
     const questions = page.locator('.mo-registry-questions details').first();
     await questions.locator('summary').click();
-    const booleanQuestion = questions.locator('select').filter({ has: page.locator('option[value="false"]') }).first();
+    const booleanQuestion = questions
+      .locator('select')
+      .filter({ has: page.locator('option[value="false"]') })
+      .first();
     await booleanQuestion.selectOption('false');
     await page.getByLabel('Listing name', { exact: false }).fill('Seasonal lunch');
     await navigate(2);
-    await page.getByLabel('Operating street address / premises', { exact: false }).fill('Westlands, Nairobi');
+    await page
+      .getByLabel('Operating street address / premises', { exact: false })
+      .fill('Westlands, Nairobi');
     await navigate(4);
-    await page.locator('#upload-owner_id').setInputFiles({ name: 'owner-id.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nPreview evidence only') });
+    await page.locator('#upload-owner_id').setInputFiles({
+      name: 'owner-id.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('%PDF-1.4\nPreview evidence only'),
+    });
     await navigate(1);
     await page.getByLabel('Business category', { exact: false }).selectOption('wellness');
     await page.getByRole('checkbox', { name: 'Spa', exact: true }).check();
@@ -67,17 +92,25 @@ fs.mkdirSync(output, { recursive: true });
     await questions.locator('summary').click();
     await expect(booleanQuestion).toHaveValue('false');
     await navigate(2);
-    await expect(page.getByLabel('Operating street address / premises', { exact: false })).toHaveValue('Westlands, Nairobi');
+    await expect(
+      page.getByLabel('Operating street address / premises', { exact: false }),
+    ).toHaveValue('Westlands, Nairobi');
     await navigate(4);
     await expect(page.getByText('Selected: owner-id.pdf', { exact: true })).toBeVisible();
-    steps.push('Captured listing, false specialty answer, location and private in-memory file survive navigation and category restoration.');
+    steps.push(
+      'Captured listing, false specialty answer, location and private in-memory file survive navigation and category restoration.',
+    );
 
     await previewHome();
-    await expect(page.getByText('1 draft listings retained. Complete the details later.', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('1 draft listings retained. Complete the details later.', { exact: true }),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Review information supplied' }).click();
     await expect(page.getByText('Seasonal lunch', { exact: true })).toBeVisible();
     await page.setViewportSize({ width: 390, height: 844 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
     await page.screenshot({ path: path.join(output, 'home-preview-phone.png'), fullPage: true });
     steps.push('Home reflects captured drafts; phone layout remains within viewport.');
 
@@ -90,17 +123,55 @@ fs.mkdirSync(output, { recursive: true });
     await expect(page.locator('.mo-panel .mo-required')).toHaveCount(0);
     await page.reload({ waitUntil: 'networkidle' });
     await expect(page.getByLabel('Business name', { exact: false })).toHaveValue('');
-    expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length }))).toEqual({ local: 0, session: 0 });
+    expect(
+      await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })),
+    ).toEqual({ local: 0, session: 0 });
     expect(writes).toEqual([]);
     expect(pageErrors).toEqual([]);
-    steps.push('Pre-auth optional sections have no required markers; no API writes, browser persistence or runtime errors; refresh clears the preview.');
-    fs.writeFileSync(path.join(output, 'browser-verification.json'), JSON.stringify({ clientDate: '2026-11-02', status: 'PASS', scope: 'Standalone frontend preview only. No real OTP, account, backend or admin decision.', journeys: steps, networkWrites: writes, pageErrors }, null, 2) + '\n');
+    steps.push(
+      'Pre-auth optional sections have no required markers; no API writes, browser persistence or runtime errors; refresh clears the preview.',
+    );
+    fs.writeFileSync(
+      path.join(output, 'browser-verification.json'),
+      JSON.stringify(
+        {
+          clientDate: '2026-11-02',
+          status: 'PASS',
+          scope:
+            'Standalone frontend preview only. No real OTP, account, backend or admin decision.',
+          journeys: steps,
+          networkWrites: writes,
+          pageErrors,
+        },
+        null,
+        2,
+      ) + '\n',
+    );
     console.log(JSON.stringify({ status: 'PASS', journeys: steps }, null, 2));
   } catch (error) {
-    await page.screenshot({ path: path.join(output, 'browser-failure.png'), fullPage: true }).catch(() => {});
-    fs.writeFileSync(path.join(output, 'browser-verification.json'), JSON.stringify({ clientDate: '2026-11-02', status: 'FAIL', completedJourneys: steps, error: String(error), pageErrors, networkWrites: writes }, null, 2) + '\n');
+    await page
+      .screenshot({ path: path.join(output, 'browser-failure.png'), fullPage: true })
+      .catch(() => {});
+    fs.writeFileSync(
+      path.join(output, 'browser-verification.json'),
+      JSON.stringify(
+        {
+          clientDate: '2026-11-02',
+          status: 'FAIL',
+          completedJourneys: steps,
+          error: String(error),
+          pageErrors,
+          networkWrites: writes,
+        },
+        null,
+        2,
+      ) + '\n',
+    );
     throw error;
   } finally {
     await browser.close();
   }
-})().catch(error => { console.error(error); process.exitCode = 1; });
+})().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

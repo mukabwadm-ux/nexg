@@ -6,9 +6,7 @@
       "id": "adult_products",
       "name": "Adult Products",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": []
     },
     {
@@ -16,11 +14,7 @@
       "id": "adult_wellness",
       "name": "Adult Wellness",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT",
-        "ORDER"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT", "ORDER"],
       "attributes": []
     },
     {
@@ -28,9 +22,7 @@
       "id": "cigarettes",
       "name": "Cigarettes",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRANDS_STOCKED_TEXT",
@@ -51,9 +43,7 @@
       "id": "cigars",
       "name": "Cigars",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRANDS_STOCKED_TEXT",
@@ -92,9 +82,7 @@
       "id": "vapes",
       "name": "Vapes",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_VAPE_DEVICE_TYPES",
@@ -103,12 +91,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "disposable",
-                "refillable",
-                "pod",
-                "mods"
-              ]
+              "enum": ["disposable", "refillable", "pod", "mods"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -140,9 +123,7 @@
       "id": "adult_accessories",
       "name": "Adult Accessories",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": []
     },
     {
@@ -150,9 +131,7 @@
       "id": "airport_pickup",
       "name": "Airport Pickup",
       "schema": "TRANSFER_ROUTE_V1",
-      "models": [
-        "TRANSFER"
-      ],
+      "models": ["TRANSFER"],
       "attributes": [
         {
           "id": "Q_VEHICLE_TYPES_TRANSFER",
@@ -161,13 +140,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "sedan",
-                "suv",
-                "van",
-                "minibus",
-                "executive"
-              ]
+              "enum": ["sedan", "suv", "van", "minibus", "executive"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -203,9 +176,7 @@
       "id": "airport_dropoff",
       "name": "Airport Drop-off",
       "schema": "TRANSFER_ROUTE_V1",
-      "models": [
-        "TRANSFER"
-      ],
+      "models": ["TRANSFER"],
       "attributes": [
         {
           "id": "Q_VEHICLE_TYPES_TRANSFER",
@@ -214,13 +185,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "sedan",
-                "suv",
-                "van",
-                "minibus",
-                "executive"
-              ]
+              "enum": ["sedan", "suv", "van", "minibus", "executive"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -256,9 +221,7 @@
       "id": "meet_greet",
       "name": "Meet & Greet",
       "schema": "TRANSFER_ROUTE_V1",
-      "models": [
-        "TRANSFER"
-      ],
+      "models": ["TRANSFER"],
       "attributes": [
         {
           "id": "Q_VEHICLE_TYPES_TRANSFER",
@@ -267,13 +230,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "sedan",
-                "suv",
-                "van",
-                "minibus",
-                "executive"
-              ]
+              "enum": ["sedan", "suv", "van", "minibus", "executive"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -309,9 +266,7 @@
       "id": "executive_transfer",
       "name": "Executive Transfer",
       "schema": "TRANSFER_ROUTE_V1",
-      "models": [
-        "TRANSFER"
-      ],
+      "models": ["TRANSFER"],
       "attributes": [
         {
           "id": "Q_VEHICLE_TYPES_TRANSFER",
@@ -320,13 +275,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "sedan",
-                "suv",
-                "van",
-                "minibus",
-                "executive"
-              ]
+              "enum": ["sedan", "suv", "van", "minibus", "executive"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -362,9 +311,7 @@
       "id": "wine",
       "name": "Wine",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_WINE_ORIGINS",
@@ -373,14 +320,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "kenya",
-                "south_africa",
-                "europe",
-                "americas",
-                "oceania",
-                "other"
-              ]
+              "enum": ["kenya", "south_africa", "europe", "americas", "oceania", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -414,9 +354,7 @@
       "id": "spirits",
       "name": "Spirits",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRANDS_STOCKED_TEXT",
@@ -455,9 +393,7 @@
       "id": "beer",
       "name": "Beer",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRANDS_STOCKED_TEXT",
@@ -478,9 +414,7 @@
       "id": "champagne",
       "name": "Champagne",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_OCCASIONS_SPEC",
@@ -489,14 +423,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "birthday",
-                "anniversary",
-                "sympathy",
-                "corporate",
-                "wedding",
-                "other"
-              ]
+              "enum": ["birthday", "anniversary", "sympathy", "corporate", "wedding", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -530,9 +457,7 @@
       "id": "cocktail_mixers",
       "name": "Cocktail Mixers",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_GIFT_PACKAGING",
@@ -559,9 +484,7 @@
       "id": "liquor_stores",
       "name": "Liquor Stores",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": []
     },
     {
@@ -569,23 +492,14 @@
       "id": "mens_fashion",
       "name": "Men's Fashion",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "APPOINTMENT",
-        "ORDER",
-        "PRODUCTION_DUE"
-      ],
+      "models": ["APPOINTMENT", "ORDER", "PRODUCTION_DUE"],
       "attributes": [
         {
           "id": "Q_BRAND_TIER",
           "label": "Brand Tier?",
           "schema": {
             "type": "string",
-            "enum": [
-              "local",
-              "mainstream",
-              "premium",
-              "mixed"
-            ]
+            "enum": ["local", "mainstream", "premium", "mixed"]
           },
           "options": [
             {
@@ -614,12 +528,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "xs_s",
-                "m_l",
-                "xl_xxl",
-                "extended"
-              ]
+              "enum": ["xs_s", "m_l", "xl_xxl", "extended"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -651,23 +560,14 @@
       "id": "womens_fashion",
       "name": "Women's Fashion",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "APPOINTMENT",
-        "ORDER",
-        "PRODUCTION_DUE"
-      ],
+      "models": ["APPOINTMENT", "ORDER", "PRODUCTION_DUE"],
       "attributes": [
         {
           "id": "Q_BRAND_TIER",
           "label": "Brand Tier?",
           "schema": {
             "type": "string",
-            "enum": [
-              "local",
-              "mainstream",
-              "premium",
-              "mixed"
-            ]
+            "enum": ["local", "mainstream", "premium", "mixed"]
           },
           "options": [
             {
@@ -696,12 +596,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "xs_s",
-                "m_l",
-                "xl_xxl",
-                "extended"
-              ]
+              "enum": ["xs_s", "m_l", "xl_xxl", "extended"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -733,21 +628,14 @@
       "id": "kids_fashion",
       "name": "Kids Fashion",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRAND_TIER",
           "label": "Brand Tier?",
           "schema": {
             "type": "string",
-            "enum": [
-              "local",
-              "mainstream",
-              "premium",
-              "mixed"
-            ]
+            "enum": ["local", "mainstream", "premium", "mixed"]
           },
           "options": [
             {
@@ -774,12 +662,7 @@
           "label": "Kids Age Range?",
           "schema": {
             "type": "string",
-            "enum": [
-              "0_2",
-              "3_5",
-              "6_12",
-              "13_17"
-            ]
+            "enum": ["0_2", "3_5", "6_12", "13_17"]
           },
           "options": [
             {
@@ -808,21 +691,14 @@
       "id": "shoes",
       "name": "Shoes",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRAND_TIER",
           "label": "Brand Tier?",
           "schema": {
             "type": "string",
-            "enum": [
-              "local",
-              "mainstream",
-              "premium",
-              "mixed"
-            ]
+            "enum": ["local", "mainstream", "premium", "mixed"]
           },
           "options": [
             {
@@ -849,12 +725,7 @@
           "label": "Shoe Size System?",
           "schema": {
             "type": "string",
-            "enum": [
-              "uk",
-              "eu",
-              "us",
-              "multiple"
-            ]
+            "enum": ["uk", "eu", "us", "multiple"]
           },
           "options": [
             {
@@ -883,21 +754,14 @@
       "id": "bags",
       "name": "Bags",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRAND_TIER",
           "label": "Brand Tier?",
           "schema": {
             "type": "string",
-            "enum": [
-              "local",
-              "mainstream",
-              "premium",
-              "mixed"
-            ]
+            "enum": ["local", "mainstream", "premium", "mixed"]
           },
           "options": [
             {
@@ -926,21 +790,14 @@
       "id": "watches",
       "name": "Watches",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRAND_TIER",
           "label": "Brand Tier?",
           "schema": {
             "type": "string",
-            "enum": [
-              "local",
-              "mainstream",
-              "premium",
-              "mixed"
-            ]
+            "enum": ["local", "mainstream", "premium", "mixed"]
           },
           "options": [
             {
@@ -969,21 +826,14 @@
       "id": "accessories",
       "name": "Accessories",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BRAND_TIER",
           "label": "Brand Tier?",
           "schema": {
             "type": "string",
-            "enum": [
-              "local",
-              "mainstream",
-              "premium",
-              "mixed"
-            ]
+            "enum": ["local", "mainstream", "premium", "mixed"]
           },
           "options": [
             {
@@ -1012,11 +862,7 @@
       "id": "makeup",
       "name": "Makeup",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT",
-        "ORDER"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT", "ORDER"],
       "attributes": [
         {
           "id": "Q_BRIDAL_PACKAGES",
@@ -1043,11 +889,7 @@
       "id": "skincare",
       "name": "Skincare",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT",
-        "ORDER"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT", "ORDER"],
       "attributes": [
         {
           "id": "Q_SKIN_TYPES_SERVED",
@@ -1056,14 +898,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "dry",
-                "oily",
-                "combination",
-                "sensitive",
-                "normal",
-                "other"
-              ]
+              "enum": ["dry", "oily", "combination", "sensitive", "normal", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -1079,11 +914,7 @@
       "id": "haircare",
       "name": "Haircare",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT",
-        "ORDER"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT", "ORDER"],
       "attributes": [
         {
           "id": "Q_HAIR_TYPES_SERVED",
@@ -1092,14 +923,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "straight",
-                "wavy",
-                "curly",
-                "coily",
-                "protective_styles",
-                "other"
-              ]
+              "enum": ["straight", "wavy", "curly", "coily", "protective_styles", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -1115,9 +939,7 @@
       "id": "fragrances",
       "name": "Fragrances",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_FRAGRANCE_FAMILIES",
@@ -1126,14 +948,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "floral",
-                "fresh",
-                "woody",
-                "amber",
-                "aromatic",
-                "other"
-              ]
+              "enum": ["floral", "fresh", "woody", "amber", "aromatic", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -1167,9 +982,7 @@
       "id": "cosmetics_stores",
       "name": "Cosmetics Stores",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_OWN_BRAND",
@@ -1196,9 +1009,7 @@
       "id": "car_rental",
       "name": "Car Rental",
       "schema": "RENTAL_ASSET_V1",
-      "models": [
-        "ASSET_INTERVAL"
-      ],
+      "models": ["ASSET_INTERVAL"],
       "attributes": [
         {
           "id": "Q_VEHICLE_TYPES_RENTAL",
@@ -1207,13 +1018,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "car",
-                "motorbike",
-                "van",
-                "suv",
-                "tuktuk"
-              ]
+              "enum": ["car", "motorbike", "van", "suv", "tuktuk"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1249,9 +1054,7 @@
       "id": "self_drive",
       "name": "Self Drive",
       "schema": "RENTAL_ASSET_V1",
-      "models": [
-        "ASSET_INTERVAL"
-      ],
+      "models": ["ASSET_INTERVAL"],
       "attributes": [
         {
           "id": "Q_VEHICLE_TYPES_RENTAL",
@@ -1260,13 +1063,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "car",
-                "motorbike",
-                "van",
-                "suv",
-                "tuktuk"
-              ]
+              "enum": ["car", "motorbike", "van", "suv", "tuktuk"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1302,9 +1099,7 @@
       "id": "corporate_rental",
       "name": "Corporate Rental",
       "schema": "RENTAL_ASSET_V1",
-      "models": [
-        "ASSET_INTERVAL"
-      ],
+      "models": ["ASSET_INTERVAL"],
       "attributes": [
         {
           "id": "Q_VEHICLE_TYPES_RENTAL",
@@ -1313,13 +1108,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "car",
-                "motorbike",
-                "van",
-                "suv",
-                "tuktuk"
-              ]
+              "enum": ["car", "motorbike", "van", "suv", "tuktuk"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1355,9 +1144,7 @@
       "id": "long_term_rental",
       "name": "Long-Term Rental",
       "schema": "RENTAL_ASSET_V1",
-      "models": [
-        "ASSET_INTERVAL"
-      ],
+      "models": ["ASSET_INTERVAL"],
       "attributes": [
         {
           "id": "Q_VEHICLE_TYPES_RENTAL",
@@ -1366,13 +1153,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "car",
-                "motorbike",
-                "van",
-                "suv",
-                "tuktuk"
-              ]
+              "enum": ["car", "motorbike", "van", "suv", "tuktuk"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1408,9 +1189,7 @@
       "id": "bike_rental",
       "name": "Bike Rental",
       "schema": "RENTAL_ASSET_V1",
-      "models": [
-        "ASSET_INTERVAL"
-      ],
+      "models": ["ASSET_INTERVAL"],
       "attributes": [
         {
           "id": "Q_BIKE_TYPES",
@@ -1419,12 +1198,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "motorcycle",
-                "scooter",
-                "bicycle",
-                "electric"
-              ]
+              "enum": ["motorcycle", "scooter", "bicycle", "electric"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1456,9 +1230,7 @@
       "id": "concerts",
       "name": "Concerts",
       "schema": "EVENT_TICKET_V1",
-      "models": [
-        "SESSION_CAPACITY"
-      ],
+      "models": ["SESSION_CAPACITY"],
       "attributes": [
         {
           "id": "Q_VIP_PACKAGES",
@@ -1485,9 +1257,7 @@
       "id": "festivals",
       "name": "Festivals",
       "schema": "EVENT_TICKET_V1",
-      "models": [
-        "SESSION_CAPACITY"
-      ],
+      "models": ["SESSION_CAPACITY"],
       "attributes": [
         {
           "id": "Q_VIP_PACKAGES",
@@ -1514,9 +1284,7 @@
       "id": "conferences",
       "name": "Conferences",
       "schema": "EVENT_TICKET_V1",
-      "models": [
-        "SESSION_CAPACITY"
-      ],
+      "models": ["SESSION_CAPACITY"],
       "attributes": [
         {
           "id": "Q_AV_EQUIPMENT",
@@ -1525,13 +1293,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "sound",
-                "projector",
-                "microphones",
-                "lighting",
-                "video"
-              ]
+              "enum": ["sound", "projector", "microphones", "lighting", "video"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1567,9 +1329,7 @@
       "id": "private_events",
       "name": "Private Events",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "REQUEST_QUOTE"
-      ],
+      "models": ["REQUEST_QUOTE"],
       "attributes": []
     },
     {
@@ -1577,10 +1337,7 @@
       "id": "photography",
       "name": "Photography",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT"],
       "attributes": []
     },
     {
@@ -1588,9 +1345,7 @@
       "id": "workshops",
       "name": "Workshops",
       "schema": "GROUP_SESSION_V1",
-      "models": [
-        "SESSION_CAPACITY"
-      ],
+      "models": ["SESSION_CAPACITY"],
       "attributes": []
     },
     {
@@ -1598,10 +1353,7 @@
       "id": "classes",
       "name": "Classes",
       "schema": "GROUP_SESSION_V1",
-      "models": [
-        "ENTITLEMENT",
-        "SESSION_CAPACITY"
-      ],
+      "models": ["ENTITLEMENT", "SESSION_CAPACITY"],
       "attributes": []
     },
     {
@@ -1609,10 +1361,7 @@
       "id": "sports_activities",
       "name": "Sports Activities",
       "schema": "GROUP_SESSION_V1",
-      "models": [
-        "ENTITLEMENT",
-        "SESSION_CAPACITY"
-      ],
+      "models": ["ENTITLEMENT", "SESSION_CAPACITY"],
       "attributes": []
     },
     {
@@ -1620,9 +1369,7 @@
       "id": "recreation",
       "name": "Recreation",
       "schema": "GROUP_SESSION_V1",
-      "models": [
-        "SESSION_CAPACITY"
-      ],
+      "models": ["SESSION_CAPACITY"],
       "attributes": []
     },
     {
@@ -1630,10 +1377,7 @@
       "id": "banking",
       "name": "Banking",
       "schema": "REGULATED_ENQUIRY_V1",
-      "models": [
-        "APPOINTMENT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["APPOINTMENT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_FIN_SERVICES_OFFERED_BANK",
@@ -1642,13 +1386,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "accounts",
-                "loans",
-                "savings",
-                "payments",
-                "advisory"
-              ]
+              "enum": ["accounts", "loans", "savings", "payments", "advisory"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1684,10 +1422,7 @@
       "id": "forex",
       "name": "Forex",
       "schema": "REGULATED_ENQUIRY_V1",
-      "models": [
-        "APPOINTMENT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["APPOINTMENT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_CURRENCIES_TRADED",
@@ -1696,13 +1431,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "kes_usd",
-                "kes_eur",
-                "kes_gbp",
-                "east_african",
-                "other"
-              ]
+              "enum": ["kes_usd", "kes_eur", "kes_gbp", "east_african", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1738,10 +1467,7 @@
       "id": "insurance",
       "name": "Insurance",
       "schema": "REGULATED_ENQUIRY_V1",
-      "models": [
-        "APPOINTMENT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["APPOINTMENT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_INSURANCE_TYPES",
@@ -1750,14 +1476,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "health",
-                "motor",
-                "life",
-                "property",
-                "business",
-                "travel"
-              ]
+              "enum": ["health", "motor", "life", "property", "business", "travel"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1797,10 +1516,7 @@
       "id": "payments",
       "name": "Payments",
       "schema": "REGULATED_ENQUIRY_V1",
-      "models": [
-        "APPOINTMENT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["APPOINTMENT", "REQUEST_QUOTE"],
       "attributes": []
     },
     {
@@ -1808,10 +1524,7 @@
       "id": "remittance",
       "name": "Remittance",
       "schema": "REGULATED_ENQUIRY_V1",
-      "models": [
-        "APPOINTMENT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["APPOINTMENT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_REMITTANCE_CORRIDORS",
@@ -1820,12 +1533,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "kenya_east_africa",
-                "kenya_europe",
-                "kenya_north_america",
-                "global"
-              ]
+              "enum": ["kenya_east_africa", "kenya_europe", "kenya_north_america", "global"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1857,10 +1565,7 @@
       "id": "sacco_services",
       "name": "Sacco Services",
       "schema": "REGULATED_ENQUIRY_V1",
-      "models": [
-        "APPOINTMENT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["APPOINTMENT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_SACCO_SERVICES_OFFERED",
@@ -1869,13 +1574,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "savings",
-                "loans",
-                "payments",
-                "insurance",
-                "member_services"
-              ]
+              "enum": ["savings", "loans", "payments", "insurance", "member_services"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1911,10 +1610,7 @@
       "id": "business_services",
       "name": "Business Services",
       "schema": "REGULATED_ENQUIRY_V1",
-      "models": [
-        "APPOINTMENT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["APPOINTMENT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_BIZ_SERVICES_OFFERED",
@@ -1923,13 +1619,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "registration",
-                "tax",
-                "accounting",
-                "legal",
-                "consulting"
-              ]
+              "enum": ["registration", "tax", "accounting", "legal", "consulting"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -1965,21 +1655,14 @@
       "id": "flowers",
       "name": "Flowers",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ENTITLEMENT",
-        "ORDER"
-      ],
+      "models": ["ENTITLEMENT", "ORDER"],
       "attributes": [
         {
           "id": "Q_FRESH_OR_PRESERVED",
           "label": "fresh or preserved?",
           "schema": {
             "type": "string",
-            "enum": [
-              "fresh",
-              "preserved",
-              "both"
-            ]
+            "enum": ["fresh", "preserved", "both"]
           },
           "options": [],
           "target": "catalog.attributes.fresh_or_preserved"
@@ -2000,10 +1683,7 @@
       "id": "gift_hampers",
       "name": "Gift Hampers",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER",
-        "PRODUCTION_DUE"
-      ],
+      "models": ["ORDER", "PRODUCTION_DUE"],
       "attributes": [
         {
           "id": "Q_CORPORATE_GIFTING",
@@ -2030,9 +1710,7 @@
       "id": "cakes",
       "name": "Cakes",
       "schema": "MADE_TO_ORDER_V1",
-      "models": [
-        "PRODUCTION_DUE"
-      ],
+      "models": ["PRODUCTION_DUE"],
       "attributes": [
         {
           "id": "Q_DIETARY_OPTIONS_CAKE",
@@ -2064,9 +1742,7 @@
       "id": "chocolates",
       "name": "Chocolates",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_GIFT_WRAPPING",
@@ -2102,9 +1778,7 @@
       "id": "personalized_gifts",
       "name": "Personalized Gifts",
       "schema": "MADE_TO_ORDER_V1",
-      "models": [
-        "PRODUCTION_DUE"
-      ],
+      "models": ["PRODUCTION_DUE"],
       "attributes": [
         {
           "id": "Q_CUSTOM_MESSAGES",
@@ -2131,9 +1805,7 @@
       "id": "occasion_gifts",
       "name": "Occasion Gifts",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_OCCASIONS_SPEC",
@@ -2142,14 +1814,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "birthday",
-                "anniversary",
-                "sympathy",
-                "corporate",
-                "wedding",
-                "other"
-              ]
+              "enum": ["birthday", "anniversary", "sympathy", "corporate", "wedding", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -2192,10 +1857,7 @@
       "id": "restaurant",
       "name": "Restaurant",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER",
-        "SPACE_RESERVATION"
-      ],
+      "models": ["ORDER", "SPACE_RESERVATION"],
       "attributes": [
         {
           "id": "Q_CUISINE_TYPES",
@@ -2204,15 +1866,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "kenyan",
-                "swahili",
-                "indian",
-                "chinese",
-                "italian",
-                "continental",
-                "other"
-              ]
+              "enum": ["kenyan", "swahili", "indian", "chinese", "italian", "continental", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -2228,9 +1882,7 @@
       "id": "fast_food",
       "name": "Fast Food",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": []
     },
     {
@@ -2238,9 +1890,7 @@
       "id": "cafe",
       "name": "Café",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_BREWING_METHODS",
@@ -2249,14 +1899,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "espresso",
-                "filter",
-                "french_press",
-                "pour_over",
-                "cold_brew",
-                "other"
-              ]
+              "enum": ["espresso", "filter", "french_press", "pour_over", "cold_brew", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -2281,10 +1924,7 @@
       "id": "bakery",
       "name": "Bakery",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER",
-        "PRODUCTION_DUE"
-      ],
+      "models": ["ORDER", "PRODUCTION_DUE"],
       "attributes": [
         {
           "id": "Q_BAKERY_SPECIALTIES",
@@ -2293,13 +1933,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "bread",
-                "pastry",
-                "cakes",
-                "biscuits",
-                "other"
-              ]
+              "enum": ["bread", "pastry", "cakes", "biscuits", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -2315,10 +1949,7 @@
       "id": "desserts",
       "name": "Desserts",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER",
-        "PRODUCTION_DUE"
-      ],
+      "models": ["ORDER", "PRODUCTION_DUE"],
       "attributes": [
         {
           "id": "Q_DESSERT_SPECIALTIES",
@@ -2327,13 +1958,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "cakes",
-                "ice_cream",
-                "pastry",
-                "chocolate",
-                "other"
-              ]
+              "enum": ["cakes", "ice_cream", "pastry", "chocolate", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -2372,9 +1997,7 @@
       "id": "juice_bar",
       "name": "Juice Bar",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_COLD_PRESSED",
@@ -2410,9 +2033,7 @@
       "id": "cloud_kitchen",
       "name": "Cloud Kitchen",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_NUMBER_OF_BRANDS",
@@ -2433,15 +2054,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "kenyan",
-                "swahili",
-                "indian",
-                "chinese",
-                "italian",
-                "continental",
-                "other"
-              ]
+              "enum": ["kenyan", "swahili", "indian", "chinese", "italian", "continental", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -2457,9 +2070,7 @@
       "id": "catering",
       "name": "Catering",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "REQUEST_QUOTE"
-      ],
+      "models": ["REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_CUISINE_TYPES",
@@ -2468,15 +2079,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "kenyan",
-                "swahili",
-                "indian",
-                "chinese",
-                "italian",
-                "continental",
-                "other"
-              ]
+              "enum": ["kenyan", "swahili", "indian", "chinese", "italian", "continental", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -2501,9 +2104,7 @@
       "id": "supermarket",
       "name": "Supermarket",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": []
     },
     {
@@ -2511,9 +2112,7 @@
       "id": "convenience_store",
       "name": "Convenience Store",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": []
     },
     {
@@ -2521,10 +2120,7 @@
       "id": "fresh_produce",
       "name": "Fresh Produce",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ENTITLEMENT",
-        "ORDER"
-      ],
+      "models": ["ENTITLEMENT", "ORDER"],
       "attributes": [
         {
           "id": "Q_ORGANIC_OPTIONS",
@@ -2560,9 +2156,7 @@
       "id": "butchery",
       "name": "Butchery",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": []
     },
     {
@@ -2570,9 +2164,7 @@
       "id": "seafood",
       "name": "Seafood",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_LIVE_SEAFOOD",
@@ -2599,9 +2191,7 @@
       "id": "organic_store",
       "name": "Organic Store",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_LOCAL_SOURCING",
@@ -2619,9 +2209,7 @@
       "id": "laundry",
       "name": "Laundry",
       "schema": "PICKUP_RETURN_V1",
-      "models": [
-        "LINKED_WINDOWS"
-      ],
+      "models": ["LINKED_WINDOWS"],
       "attributes": []
     },
     {
@@ -2629,9 +2217,7 @@
       "id": "dry_cleaning",
       "name": "Dry Cleaning",
       "schema": "PICKUP_RETURN_V1",
-      "models": [
-        "LINKED_WINDOWS"
-      ],
+      "models": ["LINKED_WINDOWS"],
       "attributes": [
         {
           "id": "Q_GARMENT_TYPES",
@@ -2640,14 +2226,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "everyday",
-                "formal",
-                "delicate",
-                "bedding",
-                "curtains",
-                "other"
-              ]
+              "enum": ["everyday", "formal", "delicate", "bedding", "curtains", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -2663,9 +2242,7 @@
       "id": "ironing",
       "name": "Ironing",
       "schema": "PICKUP_RETURN_V1",
-      "models": [
-        "LINKED_WINDOWS"
-      ],
+      "models": ["LINKED_WINDOWS"],
       "attributes": []
     },
     {
@@ -2673,10 +2250,7 @@
       "id": "home_cleaning",
       "name": "Home Cleaning",
       "schema": "FIELD_SERVICE_V1",
-      "models": [
-        "ENTITLEMENT",
-        "FIELD_VISIT"
-      ],
+      "models": ["ENTITLEMENT", "FIELD_VISIT"],
       "attributes": [
         {
           "id": "Q_ECO_PRODUCTS",
@@ -2703,10 +2277,7 @@
       "id": "office_cleaning",
       "name": "Office Cleaning",
       "schema": "FIELD_SERVICE_V1",
-      "models": [
-        "ENTITLEMENT",
-        "FIELD_VISIT"
-      ],
+      "models": ["ENTITLEMENT", "FIELD_VISIT"],
       "attributes": [
         {
           "id": "Q_ECO_PRODUCTS",
@@ -2733,9 +2304,7 @@
       "id": "home_living",
       "name": "Home & Living",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -2754,11 +2323,7 @@
           "label": "New Or Used?",
           "schema": {
             "type": "string",
-            "enum": [
-              "new",
-              "used",
-              "both"
-            ]
+            "enum": ["new", "used", "both"]
           },
           "options": [
             {
@@ -2783,10 +2348,7 @@
       "id": "furniture",
       "name": "Furniture",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "FIELD_VISIT",
-        "ORDER"
-      ],
+      "models": ["FIELD_VISIT", "ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -2805,11 +2367,7 @@
           "label": "New Or Used?",
           "schema": {
             "type": "string",
-            "enum": [
-              "new",
-              "used",
-              "both"
-            ]
+            "enum": ["new", "used", "both"]
           },
           "options": [
             {
@@ -2834,10 +2392,7 @@
       "id": "appliances",
       "name": "Appliances",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "FIELD_VISIT",
-        "ORDER"
-      ],
+      "models": ["FIELD_VISIT", "ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -2858,9 +2413,7 @@
       "id": "decor",
       "name": "Decor",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -2879,11 +2432,7 @@
           "label": "New Or Used?",
           "schema": {
             "type": "string",
-            "enum": [
-              "new",
-              "used",
-              "both"
-            ]
+            "enum": ["new", "used", "both"]
           },
           "options": [
             {
@@ -2926,9 +2475,7 @@
       "id": "kitchenware",
       "name": "Kitchenware",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -2947,11 +2494,7 @@
           "label": "New Or Used?",
           "schema": {
             "type": "string",
-            "enum": [
-              "new",
-              "used",
-              "both"
-            ]
+            "enum": ["new", "used", "both"]
           },
           "options": [
             {
@@ -2976,11 +2519,7 @@
       "id": "books",
       "name": "Books",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER",
-        "PRODUCTION_DUE",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["ORDER", "PRODUCTION_DUE", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_BOOK_GENRES",
@@ -2989,14 +2528,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "fiction",
-                "nonfiction",
-                "children",
-                "business",
-                "academic",
-                "other"
-              ]
+              "enum": ["fiction", "nonfiction", "children", "business", "academic", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3034,11 +2566,7 @@
           "label": "New Or Used?",
           "schema": {
             "type": "string",
-            "enum": [
-              "new",
-              "used",
-              "both"
-            ]
+            "enum": ["new", "used", "both"]
           },
           "options": [
             {
@@ -3063,9 +2591,7 @@
       "id": "stationery",
       "name": "Stationery",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -3086,9 +2612,7 @@
       "id": "office_supplies",
       "name": "Office Supplies",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -3109,9 +2633,7 @@
       "id": "general_retail",
       "name": "General Retail",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -3130,11 +2652,7 @@
           "label": "New Or Used?",
           "schema": {
             "type": "string",
-            "enum": [
-              "new",
-              "used",
-              "both"
-            ]
+            "enum": ["new", "used", "both"]
           },
           "options": [
             {
@@ -3159,9 +2677,7 @@
       "id": "pharmacy_retail",
       "name": "Pharmacy",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": []
     },
     {
@@ -3169,9 +2685,7 @@
       "id": "medical_supplies",
       "name": "Medical Supplies",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_MED_SUPPLY_TYPES",
@@ -3180,13 +2694,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "first_aid",
-                "diagnostic",
-                "mobility",
-                "consumables",
-                "other"
-              ]
+              "enum": ["first_aid", "diagnostic", "mobility", "consumables", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -3202,10 +2710,7 @@
       "id": "baby_products",
       "name": "Baby Products",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ENTITLEMENT",
-        "ORDER"
-      ],
+      "models": ["ENTITLEMENT", "ORDER"],
       "attributes": [
         {
           "id": "Q_BABY_PRODUCT_RANGE",
@@ -3214,13 +2719,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "feeding",
-                "diapers",
-                "skincare",
-                "equipment",
-                "other"
-              ]
+              "enum": ["feeding", "diapers", "skincare", "equipment", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -3236,9 +2735,7 @@
       "id": "supplements",
       "name": "Supplements",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_SUPPLEMENT_CATEGORIES",
@@ -3247,13 +2744,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "vitamins",
-                "minerals",
-                "sports_nutrition",
-                "herbal",
-                "other"
-              ]
+              "enum": ["vitamins", "minerals", "sports_nutrition", "herbal", "other"]
             },
             "uniqueItems": true,
             "minItems": 1,
@@ -3269,10 +2760,7 @@
       "id": "clinics",
       "name": "Clinics",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT"],
       "attributes": [
         {
           "id": "Q_CLINIC_SPECIALIZATIONS",
@@ -3281,13 +2769,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "general",
-                "dental",
-                "paediatrics",
-                "maternal",
-                "specialist"
-              ]
+              "enum": ["general", "dental", "paediatrics", "maternal", "specialist"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3323,9 +2805,7 @@
       "id": "telemedicine",
       "name": "Telemedicine",
       "schema": "REMOTE_SESSION_V1",
-      "models": [
-        "APPOINTMENT"
-      ],
+      "models": ["APPOINTMENT"],
       "attributes": [
         {
           "id": "Q_CLINIC_SPECIALIZATIONS",
@@ -3334,13 +2814,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "general",
-                "dental",
-                "paediatrics",
-                "maternal",
-                "specialist"
-              ]
+              "enum": ["general", "dental", "paediatrics", "maternal", "specialist"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3376,10 +2850,7 @@
       "id": "labs",
       "name": "Labs",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT"],
       "attributes": [
         {
           "id": "Q_LAB_TEST_TYPES",
@@ -3388,12 +2859,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "blood",
-                "imaging",
-                "wellness",
-                "diagnostic"
-              ]
+              "enum": ["blood", "imaging", "wellness", "diagnostic"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3425,9 +2891,7 @@
       "id": "mental_health",
       "name": "Mental Health (Therapy)",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT"
-      ],
+      "models": ["APPOINTMENT"],
       "attributes": [
         {
           "id": "Q_THERAPY_TYPES",
@@ -3436,12 +2900,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "individual",
-                "couples",
-                "family",
-                "group"
-              ]
+              "enum": ["individual", "couples", "family", "group"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3473,10 +2932,7 @@
       "id": "coaching",
       "name": "Coaching",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "SESSION_CAPACITY"
-      ],
+      "models": ["APPOINTMENT", "SESSION_CAPACITY"],
       "attributes": [
         {
           "id": "Q_COACHING_AREAS",
@@ -3485,13 +2941,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "fitness",
-                "nutrition",
-                "mental_wellbeing",
-                "career",
-                "other"
-              ]
+              "enum": ["fitness", "nutrition", "mental_wellbeing", "career", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3527,10 +2977,7 @@
       "id": "smartphones",
       "name": "Smartphones",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER",
-        "SERVICE_JOB"
-      ],
+      "models": ["ORDER", "SERVICE_JOB"],
       "attributes": [
         {
           "id": "Q_PHONE_BRANDS",
@@ -3539,13 +2986,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "samsung",
-                "apple",
-                "tecno_infinix",
-                "xiaomi",
-                "multiple"
-              ]
+              "enum": ["samsung", "apple", "tecno_infinix", "xiaomi", "multiple"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3579,11 +3020,7 @@
           "label": "New Or Refurbished?",
           "schema": {
             "type": "string",
-            "enum": [
-              "new",
-              "refurbished",
-              "both"
-            ]
+            "enum": ["new", "refurbished", "both"]
           },
           "options": [
             {
@@ -3608,13 +3045,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "screen",
-                "battery",
-                "software",
-                "hardware",
-                "diagnostics"
-              ]
+              "enum": ["screen", "battery", "software", "hardware", "diagnostics"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3650,9 +3081,7 @@
       "id": "tech_accessories",
       "name": "Accessories",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -3673,10 +3102,7 @@
       "id": "computers",
       "name": "Computers",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER",
-        "SERVICE_JOB"
-      ],
+      "models": ["ORDER", "SERVICE_JOB"],
       "attributes": [
         {
           "id": "Q_COMPUTER_BRANDS",
@@ -3685,13 +3111,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "apple",
-                "dell",
-                "hp",
-                "lenovo",
-                "other"
-              ]
+              "enum": ["apple", "dell", "hp", "lenovo", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3725,11 +3145,7 @@
           "label": "New Or Refurbished?",
           "schema": {
             "type": "string",
-            "enum": [
-              "new",
-              "refurbished",
-              "both"
-            ]
+            "enum": ["new", "refurbished", "both"]
           },
           "options": [
             {
@@ -3754,13 +3170,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "screen",
-                "battery",
-                "software",
-                "hardware",
-                "diagnostics"
-              ]
+              "enum": ["screen", "battery", "software", "hardware", "diagnostics"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3796,9 +3206,7 @@
       "id": "gaming",
       "name": "Gaming",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_CONSOLE_TYPES",
@@ -3807,12 +3215,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "playstation",
-                "xbox",
-                "nintendo",
-                "pc"
-              ]
+              "enum": ["playstation", "xbox", "nintendo", "pc"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3862,12 +3265,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "controllers",
-                "headsets",
-                "keyboards",
-                "storage"
-              ]
+              "enum": ["controllers", "headsets", "keyboards", "storage"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3899,9 +3297,7 @@
       "id": "audio",
       "name": "Audio",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "ORDER"
-      ],
+      "models": ["ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -3922,10 +3318,7 @@
       "id": "telecom_services",
       "name": "Telecom Services",
       "schema": "SERVICE_JOB_V1",
-      "models": [
-        "ORDER",
-        "SERVICE_JOB"
-      ],
+      "models": ["ORDER", "SERVICE_JOB"],
       "attributes": [
         {
           "id": "Q_TELECOM_SERVICES_OFFERED",
@@ -3934,13 +3327,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "airtime",
-                "data",
-                "devices",
-                "accessories",
-                "sim_services"
-              ]
+              "enum": ["airtime", "data", "devices", "accessories", "sim_services"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -3976,12 +3363,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "safaricom",
-                "airtel",
-                "telkom",
-                "multiple"
-              ]
+              "enum": ["safaricom", "airtel", "telkom", "multiple"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4013,10 +3395,7 @@
       "id": "smart_devices",
       "name": "Smart Devices",
       "schema": "PRODUCT_CATALOG_V1",
-      "models": [
-        "FIELD_VISIT",
-        "ORDER"
-      ],
+      "models": ["FIELD_VISIT", "ORDER"],
       "attributes": [
         {
           "id": "Q_PRODUCT_DESCRIPTION",
@@ -4037,9 +3416,7 @@
       "id": "safaris",
       "name": "Safaris",
       "schema": "TOUR_PACKAGE_V1",
-      "models": [
-        "TOUR"
-      ],
+      "models": ["TOUR"],
       "attributes": [
         {
           "id": "Q_PARKS_COVERED",
@@ -4048,13 +3425,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "maasai_mara",
-                "amboseli",
-                "tsavo",
-                "lake_nakuru",
-                "other_kenya"
-              ]
+              "enum": ["maasai_mara", "amboseli", "tsavo", "lake_nakuru", "other_kenya"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4106,12 +3477,7 @@
           "label": "Meal Plan?",
           "schema": {
             "type": "string",
-            "enum": [
-              "none",
-              "breakfast",
-              "half_board",
-              "full_board"
-            ]
+            "enum": ["none", "breakfast", "half_board", "full_board"]
           },
           "options": [
             {
@@ -4140,9 +3506,7 @@
       "id": "game_drives",
       "name": "Game Drives",
       "schema": "TOUR_PACKAGE_V1",
-      "models": [
-        "TOUR"
-      ],
+      "models": ["TOUR"],
       "attributes": [
         {
           "id": "Q_PARKS_COVERED",
@@ -4151,13 +3515,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "maasai_mara",
-                "amboseli",
-                "tsavo",
-                "lake_nakuru",
-                "other_kenya"
-              ]
+              "enum": ["maasai_mara", "amboseli", "tsavo", "lake_nakuru", "other_kenya"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4193,9 +3551,7 @@
       "id": "luxury_safaris",
       "name": "Luxury Safaris",
       "schema": "TOUR_PACKAGE_V1",
-      "models": [
-        "TOUR"
-      ],
+      "models": ["TOUR"],
       "attributes": [
         {
           "id": "Q_PARKS_COVERED",
@@ -4204,13 +3560,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "maasai_mara",
-                "amboseli",
-                "tsavo",
-                "lake_nakuru",
-                "other_kenya"
-              ]
+              "enum": ["maasai_mara", "amboseli", "tsavo", "lake_nakuru", "other_kenya"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4262,12 +3612,7 @@
           "label": "Meal Plan?",
           "schema": {
             "type": "string",
-            "enum": [
-              "none",
-              "breakfast",
-              "half_board",
-              "full_board"
-            ]
+            "enum": ["none", "breakfast", "half_board", "full_board"]
           },
           "options": [
             {
@@ -4296,9 +3641,7 @@
       "id": "city_tours",
       "name": "City Tours",
       "schema": "TOUR_PACKAGE_V1",
-      "models": [
-        "TOUR"
-      ],
+      "models": ["TOUR"],
       "attributes": [
         {
           "id": "Q_TOUR_MODES",
@@ -4307,13 +3650,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "walking",
-                "vehicle",
-                "cycling",
-                "boat",
-                "flight"
-              ]
+              "enum": ["walking", "vehicle", "cycling", "boat", "flight"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4367,12 +3704,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "english",
-                "swahili",
-                "french",
-                "other"
-              ]
+              "enum": ["english", "swahili", "french", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4404,9 +3736,7 @@
       "id": "cultural_tours",
       "name": "Cultural Tours",
       "schema": "TOUR_PACKAGE_V1",
-      "models": [
-        "TOUR"
-      ],
+      "models": ["TOUR"],
       "attributes": [
         {
           "id": "Q_TOUR_MODES",
@@ -4415,13 +3745,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "walking",
-                "vehicle",
-                "cycling",
-                "boat",
-                "flight"
-              ]
+              "enum": ["walking", "vehicle", "cycling", "boat", "flight"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4475,12 +3799,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "english",
-                "swahili",
-                "french",
-                "other"
-              ]
+              "enum": ["english", "swahili", "french", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4512,9 +3831,7 @@
       "id": "adventure_tours",
       "name": "Adventure Tours",
       "schema": "TOUR_PACKAGE_V1",
-      "models": [
-        "TOUR"
-      ],
+      "models": ["TOUR"],
       "attributes": [
         {
           "id": "Q_TOUR_MODES",
@@ -4523,13 +3840,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "walking",
-                "vehicle",
-                "cycling",
-                "boat",
-                "flight"
-              ]
+              "enum": ["walking", "vehicle", "cycling", "boat", "flight"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4583,9 +3894,7 @@
       "id": "travel_packages",
       "name": "Travel Packages",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "REQUEST_QUOTE"
-      ],
+      "models": ["REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_DESTINATIONS_TEXT",
@@ -4606,12 +3915,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "day_trip",
-                "weekend",
-                "multi_day",
-                "custom"
-              ]
+              "enum": ["day_trip", "weekend", "multi_day", "custom"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4661,12 +3965,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "english",
-                "swahili",
-                "french",
-                "other"
-              ]
+              "enum": ["english", "swahili", "french", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4698,11 +3997,7 @@
       "id": "car_wash",
       "name": "Car Wash",
       "schema": "SERVICE_JOB_V1",
-      "models": [
-        "ENTITLEMENT",
-        "FIELD_VISIT",
-        "SERVICE_JOB"
-      ],
+      "models": ["ENTITLEMENT", "FIELD_VISIT", "SERVICE_JOB"],
       "attributes": [
         {
           "id": "Q_WASH_TYPES",
@@ -4711,13 +4006,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "exterior",
-                "interior",
-                "full_detail",
-                "engine",
-                "motorcycle"
-              ]
+              "enum": ["exterior", "interior", "full_detail", "engine", "motorcycle"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4753,10 +4042,7 @@
       "id": "tire_service",
       "name": "Tire Service",
       "schema": "SERVICE_JOB_V1",
-      "models": [
-        "FIELD_VISIT",
-        "SERVICE_JOB"
-      ],
+      "models": ["FIELD_VISIT", "SERVICE_JOB"],
       "attributes": [
         {
           "id": "Q_TIRE_BRANDS_TEXT",
@@ -4795,10 +4081,7 @@
       "id": "battery_service",
       "name": "Battery Service",
       "schema": "FIELD_SERVICE_V1",
-      "models": [
-        "FIELD_VISIT",
-        "SERVICE_JOB"
-      ],
+      "models": ["FIELD_VISIT", "SERVICE_JOB"],
       "attributes": [
         {
           "id": "Q_EMERGENCY_CALLOUT",
@@ -4837,9 +4120,7 @@
       "id": "vehicle_assistance",
       "name": "Vehicle Assistance",
       "schema": "FIELD_SERVICE_V1",
-      "models": [
-        "FIELD_VISIT"
-      ],
+      "models": ["FIELD_VISIT"],
       "attributes": [
         {
           "id": "Q_ASSISTANCE_SERVICES",
@@ -4848,13 +4129,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "breakdown",
-                "jump_start",
-                "towing",
-                "lockout",
-                "fuel_delivery"
-              ]
+              "enum": ["breakdown", "jump_start", "towing", "lockout", "fuel_delivery"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4890,10 +4165,7 @@
       "id": "vehicle_inspection",
       "name": "Vehicle Inspection",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT"],
       "attributes": [
         {
           "id": "Q_INSPECTION_TYPES",
@@ -4902,13 +4174,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "pre_purchase",
-                "roadworthy",
-                "insurance",
-                "diagnostic",
-                "routine"
-              ]
+              "enum": ["pre_purchase", "roadworthy", "insurance", "diagnostic", "routine"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -4944,11 +4210,7 @@
       "id": "spa",
       "name": "Spa",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "ENTITLEMENT",
-        "FIELD_VISIT"
-      ],
+      "models": ["APPOINTMENT", "ENTITLEMENT", "FIELD_VISIT"],
       "attributes": [
         {
           "id": "Q_SPA_SERVICES",
@@ -4957,13 +4219,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "facials",
-                "body_treatments",
-                "massage",
-                "nails",
-                "other"
-              ]
+              "enum": ["facials", "body_treatments", "massage", "nails", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -5017,10 +4273,7 @@
       "id": "massage",
       "name": "Massage",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT"],
       "attributes": [
         {
           "id": "Q_MASSAGE_TYPES",
@@ -5029,13 +4282,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "swedish",
-                "deep_tissue",
-                "sports",
-                "aromatherapy",
-                "other"
-              ]
+              "enum": ["swedish", "deep_tissue", "sports", "aromatherapy", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -5089,10 +4336,7 @@
       "id": "gym",
       "name": "Gym",
       "schema": "MEMBERSHIP_PLAN_V1",
-      "models": [
-        "APPOINTMENT",
-        "ENTITLEMENT"
-      ],
+      "models": ["APPOINTMENT", "ENTITLEMENT"],
       "attributes": [
         {
           "id": "Q_GYM_FACILITIES",
@@ -5101,13 +4345,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "weights",
-                "cardio",
-                "classes",
-                "showers",
-                "pool"
-              ]
+              "enum": ["weights", "cardio", "classes", "showers", "pool"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -5143,12 +4381,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "monthly",
-                "quarterly",
-                "annual",
-                "class_pack"
-              ]
+              "enum": ["monthly", "quarterly", "annual", "class_pack"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -5180,11 +4413,7 @@
       "id": "personal_training",
       "name": "Personal Training",
       "schema": "SERVICE_APPOINTMENT_V1",
-      "models": [
-        "APPOINTMENT",
-        "FIELD_VISIT",
-        "SESSION_CAPACITY"
-      ],
+      "models": ["APPOINTMENT", "FIELD_VISIT", "SESSION_CAPACITY"],
       "attributes": [
         {
           "id": "Q_TRAINING_SPECIALIZATIONS",
@@ -5193,13 +4422,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "strength",
-                "cardio",
-                "weight_loss",
-                "rehabilitation",
-                "other"
-              ]
+              "enum": ["strength", "cardio", "weight_loss", "rehabilitation", "other"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -5235,10 +4458,7 @@
       "id": "reservations",
       "name": "Reservations",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": []
     },
     {
@@ -5246,11 +4466,7 @@
       "id": "personal_assistance",
       "name": "Personal Assistance",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "ENTITLEMENT",
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["ENTITLEMENT", "FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_CORPORATE_CLIENTS",
@@ -5277,10 +4493,7 @@
       "id": "shopping_assistance",
       "name": "Shopping Assistance",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_CORPORATE_CLIENTS",
@@ -5307,10 +4520,7 @@
       "id": "gift_sourcing",
       "name": "Gift Sourcing",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_CORPORATE_CLIENTS",
@@ -5355,10 +4565,7 @@
       "id": "travel_planning",
       "name": "Travel Planning",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_DESTINATIONS_COVERAGE",
@@ -5367,12 +4574,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "nairobi",
-                "kenya",
-                "east_africa",
-                "international"
-              ]
+              "enum": ["nairobi", "kenya", "east_africa", "international"]
             },
             "uniqueItems": true,
             "minItems": 1
@@ -5404,10 +4606,7 @@
       "id": "property_coordination",
       "name": "Property Coordination",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": []
     },
     {
@@ -5415,10 +4614,7 @@
       "id": "moving_assistance",
       "name": "Moving Assistance",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": []
     },
     {
@@ -5426,11 +4622,7 @@
       "id": "cleaning_coordination",
       "name": "Cleaning Coordination",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "ENTITLEMENT",
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["ENTITLEMENT", "FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_ECO_PRODUCTS",
@@ -5457,11 +4649,7 @@
       "id": "vip_assistance",
       "name": "VIP Assistance",
       "schema": "REQUEST_QUOTE_V1",
-      "models": [
-        "ENTITLEMENT",
-        "FIELD_VISIT",
-        "REQUEST_QUOTE"
-      ],
+      "models": ["ENTITLEMENT", "FIELD_VISIT", "REQUEST_QUOTE"],
       "attributes": [
         {
           "id": "Q_VIP_SERVICES_TEXT",
@@ -5482,9 +4670,7 @@
       "id": "sea_freight",
       "name": "Sea Freight",
       "schema": "FREIGHT_SHIPMENT_V1",
-      "models": [
-        "FREIGHT"
-      ],
+      "models": ["FREIGHT"],
       "attributes": []
     },
     {
@@ -5492,9 +4678,7 @@
       "id": "air_freight",
       "name": "Air Freight",
       "schema": "FREIGHT_SHIPMENT_V1",
-      "models": [
-        "FREIGHT"
-      ],
+      "models": ["FREIGHT"],
       "attributes": []
     },
     {
@@ -5502,9 +4686,7 @@
       "id": "road_freight",
       "name": "Road Freight & Trucking",
       "schema": "FREIGHT_SHIPMENT_V1",
-      "models": [
-        "FREIGHT"
-      ],
+      "models": ["FREIGHT"],
       "attributes": []
     },
     {
@@ -5512,9 +4694,7 @@
       "id": "warehousing",
       "name": "Warehousing & Storage",
       "schema": "STORAGE_SPACE_V1",
-      "models": [
-        "STORAGE"
-      ],
+      "models": ["STORAGE"],
       "attributes": []
     }
   ],

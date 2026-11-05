@@ -213,10 +213,13 @@ export function MerchantBookingWorkspace({
         const workspace = await bookingRequest<BookingWorkspaceData>('/workspace', {}, apiBase);
         setData(workspace);
         if (workspace.profiles?.length) setProfiles(workspace.profiles);
-        const linked = initial && initialBookingId
-          ? workspace.bookings.find((booking) => booking.id === initialBookingId)
-          : undefined;
-        setSelected((current) => linked ?? workspace.bookings.find((b) => b.id === current?.id) ?? null);
+        const linked =
+          initial && initialBookingId
+            ? workspace.bookings.find((booking) => booking.id === initialBookingId)
+            : undefined;
+        setSelected(
+          (current) => linked ?? workspace.bookings.find((b) => b.id === current?.id) ?? null,
+        );
         if (linked?.startTime) setDate(kenyaDate(new Date(linked.startTime)));
         if (initial && initialBookingId && !linked)
           setError('This booking is unavailable in your current workspace.');
@@ -314,7 +317,9 @@ export function MerchantBookingWorkspace({
       setSuccess('Your saved business details have been imported.');
       await load();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Your business details could not be imported.');
+      setError(
+        cause instanceof Error ? cause.message : 'Your business details could not be imported.',
+      );
     } finally {
       setBusy(false);
     }
@@ -340,9 +345,16 @@ export function MerchantBookingWorkspace({
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           Try again
         </button>
-        {!apiBase || apiBase === '/api/merchant/booking' ? <button type="button" className={buttonClass} disabled={disabled} onClick={() => void importOnboarding()}>
-          Import saved business details
-        </button> : null}
+        {!apiBase || apiBase === '/api/merchant/booking' ? (
+          <button
+            type="button"
+            className={buttonClass}
+            disabled={disabled}
+            onClick={() => void importOnboarding()}
+          >
+            Import saved business details
+          </button>
+        ) : null}
       </main>
     );
 
@@ -368,9 +380,16 @@ export function MerchantBookingWorkspace({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {!apiBase || apiBase === '/api/merchant/booking' ? <button type="button" className={buttonClass} disabled={disabled} onClick={() => void importOnboarding()}>
-            Import saved business details
-          </button> : null}
+          {!apiBase || apiBase === '/api/merchant/booking' ? (
+            <button
+              type="button"
+              className={buttonClass}
+              disabled={disabled}
+              onClick={() => void importOnboarding()}
+            >
+              Import saved business details
+            </button>
+          ) : null}
           <button
             type="button"
             className={buttonClass}
@@ -708,7 +727,7 @@ export function MerchantBookingWorkspace({
           <section className="border-border bg-surface rounded-xl border p-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-extrabold">Needs attention</h2>
-              <span className="bg-black/5 rounded-full px-2 py-0.5 text-xs tabular-nums">
+              <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs tabular-nums">
                 {attention.length}
               </span>
             </div>

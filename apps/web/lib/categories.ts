@@ -34,15 +34,19 @@ const CONFIG_CATEGORY_BY_TILE: Record<string, string> = {
 /** The tiles with their labels translated, as PopularCategories takes them. */
 export function categoryTiles(
   t: (key: string) => string,
-  configured: { category: string; label: string; image_path: string | null; image_url?: string | null }[] = [],
+  configured: {
+    category: string;
+    label: string;
+    image_path: string | null;
+    image_url?: string | null;
+  }[] = [],
 ) {
   return POPULAR_CATEGORIES.map((item) => ({
     key: item.key,
     label:
       ('category' in item &&
-        configured.find(
-          (category) => category.category === CONFIG_CATEGORY_BY_TILE[item.category],
-        )?.label) ||
+        configured.find((category) => category.category === CONFIG_CATEGORY_BY_TILE[item.category])
+          ?.label) ||
       t(item.key),
     image: item.image,
     imageUrl:

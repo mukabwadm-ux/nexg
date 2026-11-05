@@ -61,24 +61,52 @@ const saved = (savedRecord = record) =>
 const selection = resolveOnboardingSelection('restaurants_food', ['restaurant']);
 describe('saved Home host and connected entry copy', () => {
   it.each([
-    ['Please correct the business name. <script>unsafe()</script>', 'changes_requested', false, true],
+    [
+      'Please correct the business name. <script>unsafe()</script>',
+      'changes_requested',
+      false,
+      true,
+    ],
     [{ private: 'not a valid review reason' }, 'changes_requested', false, false],
     ['x'.repeat(2001), 'changes_requested', false, false],
     ['Keep the existing reviewed information.', 'pending', true, true],
-  ] as const)('renders bounded staff feedback against the submitted revision: %s', (reason, state, needsResubmission, visible) => {
-    const revised = { ...record, revision: needsResubmission ? 2 : 1,
-      review: { ...record.review, state: state as MerchantApplicationRecord['review']['state'], reason, needs_resubmission: needsResubmission,
-        submitted_revision: 1 } };
-    const savedHome = saved(revised);
-    const html = renderToStaticMarkup(<SavedHome form={record.payload} files={{}} selection={selection}
-      previewMode={false} embedded applicationStatus={state} savedHome={savedHome}
-      onExitDemo={undefined} onEdit={() => {}} onRegistration={() => {}} />);
-    expect(html.includes('Review feedback · submitted revision')).toBe(visible);
-    if (visible) {
-      expect(html).not.toContain('<script>');
-      if (typeof reason === 'string') expect(html).toContain(reason.replaceAll('<', '&lt;').replaceAll('>', '&gt;'));
-    } else expect(savedHome.review.reason).toBeNull();
-  });
+  ] as const)(
+    'renders bounded staff feedback against the submitted revision: %s',
+    (reason, state, needsResubmission, visible) => {
+      const revised = {
+        ...record,
+        revision: needsResubmission ? 2 : 1,
+        review: {
+          ...record.review,
+          state: state as MerchantApplicationRecord['review']['state'],
+          reason,
+          needs_resubmission: needsResubmission,
+          submitted_revision: 1,
+        },
+      };
+      const savedHome = saved(revised);
+      const html = renderToStaticMarkup(
+        <SavedHome
+          form={record.payload}
+          files={{}}
+          selection={selection}
+          previewMode={false}
+          embedded
+          applicationStatus={state}
+          savedHome={savedHome}
+          onExitDemo={undefined}
+          onEdit={() => {}}
+          onRegistration={() => {}}
+        />,
+      );
+      expect(html.includes('Review feedback · submitted revision')).toBe(visible);
+      if (visible) {
+        expect(html).not.toContain('<script>');
+        if (typeof reason === 'string')
+          expect(html).toContain(reason.replaceAll('<', '&lt;').replaceAll('>', '&gt;'));
+      } else expect(savedHome.review.reason).toBeNull();
+    },
+  );
   it('never substitutes a local capture when saved records are unavailable', () => {
     const html = renderToStaticMarkup(
       <SavedHome
@@ -99,18 +127,35 @@ describe('saved Home host and connected entry copy', () => {
     expect(html).not.toContain('Setup progress');
   });
   it('labels submitted business details and groups the selected categories into one row', () => {
-    const multi = { ...record, payload: { ...record.payload, subcategories: ['restaurant', 'cafe', 'bakery'] } };
+    const multi = {
+      ...record,
+      payload: { ...record.payload, subcategories: ['restaurant', 'cafe', 'bakery'] },
+    };
     const savedHome = saved(multi);
     const html = renderToStaticMarkup(
-      <SavedHome form={multi.payload} files={{}} selection={resolveOnboardingSelection('restaurants_food', ['restaurant', 'cafe', 'bakery'])}
-        previewMode={false} embedded applicationStatus="approved" savedHome={savedHome}
-        onExitDemo={undefined} onEdit={() => {}} onRegistration={() => {}} />,
+      <SavedHome
+        form={multi.payload}
+        files={{}}
+        selection={resolveOnboardingSelection('restaurants_food', ['restaurant', 'cafe', 'bakery'])}
+        previewMode={false}
+        embedded
+        applicationStatus="approved"
+        savedHome={savedHome}
+        onExitDemo={undefined}
+        onEdit={() => {}}
+        onRegistration={() => {}}
+      />,
     );
     const rows = html.match(/<li\b[^>]*>[\s\S]*?<\/li>/g) ?? [];
-    const titles = rows.map((row) => row.match(/<h3[^>]*>([^<]*)</)?.[1] ?? row.match(/font-extrabold[^>]*>([^<]*)</)?.[1]);
+    const titles = rows.map(
+      (row) =>
+        row.match(/<h3[^>]*>([^<]*)</)?.[1] ?? row.match(/font-extrabold[^>]*>([^<]*)</)?.[1],
+    );
     expect(rows[0]).toContain('Details submitted');
     expect(rows[0]).toContain('bg-green-600');
-    expect(rows.filter((row) => row.includes('Business categories and operations'))).toHaveLength(1);
+    expect(rows.filter((row) => row.includes('Business categories and operations'))).toHaveLength(
+      1,
+    );
     expect(html).not.toContain('operating setup');
     expect(html).toContain('3 categories');
     expect(new Set(titles).size).toBe(titles.length);

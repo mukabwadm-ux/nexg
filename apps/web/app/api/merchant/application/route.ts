@@ -18,9 +18,7 @@ async function route(request: Request) {
       functionName: string,
       functionArgs: Record<string, unknown>,
     ) => {
-      abortSignal(
-        abortSignal: AbortSignal,
-      ): PromiseLike<{
+      abortSignal(abortSignal: AbortSignal): PromiseLike<{
         data: unknown;
         error: null | { code?: string; message?: string; hint?: string };
       }>;
@@ -47,8 +45,11 @@ async function route(request: Request) {
       );
       if (result.error) throw new Error('The saved application email could not be checked.');
       const application = MerchantApplicationRecord.safeParse(result.data);
-      if (!application.success) throw new Error('The saved application contract could not be checked.');
-      return application.data.payload.business.email.trim().toLowerCase() === email.trim().toLowerCase();
+      if (!application.success)
+        throw new Error('The saved application contract could not be checked.');
+      return (
+        application.data.payload.business.email.trim().toLowerCase() === email.trim().toLowerCase()
+      );
     },
     rpc,
   })(request);

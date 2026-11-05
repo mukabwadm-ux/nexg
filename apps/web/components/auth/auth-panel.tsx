@@ -137,7 +137,9 @@ export function AuthPanel({
               <li>
                 Your username is <strong className="break-all">{setupEmail}</strong>.
               </li>
-              <li>Open the email and choose <strong>Set your password</strong>, then sign in here.</li>
+              <li>
+                Open the email and choose <strong>Set your password</strong>, then sign in here.
+              </li>
               <li>Not there after a few minutes? Check spam or Promotions. The link works once.</li>
             </ul>
           </div>
@@ -244,7 +246,10 @@ export function AuthPanel({
           )}
 
           {tab === 'signin' && role === 'merchant' && emailOtpEnabled ? (
-            <Link href="/merchants/sign-in/email" className="text-ink ml-4 mt-3 inline-block text-sm font-bold underline underline-offset-4">
+            <Link
+              href="/merchants/sign-in/email"
+              className="text-ink ml-4 mt-3 inline-block text-sm font-bold underline underline-offset-4"
+            >
               Sign in with an email code
             </Link>
           ) : null}
@@ -312,7 +317,9 @@ export function AuthPanel({
           <p className="text-muted text-xs leading-[1.7]">
             <span className="text-ink font-bold">One-time codes by SMS</span>, and Google and Apple
             sign-in, arrive once those accounts are set up.{' '}
-            {emailOtpEnabled ? 'Merchants can also sign in with an email code.' : 'Until then email and password is the way in — and it works on any device.'}
+            {emailOtpEnabled
+              ? 'Merchants can also sign in with an email code.'
+              : 'Until then email and password is the way in — and it works on any device.'}
           </p>
         </Card>
 

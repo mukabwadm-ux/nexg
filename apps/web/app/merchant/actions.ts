@@ -133,7 +133,9 @@ export async function renameStore(
   name: string,
   address: string,
 ): Promise<Outcome> {
-  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup' });
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
   await requireMerchantActionObject(client, 'merchant_branch', branchId, authorizedMerchantId);
   const { data, error } = await client.rpc('rpc_merchant_rename_store', {
     p_branch_id: branchId,
@@ -205,11 +207,16 @@ export async function markMessagesRead(merchantId: string): Promise<void> {
 }
 
 export async function setItemAvailable(itemId: string, available: boolean): Promise<Outcome> {
-  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup' });
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
   const { data, error } = await client
     .from('catalogue_item')
     .update({ available })
-    .eq('id', itemId).eq('merchant_id', authorizedMerchantId).select('id').maybeSingle();
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
   if (error) return { ok: false, message: error.message };
   if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
   revalidatePath('/merchant/menu');
@@ -230,13 +237,18 @@ function cleanPrice(value: number): number | null {
 }
 
 export async function setItemPrice(itemId: string, priceKes: number): Promise<Outcome> {
-  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup' });
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
   const price = cleanPrice(priceKes);
   if (price === null) return { ok: false, message: 'Enter a price between KES 1 and 1,000,000.' };
   const { data, error } = await client
     .from('catalogue_item')
     .update({ price_kes: price })
-    .eq('id', itemId).eq('merchant_id', authorizedMerchantId).select('id').maybeSingle();
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
   if (error) return { ok: false, message: error.message };
   if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
   revalidatePath('/merchant/menu');
@@ -257,7 +269,8 @@ export async function addMenuItems(input: {
   }[];
 }): Promise<Outcome> {
   const { client: supabase, merchantId: authorizedMerchantId } = await merchantActionClient({
-    access: 'setup', merchantId: input?.merchantId,
+    access: 'setup',
+    merchantId: input?.merchantId,
   });
   if (!input || !Array.isArray(input.items) || input.items.length < 1 || input.items.length > 50) {
     return { ok: false, message: 'Add between 1 and 50 products at a time.' };
@@ -322,9 +335,14 @@ export async function addMenuItems(input: {
   }
   let sectionId = input.sectionId ?? null;
   if (sectionId) {
-    const { data: section, error: sectionError } = await supabase.from('catalogue_section')
-      .select('id').eq('id', sectionId).eq('merchant_id', authorizedMerchantId).maybeSingle();
-    if (sectionError || !section) return { ok: false, message: 'Choose a section from this business.' };
+    const { data: section, error: sectionError } = await supabase
+      .from('catalogue_section')
+      .select('id')
+      .eq('id', sectionId)
+      .eq('merchant_id', authorizedMerchantId)
+      .maybeSingle();
+    if (sectionError || !section)
+      return { ok: false, message: 'Choose a section from this business.' };
   }
   if (!sectionId) {
     const sectionName = (input.newSection ?? '').trim() || 'Menu';
@@ -354,9 +372,16 @@ export async function addMenuItems(input: {
 }
 
 export async function removeMenuItem(itemId: string): Promise<Outcome> {
-  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup' });
-  const { data, error } = await client.from('catalogue_item').delete().eq('id', itemId)
-    .eq('merchant_id', authorizedMerchantId).select('id').maybeSingle();
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const { data, error } = await client
+    .from('catalogue_item')
+    .delete()
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
   if (error) return { ok: false, message: error.message };
   if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
   revalidatePath('/merchant/menu');
@@ -383,8 +408,12 @@ export async function saveBranch(input: {
   latitude?: string;
   longitude?: string;
 }): Promise<Outcome> {
-  const { client, merchantId } = await merchantActionClient({ access: 'setup', merchantId: input.merchantId });
-  if (input.branchId) await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
+  const { client, merchantId } = await merchantActionClient({
+    access: 'setup',
+    merchantId: input.merchantId,
+  });
+  if (input.branchId)
+    await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
   const { data, error } = await client.rpc('rpc_branch_upsert', {
     p_merchant_id: input.merchantId,
     p_branch_id: input.branchId ?? undefined,
@@ -506,8 +535,12 @@ export async function setHours(input: {
   closed: boolean;
   branchId?: string | null;
 }): Promise<Outcome> {
-  const { client, merchantId } = await merchantActionClient({ access: 'setup', merchantId: input.merchantId });
-  if (input.branchId) await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
+  const { client, merchantId } = await merchantActionClient({
+    access: 'setup',
+    merchantId: input.merchantId,
+  });
+  if (input.branchId)
+    await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
   const { data, error } = await client.rpc('rpc_hours_set', {
     p_merchant_id: input.merchantId,
     p_day: input.day,
@@ -525,9 +558,13 @@ export async function copyHours(
   fromBranch: string | null,
   toBranch: string,
 ): Promise<Outcome> {
-  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({ access: 'setup', merchantId });
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+    merchantId,
+  });
   await requireMerchantActionObject(client, 'merchant_branch', toBranch, authorizedMerchantId);
-  if (fromBranch) await requireMerchantActionObject(client, 'merchant_branch', fromBranch, authorizedMerchantId);
+  if (fromBranch)
+    await requireMerchantActionObject(client, 'merchant_branch', fromBranch, authorizedMerchantId);
   const { data, error } = await client.rpc('rpc_hours_copy', {
     p_merchant_id: merchantId,
     p_to_branch: toBranch,
@@ -546,7 +583,8 @@ export async function setOverride(input: {
   branchId?: string | null;
 }): Promise<Outcome> {
   const { client, merchantId } = await merchantActionClient({ merchantId: input.merchantId });
-  if (input.branchId) await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
+  if (input.branchId)
+    await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
   const { data, error } = await client.rpc('rpc_merchant_hours_override', {
     p_merchant_id: input.merchantId,
     p_date: input.date,

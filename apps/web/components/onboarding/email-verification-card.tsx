@@ -47,7 +47,12 @@ export function EmailVerificationCard({
   function updateCode(value: string, selectionStart: number | null) {
     const digits = value.replace(/[^0-9]/g, '').slice(0, 8);
     setCode(digits);
-    setCursor(Math.min(value.slice(0, selectionStart ?? value.length).replace(/[^0-9]/g, '').length, digits.length));
+    setCursor(
+      Math.min(
+        value.slice(0, selectionStart ?? value.length).replace(/[^0-9]/g, '').length,
+        digits.length,
+      ),
+    );
     setFeedback(null);
   }
 
@@ -81,7 +86,13 @@ export function EmailVerificationCard({
     try {
       await onVerify(code);
     } catch (error) {
-      setFeedback({ kind: 'error', message: error instanceof Error ? error.message : 'We could not verify this code. Check it and try again.' });
+      setFeedback({
+        kind: 'error',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'We could not verify this code. Check it and try again.',
+      });
     } finally {
       setPending(null);
     }
@@ -99,14 +110,23 @@ export function EmailVerificationCard({
       await onResend();
       setFeedback({ kind: 'notice', message: resendNotice });
     } catch (error) {
-      setFeedback({ kind: 'error', message: error instanceof Error ? error.message : 'We could not send a new code. Please try again.' });
+      setFeedback({
+        kind: 'error',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'We could not send a new code. Please try again.',
+      });
     } finally {
       setPending(null);
     }
   }
 
   return (
-    <Card padded={false} className="border-border overflow-hidden rounded-[22px] shadow-[0_18px_55px_rgba(20,20,20,0.07)]">
+    <Card
+      padded={false}
+      className="border-border overflow-hidden rounded-[22px] shadow-[0_18px_55px_rgba(20,20,20,0.07)]"
+    >
       <div className="bg-gold h-1" aria-hidden="true" />
       <CardHeader className="mb-0 block px-6 pb-0 pt-7 sm:px-8 sm:pt-8">
         <p className="text-gold-text w-full text-center text-[13px] font-extrabold uppercase tracking-[0.16em] sm:text-sm">
@@ -116,13 +136,24 @@ export function EmailVerificationCard({
           Verify your email
         </h1>
         <CardDescription className="mt-2 text-center text-[15px] leading-6">
-          {descriptionPrefix ?? (preview ? 'A verification code will be sent to ' : requestStatus === 'sending' ? 'Sending a verification code to ' : requestStatus === 'error' ? 'We could not send a code to ' : 'Enter the verification code sent to ')}
+          {descriptionPrefix ??
+            (preview
+              ? 'A verification code will be sent to '
+              : requestStatus === 'sending'
+                ? 'Sending a verification code to '
+                : requestStatus === 'error'
+                  ? 'We could not send a code to '
+                  : 'Enter the verification code sent to ')}
           <strong className="text-ink break-all font-bold">{email}</strong>.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="text-ink px-6 pb-7 pt-6 sm:px-8 sm:pb-8">
-        <form onSubmit={verify} noValidate aria-busy={pending !== null || requestStatus === 'sending'}>
+        <form
+          onSubmit={verify}
+          noValidate
+          aria-busy={pending !== null || requestStatus === 'sending'}
+        >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <label htmlFor="merchant-email-code" className="text-[13px] font-extrabold">
               Verification code
@@ -131,12 +162,20 @@ export function EmailVerificationCard({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => requestStatus === 'error' ? onRetryRequest?.() : void resend()}
-              disabled={pending !== null || requestStatus === 'sending' || (requestStatus === 'error' && !onRetryRequest)}
+              onClick={() => (requestStatus === 'error' ? onRetryRequest?.() : void resend())}
+              disabled={
+                pending !== null ||
+                requestStatus === 'sending' ||
+                (requestStatus === 'error' && !onRetryRequest)
+              }
               className="h-9 text-xs"
             >
               <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-              {pending === 'resend' || requestStatus === 'sending' ? 'Sending…' : requestStatus === 'error' ? 'Try again' : 'Resend code'}
+              {pending === 'resend' || requestStatus === 'sending'
+                ? 'Sending…'
+                : requestStatus === 'error'
+                  ? 'Try again'
+                  : 'Resend code'}
             </Button>
           </div>
 
@@ -166,7 +205,9 @@ export function EmailVerificationCard({
               spellCheck={false}
               maxLength={8}
               value={code}
-              onChange={(event) => updateCode(event.currentTarget.value, event.currentTarget.selectionStart)}
+              onChange={(event) =>
+                updateCode(event.currentTarget.value, event.currentTarget.selectionStart)
+              }
               onPaste={pasteCode}
               onFocus={(event) => {
                 setFocused(true);
@@ -188,21 +229,38 @@ export function EmailVerificationCard({
             aria-live="polite"
             className={`mt-2 text-xs leading-5 ${requestStatus === 'error' || feedback?.kind === 'error' ? 'text-danger' : 'text-muted'}`}
           >
-            {requestStatus === 'error' ? requestMessage ?? 'We could not send a verification code. Please try again.' : feedback?.message ?? ''}
+            {requestStatus === 'error'
+              ? (requestMessage ?? 'We could not send a verification code. Please try again.')
+              : (feedback?.message ?? '')}
           </p>
 
           <CardFooter className="mt-5 block p-0">
-            <Button type="submit" variant="gold" size="lg" block disabled={requestStatus !== 'ready'} loading={pending === 'verify'} loadingText="Verifying…">
+            <Button
+              type="submit"
+              variant="gold"
+              size="lg"
+              block
+              disabled={requestStatus !== 'ready'}
+              loading={pending === 'verify'}
+              loadingText="Verifying…"
+            >
               {submitLabel} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>
             <p className="text-muted mt-5 text-center text-xs leading-5">
               Having trouble?{' '}
-              <Link href="/help" className="text-ink font-bold underline underline-offset-4 hover:text-gold-text">
+              <Link
+                href="/help"
+                className="text-ink hover:text-gold-text font-bold underline underline-offset-4"
+              >
                 Contact support
               </Link>
             </p>
             {requestStatus === 'error' ? (
-              <p className="mt-3 text-center text-xs"><Link href="/merchant" className="text-ink font-bold underline underline-offset-4">Return to Home</Link></p>
+              <p className="mt-3 text-center text-xs">
+                <Link href="/merchant" className="text-ink font-bold underline underline-offset-4">
+                  Return to Home
+                </Link>
+              </p>
             ) : null}
           </CardFooter>
         </form>

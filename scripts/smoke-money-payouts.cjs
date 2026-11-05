@@ -9,16 +9,36 @@ const output = path.join(__dirname, '../docs/merchant-portal-plan/money-concept/
 
 async function main() {
   const browser = await chromium.launch({ headless: true });
-  const errors = [], writes = [];
+  const errors = [],
+    writes = [];
   try {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 633 }, deviceScaleFactor: 1.5 });
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 633 },
+      deviceScaleFactor: 1.5,
+    });
     const page = await context.newPage();
     page.on('pageerror', (error) => errors.push(error.message));
-    page.on('request', (request) => { if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) writes.push(`${request.method()} ${request.url()}`); });
-    await page.goto(`${base}/merchant-live-preview/money?profile=restaurant&tab=Payouts`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    page.on('request', (request) => {
+      if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method()))
+        writes.push(`${request.method()} ${request.url()}`);
+    });
+    await page.goto(`${base}/merchant-live-preview/money?profile=restaurant&tab=Payouts`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 90000,
+    });
     await expect(page.getByTestId('money-table-card')).toBeVisible({ timeout: 60000 });
-    const summary = page.getByLabel('Money summary'), details = page.getByTestId('money-inspector');
-    for (const text of ['Available for payout', 'KES 30,000', 'Payouts in progress', 'Paid payouts', 'KES 150,000', 'Settlement reserve', 'KES 22,000']) await expect(summary).toContainText(text);
+    const summary = page.getByLabel('Money summary'),
+      details = page.getByTestId('money-inspector');
+    for (const text of [
+      'Available for payout',
+      'KES 30,000',
+      'Payouts in progress',
+      'Paid payouts',
+      'KES 150,000',
+      'Settlement reserve',
+      'KES 22,000',
+    ])
+      await expect(summary).toContainText(text);
     await expect(details).toContainText('Settlement as of 3 Nov');
     await page.screenshot({ path: path.join(output, 'payouts-refined.png') });
     await page.getByRole('button', { name: 'Open PAY-1031' }).click();
@@ -34,9 +54,15 @@ async function main() {
     await page.getByLabel('Filter payouts & settlements').selectOption('Paid');
     await expect(page.getByRole('button', { name: 'Open SET-1103' })).toHaveCount(0);
     await expect(details).toContainText('PAY-1031');
-    const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export', exact: true }).click()]);
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: 'Export', exact: true }).click(),
+    ]);
     const csv = await fs.readFile(await download.path(), 'utf8');
-    assert.ok(csv.includes('PAY-1031') && csv.includes('KES 150,000') && !csv.includes('SET-1103'), 'Filtered export must match the selected payout records');
+    assert.ok(
+      csv.includes('PAY-1031') && csv.includes('KES 150,000') && !csv.includes('SET-1103'),
+      'Filtered export must match the selected payout records',
+    );
     await page.getByLabel('Filter payouts & settlements').selectOption('All');
     await page.getByLabel('Search payouts & settlements').fill('SET-1103');
     await expect(details).toContainText('Settlement as of 3 Nov');
@@ -45,7 +71,10 @@ async function main() {
     console.log('Payout record selection, status, filters, details and scoped export passed');
 
     for (const scenario of ['offline', 'unknown', 'error', 'empty', 'partial', 'stale']) {
-      await page.goto(`${base}/merchant-live-preview/money?profile=restaurant&tab=Payouts&scenario=${scenario}`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+      await page.goto(
+        `${base}/merchant-live-preview/money?profile=restaurant&tab=Payouts&scenario=${scenario}`,
+        { waitUntil: 'domcontentloaded', timeout: 90000 },
+      );
       await expect(page.getByTestId('money-table-card')).toBeVisible({ timeout: 30000 });
       if (['offline', 'unknown', 'error'].includes(scenario)) {
         await expect(summary).toContainText('Unavailable');
@@ -65,7 +94,10 @@ async function main() {
     }
     console.log('Offline, unknown, error, empty, partial and stale source states passed');
 
-    await page.goto(`${base}/merchant-live-preview/money?profile=restaurant&tab=Transactions`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    await page.goto(`${base}/merchant-live-preview/money?profile=restaurant&tab=Transactions`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 90000,
+    });
     await expect(page.getByTestId('money-table-card')).toBeVisible({ timeout: 30000 });
     await page.getByRole('button', { name: 'Open TX-6112' }).click();
     await page.getByRole('button', { name: 'Review sample refund' }).click();
@@ -87,14 +119,22 @@ async function main() {
     await page.getByRole('tab', { name: 'Payouts' }).click();
     await expect(summary).toContainText('KES 29,900');
     await expect(summary).toContainText('KES 150,000');
-    console.log('Unknown and confirmed refunds do not incorrectly change prior paid payout history');
+    console.log(
+      'Unknown and confirmed refunds do not incorrectly change prior paid payout history',
+    );
 
     // The separate context is disposable. Enabling a source here is an explicit local sample, not a merchant configuration.
     const matrix = await browser.newContext({ viewport: { width: 1280, height: 633 } });
     const matrixPage = await matrix.newPage();
     matrixPage.on('pageerror', (error) => errors.push(error.message));
-    matrixPage.on('request', (request) => { if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) writes.push(`${request.method()} ${request.url()}`); });
-    await matrixPage.goto(`${base}/merchant-live-preview/money?profile=restaurant`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    matrixPage.on('request', (request) => {
+      if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method()))
+        writes.push(`${request.method()} ${request.url()}`);
+    });
+    await matrixPage.goto(`${base}/merchant-live-preview/money?profile=restaurant`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 90000,
+    });
     await expect(matrixPage.getByTestId('money-table-card')).toBeVisible({ timeout: 30000 });
     await matrixPage.getByRole('button', { name: 'Sample specialty' }).click();
     assert.equal(offerings.profiles.length, 128);
@@ -115,19 +155,36 @@ async function main() {
       await matrixPage.getByRole('tab', { name: 'Payouts' }).click();
       await expect(matrixPage.getByLabel('Money summary')).toContainText('Available for payout');
       await expect(matrixPage.getByLabel('Money summary')).toContainText('Paid payouts');
-      await expect(matrixPage.getByTestId('money-inspector')).toContainText('Settlement as of 3 Nov');
+      await expect(matrixPage.getByTestId('money-inspector')).toContainText(
+        'Settlement as of 3 Nov',
+      );
       await expect(matrixPage.getByText(/NEXG-collected sample/).first()).toBeVisible();
-      if ((index + 1) % 32 === 0) console.log(`Explicit payout-source previews checked: ${index + 1}/${offerings.profiles.length}`);
+      if ((index + 1) % 32 === 0)
+        console.log(
+          `Explicit payout-source previews checked: ${index + 1}/${offerings.profiles.length}`,
+        );
       await matrixPage.getByRole('button', { name: 'Sample specialty' }).click();
     }
     await matrix.close();
 
-    const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+    const mobile = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 1,
+    });
     const mobilePage = await mobile.newPage();
     mobilePage.on('pageerror', (error) => errors.push(error.message));
-    await mobilePage.goto(`${base}/merchant-live-preview/money?profile=restaurant&tab=Payouts&role=viewer`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    await mobilePage.goto(
+      `${base}/merchant-live-preview/money?profile=restaurant&tab=Payouts&role=viewer`,
+      { waitUntil: 'domcontentloaded', timeout: 90000 },
+    );
     await expect(mobilePage.getByTestId('money-table-card')).toBeVisible({ timeout: 30000 });
-    assert.equal(await mobilePage.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true, 'Mobile viewport must not overflow horizontally');
+    assert.equal(
+      await mobilePage.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+      true,
+      'Mobile viewport must not overflow horizontally',
+    );
     await mobilePage.getByRole('button', { name: 'Open PAY-1031' }).click();
     await expect(mobilePage.getByTestId('money-inspector')).toContainText('Payout · PAY-1031');
     await mobilePage.screenshot({ path: path.join(output, 'payouts-mobile.png') });
@@ -136,6 +193,11 @@ async function main() {
     assert.deepEqual(writes, [], `Unexpected non-read requests: ${writes.join('; ')}`);
     console.log('PASS: all 128 specialties, responsive preview and read-only sample behaviour');
     await context.close();
-  } finally { await browser.close(); }
+  } finally {
+    await browser.close();
+  }
 }
-main().catch((error) => { console.error(error); process.exitCode = 1; });
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

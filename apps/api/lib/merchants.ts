@@ -56,9 +56,7 @@ export async function listDeveloperMerchants(
   }
 
   const merchantIds = memberships.map((m) => m.merchant_id);
-  const roleByMerchant = new Map(
-    memberships.map((m) => [m.merchant_id, m.role] as const),
-  );
+  const roleByMerchant = new Map(memberships.map((m) => [m.merchant_id, m.role] as const));
 
   const { data: merchants, error: merchantError } = await supabase
     .from('merchant')
@@ -76,10 +74,7 @@ export async function listDeveloperMerchants(
   const cityNameById = new Map<string, string>();
 
   if (cityIds.length > 0) {
-    const { data: cities } = await supabase
-      .from('city')
-      .select('id, name')
-      .in('id', cityIds);
+    const { data: cities } = await supabase.from('city').select('id, name').in('id', cityIds);
 
     for (const city of cities ?? []) {
       cityNameById.set(city.id, city.name);

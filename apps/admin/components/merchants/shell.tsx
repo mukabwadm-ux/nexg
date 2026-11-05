@@ -37,7 +37,9 @@ export function MerchantTabs({ current }: { current: string }) {
         tab.built ? (
           <Link
             key={tab.key}
-            href={tab.key === 'applications' ? '/merchants/applications' : `/merchants?tab=${tab.key}`}
+            href={
+              tab.key === 'applications' ? '/merchants/applications' : `/merchants?tab=${tab.key}`
+            }
             prefetch={tab.key === 'applications' ? false : undefined}
             aria-current={current === tab.key ? 'page' : undefined}
             className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${

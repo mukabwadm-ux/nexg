@@ -102,25 +102,28 @@ export function AccountMenu({
             </p>
           </div>
 
-          {operationsAllowed ? <><Link
-            href="/merchant/settings"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="text-muted hover:bg-bg hover:text-ink flex items-center gap-2.5 px-4 py-2.5 text-[0.8125rem] font-extrabold"
-          >
-            <SettingsIcon className="h-4 w-4" aria-hidden="true" />
-            Settings
-          </Link>
-          <Link
-            href="/merchant/team"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="text-muted hover:bg-bg hover:text-ink flex items-center gap-2.5 px-4 py-2.5 text-[0.8125rem] font-extrabold"
-          >
-            <User className="h-4 w-4" aria-hidden="true" />
-            Your team
-          </Link>
-          </> : null}
+          {operationsAllowed ? (
+            <>
+              <Link
+                href="/merchant/settings"
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="text-muted hover:bg-bg hover:text-ink flex items-center gap-2.5 px-4 py-2.5 text-[0.8125rem] font-extrabold"
+              >
+                <SettingsIcon className="h-4 w-4" aria-hidden="true" />
+                Settings
+              </Link>
+              <Link
+                href="/merchant/team"
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="text-muted hover:bg-bg hover:text-ink flex items-center gap-2.5 px-4 py-2.5 text-[0.8125rem] font-extrabold"
+              >
+                <User className="h-4 w-4" aria-hidden="true" />
+                Your team
+              </Link>
+            </>
+          ) : null}
 
           <button
             type="button"
@@ -132,7 +135,9 @@ export function AccountMenu({
               try {
                 await signOutBrowser();
               } catch (cause) {
-                setError(cause instanceof Error ? cause.message : 'Sign out could not be completed.');
+                setError(
+                  cause instanceof Error ? cause.message : 'Sign out could not be completed.',
+                );
                 setGoing(false);
               }
             }}
@@ -141,7 +146,11 @@ export function AccountMenu({
             <LogOut className="h-4 w-4" aria-hidden="true" />
             {going ? 'Signing out…' : 'Sign out'}
           </button>
-          {error ? <p role="alert" className="px-4 py-3 text-xs text-danger">{error}</p> : null}
+          {error ? (
+            <p role="alert" className="text-danger px-4 py-3 text-xs">
+              {error}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </div>

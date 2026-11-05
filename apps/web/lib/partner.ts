@@ -1,7 +1,11 @@
 import { redirect } from 'next/navigation';
 
 import { createClient } from './supabase/server';
-import { loadMerchantWorkspaceAccess, MerchantAccessError, type MerchantWorkspaceAccess } from './merchant-access';
+import {
+  loadMerchantWorkspaceAccess,
+  MerchantAccessError,
+  type MerchantWorkspaceAccess,
+} from './merchant-access';
 
 export interface PartnerHome {
   kind: 'merchant' | 'rider' | 'host' | 'guest' | 'staff' | 'anonymous';
@@ -30,8 +34,7 @@ export interface PartnerHome {
 export async function partnerHome(): Promise<PartnerHome> {
   const client = createClient();
   const auth = await client.auth.getUser();
-  if (auth.error || !auth.data.user)
-    return { kind: 'anonymous', home: '/sign-in' };
+  if (auth.error || !auth.data.user) return { kind: 'anonymous', home: '/sign-in' };
   const { data, error } = await client.rpc('fn_partner_home');
   if (error) throw new Error('Your account could not be loaded. Please retry.');
   return (data as unknown as PartnerHome) ?? { kind: 'anonymous', home: '/sign-in' };
@@ -46,7 +49,10 @@ export type AuthorizedMerchant = PartnerHome & {
 };
 
 export async function requireMerchant(
-  options: { access?: 'operations' | 'setup' | 'workspace-setup' | 'shell'; merchantId?: string } = {},
+  options: {
+    access?: 'operations' | 'setup' | 'workspace-setup' | 'shell';
+    merchantId?: string;
+  } = {},
 ): Promise<AuthorizedMerchant> {
   const workspaceSetup = options.access === 'workspace-setup';
   const setup = options.access === 'setup' || workspaceSetup;
@@ -57,8 +63,7 @@ export async function requireMerchant(
   if (options.merchantId && options.merchantId !== me.id) redirect('/merchant');
   const client = createClient();
   const auth = await client.auth.getUser();
-  if (auth.error || !auth.data.user)
-    redirect('/sign-in?reason=workspace-session');
+  if (auth.error || !auth.data.user) redirect('/sign-in?reason=workspace-session');
   // An unknown session type must never be granted operational access.
   const isAnonymous = auth.data.user.is_anonymous !== false;
   if (isAnonymous && !setup && options.access !== 'shell') redirect('/merchant');
@@ -83,14 +88,19 @@ export async function requireMerchant(
   if (isAnonymous && (access.state === 'legacy' || !access.setup || access.operations))
     redirect('/merchant');
   if (setup && access.state !== 'legacy') {
-    if (!access.setup) throw new MerchantAccessError('Only the application owner can edit setup.', 403);
-    const { data: merchant, error: merchantError } = await client.from('merchant')
-      .select('status').eq('id', me.id).maybeSingle();
-    if (merchantError) throw new MerchantAccessError('Your business setup could not be checked.', 503);
-    const canEditDraft = merchant && (
-      ['applied', 'documents_pending', 'under_review'].includes(merchant.status) ||
-      (workspaceSetup && merchant.status === 'live')
-    );
+    if (!access.setup)
+      throw new MerchantAccessError('Only the application owner can edit setup.', 403);
+    const { data: merchant, error: merchantError } = await client
+      .from('merchant')
+      .select('status')
+      .eq('id', me.id)
+      .maybeSingle();
+    if (merchantError)
+      throw new MerchantAccessError('Your business setup could not be checked.', 503);
+    const canEditDraft =
+      merchant &&
+      (['applied', 'documents_pending', 'under_review'].includes(merchant.status) ||
+        (workspaceSetup && merchant.status === 'live'));
     if (!canEditDraft)
       throw new MerchantAccessError('Draft setup is not available for this business.', 403);
   }

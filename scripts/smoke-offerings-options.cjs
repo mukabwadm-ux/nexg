@@ -18,7 +18,14 @@ let browser;
   const editor = page.getByRole('complementary', { name: 'Offering editor' });
   const discountButton = editor.getByRole('button', { name: 'Add discount', exact: true });
   await discountButton.waitFor();
-  assert(await discountButton.evaluate((button) => getComputedStyle(button).borderTopStyle === 'solid' && button.getBoundingClientRect().height >= 32), 'Add discount is not a visible outlined button');
+  assert(
+    await discountButton.evaluate(
+      (button) =>
+        getComputedStyle(button).borderTopStyle === 'solid' &&
+        button.getBoundingClientRect().height >= 32,
+    ),
+    'Add discount is not a visible outlined button',
+  );
   await editor.getByRole('button', { name: 'Add discount', exact: true }).click();
   await editor.getByLabel('Discount percentage', { exact: true }).fill('15');
   assert(

@@ -31,7 +31,10 @@ export function MoneyFrame({
         data-ready={ready}
       >
         <div className="mo-heading">
-          <div><h1>Money</h1><p>{description}</p></div>
+          <div>
+            <h1>Money</h1>
+            <p>{description}</p>
+          </div>
           {actions && <div className="mo-heading-actions">{actions}</div>}
         </div>
         {children}
@@ -52,7 +55,13 @@ export function MoneyTabs<Tab extends string>({
   return (
     <div className="mo-tabs" role="tablist" aria-label="Money views">
       {tabs.map((tab) => (
-        <button key={tab} type="button" role="tab" aria-selected={active === tab} onClick={() => onSelect(tab)}>
+        <button
+          key={tab}
+          type="button"
+          role="tab"
+          aria-selected={active === tab}
+          onClick={() => onSelect(tab)}
+        >
           {tab}
         </button>
       ))}

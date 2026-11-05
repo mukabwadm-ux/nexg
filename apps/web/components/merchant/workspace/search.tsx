@@ -74,7 +74,9 @@ export function WorkspaceSearch({
             onSubmit={(event) => {
               event.preventDefault();
               if (results[0]) {
-                router.push(appendMerchantOnboardingDemoContext(results[0].href, demoContext ?? null));
+                router.push(
+                  appendMerchantOnboardingDemoContext(results[0].href, demoContext ?? null),
+                );
                 changeOpen(false);
               }
             }}

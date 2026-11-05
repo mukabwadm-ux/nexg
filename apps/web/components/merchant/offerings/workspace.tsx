@@ -150,12 +150,18 @@ export function OfferingsWorkspace({
 }) {
   const demoContext = useMerchantOnboardingDemoContext();
   const profiles = useMemo(() => extendOfferingProfiles(additionalProfiles), [additionalProfiles]);
-  const initialId = suppliedConfiguration?.subcategoryId ?? initialProfileId ?? demoContext?.profileId ?? 'makeup';
+  const initialId =
+    suppliedConfiguration?.subcategoryId ?? initialProfileId ?? demoContext?.profileId ?? 'makeup';
   const [profileId, setProfileId] = useState(initialId);
   const profile = profiles.find((p) => p.id === profileId) ?? profiles[0]!;
   const demoProfileId = demoContext?.profileId;
   useEffect(() => {
-    if (!suppliedConfiguration && !initialProfileId && demoProfileId && profiles.some((item) => item.id === demoProfileId))
+    if (
+      !suppliedConfiguration &&
+      !initialProfileId &&
+      demoProfileId &&
+      profiles.some((item) => item.id === demoProfileId)
+    )
       setProfileId(demoProfileId);
   }, [suppliedConfiguration, initialProfileId, demoProfileId, profiles]);
   const [source, setSource] = useState<OfferingsSource | null>(suppliedSource ?? null);
@@ -195,7 +201,9 @@ export function OfferingsWorkspace({
   }, []);
   const dirty = draft !== null && !same(draft, baseline);
   const liveCatalogue = !preview && !setupEditor;
-  useEffect(() => { onSetupDirtyChange?.(dirty); }, [dirty, onSetupDirtyChange]);
+  useEffect(() => {
+    onSetupDirtyChange?.(dirty);
+  }, [dirty, onSetupDirtyChange]);
   const draftRef = useRef(draft);
   draftRef.current = draft;
 
@@ -243,8 +251,18 @@ export function OfferingsWorkspace({
       }
       setCatalogue(data);
       if (setupEditor) {
-        const existing = data.offerings.find((o) => o.id === (initialOfferingId ?? previousDraft?.id) && o.profileId === profile.id);
-        select(existing ?? createOffering(profile, data.configuration.enabledSchemas[0] ?? profile.schema, browserUuid()), false);
+        const existing = data.offerings.find(
+          (o) => o.id === (initialOfferingId ?? previousDraft?.id) && o.profileId === profile.id,
+        );
+        select(
+          existing ??
+            createOffering(
+              profile,
+              data.configuration.enabledSchemas[0] ?? profile.schema,
+              browserUuid(),
+            ),
+          false,
+        );
       } else {
         select(
           data.offerings.find((o) => o.id === initialOfferingId) ??
@@ -253,9 +271,17 @@ export function OfferingsWorkspace({
           false,
         );
       }
-      if (!setupEditor && initialOfferingId && data.offerings.some((o) => o.id === initialOfferingId))
+      if (
+        !setupEditor &&
+        initialOfferingId &&
+        data.offerings.some((o) => o.id === initialOfferingId)
+      )
         setTab('availability');
-      if (!setupEditor && initialOfferingId && !data.offerings.some((o) => o.id === initialOfferingId))
+      if (
+        !setupEditor &&
+        initialOfferingId &&
+        !data.offerings.some((o) => o.id === initialOfferingId)
+      )
         setNotice('The linked offering no longer exists. Choose a current listing.');
     } catch (e) {
       if (version === loadVersion.current)
@@ -308,7 +334,11 @@ export function OfferingsWorkspace({
     } else action();
   }
   function openPanel(value: Panel) {
-    if (!preview && value && ['sample', 'archive', 'import', 'configuration', 'connections'].includes(value))
+    if (
+      !preview &&
+      value &&
+      ['sample', 'archive', 'import', 'configuration', 'connections'].includes(value)
+    )
       return;
     setPanelError('');
     setPanel(value);
@@ -377,13 +407,15 @@ export function OfferingsWorkspace({
       setDraft(saved);
       setBaseline(structuredClone(saved));
       setIssues([]);
-      setNotice(preview ? (
-        publication === 'published'
-          ? 'Offering published in this browser preview.'
-          : publication === 'draft'
-            ? 'Offering unpublished in this browser preview.'
-            : 'Changes saved in this browser.'
-      ) : 'Offering saved as a draft.');
+      setNotice(
+        preview
+          ? publication === 'published'
+            ? 'Offering published in this browser preview.'
+            : publication === 'draft'
+              ? 'Offering unpublished in this browser preview.'
+              : 'Changes saved in this browser.'
+          : 'Offering saved as a draft.',
+      );
       if (!preview) onSetupSaved?.();
     } catch (e) {
       setError(
@@ -410,7 +442,10 @@ export function OfferingsWorkspace({
         item.unit = copy.unit;
         item.fields = structuredClone(copy.fields);
         item.attributes = structuredClone(copy.attributes);
-        if (preview) { item.image = copy.image; item.imageAlt = copy.imageAlt; }
+        if (preview) {
+          item.image = copy.image;
+          item.imageAlt = copy.imageAlt;
+        }
         item.variants = copy.variants.map((v) => ({
           ...v,
           id: browserUuid(),
@@ -511,544 +546,633 @@ export function OfferingsWorkspace({
       data-profile={profile.id}
       aria-busy={loading || catalogue?.configuration.subcategoryId !== profile.id}
     >
-      {!setupEditor && <>
-      <div className="of-page-heading">
-        <div>
-          <h1>Offerings</h1>
-          <p>
-            {enabled
-              .map(
-                (id) =>
-                  `${offerings.filter((o) => o.schemaId === id && o.publication !== 'archived').length} ${schemas[id]!.plural.toLowerCase()}`,
-              )
-              .join(' · ')}
-          </p>
-        </div>
-        <div className="of-heading-actions">
-          {(returnTo?.startsWith('/merchant-live-preview/availability?') ||
-            returnTo?.startsWith('/merchant-live-preview/money?')) && (
-            <a className="of-button" href={returnTo}>
-              Back to{' '}
-              {returnTo.startsWith('/merchant-live-preview/money?') ? 'Money' : 'Availability'}
-            </a>
-          )}
-          {preview && (
-            <button
-              type="button"
-              className="of-sample"
-              onClick={() =>
-                guard(() => {
-                  setSampleId(profile.id);
-                  openPanel('sample');
-                })
-              }
-            >
-              {profile.id === 'makeup' ? 'Zuri Studio' : profile.name}
-              <Settings2 size={14} />
-              <span className="sr-only">Choose sample specialty</span>
-            </button>
-          )}
-          {liveCatalogue && setupActivities && setupActivities.length > 1 && (
-            <label className="of-setup-activity">
-              <span>Business activity</span>
-              <select value={profile.id} onChange={(event) => {
-                const activity = event.target.value;
-                guard(() => setProfileId(activity));
-              }}>
-                {setupActivities.map((activity) => (
-                  <option key={activity.id} value={activity.id}>{activity.name}</option>
-                ))}
-              </select>
-            </label>
-          )}
-          {preview && <button
-            type="button"
-            className="of-link of-connections-link"
-            onClick={() => guard(() => openPanel('connections'))}
-          >
-            Manage connections
-          </button>}
-          {preview && <button
-            type="button"
-            className="of-button"
-            onClick={() =>
-              guard(() => {
-                setCsv('');
-                setImportRows([]);
-                openPanel('import');
-              })
-            }
-          >
-            <Upload size={16} />
-            <span>Import</span>
-          </button>}
-          {canWriteDrafts && <button
-            type="button"
-            className="of-button of-primary"
-            disabled={loading || (!!error && !catalogue)}
-            onClick={() =>
-              enabled.length === 1 ? create(enabled[0]!) : guard(() => openPanel('add'))
-            }
-          >
-            <Plus size={17} />
-            Add offering
-          </button>}
-        </div>
-      </div>
-      <div className="of-announcement" aria-live="polite">
-        {notice && (
-          <span>
-            <Check size={14} />
-            {notice}
-            <button
-              type="button"
-              className="of-icon"
-              aria-label="Dismiss message"
-              onClick={() => setNotice('')}
-            >
-              <X size={13} />
-            </button>
-          </span>
-        )}
-      </div>
-      {error && catalogue && (
-        <div className="of-error" role="alert">
-          {error}
-          <button type="button" className="of-link" onClick={() => guard(() => void load())}>
-            Reload saved catalogue
-          </button>
-        </div>
-      )}
-      <div
-        className={`of-content ${mobileEditor ? 'of-show-editor' : ''} ${draft ? '' : 'of-full-catalogue'}`}
-      >
-        <section className="of-catalogue" aria-label="Offerings catalogue">
-          <div className="of-type-tabs" aria-label="Filter offering type">
-            {['all', ...enabled].map((id) => (
-              <button type="button" aria-pressed={type === id} key={id} onClick={() => setType(id)}>
-                {id === 'all' ? 'All offerings' : schemas[id]!.plural}
-                <span>
-                  {
-                    offerings.filter(
-                      (o) => (id === 'all' || o.schemaId === id) && o.publication !== 'archived',
-                    ).length
-                  }
-                </span>
-              </button>
-            ))}
-            {preview && <button
-              className="of-icon of-configure"
-              type="button"
-              aria-label="Configure offering types"
-              onClick={() =>
-                guard(() => {
-                  setConfiguredTypes([...enabled]);
-                  openPanel('configuration');
-                })
-              }
-            >
-              <Settings2 size={16} />
-            </button>}
-          </div>
-          <div className="of-toolbar">
-            <label className="of-search">
-              <Search size={17} />
-              <span className="sr-only">Search offerings</span>
-              <input
-                placeholder="Search offerings…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </label>
-            <label>
-              <span className="sr-only">Publication filter</span>
-              <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                <option value="all">Status: All</option>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
-              </select>
-            </label>
-            <label>
-              <span className="sr-only">Source filter</span>
-              <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
-                <option value="all">Source: All</option>
-                <option value="nexg">NEXG only</option>
-                <option value="external">Connected source</option>
-              </select>
-            </label>
-            <button
-              type="button"
-              className="of-button of-columns-button"
-              onClick={() => openPanel('columns')}
-            >
-              <Columns3 size={16} />
-              <span>Columns</span>
-            </button>
-          </div>
-          {selectedIds.length > 0 && (
-            <div className="of-bulk">
-              <span>{selectedIds.length} selected</span>
-              <button
-                type="button"
-                className="of-link"
-                onClick={() =>
-                  download(
-                    'offerings-selected.csv',
-                    catalogueCsv(offerings.filter((o) => selectedIds.includes(o.id))),
+      {!setupEditor && (
+        <>
+          <div className="of-page-heading">
+            <div>
+              <h1>Offerings</h1>
+              <p>
+                {enabled
+                  .map(
+                    (id) =>
+                      `${offerings.filter((o) => o.schemaId === id && o.publication !== 'archived').length} ${schemas[id]!.plural.toLowerCase()}`,
                   )
-                }
-              >
-                Export
-              </button>
-              {preview && <button
-                type="button"
-                className="of-link"
-                onClick={() => guard(() => openPanel('archive'))}
-              >
-                Archive
-              </button>}
-              <button
-                type="button"
-                className="of-icon"
-                aria-label="Clear selection"
-                onClick={() => setSelectedIds([])}
-              >
-                <X size={14} />
-              </button>
+                  .join(' · ')}
+              </p>
             </div>
-          )}
-          <TableViewport className="of-table-scroll" label="Scrollable offering list">
-            {loading ? (
-              <div className="of-empty" role="status">
-                <Package size={26} />
-                <h2>Loading offerings…</h2>
-                <p>Preparing your catalogue and configuration.</p>
-              </div>
-            ) : error && !catalogue ? (
-              <div className="of-empty" role="alert">
-                <h2>Offerings could not be loaded</h2>
-                <p>{error}</p>
-                <button type="button" className="of-button" onClick={() => void load()}>
-                  Try again
+            <div className="of-heading-actions">
+              {(returnTo?.startsWith('/merchant-live-preview/availability?') ||
+                returnTo?.startsWith('/merchant-live-preview/money?')) && (
+                <a className="of-button" href={returnTo}>
+                  Back to{' '}
+                  {returnTo.startsWith('/merchant-live-preview/money?') ? 'Money' : 'Availability'}
+                </a>
+              )}
+              {preview && (
+                <button
+                  type="button"
+                  className="of-sample"
+                  onClick={() =>
+                    guard(() => {
+                      setSampleId(profile.id);
+                      openPanel('sample');
+                    })
+                  }
+                >
+                  {profile.id === 'makeup' ? 'Zuri Studio' : profile.name}
+                  <Settings2 size={14} />
+                  <span className="sr-only">Choose sample specialty</span>
                 </button>
-                {preview && (
-                  <button
-                    type="button"
-                    className="of-link"
-                    onClick={async () => {
-                      if (source) {
-                        try {
-                          const data = await source.reset(profile);
-                          setCatalogue(data);
-                          setError('');
-                          select(data.offerings[0] ?? null, false);
-                        } catch {
-                          setError(
-                            'This browser cannot access preview storage. Allow site storage, then try again.',
-                          );
-                        }
-                      }
+              )}
+              {liveCatalogue && setupActivities && setupActivities.length > 1 && (
+                <label className="of-setup-activity">
+                  <span>Business activity</span>
+                  <select
+                    value={profile.id}
+                    onChange={(event) => {
+                      const activity = event.target.value;
+                      guard(() => setProfileId(activity));
                     }}
                   >
-                    Reset this specialty’s sample
-                  </button>
-                )}
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="of-empty">
-                <Package size={28} />
-                <h2>{offerings.length ? 'No matching offerings' : 'Add your first offering'}</h2>
-                <p>
-                  {offerings.length
-                    ? 'Try another search, type, status or source.'
-                    : `Create a ${schemas[enabled[0]!]!.label.toLowerCase()}, or import a catalogue as drafts.`}
-                </p>
+                    {setupActivities.map((activity) => (
+                      <option key={activity.id} value={activity.id}>
+                        {activity.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {preview && (
+                <button
+                  type="button"
+                  className="of-link of-connections-link"
+                  onClick={() => guard(() => openPanel('connections'))}
+                >
+                  Manage connections
+                </button>
+              )}
+              {preview && (
                 <button
                   type="button"
                   className="of-button"
-                  onClick={() => {
-                    setSearch('');
-                    setStatus('all');
-                    setType('all');
-                    setSourceFilter('all');
-                  }}
+                  onClick={() =>
+                    guard(() => {
+                      setCsv('');
+                      setImportRows([]);
+                      openPanel('import');
+                    })
+                  }
                 >
-                  Clear filters
+                  <Upload size={16} />
+                  <span>Import</span>
                 </button>
-              </div>
-            ) : (
-              <table className="of-table">
-                <thead>
-                  <tr>
-                    <th className="of-select-cell">
-                      <input
-                        type="checkbox"
-                        aria-label="Select all visible offerings"
-                        checked={allSelected}
-                        onChange={(e) =>
-                          setSelectedIds(
-                            e.target.checked
-                              ? [...new Set([...selectedIds, ...filtered.map((o) => o.id)])]
-                              : selectedIds.filter((id) => !filtered.some((o) => o.id === id)),
-                          )
-                        }
-                      />
-                    </th>
-                    <th>
-                      <button
-                        type="button"
-                        className="of-sort"
-                        onClick={() => setSort(sort === 'name' ? 'updated' : 'name')}
-                      >
-                        Offering
-                        <ArrowUpDown size={12} />
-                        <span className="sr-only">
-                          Sort by {sort === 'name' ? 'last updated' : 'name'}
-                        </span>
-                      </button>
-                    </th>
-                    {columns.price && <th>Price</th>}
-                    {columns.publication && <th>Publication</th>}
-                    {columns.capacity && <th>Capacity / stock</th>}
-                    {columns.source && <th>Source</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((item) => (
-                    <tr key={item.id} data-selected={draft?.id === item.id}>
-                      <td className="of-select-cell">
-                        <input
-                          aria-label={`Select ${item.name}`}
-                          type="checkbox"
-                          checked={selectedIds.includes(item.id)}
-                          onChange={(e) =>
-                            setSelectedIds(
-                              e.target.checked
-                                ? [...selectedIds, item.id]
-                                : selectedIds.filter((id) => id !== item.id),
-                            )
-                          }
-                        />
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="of-row-name"
-                          id={`of-row-${item.id}`}
-                          aria-label={`${canWriteDrafts && !isExisting?.(item) ? 'Edit' : 'View'} ${item.name}`}
-                          aria-pressed={draft?.id === item.id}
-                          onClick={() => guard(() => select(item))}
-                        >
-                          <span className="of-thumbnail">
-                            {item.image ? (
-                              <Image unoptimized width={480} height={320} src={item.image} alt="" />
-                            ) : preview && profile.id === 'makeup' &&
-                              schemas[item.schemaId]?.capacity === 'calendar' ? (
-                              <Image
-                                width={96}
-                                height={104}
-                                src="/images/categories/beauty.jpg"
-                                alt=""
-                              />
-                            ) : (
-                              <Package size={22} />
-                            )}
-                          </span>
-                          <span>
-                            <strong>{item.name}</strong>
-                            <small>
-                              {isExisting?.(item) ? 'Existing catalogue entry' : schemas[item.schemaId]!.label}
-                              {!isExisting?.(item) && (item.fields.duration_minutes
-                                ? ` · ${item.fields.duration_minutes} min`
-                                : ` · ${item.unit}`)}
-                            </small>
-                          </span>
-                        </button>
-                      </td>
-                      {columns.price && (
-                        <td>
-                          <PriceSummary item={item} />
-                        </td>
-                      )}
-                      {columns.publication && (
-                        <td>
-                          <Status value={isExisting?.(item)
-                            ? item.publication === 'published' ? 'Available' : 'Unavailable'
-                            : item.publication} />
-                        </td>
-                      )}
-                      {columns.capacity && (
-                        <td>
-                          {capacityLabel(item)}
-                          {item.stockAsOf && item.availabilityLinked && item.sync === 'current' && (
-                            <small>
-                              As of{' '}
-                              {new Intl.DateTimeFormat('en-KE', {
-                                timeStyle: 'short',
-                                timeZone: 'Africa/Nairobi',
-                              }).format(new Date(item.stockAsOf))}{' '}
-                              EAT
-                            </small>
-                          )}
-                        </td>
-                      )}
-                      {columns.source && (
-                        <td>
-                          {item.sources.details === 'external' ? 'Connected system' : 'NEXG'}
-                          {item.sources.availability === 'external' && (
-                            <small>Stock / capacity: connected</small>
-                          )}
-                          {item.sync !== 'current' && (
-                            <small>
-                              {item.sync === 'offline'
-                                ? 'Connection unavailable'
-                                : item.sync === 'stale'
-                                  ? 'Refresh needed'
-                                  : 'Awaiting source'}
-                            </small>
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </TableViewport>
-          <div className="of-catalogue-footer">
-            <span>
-              {filtered.length} shown · {preview ? 'Saved in this browser only' : 'Catalogue'}
-            </span>
-            <button
-              type="button"
-              className="of-link"
-              onClick={() => download('offerings.csv', catalogueCsv(filtered))}
-            >
-              <Download size={13} />
-              Export
-            </button>
-          </div>
-        </section>
-        <div className="of-detail-slot">
-          {draft && isExisting?.(draft) ? (
-            <div className="of-editor-placeholder">
-              <button
-                type="button"
-                className="of-mobile-back"
-                onClick={() => setMobileEditor(false)}
-              >
-                <ArrowLeft size={16} />
-                Back to catalogue
-              </button>
-              <h2>{draft.name}</h2>
-              {draft.description && <p>{draft.description}</p>}
-              <PriceSummary item={draft} />
-              <Status value={draft.publication === 'published' ? 'Available' : 'Unavailable'} />
-              <p>Existing catalogue entry.</p>
+              )}
+              {canWriteDrafts && (
+                <button
+                  type="button"
+                  className="of-button of-primary"
+                  disabled={loading || (!!error && !catalogue)}
+                  onClick={() =>
+                    enabled.length === 1 ? create(enabled[0]!) : guard(() => openPanel('add'))
+                  }
+                >
+                  <Plus size={17} />
+                  Add offering
+                </button>
+              )}
             </div>
-          ) : draft && configuration ? (
-            <>
-              <button
-                type="button"
-                className="of-mobile-back"
-                onClick={() => setMobileEditor(false)}
-              >
-                <ArrowLeft size={16} />
-                Back to catalogue{dirty ? ' · unsaved draft kept' : ''}
+          </div>
+          <div className="of-announcement" aria-live="polite">
+            {notice && (
+              <span>
+                <Check size={14} />
+                {notice}
+                <button
+                  type="button"
+                  className="of-icon"
+                  aria-label="Dismiss message"
+                  onClick={() => setNotice('')}
+                >
+                  <X size={13} />
+                </button>
+              </span>
+            )}
+          </div>
+          {error && catalogue && (
+            <div className="of-error" role="alert">
+              {error}
+              <button type="button" className="of-link" onClick={() => guard(() => void load())}>
+                Reload saved catalogue
               </button>
-              <OfferingEditor
-                item={draft}
-                profile={profile}
-                catalogue={offerings}
-                configuration={configuration}
-                tab={tab}
-                setTab={setTab}
-                change={(next) => {
-                  if (readOnlyDraft) return;
-                  setDraft(next);
-                  setError('');
-                  setIssues([]);
-                }}
-                issues={issues}
-                busy={busy}
-                dirty={dirty}
-                onSave={(publication) => void save(publication)}
-                onClose={() =>
-                  guard(() => {
-                    const id = draft.id;
-                    select(null);
-                    window.requestAnimationFrame(() =>
-                      document.getElementById(`of-row-${id}`)?.focus(),
-                    );
-                  })
-                }
-                onAdd={() =>
-                  enabled.length === 1 ? create(enabled[0]!) : guard(() => openPanel('add'))
-                }
-                onDuplicate={() => create(draft.schemaId, draft)}
-                onConnections={() => guard(() => openPanel('connections'))}
-                onReload={() => guard(() => void load())}
-                setupDraftOnly={liveCatalogue}
-                readOnly={readOnlyDraft}
-                onUploadImage={onUploadImage}
-              />
-            </>
-          ) : (
-            <div className="of-editor-placeholder">
-              <Package size={28} />
-              <h2>Select an offering</h2>
-              <p>Choose a listing to view its details, pricing and availability.</p>
             </div>
           )}
-        </div>
-      </div>
-      </>}
+          <div
+            className={`of-content ${mobileEditor ? 'of-show-editor' : ''} ${draft ? '' : 'of-full-catalogue'}`}
+          >
+            <section className="of-catalogue" aria-label="Offerings catalogue">
+              <div className="of-type-tabs" aria-label="Filter offering type">
+                {['all', ...enabled].map((id) => (
+                  <button
+                    type="button"
+                    aria-pressed={type === id}
+                    key={id}
+                    onClick={() => setType(id)}
+                  >
+                    {id === 'all' ? 'All offerings' : schemas[id]!.plural}
+                    <span>
+                      {
+                        offerings.filter(
+                          (o) =>
+                            (id === 'all' || o.schemaId === id) && o.publication !== 'archived',
+                        ).length
+                      }
+                    </span>
+                  </button>
+                ))}
+                {preview && (
+                  <button
+                    className="of-icon of-configure"
+                    type="button"
+                    aria-label="Configure offering types"
+                    onClick={() =>
+                      guard(() => {
+                        setConfiguredTypes([...enabled]);
+                        openPanel('configuration');
+                      })
+                    }
+                  >
+                    <Settings2 size={16} />
+                  </button>
+                )}
+              </div>
+              <div className="of-toolbar">
+                <label className="of-search">
+                  <Search size={17} />
+                  <span className="sr-only">Search offerings</span>
+                  <input
+                    placeholder="Search offerings…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span className="sr-only">Publication filter</span>
+                  <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="all">Status: All</option>
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </label>
+                <label>
+                  <span className="sr-only">Source filter</span>
+                  <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
+                    <option value="all">Source: All</option>
+                    <option value="nexg">NEXG only</option>
+                    <option value="external">Connected source</option>
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  className="of-button of-columns-button"
+                  onClick={() => openPanel('columns')}
+                >
+                  <Columns3 size={16} />
+                  <span>Columns</span>
+                </button>
+              </div>
+              {selectedIds.length > 0 && (
+                <div className="of-bulk">
+                  <span>{selectedIds.length} selected</span>
+                  <button
+                    type="button"
+                    className="of-link"
+                    onClick={() =>
+                      download(
+                        'offerings-selected.csv',
+                        catalogueCsv(offerings.filter((o) => selectedIds.includes(o.id))),
+                      )
+                    }
+                  >
+                    Export
+                  </button>
+                  {preview && (
+                    <button
+                      type="button"
+                      className="of-link"
+                      onClick={() => guard(() => openPanel('archive'))}
+                    >
+                      Archive
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="of-icon"
+                    aria-label="Clear selection"
+                    onClick={() => setSelectedIds([])}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+              <TableViewport className="of-table-scroll" label="Scrollable offering list">
+                {loading ? (
+                  <div className="of-empty" role="status">
+                    <Package size={26} />
+                    <h2>Loading offerings…</h2>
+                    <p>Preparing your catalogue and configuration.</p>
+                  </div>
+                ) : error && !catalogue ? (
+                  <div className="of-empty" role="alert">
+                    <h2>Offerings could not be loaded</h2>
+                    <p>{error}</p>
+                    <button type="button" className="of-button" onClick={() => void load()}>
+                      Try again
+                    </button>
+                    {preview && (
+                      <button
+                        type="button"
+                        className="of-link"
+                        onClick={async () => {
+                          if (source) {
+                            try {
+                              const data = await source.reset(profile);
+                              setCatalogue(data);
+                              setError('');
+                              select(data.offerings[0] ?? null, false);
+                            } catch {
+                              setError(
+                                'This browser cannot access preview storage. Allow site storage, then try again.',
+                              );
+                            }
+                          }
+                        }}
+                      >
+                        Reset this specialty’s sample
+                      </button>
+                    )}
+                  </div>
+                ) : filtered.length === 0 ? (
+                  <div className="of-empty">
+                    <Package size={28} />
+                    <h2>
+                      {offerings.length ? 'No matching offerings' : 'Add your first offering'}
+                    </h2>
+                    <p>
+                      {offerings.length
+                        ? 'Try another search, type, status or source.'
+                        : `Create a ${schemas[enabled[0]!]!.label.toLowerCase()}, or import a catalogue as drafts.`}
+                    </p>
+                    <button
+                      type="button"
+                      className="of-button"
+                      onClick={() => {
+                        setSearch('');
+                        setStatus('all');
+                        setType('all');
+                        setSourceFilter('all');
+                      }}
+                    >
+                      Clear filters
+                    </button>
+                  </div>
+                ) : (
+                  <table className="of-table">
+                    <thead>
+                      <tr>
+                        <th className="of-select-cell">
+                          <input
+                            type="checkbox"
+                            aria-label="Select all visible offerings"
+                            checked={allSelected}
+                            onChange={(e) =>
+                              setSelectedIds(
+                                e.target.checked
+                                  ? [...new Set([...selectedIds, ...filtered.map((o) => o.id)])]
+                                  : selectedIds.filter((id) => !filtered.some((o) => o.id === id)),
+                              )
+                            }
+                          />
+                        </th>
+                        <th>
+                          <button
+                            type="button"
+                            className="of-sort"
+                            onClick={() => setSort(sort === 'name' ? 'updated' : 'name')}
+                          >
+                            Offering
+                            <ArrowUpDown size={12} />
+                            <span className="sr-only">
+                              Sort by {sort === 'name' ? 'last updated' : 'name'}
+                            </span>
+                          </button>
+                        </th>
+                        {columns.price && <th>Price</th>}
+                        {columns.publication && <th>Publication</th>}
+                        {columns.capacity && <th>Capacity / stock</th>}
+                        {columns.source && <th>Source</th>}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filtered.map((item) => (
+                        <tr key={item.id} data-selected={draft?.id === item.id}>
+                          <td className="of-select-cell">
+                            <input
+                              aria-label={`Select ${item.name}`}
+                              type="checkbox"
+                              checked={selectedIds.includes(item.id)}
+                              onChange={(e) =>
+                                setSelectedIds(
+                                  e.target.checked
+                                    ? [...selectedIds, item.id]
+                                    : selectedIds.filter((id) => id !== item.id),
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              className="of-row-name"
+                              id={`of-row-${item.id}`}
+                              aria-label={`${canWriteDrafts && !isExisting?.(item) ? 'Edit' : 'View'} ${item.name}`}
+                              aria-pressed={draft?.id === item.id}
+                              onClick={() => guard(() => select(item))}
+                            >
+                              <span className="of-thumbnail">
+                                {item.image ? (
+                                  <Image
+                                    unoptimized
+                                    width={480}
+                                    height={320}
+                                    src={item.image}
+                                    alt=""
+                                  />
+                                ) : preview &&
+                                  profile.id === 'makeup' &&
+                                  schemas[item.schemaId]?.capacity === 'calendar' ? (
+                                  <Image
+                                    width={96}
+                                    height={104}
+                                    src="/images/categories/beauty.jpg"
+                                    alt=""
+                                  />
+                                ) : (
+                                  <Package size={22} />
+                                )}
+                              </span>
+                              <span>
+                                <strong>{item.name}</strong>
+                                <small>
+                                  {isExisting?.(item)
+                                    ? 'Existing catalogue entry'
+                                    : schemas[item.schemaId]!.label}
+                                  {!isExisting?.(item) &&
+                                    (item.fields.duration_minutes
+                                      ? ` · ${item.fields.duration_minutes} min`
+                                      : ` · ${item.unit}`)}
+                                </small>
+                              </span>
+                            </button>
+                          </td>
+                          {columns.price && (
+                            <td>
+                              <PriceSummary item={item} />
+                            </td>
+                          )}
+                          {columns.publication && (
+                            <td>
+                              <Status
+                                value={
+                                  isExisting?.(item)
+                                    ? item.publication === 'published'
+                                      ? 'Available'
+                                      : 'Unavailable'
+                                    : item.publication
+                                }
+                              />
+                            </td>
+                          )}
+                          {columns.capacity && (
+                            <td>
+                              {capacityLabel(item)}
+                              {item.stockAsOf &&
+                                item.availabilityLinked &&
+                                item.sync === 'current' && (
+                                  <small>
+                                    As of{' '}
+                                    {new Intl.DateTimeFormat('en-KE', {
+                                      timeStyle: 'short',
+                                      timeZone: 'Africa/Nairobi',
+                                    }).format(new Date(item.stockAsOf))}{' '}
+                                    EAT
+                                  </small>
+                                )}
+                            </td>
+                          )}
+                          {columns.source && (
+                            <td>
+                              {item.sources.details === 'external' ? 'Connected system' : 'NEXG'}
+                              {item.sources.availability === 'external' && (
+                                <small>Stock / capacity: connected</small>
+                              )}
+                              {item.sync !== 'current' && (
+                                <small>
+                                  {item.sync === 'offline'
+                                    ? 'Connection unavailable'
+                                    : item.sync === 'stale'
+                                      ? 'Refresh needed'
+                                      : 'Awaiting source'}
+                                </small>
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </TableViewport>
+              <div className="of-catalogue-footer">
+                <span>
+                  {filtered.length} shown · {preview ? 'Saved in this browser only' : 'Catalogue'}
+                </span>
+                <button
+                  type="button"
+                  className="of-link"
+                  onClick={() => download('offerings.csv', catalogueCsv(filtered))}
+                >
+                  <Download size={13} />
+                  Export
+                </button>
+              </div>
+            </section>
+            <div className="of-detail-slot">
+              {draft && isExisting?.(draft) ? (
+                <div className="of-editor-placeholder">
+                  <button
+                    type="button"
+                    className="of-mobile-back"
+                    onClick={() => setMobileEditor(false)}
+                  >
+                    <ArrowLeft size={16} />
+                    Back to catalogue
+                  </button>
+                  <h2>{draft.name}</h2>
+                  {draft.description && <p>{draft.description}</p>}
+                  <PriceSummary item={draft} />
+                  <Status value={draft.publication === 'published' ? 'Available' : 'Unavailable'} />
+                  <p>Existing catalogue entry.</p>
+                </div>
+              ) : draft && configuration ? (
+                <>
+                  <button
+                    type="button"
+                    className="of-mobile-back"
+                    onClick={() => setMobileEditor(false)}
+                  >
+                    <ArrowLeft size={16} />
+                    Back to catalogue{dirty ? ' · unsaved draft kept' : ''}
+                  </button>
+                  <OfferingEditor
+                    item={draft}
+                    profile={profile}
+                    catalogue={offerings}
+                    configuration={configuration}
+                    tab={tab}
+                    setTab={setTab}
+                    change={(next) => {
+                      if (readOnlyDraft) return;
+                      setDraft(next);
+                      setError('');
+                      setIssues([]);
+                    }}
+                    issues={issues}
+                    busy={busy}
+                    dirty={dirty}
+                    onSave={(publication) => void save(publication)}
+                    onClose={() =>
+                      guard(() => {
+                        const id = draft.id;
+                        select(null);
+                        window.requestAnimationFrame(() =>
+                          document.getElementById(`of-row-${id}`)?.focus(),
+                        );
+                      })
+                    }
+                    onAdd={() =>
+                      enabled.length === 1 ? create(enabled[0]!) : guard(() => openPanel('add'))
+                    }
+                    onDuplicate={() => create(draft.schemaId, draft)}
+                    onConnections={() => guard(() => openPanel('connections'))}
+                    onReload={() => guard(() => void load())}
+                    setupDraftOnly={liveCatalogue}
+                    readOnly={readOnlyDraft}
+                    onUploadImage={onUploadImage}
+                  />
+                </>
+              ) : (
+                <div className="of-editor-placeholder">
+                  <Package size={28} />
+                  <h2>Select an offering</h2>
+                  <p>Choose a listing to view its details, pricing and availability.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
       {setupEditor && (
         <div className="of-setup-editor">
           {(setupActivities ?? demoContext?.subcategories ?? []).length > 1 && (
             <label className="of-setup-activity">
               <span>Business activity</span>
-              <select value={profile.id} onChange={(event) => {
-                const selected = event.target.value;
-                guard(() => setProfileId(selected));
-              }}>
-                {(setupActivities ?? demoContext?.subcategories ?? []).filter((activity) => profiles.some((item) => item.id === activity.id)).map((activity) => (
-                  <option key={activity.id} value={activity.id}>{activity.name}</option>
+              <select
+                value={profile.id}
+                onChange={(event) => {
+                  const selected = event.target.value;
+                  guard(() => setProfileId(selected));
+                }}
+              >
+                {(setupActivities ?? demoContext?.subcategories ?? [])
+                  .filter((activity) => profiles.some((item) => item.id === activity.id))
+                  .map((activity) => (
+                    <option key={activity.id} value={activity.id}>
+                      {activity.name}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          )}
+          {!preview && offerings.length > 0 && (
+            <label className="of-setup-activity">
+              <span>Saved drafts</span>
+              <select
+                value={draft && offerings.some((item) => item.id === draft.id) ? draft.id : ''}
+                onChange={(event) => {
+                  const item = offerings.find((entry) => entry.id === event.target.value);
+                  if (item) guard(() => select(item, false));
+                  else create(enabled[0] ?? profile.schema);
+                }}
+              >
+                <option value="">New offering</option>
+                {offerings.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name || 'Untitled offering'}
+                  </option>
                 ))}
               </select>
             </label>
           )}
-          {!preview && offerings.length > 0 && <label className="of-setup-activity">
-            <span>Saved drafts</span>
-            <select value={draft && offerings.some((item) => item.id === draft.id) ? draft.id : ''} onChange={(event) => {
-              const item = offerings.find((entry) => entry.id === event.target.value);
-              if (item) guard(() => select(item, false));
-              else create(enabled[0] ?? profile.schema);
-            }}>
-              <option value="">New offering</option>
-              {offerings.map((item) => <option key={item.id} value={item.id}>{item.name || 'Untitled offering'}</option>)}
-            </select>
-          </label>}
-          <p className="of-setup-note">{preview ? 'Demo · Changes are saved in this browser only.' : 'Offerings are saved as drafts while your business is being set up.'}</p>
-          {notice && <p className="of-setup-notice" role="status">{notice}</p>}
-          {error && <p className="of-error" role="alert">{error}</p>}
+          <p className="of-setup-note">
+            {preview
+              ? 'Demo · Changes are saved in this browser only.'
+              : 'Offerings are saved as drafts while your business is being set up.'}
+          </p>
+          {notice && (
+            <p className="of-setup-notice" role="status">
+              {notice}
+            </p>
+          )}
+          {error && (
+            <p className="of-error" role="alert">
+              {error}
+            </p>
+          )}
           {draft && configuration ? (
             <OfferingEditor
-              item={draft} profile={profile} catalogue={offerings} configuration={configuration}
-              tab={tab} setTab={setTab}
-              change={(next) => { setDraft(next); setError(''); setIssues([]); }}
-              issues={issues} busy={busy} dirty={dirty}
+              item={draft}
+              profile={profile}
+              catalogue={offerings}
+              configuration={configuration}
+              tab={tab}
+              setTab={setTab}
+              change={(next) => {
+                setDraft(next);
+                setError('');
+                setIssues([]);
+              }}
+              issues={issues}
+              busy={busy}
+              dirty={dirty}
               onSave={(publication) => void save(publication)}
               onClose={() => guard(() => onSetupClose?.())}
-              onAdd={() => enabled.length === 1 ? create(enabled[0]!) : guard(() => openPanel('add'))}
+              onAdd={() =>
+                enabled.length === 1 ? create(enabled[0]!) : guard(() => openPanel('add'))
+              }
               onDuplicate={() => create(draft.schemaId, draft)}
               onConnections={() => guard(() => openPanel('connections'))}
               onReload={() => guard(() => void load())}
               setupDraftOnly={!preview}
               onUploadImage={onUploadImage}
             />
-          ) : loading ? <p>Loading offering editor…</p> : <button type="button" onClick={onSetupClose}>Close</button>}
+          ) : loading ? (
+            <p>Loading offering editor…</p>
+          ) : (
+            <button type="button" onClick={onSetupClose}>
+              Close
+            </button>
+          )}
         </div>
       )}
       <Modal

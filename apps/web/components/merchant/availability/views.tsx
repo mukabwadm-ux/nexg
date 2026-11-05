@@ -45,10 +45,12 @@ export function HoursView({
     <section className="av-card">
       <div className="av-card-heading">
         <h2>Hours this week</h2>
-        {onEdit && <button className="av-button av-quiet" onClick={onEdit}>
-          <Pencil size={15} />
-          Edit hours
-        </button>}
+        {onEdit && (
+          <button className="av-button av-quiet" onClick={onEdit}>
+            <Pencil size={15} />
+            Edit hours
+          </button>
+        )}
       </div>
       <div className="av-table-wrap">
         <table className="av-hours">
@@ -111,13 +113,15 @@ export function HoursView({
                     )}
                   </td>
                   <td>
-                    {onEdit && <button
-                      className="av-icon"
-                      aria-label={'Edit ' + DAYS[h.day] + ' hours'}
-                      onClick={onEdit}
-                    >
-                      <Pencil size={16} />
-                    </button>}
+                    {onEdit && (
+                      <button
+                        className="av-icon"
+                        aria-label={'Edit ' + DAYS[h.day] + ' hours'}
+                        onClick={onEdit}
+                      >
+                        <Pencil size={16} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               );

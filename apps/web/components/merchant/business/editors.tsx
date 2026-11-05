@@ -306,7 +306,12 @@ export function ActivityEditor({ value: a, onChange, data }: EditProps<Activity>
     </div>
   );
 }
-export function LocationEditor({ value: l, onChange, data, setup = false }: {
+export function LocationEditor({
+  value: l,
+  onChange,
+  data,
+  setup = false,
+}: {
   value: Location;
   onChange: (value: Location) => void;
   data: { activities: Pick<Activity, 'id' | 'name' | 'enabled'>[] };
@@ -358,18 +363,24 @@ export function LocationEditor({ value: l, onChange, data, setup = false }: {
           </label>
         ))}
       </fieldset>
-      {!setup && <label className="bu-check">
-        <input
-          type="checkbox"
-          checked={l.published}
-          onChange={(e) => patch({ published: e.target.checked })}
-        />
-        Publish this sample location
-      </label>}
-      {setup ? <Note>Location visibility is reviewed separately.</Note> : <Note>
-        Timezone: Africa/Nairobi. Publishing here changes only the local sample. Existing
-        obligations must be resolved before closing.
-      </Note>}
+      {!setup && (
+        <label className="bu-check">
+          <input
+            type="checkbox"
+            checked={l.published}
+            onChange={(e) => patch({ published: e.target.checked })}
+          />
+          Publish this sample location
+        </label>
+      )}
+      {setup ? (
+        <Note>Location visibility is reviewed separately.</Note>
+      ) : (
+        <Note>
+          Timezone: Africa/Nairobi. Publishing here changes only the local sample. Existing
+          obligations must be resolved before closing.
+        </Note>
+      )}
     </div>
   );
 }
