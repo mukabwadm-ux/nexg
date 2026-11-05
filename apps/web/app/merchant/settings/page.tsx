@@ -2,14 +2,17 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { MerchantSettings } from '@/components/merchant/board-client';
-import { merchantContext } from '@/components/merchant/frame';
 import type { SettingsIdentity } from '@/components/merchant/settings-artboard/model';
 import { SettingsWorkspace } from '@/components/merchant/settings-artboard/workspace';
+import { requireMerchant } from '@/lib/partner';
+import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Settings' };
 export const dynamic = 'force-dynamic';
 
 interface SettingsRow {
+  trading_name: string | null;
+  legal_name: string | null;
   notification_rules: Record<string, string[]> | null;
   quiet_hours: { from?: string; to?: string } | null;
 }
@@ -23,13 +26,13 @@ function maskEmail(email: string | undefined) {
 }
 
 export default async function SettingsPage() {
-  const { m, supabase } = await merchantContext();
-  if (!m) return null;
+  const merchant = await requireMerchant();
+  const supabase = createClient();
   const [{ data, error }, auth] = await Promise.all([
     supabase
       .from('merchant_settings_v')
-      .select('notification_rules, quiet_hours')
-      .eq('merchant_id', m.merchant_id)
+      .select('trading_name, legal_name, notification_rules, quiet_hours')
+      .eq('merchant_id', merchant.id)
       .maybeSingle(),
     supabase.auth.getUser(),
   ]);
@@ -51,9 +54,9 @@ export default async function SettingsPage() {
   const user = auth.data.user;
   const name = user.user_metadata?.full_name ?? user.user_metadata?.name;
   const identity: SettingsIdentity = {
-    merchantId: m.merchant_id,
+    merchantId: merchant.id,
     userId: user.id,
-    businessName: m.name,
+    businessName: settings.trading_name ?? settings.legal_name ?? 'Your business',
     name: typeof name === 'string' && name.trim() ? name.trim().slice(0, 80) : 'Your account',
     phone: maskPhone(user.phone),
     email: maskEmail(user.email),

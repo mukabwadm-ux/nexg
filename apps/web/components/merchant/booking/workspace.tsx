@@ -177,9 +177,11 @@ function ErrorMessage({ message }: { message: string | null }) {
 export function MerchantBookingWorkspace({
   apiBase = '/api/merchant/booking',
   development = false,
+  initialBookingId,
 }: {
   apiBase?: string;
   development?: boolean;
+  initialBookingId?: string;
 }) {
   const [data, setData] = useState<BookingWorkspaceData | null>(null);
   const [profiles, setProfiles] = useState<BookingProfile[]>([]);
@@ -211,9 +213,13 @@ export function MerchantBookingWorkspace({
         const workspace = await bookingRequest<BookingWorkspaceData>('/workspace', {}, apiBase);
         setData(workspace);
         if (workspace.profiles?.length) setProfiles(workspace.profiles);
-        setSelected((current) =>
-          current ? (workspace.bookings.find((b) => b.id === current.id) ?? null) : null,
-        );
+        const linked = initial && initialBookingId
+          ? workspace.bookings.find((booking) => booking.id === initialBookingId)
+          : undefined;
+        setSelected((current) => linked ?? workspace.bookings.find((b) => b.id === current?.id) ?? null);
+        if (linked?.startTime) setDate(kenyaDate(new Date(linked.startTime)));
+        if (initial && initialBookingId && !linked)
+          setError('This booking is unavailable in your current workspace.');
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Your calendar could not be loaded.');
       } finally {
@@ -221,7 +227,7 @@ export function MerchantBookingWorkspace({
         setRefreshing(false);
       }
     },
-    [apiBase],
+    [apiBase, initialBookingId],
   );
 
   useEffect(() => {

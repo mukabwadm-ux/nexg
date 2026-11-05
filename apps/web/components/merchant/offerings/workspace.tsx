@@ -37,6 +37,7 @@ import { catalogueCsv, localOfferingsSource, prepareImport, type OfferingsSource
 import { schemas } from './schemas';
 import styles from './workspace.module.css';
 import { useMerchantOnboardingDemoContext } from '../merchant-onboarding-demo-provider';
+import { browserUuid } from '@/lib/browser-uuid';
 
 type Panel =
   | 'add'
@@ -122,6 +123,14 @@ export function OfferingsWorkspace({
   initialProfileId,
   initialOfferingId,
   returnTo,
+  setupEditor = false,
+  onSetupClose,
+  setupActivities,
+  onSetupSaved,
+  onSetupDirtyChange,
+  onUploadImage,
+  canEditDrafts = true,
+  isExisting,
 }: {
   source?: OfferingsSource;
   configuration?: MerchantOfferingConfiguration;
@@ -130,6 +139,14 @@ export function OfferingsWorkspace({
   initialProfileId?: string;
   initialOfferingId?: string;
   returnTo?: string;
+  setupEditor?: boolean;
+  onSetupClose?: () => void;
+  setupActivities?: { id: string; name: string }[];
+  onSetupSaved?: () => void;
+  onSetupDirtyChange?: (dirty: boolean) => void;
+  onUploadImage?: (item: Offering, file: File) => Promise<{ path: string; url: string }>;
+  canEditDrafts?: boolean;
+  isExisting?: (item: Offering) => boolean;
 }) {
   const demoContext = useMerchantOnboardingDemoContext();
   const profiles = useMemo(() => extendOfferingProfiles(additionalProfiles), [additionalProfiles]);
@@ -176,9 +193,14 @@ export function OfferingsWorkspace({
     loadVersion.current++;
   }, []);
   const dirty = draft !== null && !same(draft, baseline);
+  const liveCatalogue = !preview && !setupEditor;
+  useEffect(() => { onSetupDirtyChange?.(dirty); }, [dirty, onSetupDirtyChange]);
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
 
   useEffect(() => {
-    if (!suppliedSource)
+    if (suppliedSource) setSource(suppliedSource);
+    else if (preview)
       setSource(
         localOfferingsSource({
           getItem: (key) => window.localStorage.getItem(key),
@@ -186,7 +208,7 @@ export function OfferingsWorkspace({
           removeItem: (key) => window.localStorage.removeItem(key),
         }),
       );
-  }, [suppliedSource]);
+  }, [suppliedSource, preview]);
   useEffect(() => {
     if (!catalogue?.offerings.some((item) => item.discount?.enabled || item.visibility)) return;
     const timer = window.setInterval(() => refreshPriceTime((value) => value + 1), 30000);
@@ -202,6 +224,7 @@ export function OfferingsWorkspace({
   const load = useCallback(async () => {
     if (!source) return;
     const version = ++loadVersion.current;
+    const previousDraft = draftRef.current;
     setLoading(true);
     setCatalogue(null);
     setError('');
@@ -218,15 +241,20 @@ export function OfferingsWorkspace({
         await source.replace(profile, data);
       }
       setCatalogue(data);
-      select(
-        data.offerings.find((o) => o.id === initialOfferingId) ??
-          data.offerings.find((o) => o.publication !== 'archived') ??
-          null,
-        false,
-      );
-      if (initialOfferingId && data.offerings.some((o) => o.id === initialOfferingId))
+      if (setupEditor) {
+        const existing = data.offerings.find((o) => o.id === (initialOfferingId ?? previousDraft?.id) && o.profileId === profile.id);
+        select(existing ?? createOffering(profile, data.configuration.enabledSchemas[0] ?? profile.schema, browserUuid()), false);
+      } else {
+        select(
+          data.offerings.find((o) => o.id === initialOfferingId) ??
+            data.offerings.find((o) => o.publication !== 'archived') ??
+            null,
+          false,
+        );
+      }
+      if (!setupEditor && initialOfferingId && data.offerings.some((o) => o.id === initialOfferingId))
         setTab('availability');
-      if (initialOfferingId && !data.offerings.some((o) => o.id === initialOfferingId))
+      if (!setupEditor && initialOfferingId && !data.offerings.some((o) => o.id === initialOfferingId))
         setNotice('The linked offering no longer exists. Choose a current listing.');
     } catch (e) {
       if (version === loadVersion.current)
@@ -234,7 +262,7 @@ export function OfferingsWorkspace({
     } finally {
       if (version === loadVersion.current) setLoading(false);
     }
-  }, [source, profile, select, suppliedConfiguration, initialOfferingId]);
+  }, [source, profile, select, suppliedConfiguration, initialOfferingId, setupEditor]);
   useEffect(() => {
     void load();
     return invalidateLoad;
@@ -279,12 +307,16 @@ export function OfferingsWorkspace({
     } else action();
   }
   function openPanel(value: Panel) {
+    if (!preview && value && ['sample', 'archive', 'import', 'configuration', 'connections'].includes(value))
+      return;
     setPanelError('');
     setPanel(value);
   }
   const offerings = catalogue?.offerings ?? emptyOfferings;
   const configuration = catalogue?.configuration;
   const enabled = configuration?.enabledSchemas ?? [profile.schema];
+  const canWriteDrafts = canEditDrafts && catalogue?.writable !== false;
+  const readOnlyDraft = !canWriteDrafts || Boolean(draft && isExisting?.(draft));
   const filtered = useMemo(
     () =>
       offerings
@@ -308,7 +340,7 @@ export function OfferingsWorkspace({
   const allSelected = filtered.length > 0 && filtered.every((o) => selectedIds.includes(o.id));
 
   async function save(publication?: Offering['publication']) {
-    if (!draft || !source || !catalogue || busy) return;
+    if (!draft || !source || !catalogue || busy || readOnlyDraft) return;
     const found = validateOffering(
       draft,
       (publication ?? draft.publication) === 'published',
@@ -344,13 +376,14 @@ export function OfferingsWorkspace({
       setDraft(saved);
       setBaseline(structuredClone(saved));
       setIssues([]);
-      setNotice(
+      setNotice(preview ? (
         publication === 'published'
           ? 'Offering published in this browser preview.'
           : publication === 'draft'
             ? 'Offering unpublished in this browser preview.'
-            : 'Changes saved in this browser.',
-      );
+            : 'Changes saved in this browser.'
+      ) : 'Offering saved as a draft.');
+      if (!preview) onSetupSaved?.();
     } catch (e) {
       setError(
         e instanceof Error ? e.message : 'Changes could not be saved. Your edits remain open.',
@@ -360,8 +393,9 @@ export function OfferingsWorkspace({
     }
   }
   function create(schemaId: string, copy?: Offering) {
+    if (!canWriteDrafts) return;
     guard(() => {
-      const item = createOffering(profile, schemaId, crypto.randomUUID());
+      const item = createOffering(profile, schemaId, browserUuid());
       if (copy) {
         item.name = `${copy.name} (copy)`;
         item.description = copy.description;
@@ -375,11 +409,10 @@ export function OfferingsWorkspace({
         item.unit = copy.unit;
         item.fields = structuredClone(copy.fields);
         item.attributes = structuredClone(copy.attributes);
-        item.image = copy.image;
-        item.imageAlt = copy.imageAlt;
+        if (preview) { item.image = copy.image; item.imageAlt = copy.imageAlt; }
         item.variants = copy.variants.map((v) => ({
           ...v,
-          id: crypto.randomUUID(),
+          id: browserUuid(),
           stock: undefined,
         }));
       }
@@ -477,6 +510,7 @@ export function OfferingsWorkspace({
       data-profile={profile.id}
       aria-busy={loading || catalogue?.configuration.subcategoryId !== profile.id}
     >
+      {!setupEditor && <>
       <div className="of-page-heading">
         <div>
           <h1>Offerings</h1>
@@ -513,14 +547,27 @@ export function OfferingsWorkspace({
               <span className="sr-only">Choose sample specialty</span>
             </button>
           )}
-          <button
+          {liveCatalogue && setupActivities && setupActivities.length > 1 && (
+            <label className="of-setup-activity">
+              <span>Business activity</span>
+              <select value={profile.id} onChange={(event) => {
+                const activity = event.target.value;
+                guard(() => setProfileId(activity));
+              }}>
+                {setupActivities.map((activity) => (
+                  <option key={activity.id} value={activity.id}>{activity.name}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          {preview && <button
             type="button"
             className="of-link of-connections-link"
             onClick={() => guard(() => openPanel('connections'))}
           >
             Manage connections
-          </button>
-          <button
+          </button>}
+          {preview && <button
             type="button"
             className="of-button"
             onClick={() =>
@@ -533,8 +580,8 @@ export function OfferingsWorkspace({
           >
             <Upload size={16} />
             <span>Import</span>
-          </button>
-          <button
+          </button>}
+          {canWriteDrafts && <button
             type="button"
             className="of-button of-primary"
             disabled={loading || (!!error && !catalogue)}
@@ -544,7 +591,7 @@ export function OfferingsWorkspace({
           >
             <Plus size={17} />
             Add offering
-          </button>
+          </button>}
         </div>
       </div>
       <div className="of-announcement" aria-live="polite">
@@ -588,7 +635,7 @@ export function OfferingsWorkspace({
                 </span>
               </button>
             ))}
-            <button
+            {preview && <button
               className="of-icon of-configure"
               type="button"
               aria-label="Configure offering types"
@@ -600,7 +647,7 @@ export function OfferingsWorkspace({
               }
             >
               <Settings2 size={16} />
-            </button>
+            </button>}
           </div>
           <div className="of-toolbar">
             <label className="of-search">
@@ -653,13 +700,13 @@ export function OfferingsWorkspace({
               >
                 Export
               </button>
-              <button
+              {preview && <button
                 type="button"
                 className="of-link"
                 onClick={() => guard(() => openPanel('archive'))}
               >
                 Archive
-              </button>
+              </button>}
               <button
                 type="button"
                 className="of-icon"
@@ -788,14 +835,14 @@ export function OfferingsWorkspace({
                           type="button"
                           className="of-row-name"
                           id={`of-row-${item.id}`}
-                          aria-label={`Edit ${item.name}`}
+                          aria-label={`${canWriteDrafts && !isExisting?.(item) ? 'Edit' : 'View'} ${item.name}`}
                           aria-pressed={draft?.id === item.id}
                           onClick={() => guard(() => select(item))}
                         >
                           <span className="of-thumbnail">
                             {item.image ? (
                               <Image unoptimized width={480} height={320} src={item.image} alt="" />
-                            ) : profile.id === 'makeup' &&
+                            ) : preview && profile.id === 'makeup' &&
                               schemas[item.schemaId]?.capacity === 'calendar' ? (
                               <Image
                                 width={96}
@@ -810,10 +857,10 @@ export function OfferingsWorkspace({
                           <span>
                             <strong>{item.name}</strong>
                             <small>
-                              {schemas[item.schemaId]!.label}
-                              {item.fields.duration_minutes
+                              {isExisting?.(item) ? 'Existing catalogue entry' : schemas[item.schemaId]!.label}
+                              {!isExisting?.(item) && (item.fields.duration_minutes
                                 ? ` · ${item.fields.duration_minutes} min`
-                                : ` · ${item.unit}`}
+                                : ` · ${item.unit}`)}
                             </small>
                           </span>
                         </button>
@@ -825,7 +872,9 @@ export function OfferingsWorkspace({
                       )}
                       {columns.publication && (
                         <td>
-                          <Status value={item.publication} />
+                          <Status value={isExisting?.(item)
+                            ? item.publication === 'published' ? 'Available' : 'Unavailable'
+                            : item.publication} />
                         </td>
                       )}
                       {columns.capacity && (
@@ -881,7 +930,23 @@ export function OfferingsWorkspace({
           </div>
         </section>
         <div className="of-detail-slot">
-          {draft && configuration ? (
+          {draft && isExisting?.(draft) ? (
+            <div className="of-editor-placeholder">
+              <button
+                type="button"
+                className="of-mobile-back"
+                onClick={() => setMobileEditor(false)}
+              >
+                <ArrowLeft size={16} />
+                Back to catalogue
+              </button>
+              <h2>{draft.name}</h2>
+              {draft.description && <p>{draft.description}</p>}
+              <PriceSummary item={draft} />
+              <Status value={draft.publication === 'published' ? 'Available' : 'Unavailable'} />
+              <p>Existing catalogue entry.</p>
+            </div>
+          ) : draft && configuration ? (
             <>
               <button
                 type="button"
@@ -899,6 +964,7 @@ export function OfferingsWorkspace({
                 tab={tab}
                 setTab={setTab}
                 change={(next) => {
+                  if (readOnlyDraft) return;
                   setDraft(next);
                   setError('');
                   setIssues([]);
@@ -922,6 +988,9 @@ export function OfferingsWorkspace({
                 onDuplicate={() => create(draft.schemaId, draft)}
                 onConnections={() => guard(() => openPanel('connections'))}
                 onReload={() => guard(() => void load())}
+                setupDraftOnly={liveCatalogue}
+                readOnly={readOnlyDraft}
+                onUploadImage={onUploadImage}
               />
             </>
           ) : (
@@ -933,6 +1002,54 @@ export function OfferingsWorkspace({
           )}
         </div>
       </div>
+      </>}
+      {setupEditor && (
+        <div className="of-setup-editor">
+          {(setupActivities ?? demoContext?.subcategories ?? []).length > 1 && (
+            <label className="of-setup-activity">
+              <span>Business activity</span>
+              <select value={profile.id} onChange={(event) => {
+                const selected = event.target.value;
+                guard(() => setProfileId(selected));
+              }}>
+                {(setupActivities ?? demoContext?.subcategories ?? []).filter((activity) => profiles.some((item) => item.id === activity.id)).map((activity) => (
+                  <option key={activity.id} value={activity.id}>{activity.name}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          {!preview && offerings.length > 0 && <label className="of-setup-activity">
+            <span>Saved drafts</span>
+            <select value={draft && offerings.some((item) => item.id === draft.id) ? draft.id : ''} onChange={(event) => {
+              const item = offerings.find((entry) => entry.id === event.target.value);
+              if (item) guard(() => select(item, false));
+              else create(enabled[0] ?? profile.schema);
+            }}>
+              <option value="">New offering</option>
+              {offerings.map((item) => <option key={item.id} value={item.id}>{item.name || 'Untitled offering'}</option>)}
+            </select>
+          </label>}
+          <p className="of-setup-note">{preview ? 'Demo · Changes are saved in this browser only.' : 'Offerings are saved as drafts while your business is being set up.'}</p>
+          {notice && <p className="of-setup-notice" role="status">{notice}</p>}
+          {error && <p className="of-error" role="alert">{error}</p>}
+          {draft && configuration ? (
+            <OfferingEditor
+              item={draft} profile={profile} catalogue={offerings} configuration={configuration}
+              tab={tab} setTab={setTab}
+              change={(next) => { setDraft(next); setError(''); setIssues([]); }}
+              issues={issues} busy={busy} dirty={dirty}
+              onSave={(publication) => void save(publication)}
+              onClose={() => guard(() => onSetupClose?.())}
+              onAdd={() => enabled.length === 1 ? create(enabled[0]!) : guard(() => openPanel('add'))}
+              onDuplicate={() => create(draft.schemaId, draft)}
+              onConnections={() => guard(() => openPanel('connections'))}
+              onReload={() => guard(() => void load())}
+              setupDraftOnly={!preview}
+              onUploadImage={onUploadImage}
+            />
+          ) : loading ? <p>Loading offering editor…</p> : <button type="button" onClick={onSetupClose}>Close</button>}
+        </div>
+      )}
       <Modal
         open={panel === 'add'}
         title="Add an offering"

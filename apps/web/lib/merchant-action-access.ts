@@ -4,11 +4,18 @@ import { createClient } from './supabase/server';
 
 /** Page layouts do not authorize directly invoked server actions. */
 export async function merchantActionClient(
-  options: { access?: 'operations' | 'setup' | 'support'; merchantId?: string } = {},
+  options: { access?: 'operations' | 'setup' | 'workspace-setup' | 'support'; merchantId?: string } = {},
 ): Promise<{ client: ReturnType<typeof createClient>; merchantId: string }> {
   const me = await requireMerchant({ ...options, access: options.access === 'support' ? 'shell' : options.access });
   const client = createClient();
   return { client, merchantId: me.id };
+}
+
+export type WorkspaceSetupLoadFailure = { ok: false; message: string; unavailable?: true };
+
+/** A rolling schema upgrade can leave the older editor available while this RPC is missing. */
+export function isMissingWorkspaceSetupRpc(error: { code?: string } | null): boolean {
+  return error?.code === 'PGRST202' || error?.code === '42883';
 }
 
 /** Bind object-only RPC arguments to the already authorized current workspace. */

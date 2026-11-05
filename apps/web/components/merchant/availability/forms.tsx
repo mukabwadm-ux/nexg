@@ -122,10 +122,12 @@ export function HoursEditor({
   hours,
   onChange,
   onlyDay,
+  singleIntervalOnly = false,
 }: {
   hours: DayHours[];
   onChange: (h: DayHours[]) => void;
   onlyDay?: number;
+  singleIntervalOnly?: boolean;
 }) {
   const patch = (day: number, v: Partial<DayHours>) =>
     onChange(hours.map((h) => (h.day === day ? { ...h, ...v } : h)));
@@ -153,7 +155,7 @@ export function HoursEditor({
                 <option value="closed">Closed</option>
                 <option value="unspecified">Not set</option>
               </select>
-              {h.state === 'open' && (
+              {!singleIntervalOnly && h.state === 'open' && (
                 <button
                   className="av-icon"
                   aria-label={'Add ' + DAYS[h.day] + ' interval'}
@@ -166,7 +168,7 @@ export function HoursEditor({
                   <Plus size={17} />
                 </button>
               )}
-              <button
+              {!singleIntervalOnly && <button
                 className="av-link"
                 type="button"
                 onClick={() =>
@@ -177,7 +179,7 @@ export function HoursEditor({
                 }
               >
                 24 hours
-              </button>
+              </button>}
             </div>
             {h.state === 'open' &&
               h.intervals.map((i, n) => (
@@ -207,7 +209,7 @@ export function HoursEditor({
                       })
                     }
                   />
-                  <label className="av-check">
+                  {!singleIntervalOnly && <label className="av-check">
                     <input
                       type="checkbox"
                       checked={i.nextDay}
@@ -220,8 +222,8 @@ export function HoursEditor({
                       }
                     />
                     Ends next day
-                  </label>
-                  <button
+                  </label>}
+                  {!singleIntervalOnly && <button
                     className="av-icon"
                     aria-label={'Remove ' + DAYS[h.day] + ' interval ' + (n + 1)}
                     onClick={() =>
@@ -229,7 +231,7 @@ export function HoursEditor({
                     }
                   >
                     <Trash2 size={16} />
-                  </button>
+                  </button>}
                 </div>
               ))}
           </fieldset>

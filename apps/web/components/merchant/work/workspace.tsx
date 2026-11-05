@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { listBookingProfiles } from '@nexg/booking-config/profiles';
 import { TableViewport } from '@nexg/ui/table-viewport';
 import { ArrowLeft, Check, ChevronRight, Search, X } from 'lucide-react';
@@ -31,7 +32,17 @@ const tabs: { id: WorkTab; label: string }[] = [
   { id: 'history', label: 'History' },
 ];
 
-export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }) {
+export function WorkWorkspace({
+  source = sampleSource,
+  preview = true,
+  initialWorkflow = 'WF_ORDER',
+  initialWorkId,
+}: {
+  source?: WorkSource;
+  preview?: boolean;
+  initialWorkflow?: WorkflowId;
+  initialWorkId?: string;
+}) {
   const demoContext = useMerchantOnboardingDemoContext();
   const availableProfiles = useMemo(() => {
     if (!demoContext) return profiles;
@@ -44,9 +55,12 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
   const contextProfile = availableProfiles.find((item) => item.subcategoryId === demoContext?.profileId) ?? availableProfiles[0] ?? initialProfile;
   const [profileId, setProfileId] = useState(contextProfile.subcategoryId);
   const profile = profiles.find((p) => p.subcategoryId === profileId) ?? initialProfile;
-  const candidates = useMemo(() => candidateWorkflows(profile), [profile]);
+  const candidates = useMemo(
+    () => preview ? candidateWorkflows(profile) : (['WF_ORDER', 'WF_SCHEDULED_WORK', 'WF_BOOKING'] as const),
+    [profile, preview],
+  );
   const [workflow, setWorkflow] = useState<WorkflowId | undefined>(() =>
-    defaultWorkflow(contextProfile),
+    preview ? defaultWorkflow(contextProfile) : initialWorkflow,
   );
   const [records, setRecords] = useState<WorkRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,16 +76,17 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
   const [detailTab, setDetailTab] = useState<'activity' | 'details'>('details');
 
   useEffect(() => {
-    if (!demoContext) return;
+    if (!preview || !demoContext) return;
     setProfileId(contextProfile.subcategoryId);
     setWorkflow(defaultWorkflow(contextProfile));
     setTab('progress');
-  }, [demoContext, contextProfile]);
+  }, [demoContext, contextProfile, preview]);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError('');
+    setRecords([]);
     setSelectedId(null);
     setNotice('');
     if (!workflow) {
@@ -86,11 +101,21 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
       .then((items) => {
         if (active) {
           setRecords(items);
-          setSelectedId(items.find((item) => inTab(item, 'progress'))?.id ?? null);
+          const linked = workflow === initialWorkflow
+            ? items.find((item) => item.id === initialWorkId)
+            : undefined;
+          const selected = linked ?? items.find((item) => inTab(item, 'progress')) ??
+            (!preview ? items[0] : undefined);
+          setSelectedId(selected?.id ?? null);
+          if (linked || (!preview && selected && !inTab(selected, 'progress')))
+            setTab(tabs.find(({ id }) => selected && inTab(selected, id))?.id ?? 'progress');
+          if (linked) {
+            setMobileDetail(true);
+          }
         }
       })
-      .catch(() => {
-        if (active) setError('Work could not be loaded. Try again.');
+      .catch((failure: unknown) => {
+        if (active) setError(failure instanceof Error ? failure.message : 'Work could not be loaded. Try again.');
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -98,18 +123,22 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
     return () => {
       active = false;
     };
-  }, [workflow, profile, source, reload]);
+  }, [workflow, profile, source, reload, initialWorkflow, initialWorkId, preview]);
 
   const filtered = records.filter(
     (record) =>
       inTab(record, tab) &&
       (operator === 'all' || record.operator === operator) &&
-      `${record.id} ${record.customer} ${record.item} ${record.context}`
+      `${record.reference ?? record.id} ${record.customer} ${record.item} ${record.context}`
         .toLowerCase()
         .includes(search.toLowerCase().trim()),
   );
   const selected = filtered.find((record) => record.id === selectedId);
-  const template = workflow ? templates[workflow] : undefined;
+  const template = workflow
+    ? !preview && workflow === 'WF_ORDER'
+      ? { ...templates[workflow], contextLabel: 'Location', milestoneLabel: 'Time' }
+      : templates[workflow]
+    : undefined;
   const counts = Object.fromEntries(
     tabs.map(({ id }) => [id, records.filter((record) => inTab(record, id)).length]),
   ) as Record<WorkTab, number>;
@@ -145,15 +174,18 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
     setDetailTab(next);
     document.getElementById(`work-tab-${next}`)?.focus();
   }
-  async function advance() {
-    if (!selected?.nextAction || pending) return;
+  async function advance(action = selected?.nextAction) {
+    if (!selected || !action || pending) return;
+    if (action.id === 'cancelled' && !window.confirm('Cancel this booking?')) return;
     setPending(true);
     setNotice('');
     try {
-      const updated = await source.advance(selected, selected.nextAction.id);
+      const updated = await source.advance(selected, action.id);
       setRecords((current) => current.map((item) => (item.id === updated.id ? updated : item)));
       setNotice(
-        `Preview updated: ${templates[updated.workflowId].stages[updated.stage]}. Changes are not saved.`,
+        preview
+          ? `Preview updated: ${templates[updated.workflowId].stages[updated.stage]}. Changes are not saved.`
+          : `Booking updated: ${updated.statusLabel}.`,
       );
       if (!inTab(updated, tab)) {
         setTab(
@@ -165,8 +197,8 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
         );
         setMobileDetail(false);
       }
-    } catch {
-      setNotice('The preview action could not be completed. Try again.');
+    } catch (failure) {
+      setNotice(failure instanceof Error ? failure.message : 'The action could not be completed. Try again.');
     } finally {
       setPending(false);
     }
@@ -194,7 +226,7 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                 <h1 className="text-[28px] font-bold tracking-tight">Work</h1>
                 <p className="mt-1 text-sm text-[#626675]">{template.label}</p>
               </div>
-              <details className="relative">
+              {preview ? <details className="relative">
                 <summary className="cursor-pointer rounded-md border border-[#e1d7c3] bg-white px-3 py-2 text-xs font-semibold text-[#805c1d]">
                   Choose sample specialty
                 </summary>
@@ -238,7 +270,22 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                     </select>
                   </label>
                 </div>
-              </details>
+              </details> : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold">
+                    Work type
+                    <select value={workflow} disabled={pending} onChange={(event) => changeWorkflow(event.target.value)}
+                      className="rounded-md border border-[#dedfdf] bg-white px-3 py-2">
+                      {candidates.map((id) => <option key={id} value={id}>{templates[id].label}</option>)}
+                    </select>
+                  </label>
+                  <button type="button" disabled={loading || pending}
+                    className="rounded-md border border-[#dedfdf] bg-white px-3 py-2 text-sm font-semibold"
+                    onClick={() => setReload((value) => value + 1)}>
+                    Refresh
+                  </button>
+                </div>
+              )}
             </div>
             <div
               role="tablist"
@@ -295,7 +342,7 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
             </div>
             {loading ? (
               <p role="status" className="rounded-lg bg-white p-6 text-sm text-[#5e6b79]">
-                Loading sample work…
+                {preview ? 'Loading sample work…' : 'Loading work…'}
               </p>
             ) : error ? (
               <div role="alert" className="rounded-lg bg-white p-6 text-sm">
@@ -313,7 +360,7 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                 <p className="mt-2 text-sm text-[#667384]">
                   {search || operator !== 'all'
                     ? 'Try another search or operator.'
-                    : `There are no sample ${template.label.toLowerCase()} in this view.`}
+                    : `There are no ${preview ? 'sample ' : ''}${template.label.toLowerCase()} in this view.`}
                 </p>
               </div>
             ) : (
@@ -347,9 +394,9 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                   >
                     <span
                       className="min-w-0 truncate text-xs"
-                      title={`${record.id} · ${record.customer}`}
+                      title={`${record.reference ?? record.id} · ${record.customer}`}
                     >
-                      <strong>{record.id}</strong>
+                      <strong>{record.reference ?? record.id}</strong>
                       <span className="ml-1.5 text-[#667384]">{record.customer}</span>
                     </span>
                     <span className="hidden min-w-0 truncate text-xs md:block" title={record.item}>
@@ -366,7 +413,7 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                     </span>
                     <span className="flex items-center gap-2">
                       <span className="rounded-md bg-[#e4f0fa] px-2 py-0.5 text-xs font-semibold text-[#23669b]">
-                        {template.stages[record.stage]}
+                        {record.statusLabel ?? template.stages[record.stage]}
                       </span>
                       <ChevronRight size={16} className="text-[#6d7885] md:hidden" />
                     </span>
@@ -381,8 +428,8 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
             {!loading && !error && (
               <p className="mt-3 text-xs text-[#75808c]">
                 {filtered.length}{' '}
-                {filtered.length === 1 ? template.singular : template.label.toLowerCase()} · sample
-                records
+                {filtered.length === 1 ? template.singular : template.label.toLowerCase()}{preview ? ' · sample' : ''}
+                {' '}records
               </p>
             )}
           </main>
@@ -401,9 +448,9 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                       <ArrowLeft size={16} /> Back to work
                     </button>
                     <div className="of-title-row">
-                      <h2>{selected.id}</h2>
+                      <h2>{selected.reference ?? selected.id}</h2>
                       <span className="rounded-full bg-[#e4f0fa] px-2 py-1 text-xs font-semibold text-[#23669b]">
-                        {template.stages[selected.stage]}
+                        {selected.statusLabel ?? template.stages[selected.stage]}
                       </span>
                     </div>
                     <p>{selected.customer} · Sample record</p>
@@ -467,7 +514,7 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                         <Check size={16} className="mt-0.5 shrink-0 text-[#92712f]" />{' '}
                         {selected.confirmation}
                       </p>
-                      <WorkSteps stages={template.stages} current={selected.stage} />
+                      {preview && <WorkSteps stages={template.stages} current={selected.stage} />}
                       <h3 className="border-b border-[#e8e7e4] pb-2 text-base font-bold">
                         {template.itemLabel}
                         {selected.lines ? ` (${selected.lines.length})` : ''}
@@ -518,7 +565,7 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                   ) : (
                     <div>
                       <h3 className="text-base font-semibold">Activity history</h3>
-                      <p className="mt-1 text-xs text-[#72808e]">Sample events for this record</p>
+                      <p className="mt-1 text-xs text-[#72808e]">{preview ? 'Sample events for this record' : 'Recorded events'}</p>
                       <ol className="mt-4 space-y-3">
                         {selected.history.map((entry, index) => (
                           <li key={`${entry}-${index}`} className="flex gap-3 text-sm">
@@ -534,27 +581,37 @@ export function WorkWorkspace({ source = sampleSource }: { source?: WorkSource }
                 </div>
                 <div className="of-editor-footer" style={{ padding: '8px 14px' }}>
                   <div className="w-full">
-                    <p className="mb-2 text-xs text-[#72808e]">{selected.sourceLabel} · sample</p>
+                    <p className="mb-2 text-xs text-[#72808e]">{selected.sourceLabel}{preview ? ' · sample' : ''}</p>
                     {selected.readOnly ? (
                       <p className="rounded-md bg-[#f2f4f5] p-3 text-sm">
                         This record is read-only in this workspace.
                       </p>
+                    ) : selected.manageHref ? (
+                      <Link href={selected.manageHref}
+                        className="inline-flex rounded-md bg-[#b58a38] px-4 py-2 text-sm font-bold text-white">
+                        Manage booking
+                      </Link>
                     ) : selected.nextAction ? (
                       <button
                         type="button"
                         disabled={pending}
-                        onClick={advance}
+                        onClick={() => void advance()}
                         className="w-full rounded-md bg-[#d4a72c] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
                       >
-                        {pending ? 'Updating preview…' : selected.nextAction.label}
+                        {pending ? (preview ? 'Updating preview…' : 'Saving…') : selected.nextAction.label}
                       </button>
                     ) : (
                       <p className="rounded-md bg-[#edf5ee] p-3 text-sm font-semibold text-[#397348]">
                         {selected.stage >= template.stages.length - 1
-                          ? 'This sample work is complete.'
-                          : 'No action is available in this preview.'}
+                          ? (preview ? 'This sample work is complete.' : 'This record is closed.')
+                          : (preview ? 'No action is available in this preview.' : 'No primary action is available for this record.')}
                       </p>
                     )}
+                    {selected.additionalActions?.map((action) => (
+                      <button key={action.id} type="button" disabled={pending}
+                        className="mr-2 mt-2 rounded-md border px-3 py-2 text-sm font-semibold"
+                        onClick={() => void advance(action)}>{action.label}</button>
+                    ))}
                     {notice && (
                       <p role="status" className="mt-3 text-sm text-[#536779]">
                         {notice}

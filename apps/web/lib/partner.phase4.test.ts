@@ -25,7 +25,7 @@ beforeEach(() => {
 });
 
 describe('merchant page entry', () => {
-  it.each([undefined, 'operations', 'setup', 'shell'] as const)('keeps rejected applications outside %s and gives a decision recovery route', async access => {
+  it.each([undefined, 'operations', 'setup', 'workspace-setup', 'shell'] as const)('keeps rejected applications outside %s and gives a decision recovery route', async access => {
     state.access = { state: 'rejected', setup: false, operations: false, expires_at: expiry };
     await expect(requireMerchant({ access })).rejects.toThrow('redirect:/merchants/decision');
     expect(state.reads).toEqual(['merchant_user']);
@@ -43,6 +43,7 @@ describe('merchant page entry', () => {
   });
   it('allows pending owner draft setup while the default operational entry redirects', async () => {
     await expect(requireMerchant({ access: 'setup' })).resolves.toMatchObject({ id: 'merchant-1', userId: 'user-1', access: { operations: false } });
+    await expect(requireMerchant({ access: 'workspace-setup' })).resolves.toMatchObject({ id: 'merchant-1', userId: 'user-1', access: { operations: false } });
     await expect(requireMerchant()).rejects.toThrow('redirect:/merchant');
     expect(state.reads.filter(table => table !== 'merchant_user' && table !== 'merchant')).toEqual([]);
   });
@@ -56,10 +57,23 @@ describe('merchant page entry', () => {
       revision: 2, needs_resubmission: false, expires_at: expiry };
     await expect(requireMerchant({ access: 'shell' })).resolves.toMatchObject({ id: 'merchant-1' });
     await expect(requireMerchant({ access: 'setup' })).rejects.toMatchObject({ status: 403 });
+    await expect(requireMerchant({ access: 'workspace-setup' })).rejects.toMatchObject({ status: 403 });
   });
-  it('denies a live new-flow business at the draft editor entry', async () => {
+  it('lets an approved live owner edit workspace setup drafts while preserving the old setup restriction', async () => {
     state.status = 'live';
+    state.access = { state: 'approved', setup: true, operations: true, review_state: 'approved',
+      revision: 2, needs_resubmission: false, expires_at: expiry };
     await expect(requireMerchant({ access: 'setup' })).rejects.toMatchObject({ status: 403 });
+    await expect(requireMerchant({ access: 'workspace-setup' })).resolves.toMatchObject({
+      id: 'merchant-1', userId: 'user-1', access: { state: 'approved', setup: true },
+    });
+    state.access = { state: 'approved', setup: false, operations: true, review_state: 'approved',
+      revision: 2, needs_resubmission: false, expires_at: expiry };
+    await expect(requireMerchant({ access: 'workspace-setup' })).rejects.toMatchObject({ status: 403 });
+  });
+  it.each(['paused', 'delisted', 'rejected'])('keeps a %s business outside setup even with a stale setup permission', async status => {
+    state.status = status;
+    await expect(requireMerchant({ access: 'workspace-setup' })).rejects.toMatchObject({ status: 403 });
   });
   it('fails closed on unknown permissions, removed membership and a supplied foreign tenant', async () => {
     state.accessError = { message: 'Unavailable' };

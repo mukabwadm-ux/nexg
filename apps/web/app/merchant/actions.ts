@@ -170,7 +170,7 @@ export async function requestFeatured(input: {
     p_weeks: input.weeks,
     p_note: input.note || undefined,
   });
-  return unwrap(data, error, ['/merchant', '/merchant/featured']);
+  return unwrap(data, error, ['/merchant', '/merchant/featured', '/merchant/promotions']);
 }
 
 export async function withdrawFeatured(bookingId: string): Promise<Outcome> {
@@ -179,7 +179,7 @@ export async function withdrawFeatured(bookingId: string): Promise<Outcome> {
   const { data, error } = await client.rpc('rpc_merchant_withdraw_featured', {
     p_booking_id: bookingId,
   });
-  return unwrap(data, error, ['/merchant', '/merchant/featured']);
+  return unwrap(data, error, ['/merchant', '/merchant/featured', '/merchant/promotions']);
 }
 
 // ──────────────────────────────────────────────────── messages

@@ -448,7 +448,7 @@ export function fitsHours(hours: DayHours[], start: string, end: string): boolea
       spans.push({ start: dateAdd(week, -1) + 'T' + i.start, end: week + 'T' + i.end });
   return spans.some((i) => stamp(start) >= stamp(i.start) && stamp(end) <= stamp(i.end));
 }
-export function hoursForDate(s: Snapshot, date: string): DayHours[] {
+export function hoursForDate(s: Pick<Snapshot, 'scheduleVersions' | 'baseHours' | 'hours'>, date: string): DayHours[] {
   const version = [...(s.scheduleVersions ?? [])]
     .reverse()
     .filter((v) => v.effectiveFrom <= date)
@@ -475,7 +475,9 @@ export function fitsSchedule(s: Snapshot, start: string, end: string): boolean {
   }
   return fitsHours(h, start, end);
 }
-export function effectiveIntervals(s: Snapshot, date: string): Interval[] {
+export type HoursSchedule = Pick<Snapshot, 'hours' | 'baseHours' | 'scheduleVersions' | 'dateHours' | 'events'>;
+
+export function effectiveIntervals(s: HoursSchedule, date: string): Interval[] {
   const index = (new Date(date + 'T12:00Z').getUTCDay() + 6) % 7;
   const day = s.dateHours?.[date] ?? hoursForDate(s, date)[index];
   if (!day || day.state !== 'open') return [];
@@ -879,7 +881,7 @@ export function expandProposal(p: Proposal): { start: string; end: string }[] {
   }
   return dates;
 }
-export function activeEvents(s: Snapshot) {
+export function activeEvents(s: Pick<Snapshot, 'events'>) {
   return s.events.filter((e) => e.status !== 'tentative' && e.status !== 'completed');
 }
 export function poolUsage(s: Snapshot, id: string, start?: string, end?: string) {

@@ -127,6 +127,7 @@ const locationSchema = z.object({
   contact: z.string().max(100),
   activityIds: z.array(z.string()),
   published: z.boolean(),
+  liveStatus: z.enum(['On file', 'Closed', 'Paused']).optional(),
   commitments: z.number().int().min(0),
   coverage: z.string().max(2000),
 });
@@ -136,6 +137,8 @@ const memberSchema = z.object({
   email: z.string().email(),
   role: z.enum([
     'Owner',
+    'Manager',
+    'Cashier',
     'Supervisor',
     'Service provider',
     'Location manager',
