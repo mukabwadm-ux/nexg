@@ -51528,6 +51528,7 @@ export type Database = {
         Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
         Returns: Json;
       };
+      rpc_merchant_document_readiness: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_go_live: {
         Args: { p_merchant_id: string; p_reason?: string };
         Returns: {
