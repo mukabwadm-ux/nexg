@@ -1,6 +1,7 @@
 import { Button, Card } from '@nexg/ui';
 import { ArrowRight, Check, QrCode } from 'lucide-react';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { HostRegisterCard } from '@/components/hosts/host-register-card';
@@ -9,6 +10,7 @@ import { TailorForm } from '@/components/stays/tailor-form';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
+import sunset from '@/public/images/hero/stay-sunset.jpg';
 
 export const metadata: Metadata = {
   title: 'List your Airbnb',
@@ -167,36 +169,47 @@ export default async function HostsPage() {
 
       <main id="main">
         {/* ───────────────────────────────────────────── hero */}
-        <section className="mx-auto grid max-w-[96rem] gap-10 px-4 pb-16 pt-10 sm:px-8 lg:grid-cols-[1fr_32rem] lg:items-center lg:gap-12 lg:px-16 lg:pt-16">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-[#DDD8CC] bg-white px-3 py-1.5 text-[0.6875rem] font-extrabold">
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#D4A72C]" />
+        {/* Design B · "Cream Editorial": copy on the left, an arched
+            photograph with the dark "your unit" card over its lower half
+            on the right. Copy, links and the card's placeholders are
+            unchanged from the previous hero. */}
+        <section className="mx-auto grid max-w-[96rem] gap-12 px-4 pb-16 pt-10 sm:px-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center lg:gap-10 lg:px-10 lg:pt-16 xl:grid-cols-[minmax(0,700px)_500px] xl:justify-between xl:gap-12 xl:px-16">
+          <div className="min-w-0">
+            <p className="inline-flex items-center gap-2 rounded-full border border-[#E3DCC9] bg-white px-3.5 py-2 text-[0.78125rem] font-bold leading-tight">
+              <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-[#D4A72C]" />
               For Airbnb &amp; short-stay hosts · Free to join
             </p>
 
-            <h1 className="mt-5 text-[2.5rem] font-extrabold leading-[1.08] tracking-[-0.02em] sm:text-[3.25rem]">
-              Give your guests a <span className="text-[#B8901F]">concierge</span>. Without hiring
-              one.
+            <h1 className="text-ink mt-6 max-w-[700px] text-[2.5rem] font-extrabold leading-[1.04] tracking-[-0.03em] sm:text-[3.25rem] xl:text-[4.25rem]">
+              Give your guests a{' '}
+              <span className="bg-[linear-gradient(transparent_62%,#F2C94C_62%,#F2C94C_92%,transparent_92%)] box-decoration-clone">
+                concierge.
+              </span>{' '}
+              Without hiring one.
             </h1>
 
-            <p className="mt-5 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8] text-[#5B5B5B]">
+            <p className="mt-6 max-w-[600px] text-[1.0625rem] font-medium leading-[1.65] text-[#4A4436] sm:text-[1.125rem]">
               Your guests land at midnight needing food, a charger, laundry or a ride to the
               airport. NexG handles it — delivered to your door with your access rules — and you get
               the 5-star review.
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild>
-                <Link href="#list">
-                  List Your Airbnb <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="#how">See how it works</Link>
-              </Button>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                href="#list"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#141414] px-7 py-[17px] text-base font-bold leading-none text-white transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#141414] motion-reduce:transition-none"
+              >
+                List Your Airbnb <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="#how"
+                className="text-ink inline-flex items-center justify-center rounded-full border border-[#E1D9C6] bg-white px-7 py-[17px] text-base font-bold leading-none transition-colors hover:border-[#141414] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#141414] motion-reduce:transition-none"
+              >
+                See how it works
+              </Link>
             </div>
 
-            <dl className="mt-9 flex flex-wrap gap-x-10 gap-y-4">
+            <dl className="mt-10 grid grid-cols-3 gap-4 sm:flex sm:flex-wrap sm:gap-x-11 sm:gap-y-5 lg:gap-x-8 xl:gap-x-11">
               <Stat value="KES 0" label="to list · guests pay per order" />
               <Stat value="10 min" label="to set up a unit" />
               <Stat
@@ -206,7 +219,7 @@ export default async function HostsPage() {
             </dl>
           </div>
 
-          <PhoneMock />
+          <HeroVisual />
         </section>
 
         {/* ──────────────────────────────────────── why hosts list */}
@@ -518,9 +531,13 @@ export default async function HostsPage() {
  */
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div>
-      <dt className="text-[1.5rem] font-extrabold tracking-tight">{value}</dt>
-      <dd className="mt-0.5 text-[0.6875rem] font-semibold text-[#8A8A8A]">
+    <div className="min-w-0">
+      <dt className="text-ink text-[1.375rem] font-extrabold leading-tight tracking-tight sm:text-[1.75rem]">
+        {value}
+      </dt>
+      {/* #6B6453 rather than the reference's #7A7260, which is 4.3:1 on
+          the cream ground; this is 5.3:1. */}
+      <dd className="mt-1 text-[0.78125rem] font-semibold leading-snug text-[#6B6453]">
         {label.replace('&amp;', '&')}
       </dd>
     </div>
@@ -528,51 +545,69 @@ function Stat({ value, label }: { value: string; label: string }) {
 }
 
 /**
- * The dark hero mock. Decorative — every number in it is a placeholder,
- * and the review quote says so rather than inventing a happy host.
+ * The arched sunset photograph with the dark "your unit" card laid over
+ * its lower part. Both are decorative: the photo has an empty alt and the
+ * card is aria-hidden — every value in it is a placeholder, and the
+ * review quote says so rather than inventing a happy host.
+ *
+ * The card sits in normal flow with a negative top margin (not absolute),
+ * so it can never be clipped and the column grows to fit it.
  */
-function PhoneMock() {
+function HeroVisual() {
   return (
-    <div
-      aria-hidden="true"
-      className="overflow-hidden rounded-2xl border border-[#2A2A2A] bg-[#141414] p-4"
-    >
-      <div className="rounded-xl bg-[#1E1E1E] p-3">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4A72C]">
-            <QrCode className="h-4 w-4 text-[#141414]" />
+    <div className="mx-auto w-full max-w-[420px] lg:mx-0 lg:max-w-[400px] lg:justify-self-end xl:max-w-[500px]">
+      <div className="relative h-[280px] overflow-hidden rounded-b-[28px] rounded-t-[min(calc(50vw_-_16px),210px)] shadow-[0_30px_60px_rgba(60,40,10,0.25)] sm:h-[470px] sm:rounded-t-[210px] lg:h-[448px] lg:rounded-t-[200px] xl:h-[560px] xl:rounded-t-[250px]">
+        <Image
+          src={sunset}
+          alt=""
+          fill
+          priority
+          placeholder="blur"
+          sizes="(min-width: 1280px) 500px, (min-width: 1024px) 400px, 420px"
+          className="object-cover"
+        />
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="relative z-10 -mt-6 rounded-[24px] bg-[#141311] p-4 shadow-[0_30px_70px_rgba(0,0,0,0.35)] sm:-mt-[194px] lg:-mt-[184px] xl:-mt-[230px]"
+      >
+        <div className="flex items-center gap-3 rounded-2xl bg-[#222120] p-3.5">
+          <span className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[#D4A72C]">
+            <QrCode className="h-5 w-5 text-[#141414]" />
           </span>
-          <span>
-            <span className="block text-[0.75rem] font-extrabold text-white">
+          <span className="min-w-0">
+            <span className="block text-[0.875rem] font-extrabold leading-snug text-white">
               Your unit&rsquo;s QR · [Apartment 4B, Kilimani]
             </span>
-            <span className="block text-[0.625rem] font-semibold text-[#8A8A8A]">
+            <span className="mt-0.5 block text-[0.78125rem] font-semibold leading-snug text-[#A8A39A]">
               Guest scans → unit, gate code and hand-off rule pre-filled
             </span>
           </span>
         </div>
-      </div>
 
-      <div className="mt-3 rounded-xl bg-[#0E0E0E] p-3">
-        <p className="text-[0.5625rem] font-extrabold uppercase tracking-[0.12em] text-[#8A8A8A]">
-          Tonight · your guests
-        </p>
-        <p className="mt-2 text-[0.6875rem] font-semibold text-[#DADADA]">
-          23:14 · Dinner to 4B · delivered · left with askari as per your rule
-        </p>
-        <p className="mt-1 text-[0.6875rem] font-semibold text-[#DADADA]">
-          06:10 · Airport transfer from 4B · booked for Thursday
-        </p>
-      </div>
+        <div className="mt-3 rounded-2xl bg-[#0C0B0A] p-4">
+          <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#9C978E]">
+            Tonight · your guests
+          </p>
+          <p className="mt-2.5 text-[0.8125rem] font-semibold leading-snug text-[#DADADA]">
+            23:14 · Dinner to 4B · delivered · left with askari as per your rule
+          </p>
+          <p className="mt-1.5 text-[0.8125rem] font-semibold leading-snug text-[#DADADA]">
+            06:10 · Airport transfer from 4B · booked for Thursday
+          </p>
+        </div>
 
-      <div className="mt-3 rounded-xl bg-[#D4A72C] p-3">
-        <p className="text-[0.5625rem] font-extrabold uppercase tracking-[0.12em] text-[#5B4708]">
-          What guests say
-        </p>
-        <p className="mt-1.5 text-[0.6875rem] font-bold leading-relaxed text-[#141414]">
-          &ldquo;Host had a concierge service set up — ordered breakfast at 7 and it was at the gate
-          by 7:30.&rdquo; — [Review placeholder]
-        </p>
+        <div className="mt-3 rounded-2xl bg-[#D4A72C] p-4">
+          {/* #3D2F05 (5.8:1 on the gold) replaces #5B4708, which was 4:1. */}
+          <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#3D2F05]">
+            What guests say
+          </p>
+          <p className="mt-2 text-[0.84375rem] font-bold leading-relaxed text-[#141414]">
+            &ldquo;Host had a concierge service set up — ordered breakfast at 7 and it was at the
+            gate by 7:30.&rdquo; — [Review placeholder]
+          </p>
+        </div>
       </div>
     </div>
   );
