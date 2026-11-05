@@ -12,7 +12,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(13);
+select plan(14);
 
 create temp table p (k text primary key, g extensions.geography);
 insert into p (k, g) values
@@ -106,11 +106,24 @@ select is(
   false,
   '25 km is past the 15 km maximum and is refused rather than priced.');
 
-select is(
-  (public.fn_price_order((select id from public.city where slug = 'nairobi'),
-     'restaurant', 100000, 4::smallint) -> 'missing') ? 'fees.delivery.band_4',
-  true,
-  'Band 4 prices from its own fee, and an unset one stops the order rather than charging nothing.');
+/* Set a distinct Band 4 fee, then exercise pricing without a published fee. */
+delete from settings.version where key = 'fees.delivery.band_4';
+update settings.definition set default_value = null where key = 'fees.delivery.band_4';
+insert into settings.version (key, scope_kind, scope_city_id, value, status, effective_from, activated_at)
+select 'fees.delivery.band_4', 'city', id, '431'::jsonb, 'active', now(), now()
+  from public.city where slug = 'nairobi';
+
+select ok(
+  public.fn_price_order((select id from public.city where slug = 'nairobi'),
+     'restaurant', 100000, 4::smallint) @> '{"ok": true, "delivery_fee_cents": 43100}'::jsonb,
+  'Band 4 prices from its own published fee.');
+
+delete from settings.version where key = 'fees.delivery.band_4';
+
+select ok(
+  public.fn_price_order((select id from public.city where slug = 'nairobi'),
+     'restaurant', 100000, 4::smallint) @> '{"ok": false, "missing": ["fees.delivery.band_4"]}'::jsonb,
+  'An unset Band 4 fee stops pricing rather than charging nothing.');
 
 select * from finish();
 rollback;

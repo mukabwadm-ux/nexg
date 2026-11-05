@@ -31,8 +31,11 @@ export function ApplicationSessionBootstrap() {
     }
   }
 
+  // Runs once on mount; the ref keeps the latest `start` without re-running.
+  const startOnMount = useRef(start);
+  startOnMount.current = start;
   useEffect(() => {
-    void start();
+    void startOnMount.current();
   }, []);
 
   return (

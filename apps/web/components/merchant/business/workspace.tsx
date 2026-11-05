@@ -93,10 +93,12 @@ export function BusinessWorkspace({
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [reload, setReload] = useState(0);
+  const demoProfileId = activeDemo?.profileId;
+  const demoBusinessName = activeDemo?.businessName;
   useEffect(() => {
-    if (!demoContext && activeDemo && category(activeDemo.profileId))
-      setProfileId(activeDemo.profileId);
-  }, [demoContext, activeDemo?.profileId]);
+    if (!demoContext && demoProfileId && category(demoProfileId))
+      setProfileId(demoProfileId);
+  }, [demoContext, demoProfileId]);
   const [locationScope, setLocationScope] = useState('all');
   const source = useMemo(
     () =>
@@ -144,7 +146,7 @@ export function BusinessWorkspace({
         } catch {
           setNotice('Browser drafts are unavailable. Confirmed sample data is still displayed.');
         }
-        setProfileDraft({ ...(restored ?? value.profile), ...(activeDemo ? { name: activeDemo.businessName } : {}) });
+        setProfileDraft({ ...(restored ?? value.profile), ...(demoBusinessName !== undefined ? { name: demoBusinessName } : {}) });
         if (restored) setNotice('Recovered your unsaved public-profile draft.');
       })
       .catch((e) => {
@@ -156,7 +158,7 @@ export function BusinessWorkspace({
     return () => {
       active = false;
     };
-  }, [profileId, source, reload, activeDemo?.businessName]);
+  }, [profileId, source, reload, demoBusinessName]);
   const showPreview = useCallback((title: string, description: string) => {
     setPreview({ title, description });
     setDialog('preview');

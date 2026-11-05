@@ -26,9 +26,13 @@ const contextKeys = [
   'contactName',
 ] as const;
 
+// Stripping control characters is the point of this pattern.
+// eslint-disable-next-line no-control-regex
+const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/g;
+
 const cleanText = (value: unknown, maxLength: number): string =>
   typeof value === 'string'
-    ? value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, maxLength)
+    ? value.replace(CONTROL_CHARACTERS, '').trim().slice(0, maxLength)
     : '';
 
 const cleanId = (value: unknown): string => {

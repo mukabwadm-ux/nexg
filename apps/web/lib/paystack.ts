@@ -196,15 +196,3 @@ export function signatureValid(rawBody: string, signature: string | null): boole
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
 }
-
-/**
- * A stable name for one delivery of one event.
- *
- * Paystack sends no event id and retries on any non-200, so
- * without this a retry would be processed as a second payment.
- * The digest covers the whole body, so a genuine second event —
- * a refund after a charge, say — hashes differently.
- */
-export function dedupeKey(rawBody: string): string {
-  return crypto.createHash('sha256').update(rawBody, 'utf8').digest('hex');
-}

@@ -28,6 +28,7 @@ describe('admin review with actual production PostgreSQL RPCs', () => {
         rpc_merchant_application_review_detail: ['p_merchant_id'],
         rpc_merchant_application_review_lookup: ['p_merchant_id'],
       };
+      // eslint-disable-next-line no-inner-declarations -- test helper closes over the per-test database
       async function readRpc(actor: Actor, name: string, args: Record<string, unknown>): Promise<ReviewRpcResult> {
         const keys = readArguments[name];
         if (!keys || Object.keys(args).some(key => !keys.includes(key))) throw new Error('Read outside Phase 6 allowlist');
@@ -43,11 +44,13 @@ describe('admin review with actual production PostgreSQL RPCs', () => {
         authenticate: async () => db.ids[actor === 'revokedOwner' ? 'owner' : actor]!,
         rpc: (name, args) => readRpc(actor, name, args),
       });
+      // eslint-disable-next-line no-inner-declarations -- test helper closes over the per-test database
       async function command(actor: Actor, name: string, args: Record<string, unknown>) {
         const result = await db.rpc(actor, name, args);
         expect(result.error, JSON.stringify(result.error)).toBeNull();
         return MerchantApplicationRecord.parse(result.data);
       }
+      // eslint-disable-next-line no-inner-declarations -- test helper closes over the per-test database
       async function start(name: string, email: string, actor: Actor = 'owner') {
         const started = await command(actor, 'rpc_merchant_application_start', {
           p_operation_id: randomUUID(), p_payload: reviewCapture(name, email), p_merchant_id: null,
@@ -56,6 +59,7 @@ describe('admin review with actual production PostgreSQL RPCs', () => {
           p_merchant_id: started.merchant_id, p_expected_revision: 1, p_operation_id: randomUUID(),
         });
       }
+      // eslint-disable-next-line no-inner-declarations -- test helper closes over the per-test database
       async function post(merchantId: string, revision: number, decision: string, reason = '', operationId = randomUUID(), loseReply = false) {
         const handler = merchantApplicationReviewHandler({ authenticate: async () => db.ids.staff!,
           rpc: async (name, args, signal) => {

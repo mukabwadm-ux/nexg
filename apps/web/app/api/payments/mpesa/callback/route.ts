@@ -3,20 +3,20 @@ import { NextResponse } from 'next/server';
 import { callbackSecretValid } from '@/lib/daraja';
 import { createPublicClient } from '@/lib/supabase/public';
 
-interface Item {
+type Item = {
   Name: string;
   Value?: string | number;
-}
+};
 
 /**
  * Safaricom's result callback. It is unsigned, so authenticity rests on the
- * secret token in the URL plus the database only acting on a CheckoutRequestID
- * we stored and an amount we asked for. Always answers 200 so Safaricom does
- * not retry what we have already recorded.
+ * secret token in the URL. The database checks that token again before
+ * looking up the recorded CheckoutRequestID and verifying the amount.
  */
 export async function POST(request: Request) {
-  const ok = callbackSecretValid(new URL(request.url).searchParams.get('token'));
+  const token = new URL(request.url).searchParams.get('token');
   const accepted = NextResponse.json({ ResultCode: 0, ResultDesc: 'Accepted' });
+  if (!token || !callbackSecretValid(token)) return accepted;
 
   let body: {
     Body?: {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     return accepted;
   }
 
-  const cb = body.Body?.stkCallback;
+  const cb = body?.Body?.stkCallback;
   if (!cb?.CheckoutRequestID || typeof cb.ResultCode !== 'number') return accepted;
 
   const items = cb.CallbackMetadata?.Item ?? [];
@@ -43,20 +43,16 @@ export async function POST(request: Request) {
   const receipt = pick('MpesaReceiptNumber');
   const phone = pick('PhoneNumber');
 
-  const client = createPublicClient();
-  const { error } = (await client.rpc(
-    'rpc_payment_mpesa_callback' as never,
-    {
-      p_checkout_request_id: cb.CheckoutRequestID,
-      p_result_code: cb.ResultCode,
-      p_result_desc: cb.ResultDesc ?? '',
-      p_secret_ok: ok,
-      p_payload: body,
-      p_amount_kes: amount === undefined ? null : Number(amount),
-      p_receipt: receipt === undefined ? null : String(receipt),
-      p_phone: phone === undefined ? null : String(phone),
-    } as never,
-  )) as unknown as { error: { message: string } | null };
+  const { error } = await createPublicClient().rpc('rpc_payment_mpesa_callback', {
+    p_checkout_request_id: cb.CheckoutRequestID,
+    p_result_code: cb.ResultCode,
+    p_result_desc: cb.ResultDesc ?? '',
+    p_callback_secret: token,
+    p_payload: body,
+    p_amount_kes: amount === undefined ? undefined : Number(amount),
+    p_receipt: receipt === undefined ? undefined : String(receipt),
+    p_phone: phone === undefined ? undefined : String(phone),
+  });
 
   /* Our fault: let Safaricom retry. */
   if (error) return NextResponse.json({ ResultCode: 1, ResultDesc: 'Retry' }, { status: 500 });

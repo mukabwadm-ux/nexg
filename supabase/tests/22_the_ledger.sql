@@ -130,6 +130,10 @@ select is(ledger.from_kes(null), 0::bigint, 'And nothing is nothing, not null.')
 
 -- ════════════════════════════ 6. an order posts, and it balances
 
+delete from settings.version where key = 'tax.vat_pct';
+insert into settings.version (key, scope_kind, value, status, effective_from, activated_at)
+values ('tax.vat_pct', 'global', '16'::jsonb, 'active', now(), now());
+
 insert into public.guest (id, phone, name)
 values ('ba000000-0000-4000-8000-000000000001','+254700000931','[Guest]')
 on conflict (id) do nothing;
@@ -184,12 +188,14 @@ select is(
   'The merchant is owed the items less commission: 1,000 − 180 = 820.');
 
 select is(
-  (select sum(credit) from ledger.entry e
+  (select jsonb_build_object(
+      'revenue_cents', sum(e.credit) filter (where e.account_code like 'revenue.%'),
+      'vat_cents', sum(e.credit) filter (where e.account_code = 'tax.vat_output'))
+     from ledger.entry e
      join ledger.transaction tx on tx.id = e.transaction_id
-    where tx.order_id = 'bb000000-0000-4000-8000-000000000001'
-      and e.account_code like 'revenue.%')::bigint,
-  48000::bigint,
-  'And ours is 180 commission + 250 delivery + 50 service = 480.');
+    where tx.order_id = 'bb000000-0000-4000-8000-000000000001'),
+  '{"revenue_cents": 41379, "vat_cents": 6621}'::jsonb,
+  'The 480 shillings in commission and fees split into net revenue and 16% VAT.');
 
 select is(
   (select merchant_net_cents from public.order_money_v

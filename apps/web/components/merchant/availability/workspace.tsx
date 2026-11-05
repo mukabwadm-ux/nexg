@@ -138,10 +138,11 @@ export function AvailabilityWorkspace({
   const [profileId, setProfileId] = useState(initialProfileId ?? demoContext?.profileId ?? 'restaurant'),
     [location, setLocation] = useState<string>('Westlands');
   const profile = profiles.find((p) => p.id === profileId) ?? profiles[0]!;
+  const demoProfileId = activeDemo?.profileId;
   useEffect(() => {
-    if (!initialProfileId && activeDemo && profiles.some((item) => item.id === activeDemo.profileId))
-      setProfileId(activeDemo.profileId);
-  }, [initialProfileId, activeDemo?.profileId, profiles]);
+    if (!initialProfileId && demoProfileId && profiles.some((item) => item.id === demoProfileId))
+      setProfileId(demoProfileId);
+  }, [initialProfileId, demoProfileId, profiles]);
   const [catalogue, setCatalogue] = useState<Catalogue | null>(null),
     [offeringId, setOfferingId] = useState(''),
     [method, setMethod] = useState('');
