@@ -136,10 +136,11 @@ export function OfferingsWorkspace({
   const initialId = suppliedConfiguration?.subcategoryId ?? initialProfileId ?? demoContext?.profileId ?? 'makeup';
   const [profileId, setProfileId] = useState(initialId);
   const profile = profiles.find((p) => p.id === profileId) ?? profiles[0]!;
+  const demoProfileId = demoContext?.profileId;
   useEffect(() => {
-    if (!suppliedConfiguration && !initialProfileId && demoContext && profiles.some((item) => item.id === demoContext.profileId))
-      setProfileId(demoContext.profileId);
-  }, [suppliedConfiguration, initialProfileId, demoContext?.profileId, profiles]);
+    if (!suppliedConfiguration && !initialProfileId && demoProfileId && profiles.some((item) => item.id === demoProfileId))
+      setProfileId(demoProfileId);
+  }, [suppliedConfiguration, initialProfileId, demoProfileId, profiles]);
   const [source, setSource] = useState<OfferingsSource | null>(suppliedSource ?? null);
   const [catalogue, setCatalogue] = useState<Catalogue | null>(null);
   const [, refreshPriceTime] = useState(0);
