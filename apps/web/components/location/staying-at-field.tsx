@@ -141,6 +141,7 @@ export function StayingAtField() {
         label="Where are you staying?"
         placeholder="Hotel, apartment or address"
         leadingIcon={<MapPin className="h-4 w-4" />}
+        className="h-[46px] rounded-xl [&:not([aria-invalid=true])]:border-[#DDD6C6]"
         /*
          * Deliberately not `loading={searching}`. The shared
          * Input renders its spinner by way of
@@ -188,12 +189,12 @@ export function StayingAtField() {
       >
         {confirmed ? (
           <>
-            <span className="text-success flex items-center gap-1 text-[0.6875rem] font-extrabold">
+            <span className="text-success flex items-center gap-1 text-[0.75rem] font-extrabold">
               <Check className="h-3 w-3" aria-hidden="true" />
               From your delivery location
             </span>
             {picked?.zone ? (
-              <span className="text-muted-light text-[0.6875rem] font-semibold">
+              <span className="text-muted-light text-[0.75rem] font-semibold">
                 {picked.zone}
                 {picked.eta_min && picked.eta_max
                   ? ` · ${picked.eta_min}–${picked.eta_max} min typical`
@@ -208,7 +209,7 @@ export function StayingAtField() {
                 setPicked(null);
                 setOpen(true);
               }}
-              className="text-gold ml-auto text-[0.6875rem] font-extrabold hover:underline"
+              className="ml-auto text-[0.75rem] font-extrabold text-[#86650D] hover:underline"
             >
               Change
             </button>
@@ -222,7 +223,7 @@ export function StayingAtField() {
                 the generic hint, when the useful sentence is the
                 one saying their city was guessed. */}
             {place && (guessed || place.coverage !== 'covered') ? (
-              <span className="text-muted-light text-[0.6875rem] font-semibold">
+              <span className="text-muted-light text-[0.75rem] font-semibold">
                 {place.coverage === 'unlaunched'
                   ? `We are not live in ${place.city ?? 'that city'} yet — tell us where anyway and we will be in touch.`
                   : guessed
@@ -230,7 +231,7 @@ export function StayingAtField() {
                     : 'That spot is outside the areas we deliver to. Type another, or tell us anyway.'}
               </span>
             ) : (
-              <span className="text-muted-light text-[0.6875rem] font-semibold">
+              <span className="text-muted-light text-[0.75rem] font-semibold">
                 Type a hotel, estate or building — or use your location.
               </span>
             )}
@@ -247,7 +248,7 @@ export function StayingAtField() {
                  * to tell which is which.
                  */
                 aria-label="Use my current location to fill in where you are staying"
-                className="text-gold ml-auto flex items-center gap-1 text-[0.6875rem] font-extrabold hover:underline"
+                className="ml-auto flex items-center gap-1 text-[0.75rem] font-extrabold text-[#86650D] hover:underline"
               >
                 <Crosshair className="h-3 w-3" aria-hidden="true" />
                 {consent === 'denied' ? 'Pick on a map' : 'Use my current location'}
@@ -271,7 +272,7 @@ export function StayingAtField() {
               <button
                 type="button"
                 onClick={() => openSheet('hero-no-match')}
-                className="text-gold mt-1.5 text-[0.75rem] font-extrabold hover:underline"
+                className="mt-1.5 text-[0.75rem] font-extrabold text-[#86650D] hover:underline"
               >
                 Or drop a pin on a map
               </button>
@@ -288,7 +289,7 @@ export function StayingAtField() {
                 <span className="min-w-0">
                   <span className="block truncate text-[0.8125rem] font-extrabold">{r.label}</span>
                   {r.address_line ? (
-                    <span className="text-muted-light block truncate text-[0.6875rem] font-semibold">
+                    <span className="text-muted-light block truncate text-[0.75rem] font-semibold">
                       {r.address_line}
                     </span>
                   ) : null}
