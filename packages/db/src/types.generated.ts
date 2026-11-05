@@ -16585,6 +16585,7 @@ export type Database = {
       };
       merchant_branch: {
         Row: {
+          activity_ids: string[];
           address_text: string | null;
           closed_at: string | null;
           closed_reason: string | null;
@@ -16602,6 +16603,8 @@ export type Database = {
           paused_at: string | null;
           photos: NonNullable<Json>;
           pickup_instructions: string | null;
+          place_type: string;
+          public_contact: string | null;
           rider_phone: string | null;
           sort: number;
           source: string;
@@ -16610,6 +16613,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          activity_ids?: string[];
           address_text?: string | null;
           closed_at?: string | null;
           closed_reason?: string | null;
@@ -16627,6 +16631,8 @@ export type Database = {
           paused_at?: string | null;
           photos?: NonNullable<Json>;
           pickup_instructions?: string | null;
+          place_type?: string;
+          public_contact?: string | null;
           rider_phone?: string | null;
           sort?: number;
           source?: string;
@@ -16634,6 +16640,7 @@ export type Database = {
           zone_id?: string | null;
         };
         Update: {
+          activity_ids?: string[];
           address_text?: string | null;
           closed_at?: string | null;
           closed_reason?: string | null;
@@ -16651,6 +16658,8 @@ export type Database = {
           paused_at?: string | null;
           photos?: NonNullable<Json>;
           pickup_instructions?: string | null;
+          place_type?: string;
+          public_contact?: string | null;
           rider_phone?: string | null;
           sort?: number;
           source?: string;
@@ -17534,6 +17543,7 @@ export type Database = {
           service: string;
           sort: number;
           updated_at: string;
+          weekday_convention: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -17548,6 +17558,7 @@ export type Database = {
           service?: string;
           sort?: number;
           updated_at?: string;
+          weekday_convention?: string | null;
         };
         Update: {
           branch_id?: string | null;
@@ -17561,6 +17572,7 @@ export type Database = {
           service?: string;
           sort?: number;
           updated_at?: string;
+          weekday_convention?: string | null;
         };
         Relationships: [
           {
@@ -18474,6 +18486,151 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_setup_offering_detail: {
+        Row: {
+          data: NonNullable<Json>;
+          item_id: string;
+          merchant_id: string;
+          updated_at: string;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          data: NonNullable<Json>;
+          item_id: string;
+          merchant_id: string;
+          updated_at?: string;
+          version: number;
+        };
+        Update: {
+          data?: NonNullable<Json>;
+          item_id?: string;
+          merchant_id?: string;
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: true;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: true;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: true;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
           },
         ];
       };
@@ -48467,6 +48624,7 @@ export type Database = {
       rpc_branch_pause: {
         Args: { p_branch_id: string; p_reason: string };
         Returns: {
+          activity_ids: string[];
           address_text: string | null;
           closed_at: string | null;
           closed_reason: string | null;
@@ -48484,6 +48642,8 @@ export type Database = {
           paused_at: string | null;
           photos: NonNullable<Json>;
           pickup_instructions: string | null;
+          place_type: string;
+          public_contact: string | null;
           rider_phone: string | null;
           sort: number;
           source: string;
@@ -48500,6 +48660,7 @@ export type Database = {
       rpc_branch_photos_set: {
         Args: { p_branch_id: string; p_photos: Json };
         Returns: {
+          activity_ids: string[];
           address_text: string | null;
           closed_at: string | null;
           closed_reason: string | null;
@@ -48517,6 +48678,8 @@ export type Database = {
           paused_at: string | null;
           photos: NonNullable<Json>;
           pickup_instructions: string | null;
+          place_type: string;
+          public_contact: string | null;
           rider_phone: string | null;
           sort: number;
           source: string;
@@ -48533,6 +48696,7 @@ export type Database = {
       rpc_branch_resume: {
         Args: { p_branch_id: string };
         Returns: {
+          activity_ids: string[];
           address_text: string | null;
           closed_at: string | null;
           closed_reason: string | null;
@@ -48550,6 +48714,8 @@ export type Database = {
           paused_at: string | null;
           photos: NonNullable<Json>;
           pickup_instructions: string | null;
+          place_type: string;
+          public_contact: string | null;
           rider_phone: string | null;
           sort: number;
           source: string;
@@ -48566,6 +48732,7 @@ export type Database = {
       rpc_branch_upsert: {
         Args: { p_branch: Json; p_branch_id?: string; p_merchant_id: string };
         Returns: {
+          activity_ids: string[];
           address_text: string | null;
           closed_at: string | null;
           closed_reason: string | null;
@@ -48583,6 +48750,8 @@ export type Database = {
           paused_at: string | null;
           photos: NonNullable<Json>;
           pickup_instructions: string | null;
+          place_type: string;
+          public_contact: string | null;
           rider_phone: string | null;
           sort: number;
           source: string;
@@ -50877,6 +51046,7 @@ export type Database = {
           service: string;
           sort: number;
           updated_at: string;
+          weekday_convention: string | null;
         };
         SetofOptions: {
           from: '*';
@@ -52217,6 +52387,40 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_merchant_setup_adopt_offering: {
+        Args: {
+          p_data: Json;
+          p_expected_updated_at: string;
+          p_item_id: string;
+          p_merchant_id: string;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_setup_hours_load: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_setup_hours_save: {
+        Args: { p_days: Json; p_merchant_id: string; p_version: string };
+        Returns: Json;
+      };
+      rpc_merchant_setup_legacy_offerings: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_setup_location_save: {
+        Args: {
+          p_activity_ids: string[];
+          p_address: string;
+          p_branch_id: string;
+          p_contact: string;
+          p_expected_updated_at: string;
+          p_merchant_id: string;
+          p_name: string;
+          p_place_type: string;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_setup_locations: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_setup_offering_save: {
+        Args: { p_data: Json; p_merchant_id: string };
+        Returns: Json;
+      };
+      rpc_merchant_setup_offerings: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_soft_delete: {
         Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
         Returns: Json;

@@ -218,7 +218,7 @@ function Workspace({ routingEditor }: { routingEditor?: React.ReactNode }) {
               </button>
             ))}
             {/opening|hours/i.test(query) && (
-              <Link href={demoContext ? appendMerchantOnboardingDemoContext('/merchant-live-preview/availability', demoContext) : '/merchant/hours'}>
+              <Link href={demoContext ? appendMerchantOnboardingDemoContext('/merchant-live-preview/availability', demoContext) : '/merchant/availability'}>
                 Opening hours <small>Availability</small>
               </Link>
             )}

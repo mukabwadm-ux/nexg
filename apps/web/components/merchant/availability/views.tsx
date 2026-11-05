@@ -25,6 +25,7 @@ import {
   stamp,
   type Commitment,
   type Context,
+  type HoursSchedule,
   type Snapshot,
 } from './model';
 
@@ -34,9 +35,9 @@ export function HoursView({
   onEdit,
   onSelect,
 }: {
-  s: Snapshot;
+  s: HoursSchedule & { now: string };
   date: string;
-  onEdit: () => void;
+  onEdit?: () => void;
   onSelect: (e: Commitment) => void;
 }) {
   const week = monday(date);
@@ -44,10 +45,10 @@ export function HoursView({
     <section className="av-card">
       <div className="av-card-heading">
         <h2>Hours this week</h2>
-        <button className="av-button av-quiet" onClick={onEdit}>
+        {onEdit && <button className="av-button av-quiet" onClick={onEdit}>
           <Pencil size={15} />
           Edit hours
-        </button>
+        </button>}
       </div>
       <div className="av-table-wrap">
         <table className="av-hours">
@@ -110,13 +111,13 @@ export function HoursView({
                     )}
                   </td>
                   <td>
-                    <button
+                    {onEdit && <button
                       className="av-icon"
                       aria-label={'Edit ' + DAYS[h.day] + ' hours'}
                       onClick={onEdit}
                     >
                       <Pencil size={16} />
-                    </button>
+                    </button>}
                   </td>
                 </tr>
               );

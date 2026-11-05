@@ -25,7 +25,8 @@ import {
   Wrench,
   type LucideIcon,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
+import { ReviewReply } from '@/components/merchant/board-client';
 import { readDraft, writeDraft } from './source';
 import {
   activityIssues,
@@ -79,6 +80,8 @@ function ActivityIcon({ activity }: { activity: Pick<Activity, 'profileId' | 'mo
 export type ViewProps = {
   data: Business;
   readOnly: boolean;
+  live?: boolean;
+  liveMemberTools?: Record<string, ReactNode>;
   edit: (section: Section, id: string, value: unknown) => void;
   save: (next: Business, action: string, review?: boolean) => Promise<void>;
   message: (text: string) => void;
@@ -88,6 +91,7 @@ export type ViewProps = {
 export function ProfileView({
   data,
   readOnly,
+  live,
   draft,
   onChange,
   onSave,
@@ -98,6 +102,7 @@ export function ProfileView({
 }: {
   data: Business;
   readOnly: boolean;
+  live?: boolean;
   draft: Business['profile'];
   onChange: (value: Business['profile']) => void;
   onSave: () => void;
@@ -155,8 +160,8 @@ export function ProfileView({
         <section className="bu-card bu-profile-card">
           <div className="bu-card-heading">
             <div>
-              <h2>Public profile</h2>
-              <p>This information is shown to customers on your public profile.</p>
+              <h2>{live ? 'Business profile' : 'Public profile'}</h2>
+              <p>{live ? 'Business details currently available in your workspace.' : 'This information is shown to customers on your public profile.'}</p>
             </div>
           </div>
           <div className="bu-profile-form">
@@ -290,10 +295,10 @@ export function ProfileView({
               </div>
             </div>
             <div className="bu-profile-field">
-              <span>Customer-facing activities</span>
+              <span>{live ? 'Declared activities' : 'Customer-facing activities'}</span>
               <div>
                 {data.activities
-                  .filter((a) => a.enabled)
+                  .filter((a) => live || a.enabled)
                   .map((a) => (
                     <span className="bu-chip" key={a.id}>
                       <ActivityIcon activity={a} />
@@ -303,10 +308,10 @@ export function ProfileView({
               </div>
             </div>
             <div className="bu-profile-field">
-              <span>Locations shown</span>
+              <span>{live ? 'Locations on file' : 'Locations shown'}</span>
               <div>
                 {data.locations
-                  .filter((l) => l.published)
+                  .filter((l) => live || l.published)
                   .map((l) => (
                     <span className="bu-chip" key={l.id}>
                       <MapPin />
@@ -326,13 +331,13 @@ export function ProfileView({
               <p className="bu-small">Changes to registered business details require a review.</p>
             </div>
           </div>
-          <Button soft disabled={readOnly} onClick={() => request('Registered identity change')}>
+          {!live && <Button soft disabled={readOnly} onClick={() => request('Registered identity change')}>
             Request change
-          </Button>
+          </Button>}
         </section>
-        <Note>Public profile changes do not alter active bookings.</Note>
+        {!live && <Note>Public profile changes do not alter active bookings.</Note>}
       </div>
-      <div className="bu-profile-right">
+      {!live && <div className="bu-profile-right">
         <aside className="bu-card">
           <div className="bu-card-heading">
             <div>
@@ -412,7 +417,7 @@ export function ProfileView({
             Save profile
           </Button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
@@ -437,12 +442,12 @@ export function ActivitiesView(p: ViewProps) {
           <div className="bu-card-heading">
             <div>
               <h2>Your activities</h2>
-              <p>Manage the different ways you serve customers.</p>
+              <p>{p.live ? 'Activities recorded in your merchant registration.' : 'Manage the different ways you serve customers.'}</p>
             </div>
-            <Button primary disabled={readOnly} onClick={() => edit('activities', 'new', null)}>
+            {!p.live && <Button primary disabled={readOnly} onClick={() => edit('activities', 'new', null)}>
               <Plus />
               Add activity
-            </Button>
+            </Button>}
           </div>
           <div className="bu-toolbar">
             <SearchBox value={search} onChange={setSearch} placeholder="Search activities…" />
@@ -455,7 +460,7 @@ export function ActivitiesView(p: ViewProps) {
                 <tr>
                   <th style={{ width: '38%' }}>Activity</th>
                   <th>Where it happens</th>
-                  <th style={{ width: '26%' }}>Setup</th>
+                  <th style={{ width: '26%' }}>{p.live ? 'Registration' : 'Setup'}</th>
                   <th style={{ width: 36 }} />
                 </tr>
               </thead>
@@ -480,12 +485,12 @@ export function ActivitiesView(p: ViewProps) {
                         ? 'Customer location'
                         : x.methods.includes('DIGITAL')
                           ? 'Digital operation'
-                          : locations(x.locationIds) || 'Location needed'}
+                          : locations(x.locationIds) || (p.live ? 'No linked location' : 'Location needed')}
                     </td>
                     <td>
                       <Status
                         value={
-                          x.enabled
+                          p.live ? 'Declared' : x.enabled
                             ? 'Configured'
                             : activityIssues(x, data).length
                               ? 'Coverage needed'
@@ -508,7 +513,7 @@ export function ActivitiesView(p: ViewProps) {
             </table>
           )}
         </section>
-        {tasks.length > 0 && (
+        {!p.live && tasks.length > 0 && (
           <section className="bu-card">
             <div className="bu-card-heading">
               <div>
@@ -531,18 +536,18 @@ export function ActivitiesView(p: ViewProps) {
             ))}
           </section>
         )}
-        <Note>
+        {!p.live && <Note>
           Configured activities determine the relevant fields, fulfilment and workflow across your
           workspace.
-        </Note>
+        </Note>}
       </div>
       {a ? (
         <Panel
           title={a.name}
-          status={a.enabled ? 'Configured' : 'Draft'}
-          subtitle={locations(a.locationIds) || 'Customer location'}
+          status={p.live ? 'Declared' : a.enabled ? 'Configured' : 'Draft'}
+          subtitle={locations(a.locationIds) || (p.live ? 'No linked location' : 'Customer location')}
           onClose={() => setSelected(null)}
-          footer={
+          footer={p.live ? undefined :
             <>
               <Button
                 onClick={() =>
@@ -562,7 +567,11 @@ export function ActivitiesView(p: ViewProps) {
           }
         >
           <Facts
-            rows={[
+            rows={p.live ? [
+              { label: 'Activity', value: a.name },
+              { label: 'Default operation', value: modelLabels[a.model] },
+              { label: 'Linked locations', value: locations(a.locationIds) || 'None recorded' },
+            ] : [
               {
                 label: 'Service location',
                 value: a.methods.includes('DIGITAL')
@@ -596,10 +605,10 @@ export function ActivitiesView(p: ViewProps) {
               },
             ]}
           />
-          <p className="bu-small bu-muted" style={{ marginTop: 8 }}>
+          {!p.live && <><p className="bu-small bu-muted" style={{ marginTop: 8 }}>
             Current configuration · Revision {data.revision}
           </p>
-          <Note>Changes affect future work. Existing bookings retain their agreed setup.</Note>
+          <Note>Changes affect future work. Existing bookings retain their agreed setup.</Note></>}
         </Panel>
       ) : (
         <Empty title="Select an activity" text="Choose an activity to inspect its setup." />
@@ -629,10 +638,10 @@ export function LocationsView(p: ViewProps) {
               <h2>Locations</h2>
               <p>Manage your operating places and service coverage.</p>
             </div>
-            <Button primary disabled={readOnly} onClick={() => edit('locations', 'new', null)}>
+            {!p.live && <Button primary disabled={readOnly} onClick={() => edit('locations', 'new', null)}>
               <Plus />
               Add location
-            </Button>
+            </Button>}
           </div>
           <div className="bu-toolbar">
             <SearchBox value={search} onChange={setSearch} placeholder="Search locations…" />
@@ -673,7 +682,7 @@ export function LocationsView(p: ViewProps) {
                     </td>
                     <td>{activityNames(x.activityIds).join(', ') || 'No activities assigned'}</td>
                     <td>
-                      <Status value={x.published ? 'Published' : 'Draft'} />
+                      <Status value={x.liveStatus ?? (x.published ? 'Published' : 'Draft')} />
                     </td>
                     <td>
                       <button
@@ -710,14 +719,14 @@ export function LocationsView(p: ViewProps) {
       {l ? (
         <Panel
           title={l.name}
-          status={l.published ? 'Published' : 'Draft'}
+          status={l.liveStatus ?? (l.published ? 'Published' : 'Draft')}
           subtitle={
-            l.published
+            p.live ? 'Saved business location.' : l.published
               ? 'This location is visible to customers.'
               : 'Complete setup before publishing.'
           }
           onClose={() => setSelected(null)}
-          footer={
+          footer={p.live ? undefined :
             <>
               <Button
                 onClick={() =>
@@ -767,12 +776,12 @@ export function LocationsView(p: ViewProps) {
               { label: 'Timezone', value: 'Africa/Nairobi' },
               {
                 label: 'Opening hours',
-                value: <Link href="/merchant-live-preview/availability">View availability →</Link>,
+                value: <Link href={p.live ? '/merchant/availability' : '/merchant-live-preview/availability'}>View availability →</Link>,
                 hint: 'Opening hours are managed in Availability.',
               },
             ]}
           />
-          <div className="bu-public-location">
+          {!p.live && <div className="bu-public-location">
             <h3>Public location preview</h3>
             <div className="bu-location-preview">
               <div
@@ -791,7 +800,7 @@ export function LocationsView(p: ViewProps) {
             <p className="bu-small bu-muted bu-location-source">
               Source · NEXG · Current configuration
             </p>
-          </div>
+          </div>}
         </Panel>
       ) : (
         <Empty title="Select a location" />
@@ -835,10 +844,10 @@ export function TeamView(p: ViewProps) {
                 pending
               </p>
             </div>
-            <Button primary disabled={readOnly} onClick={() => edit('team', 'new', null)}>
+            {!p.live && <Button primary disabled={readOnly} onClick={() => edit('team', 'new', null)}>
               <Plus />
               Invite member
-            </Button>
+            </Button>}
           </div>
           <div className="bu-toolbar">
             <SearchBox value={search} onChange={setSearch} placeholder="Search team members…" />
@@ -922,9 +931,9 @@ export function TeamView(p: ViewProps) {
           footer={
             <>
               <Button onClick={() => setSelected(null)}>Cancel</Button>
-              <Button primary disabled={readOnly} onClick={() => edit('team', m.id, m)}>
+              {p.live ? p.liveMemberTools?.[m.id] : <Button primary disabled={readOnly} onClick={() => edit('team', m.id, m)}>
                 Edit access
-              </Button>
+              </Button>}
             </>
           }
         >
@@ -948,7 +957,7 @@ export function TeamView(p: ViewProps) {
                     {m.resource || 'No linked scheduling resource'}
                     {m.resource && (
                       <p>
-                        <Link href="/merchant-live-preview/availability">
+                        <Link href={p.live ? '/merchant/availability' : '/merchant-live-preview/availability'}>
                           View linked resource ↗
                         </Link>
                       </p>
@@ -971,13 +980,13 @@ export function TeamView(p: ViewProps) {
             Team access and scheduling availability are managed separately. The linked
             resource&apos;s schedule is edited in Availability.
           </Note>
-          <div style={{ marginTop: 10 }}>
+          {!p.live && <div style={{ marginTop: 10 }}>
             <h3>Changes require access review</h3>
             <p className="bu-small bu-muted">
               Updating access may affect assignments and visible information. This preview does not
               send invitations.
             </p>
-          </div>
+          </div>}
         </Panel>
       ) : (
         <Empty title="Select a team member" />
@@ -1063,10 +1072,10 @@ export function DocumentsView(p: ViewProps) {
               <h2>Business documents</h2>
               <p>Requirements for your configured business activities.</p>
             </div>
-            <Button primary disabled={readOnly} onClick={() => p.edit('documents', 'new', null)}>
+            {!p.live && <Button primary disabled={readOnly} onClick={() => p.edit('documents', 'new', null)}>
               <Plus />
               Add document
-            </Button>
+            </Button>}
           </div>
           <div className="bu-toolbar">
             <SearchBox value={search} onChange={setSearch} placeholder="Search documents…" />
@@ -1256,7 +1265,7 @@ export function FeedbackView(p: ViewProps) {
   const [response, setResponse] = useState('All');
   const [selected, setSelected] = useState<string | null>(data.reviews[0]?.id ?? null);
   const [drafts, setDrafts] = useState<Record<string, string>>(() => {
-    if (typeof window === 'undefined') return {};
+    if (p.live || typeof window === 'undefined') return {};
     const values: Record<string, string> = {};
     for (const review of data.reviews) {
       try {
@@ -1301,7 +1310,7 @@ export function FeedbackView(p: ViewProps) {
             <div>
               <h2>Customer feedback</h2>
               <p>
-                {average} / 5 · {data.reviews.length} sample reviews · Source: NEXG
+                {average} / 5 · {data.reviews.length} {p.live ? 'reviews' : 'sample reviews'} · Source: NEXG
               </p>
             </div>
           </div>
@@ -1415,9 +1424,9 @@ export function FeedbackView(p: ViewProps) {
       {r ? (
         <Panel
           title={`Review from ${r.name}`}
-          subtitle={`${data.locations.find((l) => l.id === r.locationId)?.name} · ${r.at}`}
+          subtitle={[data.locations.find((l) => l.id === r.locationId)?.name, r.at].filter(Boolean).join(' · ')}
           onClose={() => setSelected(null)}
-          footer={
+          footer={p.live ? <ReviewReply ratingId={r.id} stars={r.rating} comment={r.text || null} /> :
             <>
               <Button disabled={readOnly} onClick={() => saveReply(false)}>
                 Save reply draft
@@ -1432,8 +1441,8 @@ export function FeedbackView(p: ViewProps) {
             {'★'.repeat(r.rating)}
           </span>
           <blockquote className="bu-review-quote">“{r.text}”</blockquote>
-          {r.reply && <Note>Current public sample reply: {r.reply}</Note>}
-          <Field label={`Reply as ${data.profile.name}`}>
+          {r.reply && <Note>{p.live ? 'Current public reply' : 'Current public sample reply'}: {r.reply}</Note>}
+          {!p.live && <><Field label={`Reply as ${data.profile.name}`}>
             <textarea
               className="bu-reply"
               disabled={readOnly}
@@ -1473,7 +1482,7 @@ export function FeedbackView(p: ViewProps) {
           >
             <Flag size={15} />
             {r.reported ? 'Report recorded in preview' : 'Report review'}
-          </button>
+          </button></>}
         </Panel>
       ) : (
         <Empty title="Select a review" />

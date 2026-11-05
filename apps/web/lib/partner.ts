@@ -46,8 +46,10 @@ export type AuthorizedMerchant = PartnerHome & {
 };
 
 export async function requireMerchant(
-  options: { access?: 'operations' | 'setup' | 'shell'; merchantId?: string } = {},
+  options: { access?: 'operations' | 'setup' | 'workspace-setup' | 'shell'; merchantId?: string } = {},
 ): Promise<AuthorizedMerchant> {
+  const workspaceSetup = options.access === 'workspace-setup';
+  const setup = options.access === 'setup' || workspaceSetup;
   const me = await partnerHome();
   if (me.kind !== 'merchant' || !me.id) redirect(me.home);
   // A supplied target must match the database-selected workspace. Object-level
@@ -59,7 +61,7 @@ export async function requireMerchant(
     redirect('/sign-in?reason=workspace-session');
   // An unknown session type must never be granted operational access.
   const isAnonymous = auth.data.user.is_anonymous !== false;
-  if (isAnonymous && options.access !== 'setup' && options.access !== 'shell') redirect('/merchant');
+  if (isAnonymous && !setup && options.access !== 'shell') redirect('/merchant');
   const { data: membership, error } = await client
     .from('merchant_user')
     .select('role')
@@ -80,15 +82,19 @@ export async function requireMerchant(
   }
   if (isAnonymous && (access.state === 'legacy' || !access.setup || access.operations))
     redirect('/merchant');
-  if (options.access === 'setup' && access.state !== 'legacy') {
+  if (setup && access.state !== 'legacy') {
     if (!access.setup) throw new MerchantAccessError('Only the application owner can edit setup.', 403);
     const { data: merchant, error: merchantError } = await client.from('merchant')
       .select('status').eq('id', me.id).maybeSingle();
     if (merchantError) throw new MerchantAccessError('Your business setup could not be checked.', 503);
-    if (!merchant || !['applied', 'documents_pending', 'under_review'].includes(merchant.status))
+    const canEditDraft = merchant && (
+      ['applied', 'documents_pending', 'under_review'].includes(merchant.status) ||
+      (workspaceSetup && merchant.status === 'live')
+    );
+    if (!canEditDraft)
       throw new MerchantAccessError('Draft setup is not available for this business.', 403);
   }
-  if (options.access !== 'setup' && options.access !== 'shell' && !access.operations) redirect('/merchant');
+  if (!setup && options.access !== 'shell' && !access.operations) redirect('/merchant');
   return { ...me, id: me.id, userId: auth.data.user.id, isAnonymous, access };
 }
 

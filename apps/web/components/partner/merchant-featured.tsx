@@ -16,6 +16,7 @@ export interface Placement {
   description: string | null;
   city_id: string;
   price_kes?: number | null;
+  priceUnavailable?: boolean;
 }
 
 export interface Booking {
@@ -36,6 +37,10 @@ const KIND: Record<string, string> = {
   popular_request: 'Popular requests',
 };
 
+export function featuredPlacementLabel(kind: string) {
+  return KIND[kind] ?? kind.replaceAll('_', ' ');
+}
+
 const TONE: Record<string, string> = {
   live: 'bg-success-bg text-success',
   booked: 'bg-success-bg text-success',
@@ -55,6 +60,7 @@ export function Featured({
   placements,
   bookings,
   nextMonday,
+  showHistory = true,
 }: {
   merchantId: string;
   status: string;
@@ -62,6 +68,7 @@ export function Featured({
   placements: Placement[];
   bookings: Booking[];
   nextMonday: string;
+  showHistory?: boolean;
 }) {
   const router = useRouter();
   const [busy, setBusy] = React.useState(false);
@@ -74,12 +81,17 @@ export function Featured({
   const run = async (fn: () => Promise<Outcome>) => {
     setBusy(true);
     setSaid(null);
-    const r = await fn();
-    setSaid(r);
-    setBusy(false);
-    if (r.ok) {
-      setOpen(null);
-      router.refresh();
+    try {
+      const r = await fn();
+      setSaid(r);
+      if (r.ok) {
+        setOpen(null);
+        router.refresh();
+      }
+    } catch {
+      setSaid({ ok: false, message: 'The featured placement request could not be updated. Reload Promotions and try again.' });
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -109,22 +121,11 @@ export function Featured({
             that first and this opens by itself.
           </p>
         </Panel>
-      ) : !eligible ? (
-        <Panel title="Not eligible yet">
-          <p className="text-muted text-[0.8125rem] font-semibold">
-            {why ??
-              'Your account does not meet the bar for a paid placement at the moment. A green health band for a run of weeks is the usual way in.'}
-          </p>
-          <p className="text-muted-light mt-2 text-[0.75rem] font-semibold">
-            This is deliberately not something money gets you past. A guest has to be able to trust
-            a sponsored card.
-          </p>
-        </Panel>
       ) : openBooking ? (
         <Panel title="You have a request with us">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <p className="text-[0.9375rem] font-extrabold">
-              {KIND[openBooking.placement_kind] ?? openBooking.placement_kind}
+              {featuredPlacementLabel(openBooking.placement_kind)}
             </p>
             <Pill tone={TONE[openBooking.status]}>{openBooking.status.toUpperCase()}</Pill>
           </div>
@@ -150,6 +151,16 @@ export function Featured({
             </button>
           )}
         </Panel>
+      ) : !eligible ? (
+        <Panel title="Not eligible yet">
+          <p className="text-muted text-[0.8125rem] font-semibold">
+            {why ??
+              'Your account does not meet the bar for a paid placement at the moment. A green health band for a run of weeks is the usual way in.'}
+          </p>
+          <p className="text-muted-light mt-2 text-[0.75rem] font-semibold">
+            A guest has to be able to trust a sponsored card.
+          </p>
+        </Panel>
       ) : (
         <Panel title="Slots in your city" note={`${placements.length} available`}>
           {placements.length === 0 ? (
@@ -163,13 +174,15 @@ export function Featured({
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-[0.9375rem] font-extrabold">
-                        {p.label || KIND[p.kind] || p.kind}
+                        {p.label || featuredPlacementLabel(p.kind)}
                       </p>
                       {p.description && (
                         <p className="text-muted text-[0.8125rem] font-semibold">{p.description}</p>
                       )}
                       <p className="text-muted-light mt-0.5 text-[0.8125rem] font-semibold">
-                        {p.price_kes === null || p.price_kes === undefined ? (
+                        {p.priceUnavailable ? (
+                          'Price could not be checked. NexG will confirm your quote.'
+                        ) : p.price_kes === null || p.price_kes === undefined ? (
                           <>
                             <strong className="text-ink">{DASH}</strong> a week · no rate published
                             for your city yet, so somebody will quote you
@@ -266,13 +279,13 @@ export function Featured({
         </Panel>
       )}
 
-      {bookings.length > 0 && (
+      {showHistory && bookings.length > 0 && (
         <Panel title="Everything you have asked for">
           <ul className="divide-border divide-y">
             {bookings.map((b) => (
               <li key={b.id} className="flex items-baseline justify-between gap-2 py-2">
                 <span className="text-[0.8125rem] font-semibold">
-                  {KIND[b.placement_kind] ?? b.placement_kind} · week of{' '}
+                  {featuredPlacementLabel(b.placement_kind)} · week of{' '}
                   {day(b.wanted_start ?? b.start_date)}
                 </span>
                 <Pill tone={TONE[b.status]}>{b.status.toUpperCase()}</Pill>

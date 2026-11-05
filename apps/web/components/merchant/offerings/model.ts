@@ -51,6 +51,8 @@ export type Offering = CatalogueOptions & {
   stock?: number;
   stockAsOf?: string;
   image?: string;
+  /** Private storage path. `image` is a short-lived URL for display only. */
+  imageStoragePath?: string;
   imageAlt?: string;
   sources: { details: Ownership; price: Ownership; availability: Ownership };
   sync: 'current' | 'stale' | 'offline' | 'pending';
@@ -62,6 +64,7 @@ export type Offering = CatalogueOptions & {
 };
 export type Catalogue = {
   revision: 1;
+  writable?: boolean;
   configuration: MerchantOfferingConfiguration;
   offerings: Offering[];
 };

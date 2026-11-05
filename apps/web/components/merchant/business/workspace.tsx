@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { AlertCircle, Download, FileText, MapPin, Package } from 'lucide-react';
 import { MerchantLivePreviewShell } from '../live-preview-shell';
 import { useMerchantOnboardingDemoContext } from '../merchant-onboarding-demo-provider';
@@ -66,19 +66,26 @@ export function BusinessWorkspace({
   initialTab = 'activities',
   source: providedSource,
   demoContext,
+  liveData,
+  liveTools,
+  liveMemberTools,
 }: {
   initialProfileId?: string;
   initialTab?: Section;
   source?: BusinessSource;
   demoContext?: MerchantOnboardingDemoContext | null;
+  liveData?: Business;
+  liveTools?: Partial<Record<Section, ReactNode>>;
+  liveMemberTools?: Record<string, ReactNode>;
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
-  const activeDemo = demoContext ?? inheritedDemo;
+  const live = Boolean(liveData);
+  const activeDemo = live ? null : demoContext ?? inheritedDemo;
   const [profileId, setProfileId] = useState(
     category(initialProfileId) ? initialProfileId : 'haircare',
   );
-  const [data, setData] = useState<Business | null>(null);
-  const [profileDraft, setProfileDraft] = useState<Business['profile'] | null>(null);
+  const [data, setData] = useState<Business | null>(liveData ?? null);
+  const [profileDraft, setProfileDraft] = useState<Business['profile'] | null>(liveData?.profile ?? null);
   const [tab, setTab] = useState<Section>(
     sections.some((s) => s.id === initialTab) ? initialTab : 'activities',
   );
@@ -88,7 +95,7 @@ export function BusinessWorkspace({
   const [candidate, setCandidate] = useState<{ next: Business; action: string } | null>(null);
   const [preview, setPreview] = useState({ title: '', description: '' });
   const [request, setRequest] = useState({ kind: '', text: '' });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!live);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -103,11 +110,11 @@ export function BusinessWorkspace({
   const source = useMemo(
     () =>
       providedSource ??
-      (typeof window === 'undefined' ? null : localBusinessSource(window.localStorage)),
-    [providedSource],
+      (live || typeof window === 'undefined' ? null : localBusinessSource(window.localStorage)),
+    [live, providedSource],
   );
   const readOnly =
-    ['viewer', 'external', 'offline', 'unavailable', 'empty'].includes(scenario) || busy;
+    live || ['viewer', 'external', 'offline', 'unavailable', 'empty'].includes(scenario) || busy;
   const accountSummary = data
     ? {
         Approved: ['Business approved', 'Account approval confirmed.'],
@@ -120,6 +127,12 @@ export function BusinessWorkspace({
       }[data.accountStatus]
     : ['Business status unavailable', 'Waiting for confirmed account status.'];
   useEffect(() => {
+    if (liveData) {
+      setData(liveData);
+      setProfileDraft(liveData.profile);
+      setLoading(false);
+      return;
+    }
     let active = true;
     setLoading(true);
     setError('');
@@ -158,7 +171,7 @@ export function BusinessWorkspace({
     return () => {
       active = false;
     };
-  }, [profileId, source, reload, demoBusinessName]);
+  }, [profileId, source, reload, demoBusinessName, liveData]);
   const showPreview = useCallback((title: string, description: string) => {
     setPreview({ title, description });
     setDialog('preview');
@@ -407,6 +420,8 @@ export function BusinessWorkspace({
     ? {
         data: display,
         readOnly: scopedReadOnly,
+        live,
+        liveMemberTools,
         edit,
         save,
         message,
@@ -441,15 +456,7 @@ export function BusinessWorkspace({
       </select>
     </label>
   );
-  return (
-    <MerchantLivePreviewShell
-      active="Business"
-      businessName={activeDemo?.businessName}
-      accountInitials={activeDemo?.initials}
-      demoContext={activeDemo}
-      sampleControl={sampleControl}
-      locationControl={locationControl}
-    >
+  const content = (
       <div className={styles.root}>
         <div className="bu-title">
           <div>
@@ -464,13 +471,13 @@ export function BusinessWorkspace({
               </button>
             </div>
           )}
-          <button
+          {live ? locationControl : <button
             className="bu-link bu-small"
             aria-label="View configuration history"
             onClick={() => setDialog('history')}
           >
             Revision {data?.revision ?? '—'}
-          </button>
+          </button>}
         </div>
         <div className="bu-summary">
           <div>
@@ -484,12 +491,14 @@ export function BusinessWorkspace({
             <Package />
             <span>
               <strong>
-                {data?.activities.filter((a) => a.enabled).length ?? '—'} configured activities
+                {live
+                  ? `${data?.activities.length ?? 0} declared activities`
+                  : `${data?.activities.filter((a) => a.enabled).length ?? '—'} configured activities`}
               </strong>
-              <p>Active in your workspace.</p>
+              <p>{live ? 'From your saved registration.' : 'Active in your workspace.'}</p>
             </span>
           </div>
-          <div>
+          {!live && <div>
             <AlertCircle color="#e36c00" />
             <span>
               <strong>
@@ -497,7 +506,7 @@ export function BusinessWorkspace({
               </strong>
               <p>Complete setup to activate.</p>
             </span>
-          </div>
+          </div>}
         </div>
         <div className="bu-tabs" role="tablist" aria-label="Business sections">
           {sections.map((s, i) => (
@@ -547,7 +556,7 @@ export function BusinessWorkspace({
         )}
         {locationScope !== 'all' && (
           <div className="bu-banner">
-            Location-scoped view. Select All locations to edit shared configuration.
+            Location-scoped view. Select All locations for the full business.
           </div>
         )}
         {error && !dialog && (
@@ -578,10 +587,12 @@ export function BusinessWorkspace({
               style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}
               key={`${profileId}-${tab}`}
             >
+              {liveTools?.[tab] && <div className="mb-3">{liveTools[tab]}</div>}
               {tab === 'profile' ? (
                 <ProfileView
                   data={display}
                   readOnly={scopedReadOnly}
+                  live={live}
                   draft={profileDraft}
                   onChange={setProfile}
                   onSave={() =>
@@ -947,6 +958,18 @@ export function BusinessWorkspace({
           </Modal>
         )}
       </div>
+  );
+  if (live) return content;
+  return (
+    <MerchantLivePreviewShell
+      active="Business"
+      businessName={activeDemo?.businessName}
+      accountInitials={activeDemo?.initials}
+      demoContext={activeDemo}
+      sampleControl={sampleControl}
+      locationControl={locationControl}
+    >
+      {content}
     </MerchantLivePreviewShell>
   );
 }

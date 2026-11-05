@@ -2,7 +2,6 @@
 /* eslint-disable @next/next/no-img-element -- sample media may be a local data URL */
 
 import { MERCHANT_TAXONOMY } from '@nexg/contracts';
-import { TableViewport } from '@nexg/ui/table-viewport';
 import {
   AlertCircle,
   ArrowLeft,
@@ -49,7 +48,7 @@ import {
   type PromotionAction,
   type PromotionSource,
 } from './source';
-import styles from './workspace.module.css';
+import { PromotionsFrame, PromotionStatus, PromotionTable, PromotionTabs } from './presentation';
 
 type Mode = 'list' | 'edit' | 'review' | 'preview';
 const errorText = (error: unknown) =>
@@ -84,11 +83,7 @@ const periodLabel = (campaign: Campaign) =>
 const localNow = () => new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 16);
 
 function State({ value, badge = false }: { value: DisplayState; badge?: boolean }) {
-  return (
-    <span className={badge ? 'pm-badge' : 'pm-state'} data-tone={tone(value)}>
-      {value}
-    </span>
-  );
+  return <PromotionStatus label={value} tone={tone(value)} badge={badge} />;
 }
 function CampaignIcon({
   campaign,
@@ -459,34 +454,24 @@ export function PromotionsWorkspace({
 
   return (
     <MerchantLivePreviewShell active="Promotions" businessName={activeDemo?.businessName} accountInitials={activeDemo?.initials} demoContext={activeDemo} sampleControl={sampleControl}>
-      <main
-        className={`${styles.root} ${styles.workspace}`}
-        data-promotions-workspace
-        data-profile={profile.id}
-        aria-busy={isLoading}
+      <PromotionsFrame
+        title={mode === 'edit' || mode === 'review'
+          ? (liveEdit ? 'Edit promotion' : 'Create promotion')
+          : 'Promotions'}
+        businessName={activeDemo?.businessName ?? (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)}
+        profileId={profile.id}
+        busy={isLoading}
+        action={mode === 'list' && (
+          <button
+            type="button"
+            className="pm-button pm-primary"
+            onClick={newOffer}
+            disabled={!catalogue || isLoading}
+          >
+            <Plus size={16} /> Create promotion
+          </button>
+        )}
       >
-        <div className="pm-header">
-          <div>
-            <h1>
-              {mode === 'edit' || mode === 'review'
-                ? liveEdit
-                  ? 'Edit promotion'
-                  : 'Create promotion'
-                : 'Promotions'}
-            </h1>
-            <p>{activeDemo?.businessName ?? (profile.id === 'makeup' ? 'Nairobi Collective' : profile.name)}</p>
-          </div>
-          {mode === 'list' && (
-            <button
-              type="button"
-              className="pm-button pm-primary"
-              onClick={newOffer}
-              disabled={!catalogue || isLoading}
-            >
-              <Plus size={16} /> Create promotion
-            </button>
-          )}
-        </div>
         {error && (
           <div className="pm-note pm-error" role="alert">
             <AlertCircle size={16} />
@@ -525,37 +510,7 @@ export function PromotionsWorkspace({
           </div>
         ) : mode === 'list' ? (
           <>
-            <div className="pm-tabs" role="tablist" aria-label="Promotions sections">
-              {(['Campaigns', 'History'] as const).map((entry) => (
-                <button
-                  key={entry}
-                  id={`pm-tab-${entry}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === entry}
-                  aria-controls={`pm-panel-${entry}`}
-                  tabIndex={tab === entry ? 0 : -1}
-                  className="pm-tab"
-                  onClick={() => changeTab(entry)}
-                  onKeyDown={(event) => {
-                    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-                    event.preventDefault();
-                    const next =
-                      event.key === 'Home'
-                        ? 'Campaigns'
-                        : event.key === 'End'
-                          ? 'History'
-                          : tab === 'Campaigns'
-                            ? 'History'
-                            : 'Campaigns';
-                    changeTab(next);
-                    document.getElementById(`pm-tab-${next}`)?.focus();
-                  }}
-                >
-                  {entry}
-                </button>
-              ))}
-            </div>
+            <PromotionTabs active={tab} onSelect={changeTab} />
             <div
               className="pm-grid"
               role="tabpanel"
@@ -643,20 +598,7 @@ export function PromotionsWorkspace({
                   })}
                 </div>
                 {visible.length ? (
-                  <TableViewport className="pm-table-wrap" label="Promotion records">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>{tab === 'History' ? 'Promotion' : 'Campaign'}</th>
-                          <th>{tab === 'History' ? 'Type' : 'Offer / placement'}</th>
-                          <th className="pm-desktop-column">
-                            {tab === 'History' ? 'Period' : 'Applies to'}
-                          </th>
-                          <th>{tab === 'History' ? 'Outcome' : 'Status'}</th>
-                          <th aria-label="Open" />
-                        </tr>
-                      </thead>
-                      <tbody>
+                  <PromotionTable tab={tab}>
                         {visible.map(({ campaign, item, state }) => (
                           <tr
                             key={campaign.id}
@@ -703,9 +645,7 @@ export function PromotionsWorkspace({
                             </td>
                           </tr>
                         ))}
-                      </tbody>
-                    </table>
-                  </TableViewport>
+                  </PromotionTable>
                 ) : (
                   <div className="pm-empty">
                     <strong>No matching promotions</strong>
@@ -1474,7 +1414,7 @@ export function PromotionsWorkspace({
             </section>
           </>
         ) : null}
-      </main>
+      </PromotionsFrame>
     </MerchantLivePreviewShell>
   );
 }

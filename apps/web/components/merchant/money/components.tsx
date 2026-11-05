@@ -6,6 +6,60 @@ import { Info, X, type LucideIcon } from 'lucide-react';
 import { useRef, type ReactNode } from 'react';
 import styles from './workspace.module.css';
 
+export function MoneyFrame({
+  description,
+  actions,
+  profile,
+  schema,
+  ready,
+  children,
+}: {
+  description: string;
+  actions?: ReactNode;
+  profile?: string;
+  schema?: string;
+  ready: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div className={styles.root}>
+      <main
+        className="mo-workspace"
+        data-testid="money-workspace"
+        data-profile={profile}
+        data-schema={schema}
+        data-ready={ready}
+      >
+        <div className="mo-heading">
+          <div><h1>Money</h1><p>{description}</p></div>
+          {actions && <div className="mo-heading-actions">{actions}</div>}
+        </div>
+        {children}
+      </main>
+    </div>
+  );
+}
+
+export function MoneyTabs<Tab extends string>({
+  tabs,
+  active,
+  onSelect,
+}: {
+  tabs: readonly Tab[];
+  active: Tab;
+  onSelect: (tab: Tab) => void;
+}) {
+  return (
+    <div className="mo-tabs" role="tablist" aria-label="Money views">
+      {tabs.map((tab) => (
+        <button key={tab} type="button" role="tab" aria-selected={active === tab} onClick={() => onSelect(tab)}>
+          {tab}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function Modal({
   title,
   description,
@@ -134,6 +188,7 @@ export function DataTable({
   footer,
   showControls = true,
   onClear,
+  emptyMessage = 'No records in this sample.',
 }: {
   title: string;
   columns: string[];
@@ -148,6 +203,7 @@ export function DataTable({
   footer?: ReactNode;
   showControls?: boolean;
   onClear?: () => void;
+  emptyMessage?: string;
 }) {
   const filtered = rows.filter((row) => matchesTableRow(row, search, filter));
   return (
@@ -254,7 +310,7 @@ export function DataTable({
                 </button>
               </>
             ) : (
-              'No records in this sample.'
+              emptyMessage
             )}
           </div>
         )}

@@ -138,6 +138,9 @@ export function OfferingEditor({
   onConnections,
   onReload,
   onAdd,
+  setupDraftOnly = false,
+  onUploadImage,
+  readOnly = false,
 }: {
   item: Offering;
   profile: OfferingProfile;
@@ -155,15 +158,22 @@ export function OfferingEditor({
   onConnections: () => void;
   onReload: () => void;
   onAdd: () => void;
+  setupDraftOnly?: boolean;
+  onUploadImage?: (item: Offering, file: File) => Promise<{ path: string; url: string }>;
+  readOnly?: boolean;
 }) {
   const schema = schemas[item.schemaId]!;
   const uploadRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const patch = (update: Partial<Offering>) => change({ ...item, ...update });
-  const lockedDetails = item.sources.details === 'external' || item.publication === 'archived';
-  const lockedPrice = item.sources.price === 'external' || item.publication === 'archived';
+  const itemRef = useRef(item);
+  itemRef.current = item;
+  const patch = (update: Partial<Offering>) => {
+    if (!readOnly) change({ ...item, ...update });
+  };
+  const lockedDetails = readOnly || item.sources.details === 'external' || item.publication === 'archived';
+  const lockedPrice = readOnly || item.sources.price === 'external' || item.publication === 'archived';
   const lockedAvailability =
-    item.sources.availability === 'external' || item.publication === 'archived';
+    readOnly || item.sources.availability === 'external' || item.publication === 'archived';
   const fieldIssue = (key: string) => issues.find((issue) => issue.key === key)?.message;
   const allResources = [...new Set([...schema.resources, ...item.resources])];
   async function upload(file?: File) {
@@ -174,6 +184,20 @@ export function OfferingEditor({
         input.setCustomValidity('Choose a JPG, PNG or WebP smaller than 2 MB.');
         input.reportValidity();
         input.value = '';
+      }
+      return;
+    }
+    if (onUploadImage) {
+      try {
+        const uploaded = await onUploadImage(item, file);
+        if (itemRef.current.id === item.id)
+          change({ ...itemRef.current, image: uploaded.url, imageStoragePath: uploaded.path, imageAlt: itemRef.current.imageAlt ?? '' });
+      } catch (error) {
+        if (input) {
+          input.setCustomValidity(error instanceof Error ? error.message : 'Could not upload the photo.');
+          input.reportValidity();
+          input.value = '';
+        }
       }
       return;
     }
@@ -298,7 +322,9 @@ export function OfferingEditor({
             {lockedDetails && (
               <p className="of-note">
                 <LockKeyhole size={15} />
-                {item.publication === 'archived'
+                {readOnly
+                  ? 'This saved catalogue entry is available for review.'
+                  : item.publication === 'archived'
                   ? 'Archived offerings are read-only. Restore as a draft to edit them.'
                   : 'Edit these details in your connected system. Changes appear after the next confirmed sync.'}
               </p>
@@ -417,7 +443,7 @@ export function OfferingEditor({
                       <button
                         type="button"
                         className="of-link"
-                        onClick={() => patch({ image: undefined, imageAlt: undefined })}
+                        onClick={() => patch({ image: undefined, imageStoragePath: undefined, imageAlt: undefined })}
                       >
                         Remove photo
                       </button>
@@ -429,6 +455,7 @@ export function OfferingEditor({
                       <input
                         ref={uploadRef}
                         type="file"
+                        disabled={setupDraftOnly && !onUploadImage}
                         accept="image/jpeg,image/png,image/webp"
                         onChange={(e) => {
                           e.target.setCustomValidity('');
@@ -967,9 +994,9 @@ export function OfferingEditor({
             <button type="button" className="of-button" onClick={onReload}>
               Reload saved version
             </button>
-            <button type="button" className="of-button" onClick={onDuplicate}>
+            {!readOnly && <button type="button" className="of-button" onClick={onDuplicate}>
               Duplicate as draft
-            </button>
+            </button>}
           </>
         )}
       </div>
@@ -983,7 +1010,9 @@ export function OfferingEditor({
           <Eye size={16} />
           <span>Preview</span>
         </button>
-        {item.publication === 'archived' ? (
+        {readOnly ? (
+          <span className="of-note">Saved catalogue entry · view only</span>
+        ) : item.publication === 'archived' ? (
           <button
             className="of-button of-primary"
             type="button"
@@ -997,7 +1026,7 @@ export function OfferingEditor({
             <button type="button" className="of-button" disabled={busy} onClick={() => onSave()}>
               {busy ? 'Saving…' : item.publication === 'published' ? 'Save changes' : 'Save draft'}
             </button>
-            <button
+            {!setupDraftOnly && <button
               type="button"
               className="of-button of-primary"
               disabled={busy}
@@ -1010,7 +1039,7 @@ export function OfferingEditor({
                   ? 'Publish changes'
                   : 'Unpublish'
                 : 'Publish offering'}
-            </button>
+            </button>}
           </>
         )}
       </div>

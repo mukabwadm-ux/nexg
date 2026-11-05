@@ -85,10 +85,10 @@ export default async function MerchantLayout({ children }: { children: React.Rea
   if (me.access.state !== 'legacy') {
     const destinations: MerchantWorkspaceNavItem[] = [
       { label: 'Home', href: '/merchant' },
-      { label: 'Work', href: '/merchant/orders' },
-      { label: 'Offerings', href: '/merchant/menu' },
-      { label: 'Availability', href: '/merchant/hours' },
-      { label: 'Business', href: '/merchant/stores' },
+      { label: 'Work', href: '/merchant/work' },
+      { label: 'Offerings', href: '/merchant/offerings' },
+      { label: 'Availability', href: '/merchant/availability' },
+      { label: 'Business', href: '/merchant/business' },
       { label: 'Money', href: '/merchant/money' },
       { label: 'Promotions', href: '/merchant/promotions' },
       { label: 'Insights', href: '/merchant/insights' },

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
@@ -28,6 +29,36 @@ import {
 } from '@/lib/merchant-onboarding-demo';
 
 const Form = SharedRegistration;
+const SetupOfferings = dynamic(() =>
+  import('@/components/merchant/offerings/setup-offerings').then((module) => module.SetupOfferings),
+);
+const SetupLocationEditor = dynamic(() =>
+  import('@/components/merchant/business/setup-location').then((module) => module.SetupLocationEditor),
+);
+const SetupDocuments = dynamic(() =>
+  import('@/components/merchant/setup-documents').then((module) => module.SetupDocuments),
+);
+const SetupHours = dynamic(() =>
+  import('@/components/merchant/availability/setup-hours').then((module) => module.SetupHours),
+);
+const SetupPayout = dynamic(() =>
+  import('@/components/merchant/setup-payout').then((module) => module.SetupPayout),
+);
+
+type SetupEditor = 'offerings' | 'location' | 'hours' | 'documents' | 'payout';
+const taskRoutes: Record<string, string> = {
+  offerings: '/merchant/menu',
+  location: '/merchant/stores',
+  hours: '/merchant/hours',
+  documents: '/merchant/documents',
+  team: '/merchant/team',
+};
+const liveSetupRoutes = {
+  offerings: '/merchant/offerings',
+  location: '/merchant/business',
+  hours: '/merchant/availability',
+};
+
 type PayoutRecord = { version: number; payout: Record<string, string> | null };
 export function ConnectedApplication({
   initialRecord,
@@ -50,6 +81,17 @@ export function ConnectedApplication({
   const record = useRef(initialRecord);
   const payout = useRef(initialPayout);
   const [status, setStatus] = useState(initialRecord?.review.state ?? 'draft');
+  const [setupEditor, setSetupEditor] = useState<SetupEditor | null>(null);
+  const closeSetupEditor = () => setSetupEditor(null);
+  const refreshSetup = () => router.refresh();
+  const openLegacySetup = useCallback(
+    (editor: 'offerings' | 'location' | 'hours') => {
+      if (!savedHome?.access.operations && savedHome?.publication.status === 'live') return;
+      setSetupEditor(null);
+      router.push(savedHome?.access.operations ? liveSetupRoutes[editor] : taskRoutes[editor]!);
+    },
+    [router, savedHome?.access.operations, savedHome?.publication.status],
+  );
   const [expired, setExpired] = useState(false);
   const [businessEmail, setBusinessEmail] = useState(initialRecord?.payload.business.email ?? '');
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
@@ -468,6 +510,11 @@ export function ConnectedApplication({
         Your session ended. Sign in again to open your saved application.
       </p>
     );
+  const setupActivities = savedHome?.projection.profiles.map((profile) => ({
+    id: profile.subcategoryId,
+    name: profile.name,
+  })) ?? [];
+  const savedPayout = payoutForm(payout.current?.payout ?? null);
   return (
     <>
       {home && anonymousSession ? (
@@ -524,17 +571,20 @@ export function ConnectedApplication({
         }}
         onSaveTask={saveTask}
         onTaskNavigation={(step: number, rowId?: string) => {
+          if (home && savedHome) {
+            const task = rowId ?? (step === 2 ? 'location' : undefined);
+            if (
+              task === 'offerings' || task === 'location' || task === 'hours' ||
+              task === 'documents' || (task === 'payout' && !anonymousSession)
+            ) {
+              setSetupEditor(task);
+              return true;
+            }
+          }
           // The Team page and its invite actions require operational access.
           // Keep the pre-approval Home row informational until that access is
           // granted rather than sending the merchant to a page that redirects.
           if (rowId === 'team' && !savedHome?.access.operations) return false;
-          const taskRoutes: Record<string, string> = {
-            offerings: '/merchant/menu',
-            location: '/merchant/stores',
-            hours: '/merchant/hours',
-            documents: '/merchant/documents',
-            team: '/merchant/team',
-          };
           const href = rowId?.startsWith('model:')
             ? '/merchant/calendar'
             : rowId
@@ -558,6 +608,26 @@ export function ConnectedApplication({
         }
         onExitDemo={undefined}
       />
+      {setupEditor === 'offerings' && (
+        <SetupOfferings open onClose={closeSetupEditor} onSaved={refreshSetup}
+          activities={setupActivities} onUnavailable={openLegacySetup} />
+      )}
+      {setupEditor === 'location' && (
+        <SetupLocationEditor open onClose={closeSetupEditor} onSaved={refreshSetup}
+          activities={setupActivities} onUnavailable={openLegacySetup} />
+      )}
+      {setupEditor === 'documents' && (
+        <SetupDocuments open onClose={closeSetupEditor} onSaved={refreshSetup} />
+      )}
+      {setupEditor === 'hours' && (
+        <SetupHours open onClose={closeSetupEditor} onSaved={refreshSetup}
+          activities={setupActivities} onUnavailable={openLegacySetup} />
+      )}
+      {setupEditor === 'payout' && (
+        <SetupPayout open onClose={closeSetupEditor}
+          initialValue={{ ...savedPayout, method: savedPayout?.method ?? '' }}
+          onSave={async (value) => { await saveTask({ payout: value, policies: {} }, { step: 5 }); }} />
+      )}
     </>
   );
 }
