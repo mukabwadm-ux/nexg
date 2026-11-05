@@ -189,10 +189,10 @@ importers:
         version: link:../../packages/booking-config
       '@payloadcms/db-postgres':
         specifier: 3.86.0
-        version: 3.86.0(@libsql/client@0.14.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))
+        version: 3.86.0(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))
       '@payloadcms/db-sqlite':
         specifier: 3.86.0
-        version: 3.86.0(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)
+        version: 3.86.0(@electric-sql/pglite@0.5.14)(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)
       '@payloadcms/translations':
         specifier: 3.86.0
         version: 3.86.0
@@ -313,6 +313,9 @@ importers:
         specifier: 3.24.1
         version: 3.24.1
     devDependencies:
+      '@electric-sql/pglite':
+        specifier: 0.5.14
+        version: 0.5.14
       '@nexg/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -778,6 +781,9 @@ packages:
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
+
+  '@electric-sql/pglite@0.5.14':
+    resolution: {integrity: sha512-aAQe7iArcFB2w1xtx91l3l9trxhMzD6aZf+WnosSHNhwgp70EJz80Igw/bHnW14fUEFYWPBoQ1sGom8Xc0Jttg==}
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -5855,6 +5861,8 @@ snapshots:
 
   '@drizzle-team/brocli@0.10.2': {}
 
+  '@electric-sql/pglite@0.5.14': {}
+
   '@emnapi/core@1.10.0':
     dependencies:
       '@emnapi/wasi-threads': 1.2.1
@@ -6693,13 +6701,13 @@ snapshots:
 
   '@nolyfill/is-core-module@1.0.39': {}
 
-  '@payloadcms/db-postgres@3.86.0(@libsql/client@0.14.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))':
+  '@payloadcms/db-postgres@3.86.0(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))':
     dependencies:
-      '@payloadcms/drizzle': 3.86.0(@libsql/client@0.14.0)(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)
+      '@payloadcms/drizzle': 3.86.0(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)
       '@types/pg': 8.20.0
       console-table-printer: 2.12.1
       drizzle-kit: 0.31.7
-      drizzle-orm: 0.45.2(@libsql/client@0.14.0)(@types/pg@8.20.0)(pg@8.20.0)
+      drizzle-orm: 0.45.2(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(@types/pg@8.20.0)(pg@8.20.0)
       payload: 3.86.0(graphql@16.14.2)(typescript@5.7.2)
       pg: 8.20.0
       prompts: 2.4.2
@@ -6736,13 +6744,13 @@ snapshots:
       - sqlite3
       - supports-color
 
-  '@payloadcms/db-sqlite@3.86.0(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)':
+  '@payloadcms/db-sqlite@3.86.0(@electric-sql/pglite@0.5.14)(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)':
     dependencies:
       '@libsql/client': 0.14.0
-      '@payloadcms/drizzle': 3.86.0(@libsql/client@0.14.0)(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)
+      '@payloadcms/drizzle': 3.86.0(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)
       console-table-printer: 2.12.1
       drizzle-kit: 0.31.7
-      drizzle-orm: 0.45.2(@libsql/client@0.14.0)(@types/pg@8.20.0)(pg@8.20.0)
+      drizzle-orm: 0.45.2(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(@types/pg@8.20.0)(pg@8.20.0)
       payload: 3.86.0(graphql@16.14.2)(typescript@5.7.2)
       prompts: 2.4.2
       to-snake-case: 1.0.0
@@ -6780,11 +6788,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@payloadcms/drizzle@3.86.0(@libsql/client@0.14.0)(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)':
+  '@payloadcms/drizzle@3.86.0(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(@types/pg@8.20.0)(payload@3.86.0(graphql@16.14.2)(typescript@5.7.2))(pg@8.20.0)':
     dependencies:
       console-table-printer: 2.12.1
       dequal: 2.0.3
-      drizzle-orm: 0.45.2(@libsql/client@0.14.0)(@types/pg@8.20.0)(pg@8.20.0)
+      drizzle-orm: 0.45.2(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(@types/pg@8.20.0)(pg@8.20.0)
       payload: 3.86.0(graphql@16.14.2)(typescript@5.7.2)
       prompts: 2.4.2
       to-snake-case: 1.0.0
@@ -8100,8 +8108,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.45.2(@libsql/client@0.14.0)(@types/pg@8.20.0)(pg@8.20.0):
+  drizzle-orm@0.45.2(@electric-sql/pglite@0.5.14)(@libsql/client@0.14.0)(@types/pg@8.20.0)(pg@8.20.0):
     optionalDependencies:
+      '@electric-sql/pglite': 0.5.14
       '@libsql/client': 0.14.0
       '@types/pg': 8.20.0
       pg: 8.20.0
