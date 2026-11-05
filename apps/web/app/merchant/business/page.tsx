@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { loadSetupLocations } from '@/app/merchant/location-setup-actions';
 import { loadSetupDocuments } from '@/app/merchant/setup-documents-actions';
@@ -23,7 +24,11 @@ export const metadata = { title: 'Business' };
 export const dynamic = 'force-dynamic';
 
 export default async function BusinessPage({ searchParams }: { searchParams?: { tab?: Section } }) {
-  const me = await requireMerchant();
+  // Open before approval too: the owner finishes their business details here
+  // while the rest of the workspace waits for document verification.
+  const me = await requireMerchant({ access: 'shell' });
+  if (!me.access.operations && !me.access.setup) redirect('/merchant');
+  const operational = me.access.operations;
   const db = createClient();
   const mayManageSetup = me.access.setup && me.access.state !== 'legacy';
   const mayManageDocuments = mayManageSetup || me.access.state === 'legacy';
@@ -225,7 +230,7 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
   const manage = 'text-gold-text text-sm font-bold underline';
   const branchChoices = locations.map(({ id, name }) => ({ id, name }));
   const memberTools = Object.fromEntries(
-    (members.data ?? []).flatMap((member) => {
+    (operational ? (members.data ?? []) : []).flatMap((member) => {
       const id = member.user_id ?? member.invite_id;
       if (!id || !member.role || !member.status || !member.created_at) return [];
       const caps =
@@ -268,12 +273,20 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
         ) : undefined,
         activities: (
           <div className="flex flex-wrap gap-4">
-            <Link className={manage} href="/merchant/offerings">
-              Manage offerings
-            </Link>
-            <Link className={manage} href="/merchant/availability">
-              Manage availability
-            </Link>
+            {operational ? (
+              <>
+                <Link className={manage} href="/merchant/offerings">
+                  Manage offerings
+                </Link>
+                <Link className={manage} href="/merchant/availability">
+                  Manage availability
+                </Link>
+              </>
+            ) : (
+              <p className="text-sm">
+                Offerings and availability unlock once your account is approved.
+              </p>
+            )}
             {mayManageSetup && !record ? (
               <p>Saved activities could not be loaded. Refresh to try again.</p>
             ) : null}
@@ -284,7 +297,11 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
         ) : (
           <AddBranch merchantId={me.id} />
         ),
-        team: <InviteMember merchantId={me.id} branches={branchChoices} />,
+        team: operational ? (
+          <InviteMember merchantId={me.id} branches={branchChoices} />
+        ) : (
+          <p className="text-sm">You can invite your team once your account is approved.</p>
+        ),
         documents: mayManageDocuments ? (
           <>
             {evidence && !evidence.ok && <p role="alert">{evidence.message}</p>}
