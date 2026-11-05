@@ -237,7 +237,8 @@ async function main() {
   const payload = await createPayload();
   const engine = new BookingEngine(payload, !process.env.BOOKING_DATABASE_URL);
   const server = createBookingServer(engine, secret);
-  const port = Number(process.env.BOOKING_PORT ?? 3003),
+  // Hosting platforms usually assign the port through PORT.
+  const port = Number(process.env.BOOKING_PORT ?? process.env.PORT ?? 3003),
     host = process.env.BOOKING_HOST ?? '127.0.0.1';
   server.listen(port, host, () =>
     console.log(
