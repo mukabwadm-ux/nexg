@@ -13,7 +13,7 @@ export default function HomePage() {
       <h1 className="text-4xl font-extrabold tracking-tight mb-4">NexG API</h1>
       <p className="text-lg text-ink/70 mb-8">
         Read the public catalog and, with an authorized merchant key,
-        your merchant's orders. Responses use API version v1.
+        your merchant&apos;s orders. Responses use API version v1.
       </p>
 
       <div className="flex flex-wrap gap-4 text-sm">

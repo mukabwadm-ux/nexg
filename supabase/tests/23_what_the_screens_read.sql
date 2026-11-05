@@ -82,11 +82,27 @@ insert into t (k, v) select 'unattributed_before',
   coalesce((select revenue_cents from public.fin_kpi_daily
              where day = (select v::date from t where k='today') and city_id is null), 0)::text;
 
+create temp view month_totals as
+with period as (
+  select date_trunc('month', v::date)::date as starts_on, v::date as ends_on
+    from t where k = 'today'
+)
+select coalesce(sum(amount_cents) filter (where direction = 'in'), 0) as cash_in,
+       coalesce(sum(amount_cents) filter (where direction = 'out' and bucket = 'tax'), 0) as tax_to_remit,
+       (select coalesce(sum(gross_cents), 0)
+          from public.fin_kpi_daily, period
+         where day between starts_on and ends_on) as gross
+  from public.fin_money_flow, period
+ where period_start = starts_on and period_end = ends_on;
+
+create temp table month_before as table month_totals;
+
 select lives_ok(
   $$select ledger.post('payment_captured', 'tap:nocity',
       jsonb_build_array(
-        jsonb_build_object('account','cash.mpesa_paybill','debit',500000),
-        jsonb_build_object('account','revenue.commission','credit',500000)))$$,
+        jsonb_build_object('account','cash.mpesa_paybill','debit',580000),
+        jsonb_build_object('account','revenue.commission','credit',500000),
+        jsonb_build_object('account','tax.vat_output','credit',80000)))$$,
   'Money can be posted without a city — the ledger does not require one.');
 
 select is(
@@ -130,10 +146,13 @@ select is(
   'And what we owe merchants is what we booked as owed to them.');
 
 select is(
-  (select coalesce(sum(amount_cents), 0) from public.fin_money_flow where direction = 'in'),
-  (select coalesce(sum(gross_cents), 0) from public.fin_kpi_daily
-    where day >= date_trunc('month', (select v::date from t where k='today'))),
-  'Money in for the month equals what guests were charged for it.');
+  (select jsonb_build_object(
+      'cash_in', after.cash_in - before.cash_in,
+      'gross', after.gross - before.gross,
+      'tax_to_remit', after.tax_to_remit - before.tax_to_remit)
+     from month_totals after cross join month_before before),
+  '{"cash_in": 580000, "gross": 500000, "tax_to_remit": 80000}'::jsonb,
+  'Cash in includes the VAT charged, and the gross tile and tax bucket show their separate amounts.');
 
 -- ═════════════════════════════════ 4. a zero is not an absence
 

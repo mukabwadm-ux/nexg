@@ -340,15 +340,17 @@ select is(
   'And a signed-in person can only read them.');
 
 /*
- * The webhook still works with no session, because it goes
- * through a security-definer function rather than a table grant.
- * That is the whole reason the grants could be taken away.
+ * The providers arrive without a session and supply proof to their own
+ * entry points. The common settlement worker is private.
  */
 select ok(
-  has_function_privilege('anon',
+  not has_function_privilege('anon',
     'public.rpc_payment_webhook(text,text,text,boolean,jsonb,boolean,text,bigint,text)',
-    'EXECUTE'),
-  'The webhook can still be called by an unauthenticated provider.');
+    'EXECUTE')
+  and has_function_privilege('anon', 'public.rpc_payment_paystack_webhook(text,text)', 'EXECUTE')
+  and has_function_privilege('anon',
+    'public.rpc_payment_mpesa_callback(text,integer,text,text,jsonb,numeric,text,text)', 'EXECUTE'),
+  'Only the proof-checking provider entry points accept a caller without a session.');
 
 select is(
   (select count(*)::int from pg_proc p
