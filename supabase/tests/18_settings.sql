@@ -51,6 +51,10 @@ from public.role r where r.key = 'ops_manager' on conflict do nothing;
 
 insert into t (k, v) select 'city', (select id::text from public.city where name = 'Nairobi');
 
+/* Exercise the first commission change even when the rate card is seeded. */
+delete from settings.version where key = 'fees.commission';
+update settings.definition set default_value = null where key = 'fees.commission';
+
 -- ══════════════════════════════════ the registry is the gate
 
 select ok(

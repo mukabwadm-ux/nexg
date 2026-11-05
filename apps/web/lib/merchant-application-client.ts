@@ -3,7 +3,11 @@ import {
   MerchantPayoutDeclaration,
 } from '@nexg/contracts/merchant-application';
 
-export function applicationCapture(input: Record<string, any>) {
+/** Form state from the untyped JSX onboarding app; validated by the zod schemas below. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LooseFormState = Record<string, any>;
+
+export function applicationCapture(input: LooseFormState) {
   const b = input.business ?? {};
   const normalize = (value: unknown) => {
     const valueText = String(value ?? '').replace(/[\s()-]/g, '');
@@ -36,7 +40,7 @@ export function applicationCapture(input: Record<string, any>) {
     policies: { terms: input.policies?.terms === true },
   });
 }
-export function payoutDeclaration(input: Record<string, any>) {
+export function payoutDeclaration(input: LooseFormState) {
   if (input.method === 'mobile_money')
     throw new Error(
       'Your previous phone number is retained. Choose Till, PayBill or bank before saving.',

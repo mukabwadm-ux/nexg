@@ -35,13 +35,18 @@ export async function POST(request: Request) {
   }
   const payment = begun.data as { reference: string; amount_cents: number };
 
-  if (!darajaConfigured()) {
+  const callbackSecret = process.env.DARAJA_CALLBACK_SECRET?.trim() ?? '';
+  const callbackReady =
+    darajaConfigured() &&
+    (await supabase.rpc('rpc_payment_mpesa_ready', { p_callback_secret: callbackSecret })).data;
+  if (!callbackReady) {
     return NextResponse.json(
       {
         ok: false,
         pending: true,
         reference: payment.reference,
-        message: 'M-Pesa is not connected yet. Your order is saved and the amount owed is recorded.',
+        message:
+          'M-Pesa is not connected yet. Your order is saved and the amount owed is recorded.',
       },
       { status: 503 },
     );
@@ -54,9 +59,7 @@ export async function POST(request: Request) {
     phone,
     amountCents: payment.amount_cents,
     reference: payment.reference,
-    callbackUrl: `${origin}/api/payments/mpesa/callback?token=${encodeURIComponent(
-      process.env.DARAJA_CALLBACK_SECRET ?? '',
-    )}`,
+    callbackUrl: `${origin}/api/payments/mpesa/callback?token=${encodeURIComponent(callbackSecret)}`,
     description: 'NexG order',
   });
   if (!sent.ok || !sent.checkoutRequestId) {
@@ -70,6 +73,7 @@ export async function POST(request: Request) {
       p_checkout_request_id: sent.checkoutRequestId,
       p_merchant_request_id: sent.merchantRequestId ?? null,
       p_phone: phone,
+      p_callback_secret: callbackSecret,
     } as never,
   )) as unknown as { error: { message: string } | null };
   if (back.error) {

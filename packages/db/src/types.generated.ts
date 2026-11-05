@@ -52825,23 +52825,29 @@ export type Database = {
       rpc_payment_mpesa_callback: {
         Args: {
           p_amount_kes?: number;
+          p_callback_secret: string;
           p_checkout_request_id: string;
           p_payload: Json;
           p_phone?: string;
           p_receipt?: string;
           p_result_code: number;
           p_result_desc: string;
-          p_secret_ok: boolean;
         };
         Returns: Json;
       };
+      rpc_payment_mpesa_ready: { Args: { p_callback_secret: string }; Returns: boolean };
       rpc_payment_mpesa_sent: {
         Args: {
+          p_callback_secret: string;
           p_checkout_request_id: string;
           p_merchant_request_id: string;
           p_phone: string;
           p_reference: string;
         };
+        Returns: Json;
+      };
+      rpc_payment_paystack_webhook: {
+        Args: { p_raw_body: string; p_signature: string };
         Returns: Json;
       };
       rpc_payment_webhook: {

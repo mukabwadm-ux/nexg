@@ -43,6 +43,7 @@ describe('persisted real merchant journey', () => {
       const db = database;
       // authenticate models a server-verified identity. PGlite still executes the
       // real session-row, ownership, revision, role and RLS checks for every call.
+      // eslint-disable-next-line no-inner-declarations -- test helper closes over the per-test database
       async function post(command: Record<string, unknown>, actor: Actor = 'owner', expectedStatus = 200) {
         const handler = applicationHandler({ enabled: true, authenticate: async () => true,
           rpc: (name, args, signal) => db.rpc(actor, name, args, signal) });
@@ -140,6 +141,7 @@ describe('persisted real merchant journey', () => {
       expect(ownRows.rows).toEqual([{ name: 'Bean stew' }, { name: 'Seasonal meal' }]);
       expect(foreignRows.rows).toEqual([]);
       expect((await db.rpc('owner', 'rpc_merchant_application_review', { p_merchant_id: merchantId, p_expected_revision: 2, p_operation_id: randomUUID(), p_decision: 'approved' })).error?.code).toBe('42501');
+      // eslint-disable-next-line no-inner-declarations -- test helper closes over the per-test database
       async function review(revision: number, decision: string, expectedError: string | null = null) {
         const response = await db.rpc('staff', 'rpc_merchant_application_review', { p_merchant_id: merchantId, p_expected_revision: revision, p_operation_id: randomUUID(), p_decision: decision, p_reason: decision === 'changes_requested' ? 'Confirm the registered name.' : null });
         expect(response.error?.code ?? null).toBe(expectedError);

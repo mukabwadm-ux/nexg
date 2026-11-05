@@ -208,10 +208,11 @@ export function PromotionsWorkspace({
       : 'makeup',
   );
   const profile = profiles.find((p) => p.id === profileId) ?? profiles[0]!;
+  const demoProfileId = activeDemo?.profileId;
   useEffect(() => {
-    if (!initialProfileId && activeDemo && profiles.some((item) => item.id === activeDemo.profileId))
-      setProfileId(activeDemo.profileId);
-  }, [initialProfileId, activeDemo?.profileId]);
+    if (!initialProfileId && demoProfileId && profiles.some((item) => item.id === demoProfileId))
+      setProfileId(demoProfileId);
+  }, [initialProfileId, demoProfileId]);
   const [source, setSource] = useState<PromotionSource | null>(suppliedSource ?? null);
   const [catalogue, setCatalogue] = useState<PromotionCatalogue | null>(null);
   const [data, setData] = useState<PromotionData | null>(null);

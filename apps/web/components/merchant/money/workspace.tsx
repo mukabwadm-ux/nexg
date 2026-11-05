@@ -35,10 +35,11 @@ export function MoneyWorkspace({ additionalProfiles = noProfiles, initialProfile
   const [initialized, setInitialized] = useState(false), [profileId, setProfileId] = useState(initialProfileId ?? demoContext?.profileId ?? 'restaurant'), [location, setLocation] = useState('Westlands');
   const [invalidProfile, setInvalidProfile] = useState('');
   const profile = profiles.find((p) => p.id === profileId) ?? profiles[0]!;
+  const demoProfileId = activeDemo?.profileId;
   useEffect(() => {
-    if (!initialProfileId && activeDemo && profiles.some((item) => item.id === activeDemo.profileId))
-      setProfileId(activeDemo.profileId);
-  }, [initialProfileId, activeDemo?.profileId, profiles]);
+    if (!initialProfileId && demoProfileId && profiles.some((item) => item.id === demoProfileId))
+      setProfileId(demoProfileId);
+  }, [initialProfileId, demoProfileId, profiles]);
   const [catalogue, setCatalogue] = useState<Catalogue | null>(null), [offeringId, setOfferingId] = useState(''), [method, setMethod] = useState('');
   const [source, setSource] = useState<MoneySource | null>(null), [offeringsSource, setOfferingsSource] = useState<OfferingsSource | null>(null);
   const [scenario, setScenario] = useState<Scenario>('current'), [role, setRole] = useState<Role>('manager');
