@@ -22,7 +22,7 @@ export function MerchantAuthBoundary({ children, merchantId, actorId, access, is
   useEffect(() => {
     let active = true;
     let expiryTimer: ReturnType<typeof setTimeout> | undefined;
-    let watcher: ReturnType<typeof watchMerchantWorkspaceAccess> | undefined;
+    let watcher: ReturnType<typeof watchMerchantWorkspaceAccess> | undefined = undefined;
     let lastActivity = 0;
     const client = createClient();
     // A refreshed server tree has re-authorized the new children. Old request
