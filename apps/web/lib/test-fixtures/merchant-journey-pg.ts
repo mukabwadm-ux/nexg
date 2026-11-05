@@ -48,9 +48,12 @@ function between(source: string, start: string, end: string) {
  * Its synthetic Auth claims never come from a browser or an unverified JWT.
  */
 export async function merchantJourneyDatabase(directory: string) {
+  // PHASE4_PGLITE_PATH still overrides, for runs against a separately pinned
+  // PGlite build; otherwise use the dev dependency so CI runs this suite too.
   const toolPath = process.env.PHASE4_PGLITE_PATH;
-  if (!toolPath) throw new Error('Set PHASE4_PGLITE_PATH to the existing isolated PGlite dist/index.js.');
-  const { PGlite } = await import(/* @vite-ignore */ pathToFileURL(toolPath).href);
+  const { PGlite } = toolPath
+    ? await import(/* @vite-ignore */ pathToFileURL(toolPath).href)
+    : await import('@electric-sql/pglite');
   let pg: Database = new PGlite(directory);
   const ids = Object.fromEntries(['owner', 'stranger', 'staff', 'ownerSession', 'strangerSession', 'staffSession', 'staffId'].map((key) => [key, randomUUID()]));
   let queue: Promise<unknown> = Promise.resolve();
