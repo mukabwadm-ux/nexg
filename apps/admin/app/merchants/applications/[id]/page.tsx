@@ -14,7 +14,6 @@ import {
   loadMerchantApplicationReview,
   ReviewSourceError,
 } from '@/lib/merchant-application-review';
-import { loadMerchantDocumentReadiness } from '@/lib/merchant-document-readiness-load';
 import { requireModule, requireStaff } from '@/lib/staff';
 
 export const metadata: Metadata = { title: 'Review merchant application' };
@@ -30,10 +29,8 @@ export default async function ManagedMerchantApplicationPage({
   const staff = await requireStaff();
   requireModule(staff, 'merchants');
   let source: Awaited<ReturnType<typeof loadMerchantApplicationReview>>;
-  let documents: Awaited<ReturnType<typeof loadMerchantDocumentReadiness>> = null;
   try {
     source = await loadMerchantApplicationReview(params.id);
-    documents = await loadMerchantDocumentReadiness(params.id);
   } catch (error) {
     return (
       <ConsoleShell staff={staff} current="/merchants">
@@ -64,7 +61,7 @@ export default async function ManagedMerchantApplicationPage({
           >
             Back to applications
           </Link>
-          <ApplicationReviewDetail {...source} documents={documents} />
+          <ApplicationReviewDetail {...source} />
         </main>
       </ConsoleShell>
     </ApplicationReviewActor>

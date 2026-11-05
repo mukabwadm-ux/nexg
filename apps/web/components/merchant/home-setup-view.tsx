@@ -50,6 +50,8 @@ export interface HomeSetupRow {
   subRows?: HomeSetupRow[];
   /** Shown under the expanded subRows, e.g. a link to change the selection. */
   subRowsFooter?: React.ReactNode;
+  /** Greyed out and not actionable yet, e.g. until the account is approved. */
+  locked?: boolean;
 }
 
 export interface HomeSetupStatusItem {
@@ -113,7 +115,8 @@ export function HomeSetupView({
       else next.add(id);
       return next;
     });
-  const requiredRows = rows.filter((row) => row.required !== false);
+  // Locked steps cannot be worked on yet, so progress counts only the open ones.
+  const requiredRows = rows.filter((row) => row.required !== false && !row.locked);
   const completed = requiredRows.filter((row) => row.status === 'complete').length;
   const total = requiredRows.length;
   const remaining = total - completed;
@@ -224,7 +227,11 @@ export function HomeSetupView({
             // A grouped row's pencil opens its items inline instead of navigating.
             const shown: HomeSetupRow = grouped ? { ...row, onAction: () => toggle(row.id) } : row;
             return (
-              <li key={row.id} className="py-1.5">
+              <li
+                key={row.id}
+                className={`py-1.5 ${row.locked ? 'opacity-50' : ''}`}
+                data-locked={row.locked || undefined}
+              >
                 <div className="grid min-h-[48px] grid-cols-[30px_24px_1fr_auto] items-center gap-2 sm:grid-cols-[30px_24px_140px_1fr_145px]">
                   <span
                     className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${numberColors[row.status]}`}

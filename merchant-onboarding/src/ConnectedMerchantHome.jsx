@@ -130,6 +130,33 @@ export default function ConnectedMerchantHome({
       ),
     });
   }
+  // Documents and evidence is step 2, straight after the business profile:
+  // they are what the admin verifies before approving the account.
+  const documentsAt = homeRows.findIndex((row) => row.id === 'documents');
+  const businessAt = homeRows.findIndex((row) => row.id === 'business');
+  if (documentsAt > 0 && businessAt >= 0) {
+    const [documentsRow] = homeRows.splice(documentsAt, 1);
+    homeRows.splice(homeRows.findIndex((row) => row.id === 'business') + 1, 0, documentsRow);
+  }
+  // Until an admin approves the account, only the business profile and the
+  // documents can be worked on. Every other step is shown greyed out.
+  const awaitingApproval = !previewMode && !savedHome.access.operations;
+  const checklist = awaitingApproval
+    ? homeRows.map((row) =>
+        row.id === 'business' || row.id === 'documents'
+          ? row
+          : {
+              ...row,
+              locked: true,
+              status: 'waiting',
+              statusLabel: 'After approval',
+              onAction: undefined,
+              renderAction: undefined,
+              subRows: undefined,
+              subRowsFooter: undefined,
+            },
+      )
+    : homeRows;
   const reviewState = previewMode ? applicationStatus : savedHome.review.state;
   const needsResubmission = !previewMode && savedHome.review.needsResubmission;
   const approved = reviewState === 'approved' && !needsResubmission;
@@ -137,7 +164,7 @@ export default function ConnectedMerchantHome({
   const content = (openHelp) => (
     <HomeSetupView
       businessName={projection.businessName}
-      rows={homeRows}
+      rows={checklist}
       previewLabel={
         previewMode
           ? 'Demo · setup'
@@ -190,7 +217,7 @@ export default function ConnectedMerchantHome({
               ? published
                 ? 'Your approved workspace is available and your business is published. Accepting work has separate requirements.'
                 : 'Your approved workspace is available. Your business remains unpublished until activation requirements are met.'
-              : 'Continue the applicable setup below. Operational sections remain locked.'}
+              : 'Complete your business profile and documents below. The other steps unlock once an admin has verified your documents and approved your account.'}
           </p>
           {!previewMode &&
             (reviewState === 'changes_requested' || needsResubmission) &&

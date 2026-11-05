@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation';
-
 import {
   Documents,
   type Asked,
@@ -14,10 +12,7 @@ export const metadata = { title: 'Documents' };
 export const dynamic = 'force-dynamic';
 
 export default async function MerchantDocuments() {
-  // Open before and after approval: applicants upload here for verification,
-  // and approved businesses keep their documents current.
-  const me = await requireMerchant({ access: 'shell' });
-  if (!me.access.setup && !me.access.operations) redirect('/merchant');
+  const me = await requireMerchant({ access: 'setup' });
   const supabase = createClient();
 
   const [{ data: reqs, error }, { data: docs }, { data: asked }] = await Promise.all([
@@ -39,7 +34,7 @@ export default async function MerchantDocuments() {
   return (
     <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
       <PageHead
-        title="Documents and evidence"
+        title="Documents"
         lead="The documents NexG needs for your category, their review state and expiry. Documents you already verified are carried over and never re-requested unless they expire."
       />
 

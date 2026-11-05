@@ -5,7 +5,6 @@ import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application'
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import { outstandingDocuments, type DocumentReadiness } from '@/lib/merchant-document-readiness';
 import { createClient } from '@/lib/supabase/client';
 
 type Decision = 'approved' | 'changes_requested' | 'rejected';
@@ -28,14 +27,11 @@ export function ApplicationReviewControls({
   merchantId,
   revision,
   canReview,
-  documents = null,
 }: {
   actorId: string;
   merchantId: string;
   revision: number;
   canReview: boolean;
-  /** Null when document status could not be read; the database still enforces it. */
-  documents?: DocumentReadiness | null;
 }) {
   const router = useRouter();
   const [decision, setDecision] = useState<Decision>('approved');
@@ -175,14 +171,12 @@ export function ApplicationReviewControls({
     );
   const frozen = phase !== 'ready';
   const reasonMissing = decision !== 'approved' && !reason.trim();
-  const unverified = documents ? outstandingDocuments(documents) : [];
-  const documentsHold = decision === 'approved' && documents !== null && !documents.ready;
   return (
     <Card className="p-5">
       <h2 className="text-base font-extrabold">Review revision {revision}</h2>
       <p className="text-muted mt-2 text-sm leading-relaxed">
-        Approval unlocks the merchant&apos;s workspace and needs every required document verified
-        first. Publication and accepting work require separate activation checks.
+        Approval unlocks workspace access. Publication and accepting work require separate
+        activation checks.
       </p>
       <fieldset className="mt-4 space-y-4" disabled={frozen}>
         <legend className="sr-only">Application decision</legend>
@@ -222,36 +216,6 @@ export function ApplicationReviewControls({
           </p>
         </div>
       </fieldset>
-      {documentsHold ? (
-        <div
-          className="border-warning/30 bg-warning-bg mt-4 rounded-lg border p-3 text-sm"
-          role="note"
-        >
-          <p className="font-bold">Verify the documents before approving.</p>
-          <p className="mt-1">
-            {unverified.length === 1 ? 'This document is' : 'These documents are'} not verified yet:
-          </p>
-          <ul className="mt-1 list-disc pl-5">
-            {unverified.map((doc) => (
-              <li key={doc.kind}>
-                {doc.label} ({doc.status === 'missing' ? 'not uploaded' : doc.status})
-              </li>
-            ))}
-          </ul>
-          <a
-            href={`/merchants/${merchantId}`}
-            className="text-gold-text mt-2 inline-flex min-h-11 items-center font-bold underline"
-          >
-            Review and verify documents
-          </a>
-        </div>
-      ) : null}
-      {decision === 'approved' && documents === null ? (
-        <p className="text-muted mt-4 text-sm" role="note">
-          Document status could not be loaded. Approval is refused until every required document is
-          verified.
-        </p>
-      ) : null}
       {phase === 'unknown' ? (
         <Button block className="mt-4" onClick={() => void send(true)}>
           Retry same decision
@@ -262,7 +226,7 @@ export function ApplicationReviewControls({
           className="mt-4"
           loading={phase === 'pending'}
           loadingText="Saving decision…"
-          disabled={frozen || reasonMissing || documentsHold || reason.length > 2000}
+          disabled={frozen || reasonMissing || reason.length > 2000}
           variant={decision === 'rejected' ? 'danger' : 'black'}
           onClick={() => void send()}
         >
