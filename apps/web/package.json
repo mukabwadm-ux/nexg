@@ -14,8 +14,8 @@
     "clean": "rimraf .turbo .next node_modules"
   },
   "dependencies": {
-    "@nexg/booking-config": "workspace:*",
     "@hookform/resolvers": "3.10.0",
+    "@nexg/booking-config": "workspace:*",
     "@nexg/contracts": "workspace:*",
     "@nexg/db": "workspace:*",
     "@nexg/location": "workspace:*",
@@ -33,6 +33,7 @@
     "zod": "3.24.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.14",
     "@nexg/config": "workspace:*",
     "@types/node": "20.17.10",
     "@types/pngjs": "^6.0.5",
