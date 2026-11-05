@@ -8,6 +8,8 @@ import type {
   SubmittedApplicationSnapshot,
 } from '@/lib/merchant-application-review-contracts';
 
+import type { DocumentReadiness } from '@/lib/merchant-document-readiness';
+
 import { ApplicationReviewControls } from './application-review-controls';
 
 const STATES: Record<string, string> = {
@@ -252,11 +254,13 @@ export function ApplicationReviewDetail({
   record,
   submitted,
   canReview,
+  documents = null,
 }: {
   actorId: string;
   record: ApplicationReviewRecord;
   submitted: SubmittedApplicationSnapshot | null;
   canReview: boolean;
+  documents?: DocumentReadiness | null;
 }) {
   const snapshotCurrent =
     submitted?.revision === record.revision &&
@@ -323,7 +327,9 @@ export function ApplicationReviewDetail({
             merchantId={record.merchant_id}
             revision={record.revision}
             canReview={canReview && snapshotCurrent && record.review.state === 'pending'}
+            documents={documents}
           />
+          <DocumentReadinessCard merchantId={record.merchant_id} documents={documents} />
           {record.review.reason && (
             <Card className="p-5">
               <h2 className="text-sm font-extrabold">Recorded review reason</h2>
@@ -371,6 +377,62 @@ export function ApplicationReviewUnavailable({
         className="text-gold-text mt-3 inline-flex min-h-11 items-center text-sm font-bold underline"
       >
         Reload applications
+      </a>
+    </Card>
+  );
+}
+
+const DOCUMENT_STATUS: Record<string, string> = {
+  missing: 'Not uploaded',
+  uploaded: 'Awaiting verification',
+  verified: 'Verified',
+  rejected: 'Rejected',
+  expired: 'Expired',
+};
+
+export function DocumentReadinessCard({
+  merchantId,
+  documents,
+}: {
+  merchantId: string;
+  documents: DocumentReadiness | null;
+}) {
+  return (
+    <Card className="p-5">
+      <h2 className="text-sm font-extrabold">Documents and evidence</h2>
+      {documents === null ? (
+        <p className="text-muted mt-2 text-sm">Document status could not be loaded.</p>
+      ) : documents.documents.length === 0 ? (
+        <p className="text-muted mt-2 text-sm">No documents are required for this business.</p>
+      ) : (
+        <>
+          <p className="text-muted mt-2 text-sm">
+            {documents.ready
+              ? 'Every required document is verified.'
+              : 'Approval waits until every required document is verified.'}
+          </p>
+          <ul className="mt-3 space-y-2 text-sm">
+            {documents.documents.map((doc) => (
+              <li key={doc.kind} className="flex items-start justify-between gap-3">
+                <span>
+                  {doc.label}
+                  {doc.essential ? null : (
+                    <span className="text-muted-light"> (optional for approval)</span>
+                  )}
+                </span>
+                <span className={doc.status === 'verified' ? 'font-bold' : 'text-muted font-bold'}>
+                  {DOCUMENT_STATUS[doc.status] ?? doc.status}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      <a
+        href={`/merchants/${merchantId}`}
+        className="text-gold-text mt-3 inline-flex min-h-11 items-center text-sm font-bold underline"
+      >
+        Open documents to verify
       </a>
     </Card>
   );
