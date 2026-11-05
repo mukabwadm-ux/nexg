@@ -14,7 +14,11 @@ async function route(
   const access = await publicMerchantBookingAccess(request, businessId);
   if (access === 'not_found') return problem(404, 'This booking page does not exist.', 'not_found');
   if (access !== 'available')
-    return problem(503, 'This merchant booking page could not be checked.', 'publication_unavailable');
+    return problem(
+      503,
+      'This merchant booking page could not be checked.',
+      'publication_unavailable',
+    );
   const secret = process.env.BOOKING_BRIDGE_SECRET;
   if (!secret || secret.length < 32)
     return problem(

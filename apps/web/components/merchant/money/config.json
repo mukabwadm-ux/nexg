@@ -4,9 +4,7 @@
     {
       "schemaId": "PRODUCT_CATALOG_V1",
       "modelId": "ORDER",
-      "workflowIds": [
-        "WF_ORDER"
-      ],
+      "workflowIds": ["WF_ORDER"],
       "title": "Product and menu orders",
       "billingBasis": "items, variants and approved adjustments",
       "invariant": "No stock-confirmed-order-to-paid inference; no direct cash in NEXG payout.",
@@ -20,9 +18,7 @@
     {
       "schemaId": "SERVICE_APPOINTMENT_V1",
       "modelId": "APPOINTMENT",
-      "workflowIds": [
-        "WF_APPOINTMENT"
-      ],
+      "workflowIds": ["WF_APPOINTMENT"],
       "title": "On-site services",
       "billingBasis": "accepted service and separately classified booking payment",
       "invariant": "Advance is credited once; completion does not prove payment.",
@@ -35,9 +31,7 @@
     {
       "schemaId": "REMOTE_SESSION_V1",
       "modelId": "APPOINTMENT",
-      "workflowIds": [
-        "WF_REMOTE_SESSION"
-      ],
+      "workflowIds": ["WF_REMOTE_SESSION"],
       "title": "Remote services",
       "billingBasis": "provider service charge and actual remaining balance",
       "invariant": "No venue, travel or vehicle lines without an actual contract.",
@@ -50,9 +44,7 @@
     {
       "schemaId": "FIELD_SERVICE_V1",
       "modelId": "FIELD_VISIT",
-      "workflowIds": [
-        "WF_FIELD_SERVICE"
-      ],
+      "workflowIds": ["WF_FIELD_SERVICE"],
       "title": "Field service",
       "billingBasis": "agreed visit/scope and approved changes",
       "invariant": "No automatic travel/call-out tariff.",
@@ -65,9 +57,7 @@
     {
       "schemaId": "RENTAL_ASSET_V1",
       "modelId": "ASSET_INTERVAL",
-      "workflowIds": [
-        "WF_RENTAL"
-      ],
+      "workflowIds": ["WF_RENTAL"],
       "title": "Rentals and security",
       "billingBasis": "rental unit/contract period, extensions, independent security",
       "invariant": "Physical return does not release money; refundable security is not rental sales.",
@@ -81,9 +71,7 @@
     {
       "schemaId": "TRANSFER_ROUTE_V1",
       "modelId": "TRANSFER",
-      "workflowIds": [
-        "WF_TRANSFER"
-      ],
+      "workflowIds": ["WF_TRANSFER"],
       "title": "Trips and greeters",
       "billingBasis": "one root trip/greeting price and actual inclusions",
       "invariant": "Driver and vehicle do not create another sale; greeter-only has no car income.",
@@ -96,39 +84,25 @@
     {
       "schemaId": "EVENT_TICKET_V1",
       "modelId": "SESSION_CAPACITY",
-      "workflowIds": [
-        "WF_EVENT_SESSION"
-      ],
+      "workflowIds": ["WF_EVENT_SESSION"],
       "title": "Event tickets",
       "billingBasis": "actual ticket/party/pass price and occurrence",
       "invariant": "Ticket/participant count is not payment count; cancelled event is not a refund.",
-      "headlineMetricIds": [
-        "finance_gross_sales",
-        "money_booking_advances_v1",
-        "finance_refunds"
-      ]
+      "headlineMetricIds": ["finance_gross_sales", "money_booking_advances_v1", "finance_refunds"]
     },
     {
       "schemaId": "GROUP_SESSION_V1",
       "modelId": "SESSION_CAPACITY",
-      "workflowIds": [
-        "WF_GROUP_ACTIVITY"
-      ],
+      "workflowIds": ["WF_GROUP_ACTIVITY"],
       "title": "Group sessions",
       "billingBasis": "accepted participant/place price and occurrence",
       "invariant": "Included membership places are not resold; joint resources do not duplicate bills.",
-      "headlineMetricIds": [
-        "finance_gross_sales",
-        "money_booking_advances_v1",
-        "finance_refunds"
-      ]
+      "headlineMetricIds": ["finance_gross_sales", "money_booking_advances_v1", "finance_refunds"]
     },
     {
       "schemaId": "SPACE_RESERVATION_V1",
       "modelId": "SPACE_RESERVATION",
-      "workflowIds": [
-        "WF_SPACE_RESERVATION_V1"
-      ],
+      "workflowIds": ["WF_SPACE_RESERVATION_V1"],
       "title": "Tables and spaces",
       "billingBasis": "reservation charge/credited advance, minimum spend and final bill",
       "invariant": "Minimum spend is a commitment until the owner charges it; credit advance once.",
@@ -141,9 +115,7 @@
     {
       "schemaId": "TOUR_PACKAGE_V1",
       "modelId": "TOUR",
-      "workflowIds": [
-        "WF_TOUR"
-      ],
+      "workflowIds": ["WF_TOUR"],
       "title": "Tours and itineraries",
       "billingBasis": "shared departure or private accepted itinerary; principal/agent basis",
       "invariant": "Supplier/customer pass-through is not automatically merchant revenue.",
@@ -156,9 +128,7 @@
     {
       "schemaId": "REQUEST_QUOTE_V1",
       "modelId": "REQUEST_QUOTE",
-      "workflowIds": [
-        "WF_REQUEST_QUOTE"
-      ],
+      "workflowIds": ["WF_REQUEST_QUOTE"],
       "title": "Quoted work",
       "billingBasis": "accepted scope, milestones, invoices and collections",
       "invariant": "Requested/accepted quote is not cash, invoice debt or recognized revenue.",
@@ -171,9 +141,7 @@
     {
       "schemaId": "MADE_TO_ORDER_V1",
       "modelId": "PRODUCTION_DUE",
-      "workflowIds": [
-        "WF_MADE_TO_ORDER"
-      ],
+      "workflowIds": ["WF_MADE_TO_ORDER"],
       "title": "Custom production",
       "billingBasis": "accepted specification, approved change and progress/final bill",
       "invariant": "Unaccepted change and production deadline do not create payment.",
@@ -186,9 +154,7 @@
     {
       "schemaId": "PICKUP_RETURN_V1",
       "modelId": "LINKED_WINDOWS",
-      "workflowIds": [
-        "WF_PICKUP_RETURN"
-      ],
+      "workflowIds": ["WF_PICKUP_RETURN"],
       "title": "Measured linked services",
       "billingBasis": "accepted rate and confirmed measured quantity on one commercial root",
       "invariant": "Collection/processing/return legs do not each create revenue.",
@@ -201,9 +167,7 @@
     {
       "schemaId": "SERVICE_JOB_V1",
       "modelId": "SERVICE_JOB",
-      "workflowIds": [
-        "WF_SERVICE_JOB"
-      ],
+      "workflowIds": ["WF_SERVICE_JOB"],
       "title": "Workshop and service jobs",
       "billingBasis": "approved assessment, parts/labour and staged/final invoice",
       "invariant": "Queue estimate is not invoice debt; approved changes already included are not added again.",
@@ -217,9 +181,7 @@
     {
       "schemaId": "MEMBERSHIP_PLAN_V1",
       "modelId": "ENTITLEMENT",
-      "workflowIds": [
-        "WF_MEMBERSHIP"
-      ],
+      "workflowIds": ["WF_MEMBERSHIP"],
       "title": "Memberships and retainers",
       "billingBasis": "contracted billing period, credits and renewal",
       "invariant": "Cash collection is not automatically earned revenue; included redemption is not a sale.",
@@ -232,9 +194,7 @@
     {
       "schemaId": "FREIGHT_SHIPMENT_V1",
       "modelId": "FREIGHT",
-      "workflowIds": [
-        "WF_FREIGHT"
-      ],
+      "workflowIds": ["WF_FREIGHT"],
       "title": "Freight",
       "billingBasis": "agreed chargeable measure and authorized separate service lines",
       "invariant": "No guessed dimensional conversion; carrier/customs funds classified by contract.",
@@ -247,31 +207,20 @@
     {
       "schemaId": "STORAGE_SPACE_V1",
       "modelId": "STORAGE",
-      "workflowIds": [
-        "WF_STORAGE"
-      ],
+      "workflowIds": ["WF_STORAGE"],
       "title": "Storage",
       "billingBasis": "declared space unit and billing period",
       "invariant": "No assumed proration; custody end and money settlement remain independent.",
-      "headlineMetricIds": [
-        "money_billed_work_v1",
-        "money_customer_due_v1",
-        "money_overdue_due_v1"
-      ]
+      "headlineMetricIds": ["money_billed_work_v1", "money_customer_due_v1", "money_overdue_due_v1"]
     },
     {
       "schemaId": "REGULATED_ENQUIRY_V1",
       "modelId": "REQUEST_QUOTE",
-      "workflowIds": [
-        "WF_REGULATED_ENQUIRY"
-      ],
+      "workflowIds": ["WF_REGULATED_ENQUIRY"],
       "title": "Regulated enquiry/referral",
       "billingBasis": "permitted merchant service/referral fees only",
       "invariant": "No customer banking, loan, FX, remittance or wallet balances or executable rails.",
-      "headlineMetricIds": [
-        "money_confirmed_collections_v1",
-        "finance_refunds"
-      ]
+      "headlineMetricIds": ["money_confirmed_collections_v1", "finance_refunds"]
     }
   ],
   "profiles": [

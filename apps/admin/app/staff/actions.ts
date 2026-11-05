@@ -91,9 +91,12 @@ export async function setStatus(
 
 export async function resetStaffCredentials(staffId: string): Promise<ActionResult> {
   const supabase = createClient();
-  const { data, error } = await supabase.rpc('rpc_staff_reset_credentials' as never, {
-    p_staff_id: staffId,
-  } as never);
+  const { data, error } = await supabase.rpc(
+    'rpc_staff_reset_credentials' as never,
+    {
+      p_staff_id: staffId,
+    } as never,
+  );
   if (error) return { ok: false, message: error.message };
   revalidatePath('/staff');
   const result = data as { one_time_password?: string } | null;

@@ -30,7 +30,12 @@ export default function OfferingsPage({
     : undefined;
   if (process.env.NODE_ENV !== 'development') notFound();
   return (
-    <MerchantLivePreviewShell active="Offerings" businessName={demoContext?.businessName} accountInitials={demoContext?.initials} demoContext={demoContext}>
+    <MerchantLivePreviewShell
+      active="Offerings"
+      businessName={demoContext?.businessName}
+      accountInitials={demoContext?.initials}
+      demoContext={demoContext}
+    >
       <OfferingsWorkspace
         initialProfileId={profileId}
         initialOfferingId={initialOfferingId}

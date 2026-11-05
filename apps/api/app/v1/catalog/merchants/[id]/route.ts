@@ -17,10 +17,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   // Resolve the credential first: a bad key is refused before any work is done.
   let credential;
   try {
@@ -46,7 +43,9 @@ export async function GET(
   // Fetch merchant
   const { data: merchant, error: merchantError } = await supabase
     .from('merchant_public')
-    .select('id, trading_name, category, category_other, cover_photo_path, featured, city_slug, city_name, branch_name, branch_address, branch_latitude, branch_longitude, listed_at, explore_visible, concierge_pick, accepting_orders, pay_on_delivery_enabled, pay_on_delivery_cap_kes, prep_minutes, busy_mode_until, closed_early_at, parent_merchant_id, subcategory')
+    .select(
+      'id, trading_name, category, category_other, cover_photo_path, featured, city_slug, city_name, branch_name, branch_address, branch_latitude, branch_longitude, listed_at, explore_visible, concierge_pick, accepting_orders, pay_on_delivery_enabled, pay_on_delivery_cap_kes, prep_minutes, busy_mode_until, closed_early_at, parent_merchant_id, subcategory',
+    )
     .eq('id', id)
     .maybeSingle();
 
@@ -62,7 +61,9 @@ export async function GET(
   // Fetch catalogue items
   const { data: catalogue, error: catalogueError } = await supabase
     .from('catalogue_public')
-    .select('id, merchant_id, section_id, name, description, price_kes, available, age_restricted, highlighted, sort')
+    .select(
+      'id, merchant_id, section_id, name, description, price_kes, available, age_restricted, highlighted, sort',
+    )
     .eq('merchant_id', id)
     .order('sort', { ascending: true })
     .order('name', { ascending: true });

@@ -114,7 +114,7 @@ export function BookingDetails({
       </dl>
       {booking.custodyState ? (
         <p
-          className={`rounded-lg p-3 text-sm ${booking.occupancyOverdue ? 'bg-danger/5 text-danger' : 'bg-black/[0.025] text-muted'}`}
+          className={`rounded-lg p-3 text-sm ${booking.occupancyOverdue ? 'bg-danger/5 text-danger' : 'text-muted bg-black/[0.025]'}`}
         >
           {booking.custodyState === 'in_use'
             ? booking.occupancyOverdue

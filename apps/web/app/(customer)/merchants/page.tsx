@@ -172,10 +172,8 @@ export default async function MerchantsPage() {
   ]);
 
   if (citiesError) throw new Error(`Could not load merchant cities: ${citiesError.message}`);
-  if (cityCountError)
-    throw new Error(`Could not count merchant cities: ${cityCountError.message}`);
-  if (commissionError)
-    throw new Error(`Could not load merchant fees: ${commissionError.message}`);
+  if (cityCountError) throw new Error(`Could not count merchant cities: ${cityCountError.message}`);
+  if (commissionError) throw new Error(`Could not load merchant fees: ${commissionError.message}`);
   if (categoriesError)
     throw new Error(`Could not load merchant categories: ${categoriesError.message}`);
 
@@ -276,7 +274,9 @@ export default async function MerchantsPage() {
                     >
                       <Icon className="h-6 w-6" />
                     </span>
-                    <span className="text-[0.6875rem] font-bold leading-tight">{category.label}</span>
+                    <span className="text-[0.6875rem] font-bold leading-tight">
+                      {category.label}
+                    </span>
                   </li>
                 );
               })}

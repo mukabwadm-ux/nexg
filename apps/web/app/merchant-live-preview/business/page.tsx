@@ -12,8 +12,10 @@ export default function BusinessPage({
   const demoContext = searchParams ? parseMerchantOnboardingDemoContext(searchParams) : null;
   return (
     <BusinessWorkspace
-      initialProfileId={typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId}
-      initialTab={typeof searchParams?.tab === 'string' ? searchParams.tab as Section : undefined}
+      initialProfileId={
+        typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId
+      }
+      initialTab={typeof searchParams?.tab === 'string' ? (searchParams.tab as Section) : undefined}
       demoContext={demoContext}
     />
   );

@@ -480,9 +480,16 @@ async function main() {
     await test('Unknown sample profile safely falls back without a runtime exception', async () => {
       await visit('?profile=not-a-registered-profile');
       await expect(workspace()).toHaveAttribute('data-profile', 'restaurant');
-      await expect(workspace()).toContainText('That sample activity was not found. The restaurant example is shown.');
+      await expect(workspace()).toContainText(
+        'That sample activity was not found. The restaurant example is shown.',
+      );
       await expect(metric('order_completed')).toHaveText('1,176');
-      return { requestedUnknownProfile: true, explicitFallbackNotice: true, fallbackProfile: 'restaurant', completed: 1176 };
+      return {
+        requestedUnknownProfile: true,
+        explicitFallbackNotice: true,
+        fallbackProfile: 'restaurant',
+        completed: 1176,
+      };
     });
     await test('Preview makes no source calls, mutations or guest consumer prompts', async () => {
       await visit();

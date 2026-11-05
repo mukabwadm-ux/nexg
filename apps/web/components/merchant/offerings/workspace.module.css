@@ -1069,7 +1069,25 @@
   }
 }
 
-.root :global(.of-setup-editor) { display: flex; flex-direction: column; min-height: 0; height: 100%; gap: 8px; }
-.root :global(.of-setup-activity) { display: flex; align-items: center; gap: 10px; font-weight: 700; }
-.root :global(.of-setup-activity select) { flex: 1; }
-.root :global(.of-setup-note), .root :global(.of-setup-notice) { font-size: 12px; color: var(--of-muted); margin: 0; }
+.root :global(.of-setup-editor) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  gap: 8px;
+}
+.root :global(.of-setup-activity) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+.root :global(.of-setup-activity select) {
+  flex: 1;
+}
+.root :global(.of-setup-note),
+.root :global(.of-setup-notice) {
+  font-size: 12px;
+  color: var(--of-muted);
+  margin: 0;
+}

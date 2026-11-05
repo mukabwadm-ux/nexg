@@ -225,7 +225,9 @@ export function InsightsWorkspace({
   const [snapshot, setSnapshot] = useState<InsightsSourceSnapshot>(
     () =>
       initialSnapshot ??
-      (mode === 'live' ? createUnavailableSnapshot() : sampleSnapshot(initialProfileId ?? demoContext?.profileId)),
+      (mode === 'live'
+        ? createUnavailableSnapshot()
+        : sampleSnapshot(initialProfileId ?? demoContext?.profileId)),
   );
   const [policy, setPolicy] = useState(
     initialPolicy ?? (mode === 'sample' ? SAMPLE_POLICY : DENIED),
@@ -815,7 +817,21 @@ export function InsightsWorkspace({
       compare={compare}
       onDefinition={(item) => setPanel({ kind: 'definition', metric: item.id })}
       currency={view.currency}
-      notes={view.metrics.missing_ready_promises?.value ? { order_ready_on_time: <button className="in-metric-note" onClick={() => openReport('RPT_ORDER_READINESS', 'missing_ready_promises')}>{number(view.metrics.missing_ready_promises.value)} without a ready promise <ArrowRight size={10} /></button> } : undefined}
+      notes={
+        view.metrics.missing_ready_promises?.value
+          ? {
+              order_ready_on_time: (
+                <button
+                  className="in-metric-note"
+                  onClick={() => openReport('RPT_ORDER_READINESS', 'missing_ready_promises')}
+                >
+                  {number(view.metrics.missing_ready_promises.value)} without a ready promise{' '}
+                  <ArrowRight size={10} />
+                </button>
+              ),
+            }
+          : undefined
+      }
     />
   );
   const recordColumns: ColumnDef<InsightRecord, unknown>[] = [
@@ -895,15 +911,34 @@ export function InsightsWorkspace({
   const domainMetrics = [
     ...new Set(['work_requested', ...genericMetricIds, 'work_completed']),
   ].slice(0, 4);
-  const offeringUnits = [...new Set(view.menuRows.map(row => row.unit))];
-  const currentOfferingUnit = offeringUnits.includes(offeringUnit) ? offeringUnit : offeringUnits[0];
-  const itemSalesSegments = view.menuRows.slice(0, 4).map(row => ({ label: row.label, value: row.itemSalesMinor == null ? null : row.itemSalesMinor / 100 }));
-  if (view.menuRows.length > 4) itemSalesSegments.push({ label: 'Other items', value: view.menuRows.slice(4).some(row => row.itemSalesMinor == null) ? null : view.menuRows.slice(4).reduce((sum, row) => sum + (row.itemSalesMinor ?? 0), 0) / 100 });
-  const majorAmount = (id: string) => { const value = view.metrics[id]?.value; return value == null ? null : value / 100; };
+  const offeringUnits = [...new Set(view.menuRows.map((row) => row.unit))];
+  const currentOfferingUnit = offeringUnits.includes(offeringUnit)
+    ? offeringUnit
+    : offeringUnits[0];
+  const itemSalesSegments = view.menuRows.slice(0, 4).map((row) => ({
+    label: row.label,
+    value: row.itemSalesMinor == null ? null : row.itemSalesMinor / 100,
+  }));
+  if (view.menuRows.length > 4)
+    itemSalesSegments.push({
+      label: 'Other items',
+      value: view.menuRows.slice(4).some((row) => row.itemSalesMinor == null)
+        ? null
+        : view.menuRows.slice(4).reduce((sum, row) => sum + (row.itemSalesMinor ?? 0), 0) / 100,
+    });
+  const majorAmount = (id: string) => {
+    const value = view.metrics[id]?.value;
+    return value == null ? null : value / 100;
+  };
   const matchingReports = view.reports.filter((report) =>
     `${report.label} ${report.area}`.toLowerCase().includes(reportSearch.toLowerCase().trim()),
   );
-  const collectionCount = libraryTab === 'library' ? matchingReports.length : libraryTab === 'saved' ? visibleSavedViews.length : exportHistory.length;
+  const collectionCount =
+    libraryTab === 'library'
+      ? matchingReports.length
+      : libraryTab === 'saved'
+        ? visibleSavedViews.length
+        : exportHistory.length;
   const collectionPages = Math.max(1, Math.ceil(collectionCount / 5));
   const resolvedCollectionPage = Math.min(collectionPage, collectionPages - 1);
   const reportMetrics =
@@ -1007,33 +1042,35 @@ export function InsightsWorkspace({
                       />
                     </div>
                     <div className="in-library-list">
-                      {matchingReports.slice(resolvedCollectionPage * 5, resolvedCollectionPage * 5 + 5).map((report) => (
-                        <button
-                          type="button"
-                          key={report.id}
-                          className="in-library-row"
-                          aria-pressed={selectedReport?.id === report.id}
-                          onClick={() => {
-                            setReportId(report.id);
-                            setEvidenceMetric(null);
-                          }}
-                        >
-                          <span>
-                            <strong>{report.label}</strong>
-                            <small>
-                              {report.area} · {BASIS[report.dateBasis]}
-                            </small>
-                          </span>
-                          <span className="in-state" data-status={report.status}>
-                            {report.status === 'ready'
-                              ? 'Available'
-                              : report.status === 'partial'
-                                ? 'Partial'
-                                : 'Unavailable'}
-                          </span>
-                          <ArrowRight size={15} aria-hidden="true" />
-                        </button>
-                      ))}
+                      {matchingReports
+                        .slice(resolvedCollectionPage * 5, resolvedCollectionPage * 5 + 5)
+                        .map((report) => (
+                          <button
+                            type="button"
+                            key={report.id}
+                            className="in-library-row"
+                            aria-pressed={selectedReport?.id === report.id}
+                            onClick={() => {
+                              setReportId(report.id);
+                              setEvidenceMetric(null);
+                            }}
+                          >
+                            <span>
+                              <strong>{report.label}</strong>
+                              <small>
+                                {report.area} · {BASIS[report.dateBasis]}
+                              </small>
+                            </span>
+                            <span className="in-state" data-status={report.status}>
+                              {report.status === 'ready'
+                                ? 'Available'
+                                : report.status === 'partial'
+                                  ? 'Partial'
+                                  : 'Unavailable'}
+                            </span>
+                            <ArrowRight size={15} aria-hidden="true" />
+                          </button>
+                        ))}
                       {matchingReports.length === 0 && (
                         <div className="in-empty-chart">No reports match this search.</div>
                       )}
@@ -1087,28 +1124,30 @@ export function InsightsWorkspace({
                       No saved views on this device. Choose a report in Library to save its filters.
                     </div>
                   ) : (
-                    visibleSavedViews.slice(resolvedCollectionPage * 5, resolvedCollectionPage * 5 + 5).map((entry) => (
-                      <div className="in-saved-row" key={entry.id}>
-                        <div>
-                          <strong>{entry.name}</strong>
-                          <p>
-                            {entry.filters.from} to {entry.filters.to} · Saved on this device
-                          </p>
+                    visibleSavedViews
+                      .slice(resolvedCollectionPage * 5, resolvedCollectionPage * 5 + 5)
+                      .map((entry) => (
+                        <div className="in-saved-row" key={entry.id}>
+                          <div>
+                            <strong>{entry.name}</strong>
+                            <p>
+                              {entry.filters.from} to {entry.filters.to} · Saved on this device
+                            </p>
+                          </div>
+                          <div className="in-heading-actions">
+                            <button className="in-button" onClick={() => loadSaved(entry)}>
+                              Open view <ArrowRight size={14} />
+                            </button>
+                            <button
+                              className="in-button"
+                              aria-label={`Delete ${entry.name}`}
+                              onClick={() => deleteView(entry.id)}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
-                        <div className="in-heading-actions">
-                          <button className="in-button" onClick={() => loadSaved(entry)}>
-                            Open view <ArrowRight size={14} />
-                          </button>
-                          <button
-                            className="in-button"
-                            aria-label={`Delete ${entry.name}`}
-                            onClick={() => deleteView(entry.id)}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    ))
+                      ))
                   )}
                 </div>
               ) : (
@@ -1122,31 +1161,51 @@ export function InsightsWorkspace({
                       No exports yet. Choose a report and preview its export scope.
                     </div>
                   ) : (
-                    exportHistory.slice(resolvedCollectionPage * 5, resolvedCollectionPage * 5 + 5).map((entry) => (
-                      <div className="in-saved-row" key={entry.id}>
-                        <div>
-                          <strong>{entry.name}</strong>
-                          <p>
-                            {entry.scope} · Prepared {asOfLabel(entry.createdAt)}
-                          </p>
+                    exportHistory
+                      .slice(resolvedCollectionPage * 5, resolvedCollectionPage * 5 + 5)
+                      .map((entry) => (
+                        <div className="in-saved-row" key={entry.id}>
+                          <div>
+                            <strong>{entry.name}</strong>
+                            <p>
+                              {entry.scope} · Prepared {asOfLabel(entry.createdAt)}
+                            </p>
+                          </div>
+                          <button
+                            className="in-button"
+                            onClick={() => {
+                              setReportId(entry.reportId);
+                              setPanel({ kind: 'export' });
+                            }}
+                          >
+                            Prepare from current data
+                          </button>
                         </div>
-                        <button
-                          className="in-button"
-                          onClick={() => {
-                            setReportId(entry.reportId);
-                            setPanel({ kind: 'export' });
-                          }}
-                        >
-                          Prepare from current data
-                        </button>
-                      </div>
-                    ))
+                      ))
                   )}
                 </div>
               )}
               <div className="in-list-pagination">
-                <span>{collectionCount ? resolvedCollectionPage * 5 + 1 : 0}–{Math.min(collectionCount, (resolvedCollectionPage + 1) * 5)} of {collectionCount}</span>
-                <div className="in-heading-actions"><button className="in-button" disabled={resolvedCollectionPage === 0} onClick={() => setCollectionPage(resolvedCollectionPage - 1)}>Previous collection page</button><button className="in-button" disabled={resolvedCollectionPage >= collectionPages - 1} onClick={() => setCollectionPage(resolvedCollectionPage + 1)}>Next collection page</button></div>
+                <span>
+                  {collectionCount ? resolvedCollectionPage * 5 + 1 : 0}–
+                  {Math.min(collectionCount, (resolvedCollectionPage + 1) * 5)} of {collectionCount}
+                </span>
+                <div className="in-heading-actions">
+                  <button
+                    className="in-button"
+                    disabled={resolvedCollectionPage === 0}
+                    onClick={() => setCollectionPage(resolvedCollectionPage - 1)}
+                  >
+                    Previous collection page
+                  </button>
+                  <button
+                    className="in-button"
+                    disabled={resolvedCollectionPage >= collectionPages - 1}
+                    onClick={() => setCollectionPage(resolvedCollectionPage + 1)}
+                  >
+                    Next collection page
+                  </button>
+                </div>
               </div>
             </section>
           </>
@@ -1316,19 +1375,33 @@ export function InsightsWorkspace({
             ])}
           <div className="in-grid">
             <div className="in-content">
-              {offeringUnits.length > 1 && <label className="in-unit-picker">Quantity unit <select value={currentOfferingUnit} onChange={event => setOfferingUnit(event.target.value)}>{offeringUnits.map(unit => <option key={unit}>{unit}</option>)}</select></label>}
-              {offeringUnits.filter(unit => unit === currentOfferingUnit).map((unit) => (
-                <BarReport
-                  key={unit}
-                  title={`Top items by fulfilled units · ${unit}`}
-                  data={view.menuRows
-                    .filter((row) => row.unit === unit)
-                    .slice(0, 5)
-                    .map((row) => ({ label: row.label, value: row.units }))}
-                  unit={unit}
-                  onReport={() => openReport('RPT_ORDER_VARIANTS')}
-                />
-              ))}
+              {offeringUnits.length > 1 && (
+                <label className="in-unit-picker">
+                  Quantity unit{' '}
+                  <select
+                    value={currentOfferingUnit}
+                    onChange={(event) => setOfferingUnit(event.target.value)}
+                  >
+                    {offeringUnits.map((unit) => (
+                      <option key={unit}>{unit}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {offeringUnits
+                .filter((unit) => unit === currentOfferingUnit)
+                .map((unit) => (
+                  <BarReport
+                    key={unit}
+                    title={`Top items by fulfilled units · ${unit}`}
+                    data={view.menuRows
+                      .filter((row) => row.unit === unit)
+                      .slice(0, 5)
+                      .map((row) => ({ label: row.label, value: row.units }))}
+                    unit={unit}
+                    onReport={() => openReport('RPT_ORDER_VARIANTS')}
+                  />
+                ))}
               {view.menuRows.length === 0 && (
                 <Unavailable
                   title="Offering quantity evidence"
@@ -1339,17 +1412,27 @@ export function InsightsWorkspace({
                 />
               )}
             </div>
-            {isOrder && resolvedPolicy.canReadFinance ? <BarReport title="Item sales by offering" data={itemSalesSegments} unit={view.currency} donut onReport={() => openReport('RPT_ORDER_VARIANTS')} /> : <ReportPanel title="What this report counts">
-              <div className="in-report-preview">
-                <p>
-                  Actual accepted offerings and their selected variants. Each quantity retains its
-                  declared unit. Unknown quantities are not counted as zero.
-                </p>
-                <button className="in-text-button" onClick={() => setPanel({ kind: 'coverage' })}>
-                  View definitions and coverage <ArrowRight size={14} />
-                </button>
-              </div>
-            </ReportPanel>}
+            {isOrder && resolvedPolicy.canReadFinance ? (
+              <BarReport
+                title="Item sales by offering"
+                data={itemSalesSegments}
+                unit={view.currency}
+                donut
+                onReport={() => openReport('RPT_ORDER_VARIANTS')}
+              />
+            ) : (
+              <ReportPanel title="What this report counts">
+                <div className="in-report-preview">
+                  <p>
+                    Actual accepted offerings and their selected variants. Each quantity retains its
+                    declared unit. Unknown quantities are not counted as zero.
+                  </p>
+                  <button className="in-text-button" onClick={() => setPanel({ kind: 'coverage' })}>
+                    View definitions and coverage <ArrowRight size={14} />
+                  </button>
+                </div>
+              </ReportPanel>
+            )}
           </div>
           {view.menuRows.length ? (
             <EvidenceTable
@@ -1564,8 +1647,28 @@ export function InsightsWorkspace({
           />
           {cardSet(['merchant_credits', 'refund_debits', 'fee_debits', 'net_posted_credit'])}
           <div className="in-grid">
-            <BarReport title="Posted credits and net credit" description="Credits less refunds and fees. Net credit is not profit or a payout estimate." data={[{ label: 'Merchant credits', value: majorAmount('merchant_credits') }, { label: 'Net posted credit', value: majorAmount('net_posted_credit') }]} unit={view.currency} vertical onReport={() => openReport('RPT_POSTED_MERCHANT_ACTIVITY')} />
-            <BarReport title="Posted movements by class" data={[{ label: 'Credits', value: majorAmount('merchant_credits') }, { label: 'Refunds', value: majorAmount('refund_debits') }, { label: 'Fees', value: majorAmount('fee_debits') }]} unit={view.currency} donut onReport={() => openReport('RPT_POSTED_MERCHANT_ACTIVITY')} />
+            <BarReport
+              title="Posted credits and net credit"
+              description="Credits less refunds and fees. Net credit is not profit or a payout estimate."
+              data={[
+                { label: 'Merchant credits', value: majorAmount('merchant_credits') },
+                { label: 'Net posted credit', value: majorAmount('net_posted_credit') },
+              ]}
+              unit={view.currency}
+              vertical
+              onReport={() => openReport('RPT_POSTED_MERCHANT_ACTIVITY')}
+            />
+            <BarReport
+              title="Posted movements by class"
+              data={[
+                { label: 'Credits', value: majorAmount('merchant_credits') },
+                { label: 'Refunds', value: majorAmount('refund_debits') },
+                { label: 'Fees', value: majorAmount('fee_debits') },
+              ]}
+              unit={view.currency}
+              donut
+              onReport={() => openReport('RPT_POSTED_MERCHANT_ACTIVITY')}
+            />
           </div>
           {detailedReportContent(
             view.reports.find((report) => report.id === 'RPT_POSTED_MERCHANT_ACTIVITY') ?? {
@@ -1716,7 +1819,13 @@ export function InsightsWorkspace({
                 Open Work <ArrowRight size={14} />
               </Link>
             ) : (
-              <Link className="in-button" href={appendMerchantOnboardingDemoContext('/merchant-live-preview/work', activeDemo)}>
+              <Link
+                className="in-button"
+                href={appendMerchantOnboardingDemoContext(
+                  '/merchant-live-preview/work',
+                  activeDemo,
+                )}
+              >
                 Open sample Work workspace <ArrowRight size={14} />
               </Link>
             )}
@@ -1865,7 +1974,14 @@ export function InsightsWorkspace({
             )}
             <Link
               className="in-button"
-              href={mode === 'sample' ? appendMerchantOnboardingDemoContext('/merchant-live-preview/settings', activeDemo) : '/merchant/settings'}
+              href={
+                mode === 'sample'
+                  ? appendMerchantOnboardingDemoContext(
+                      '/merchant-live-preview/settings',
+                      activeDemo,
+                    )
+                  : '/merchant/settings'
+              }
             >
               Open connection settings <ArrowRight size={14} />
             </Link>
@@ -2074,8 +2190,8 @@ export function InsightsWorkspace({
             <div>
               <h1>Insights</h1>
               <p className="in-subtitle">
-                {(activeDemo?.businessName ?? view.merchantName) || 'Your business'} · Understand your activity and the evidence
-                behind it.
+                {(activeDemo?.businessName ?? view.merchantName) || 'Your business'} · Understand
+                your activity and the evidence behind it.
               </p>
             </div>
             <div className="in-heading-actions">
@@ -2284,7 +2400,8 @@ export function InsightsWorkspace({
                 </span>
               </div>
             )}
-            {((view.notice && !(mode === 'sample' && visibleSnapshot.status === 'ready')) || visibleSnapshot.status === 'partial') && (
+            {((view.notice && !(mode === 'sample' && visibleSnapshot.status === 'ready')) ||
+              visibleSnapshot.status === 'partial') && (
               <div className="in-notice" data-tone="warning">
                 <Info size={16} />
                 <span>
@@ -2354,11 +2471,14 @@ export function InsightsWorkspace({
     <MerchantLivePreviewShell
       active="Insights"
       businessName={activeDemo?.businessName ?? snapshot.merchantName}
-      accountInitials={activeDemo?.initials ?? snapshot.merchantName
-        .split(' ')
-        .slice(0, 2)
-        .map((word) => word[0])
-        .join('')}
+      accountInitials={
+        activeDemo?.initials ??
+        snapshot.merchantName
+          .split(' ')
+          .slice(0, 2)
+          .map((word) => word[0])
+          .join('')
+      }
       demoContext={activeDemo}
       locationControl={locationControl}
       sampleControl={

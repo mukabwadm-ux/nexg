@@ -44,7 +44,9 @@ export async function GET(request: Request) {
   // Build the query â€” events are sorted by starts_at, then id
   let dbQuery = supabase
     .from('event_public')
-    .select('id, city_id, name, category, venue_name, venue_address, starts_at, ends_at, doors_at, cover_path, featured, anchor_slot, organiser_name, organiser_url, ticket_url, ticket_bands, nexg_can_hold_tickets, practical_note, suggested_blocks')
+    .select(
+      'id, city_id, name, category, venue_name, venue_address, starts_at, ends_at, doors_at, cover_path, featured, anchor_slot, organiser_name, organiser_url, ticket_url, ticket_bands, nexg_can_hold_tickets, practical_note, suggested_blocks',
+    )
     .order('starts_at', { ascending: true })
     .order('id', { ascending: false })
     .limit(limit + 1);
@@ -86,7 +88,8 @@ export async function GET(request: Request) {
 
   let nextCursor: string | null = null;
   const last = items[items.length - 1];
-  if (hasMore && last) {    nextCursor = encodeCursor(last.starts_at ?? '', last.id ?? '');
+  if (hasMore && last) {
+    nextCursor = encodeCursor(last.starts_at ?? '', last.id ?? '');
   }
 
   const response = {

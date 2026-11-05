@@ -33,7 +33,9 @@ const SetupOfferings = dynamic(() =>
   import('@/components/merchant/offerings/setup-offerings').then((module) => module.SetupOfferings),
 );
 const SetupLocationEditor = dynamic(() =>
-  import('@/components/merchant/business/setup-location').then((module) => module.SetupLocationEditor),
+  import('@/components/merchant/business/setup-location').then(
+    (module) => module.SetupLocationEditor,
+  ),
 );
 const SetupDocuments = dynamic(() =>
   import('@/components/merchant/setup-documents').then((module) => module.SetupDocuments),
@@ -95,7 +97,9 @@ export function ConnectedApplication({
   const [expired, setExpired] = useState(false);
   const [businessEmail, setBusinessEmail] = useState(initialRecord?.payload.business.email ?? '');
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
-  const [verificationStatus, setVerificationStatus] = useState<'sending' | 'ready' | 'error'>('ready');
+  const [verificationStatus, setVerificationStatus] = useState<'sending' | 'ready' | 'error'>(
+    'ready',
+  );
   const [verificationMessage, setVerificationMessage] = useState('');
   const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
   const [verificationCode, setVerificationCode] = useState('');
@@ -226,7 +230,9 @@ export function ConnectedApplication({
     } catch (error) {
       if (currentEmail.current === address) {
         setVerificationStatus('error');
-        setVerificationMessage(error instanceof Error ? error.message : 'We could not send a verification code.');
+        setVerificationMessage(
+          error instanceof Error ? error.message : 'We could not send a verification code.',
+        );
       }
       throw error;
     }
@@ -251,21 +257,36 @@ export function ConnectedApplication({
     try {
       await verifyEmailCode(normalizedBusinessEmail, verificationCode);
     } catch (error) {
-      setVerificationMessage(error instanceof Error ? error.message : 'We could not verify this code.');
+      setVerificationMessage(
+        error instanceof Error ? error.message : 'We could not verify this code.',
+      );
     } finally {
       setVerifyingEmail(false);
     }
   }
   const normalizedBusinessEmail = businessEmail.trim().toLowerCase();
   const emailVerificationPending = verificationEmail === normalizedBusinessEmail;
-  const emailIsVerified = verifiedEmail === normalizedBusinessEmail && normalizedBusinessEmail.length > 0;
+  const emailIsVerified =
+    verifiedEmail === normalizedBusinessEmail && normalizedBusinessEmail.length > 0;
   const businessEmailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedBusinessEmail);
   function emailVerificationAction() {
     if (!emailOtpEnabled || !businessEmailIsValid) return null;
     if (emailIsVerified)
-      return <span className="mo-email-verified" role="status">Email verified</span>;
+      return (
+        <span className="mo-email-verified" role="status">
+          Email verified
+        </span>
+      );
     if (emailVerificationPending && verificationStatus === 'sending')
-      return <button type="button" className="mo-button mo-button-secondary mo-email-verify-button" disabled>Sending code…</button>;
+      return (
+        <button
+          type="button"
+          className="mo-button mo-button-secondary mo-email-verify-button"
+          disabled
+        >
+          Sending code…
+        </button>
+      );
     if (emailVerificationPending && verificationStatus === 'error')
       return (
         <button
@@ -299,9 +320,17 @@ export function ConnectedApplication({
   function emailVerificationContent() {
     if (!emailOtpEnabled || !emailVerificationPending) return null;
     if (verificationStatus === 'sending')
-      return <p className="mo-email-code-message" role="status">Sending a verification code…</p>;
+      return (
+        <p className="mo-email-code-message" role="status">
+          Sending a verification code…
+        </p>
+      );
     if (verificationStatus === 'error')
-      return <p className="mo-email-code-message mo-email-code-error" role="alert">{verificationMessage}</p>;
+      return (
+        <p className="mo-email-code-message mo-email-code-error" role="alert">
+          {verificationMessage}
+        </p>
+      );
     return (
       <div className="mo-email-code-panel">
         <label htmlFor="merchant-registration-email-code">Enter verification code</label>
@@ -331,7 +360,9 @@ export function ConnectedApplication({
           <button
             type="button"
             className="mo-button mo-button-primary mo-email-code-verify"
-            disabled={verifyingEmail || resendingCode || !/^(?:\d{6}|\d{8})$/.test(verificationCode)}
+            disabled={
+              verifyingEmail || resendingCode || !/^(?:\d{6}|\d{8})$/.test(verificationCode)
+            }
             onClick={() => void verifyInlineEmailCode()}
           >
             {verifyingEmail ? 'Checking…' : 'Verify code'}
@@ -344,10 +375,16 @@ export function ConnectedApplication({
               setResendingCode(true);
               setVerificationMessage('');
               try {
-                await resendMerchantEmailCode(createClient().auth, actorId, normalizedBusinessEmail);
+                await resendMerchantEmailCode(
+                  createClient().auth,
+                  actorId,
+                  normalizedBusinessEmail,
+                );
                 setVerificationMessage('A new code has been sent.');
               } catch (error) {
-                setVerificationMessage(error instanceof Error ? error.message : 'We could not send a new code.');
+                setVerificationMessage(
+                  error instanceof Error ? error.message : 'We could not send a new code.',
+                );
               } finally {
                 setResendingCode(false);
               }
@@ -359,7 +396,11 @@ export function ConnectedApplication({
         <p
           id="merchant-registration-email-code-message"
           className={`mo-email-code-message ${verificationMessage && !verificationMessage.startsWith('A new code') ? 'mo-email-code-error' : ''}`}
-          role={verificationMessage && !verificationMessage.startsWith('A new code') ? 'alert' : 'status'}
+          role={
+            verificationMessage && !verificationMessage.startsWith('A new code')
+              ? 'alert'
+              : 'status'
+          }
         >
           {verificationMessage}
         </p>
@@ -374,7 +415,10 @@ export function ConnectedApplication({
         setupLinkSent.current = true;
       }
       const { error } = await createClient().auth.signOut();
-      if (error) throw new Error('Your password setup link was sent, but we could not sign out. Please try again.');
+      if (error)
+        throw new Error(
+          'Your password setup link was sent, but we could not sign out. Please try again.',
+        );
       const params = new URLSearchParams({
         role: 'merchant',
         next: '/merchant',
@@ -424,7 +468,11 @@ export function ConnectedApplication({
       const { data, error } = await createClient().auth.getUser();
       if (error || !data.user || data.user.id !== actorId)
         throw new Error('Your registration session changed. Sign in again before submitting.');
-      if (data.user.is_anonymous || data.user.email?.trim().toLowerCase() !== email || !data.user.email_confirmed_at)
+      if (
+        data.user.is_anonymous ||
+        data.user.email?.trim().toLowerCase() !== email ||
+        !data.user.email_confirmed_at
+      )
         throw new Error('Verify the business email above before submitting your application.');
     }
     return serialize(async () => {
@@ -433,7 +481,11 @@ export function ConnectedApplication({
         saved.review.submitted_revision === saved.revision &&
         ['pending', 'approved'].includes(saved.review.state)
       ) {
-        await completeSubmission(String((input.business as { email?: unknown } | undefined)?.email ?? '').trim().toLowerCase());
+        await completeSubmission(
+          String((input.business as { email?: unknown } | undefined)?.email ?? '')
+            .trim()
+            .toLowerCase(),
+        );
         return { applicationId: saved.merchant_id, status: saved.review.state, redirecting: true };
       }
       const submitted = MerchantApplicationRecord.parse(
@@ -445,7 +497,11 @@ export function ConnectedApplication({
       );
       record.current = submitted;
       setStatus(submitted.review.state);
-      await completeSubmission(String((input.business as { email?: unknown } | undefined)?.email ?? '').trim().toLowerCase());
+      await completeSubmission(
+        String((input.business as { email?: unknown } | undefined)?.email ?? '')
+          .trim()
+          .toLowerCase(),
+      );
       return {
         applicationId: submitted.merchant_id,
         status: submitted.review.state,
@@ -510,10 +566,11 @@ export function ConnectedApplication({
         Your session ended. Sign in again to open your saved application.
       </p>
     );
-  const setupActivities = savedHome?.projection.profiles.map((profile) => ({
-    id: profile.subcategoryId,
-    name: profile.name,
-  })) ?? [];
+  const setupActivities =
+    savedHome?.projection.profiles.map((profile) => ({
+      id: profile.subcategoryId,
+      name: profile.name,
+    })) ?? [];
   const savedPayout = payoutForm(payout.current?.payout ?? null);
   return (
     <>
@@ -524,10 +581,16 @@ export function ConnectedApplication({
         >
           <p className="font-bold">Your application and setup are saved in this browser.</p>
           <p className="text-muted mt-1 text-sm">
-            {emailOtpEnabled ? 'Verify your email to keep access to this workspace on other devices.' : 'Create your account to keep access to this workspace on other devices.'}
+            {emailOtpEnabled
+              ? 'Verify your email to keep access to this workspace on other devices.'
+              : 'Create your account to keep access to this workspace on other devices.'}
           </p>
           <Link
-            href={emailOtpEnabled ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'}
+            href={
+              emailOtpEnabled
+                ? '/merchants/verify-email'
+                : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'
+            }
             prefetch={false}
             className="bg-gold text-ink mt-3 inline-flex rounded-lg px-4 py-2.5 font-bold"
           >
@@ -551,7 +614,9 @@ export function ConnectedApplication({
         onSaveDraft={(input: Record<string, unknown>) => serialize(() => save(input))}
         onSubmit={submit}
         canSubmit={!emailOtpEnabled || emailIsVerified}
-        emailFieldDisabled={emailOtpEnabled && (verificationStatus === 'sending' || verifyingEmail || resendingCode)}
+        emailFieldDisabled={
+          emailOtpEnabled && (verificationStatus === 'sending' || verifyingEmail || resendingCode)
+        }
         emailVerificationAction={emailVerificationAction()}
         emailVerificationContent={emailVerificationContent()}
         onBusinessEmailChange={(email: string) => {
@@ -574,8 +639,11 @@ export function ConnectedApplication({
           if (home && savedHome) {
             const task = rowId ?? (step === 2 ? 'location' : undefined);
             if (
-              task === 'offerings' || task === 'location' || task === 'hours' ||
-              task === 'documents' || (task === 'payout' && !anonymousSession)
+              task === 'offerings' ||
+              task === 'location' ||
+              task === 'hours' ||
+              task === 'documents' ||
+              (task === 'payout' && !anonymousSession)
             ) {
               setSetupEditor(task);
               return true;
@@ -588,10 +656,10 @@ export function ConnectedApplication({
           const href = rowId?.startsWith('model:')
             ? '/merchant/calendar'
             : rowId
-              ? taskRoutes[rowId] ?? null
-              // The Home location summary tile has no row id, but still opens
-              // the same saved branch records as the location task.
-              : step === 2
+              ? (taskRoutes[rowId] ?? null)
+              : // The Home location summary tile has no row id, but still opens
+                // the same saved branch records as the location task.
+                step === 2
                 ? '/merchant/stores'
                 : null;
           if (!href) return false;
@@ -609,24 +677,44 @@ export function ConnectedApplication({
         onExitDemo={undefined}
       />
       {setupEditor === 'offerings' && (
-        <SetupOfferings open onClose={closeSetupEditor} onSaved={refreshSetup}
-          activities={setupActivities} onUnavailable={openLegacySetup} />
+        <SetupOfferings
+          open
+          onClose={closeSetupEditor}
+          onSaved={refreshSetup}
+          activities={setupActivities}
+          onUnavailable={openLegacySetup}
+        />
       )}
       {setupEditor === 'location' && (
-        <SetupLocationEditor open onClose={closeSetupEditor} onSaved={refreshSetup}
-          activities={setupActivities} onUnavailable={openLegacySetup} />
+        <SetupLocationEditor
+          open
+          onClose={closeSetupEditor}
+          onSaved={refreshSetup}
+          activities={setupActivities}
+          onUnavailable={openLegacySetup}
+        />
       )}
       {setupEditor === 'documents' && (
         <SetupDocuments open onClose={closeSetupEditor} onSaved={refreshSetup} />
       )}
       {setupEditor === 'hours' && (
-        <SetupHours open onClose={closeSetupEditor} onSaved={refreshSetup}
-          activities={setupActivities} onUnavailable={openLegacySetup} />
+        <SetupHours
+          open
+          onClose={closeSetupEditor}
+          onSaved={refreshSetup}
+          activities={setupActivities}
+          onUnavailable={openLegacySetup}
+        />
       )}
       {setupEditor === 'payout' && (
-        <SetupPayout open onClose={closeSetupEditor}
+        <SetupPayout
+          open
+          onClose={closeSetupEditor}
           initialValue={{ ...savedPayout, method: savedPayout?.method ?? '' }}
-          onSave={async (value) => { await saveTask({ payout: value, policies: {} }, { step: 5 }); }} />
+          onSave={async (value) => {
+            await saveTask({ payout: value, policies: {} }, { step: 5 });
+          }}
+        />
       )}
     </>
   );

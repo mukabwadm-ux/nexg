@@ -14,7 +14,9 @@ export default function InsightsPreview({
   return (
     <InsightsWorkspace
       mode="sample"
-      initialProfileId={typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId}
+      initialProfileId={
+        typeof searchParams?.profile === 'string' ? searchParams.profile : demoContext?.profileId
+      }
       initialTab={typeof searchParams?.tab === 'string' ? searchParams.tab : undefined}
       demoContext={demoContext}
     />

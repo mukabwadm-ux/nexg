@@ -30,12 +30,19 @@ export function MerchantSideNav({ nav }: { nav: MerchantNavItem[] }) {
       <ul className="space-y-0.5">
         {nav.map((item) => {
           const on = isOn(pathname, item.href);
-          if (item.locked) return <li key={item.href}>
-            <span aria-disabled="true" className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[0.8125rem] font-extrabold text-white/40">
-              <span aria-hidden="true">{item.icon}</span><span className="min-w-0 flex-1 truncate">{item.label}</span>
-              <Lock className="h-3 w-3 shrink-0" aria-label="Approval required" />
-            </span>
-          </li>;
+          if (item.locked)
+            return (
+              <li key={item.href}>
+                <span
+                  aria-disabled="true"
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[0.8125rem] font-extrabold text-white/40"
+                >
+                  <span aria-hidden="true">{item.icon}</span>
+                  <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                  <Lock className="h-3 w-3 shrink-0" aria-label="Approval required" />
+                </span>
+              </li>
+            );
           return (
             <li key={item.href}>
               <Link
@@ -90,10 +97,21 @@ export function MerchantPhoneNav({ nav }: { nav: MerchantNavItem[] }) {
     >
       {nav.slice(0, 7).map((item) => {
         const on = isOn(pathname, item.href);
-        if (item.locked) return <span key={item.href} aria-disabled="true" className="relative flex shrink-0 flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[0.5625rem] font-extrabold text-muted/60">
-          <span aria-hidden="true">{item.icon}</span><span className="whitespace-nowrap">{item.label}</span>
-          <Lock className="absolute right-1 top-0.5 h-2.5 w-2.5" aria-label="Approval required" />
-        </span>;
+        if (item.locked)
+          return (
+            <span
+              key={item.href}
+              aria-disabled="true"
+              className="text-muted/60 relative flex shrink-0 flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[0.5625rem] font-extrabold"
+            >
+              <span aria-hidden="true">{item.icon}</span>
+              <span className="whitespace-nowrap">{item.label}</span>
+              <Lock
+                className="absolute right-1 top-0.5 h-2.5 w-2.5"
+                aria-label="Approval required"
+              />
+            </span>
+          );
         return (
           <Link
             key={item.href}

@@ -53,7 +53,9 @@ export async function GET(request: Request) {
   // Build the query
   let dbQuery = supabase
     .from('merchant_public')
-    .select('id, trading_name, category, category_other, cover_photo_path, featured, city_slug, city_name, branch_name, branch_address, branch_latitude, branch_longitude, listed_at, explore_visible, concierge_pick, accepting_orders, pay_on_delivery_enabled, pay_on_delivery_cap_kes, prep_minutes, busy_mode_until, closed_early_at, parent_merchant_id, subcategory')
+    .select(
+      'id, trading_name, category, category_other, cover_photo_path, featured, city_slug, city_name, branch_name, branch_address, branch_latitude, branch_longitude, listed_at, explore_visible, concierge_pick, accepting_orders, pay_on_delivery_enabled, pay_on_delivery_cap_kes, prep_minutes, busy_mode_until, closed_early_at, parent_merchant_id, subcategory',
+    )
     .order('listed_at', { ascending: false })
     .order('id', { ascending: false })
     .limit(limit + 1); // fetch one extra to know if there's a next page
@@ -76,7 +78,9 @@ export async function GET(request: Request) {
   }
   if (q) {
     const like = `%${q}%`;
-    dbQuery = dbQuery.or(`trading_name.ilike.${like},branch_name.ilike.${like},category_other.ilike.${like}`);
+    dbQuery = dbQuery.or(
+      `trading_name.ilike.${like},branch_name.ilike.${like},category_other.ilike.${like}`,
+    );
   }
 
   const { data: rows, error } = await dbQuery;
@@ -93,7 +97,8 @@ export async function GET(request: Request) {
   // Build the next cursor from the last item
   let nextCursor: string | null = null;
   const last = items[items.length - 1];
-  if (hasMore && last) {    nextCursor = encodeCursor(last.listed_at ?? '', last.id ?? '');
+  if (hasMore && last) {
+    nextCursor = encodeCursor(last.listed_at ?? '', last.id ?? '');
   }
 
   // Validate against the schema (defense in depth)

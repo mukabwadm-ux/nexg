@@ -1,8 +1,14 @@
 'use client';
 
-import { loadMerchantWorkspaceAccess, type MerchantAccessClient, type MerchantWorkspaceAccess } from './merchant-access';
+import {
+  loadMerchantWorkspaceAccess,
+  type MerchantAccessClient,
+  type MerchantWorkspaceAccess,
+} from './merchant-access';
 
-type Query = ReturnType<MerchantAccessClient['rpc']> & { abortSignal?: (signal: AbortSignal) => Query };
+type Query = ReturnType<MerchantAccessClient['rpc']> & {
+  abortSignal?: (signal: AbortSignal) => Query;
+};
 
 /** Authorization polling is a read. It never advances the person's idle deadline. */
 export function watchMerchantWorkspaceAccess(options: {
@@ -15,8 +21,10 @@ export function watchMerchantWorkspaceAccess(options: {
 }) {
   let active = true;
   let controller: AbortController | undefined;
-  const sameAuthority = (access: MerchantWorkspaceAccess) => access.state === options.initial.state &&
-    access.setup === options.initial.setup && access.operations === options.initial.operations;
+  const sameAuthority = (access: MerchantWorkspaceAccess) =>
+    access.state === options.initial.state &&
+    access.setup === options.initial.setup &&
+    access.operations === options.initial.operations;
   const stop = () => {
     active = false;
     controller?.abort();
@@ -26,10 +34,14 @@ export function watchMerchantWorkspaceAccess(options: {
     if (!active || !options.visible() || controller) return 'skipped';
     const request = new AbortController();
     controller = request;
-    const client: MerchantAccessClient = { rpc(name, args) {
-      const query = (options.client as { rpc: (name: string, args: { p_merchant_id: string }) => Query }).rpc(name, args);
-      return query.abortSignal ? query.abortSignal(request.signal) : query;
-    } };
+    const client: MerchantAccessClient = {
+      rpc(name, args) {
+        const query = (
+          options.client as { rpc: (name: string, args: { p_merchant_id: string }) => Query }
+        ).rpc(name, args);
+        return query.abortSignal ? query.abortSignal(request.signal) : query;
+      },
+    };
     try {
       const access = await loadMerchantWorkspaceAccess(client, options.merchantId);
       if (!active || request.signal.aborted) return 'skipped';
@@ -48,6 +60,8 @@ export function watchMerchantWorkspaceAccess(options: {
       if (controller === request) controller = undefined;
     }
   };
-  const timer = setInterval(() => { void check(); }, 30_000);
+  const timer = setInterval(() => {
+    void check();
+  }, 30_000);
   return { check, stop };
 }

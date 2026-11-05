@@ -24,7 +24,10 @@ export async function GET(request: Request) {
     await enforceRateLimit(credential, request);
   } catch (error) {
     if (error instanceof ApiAuthError) {
-      return jsonError(error.code, error.message, { status: error.status, retryAfter: error.retryAfter });
+      return jsonError(error.code, error.message, {
+        status: error.status,
+        retryAfter: error.retryAfter,
+      });
     }
     return jsonError('internal_error', 'The API is temporarily unavailable.', { status: 503 });
   }

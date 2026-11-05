@@ -170,8 +170,10 @@ export function OfferingEditor({
   const patch = (update: Partial<Offering>) => {
     if (!readOnly) change({ ...item, ...update });
   };
-  const lockedDetails = readOnly || item.sources.details === 'external' || item.publication === 'archived';
-  const lockedPrice = readOnly || item.sources.price === 'external' || item.publication === 'archived';
+  const lockedDetails =
+    readOnly || item.sources.details === 'external' || item.publication === 'archived';
+  const lockedPrice =
+    readOnly || item.sources.price === 'external' || item.publication === 'archived';
   const lockedAvailability =
     readOnly || item.sources.availability === 'external' || item.publication === 'archived';
   const fieldIssue = (key: string) => issues.find((issue) => issue.key === key)?.message;
@@ -191,10 +193,17 @@ export function OfferingEditor({
       try {
         const uploaded = await onUploadImage(item, file);
         if (itemRef.current.id === item.id)
-          change({ ...itemRef.current, image: uploaded.url, imageStoragePath: uploaded.path, imageAlt: itemRef.current.imageAlt ?? '' });
+          change({
+            ...itemRef.current,
+            image: uploaded.url,
+            imageStoragePath: uploaded.path,
+            imageAlt: itemRef.current.imageAlt ?? '',
+          });
       } catch (error) {
         if (input) {
-          input.setCustomValidity(error instanceof Error ? error.message : 'Could not upload the photo.');
+          input.setCustomValidity(
+            error instanceof Error ? error.message : 'Could not upload the photo.',
+          );
           input.reportValidity();
           input.value = '';
         }
@@ -325,8 +334,8 @@ export function OfferingEditor({
                 {readOnly
                   ? 'This saved catalogue entry is available for review.'
                   : item.publication === 'archived'
-                  ? 'Archived offerings are read-only. Restore as a draft to edit them.'
-                  : 'Edit these details in your connected system. Changes appear after the next confirmed sync.'}
+                    ? 'Archived offerings are read-only. Restore as a draft to edit them.'
+                    : 'Edit these details in your connected system. Changes appear after the next confirmed sync.'}
               </p>
             )}
             <fieldset disabled={lockedDetails || busy} className="of-fields">
@@ -443,7 +452,13 @@ export function OfferingEditor({
                       <button
                         type="button"
                         className="of-link"
-                        onClick={() => patch({ image: undefined, imageStoragePath: undefined, imageAlt: undefined })}
+                        onClick={() =>
+                          patch({
+                            image: undefined,
+                            imageStoragePath: undefined,
+                            imageAlt: undefined,
+                          })
+                        }
                       >
                         Remove photo
                       </button>
@@ -994,9 +1009,11 @@ export function OfferingEditor({
             <button type="button" className="of-button" onClick={onReload}>
               Reload saved version
             </button>
-            {!readOnly && <button type="button" className="of-button" onClick={onDuplicate}>
-              Duplicate as draft
-            </button>}
+            {!readOnly && (
+              <button type="button" className="of-button" onClick={onDuplicate}>
+                Duplicate as draft
+              </button>
+            )}
           </>
         )}
       </div>
@@ -1026,20 +1043,22 @@ export function OfferingEditor({
             <button type="button" className="of-button" disabled={busy} onClick={() => onSave()}>
               {busy ? 'Saving…' : item.publication === 'published' ? 'Save changes' : 'Save draft'}
             </button>
-            {!setupDraftOnly && <button
-              type="button"
-              className="of-button of-primary"
-              disabled={busy}
-              onClick={() =>
-                onSave(item.publication === 'published' && !dirty ? 'draft' : 'published')
-              }
-            >
-              {item.publication === 'published'
-                ? dirty
-                  ? 'Publish changes'
-                  : 'Unpublish'
-                : 'Publish offering'}
-            </button>}
+            {!setupDraftOnly && (
+              <button
+                type="button"
+                className="of-button of-primary"
+                disabled={busy}
+                onClick={() =>
+                  onSave(item.publication === 'published' && !dirty ? 'draft' : 'published')
+                }
+              >
+                {item.publication === 'published'
+                  ? dirty
+                    ? 'Publish changes'
+                    : 'Unpublish'
+                  : 'Publish offering'}
+              </button>
+            )}
           </>
         )}
       </div>

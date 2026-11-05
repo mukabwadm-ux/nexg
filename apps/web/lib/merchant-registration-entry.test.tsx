@@ -10,8 +10,18 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({ auth: { getUser: mocks.getUser }, rpc: mocks.rpc }),
 }));
 vi.mock('@/components/onboarding/connected-application', () => ({
-  ConnectedApplication: (props: { actorId: string; home?: boolean; anonymousSession?: boolean; emailOtpEnabled?: boolean }) => (
-    <div data-connected-registration={props.actorId} data-home={String(props.home ?? false)} data-anonymous={String(props.anonymousSession ?? false)} data-otp={String(props.emailOtpEnabled ?? false)}>
+  ConnectedApplication: (props: {
+    actorId: string;
+    home?: boolean;
+    anonymousSession?: boolean;
+    emailOtpEnabled?: boolean;
+  }) => (
+    <div
+      data-connected-registration={props.actorId}
+      data-home={String(props.home ?? false)}
+      data-anonymous={String(props.anonymousSession ?? false)}
+      data-otp={String(props.emailOtpEnabled ?? false)}
+    >
       Real registration
     </div>
   ),

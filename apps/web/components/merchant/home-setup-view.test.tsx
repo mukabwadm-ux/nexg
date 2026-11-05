@@ -10,10 +10,39 @@ describe('shared merchant setup Home', () => {
       <HomeSetupView
         businessName="Kilimani Clinic"
         rows={[
-          { id: 'profile', title: 'Business profile', description: 'Your business details.', actionLabel: 'View profile', status: 'complete', icon: 'business' },
-          { id: 'documents', title: 'Documents', description: 'Files supplied for review.', actionLabel: 'View documents', status: 'provided', icon: 'documents' },
-          { id: 'payout', title: 'Payout method', description: 'Add your payout details.', actionLabel: 'Set up payouts', status: 'missing', icon: 'payout' },
-          { id: 'team', title: 'Team', description: 'An optional setup task.', actionLabel: 'Manage team', status: 'complete', required: false, icon: 'team' },
+          {
+            id: 'profile',
+            title: 'Business profile',
+            description: 'Your business details.',
+            actionLabel: 'View profile',
+            status: 'complete',
+            icon: 'business',
+          },
+          {
+            id: 'documents',
+            title: 'Documents',
+            description: 'Files supplied for review.',
+            actionLabel: 'View documents',
+            status: 'provided',
+            icon: 'documents',
+          },
+          {
+            id: 'payout',
+            title: 'Payout method',
+            description: 'Add your payout details.',
+            actionLabel: 'Set up payouts',
+            status: 'missing',
+            icon: 'payout',
+          },
+          {
+            id: 'team',
+            title: 'Team',
+            description: 'An optional setup task.',
+            actionLabel: 'Manage team',
+            status: 'complete',
+            required: false,
+            icon: 'team',
+          },
         ]}
       />,
     );
@@ -31,7 +60,17 @@ describe('shared merchant setup Home', () => {
     const html = renderToStaticMarkup(
       <HomeSetupView
         businessName="Kilimani Clinic"
-        rows={[{ id: 'launch', title: 'Go live', description: 'Wait for business approval.', actionLabel: 'Get help', status: 'waiting', statusLabel: 'Awaiting approval', icon: 'launch' }]}
+        rows={[
+          {
+            id: 'launch',
+            title: 'Go live',
+            description: 'Wait for business approval.',
+            actionLabel: 'Get help',
+            status: 'waiting',
+            statusLabel: 'Awaiting approval',
+            icon: 'launch',
+          },
+        ]}
         reviewState="review"
         status={{ location: { value: 'Address saved', note: 'Confirm your pin to finish.' } }}
         headerNotice={<p role="status">Your latest changes are saved.</p>}
@@ -55,9 +94,34 @@ describe('shared merchant setup Home', () => {
       <HomeSetupView
         businessName="Kilimani Clinic"
         rows={[
-          { id: 'payout', title: 'Payout method', description: 'Add your payout details.', actionLabel: 'Add payout', status: 'waiting', statusLabel: 'Details needed', onAction: () => {}, icon: 'payout' },
-          { id: 'launch', title: 'Go live', description: 'Wait for approval.', actionLabel: 'Launch business', status: 'waiting', statusLabel: 'Awaiting approval', icon: 'launch' },
-          { id: 'profile', title: 'Business profile', description: 'Your saved business details.', actionLabel: 'Review profile', status: 'complete', onAction: () => {}, icon: 'business' },
+          {
+            id: 'payout',
+            title: 'Payout method',
+            description: 'Add your payout details.',
+            actionLabel: 'Add payout',
+            status: 'waiting',
+            statusLabel: 'Details needed',
+            onAction: () => {},
+            icon: 'payout',
+          },
+          {
+            id: 'launch',
+            title: 'Go live',
+            description: 'Wait for approval.',
+            actionLabel: 'Launch business',
+            status: 'waiting',
+            statusLabel: 'Awaiting approval',
+            icon: 'launch',
+          },
+          {
+            id: 'profile',
+            title: 'Business profile',
+            description: 'Your saved business details.',
+            actionLabel: 'Review profile',
+            status: 'complete',
+            onAction: () => {},
+            icon: 'business',
+          },
         ]}
       />,
     );
@@ -69,7 +133,9 @@ describe('shared merchant setup Home', () => {
     expect(rows[1]).toContain('Awaiting approval');
     expect(rows[1]).not.toContain('<button');
     expect(rows[2]).toContain('Completed');
-    expect(rows[2]).toMatch(/<button\b(?![^>]*\sdisabled(?:=|\s|>))[^>]*aria-label="Review profile"[^>]*>/);
+    expect(rows[2]).toMatch(
+      /<button\b(?![^>]*\sdisabled(?:=|\s|>))[^>]*aria-label="Review profile"[^>]*>/,
+    );
   });
 
   it('shows one control per row: an action button when missing, otherwise a status pill and pencil', () => {
@@ -77,9 +143,36 @@ describe('shared merchant setup Home', () => {
       <HomeSetupView
         businessName="Kilimani Clinic"
         rows={[
-          { id: 'business', title: 'Business profile', description: 'Saved.', actionLabel: 'Edit details', status: 'complete', statusLabel: 'Details submitted', onAction: () => {}, icon: 'business' },
-          { id: 'offerings', title: 'Offerings', description: 'None yet.', actionLabel: 'Add offerings', status: 'missing', statusLabel: 'Add offerings', onAction: () => {}, icon: 'offerings' },
-          { id: 'documents', title: 'Documents', description: 'Optional.', actionLabel: 'Add if requested', status: 'waiting', statusLabel: 'Add if requested', onAction: () => {}, icon: 'documents' },
+          {
+            id: 'business',
+            title: 'Business profile',
+            description: 'Saved.',
+            actionLabel: 'Edit details',
+            status: 'complete',
+            statusLabel: 'Details submitted',
+            onAction: () => {},
+            icon: 'business',
+          },
+          {
+            id: 'offerings',
+            title: 'Offerings',
+            description: 'None yet.',
+            actionLabel: 'Add offerings',
+            status: 'missing',
+            statusLabel: 'Add offerings',
+            onAction: () => {},
+            icon: 'offerings',
+          },
+          {
+            id: 'documents',
+            title: 'Documents',
+            description: 'Optional.',
+            actionLabel: 'Add if requested',
+            status: 'waiting',
+            statusLabel: 'Add if requested',
+            onAction: () => {},
+            icon: 'documents',
+          },
         ]}
       />,
     );
@@ -99,10 +192,33 @@ describe('shared merchant setup Home', () => {
         businessName="Kilimani Clinic"
         rows={[
           {
-            id: 'categories', title: 'Business categories and operations', description: 'Salon · Spa', actionLabel: 'Update categories', status: 'waiting', statusLabel: '2 categories', onAction: () => {}, icon: 'specialty',
+            id: 'categories',
+            title: 'Business categories and operations',
+            description: 'Salon · Spa',
+            actionLabel: 'Update categories',
+            status: 'waiting',
+            statusLabel: '2 categories',
+            onAction: () => {},
+            icon: 'specialty',
             subRows: [
-              { id: 'model:salon', title: 'Salon operating setup', description: 'Set up.', actionLabel: 'Review setup', status: 'waiting', statusLabel: 'After approval', icon: 'specialty' },
-              { id: 'model:spa', title: 'Spa operating setup', description: 'Set up.', actionLabel: 'Review setup', status: 'waiting', statusLabel: 'After approval', icon: 'specialty' },
+              {
+                id: 'model:salon',
+                title: 'Salon operating setup',
+                description: 'Set up.',
+                actionLabel: 'Review setup',
+                status: 'waiting',
+                statusLabel: 'After approval',
+                icon: 'specialty',
+              },
+              {
+                id: 'model:spa',
+                title: 'Spa operating setup',
+                description: 'Set up.',
+                actionLabel: 'Review setup',
+                status: 'waiting',
+                statusLabel: 'After approval',
+                icon: 'specialty',
+              },
             ],
           },
         ]}

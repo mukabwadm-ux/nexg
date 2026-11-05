@@ -92,7 +92,9 @@ export function OnboardingRecord({
   const subcategories = Array.isArray(config?.subcategories)
     ? (config.subcategories as { id: string; name: string; questions?: Question[] }[])
     : [];
-  const selectedSubcategory = subcategories.find((subcategory) => subcategory.id === merchant.subcategory);
+  const selectedSubcategory = subcategories.find(
+    (subcategory) => subcategory.id === merchant.subcategory,
+  );
   const questions = [...categoryQuestions, ...(selectedSubcategory?.questions ?? [])];
   const payout = (merchant.payout_account ?? {}) as Record<string, string>;
   const lookup = merchant.payout_name_lookup as { matched: boolean | null; reason?: string } | null;

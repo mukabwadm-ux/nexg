@@ -232,7 +232,9 @@ export function CheckoutForm() {
                   >
                     <Minus className="h-3.5 w-3.5" />
                   </button>
-                  <span className="min-w-6 text-center text-sm font-extrabold">{line.quantity}</span>
+                  <span className="min-w-6 text-center text-sm font-extrabold">
+                    {line.quantity}
+                  </span>
                   <button
                     type="button"
                     aria-label={`Add one more ${line.name}`}
@@ -330,13 +332,19 @@ export function CheckoutForm() {
         <div className="border-border bg-surface rounded-2xl border p-5">
           <h2 className="text-lg font-extrabold">Summary</h2>
           <dl className="mt-3 space-y-2 text-sm font-semibold">
-            <Row label="Subtotal" value={kesFromCents((quote?.subtotal_cents ?? cart.subtotalKes * 100))} />
+            <Row
+              label="Subtotal"
+              value={kesFromCents(quote?.subtotal_cents ?? cart.subtotalKes * 100)}
+            />
             {quote?.ok && (
               <>
                 <Row label="Delivery" value={kesFromCents(quote.delivery_fee_cents)} />
                 <Row label="Service fee" value={kesFromCents(quote.service_fee_cents)} />
                 {quote.small_basket_fee_cents > 0 && (
-                  <Row label="Small basket fee" value={kesFromCents(quote.small_basket_fee_cents)} />
+                  <Row
+                    label="Small basket fee"
+                    value={kesFromCents(quote.small_basket_fee_cents)}
+                  />
                 )}
                 {quote.cash_handling_cents > 0 && (
                   <Row label="Cash handling" value={kesFromCents(quote.cash_handling_cents)} />

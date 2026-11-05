@@ -32,9 +32,19 @@ export default async function MerchantApplicationPage({ params }: { params: { id
   const staff = await requireStaff();
   requireModule(staff, 'merchants');
   let managed: boolean;
-  try { managed = await isManagedMerchantApplication(params.id); }
-  catch (error) {
-    return <ConsoleShell staff={staff} current="/merchants"><ConsoleHeader title="Merchant application" breadcrumb="Merchants / Application" /><main className="px-4 py-6 sm:px-8"><ApplicationReviewUnavailable status={error instanceof ReviewSourceError ? error.status : 503} /></main></ConsoleShell>;
+  try {
+    managed = await isManagedMerchantApplication(params.id);
+  } catch (error) {
+    return (
+      <ConsoleShell staff={staff} current="/merchants">
+        <ConsoleHeader title="Merchant application" breadcrumb="Merchants / Application" />
+        <main className="px-4 py-6 sm:px-8">
+          <ApplicationReviewUnavailable
+            status={error instanceof ReviewSourceError ? error.status : 503}
+          />
+        </main>
+      </ConsoleShell>
+    );
   }
   if (managed) redirect(`/merchants/applications/${encodeURIComponent(params.id)}`);
   const supabase = createClient();

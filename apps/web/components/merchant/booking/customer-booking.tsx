@@ -540,7 +540,7 @@ export function CustomerBooking({ businessId }: { businessId: string }) {
                 className={inputClass}
                 value={offeringId}
                 onChange={(e) => {
-                    if (e.target.value === offeringId) return;
+                  if (e.target.value === offeringId) return;
                   setOfferingId(e.target.value);
                   setSpecialist(null);
                   setQuantity('1');

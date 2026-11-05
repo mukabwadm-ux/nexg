@@ -1,6 +1,14 @@
 import { listBookingProfiles } from '@nexg/booking-config/profiles';
 import { describe, expect, it } from 'vitest';
-import { candidateWorkflows, createSampleRecords, defaultWorkflow, inTab, sampleSource, templates, workActivitiesFromBooking } from './model';
+import {
+  candidateWorkflows,
+  createSampleRecords,
+  defaultWorkflow,
+  inTab,
+  sampleSource,
+  templates,
+  workActivitiesFromBooking,
+} from './model';
 
 describe('Work preview configuration', () => {
   it('offers a supported explicitly selected activity for each of the 128 shared booking profiles', () => {
@@ -39,7 +47,9 @@ describe('Work preview configuration', () => {
     const returned = await sampleSource.advance(rental, rental.nextAction!.id);
     expect(returned.history).toContain('Record return');
     expect(inTab(returned, 'history')).toBe(false);
-    expect(inTab(await sampleSource.advance(returned, returned.nextAction!.id), 'history')).toBe(true);
+    expect(inTab(await sampleSource.advance(returned, returned.nextAction!.id), 'history')).toBe(
+      true,
+    );
   });
 
   it('does not advance a read-only record', async () => {
@@ -48,19 +58,59 @@ describe('Work preview configuration', () => {
   });
 
   it('uses only ready, active booking bindings for the selected offering', () => {
-    const config = { isReady: false, activeModels: ['ASSET_INTERVAL'] as const, workflowBindings: [{ modelId: 'ASSET_INTERVAL' as const, workflowId: 'WF_RENTAL', variantId: null, linkedExecution: false, createsWork: false as const }], configurationRevision: 'revision-1' };
-    expect(workActivitiesFromBooking('vehicle-1', { ...config, activeModels: [...config.activeModels] }).activities).toEqual([]);
-    const resolved = workActivitiesFromBooking('vehicle-1', { ...config, isReady: true, activeModels: [...config.activeModels] });
-    expect(resolved.activities).toEqual([{ offeringId: 'vehicle-1', workflowId: 'WF_RENTAL', modelId: 'ASSET_INTERVAL', linkedExecution: false, configurationRevision: 'revision-1' }]);
-    expect(resolved.activities.some((activity) => activity.workflowId === 'WF_TRANSFER')).toBe(false);
-    const unknown = workActivitiesFromBooking('vehicle-1', { ...config, isReady: true, activeModels: [...config.activeModels], workflowBindings: [{ ...config.workflowBindings[0]!, workflowId: 'WF_FUTURE' }] });
+    const config = {
+      isReady: false,
+      activeModels: ['ASSET_INTERVAL'] as const,
+      workflowBindings: [
+        {
+          modelId: 'ASSET_INTERVAL' as const,
+          workflowId: 'WF_RENTAL',
+          variantId: null,
+          linkedExecution: false,
+          createsWork: false as const,
+        },
+      ],
+      configurationRevision: 'revision-1',
+    };
+    expect(
+      workActivitiesFromBooking('vehicle-1', { ...config, activeModels: [...config.activeModels] })
+        .activities,
+    ).toEqual([]);
+    const resolved = workActivitiesFromBooking('vehicle-1', {
+      ...config,
+      isReady: true,
+      activeModels: [...config.activeModels],
+    });
+    expect(resolved.activities).toEqual([
+      {
+        offeringId: 'vehicle-1',
+        workflowId: 'WF_RENTAL',
+        modelId: 'ASSET_INTERVAL',
+        linkedExecution: false,
+        configurationRevision: 'revision-1',
+      },
+    ]);
+    expect(resolved.activities.some((activity) => activity.workflowId === 'WF_TRANSFER')).toBe(
+      false,
+    );
+    const unknown = workActivitiesFromBooking('vehicle-1', {
+      ...config,
+      isReady: true,
+      activeModels: [...config.activeModels],
+      workflowBindings: [{ ...config.workflowBindings[0]!, workflowId: 'WF_FUTURE' }],
+    });
     expect(unknown.activities).toEqual([]);
     expect(unknown.unsupported).toEqual(['WF_FUTURE']);
   });
 
   it('suggests registered models for a future declarative category without activating it', () => {
     const original = listBookingProfiles()[0]!;
-    const future = { ...original, subcategoryId: 'future-example', defaultModelId: 'ASSET_INTERVAL' as const, candidateModels: ['ASSET_INTERVAL' as const] };
+    const future = {
+      ...original,
+      subcategoryId: 'future-example',
+      defaultModelId: 'ASSET_INTERVAL' as const,
+      candidateModels: ['ASSET_INTERVAL' as const],
+    };
     expect(candidateWorkflows(future)).toEqual(['WF_RENTAL']);
     expect(defaultWorkflow(future)).toBe('WF_RENTAL');
   });

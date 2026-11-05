@@ -155,7 +155,10 @@ export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
   const { data: home, error: homeError } = await supabase.rpc('fn_partner_home');
   const partner = home as { kind?: string; id?: string } | null;
   if (homeError || partner?.kind !== 'merchant' || !partner.id)
-    return { ok: false, message: 'We could not confirm your merchant application. Please contact support.' };
+    return {
+      ok: false,
+      message: 'We could not confirm your merchant application. Please contact support.',
+    };
 
   const rpc = supabase.rpc as unknown as (
     name: string,
@@ -173,7 +176,11 @@ export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
     !['pending', 'approved'].includes(application.data.review.state) ||
     application.data.payload.business.email.trim().toLowerCase() !== user.email.trim().toLowerCase()
   )
-    return { ok: false, message: 'We could not confirm the submitted application for this email. Please contact support.' };
+    return {
+      ok: false,
+      message:
+        'We could not confirm the submitted application for this email. Please contact support.',
+    };
 
   // Mark this merchant so the setup email renders as a welcome (greeting,
   // username, "Set your password"). Wording only: if it fails, the plain
@@ -187,9 +194,16 @@ export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
     redirectTo: redirectTo.toString(),
   });
   if (error)
-    return { ok: false, message: 'Your application was submitted, but we could not send the password setup link. Please retry.' };
+    return {
+      ok: false,
+      message:
+        'Your application was submitted, but we could not send the password setup link. Please retry.',
+    };
 
-  return { ok: true, message: 'A secure password setup link has been sent to your verified email.' };
+  return {
+    ok: true,
+    message: 'A secure password setup link has been sent to your verified email.',
+  };
 }
 
 export async function updateRecoveredPassword(formData: FormData): Promise<AuthResult> {

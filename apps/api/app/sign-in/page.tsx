@@ -14,18 +14,12 @@ export const metadata: Metadata = {
   description: 'Sign in to the NexG developer console to issue an API key.',
 };
 
-export default function SignInPage({
-  searchParams,
-}: {
-  searchParams?: { next?: string };
-}) {
+export default function SignInPage({ searchParams }: { searchParams?: { next?: string } }) {
   const next =
-    searchParams?.next && /^\/(?!\/)/.test(searchParams.next)
-      ? searchParams.next
-      : undefined;
+    searchParams?.next && /^\/(?!\/)/.test(searchParams.next) ? searchParams.next : undefined;
 
   return (
-    <main className="max-w-md mx-auto px-6 py-16">
+    <main className="mx-auto max-w-md px-6 py-16">
       <SignInForm next={next} />
     </main>
   );

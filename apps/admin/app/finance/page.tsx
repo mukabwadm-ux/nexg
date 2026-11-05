@@ -252,10 +252,16 @@ export default async function FinancePage({
       supabase.from('fin_tax_position_v').select('*').order('sort'),
       supabase
         .from('tax_invoice' as never)
-        .select('id, number, kind, purpose, party_name, party_pin, issued_at, net_cents, vat_cents, gross_cents, kra_status, kra_reference')
+        .select(
+          'id, number, kind, purpose, party_name, party_pin, issued_at, net_cents, vat_cents, gross_cents, kra_status, kra_reference',
+        )
         .order('issued_at', { ascending: false })
         .limit(100),
-      supabase.from('tax_vat_summary_v' as never).select('*').order('month', { ascending: false }).limit(24),
+      supabase
+        .from('tax_vat_summary_v' as never)
+        .select('*')
+        .order('month', { ascending: false })
+        .limit(24),
     ]);
     body = (
       <Tax

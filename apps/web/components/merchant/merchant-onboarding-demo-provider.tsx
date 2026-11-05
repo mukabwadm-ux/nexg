@@ -65,7 +65,8 @@ export function MerchantOnboardingDemoProvider({ children }: { children: ReactNo
       }
     };
     window.addEventListener(MERCHANT_ONBOARDING_DEMO_CONTEXT_EVENT, receiveDemoContext);
-    return () => window.removeEventListener(MERCHANT_ONBOARDING_DEMO_CONTEXT_EVENT, receiveDemoContext);
+    return () =>
+      window.removeEventListener(MERCHANT_ONBOARDING_DEMO_CONTEXT_EVENT, receiveDemoContext);
   }, []);
 
   return <DemoContext.Provider value={demoContext}>{children}</DemoContext.Provider>;

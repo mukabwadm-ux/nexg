@@ -91,11 +91,16 @@ export function Tax({
                 </tr>
               ) : (
                 months.map((m) => (
-                  <tr key={m.month} className="border-border border-b text-[0.8125rem] font-semibold last:border-0">
+                  <tr
+                    key={m.month}
+                    className="border-border border-b text-[0.8125rem] font-semibold last:border-0"
+                  >
                     <td className="px-4 py-2.5 font-extrabold">{m.month}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{m.documents}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(m.net_cents)}</td>
-                    <td className="px-4 py-2.5 text-right font-extrabold tabular-nums">{kesMoney(m.vat_cents)}</td>
+                    <td className="px-4 py-2.5 text-right font-extrabold tabular-nums">
+                      {kesMoney(m.vat_cents)}
+                    </td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{m.pending_kra}</td>
                   </tr>
                 ))
@@ -131,18 +136,27 @@ export function Tax({
                 </tr>
               ) : (
                 docs.map((d) => (
-                  <tr key={d.id} className="border-border border-b text-[0.8125rem] font-semibold last:border-0">
-                    <td className="px-4 py-2.5 font-mono text-[0.75rem] font-extrabold">{d.number}</td>
+                  <tr
+                    key={d.id}
+                    className="border-border border-b text-[0.8125rem] font-semibold last:border-0"
+                  >
+                    <td className="px-4 py-2.5 font-mono text-[0.75rem] font-extrabold">
+                      {d.number}
+                    </td>
                     <td className="px-4 py-2.5">
                       {d.party_name ?? '—'}
-                      {d.party_pin ? <span className="text-muted-light"> · {d.party_pin}</span> : null}
+                      {d.party_pin ? (
+                        <span className="text-muted-light"> · {d.party_pin}</span>
+                      ) : null}
                     </td>
                     <td className="text-muted px-4 py-2.5">
                       {d.purpose === 'merchant_commission' ? 'Commission' : 'Guest fees'}
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(d.net_cents)}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(d.vat_cents)}</td>
-                    <td className="px-4 py-2.5 text-right font-extrabold tabular-nums">{kesMoney(d.gross_cents)}</td>
+                    <td className="px-4 py-2.5 text-right font-extrabold tabular-nums">
+                      {kesMoney(d.gross_cents)}
+                    </td>
                     <td className="px-4 py-2.5 capitalize">{d.kra_status.replace(/_/g, ' ')}</td>
                   </tr>
                 ))

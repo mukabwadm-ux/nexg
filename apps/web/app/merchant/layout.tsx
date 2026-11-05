@@ -102,7 +102,12 @@ export default async function MerchantLayout({ children }: { children: React.Rea
           ? 'Changes requested'
           : 'Waiting for admin approval';
     return (
-      <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
+      <MerchantAuthBoundary
+        merchantId={me.id}
+        actorId={me.userId}
+        access={me.access}
+        isAnonymous={me.isAnonymous}
+      >
         <MerchantWorkspaceShell
           businessName={m.name}
           approvalLabel={approvalLabel}
@@ -115,13 +120,26 @@ export default async function MerchantLayout({ children }: { children: React.Rea
             ...item,
             locked: item.label !== 'Home' && !me.access.operations,
           }))}
-          headerEnd={me.isAnonymous ? (
-            <Link href={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false' ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'} className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold">
-              {process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false' ? 'Verify email' : 'Create account'}
-            </Link>
-          ) : (
-            <span className="bg-ink inline-flex rounded-lg px-1 py-0.5"><SignOut /></span>
-          )}
+          headerEnd={
+            me.isAnonymous ? (
+              <Link
+                href={
+                  process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'
+                    ? '/merchants/verify-email'
+                    : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'
+                }
+                className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold"
+              >
+                {process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'
+                  ? 'Verify email'
+                  : 'Create account'}
+              </Link>
+            ) : (
+              <span className="bg-ink inline-flex rounded-lg px-1 py-0.5">
+                <SignOut />
+              </span>
+            )
+          }
         >
           {children}
         </MerchantWorkspaceShell>
@@ -130,7 +148,12 @@ export default async function MerchantLayout({ children }: { children: React.Rea
   }
 
   return (
-    <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
+    <MerchantAuthBoundary
+      merchantId={me.id}
+      actorId={me.userId}
+      access={me.access}
+      isAnonymous={me.isAnonymous}
+    >
       <MerchantShell
         businessName={m.name}
         personName={firstName(m.contact_name, m.name)}

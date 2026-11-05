@@ -69,7 +69,9 @@ export function jsonError(
     headers: {
       'Cache-Control': 'no-store',
       'X-Request-Id': randomUUID(),
-      ...(retryAfter !== undefined ? { 'Retry-After': String(Math.max(1, Math.ceil(retryAfter))) } : {}),
+      ...(retryAfter !== undefined
+        ? { 'Retry-After': String(Math.max(1, Math.ceil(retryAfter))) }
+        : {}),
     },
   });
 }

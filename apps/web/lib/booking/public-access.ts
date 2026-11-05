@@ -12,9 +12,12 @@ export async function publicMerchantBookingAccess(
 ): Promise<'available' | 'not_found' | 'unavailable'> {
   const source = new URL(request.url);
   const host = request.headers.get('host');
-  if (businessId === 'local-booking-business' &&
-      (!host || host.toLowerCase() === source.host.toLowerCase()) &&
-      localBookingSandboxEnabled(source.hostname, process.env)) return 'available';
+  if (
+    businessId === 'local-booking-business' &&
+    (!host || host.toLowerCase() === source.host.toLowerCase()) &&
+    localBookingSandboxEnabled(source.hostname, process.env)
+  )
+    return 'available';
   if (!MERCHANT_UUID.test(businessId)) return 'not_found';
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -28,8 +31,11 @@ export async function publicMerchantBookingAccess(
     });
     // merchant_public is the existing anon projection. Its database definition
     // admits only merchant.status='live'; anon cannot read the private table.
-    const { data, error } = await client.from('merchant_public').select('id')
-      .eq('id', businessId).maybeSingle();
+    const { data, error } = await client
+      .from('merchant_public')
+      .select('id')
+      .eq('id', businessId)
+      .maybeSingle();
     if (error) return 'unavailable';
     return data?.id === businessId ? 'available' : 'not_found';
   } catch {

@@ -3,8 +3,20 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/link', () => ({
-  default: ({ href, children, prefetch: _prefetch, ...props }: { href: string; children: React.ReactNode; prefetch?: boolean }) =>
-    <a href={href} {...props}>{children}</a>,
+  default: ({
+    href,
+    children,
+    prefetch: _prefetch,
+    ...props
+  }: {
+    href: string;
+    children: React.ReactNode;
+    prefetch?: boolean;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
 import { MerchantTabs } from './shell';

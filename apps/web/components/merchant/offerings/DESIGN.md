@@ -2,97 +2,97 @@
 name: NEXG merchant Offerings
 description: Scoped record of the implemented adaptive catalogue and editor in the existing merchant workspace.
 colors:
-  workspace: "#f6f3ec"
-  surface: "#ffffff"
-  shell: "#141414"
-  ink: "#171b24"
-  muted: "#586071"
-  line: "#e3e1dc"
-  field-line: "#cdd0d7"
-  gold: "#d4a72c"
-  gold-text: "#775617"
-  gold-hover: "#c89a22"
-  selected: "#fcf6e9"
-  status-surface: "#f0f1f4"
-  draft: "#969ca8"
-  published: "#278047"
+  workspace: '#f6f3ec'
+  surface: '#ffffff'
+  shell: '#141414'
+  ink: '#171b24'
+  muted: '#586071'
+  line: '#e3e1dc'
+  field-line: '#cdd0d7'
+  gold: '#d4a72c'
+  gold-text: '#775617'
+  gold-hover: '#c89a22'
+  selected: '#fcf6e9'
+  status-surface: '#f0f1f4'
+  draft: '#969ca8'
+  published: '#278047'
 typography:
   display:
     fontFamily: "Georgia, 'Times New Roman', serif"
-    fontSize: "39px"
+    fontSize: '39px'
     fontWeight: 700
     lineHeight: 1.1
-    letterSpacing: "-0.035em"
+    letterSpacing: '-0.035em'
   title:
-    fontFamily: "Manrope, system-ui, sans-serif"
-    fontSize: "19px"
+    fontFamily: 'Manrope, system-ui, sans-serif'
+    fontSize: '19px'
     fontWeight: 750
     lineHeight: 1.25
-    letterSpacing: "-0.025em"
+    letterSpacing: '-0.025em'
   body:
-    fontFamily: "Manrope, system-ui, sans-serif"
-    fontSize: "13px"
+    fontFamily: 'Manrope, system-ui, sans-serif'
+    fontSize: '13px'
     fontWeight: 400
     lineHeight: 1.5
   label:
-    fontFamily: "Manrope, system-ui, sans-serif"
-    fontSize: "12px"
+    fontFamily: 'Manrope, system-ui, sans-serif'
+    fontSize: '12px'
     fontWeight: 600
   table:
-    fontFamily: "Manrope, system-ui, sans-serif"
-    fontSize: "12px"
+    fontFamily: 'Manrope, system-ui, sans-serif'
+    fontSize: '12px'
   status:
-    fontFamily: "Manrope, system-ui, sans-serif"
-    fontSize: "11px"
+    fontFamily: 'Manrope, system-ui, sans-serif'
+    fontSize: '11px'
 rounded:
-  thumbnail: "4px"
-  control: "5px"
-  table: "8px"
-  editor: "9px"
-  dialog: "10px"
-  status: "14px"
+  thumbnail: '4px'
+  control: '5px'
+  table: '8px'
+  editor: '9px'
+  dialog: '10px'
+  status: '14px'
 spacing:
-  control-block: "7px"
-  control-inline: "12px"
-  field-gap: "13px"
-  editor-inline: "17px"
-  column-gap: "22px"
-  workspace-inline: "24px"
+  control-block: '7px'
+  control-inline: '12px'
+  field-gap: '13px'
+  editor-inline: '17px'
+  column-gap: '22px'
+  workspace-inline: '24px'
 components:
   button-primary:
-    backgroundColor: "{colors.gold}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    padding: "7px 12px"
+    backgroundColor: '{colors.gold}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.control}'
+    padding: '7px 12px'
   button-primary-hover:
-    backgroundColor: "{colors.gold-hover}"
+    backgroundColor: '{colors.gold-hover}'
   button-secondary:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    padding: "7px 12px"
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.control}'
+    padding: '7px 12px'
   field:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    padding: "7px 10px"
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.control}'
+    padding: '7px 10px'
   editor-tabs:
-    textColor: "{colors.ink}"
-    padding: "12px 8px 10px"
+    textColor: '{colors.ink}'
+    padding: '12px 8px 10px'
   publication-pill:
-    backgroundColor: "{colors.status-surface}"
-    typography: "{typography.status}"
-    rounded: "{rounded.status}"
-    padding: "2px 7px"
+    backgroundColor: '{colors.status-surface}'
+    typography: '{typography.status}'
+    rounded: '{rounded.status}'
+    padding: '2px 7px'
   selected-row:
-    backgroundColor: "{colors.selected}"
-    textColor: "{colors.ink}"
+    backgroundColor: '{colors.selected}'
+    textColor: '{colors.ink}'
   editor:
-    backgroundColor: "{colors.surface}"
-    rounded: "{rounded.editor}"
+    backgroundColor: '{colors.surface}'
+    rounded: '{rounded.editor}'
   availability-summary:
-    rounded: "{rounded.control}"
-    padding: "11px"
+    rounded: '{rounded.control}'
+    padding: '11px'
 ---
 
 # Design System: NEXG merchant Offerings

@@ -30,8 +30,8 @@ export function MerchantRegistrationPage({ children }: { children: React.ReactNo
           <div className={styles.intro}>
             <h1 id="merchant-page-title">Bring your business to NexG.</h1>
             <p>
-              Create your merchant profile, introduce the products or services you offer, and set
-              up your workspace at your own pace.
+              Create your merchant profile, introduce the products or services you offer, and set up
+              your workspace at your own pace.
             </p>
           </div>
           <div id="merchant-registration" className={styles.form}>
@@ -53,8 +53,8 @@ export function MerchantRegistrationPage({ children }: { children: React.ReactNo
           <div className={styles.featureCopy}>
             <h2 id="merchant-feature-title">More than a listing.</h2>
             <p>
-              Your NexG workspace brings your business profile, offerings, orders and setup
-              progress together.
+              Your NexG workspace brings your business profile, offerings, orders and setup progress
+              together.
             </p>
             <ul className={styles.featureList}>
               <li>Shape a storefront around your business</li>
@@ -80,9 +80,7 @@ export function MerchantRegistrationPage({ children }: { children: React.ReactNo
           </article>
           <article className={styles.benefit}>
             <h3>Keep your offerings in order</h3>
-            <p>
-              Organize your catalogue and business details in one merchant workspace.
-            </p>
+            <p>Organize your catalogue and business details in one merchant workspace.</p>
           </article>
           <article className={styles.benefit}>
             <h3>Know what comes next</h3>

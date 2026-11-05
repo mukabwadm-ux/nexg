@@ -218,12 +218,30 @@ function Workspace({ routingEditor }: { routingEditor?: React.ReactNode }) {
               </button>
             ))}
             {/opening|hours/i.test(query) && (
-              <Link href={demoContext ? appendMerchantOnboardingDemoContext('/merchant-live-preview/availability', demoContext) : '/merchant/availability'}>
+              <Link
+                href={
+                  demoContext
+                    ? appendMerchantOnboardingDemoContext(
+                        '/merchant-live-preview/availability',
+                        demoContext,
+                      )
+                    : '/merchant/availability'
+                }
+              >
                 Opening hours <small>Availability</small>
               </Link>
             )}
             {/payout|bank/i.test(query) && (
-              <Link href={demoContext ? appendMerchantOnboardingDemoContext('/merchant-live-preview/money', demoContext) : '/merchant/money'}>
+              <Link
+                href={
+                  demoContext
+                    ? appendMerchantOnboardingDemoContext(
+                        '/merchant-live-preview/money',
+                        demoContext,
+                      )
+                    : '/merchant/money'
+                }
+              >
                 Payouts <small>Money</small>
               </Link>
             )}

@@ -52,11 +52,17 @@ export function WorkWorkspace({
     });
     return selected.length ? selected : profiles;
   }, [demoContext]);
-  const contextProfile = availableProfiles.find((item) => item.subcategoryId === demoContext?.profileId) ?? availableProfiles[0] ?? initialProfile;
+  const contextProfile =
+    availableProfiles.find((item) => item.subcategoryId === demoContext?.profileId) ??
+    availableProfiles[0] ??
+    initialProfile;
   const [profileId, setProfileId] = useState(contextProfile.subcategoryId);
   const profile = profiles.find((p) => p.subcategoryId === profileId) ?? initialProfile;
   const candidates = useMemo(
-    () => preview ? candidateWorkflows(profile) : (['WF_ORDER', 'WF_SCHEDULED_WORK', 'WF_BOOKING'] as const),
+    () =>
+      preview
+        ? candidateWorkflows(profile)
+        : (['WF_ORDER', 'WF_SCHEDULED_WORK', 'WF_BOOKING'] as const),
     [profile, preview],
   );
   const [workflow, setWorkflow] = useState<WorkflowId | undefined>(() =>
@@ -101,10 +107,13 @@ export function WorkWorkspace({
       .then((items) => {
         if (active) {
           setRecords(items);
-          const linked = workflow === initialWorkflow
-            ? items.find((item) => item.id === initialWorkId)
-            : undefined;
-          const selected = linked ?? items.find((item) => inTab(item, 'progress')) ??
+          const linked =
+            workflow === initialWorkflow
+              ? items.find((item) => item.id === initialWorkId)
+              : undefined;
+          const selected =
+            linked ??
+            items.find((item) => inTab(item, 'progress')) ??
             (!preview ? items[0] : undefined);
           setSelectedId(selected?.id ?? null);
           if (linked || (!preview && selected && !inTab(selected, 'progress')))
@@ -115,7 +124,10 @@ export function WorkWorkspace({
         }
       })
       .catch((failure: unknown) => {
-        if (active) setError(failure instanceof Error ? failure.message : 'Work could not be loaded. Try again.');
+        if (active)
+          setError(
+            failure instanceof Error ? failure.message : 'Work could not be loaded. Try again.',
+          );
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -198,7 +210,11 @@ export function WorkWorkspace({
         setMobileDetail(false);
       }
     } catch (failure) {
-      setNotice(failure instanceof Error ? failure.message : 'The action could not be completed. Try again.');
+      setNotice(
+        failure instanceof Error
+          ? failure.message
+          : 'The action could not be completed. Try again.',
+      );
     } finally {
       setPending(false);
     }
@@ -226,42 +242,64 @@ export function WorkWorkspace({
                 <h1 className="text-[28px] font-bold tracking-tight">Work</h1>
                 <p className="mt-1 text-sm text-[#626675]">{template.label}</p>
               </div>
-              {preview ? <details className="relative">
-                <summary className="cursor-pointer rounded-md border border-[#e1d7c3] bg-white px-3 py-2 text-xs font-semibold text-[#805c1d]">
-                  Choose sample specialty
-                </summary>
-                <div className="absolute right-0 z-40 mt-2 grid w-72 gap-3 rounded-lg border border-[#e6e4df] bg-white p-4 shadow-lg">
-                  <p className="text-xs leading-relaxed text-[#667384]">
-                    Preview possibilities only. Sample changes are not saved.
-                  </p>
-                  <label className="text-xs font-semibold text-[#526071]">
-                    Sample specialty
+              {preview ? (
+                <details className="relative">
+                  <summary className="cursor-pointer rounded-md border border-[#e1d7c3] bg-white px-3 py-2 text-xs font-semibold text-[#805c1d]">
+                    Choose sample specialty
+                  </summary>
+                  <div className="absolute right-0 z-40 mt-2 grid w-72 gap-3 rounded-lg border border-[#e6e4df] bg-white p-4 shadow-lg">
+                    <p className="text-xs leading-relaxed text-[#667384]">
+                      Preview possibilities only. Sample changes are not saved.
+                    </p>
+                    <label className="text-xs font-semibold text-[#526071]">
+                      Sample specialty
+                      <select
+                        value={profileId}
+                        onChange={(event) => changeProfile(event.target.value)}
+                        className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
+                      >
+                        {[...new Set(availableProfiles.map((p) => p.categoryName))].map(
+                          (category) => (
+                            <optgroup key={category} label={category}>
+                              {availableProfiles
+                                .filter((p) => p.categoryName === category)
+                                .map((p) => (
+                                  <option key={p.subcategoryId} value={p.subcategoryId}>
+                                    {p.name.replace('CafÃƒÂ©', 'Café')}
+                                  </option>
+                                ))}
+                            </optgroup>
+                          ),
+                        )}
+                      </select>
+                    </label>
+                    <label className="text-xs font-semibold text-[#526071]">
+                      Sample activity
+                      <select
+                        value={workflow ?? ''}
+                        onChange={(event) => changeWorkflow(event.target.value)}
+                        className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
+                      >
+                        {candidates.length === 0 && <option value="">No supported activity</option>}
+                        {candidates.map((id) => (
+                          <option key={id} value={id}>
+                            {templates[id].label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </details>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold">
+                    Work type
                     <select
-                      value={profileId}
-                      onChange={(event) => changeProfile(event.target.value)}
-                      className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
-                    >
-                      {[...new Set(availableProfiles.map((p) => p.categoryName))].map((category) => (
-                        <optgroup key={category} label={category}>
-                          {availableProfiles
-                            .filter((p) => p.categoryName === category)
-                            .map((p) => (
-                              <option key={p.subcategoryId} value={p.subcategoryId}>
-                                {p.name.replace('CafÃƒÂ©', 'Café')}
-                              </option>
-                            ))}
-                        </optgroup>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="text-xs font-semibold text-[#526071]">
-                    Sample activity
-                    <select
-                      value={workflow ?? ''}
+                      value={workflow}
+                      disabled={pending}
                       onChange={(event) => changeWorkflow(event.target.value)}
-                      className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
+                      className="rounded-md border border-[#dedfdf] bg-white px-3 py-2"
                     >
-                      {candidates.length === 0 && <option value="">No supported activity</option>}
                       {candidates.map((id) => (
                         <option key={id} value={id}>
                           {templates[id].label}
@@ -269,19 +307,12 @@ export function WorkWorkspace({
                       ))}
                     </select>
                   </label>
-                </div>
-              </details> : (
-                <div className="flex flex-wrap items-center gap-2">
-                  <label className="flex items-center gap-2 text-sm font-semibold">
-                    Work type
-                    <select value={workflow} disabled={pending} onChange={(event) => changeWorkflow(event.target.value)}
-                      className="rounded-md border border-[#dedfdf] bg-white px-3 py-2">
-                      {candidates.map((id) => <option key={id} value={id}>{templates[id].label}</option>)}
-                    </select>
-                  </label>
-                  <button type="button" disabled={loading || pending}
+                  <button
+                    type="button"
+                    disabled={loading || pending}
                     className="rounded-md border border-[#dedfdf] bg-white px-3 py-2 text-sm font-semibold"
-                    onClick={() => setReload((value) => value + 1)}>
+                    onClick={() => setReload((value) => value + 1)}
+                  >
                     Refresh
                   </button>
                 </div>
@@ -428,8 +459,8 @@ export function WorkWorkspace({
             {!loading && !error && (
               <p className="mt-3 text-xs text-[#75808c]">
                 {filtered.length}{' '}
-                {filtered.length === 1 ? template.singular : template.label.toLowerCase()}{preview ? ' · sample' : ''}
-                {' '}records
+                {filtered.length === 1 ? template.singular : template.label.toLowerCase()}
+                {preview ? ' · sample' : ''} records
               </p>
             )}
           </main>
@@ -565,7 +596,9 @@ export function WorkWorkspace({
                   ) : (
                     <div>
                       <h3 className="text-base font-semibold">Activity history</h3>
-                      <p className="mt-1 text-xs text-[#72808e]">{preview ? 'Sample events for this record' : 'Recorded events'}</p>
+                      <p className="mt-1 text-xs text-[#72808e]">
+                        {preview ? 'Sample events for this record' : 'Recorded events'}
+                      </p>
                       <ol className="mt-4 space-y-3">
                         {selected.history.map((entry, index) => (
                           <li key={`${entry}-${index}`} className="flex gap-3 text-sm">
@@ -581,14 +614,19 @@ export function WorkWorkspace({
                 </div>
                 <div className="of-editor-footer" style={{ padding: '8px 14px' }}>
                   <div className="w-full">
-                    <p className="mb-2 text-xs text-[#72808e]">{selected.sourceLabel}{preview ? ' · sample' : ''}</p>
+                    <p className="mb-2 text-xs text-[#72808e]">
+                      {selected.sourceLabel}
+                      {preview ? ' · sample' : ''}
+                    </p>
                     {selected.readOnly ? (
                       <p className="rounded-md bg-[#f2f4f5] p-3 text-sm">
                         This record is read-only in this workspace.
                       </p>
                     ) : selected.manageHref ? (
-                      <Link href={selected.manageHref}
-                        className="inline-flex rounded-md bg-[#b58a38] px-4 py-2 text-sm font-bold text-white">
+                      <Link
+                        href={selected.manageHref}
+                        className="inline-flex rounded-md bg-[#b58a38] px-4 py-2 text-sm font-bold text-white"
+                      >
                         Manage booking
                       </Link>
                     ) : selected.nextAction ? (
@@ -598,19 +636,33 @@ export function WorkWorkspace({
                         onClick={() => void advance()}
                         className="w-full rounded-md bg-[#d4a72c] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
                       >
-                        {pending ? (preview ? 'Updating preview…' : 'Saving…') : selected.nextAction.label}
+                        {pending
+                          ? preview
+                            ? 'Updating preview…'
+                            : 'Saving…'
+                          : selected.nextAction.label}
                       </button>
                     ) : (
                       <p className="rounded-md bg-[#edf5ee] p-3 text-sm font-semibold text-[#397348]">
                         {selected.stage >= template.stages.length - 1
-                          ? (preview ? 'This sample work is complete.' : 'This record is closed.')
-                          : (preview ? 'No action is available in this preview.' : 'No primary action is available for this record.')}
+                          ? preview
+                            ? 'This sample work is complete.'
+                            : 'This record is closed.'
+                          : preview
+                            ? 'No action is available in this preview.'
+                            : 'No primary action is available for this record.'}
                       </p>
                     )}
                     {selected.additionalActions?.map((action) => (
-                      <button key={action.id} type="button" disabled={pending}
+                      <button
+                        key={action.id}
+                        type="button"
+                        disabled={pending}
                         className="mr-2 mt-2 rounded-md border px-3 py-2 text-sm font-semibold"
-                        onClick={() => void advance(action)}>{action.label}</button>
+                        onClick={() => void advance(action)}
+                      >
+                        {action.label}
+                      </button>
                     ))}
                     {notice && (
                       <p role="status" className="mt-3 text-sm text-[#536779]">

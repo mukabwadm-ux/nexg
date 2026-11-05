@@ -66,13 +66,21 @@ export default async function TransactionsPage({
           <table className="w-full min-w-[56rem] text-left text-[0.8125rem]">
             <thead className="text-muted-light border-border border-b text-[0.6875rem] uppercase tracking-wide">
               <tr>
-                {['Order', 'Placed', 'Merchant', 'Payment', 'Guest paid', 'Merchant gets', 'Rider', 'NexG keeps', 'Settlement'].map(
-                  (h) => (
-                    <th key={h} className="px-3 py-2.5 font-extrabold">
-                      {h}
-                    </th>
-                  ),
-                )}
+                {[
+                  'Order',
+                  'Placed',
+                  'Merchant',
+                  'Payment',
+                  'Guest paid',
+                  'Merchant gets',
+                  'Rider',
+                  'NexG keeps',
+                  'Settlement',
+                ].map((h) => (
+                  <th key={h} className="px-3 py-2.5 font-extrabold">
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-border divide-y">
@@ -89,9 +97,13 @@ export default async function TransactionsPage({
                     {r.payment_method.replace(/_/g, ' ')} · {r.payment_status.replace(/_/g, ' ')}
                   </td>
                   <td className="px-3 py-2.5 font-extrabold tabular-nums">{kes(r.total_cents)}</td>
-                  <td className="px-3 py-2.5 font-bold tabular-nums">{kes(r.merchant_net_cents)}</td>
+                  <td className="px-3 py-2.5 font-bold tabular-nums">
+                    {kes(r.merchant_net_cents)}
+                  </td>
                   <td className="px-3 py-2.5 font-bold tabular-nums">{kes(r.rider_total_cents)}</td>
-                  <td className="px-3 py-2.5 font-bold tabular-nums">{kes(r.platform_net_cents)}</td>
+                  <td className="px-3 py-2.5 font-bold tabular-nums">
+                    {kes(r.platform_net_cents)}
+                  </td>
                   <td className="px-3 py-2.5 font-semibold">{r.settlement}</td>
                 </tr>
               ))}

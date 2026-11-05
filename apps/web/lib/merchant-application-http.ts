@@ -5,12 +5,13 @@ export type ApplicationPorts = {
   enabled: boolean;
   emailVerificationRequired?: boolean;
   authenticate: () => Promise<
-    boolean | {
-      authenticated: boolean;
-      anonymous: boolean;
-      email?: string | null;
-      emailConfirmed?: boolean;
-    }
+    | boolean
+    | {
+        authenticated: boolean;
+        anonymous: boolean;
+        email?: string | null;
+        emailConfirmed?: boolean;
+      }
   >;
   verifyApplicationEmail?: (
     merchantId: string,
@@ -170,7 +171,11 @@ export function applicationHandler(ports: ApplicationPorts) {
         if (query.get('view') && !['application', 'payout'].includes(query.get('view')!))
           return problem(400, 'invalid_request', 'Unknown application view.');
         if (anonymous && query.get('view') === 'payout')
-          return problem(403, 'access_denied', 'Create your merchant account before opening payout details.');
+          return problem(
+            403,
+            'access_denied',
+            'Create your merchant account before opening payout details.',
+          );
         if (operationId && query.has('view'))
           return problem(400, 'invalid_request', 'Operation lookup has no data view.');
         name = operationId
@@ -191,7 +196,11 @@ export function applicationHandler(ports: ApplicationPorts) {
           );
         const input = command.data;
         if (anonymous && (input.command === 'payout' || input.command === 'activity'))
-          return problem(403, 'access_denied', 'Create your merchant account before using this workspace action.');
+          return problem(
+            403,
+            'access_denied',
+            'Create your merchant account before using this workspace action.',
+          );
         if (input.command === 'submit' && ports.emailVerificationRequired) {
           if (anonymous || !email || !emailConfirmed)
             return problem(

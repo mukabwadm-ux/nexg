@@ -31,9 +31,7 @@ const contextKeys = [
 const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/g;
 
 const cleanText = (value: unknown, maxLength: number): string =>
-  typeof value === 'string'
-    ? value.replace(CONTROL_CHARACTERS, '').trim().slice(0, maxLength)
-    : '';
+  typeof value === 'string' ? value.replace(CONTROL_CHARACTERS, '').trim().slice(0, maxLength) : '';
 
 const cleanId = (value: unknown): string => {
   const id = cleanText(value, 100);
@@ -171,8 +169,6 @@ export function appendMerchantOnboardingDemoContext(
   return `${pathname}?${params.toString()}`;
 }
 
-export function merchantOnboardingDemoHref(
-  context: MerchantOnboardingDemoContext,
-): string {
+export function merchantOnboardingDemoHref(context: MerchantOnboardingDemoContext): string {
   return appendMerchantOnboardingDemoContext('/merchant-live-preview?state=setup', context);
 }

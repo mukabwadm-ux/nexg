@@ -45,7 +45,10 @@ function apiClient(privileged = false) {
   return createClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   }) as unknown as {
-    rpc: (name: string, args: Record<string, unknown>) => Promise<{
+    rpc: (
+      name: string,
+      args: Record<string, unknown>,
+    ) => Promise<{
       data: unknown;
       error: { message: string; code?: string } | null;
     }>;
@@ -65,8 +68,12 @@ export async function authenticate(request: Request): Promise<ApiCredential> {
   const raw = header ?? (authorization === null ? null : authorization.slice(7));
   if (raw === null) {
     return {
-      keyId: '', rawKey: '', merchantId: null,
-      scopes: [API_SCOPES.public_read], rateLimit: 120, anonymous: true,
+      keyId: '',
+      rawKey: '',
+      merchantId: null,
+      scopes: [API_SCOPES.public_read],
+      rateLimit: 120,
+      anonymous: true,
     };
   }
   if (!raw || raw.length > 256 || /\s/.test(raw)) {
@@ -78,22 +85,35 @@ export async function authenticate(request: Request): Promise<ApiCredential> {
     throw new ApiAuthError('The API key could not be checked.', 'internal_error', 503);
   }
   const row = (Array.isArray(data) ? data[0] : data) as {
-    key_id?: unknown; merchant_id?: unknown; scopes?: unknown; rate_limit?: unknown;
+    key_id?: unknown;
+    merchant_id?: unknown;
+    scopes?: unknown;
+    rate_limit?: unknown;
   } | null;
   if (!row) {
     // Unknown, revoked, expired and access-restricted credentials share one response.
     throw new ApiAuthError('That API key is not valid.', 'not_found', 401);
   }
-  if (typeof row.key_id !== 'string' || !row.key_id
-    || !(row.merchant_id === null || typeof row.merchant_id === 'string')
-    || !Array.isArray(row.scopes) || !row.scopes.length
-    || row.scopes.some((scope) => !Object.values(API_SCOPES).includes(scope as ApiScope))
-    || typeof row.rate_limit !== 'number' || !Number.isInteger(row.rate_limit) || row.rate_limit < 1) {
+  if (
+    typeof row.key_id !== 'string' ||
+    !row.key_id ||
+    !(row.merchant_id === null || typeof row.merchant_id === 'string') ||
+    !Array.isArray(row.scopes) ||
+    !row.scopes.length ||
+    row.scopes.some((scope) => !Object.values(API_SCOPES).includes(scope as ApiScope)) ||
+    typeof row.rate_limit !== 'number' ||
+    !Number.isInteger(row.rate_limit) ||
+    row.rate_limit < 1
+  ) {
     throw new ApiAuthError('The API key could not be checked.', 'internal_error', 503);
   }
   return {
-    keyId: row.key_id, rawKey: raw, merchantId: row.merchant_id,
-    scopes: row.scopes as ApiScope[], rateLimit: Math.min(row.rate_limit, 600), anonymous: false,
+    keyId: row.key_id,
+    rawKey: raw,
+    merchantId: row.merchant_id,
+    scopes: row.scopes as ApiScope[],
+    rateLimit: Math.min(row.rate_limit, 600),
+    anonymous: false,
   };
 }
 
@@ -112,9 +132,7 @@ export function trustedAnonymousIp(request: Request): string | null {
   if (!name || !/^[a-z0-9-]{1,64}$/.test(name)) return null;
   const value = request.headers.get(name)?.trim();
   if (!value || !isIP(value)) return null;
-  return isIP(value) === 6
-    ? new URL(`http://[${value}]/`).hostname.slice(1, -1)
-    : value;
+  return isIP(value) === 6 ? new URL(`http://[${value}]/`).hostname.slice(1, -1) : value;
 }
 
 /** Fleet-wide PostgreSQL token bucket; the database derives and locks the principal. */
@@ -135,15 +153,25 @@ export async function enforceRateLimit(
     throw new ApiAuthError('The rate limit could not be checked.', 'internal_error', 503);
   }
   const result = (Array.isArray(data) ? data[0] : data) as {
-    allowed?: unknown; retry_after?: unknown;
+    allowed?: unknown;
+    retry_after?: unknown;
   } | null;
-  if (!result || typeof result.allowed !== 'boolean'
-    || typeof result.retry_after !== 'number' || !Number.isFinite(result.retry_after)
-    || result.retry_after < 0 || result.retry_after > 3600) {
+  if (
+    !result ||
+    typeof result.allowed !== 'boolean' ||
+    typeof result.retry_after !== 'number' ||
+    !Number.isFinite(result.retry_after) ||
+    result.retry_after < 0 ||
+    result.retry_after > 3600
+  ) {
     throw new ApiAuthError('The rate limit could not be checked.', 'internal_error', 503);
   }
   if (!result.allowed) {
-    throw new ApiAuthError('Too many requests. Try again later.', 'rate_limited', 429,
-      Math.max(1, Math.ceil(result.retry_after)));
+    throw new ApiAuthError(
+      'Too many requests. Try again later.',
+      'rate_limited',
+      429,
+      Math.max(1, Math.ceil(result.retry_after)),
+    );
   }
 }
