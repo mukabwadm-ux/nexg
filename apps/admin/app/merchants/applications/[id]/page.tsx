@@ -14,7 +14,7 @@ import {
   loadMerchantApplicationReview,
   ReviewSourceError,
 } from '@/lib/merchant-application-review';
-import { loadMerchantDocumentReadiness } from '@/lib/merchant-document-readiness';
+import { loadMerchantDocumentReadiness } from '@/lib/merchant-document-readiness-load';
 import { requireModule, requireStaff } from '@/lib/staff';
 
 export const metadata: Metadata = { title: 'Review merchant application' };
