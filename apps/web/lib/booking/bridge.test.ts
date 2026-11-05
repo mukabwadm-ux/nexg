@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   allowedBookingPath,
   bookingCustomerSession,
+  bookingEngineConfigured,
   bookingHeaders,
   localBookingSandboxEnabled,
   sameOriginMutation,
@@ -132,5 +133,24 @@ describe('booking portal boundary', () => {
     expect(bookingCustomerSession(`nexg_booking_session=${tampered}`, secret, now).userId).not.toBe(
       first.userId,
     );
+  });
+
+  it('treats the booking runtime as connected only with an address and a long secret', () => {
+    expect(bookingEngineConfigured({})).toBe(false);
+    expect(bookingEngineConfigured({ BOOKING_ENGINE_URL: 'https://booking.example.test' })).toBe(
+      false,
+    );
+    expect(
+      bookingEngineConfigured({
+        BOOKING_ENGINE_URL: 'https://booking.example.test',
+        BOOKING_BRIDGE_SECRET: 'short',
+      }),
+    ).toBe(false);
+    expect(
+      bookingEngineConfigured({
+        BOOKING_ENGINE_URL: 'https://booking.example.test',
+        BOOKING_BRIDGE_SECRET: 'a'.repeat(32),
+      }),
+    ).toBe(true);
   });
 });
