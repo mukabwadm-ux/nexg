@@ -263,10 +263,11 @@ export function InsightsWorkspace({
   const tabsRef = useRef<HTMLDivElement>(null);
   const [tabWidth, setTabWidth] = useState(960);
   const [collectionPage, setCollectionPage] = useState(0);
+  const demoProfileId = activeDemo?.profileId;
   useEffect(() => {
-    if (!initialProfileId && !initialSnapshot && mode === 'sample' && activeDemo)
-      setSnapshot(sampleSnapshot(activeDemo.profileId));
-  }, [initialProfileId, initialSnapshot, mode, activeDemo?.profileId]);
+    if (!initialProfileId && !initialSnapshot && mode === 'sample' && demoProfileId)
+      setSnapshot(sampleSnapshot(demoProfileId));
+  }, [initialProfileId, initialSnapshot, mode, demoProfileId]);
   const [offeringUnit, setOfferingUnit] = useState('');
   useEffect(() => setCollectionPage(0), [libraryTab, reportSearch]);
   const hasLoaded = useRef(false);
