@@ -156,6 +156,15 @@ export function sameOriginMutation(request: Request) {
   }
 }
 
+/**
+ * Whether the booking runtime is connected: its address and a signing secret
+ * long enough for the bridge. Until it is, booking pages fall back to the
+ * Supabase Bookings board instead of showing a connection error.
+ */
+export function bookingEngineConfigured(env: Record<string, string | undefined>) {
+  return Boolean(env.BOOKING_ENGINE_URL) && (env.BOOKING_BRIDGE_SECRET?.length ?? 0) >= 32;
+}
+
 export function localBookingSandboxEnabled(
   hostname: string,
   env: Record<string, string | undefined>,
