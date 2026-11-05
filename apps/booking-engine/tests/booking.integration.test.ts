@@ -12,6 +12,12 @@ import { runSpecialistFixtures } from './specialist-fixtures.js';
 import { createBookingServer } from '../src/server.js';
 import type { Identity, OfferingInput } from '../src/types.js';
 
+// Each test opens its own fresh SQLite file in this same process. Payload's
+// dev schema push remembers the last schema it pushed (module-wide) and skips
+// any later database with the same schema, so the second file never got its
+// tables ("no such table: booking_operations"). Force a push for every one.
+process.env.PAYLOAD_FORCE_DRIZZLE_PUSH = 'true';
+
 test('booking GET reads preserve persisted business state', async (t) => {
   const directory = await mkdtemp(path.join(tmpdir(), 'nexg-read-only-'));
   const sqliteUrl = 'file:' + path.join(directory, 'test.db').replaceAll('\\', '/');
