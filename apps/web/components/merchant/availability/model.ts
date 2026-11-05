@@ -342,12 +342,17 @@ export function localTime(value: string) {
   }).format(new Date(stamp(value)));
 }
 export function prettyDate(value: string) {
+  // Browser and server ICU versions disagree about punctuation in weekday labels.
   return new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Africa/Nairobi',
     weekday: 'short',
     day: 'numeric',
     month: 'short',
-  }).format(new Date(stamp(value.includes('T') ? value : value + 'T12:00')));
+  })
+    .formatToParts(new Date(stamp(value.includes('T') ? value : value + 'T12:00')))
+    .filter((part) => part.type !== 'literal')
+    .map((part) => part.value)
+    .join(' ');
 }
 export function localInput(value: string) {
   return localDate(value) + 'T' + localTime(value);
