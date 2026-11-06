@@ -99,3 +99,6 @@ apps/web/.next-merchant-layout-preview/
 
 # Isolated local merchant preview
 apps/web/.next-dev-3141/
+
+# Generated host workspace preview assets
+/apps/web/public/nexg-hosts-workspace/

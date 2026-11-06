@@ -89,7 +89,12 @@ export function AuthPanel({
     }
 
     toast({ title: 'Welcome', description: result.message, tone: 'success' });
-    router.push(authDestination(role, next, result.redirectTo));
+    const destination = authDestination(role, next, result.redirectTo);
+    if (destination === '/host' || destination.startsWith('/host?')) {
+      window.location.assign(destination);
+      return;
+    }
+    router.push(destination);
     router.refresh();
   };
 
@@ -152,7 +157,7 @@ export function AuthPanel({
               : 'For guests. You can order without an account — this just saves you time next visit.'}
         </p>
 
-        <form onSubmit={submit} className="mt-6">
+        <form method="post" onSubmit={submit} className="mt-6">
           {tab === 'signin' && (
             <fieldset className="mb-5">
               <legend className="text-ink mb-2 text-sm font-bold">I am a…</legend>
