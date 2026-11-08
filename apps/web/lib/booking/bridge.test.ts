@@ -41,6 +41,10 @@ describe('booking portal boundary', () => {
     expect(allowedBookingPath(['bookings', 'own-id', 'workflow'], 'POST', 'merchant')).toBe(true);
     expect(allowedBookingPath(['bookings', 'own-id', 'workflow'], 'GET', 'customer')).toBe(false);
     expect(allowedBookingPath(['..', 'configuration'], 'PUT', 'merchant')).toBe(false);
+    // The sandbox workspace creates itself through the engine's bootstrap; customers never can.
+    expect(allowedBookingPath(['bootstrap'], 'POST', 'merchant')).toBe(true);
+    expect(allowedBookingPath(['bootstrap'], 'POST', 'customer')).toBe(false);
+    expect(allowedBookingPath(['bootstrap'], 'GET', 'merchant')).toBe(false);
   });
   it('rejects cross-origin and missing-origin mutations', () => {
     expect(

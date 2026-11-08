@@ -4,6 +4,22 @@ import type { Database } from '@nexg/db';
 import { localBookingSandboxEnabled } from './bridge';
 
 const MERCHANT_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/**
+ * The development sandbox's businesses: the fixed workspace id and the ids the
+ * acceptance scripts create (`local-space-acceptance-…`, `local-workflow-linked_windows-…`).
+ * Nothing outside the sandbox gate below can ever match them as a real merchant.
+ */
+const LOCAL_SANDBOX_BUSINESS = /^local-[a-z0-9_-]{1,120}$/;
+
+/** The hostname the browser addressed, from its Host header; null when absent or malformed. */
+function requestedHostname(host: string | null): string | null {
+  if (!host) return null;
+  try {
+    return new URL(`http://${host}`).hostname;
+  } catch {
+    return null;
+  }
+}
 
 /** Public booking requires the existing anonymously visible live merchant. */
 export async function publicMerchantBookingAccess(
@@ -11,10 +27,14 @@ export async function publicMerchantBookingAccess(
   businessId: string,
 ): Promise<'available' | 'not_found' | 'unavailable'> {
   const source = new URL(request.url);
-  const host = request.headers.get('host');
+  // Both the address the browser used and the one Next reports must be loopback.
+  // They are compared for loopback-ness rather than equality: `next dev --hostname
+  // 127.0.0.1` still reports `localhost` in `request.url`, which used to turn every
+  // sandbox booking page into "This booking page does not exist".
+  const requested = requestedHostname(request.headers.get('host')) ?? source.hostname;
   if (
-    businessId === 'local-booking-business' &&
-    (!host || host.toLowerCase() === source.host.toLowerCase()) &&
+    LOCAL_SANDBOX_BUSINESS.test(businessId) &&
+    localBookingSandboxEnabled(requested, process.env) &&
     localBookingSandboxEnabled(source.hostname, process.env)
   )
     return 'available';

@@ -96,7 +96,7 @@ export function allowedBookingPath(
     if (audience === 'merchant' && method === 'PUT') return section === 'configuration';
     if (method === 'POST')
       return audience === 'merchant'
-        ? ['resources', 'offerings', 'bookings', 'quote'].includes(section ?? '')
+        ? ['resources', 'offerings', 'bookings', 'quote', 'bootstrap'].includes(section ?? '')
         : ['bookings', 'quote'].includes(section ?? '');
   }
   if (section === 'bookings' && id && parts.length === 2 && method === 'GET') return true;

@@ -309,12 +309,20 @@ export function MerchantBookingWorkspace({
   );
   const disabled = busy || !online;
 
+  // The merchant route imports the saved application; the local sandbox has none and
+  // simply creates its empty workspace through the engine's bootstrap.
+  const sandboxWorkspace = Boolean(apiBase) && apiBase !== '/api/merchant/booking';
+  const needsInitialization = Boolean(error?.includes('Initialize this booking workspace'));
   async function importOnboarding() {
     setBusy(true);
     setError(null);
     try {
       await command('/bootstrap', {}, 'POST', apiBase);
-      setSuccess('Your saved business details have been imported.');
+      setSuccess(
+        sandboxWorkspace
+          ? 'Your booking workspace is ready. Open Booking setup to choose your specialty.'
+          : 'Your saved business details have been imported.',
+      );
       await load();
     } catch (cause) {
       setError(
@@ -339,22 +347,24 @@ export function MerchantBookingWorkspace({
         <h1 className="font-serif text-3xl font-extrabold">Calendar</h1>
         <ErrorMessage message={error} />
         <p className="text-muted max-w-xl text-sm leading-relaxed">
-          Your bookings have not been loaded. Reconnect and try again to see their confirmed status.
+          {needsInitialization
+            ? 'This booking workspace has not been set up yet. Create it to start configuring your calendar; nothing is published until you say so.'
+            : 'Your bookings have not been loaded. Reconnect and try again to see their confirmed status.'}
         </p>
-        <button className={buttonClass} onClick={() => void load(true)}>
-          <RefreshCw className="h-4 w-4" aria-hidden="true" />
-          Try again
-        </button>
-        {!apiBase || apiBase === '/api/merchant/booking' ? (
-          <button
-            type="button"
-            className={buttonClass}
-            disabled={disabled}
-            onClick={() => void importOnboarding()}
-          >
-            Import saved business details
+        {!needsInitialization ? (
+          <button className={buttonClass} onClick={() => void load(true)}>
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            Try again
           </button>
         ) : null}
+        <button
+          type="button"
+          className={needsInitialization ? primaryClass : buttonClass}
+          disabled={disabled}
+          onClick={() => void importOnboarding()}
+        >
+          {sandboxWorkspace ? 'Create this booking workspace' : 'Import saved business details'}
+        </button>
       </main>
     );
 
