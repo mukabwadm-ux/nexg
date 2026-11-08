@@ -127,7 +127,6 @@ export const CALENDAR_PROVIDERS = [
   { value: 'pms_csv', label: 'Hotel PMS (CSV upload)' },
 ];
 
-
 export const HOST_REQUEST_TYPES = [
   { value: 'amenities', label: 'Amenities' },
   { value: 'late_checkout', label: 'Late check-out' },

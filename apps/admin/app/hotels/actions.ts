@@ -48,19 +48,31 @@ export async function listHostPrivacyShares(requestId: string) {
   const staff = await requireStaff();
   requireModule(staff, 'hotels');
   if (!uuid.test(requestId)) return { error: 'Choose a valid data request.' } as const;
-  const {data,error}=await createClient().rpc('rpc_host_workspace_data_share_options',{p_request_id:requestId});
-  return error ? {error:'Host status options could not be loaded.'} as const : {rows:data??[]} as const;
+  const { data, error } = await createClient().rpc('rpc_host_workspace_data_share_options', {
+    p_request_id: requestId,
+  });
+  return error
+    ? ({ error: 'Host status options could not be loaded.' } as const)
+    : ({ rows: data ?? [] } as const);
 }
 
 export async function setHostPrivacyShare(requestId: string, hostId: string, shared: boolean) {
   const staff = await requireStaff();
   requireModule(staff, 'hotels');
-  if (!uuid.test(requestId)||!uuid.test(hostId)||typeof shared!=='boolean')
-    return {error:'Choose a valid request and host.'};
-  const {error}=await createClient().rpc('rpc_host_workspace_data_share_set',{
-    p_request_id:requestId,p_host_id:hostId,p_shared:shared,
+  if (!uuid.test(requestId) || !uuid.test(hostId) || typeof shared !== 'boolean')
+    return { error: 'Choose a valid request and host.' };
+  const { error } = await createClient().rpc('rpc_host_workspace_data_share_set', {
+    p_request_id: requestId,
+    p_host_id: hostId,
+    p_shared: shared,
   });
-  if (error) return {error:error.code==='22023'||error.code==='42501'?error.message:'Status sharing could not be saved.'};
+  if (error)
+    return {
+      error:
+        error.code === '22023' || error.code === '42501'
+          ? error.message
+          : 'Status sharing could not be saved.',
+    };
   revalidatePath('/hotels');
-  return {ok:true};
+  return { ok: true };
 }

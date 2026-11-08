@@ -90,9 +90,10 @@ export default async function ScanPage({ params }: { params: { code: string } })
 
   const code = params.code.toUpperCase();
   const canonicalCode = code.startsWith('NXG-') ? code : 'NXG-' + code;
-  const guide = r.kind === 'unit' && localHostWorkspaceEnabled()
-    ? await readPublishedGuide(canonicalCode).catch(() => null)
-    : null;
+  const guide =
+    r.kind === 'unit' && localHostWorkspaceEnabled()
+      ? await readPublishedGuide(canonicalCode).catch(() => null)
+      : null;
   const ctx = (r.context ?? {}) as Record<string, unknown>;
   const hours = ctx.delivery_hours as { from?: string; to?: string } | null;
   const handoff = ctx.handoff_sentence as string | undefined;
@@ -141,10 +142,14 @@ export default async function ScanPage({ params }: { params: { code: string } })
         Ask a concierge for something specific
       </Link>
 
-      {guide && <Link href={'/q/' + canonicalCode + '/guide'}
-        className="border-border mt-3 block rounded-xl border bg-white px-5 py-4 text-center text-[0.875rem] font-extrabold">
-        Open your unit guide
-      </Link>}
+      {guide && (
+        <Link
+          href={'/q/' + canonicalCode + '/guide'}
+          className="border-border mt-3 block rounded-xl border bg-white px-5 py-4 text-center text-[0.875rem] font-extrabold"
+        >
+          Open your unit guide
+        </Link>
+      )}
 
       <p className="text-muted-light mt-6 text-[0.75rem] font-semibold leading-[1.7]">
         We note that this card was scanned so your host knows the service is used. No account

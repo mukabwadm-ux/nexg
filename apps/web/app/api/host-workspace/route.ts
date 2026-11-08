@@ -19,7 +19,8 @@ const requestSchema = z.discriminatedUnion('action', [
 ]);
 
 export async function GET() {
-  if (!localHostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
+  if (!localHostWorkspaceEnabled())
+    return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
     return hostWorkspaceJson(await readHostWorkspace(await hostWorkspaceAccess()));
   } catch (error) {
@@ -28,7 +29,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!localHostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
+  if (!localHostWorkspaceEnabled())
+    return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
     requireWorkspaceOrigin(request);
     if (!request.headers.get('content-type')?.startsWith('application/json'))
@@ -38,7 +40,8 @@ export async function POST(request: Request) {
     if (Number(request.headers.get('content-length')) > maxBytes)
       throw new HostWorkspaceError(413, 'The workspace update is too large.');
     const body = await request.text();
-    if (Buffer.byteLength(body) > maxBytes) throw new HostWorkspaceError(413, 'The workspace update is too large.');
+    if (Buffer.byteLength(body) > maxBytes)
+      throw new HostWorkspaceError(413, 'The workspace update is too large.');
     const action = requestSchema.parse(JSON.parse(body));
     if (action.action === 'sign-out') {
       const { error } = await access.db.auth.signOut({ scope: 'local' });
@@ -49,9 +52,15 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const field = error.issues[0]?.path.at(-1);
-      return hostWorkspaceJson({ error: field ? 'Check the ' + String(field) + ' field.' : 'Check the workspace details.' }, 400);
+      return hostWorkspaceJson(
+        {
+          error: field ? 'Check the ' + String(field) + ' field.' : 'Check the workspace details.',
+        },
+        400,
+      );
     }
-    if (error instanceof SyntaxError) return hostWorkspaceJson({ error: 'Enter valid workspace details.' }, 400);
+    if (error instanceof SyntaxError)
+      return hostWorkspaceJson({ error: 'Enter valid workspace details.' }, 400);
     return hostWorkspaceError(error);
   }
 }

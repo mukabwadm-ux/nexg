@@ -13272,43 +13272,69 @@ export type Database = {
         Row: { unit_id: string; revision: number; document: Json; published_id: string | null };
         Insert: never;
         Update: never;
-        Relationships: [{
-          foreignKeyName: 'host_unit_guide_unit_id_fkey';
-          columns: ['unit_id'];
-          isOneToOne: true;
-          referencedRelation: 'unit';
-          referencedColumns: ['id'];
-        }];
+        Relationships: [
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       host_unit_guide_version: {
-        Row: { id: string; unit_id: string; document: Json; article_count: number; published_at: string };
-        Insert: never;
-        Update: never;
-        Relationships: [{
-          foreignKeyName: 'host_unit_guide_version_unit_id_fkey';
-          columns: ['unit_id'];
-          isOneToOne: false;
-          referencedRelation: 'host_unit_guide';
-          referencedColumns: ['unit_id'];
-        }];
-      };
-      host_workspace_task: {
         Row: {
-          id: string; unit_id: string; stay_id: string | null; repeat_of: string | null;
-          assignee_id: string | null; created_by: string | null;
-          title: string; kind: string; due_at: string; priority: string; status: string;
-          checklist: string[]; completed_checks: string[]; evidence: string; comments: string;
-          cadence: string; inspection: boolean; version: number; updated_at: string;
+          id: string;
+          unit_id: string;
+          document: Json;
+          article_count: number;
+          published_at: string;
         };
         Insert: never;
         Update: never;
-        Relationships: [{
-          foreignKeyName: 'host_workspace_task_unit_id_fkey';
-          columns: ['unit_id'];
-          isOneToOne: false;
-          referencedRelation: 'unit';
-          referencedColumns: ['id'];
-        }];
+        Relationships: [
+          {
+            foreignKeyName: 'host_unit_guide_version_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_guide';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
+      host_workspace_task: {
+        Row: {
+          id: string;
+          unit_id: string;
+          stay_id: string | null;
+          repeat_of: string | null;
+          assignee_id: string | null;
+          created_by: string | null;
+          title: string;
+          kind: string;
+          due_at: string;
+          priority: string;
+          status: string;
+          checklist: string[];
+          completed_checks: string[];
+          evidence: string;
+          comments: string;
+          cadence: string;
+          inspection: boolean;
+          version: number;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       host_manual_finance: {
         Row: {
@@ -50610,7 +50636,10 @@ export type Database = {
       };
       rpc_hospitality_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_apply: { Args: { p_payload: Json }; Returns: Json };
-      rpc_host_manual_finance_record: { Args: { p_host_id: string; p_entry: Json }; Returns: string };
+      rpc_host_manual_finance_record: {
+        Args: { p_host_id: string; p_entry: Json };
+        Returns: string;
+      };
       rpc_host_message_read: { Args: { p_conversation: string }; Returns: Json };
       rpc_host_message_reply: {
         Args: { p_body: string; p_conversation: string; p_idempotency_key?: string };
@@ -50801,11 +50830,23 @@ export type Database = {
         Returns: undefined;
       };
       rpc_host_workspace_guide_commit: {
-        Args: { p_unit_id: string; p_revision: number; p_action: string; p_document: Json; p_restore_id?: string };
+        Args: {
+          p_unit_id: string;
+          p_revision: number;
+          p_action: string;
+          p_document: Json;
+          p_restore_id?: string;
+        };
         Returns: number;
       };
       rpc_host_workspace_guide_asset_put: {
-        Args: { p_unit_id: string; p_revision: number; p_kind: string; p_mime: string; p_base64: string };
+        Args: {
+          p_unit_id: string;
+          p_revision: number;
+          p_kind: string;
+          p_mime: string;
+          p_base64: string;
+        };
         Returns: number;
       };
       rpc_host_workspace_published_guide: { Args: { p_code: string }; Returns: Json };
@@ -50816,9 +50857,20 @@ export type Database = {
       };
       rpc_host_workspace_shared_data_requests: {
         Args: { p_host_id: string };
-        Returns: { id: string; kind: string; status: string; verified: boolean; received_at: string; due_at: string | null; fulfilled_at: string | null }[];
+        Returns: {
+          id: string;
+          kind: string;
+          status: string;
+          verified: boolean;
+          received_at: string;
+          due_at: string | null;
+          fulfilled_at: string | null;
+        }[];
       };
-      rpc_host_workspace_package_cancel: { Args: { p_host_id: string; p_order_id: string }; Returns: undefined };
+      rpc_host_workspace_package_cancel: {
+        Args: { p_host_id: string; p_order_id: string };
+        Returns: undefined;
+      };
       rpc_host_workspace_photos_set: {
         Args: { p_kind: string; p_id: string; p_expected: Json; p_photos: Json };
         Returns: undefined;

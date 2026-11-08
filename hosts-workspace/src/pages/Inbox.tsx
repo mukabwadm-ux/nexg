@@ -13,7 +13,7 @@ const zone = 'Africa/Nairobi';
 
 export function SupportInboxPage({ routeId }: { routeId: string }) {
   const { section, data, unitLabel } = useWorkspace();
-  const unit = data.units.find(item => item.id === section);
+  const unit = data.units.find((item) => item.id === section);
   const [inbox, setInbox] = useState<SupportInbox | null>(null);
   const [conversation, setConversation] = useState<SupportConversation | null>(null);
   const [inboxError, setInboxError] = useState('');
@@ -105,7 +105,9 @@ export function SupportInboxPage({ routeId }: { routeId: string }) {
   return (
     <div className="nxops-page nxops-inbox-page platform-inbox">
       <PageHeader title="Inbox" subtitle="Messages with NexG support.">
-        <a className="btn" href="#support-tickets">Support ticket history</a>
+        <a className="btn" href="#support-tickets">
+          Support ticket history
+        </a>
         <Button onClick={reload}>Refresh</Button>
         <a className="btn btn-primary" href="#inbox/new">
           <Icon name="add" size={17} />
