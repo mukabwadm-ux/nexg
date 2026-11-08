@@ -1,0 +1,14 @@
+export * from './contracts/index.js';
+export * from './contracts/validate.js';
+export * from './releases/artifact.js';
+export * from './releases/baselineReleaseReader.js';
+export * from './policy/composition.js';
+export { resolveWorkflowPolicy, requestBinding, andDecisions } from '../engines/catalog-eligibility/src/index.js';
+export type { OfferingFacts, VerifiedWorkflow, PolicyInput, PolicyReport } from '../engines/catalog-eligibility/src/index.js';
+export { understandQuery } from '../engines/query-understanding/src/index.js';
+export type { QueryPlan, QueryRules, ReviewedAlias } from '../engines/query-understanding/src/index.js';
+export type { RetrievalCandidatePort, CandidateRequest, CandidateWindow } from '../engines/search-retrieval/src/ports.js';
+export { rankRecommendations } from '../engines/recommendation/src/index.js';
+export type { RankingInput, RankingCandidate, RankingResult, PreferenceContext, ExplicitPreference, SourceSortOrder } from '../engines/recommendation/src/contracts.js';
+export { prepareCollections, selectCollections, evaluateCollectionPredicate } from '../engines/collection-composition/src/index.js';
+export type { ReleasedCollectionDefinition, ExecutableCollectionDefinition, PreparedCollection, CompositionResult, PredicateInput } from '../engines/collection-composition/src/index.js';

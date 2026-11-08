@@ -1,0 +1,73 @@
+/* Home page feature carousel (HomepageFeatureCarousel): category ideas that run past the content column, with
+   the neighbouring cards peeking in. On wide screens the first card lines up with the page (see the component). */
+
+.homepage-feature-carousel{position:relative;margin:26px calc(50% - 50vw) 36px}
+.homepage-feature-carousel__stage{position:relative}
+.homepage-feature-carousel__viewport{position:relative;overflow:hidden;isolation:isolate;touch-action:pan-y}
+.homepage-feature-carousel__track{display:flex;gap:18px;transition:transform 300ms var(--ease-out);will-change:transform}
+.homepage-feature-carousel__track--still{transition:none}
+
+.homepage-feature-card{position:relative;display:flex;flex:0 0 auto;flex-direction:column;justify-content:flex-end;aspect-ratio:1.75;min-height:270px;overflow:hidden;padding:26px 28px;border-radius:24px;background:#172126;text-align:left;isolation:isolate;box-shadow:0 14px 34px rgba(0,0,0,.22);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+.homepage-feature-card:active{scale:.985}
+.homepage-feature-card:disabled{pointer-events:none}
+.homepage-feature-card:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.homepage-feature-card--start-hidden{visibility:hidden}
+.homepage-feature-card__image,.homepage-feature-card__shade{position:absolute;inset:0;width:100%;height:100%;border-radius:inherit}
+.homepage-feature-card__image{z-index:-2;object-fit:cover;filter:brightness(1.28) saturate(1.3) contrast(1.05);transition-property:scale,filter;transition-duration:300ms;transition-timing-function:var(--ease-out)}
+.homepage-feature-card__shade{z-index:-1;background:radial-gradient(ellipse 112% 132% at 0% 100%,rgba(5,9,10,.74) 0%,rgba(5,9,10,.56) 34%,rgba(5,9,10,.28) 62%,rgba(5,9,10,0) 100%),linear-gradient(0deg,rgba(5,9,10,.28) 0%,rgba(5,9,10,.12) 25%,transparent 58%)}
+.homepage-feature-card__tag{position:absolute;top:20px;left:22px;z-index:2;display:inline-flex;align-items:center;gap:8px;max-width:calc(100% - 44px);padding:8px 12px;border-radius:999px;background:rgba(8,13,15,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 5px 18px rgba(0,0,0,.3);color:#ffd27b;font-size:clamp(9px,.78vw,11px);font-weight:700;line-height:1.2;letter-spacing:.075em;text-transform:uppercase;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.homepage-feature-card__tag-icon{flex:none;color:var(--gold)}
+.homepage-feature-card__tag-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.homepage-feature-card__copy{position:relative;display:flex;max-width:94%;flex-direction:column;align-items:flex-start;gap:4px;color:#f6f0e4}
+.homepage-feature-card__text{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:fit-content;max-width:100%}
+.homepage-feature-card__title{display:-webkit-box;max-width:32ch;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:clamp(22px,1.65vw,30px);font-weight:700;line-height:1.08;letter-spacing:-.035em;text-wrap:balance;text-shadow:0 1px 8px rgba(0,0,0,.72)}
+.homepage-feature-card__description{width:0;min-width:100%;max-width:100%;color:#fffaf0;font-size:clamp(12px,.68vw,13px);font-weight:400;line-height:1.5;overflow-wrap:break-word;text-shadow:0 1px 8px rgba(0,0,0,.72)}
+.homepage-feature-card__action{display:inline-flex;align-items:center;gap:5px;margin-top:3px;padding:10px 16px;border-radius:999px;background:var(--feature-accent,#ffc259);box-shadow:0 3px 10px rgba(0,0,0,.24);color:#171514;font-size:14px;font-weight:700;transition-property:translate,filter;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+
+.homepage-feature-carousel__arrow{position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:44px;height:44px;min-height:44px;margin-top:-22px;padding:0;border-radius:50%;background:rgba(12,20,23,.86);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);box-shadow:var(--shadow-ring),0 4px 14px rgba(0,0,0,.4);color:#ffc259;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.homepage-feature-carousel__arrow--previous{left:14px}
+.homepage-feature-carousel__arrow--next{right:14px}
+.homepage-feature-carousel__arrow:active,.homepage-feature-carousel__toggle:active{scale:.96}
+.homepage-feature-carousel__arrow:focus-visible,.homepage-feature-carousel__toggle:focus-visible{outline:2px solid #ffc259;outline-offset:3px}
+
+/* Progress and pause sit under the cards, lined up with the content column. */
+.homepage-feature-carousel__footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:12px max(48px,calc((100% - 1360px) / 2)) 0}
+.homepage-feature-carousel__progress{grid-column:2;display:flex;align-items:center;justify-self:center;gap:5px}
+.homepage-feature-carousel__progress>span{width:16px;height:3px;border-radius:5px;background:#384348;transition-property:scale,background-color;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+.homepage-feature-carousel__progress>span.is-active{scale:1.625 1;background:var(--gold)}
+.homepage-feature-carousel__meta{grid-column:3;display:flex;align-items:center;justify-self:end;gap:12px}
+.homepage-feature-carousel__toggle{display:grid;place-items:center;width:40px;height:40px;min-height:40px;padding:0;border-radius:50%;background:#182126;color:#f3eee2;transition-property:scale,color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+
+@media (hover:hover) and (pointer:fine){
+  .homepage-feature-card:hover{translate:0 -2px;box-shadow:0 20px 42px rgba(0,0,0,.3)}
+  .homepage-feature-card:hover .homepage-feature-card__image{scale:1.04;filter:brightness(1.34) saturate(1.36) contrast(1.06)}
+  .homepage-feature-card:hover .homepage-feature-card__action{translate:0 -1px;filter:brightness(1.08)}
+  .homepage-feature-carousel__arrow:hover{background:rgba(34,52,58,.96)}
+  .homepage-feature-carousel__toggle:hover{color:var(--gold)}
+}
+/* The owner's laptop (1536 x 760): a slightly shorter carousel lets the merchants start above the fold. */
+@media (min-width:1100px) and (max-height:820px){
+  .homepage-feature-card{aspect-ratio:1.9;min-height:232px;padding:22px 26px}
+}
+@media (max-width:760px){
+  .homepage-feature-carousel{margin-top:22px;margin-bottom:30px}
+  .homepage-feature-card{aspect-ratio:1.32;min-height:250px;padding:22px}
+  .homepage-feature-card__title{font-size:21px}
+  .homepage-feature-card__description{font-size:12px}
+}
+@media (max-width:640px){
+  .homepage-feature-carousel__arrow{width:40px;height:40px;min-height:40px;margin-top:-20px}
+  .homepage-feature-carousel__footer{padding:10px 20px 0}
+  .homepage-feature-carousel__progress{gap:4px}
+  .homepage-feature-carousel__progress>span{width:9px}
+  .homepage-feature-carousel__progress>span.is-active{scale:1.78 1}
+}
+@media (max-width:420px){
+  .homepage-feature-card{min-height:235px;padding:18px}
+  .homepage-feature-card__copy{max-width:100%}
+  .homepage-feature-card__title{font-size:19px}
+  .homepage-feature-card__tag{top:16px;left:16px;max-width:calc(100% - 32px);padding:7px 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .homepage-feature-carousel__track,.homepage-feature-card,.homepage-feature-card__image,.homepage-feature-card__action,.homepage-feature-carousel__progress>span,.homepage-feature-carousel__arrow,.homepage-feature-carousel__toggle{transition:none}
+}

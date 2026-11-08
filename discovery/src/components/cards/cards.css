@@ -1,0 +1,257 @@
+/* One item card family (owner decision, 8 Nov 2026): six kinds, small and expanded, desktop to phone.
+   Emil Kowalski and better-ui (Jakub Krehel) rules: rings instead of borders on surfaces (borders only on
+   inputs and dividers), concentric radii, press feedback at .96, named transitions of 300ms or less,
+   hover only on mouse devices, at least 40px to hit. */
+
+:root{--ease-out:cubic-bezier(.23,1,.32,1);--shadow-ring:0 0 0 1px oklch(1 0 0 / .08);--shadow-ring-hover:0 0 0 1px oklch(1 0 0 / .17)}
+
+/* Products need only a price and a +, so they sit five across on a laptop; requests carry a worded action and get more room. */
+.offering-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:20px 16px}
+.offering-grid--roomy{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+
+/* Small card: one anatomy for every kind. Framed photo: card radius 18 = photo radius 12 + 6 padding. */
+.offering-card{position:relative;display:flex;flex-direction:column;min-width:0;padding:6px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow-ring);transition-property:box-shadow,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card.is-chosen{box-shadow:0 0 0 1px rgba(229,182,95,.42)}
+.offering-card__media{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#0c1418}
+.offering-card--activity .offering-card__media,.offering-card--vehicle .offering-card__media{aspect-ratio:16/11}
+.offering-card__image{display:block;width:100%;height:100%;min-height:0;padding:0}
+.offering-card__image img,.offering-card__image .image-fallback{display:block;width:100%;height:100%;object-fit:cover;border-radius:12px}
+.offering-card__image img{outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px;transition-property:scale;transition-duration:300ms;transition-timing-function:var(--ease-out)}
+.offering-card__tag{position:absolute;top:8px;left:8px;z-index:1;max-width:calc(100% - 60px);padding:5px 10px;border-radius:999px;background:rgba(8,13,15,.72);color:#f2c56d;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.offering-card__save{position:absolute;top:8px;right:8px;z-index:1;display:grid;place-items:center;width:34px;height:34px;min-height:34px;padding:0;border-radius:50%;background:rgba(8,13,15,.66);color:#f3eee2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition-property:scale,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card__save::after{content:'';position:absolute;inset:-3px;border-radius:50%}
+.offering-card__save[aria-pressed=true]{color:var(--gold)}
+.offering-card__body{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;padding:10px 8px 6px}
+.offering-card__title{margin:0;font-size:15px;line-height:1.3;font-weight:700;letter-spacing:-.005em}
+.offering-card__title button{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:0;padding:0;text-align:left;font:inherit;color:inherit;text-wrap:pretty}
+/* The name's button stretches over the whole card, so a tap anywhere opens it; the card's own buttons sit above. */
+.offering-card__title button::after{content:'';position:absolute;inset:0;border-radius:18px}
+.offering-card__title button:focus-visible{outline:none}
+.offering-card:has(.offering-card__title button:focus-visible){box-shadow:0 0 0 2px var(--gold)}
+.offering-card__byline{margin:0;color:#c4c9c4;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.offering-card__description{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* The price never splits over two lines; a long action moves under it as a whole instead. */
+.offering-card__footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;margin-top:auto;padding-top:8px}
+.offering-card__price{font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap;font-variant-numeric:tabular-nums}
+.offering-card__price.is-unavailable{color:var(--muted);font-weight:500}
+.offering-card__action{position:relative;z-index:1;display:inline-flex;align-items:center;gap:5px;min-height:40px;margin-left:auto;padding:0 2px;font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap;transition-property:scale,color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card__action svg{flex:none;transition-property:translate;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+/* Products and dishes: a gold + that grows into − count + once the item is on the list. */
+.offering-card__quantity{position:relative;z-index:1;display:flex;align-items:center;gap:2px;flex:none;margin-left:auto;border-radius:999px;transition-property:background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card__quantity.is-open{padding:2px;background:rgba(229,182,95,.1);box-shadow:inset 0 0 0 1px rgba(229,182,95,.32)}
+.offering-card__less,.offering-card__add{position:relative;display:grid;place-items:center;flex:none;padding:0;border-radius:50%;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card__less::after,.offering-card__add::after{content:'';position:absolute;inset:-4px;border-radius:50%}
+.offering-card__less{width:32px;height:32px;min-height:32px;color:#f3eee2}
+.offering-card__add{width:36px;height:36px;min-height:36px;background:var(--gold);color:#111315}
+.offering-card__quantity.is-open .offering-card__add{width:32px;height:32px;min-height:32px}
+.offering-card__count{min-width:22px;text-align:center;color:#f3eee2;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.offering-card__badge{position:absolute;top:-6px;right:-6px;z-index:1;display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#f3eee2;color:#111315;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;pointer-events:none}
+.offering-card__save:active,.offering-card__add:active,.offering-card__less:active,.offering-card__action:active{scale:.96}
+.offering-card__add:disabled,.offering-card__action:disabled{opacity:.4}
+
+/* Expanded state: a centred two-column panel on wider screens, a bottom sheet on phones. It eases in. */
+.offering-sheet{width:min(940px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 48px);padding:0;border:0;border-radius:20px;background:#121b1f;color:inherit;overflow:hidden;box-shadow:var(--shadow-ring),0 30px 80px rgba(0,0,0,.55);transition-property:opacity,scale,translate;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+@starting-style{.offering-sheet[open]{opacity:0;scale:.96}}
+.offering-sheet::backdrop{background:rgba(3,6,8,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition-property:opacity;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+@starting-style{.offering-sheet[open]::backdrop{opacity:0}}
+.offering-sheet__layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);max-height:calc(100dvh - 48px)}
+.offering-sheet__media{position:relative;min-height:100%;background:#0c1418}
+.offering-sheet__media img,.offering-sheet__media .image-fallback{display:block;width:100%;height:100%;object-fit:cover}
+.offering-sheet__media img{outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.offering-sheet__close{position:absolute;top:14px;left:14px;display:grid;place-items:center;width:40px;height:40px;min-height:40px;padding:0;border-radius:50%;background:rgba(8,13,15,.72);box-shadow:var(--shadow-ring);color:#f3eee2;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-sheet__content{display:flex;flex-direction:column;gap:10px;min-width:0;padding:24px 26px 20px;overflow-y:auto;overscroll-behavior:contain}
+.offering-sheet__merchant{display:flex;align-items:center;gap:6px;margin:0;color:var(--muted);font-size:13px}
+.offering-sheet__merchant svg{flex:none;color:var(--gold)}
+.offering-sheet__title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.offering-sheet__title h2{margin:0;font-size:26px;line-height:1.2;text-wrap:balance}
+.offering-sheet__save{display:grid;place-items:center;width:40px;height:40px;min-height:40px;flex:none;padding:0;border-radius:50%;box-shadow:var(--shadow-ring);color:#f3eee2;transition-property:scale,color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-sheet__save[aria-pressed=true]{color:var(--gold);box-shadow:0 0 0 1px rgba(229,182,95,.55)}
+.offering-sheet__price{margin:0;font-size:20px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.offering-sheet__price.is-unavailable{color:var(--muted);font-size:16px}
+.offering-sheet__listed{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin:0;padding:4px 10px;border-radius:999px;background:rgba(229,182,95,.1);color:var(--gold);font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.offering-sheet__description{margin:0;color:#d2d6cf;font-size:14px;line-height:1.6;text-wrap:pretty}
+.offering-sheet__questions{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin-top:6px;padding-top:16px;border-top:1px solid var(--line)}
+.offering-sheet__questions:empty{display:none}
+.offering-field{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:13px;color:var(--muted)}
+.offering-field--wide,.offering-chips,.offering-options,.offering-check{grid-column:1/-1}
+.offering-field input,.offering-field textarea{width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#0d1518;color:#f3eee2;font:inherit;font-size:14px;color-scheme:dark;transition-property:border-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-field input:focus,.offering-field textarea:focus{outline:none;border-color:rgba(229,182,95,.7);box-shadow:0 0 0 3px rgba(229,182,95,.15)}
+.offering-field input::placeholder,.offering-field textarea::placeholder{color:#7f8988}
+.offering-field textarea{min-height:84px;resize:vertical}
+.offering-chips,.offering-options{margin:0;padding:0;border:0;min-width:0}
+.offering-chips legend,.offering-options legend{padding:0;margin-bottom:6px;font-size:13px;color:var(--muted)}
+.offering-chips>div{display:flex;flex-wrap:wrap;gap:8px}
+.offering-chip{position:relative}
+.offering-chip input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
+.offering-chip span{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;transition-property:border-color,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-chip input:checked+span{border-color:var(--gold);color:var(--gold);background:rgba(229,182,95,.08)}
+.offering-chip input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+.offering-option{display:flex;align-items:center;gap:10px;min-height:40px;font-size:14px}
+.offering-option small{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.offering-option input,.offering-check input{accent-color:var(--gold)}
+.offering-check{display:flex;align-items:center;gap:10px;min-height:40px;font-size:14px;cursor:pointer}
+.offering-check input{width:18px;height:18px;margin:0;flex:none}
+.offering-check--inline{grid-column:auto;align-self:end;min-height:42px}
+.offering-stepper{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:42px;font-size:13px;color:var(--muted)}
+.offering-stepper>div{display:flex;align-items:center;gap:4px;padding:3px;border-radius:999px;background:#0d1518;box-shadow:var(--shadow-ring)}
+.offering-stepper button{position:relative;display:grid;place-items:center;width:34px;height:34px;min-height:34px;padding:0;border-radius:50%;color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-stepper button::after{content:'';position:absolute;inset:-3px;border-radius:50%}
+.offering-stepper output{min-width:26px;text-align:center;color:#f3eee2;font-weight:700;font-variant-numeric:tabular-nums}
+.offering-sheet__footer{position:sticky;bottom:-20px;display:flex;align-items:center;gap:12px;margin:8px -26px -20px;padding:14px 26px 18px;border-top:1px solid var(--line);background:#121b1f}
+.offering-sheet__footer p{flex:1;margin:0;font-size:12.5px;line-height:1.45;color:var(--muted);text-wrap:pretty}
+.offering-sheet__footer p.is-saved{color:#bfe3b0}
+.offering-sheet__footer p.is-error{color:#f2a49b}
+.offering-sheet__primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:999px;background:var(--gold);color:#111315;font-weight:700;white-space:nowrap;transition-property:scale,opacity,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-sheet__primary:disabled{opacity:.45}
+.offering-sheet__primary-total{margin-left:2px;padding-left:10px;border-left:1px solid rgba(17,19,21,.25);font-variant-numeric:tabular-nums}
+.offering-sheet__remove{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;color:var(--muted);font-size:13px;font-weight:700;white-space:nowrap;transition-property:scale,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+/* With a Remove button the status line takes its own row, so it never squeezes into a narrow column. */
+.offering-sheet__footer:has(.offering-sheet__remove){flex-wrap:wrap;row-gap:8px}
+.offering-sheet__footer:has(.offering-sheet__remove) p{flex:1 1 100%}
+.offering-sheet__footer:has(.offering-sheet__remove) .offering-sheet__primary{margin-left:auto}
+.offering-sheet__close:active,.offering-sheet__save:active,.offering-sheet__primary:active:not(:disabled),.offering-sheet__remove:active,.offering-stepper button:active:not(:disabled){scale:.96}
+
+/* The shopper's list (products and dishes), opened from the basket pill. */
+.offering-sheet--list{width:min(560px,calc(100vw - 32px))}
+.offering-list{display:flex;flex-direction:column;max-height:calc(100dvh - 48px)}
+.offering-list__header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 24px 14px;border-bottom:1px solid var(--line)}
+.offering-list__header h2{margin:0;font-size:22px}
+.offering-list__header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.offering-list__close{display:grid;place-items:center;flex:none;width:40px;height:40px;min-height:40px;padding:0;border-radius:50%;box-shadow:var(--shadow-ring);color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-list__lines{flex:1;min-height:0;margin:0;padding:4px 24px;list-style:none;overflow-y:auto;overscroll-behavior:contain}
+.offering-list__line{display:grid;grid-template-columns:56px minmax(0,1fr) auto;grid-template-areas:"photo text text" "photo stepper amount";align-items:center;gap:8px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.offering-list__line:last-child{border-bottom:0}
+.offering-list__photo{grid-area:photo;align-self:start;width:56px;height:56px;border-radius:12px;object-fit:cover;outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.offering-list__photo.image-fallback{display:grid;place-items:center}
+.offering-list__text{grid-area:text;display:flex;flex-direction:column;gap:2px;min-width:0}
+.offering-list__text strong{font-size:14px;line-height:1.3;text-wrap:pretty}
+.offering-list__text span{color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.offering-list__stepper{grid-area:stepper;justify-self:start;display:flex;align-items:center;gap:4px;padding:2px;border-radius:999px;box-shadow:var(--shadow-ring)}
+.offering-list__stepper button{position:relative;display:grid;place-items:center;width:32px;height:32px;min-height:32px;padding:0;border-radius:50%;color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-list__stepper button::after{content:'';position:absolute;inset:-4px;border-radius:50%}
+.offering-list__stepper button:active:not(:disabled),.offering-list__close:active{scale:.96}
+.offering-list__stepper output{min-width:24px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.offering-list__amount{grid-area:amount;justify-self:end;font-weight:700;font-variant-numeric:tabular-nums}
+.offering-list__empty{margin:0;padding:32px 24px;color:var(--muted);text-align:center}
+.offering-list__footer{display:flex;flex-direction:column;gap:10px;padding:14px 24px 18px;border-top:1px solid var(--line)}
+.offering-list__total{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0}
+.offering-list__total span{color:var(--muted);font-size:13px}
+.offering-list__total strong{color:var(--gold);font-size:18px;font-variant-numeric:tabular-nums}
+.offering-list__note{margin:0;color:var(--muted);font-size:12.5px;line-height:1.45;text-wrap:pretty}
+.offering-list__actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.offering-list__actions .offering-sheet__primary{margin-left:auto}
+
+/* Date picker (one date or a range), opened inline so a sheet never clips it. */
+.date-picker{display:flex;flex-direction:column;gap:6px;min-width:0;grid-column:1/-1}
+.date-picker__label{font-size:13px;color:var(--muted)}
+.date-picker__trigger{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#0d1518;color:#f3eee2;text-align:left;font-size:14px;transition-property:border-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__trigger svg{color:var(--gold);flex:none}
+.date-picker__trigger .is-placeholder{color:var(--muted)}
+.date-picker.is-open .date-picker__trigger{border-color:rgba(229,182,95,.6)}
+.date-picker__panel{padding:12px;border-radius:14px;background:#0d1518;box-shadow:var(--shadow-ring)}
+.date-picker__header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.date-picker__header strong{font-size:15px}
+.date-picker__header button{display:grid;place-items:center;width:40px;height:40px;min-height:40px;padding:0;border-radius:50%;color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__header button:disabled{opacity:.3}
+.date-picker__grid{display:flex;flex-direction:column;gap:2px}
+.date-picker__row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.date-picker__weekday{padding:4px 0;text-align:center;font-size:11px;color:var(--muted)}
+.date-picker__row>span[role=gridcell]{display:flex;justify-content:center}
+.date-picker__day{width:100%;max-width:44px;height:40px;min-height:40px;padding:0;border-radius:10px;color:#f3eee2;font-size:13px;font-variant-numeric:tabular-nums;transition-property:background-color,color,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__day.is-outside{color:rgba(243,238,226,.35)}
+.date-picker__day.is-today{box-shadow:inset 0 0 0 1px rgba(229,182,95,.6)}
+.date-picker__day.is-between{background:rgba(229,182,95,.14);border-radius:0}
+.date-picker__day.is-selected{background:var(--gold);color:#111315;font-weight:700}
+.date-picker__day:disabled{opacity:.25;cursor:not-allowed}
+.date-picker__day:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.date-picker__day:active:not(:disabled),.date-picker__header button:active:not(:disabled),.date-picker__done:active,.date-picker__clear:active:not(:disabled){scale:.96}
+.date-picker__footer{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.date-picker__footer>span{flex:1;min-width:0}
+.date-picker__clear{min-height:40px;padding:0 10px;border-radius:999px;color:var(--muted);transition-property:scale,color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__done{min-height:40px;padding:0 16px;border-radius:999px;background:var(--gold);color:#111315;font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__clear:disabled{opacity:.35}
+
+/* Trip first for car and bike hire, and for transfers: where and when, then the vehicles. */
+.trip-panel{margin:24px 0 8px;padding:20px 22px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(229,182,95,.09),rgba(16,27,32,.92) 42%);box-shadow:0 0 0 1px rgba(229,182,95,.28)}
+.trip-panel__heading h2{margin:0;font-size:21px;text-wrap:balance}
+.trip-panel__heading p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.trip-panel__fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;gap:12px 14px;margin-top:16px}
+.trip-panel__fields .trip-panel__wide,.trip-panel__fields .date-picker{grid-column:span 2}
+.trip-panel__options{display:flex;flex-wrap:wrap;align-items:center;align-self:end;gap:0 20px;grid-column:span 2;min-height:42px}
+.trip-panel--transfer .trip-panel__options{grid-column:span 1}
+.trip-panel .date-picker__panel{max-width:400px}
+.trip-panel__footer{display:flex;align-items:center;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.trip-panel__footer p{flex:1;margin:0;font-size:13px;color:var(--muted);text-wrap:pretty}
+
+@media (hover:hover) and (pointer:fine){
+  .offering-card:hover{box-shadow:var(--shadow-ring-hover);background-color:#12212a}
+  .offering-card.is-chosen:hover{box-shadow:0 0 0 1px rgba(229,182,95,.6)}
+  .offering-card:hover .offering-card__image img{scale:1.03}
+  .offering-card__save:hover{background:rgba(8,13,15,.86)}
+  .offering-card__add:hover:not(:disabled){background:#f0c979}
+  .offering-card__less:hover{background:rgba(255,255,255,.08)}
+  .offering-card__action:hover:not(:disabled){color:#f0c979}
+  .offering-card__action:hover:not(:disabled) svg{translate:2px 0}
+  .offering-sheet__close:hover{background:rgba(8,13,15,.92)}
+  .offering-sheet__save:hover,.offering-list__close:hover{box-shadow:var(--shadow-ring-hover)}
+  .offering-sheet__primary:hover:not(:disabled){background:#f0c979}
+  .offering-sheet__remove:hover{background:rgba(255,255,255,.06);color:#f3eee2}
+  .offering-stepper button:hover:not(:disabled),.offering-list__stepper button:hover:not(:disabled){background:rgba(255,255,255,.08)}
+  .offering-chip:hover span{border-color:rgba(229,182,95,.45)}
+  .date-picker__trigger:hover{border-color:rgba(229,182,95,.4)}
+  .date-picker__day:hover:not(:disabled):not(.is-selected),.date-picker__header button:hover:not(:disabled){background:rgba(255,255,255,.07)}
+  .date-picker__done:hover{background:#f0c979}
+  .date-picker__clear:hover:not(:disabled){color:#f3eee2}
+}
+
+@media (max-width:900px){
+  .trip-panel__fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .trip-panel--transfer .trip-panel__options{grid-column:span 1}
+}
+
+@media (max-width:720px){
+  .offering-sheet{width:100vw;max-width:100vw;max-height:92dvh;margin:auto 0 0;border-radius:22px 22px 0 0;transition-duration:280ms}
+  @starting-style{.offering-sheet[open]{opacity:1;scale:1;translate:0 100%}}
+  .offering-sheet__layout{display:block;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain}
+  .offering-sheet__media{height:220px;min-height:0}
+  .offering-sheet__content{overflow:visible;padding:18px 18px 16px}
+  .offering-sheet__questions{grid-template-columns:1fr}
+  .offering-check--inline{grid-column:1/-1;min-height:40px}
+  .offering-sheet__footer{bottom:0;flex-wrap:wrap;row-gap:10px;margin:8px -18px -16px;padding:12px 18px calc(16px + env(safe-area-inset-bottom))}
+  .offering-sheet__footer p{flex:1 1 100%}
+  .offering-sheet__footer .offering-sheet__primary{flex:1}
+  .offering-sheet__title h2{font-size:22px}
+  .offering-list{max-height:92dvh}
+  .offering-list__header{padding:18px 18px 12px}
+  .offering-list__lines{padding:4px 18px}
+  .offering-list__footer{padding:12px 18px calc(16px + env(safe-area-inset-bottom))}
+  /* 16px keeps phones from zooming into a field on focus. */
+  .offering-field input,.offering-field textarea{font-size:16px}
+}
+
+/* Phones: a row card (photo left, text right) keeps long lists scannable. */
+@media (max-width:560px){
+  .offering-grid,.offering-grid--roomy{grid-template-columns:1fr;gap:10px}
+  .offering-card{flex-direction:row;min-height:124px}
+  .offering-card__media,.offering-card--activity .offering-card__media,.offering-card--vehicle .offering-card__media{width:112px;flex:none;aspect-ratio:auto}
+  .offering-card__save{top:6px;right:6px;width:30px;height:30px;min-height:30px}
+  .offering-card__save::after{inset:-5px}
+  .offering-card__tag{display:none}
+  .offering-card__body{padding:6px 6px 2px 12px}
+  .offering-card__footer{padding-top:4px}
+  .offering-card__footer--action{flex-direction:column;align-items:flex-start;gap:0}
+  .offering-card__footer--action .offering-card__action{margin-left:0}
+  .trip-panel{margin:20px 0 4px;padding:16px}
+  .trip-panel__heading h2{font-size:19px}
+  .trip-panel__fields{gap:12px 10px}
+  .trip-panel__fields .offering-stepper{grid-column:1/-1}
+  .trip-panel__footer{flex-direction:column;align-items:stretch}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .offering-sheet{transition-property:opacity}
+  .offering-card,.offering-card__image img,.offering-card__save,.offering-card__add,.offering-card__less,.offering-card__action,.offering-card__action svg,.offering-card__quantity,
+  .offering-sheet__close,.offering-sheet__save,.offering-sheet__primary,.offering-sheet__remove,.offering-stepper button,.offering-list__stepper button,.offering-list__close,
+  .offering-chip span,.offering-field input,.offering-field textarea,.date-picker__trigger,.date-picker__day,.date-picker__header button,.date-picker__done,.date-picker__clear{transition:none}
+  .offering-card:hover .offering-card__image img{scale:1}
+}

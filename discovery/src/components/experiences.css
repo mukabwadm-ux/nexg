@@ -1,0 +1,59 @@
+.experience-browse>.section-block{margin-bottom:36px}
+.experience-browse>.category-collections>.section-block{margin-bottom:36px}
+.experience-browse>.category-discovery__subcategories{margin-bottom:28px}
+.experience-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px 18px}
+.experience-card{min-width:0}
+.experience-card__main{display:flex;flex-direction:column;width:100%;height:100%;padding:0;text-align:left;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.experience-card__main:hover{border-color:var(--gold)}
+.experience-card__cover{position:relative;display:block;width:100%;overflow:hidden}
+.experience-card__image{display:block;width:100%;height:auto;aspect-ratio:1.95;object-fit:cover}
+.experience-card__tag{display:inline-block;width:fit-content;border:1px solid var(--gold);border-radius:20px;padding:5px 12px;color:var(--gold);font-size:11px;background:#071015e8}
+.experience-card__cover .experience-card__tag{position:absolute;top:10px;left:10px}
+.experience-card__body{display:flex;flex-direction:column;gap:8px;padding:14px;flex:1;width:100%}
+.experience-card__body>strong{font-size:15px;line-height:1.4}
+.experience-card__host,.experience-card__location{font-size:12px;color:var(--muted)}
+.experience-card__location{display:flex;align-items:center;gap:5px}
+.experience-card__location svg{color:var(--gold);flex-shrink:0}
+.experience-card__description{font-size:12px;line-height:1.6;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.experience-card__footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:8px;color:var(--gold);font-size:12px;font-weight:700}
+.experience-card__action{display:flex;align-items:center;gap:5px}
+.experience-category-intro{color:var(--muted);font-size:14px;margin:0 0 18px}
+.experience-detail__hero{display:grid;grid-template-columns:1.5fr 1fr;gap:32px;align-items:center}
+.experience-detail__image{display:block;width:100%;height:auto;aspect-ratio:1.7;object-fit:cover;border:1px solid var(--line);border-radius:18px}
+.experience-detail__intro{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.experience-detail__intro h1{font-size:clamp(28px,3vw,44px);line-height:1.15}
+.experience-detail__intro p,.experience-detail__section p{font-size:14px;line-height:1.8;color:var(--muted);white-space:pre-line}
+.experience-detail__facts{display:flex;flex-wrap:wrap;gap:18px;color:var(--muted);font-size:12px}
+.experience-detail__facts>span{display:flex;align-items:center;gap:8px}
+.experience-detail__facts svg{color:var(--gold)}
+.experience-detail__nav{display:flex;gap:28px;border-bottom:1px solid var(--line);padding:24px 0 16px;margin-bottom:28px;overflow:auto;white-space:nowrap;font-size:13px}
+.experience-detail__nav button{color:var(--muted);text-decoration:none;min-height:44px;padding:0}
+.experience-detail__nav button:hover{color:var(--gold)}
+.experience-detail__layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;align-items:start}
+.experience-detail__section{padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(--line);scroll-margin-top:24px}
+.experience-detail__section h2{font-size:22px;margin-bottom:18px;border-left:3px solid var(--gold);padding-left:12px}
+.experience-detail__schedule{display:flex;gap:16px;margin-top:24px;padding:18px;background:var(--surface);border-radius:14px}
+.experience-detail__schedule>svg{color:var(--gold);flex-shrink:0}
+.experience-detail__schedule h3{font-size:15px;margin-bottom:6px}
+.experience-detail__host{display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,1fr);gap:24px;align-items:center}
+.experience-detail__host .merchant-card{width:100%;min-width:0}
+.merchant-card--host .merchant-card__main{display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:16px;padding:16px}
+.merchant-card--host .merchant-card__cover{width:64px;height:64px;aspect-ratio:1;border-radius:50%;overflow:hidden}
+.merchant-card--host .merchant-card__hero{width:64px;height:64px;aspect-ratio:1;object-fit:cover}
+.merchant-card--host .merchant-card__body{padding:0;gap:6px}
+.merchant-card--host .merchant-card__action{margin-top:6px}
+.experience-detail__content .experience-grid{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px}
+.experience-detail__content .experience-grid>.experience-card{flex:0 0 calc((100% - 42px)/4);min-width:190px}
+.experience-booking{position:sticky;top:100px;padding:24px;border:1px solid var(--line);border-radius:18px;background:var(--surface);display:flex;flex-direction:column;gap:18px}
+.experience-booking>svg{color:var(--gold)}
+.experience-booking h2{font-size:22px}
+.experience-booking>p{font-size:14px;line-height:1.6}
+.experience-booking__price{display:flex;align-items:center;justify-content:space-between;gap:16px;border-block:1px solid var(--line);padding:20px 0;font-size:13px}
+.experience-booking__price strong{color:var(--gold);font-size:20px}
+.experience-booking .experience-booking__notice{color:var(--muted);font-size:12px;line-height:1.7}
+.experience-booking .button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:1100px){.experience-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.experience-detail__host{grid-template-columns:240px minmax(0,1fr)}}
+@media(max-width:1050px){.experience-booking{top:150px}}
+@media(max-width:900px){.experience-detail__hero{grid-template-columns:1fr}.experience-detail__layout{grid-template-columns:minmax(0,1fr) 280px;gap:22px}.experience-detail__host{grid-template-columns:1fr}.experience-booking{padding:20px}}
+@media(max-width:700px){.experience-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.experience-detail__layout{display:flex;flex-direction:column}.experience-detail__content,.experience-booking{width:100%}.experience-booking{position:static;order:-1}.experience-detail__hero{gap:22px}.experience-detail__nav{gap:22px}}
+@media(max-width:440px){.experience-grid,.experience-detail__content .experience-grid{grid-template-columns:1fr}}

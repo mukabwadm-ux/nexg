@@ -1,0 +1,125 @@
+{
+  "note": "New synthetic demo merchants for the Discovery subcategories that had none (owner decision, 8 Nov 2026: fill them now). They exist only in the local Supabase seed; the NEXG-PLATFORM demo API doesn't have them. Prices are whole KES list prices for the demo, not market research. Five merchants per group, named in the demo data's style; each merchant lists the group's items with its own price level.",
+  "firstMerchantNumber": 641,
+  "firstItemNumber": 20001,
+  "priceLevels": [1, 1.15, 0.9, 1.3, 1.05],
+  "groups": [
+    {
+      "discoverySubcategoryId": "alcohol-beverages:non-alcoholic-drinks",
+      "demoSubcategoryId": "alcohol-beverages_non-alcoholic-drinks",
+      "demoCategoryId": "alcohol-beverages",
+      "demoLabel": "Non-Alcoholic Drinks",
+      "supabase": { "category": "alcohol_beverages", "subcategory": "non_alcoholic_drinks" },
+      "nameWord": "Refreshments",
+      "items": [
+        ["Still mineral water 1.5L", 120], ["Sparkling water 500ml", 150], ["Fresh orange juice 1L", 450], ["Mango juice 1L", 380],
+        ["Ginger beer 330ml", 160], ["Cola 2L", 260], ["Iced tea 500ml", 200], ["Energy drink 250ml", 250],
+        ["Coconut water 330ml", 280], ["Kombucha 330ml", 420], ["Tonic water, 4 x 200ml", 600], ["Sports drink 500ml", 180]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "beauty-wellness:salon-barber",
+      "demoSubcategoryId": "beauty_salon-barber",
+      "demoCategoryId": "beauty",
+      "demoLabel": "Salon & Barber",
+      "supabase": { "category": "beauty", "subcategory": "salon_barber" },
+      "nameWord": "Salon",
+      "items": [
+        ["Men's haircut", 500], ["Haircut and beard trim", 800], ["Clean shave", 400], ["Kids haircut", 350],
+        ["Wash and blow-dry", 1200], ["Box braids, medium", 4500], ["Cornrows", 1500], ["Relaxer treatment", 2500],
+        ["Full hair colour", 3500], ["Locs retwist", 2000], ["Wig installation", 3000], ["Deep conditioning treatment", 1500]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "beauty-wellness:nails-beauty-services",
+      "demoSubcategoryId": "beauty_nails-beauty-services",
+      "demoCategoryId": "beauty",
+      "demoLabel": "Nails & Beauty Services",
+      "supabase": { "category": "beauty", "subcategory": "nails_beauty_services" },
+      "nameWord": "Nails",
+      "items": [
+        ["Classic manicure", 800], ["Gel manicure", 1500], ["Classic pedicure", 1200], ["Gel pedicure", 1800],
+        ["Acrylic nail set", 2500], ["Nail art, full set", 700], ["Eyebrow shaping", 500], ["Classic eyelash extensions", 3000],
+        ["Lash lift", 2500], ["Full face makeup", 3500], ["Bridal makeup trial", 5000], ["Express facial", 2500]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "marketplace:hardware-diy",
+      "demoSubcategoryId": "marketplace_hardware-diy",
+      "demoCategoryId": "marketplace",
+      "demoLabel": "Hardware & DIY",
+      "supabase": { "category": "marketplace", "subcategory": "hardware_diy" },
+      "nameWord": "Hardware",
+      "items": [
+        ["Cordless drill 18V", 9500], ["Claw hammer 16oz", 850], ["Screwdriver set, 12 pieces", 1200], ["Measuring tape 5m", 450],
+        ["White emulsion paint 4L", 2800], ["Paint roller set", 900], ["PVC pipe 1/2 inch, 6m", 650], ["Extension cable, 4-way", 1100],
+        ["LED bulb 9W", 250], ["Padlock 50mm", 700], ["Wood glue 500ml", 550], ["Masking tape 48mm", 300]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "marketplace:pet-supplies",
+      "demoSubcategoryId": "marketplace_pet-supplies",
+      "demoCategoryId": "marketplace",
+      "demoLabel": "Pet Supplies",
+      "supabase": { "category": "marketplace", "subcategory": "pet_supplies" },
+      "nameWord": "Pets",
+      "items": [
+        ["Dry dog food 3kg", 2800], ["Dry cat food 2kg", 2200], ["Cat litter 10L", 1500], ["Dog collar, medium", 650],
+        ["Dog leash 1.5m", 800], ["Pet shampoo 500ml", 900], ["Rubber chew toy", 450], ["Pet bed, medium", 3500],
+        ["Stainless steel food bowl", 600], ["Dental chews, 7 pack", 850], ["Flea and tick collar", 1200], ["Bird seed 1kg", 500]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "groceries-essentials:household-essentials",
+      "demoSubcategoryId": "groceries-essentials_household-essentials",
+      "demoCategoryId": "groceries-essentials",
+      "demoLabel": "Household Essentials",
+      "supabase": { "category": "groceries_essentials", "subcategory": "household_essentials" },
+      "nameWord": "Household",
+      "items": [
+        ["Toilet paper, 10 rolls", 750], ["Dishwashing liquid 750ml", 250], ["Laundry detergent 2kg", 650], ["Bleach 2L", 300],
+        ["Bin liners, 20 pack", 200], ["Multipurpose cleaner 1L", 350], ["Kitchen towels, 2 rolls", 280], ["Bar soap, 3 pack", 220],
+        ["Scouring sponges, 5 pack", 150], ["Air freshener 300ml", 380], ["Insect spray 300ml", 450], ["Matchboxes, 10 pack", 100]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "health-pharmacy:therapy",
+      "demoSubcategoryId": "health_therapy",
+      "demoCategoryId": "health",
+      "demoLabel": "Therapy",
+      "supabase": { "category": "health", "subcategory": "therapy" },
+      "nameWord": "Therapy",
+      "items": [
+        ["First therapy consultation, 50 min", 4500], ["Individual therapy session, 50 min", 4000], ["Couples therapy session, 75 min", 6500], ["Family therapy session, 75 min", 7000],
+        ["Online therapy session, 50 min", 3500], ["Physiotherapy assessment", 3500], ["Physiotherapy session, 45 min", 3000], ["Occupational therapy session", 3500],
+        ["Speech therapy session, 45 min", 3500], ["Group therapy session", 1500], ["Follow-up session, 30 min", 2500], ["Child therapy session, 45 min", 4000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "tech-electronics:device-repairs",
+      "demoSubcategoryId": "tech-electronics_device-repairs",
+      "demoCategoryId": "tech-electronics",
+      "demoLabel": "Device Repairs",
+      "supabase": { "category": "tech_electronics", "subcategory": "device_repairs" },
+      "nameWord": "Repairs",
+      "items": [
+        ["Phone screen replacement", 6500], ["Phone battery replacement", 2500], ["Charging port repair", 1800], ["Laptop screen replacement", 12000],
+        ["Laptop battery replacement", 6000], ["Laptop keyboard replacement", 4500], ["Water damage check", 1000], ["Software reinstall and backup", 2000],
+        ["Tablet screen replacement", 7500], ["Smartwatch battery replacement", 2500], ["Basic data recovery", 5000], ["Device diagnostic check", 500]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "concierge-services:courier-errands",
+      "demoSubcategoryId": "concierge-services_courier-errands",
+      "demoCategoryId": "concierge-services",
+      "demoLabel": "Courier & Errands",
+      "supabase": { "category": "concierge_services", "subcategory": "courier_errands" },
+      "nameWord": "Couriers",
+      "items": [
+        ["Same-day parcel delivery in Nairobi", 500], ["Document delivery", 400], ["Express delivery within 2 hours", 900], ["Grocery pickup errand", 600],
+        ["Pharmacy pickup errand", 500], ["Bill payment errand", 400], ["Gift drop-off", 700], ["Large parcel delivery, up to 20kg", 1500],
+        ["Bank queue errand", 800], ["Laundry drop-off and pickup", 600], ["Airport parcel drop-off", 1500], ["Half-day errand assistant", 2500]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+/* Trip page (owner design, 8 Nov 2026): title, photos, facts, overview, itinerary and a sticky booking card.
+   Depth comes from a 1px ring shadow, not borders; dividers stay borders. Hover only on mouse devices. */
+.trip-page{--trip-ring:0 0 0 1px oklch(1 0 0 / .08);--trip-ring-hover:0 0 0 1px oklch(1 0 0 / .14);--trip-ease:cubic-bezier(.23,1,.32,1);--trip-panel:rgba(16,27,32,.55);padding-bottom:48px}
+.trip-page .trip-page__back{margin-bottom:14px}
+
+.trip-page__header{display:flex;flex-direction:column;gap:6px;max-width:900px;margin-bottom:20px}
+.trip-page__header h1{font-size:clamp(30px,3.2vw,46px);line-height:1.08;letter-spacing:-.025em;text-wrap:balance}
+.trip-page__operator{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;color:var(--muted);font-size:15px}
+.trip-page__operator button{min-height:0;padding:2px 0;color:#f3eee2;font-weight:700;text-decoration:underline;text-decoration-color:rgba(229,182,95,.6);text-underline-offset:4px;transition-property:color;transition-duration:150ms}
+.trip-page__summary{margin-top:4px;max-width:70ch;color:#d9ddd7;font-size:16px;line-height:1.55;text-wrap:pretty}
+
+/* Booking sits right of the photos, facts and details on desktop; after the facts on phones. */
+.trip-page__layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,380px);grid-template-areas:"photos booking" "facts booking" "details booking";grid-template-rows:auto auto 1fr;column-gap:clamp(24px,2.6vw,40px);row-gap:18px;align-items:start}
+.trip-photos{grid-area:photos}
+.trip-facts{grid-area:facts}
+.trip-page__booking{grid-area:booking;align-self:stretch;min-width:0}
+.trip-page__details{grid-area:details;display:flex;flex-direction:column;gap:28px;min-width:0;padding-top:10px}
+
+.trip-photos{display:grid;gap:10px;min-width:0}
+.trip-photos .trip-photos__image{display:block;width:100%;height:100%;object-fit:cover;border-radius:16px;background:#0c1418;outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.trip-photos .image-fallback.trip-photos__image{display:flex}
+.trip-photos--single .trip-photos__image{height:auto;aspect-ratio:16/7;max-height:min(48vh,440px)}
+.trip-photos--2{grid-template-columns:2fr 1fr}
+.trip-photos--3{grid-template-columns:3fr 1fr 1fr}
+.trip-photos--2 .trip-photos__image,.trip-photos--3 .trip-photos__image{height:clamp(200px,30vh,300px)}
+
+.trip-facts{display:flex;margin:0;padding:4px 0;list-style:none;border-radius:16px;background:var(--trip-panel);box-shadow:var(--trip-ring)}
+.trip-facts__item{flex:1 1 0;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;align-items:center;min-width:0;padding:12px 18px}
+.trip-facts__item+.trip-facts__item{border-left:1px solid var(--line)}
+.trip-facts__item svg{grid-row:1/3;color:var(--gold)}
+.trip-facts__label{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.trip-facts__value{font-size:15px;font-weight:700;line-height:1.3;color:#f3eee2;overflow-wrap:anywhere}
+
+.trip-section{display:flex;flex-direction:column;gap:12px;min-width:0}
+.trip-section h2{font-size:clamp(22px,2vw,28px);line-height:1.2;letter-spacing:-.015em}
+.trip-section__text{max-width:72ch;color:#d2d6cf;font-size:15px;line-height:1.65;white-space:pre-line}
+.trip-chips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 0;padding:0;list-style:none}
+.trip-chips li{display:inline-flex;align-items:center;min-height:34px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:var(--trip-ring);color:#e7e9e4;font-size:13px;font-weight:600}
+
+/* At most three day cards across, each at least 220px wide. */
+.trip-days{display:grid;grid-template-columns:repeat(auto-fit,minmax(max(220px,calc((100% - 24px)/3)),1fr));gap:12px;margin:0;padding:0;list-style:none}
+.trip-day{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;padding:16px;border-radius:16px;background:var(--trip-panel);box-shadow:var(--trip-ring)}
+.trip-day__number{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--gold);color:var(--gold);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.trip-day__label{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--gold)}
+.trip-day h3{margin-top:4px;font-size:17px;line-height:1.3}
+.trip-day__text{margin-top:6px;color:var(--muted);font-size:13.5px;line-height:1.55}
+
+.trip-included-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+.trip-included{flex:1 1 320px;min-width:0;max-width:560px;border-radius:14px;background:var(--trip-panel);box-shadow:var(--trip-ring)}
+.trip-included summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:0 18px;border-radius:14px;font-size:16px;font-weight:700;list-style:none;cursor:pointer}
+.trip-included summary::-webkit-details-marker{display:none}
+.trip-included summary svg{flex:none;color:var(--muted);transition-property:rotate,color;transition-duration:200ms;transition-timing-function:var(--trip-ease)}
+.trip-included[open] summary svg{rotate:180deg}
+.trip-included summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.trip-included__lists{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px 24px;padding:4px 18px 18px}
+.trip-included__lists h3{margin-bottom:8px;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.trip-included__lists ul{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;font-size:14px;line-height:1.45}
+.trip-included__lists li{display:flex;align-items:flex-start;gap:8px}
+.trip-included__lists li svg{flex:none;margin-top:2px;color:var(--gold)}
+.trip-included__lists .is-excluded li svg{color:var(--muted)}
+.trip-addons{padding-left:20px;border-left:1px solid var(--line);color:var(--muted);font-size:14px;font-style:italic}
+
+.trip-note{display:flex;align-items:flex-start;gap:10px;max-width:72ch;padding:14px 16px;border-radius:14px;background:rgba(229,182,95,.07);box-shadow:0 0 0 1px rgba(229,182,95,.22);color:#e3dccb;font-size:14px;line-height:1.55}
+.trip-note svg{flex:none;margin-top:1px;color:var(--gold)}
+
+/* Sticky under the site header; scrolls inside itself if the open calendar makes it taller than the screen. */
+.trip-booking{position:sticky;top:calc(var(--trip-sticky-top,0px) + 16px);display:flex;flex-direction:column;gap:16px;max-height:calc(100dvh - var(--trip-sticky-top,0px) - 32px);overflow-y:auto;overscroll-behavior:contain;padding:24px;border-radius:22px;background:#121b1f;box-shadow:var(--trip-ring)}
+.trip-booking__price{font-size:clamp(26px,2.4vw,34px);line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.trip-booking__lead{color:#d2d6cf;font-size:14.5px;line-height:1.55;text-wrap:pretty}
+.trip-booking__label,.trip-booking .date-picker__label{display:block;margin-bottom:8px;color:#d9ddd7;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.trip-booking .date-picker__trigger{min-height:50px;border-radius:12px;font-size:15px}
+.trip-booking__departures{display:flex;flex-direction:column;gap:8px;min-width:0;margin:0;padding:0;border:0}
+.trip-booking__departure{position:relative;display:flex;align-items:center;gap:12px;min-height:50px;padding:0 16px;border-radius:12px;box-shadow:var(--trip-ring);font-size:16px;font-weight:600;cursor:pointer;transition-property:scale,box-shadow,background-color;transition-duration:150ms;transition-timing-function:var(--trip-ease)}
+.trip-booking__departure input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
+.trip-booking__departure svg{flex:none;color:var(--gold)}
+.trip-booking__departure:has(input:checked){background:rgba(229,182,95,.08);box-shadow:0 0 0 1.5px var(--gold)}
+.trip-booking__departure:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+.trip-booking__travellers{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid var(--line)}
+.trip-booking__travellers .trip-booking__label{margin:0}
+.trip-booking__stepper{display:flex;align-items:center;gap:14px}
+.trip-booking__stepper button{display:grid;place-items:center;width:44px;height:44px;min-height:44px;border-radius:50%;box-shadow:0 0 0 1px oklch(1 0 0 / .22);color:#f3eee2;transition-property:scale,box-shadow;transition-duration:150ms;transition-timing-function:var(--trip-ease)}
+.trip-booking__stepper button:disabled{opacity:.35}
+.trip-booking__stepper output{min-width:24px;text-align:center;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.trip-booking__actions{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.trip-booking__primary,.trip-booking__secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;padding:0 20px;border-radius:999px;font-size:16px;font-weight:700;transition-property:scale,background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--trip-ease)}
+.trip-booking__primary{background:var(--gold);color:#1b150a}
+.trip-booking__primary:disabled{opacity:.45}
+.trip-booking__secondary{box-shadow:0 0 0 1px oklch(1 0 0 / .28);color:#f3eee2}
+.trip-booking__primary:active:not(:disabled),.trip-booking__secondary:active,.trip-booking__stepper button:active:not(:disabled),.trip-booking__departure:active{scale:.96}
+.trip-booking__status{font-size:13px;line-height:1.5;color:var(--muted)}
+.trip-booking__status.is-saved{color:#bfe3b0}
+.trip-booking__status.is-error{color:#f2a49b}
+
+.trip-page__more{margin-top:44px;padding-top:28px;border-top:1px solid var(--line)}
+.trip-page__more h2{margin-bottom:18px;font-size:clamp(22px,2vw,28px)}
+
+@media (hover:hover) and (pointer:fine){
+  .trip-page__operator button:hover{color:var(--gold)}
+  .trip-included summary:hover svg{color:#f3eee2}
+  .trip-booking__departure:hover{box-shadow:var(--trip-ring-hover)}
+  .trip-booking__departure:has(input:checked):hover{box-shadow:0 0 0 1.5px var(--gold)}
+  .trip-booking__stepper button:hover:not(:disabled){box-shadow:0 0 0 1px oklch(1 0 0 / .4)}
+  .trip-booking__primary:hover:not(:disabled){background:#f0c979}
+  .trip-booking__secondary:hover{box-shadow:0 0 0 1px oklch(1 0 0 / .45)}
+}
+
+@media (max-width:900px){
+  .trip-page__layout{grid-template-columns:minmax(0,1fr);grid-template-areas:"photos" "facts" "booking" "details";grid-template-rows:none}
+  .trip-booking{position:static;max-height:none;overflow:visible}
+  .trip-page__details{padding-top:0}
+}
+@media (max-width:640px){
+  .trip-page__header h1{font-size:30px}
+  .trip-page__summary{font-size:15px}
+  .trip-photos--single .trip-photos__image{aspect-ratio:4/3;max-height:none}
+  .trip-photos--2{grid-template-columns:1fr}
+  .trip-photos--3{grid-template-columns:1fr 1fr}
+  .trip-photos--3 .trip-photos__image:first-child{grid-column:1/-1}
+  .trip-photos--2 .trip-photos__image,.trip-photos--3 .trip-photos__image{height:auto;aspect-ratio:4/3}
+  .trip-facts{flex-direction:column;padding:0}
+  .trip-facts__item+.trip-facts__item{border-top:1px solid var(--line);border-left:0}
+  .trip-booking{padding:20px;border-radius:20px}
+  .trip-included-row{flex-direction:column;align-items:stretch}
+  .trip-included{max-width:none}
+  .trip-addons{padding-left:0;border-left:0}
+}

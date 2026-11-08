@@ -1,0 +1,177 @@
+/* Grocery storefront (owner, 8 Nov 2026): every Groceries And Essentials shop (supermarket, convenience store,
+   fresh produce, butchery, seafood, organic store, household essentials). The frame comes from store.css
+   (hero, sticky section bar, sections, basket pill) and the product card and sheet from cards.css; this file
+   adds only what a grocery list needs. It loads with the app, and before the shared sheets, so every rule
+   stays inside .supermarket-store, .supermarket-sheet or .supermarket-list with enough weight to sit on top.
+   Rings instead of borders, concentric radii, press feedback at .96, hover only on mouse devices, motion
+   under 300ms with ease-out, and none when the shopper asks for reduced motion. */
+
+.supermarket-store{padding-bottom:8px}
+/* Room under the last aisle for the floating basket pill. */
+.supermarket-store.has-basket{padding-bottom:32px}
+.supermarket-store .store-hero__facts li{font-variant-numeric:tabular-nums}
+
+/* A product a link pointed to that the shop no longer lists: one calm line above the aisles. */
+.supermarket-store .supermarket-notice{display:flex;align-items:flex-start;gap:10px;max-width:72ch;margin:20px 0 0;padding:12px 16px;border-radius:14px;background:rgba(229,182,95,.07);box-shadow:0 0 0 1px rgba(229,182,95,.22);color:#e3dccb;font-size:14px;line-height:1.5;text-wrap:pretty}
+.supermarket-store .supermarket-notice svg{flex:none;margin-top:1px;color:var(--gold)}
+
+/* The aisles take focus back when the list closes empty; no ring on a whole region. */
+.supermarket-store .supermarket-results:focus{outline:none}
+/* What a search found, under the section bar. */
+.supermarket-store .supermarket-results__status{margin:18px 0 0;color:var(--muted);font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums}
+
+/* Aisles. History sections ("Frequently ordered", "New") lead with a gold mark, as Wolt marks "Most ordered". */
+.supermarket-store .store-section__heading h2{text-wrap:balance}
+.supermarket-store .supermarket-aisle--history .store-section__heading{align-items:center}
+.supermarket-store .supermarket-aisle__mark{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;background:rgba(229,182,95,.14);box-shadow:0 0 0 1px rgba(229,182,95,.28);color:var(--gold)}
+.supermarket-store .supermarket-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:18px 14px}
+
+/* Product card: the card family's small state. The name's button stretches over the whole card, so a tap
+   anywhere opens the product, and the + stepper sits above it. */
+.supermarket-store .supermarket-product{position:relative}
+.supermarket-store .supermarket-product .offering-card__title button::after{content:'';position:absolute;inset:0;border-radius:18px}
+.supermarket-store .supermarket-product .offering-card__footer{flex-wrap:wrap;row-gap:8px}
+.supermarket-store .supermarket-product.is-listed{box-shadow:0 0 0 1px rgba(229,182,95,.45)}
+.supermarket-store .supermarket-product.is-unavailable .offering-card__image img{filter:grayscale(.7);opacity:.7}
+@supports selector(:has(*)){
+  .supermarket-store .supermarket-product:has(.offering-card__title button:focus-visible){box-shadow:0 0 0 2px var(--gold)}
+  .supermarket-store .supermarket-product .offering-card__title button:focus-visible{outline:none}
+}
+
+/* The round + grows into a − n + stepper once the product is on the list. The pill keeps one height in both
+   states, so adding never nudges the row. Hit areas reach 44px. */
+.supermarket-store .supermarket-add{position:relative;z-index:1;display:flex;align-items:center;gap:2px;flex:none;margin-left:auto;padding:2px;border-radius:999px;transition-property:background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .supermarket-add.is-open{background:rgba(255,255,255,.05);box-shadow:var(--shadow-ring)}
+.supermarket-store .supermarket-add button{position:relative}
+.supermarket-store .supermarket-add button::after{content:'';position:absolute;inset:-4px;border-radius:999px}
+.supermarket-store .supermarket-add__less{display:grid;place-items:center;width:36px;height:36px;min-height:36px;border-radius:50%;color:#f3eee2;transition-property:scale,background-color,opacity,translate;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .supermarket-add__less:active{scale:.96}
+.supermarket-store .supermarket-add__count{min-width:22px;text-align:center;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;transition-property:opacity,translate;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+@starting-style{
+  .supermarket-store .supermarket-add__less,.supermarket-store .supermarket-add__count{opacity:0;translate:8px 0}
+}
+
+/* Empty states (no products listed, or nothing matches a search). */
+.supermarket-store .store-empty h2{margin:0;color:#f3eee2;font-size:18px;line-height:1.3;text-wrap:balance}
+.supermarket-store .store-empty p{margin:0;font-size:14px;line-height:1.5;text-wrap:pretty}
+.supermarket-store .store-empty button{min-height:40px;padding:0 16px;border-radius:999px;box-shadow:0 0 0 1px rgba(229,182,95,.4);transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .store-empty button:active{scale:.96}
+
+/* The floating basket: the whole pill opens the list. */
+.supermarket-store .supermarket-basket{gap:10px;min-height:56px;padding:8px 8px 8px 20px;font-weight:700;text-align:left;transition-property:translate,opacity,scale,background-color;transition-duration:220ms,220ms,150ms,150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .supermarket-basket:active{scale:.96}
+.supermarket-store .supermarket-basket:focus-visible{outline:2px solid #f3eee2;outline-offset:3px}
+.supermarket-store .supermarket-basket>svg{flex:none}
+.supermarket-store .supermarket-basket strong{font-variant-numeric:tabular-nums}
+.supermarket-store .supermarket-basket .supermarket-basket__total{font-size:13px;font-weight:600;opacity:.75;font-variant-numeric:tabular-nums;white-space:nowrap}
+.supermarket-store .supermarket-basket .supermarket-basket__cta{display:inline-flex;align-items:center;min-height:40px;margin-left:4px;padding:0 16px;border-radius:999px;background:#16120a;color:#f3eee2;font-size:13.5px;font-weight:700;opacity:1;white-space:nowrap}
+
+/* Product sheet: the card family's expanded state, a little narrower for a product's few facts. */
+.offering-sheet.supermarket-sheet{width:min(860px,calc(100vw - 32px));border:0;box-shadow:var(--shadow-ring),0 28px 80px rgba(0,0,0,.55)}
+.offering-sheet.supermarket-sheet[open]{transition-property:opacity,scale,translate;transition-duration:220ms;transition-timing-function:var(--ease-out)}
+.offering-sheet.supermarket-sheet::backdrop{transition-property:opacity;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+@starting-style{
+  .offering-sheet.supermarket-sheet[open]{opacity:0;scale:.97}
+  .offering-sheet.supermarket-sheet[open]::backdrop{opacity:0}
+}
+.supermarket-sheet .offering-sheet__media{min-height:360px}
+.supermarket-sheet .offering-sheet__media img{outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.supermarket-sheet .offering-sheet__title h2{text-wrap:balance}
+.supermarket-sheet .supermarket-sheet__listed{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;min-height:28px;margin:0;padding:0 11px;border-radius:999px;background:rgba(229,182,95,.12);color:var(--gold);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.supermarket-sheet .offering-sheet__description{text-wrap:pretty}
+.supermarket-sheet .offering-stepper{grid-column:1/-1}
+.supermarket-sheet .offering-stepper button{position:relative;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-sheet .offering-stepper button::after{content:'';position:absolute;inset:-4px;border-radius:12px}
+.supermarket-sheet .offering-stepper button:active:not(:disabled),.supermarket-sheet .offering-sheet__close:active{scale:.96}
+.supermarket-sheet .offering-sheet__close{transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-sheet .offering-sheet__footer{margin-top:auto}
+.supermarket-sheet .offering-sheet__footer p{text-wrap:pretty}
+.supermarket-sheet .offering-sheet__primary{font-variant-numeric:tabular-nums}
+.supermarket-sheet .supermarket-sheet__dot{opacity:.55}
+
+/* The shopper's list: a drawer on the right on desktop, a bottom sheet on phones. */
+.supermarket-list{position:fixed;inset:0 0 0 auto;width:min(440px,100vw);height:100dvh;max-width:100vw;max-height:100dvh;margin:0;padding:0;border:0;border-radius:22px 0 0 22px;background:#121b1f;color:#f3eee2;box-shadow:var(--shadow-ring),-28px 0 80px rgba(0,0,0,.5);overflow:hidden}
+.supermarket-list[open]{display:flex;flex-direction:column;transition-property:translate,opacity;transition-duration:260ms;transition-timing-function:var(--ease-out)}
+.supermarket-list::backdrop{background:rgba(3,6,8,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);transition-property:opacity;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+@starting-style{
+  .supermarket-list[open]{translate:40px 0;opacity:0}
+  .supermarket-list[open]::backdrop{opacity:0}
+}
+.supermarket-list__header{display:flex;flex:none;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 22px 0}
+.supermarket-list__header h2{margin:0;font-size:22px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+.supermarket-list__header p{margin:4px 0 0;color:var(--muted);font-size:13.5px;line-height:1.4;font-variant-numeric:tabular-nums}
+.supermarket-list__close{display:grid;place-items:center;flex:none;width:40px;height:40px;min-height:40px;border-radius:50%;background:rgba(255,255,255,.05);box-shadow:var(--shadow-ring);color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-list__note{display:flex;flex:none;align-items:flex-start;gap:8px;margin:14px 22px 0;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);color:var(--muted);font-size:13px;line-height:1.45;text-wrap:pretty}
+.supermarket-list__note svg{flex:none;margin-top:1px;color:var(--gold)}
+.supermarket-list__lines{flex:1 1 auto;min-height:0;margin:8px 0 0;padding:0 22px;list-style:none;overflow-y:auto;overscroll-behavior:contain}
+.supermarket-list__line{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.supermarket-list__line:last-child{border-bottom:0}
+.supermarket-list__photo{display:block;width:56px;height:56px;border-radius:12px;object-fit:cover;background:#0c1418;outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.supermarket-list__line.is-unavailable .supermarket-list__photo{filter:grayscale(.7);opacity:.7}
+.supermarket-list__copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.supermarket-list__copy strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14.5px;line-height:1.3}
+.supermarket-list__copy span{color:var(--muted);font-size:13px;line-height:1.4;font-variant-numeric:tabular-nums}
+.supermarket-list__stepper{display:flex;align-items:center;gap:2px;padding:2px;border-radius:999px;background:rgba(255,255,255,.05);box-shadow:var(--shadow-ring)}
+.supermarket-list__stepper button{position:relative;display:grid;place-items:center;width:36px;height:36px;min-height:36px;border-radius:50%;color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-list__stepper button::after{content:'';position:absolute;inset:-3px;border-radius:50%}
+.supermarket-list__stepper .supermarket-list__more{background:var(--gold);color:#111315}
+.supermarket-list__stepper button:active:not(:disabled){scale:.96}
+.supermarket-list__stepper>span{min-width:22px;text-align:center;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.supermarket-list__empty{display:flex;flex:1 1 auto;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:32px 28px;color:var(--muted);text-align:center}
+.supermarket-list__empty>svg{margin-bottom:4px;color:var(--gold)}
+.supermarket-list__empty h3{margin:0;color:#f3eee2;font-size:18px;line-height:1.3}
+.supermarket-list__empty p{margin:0;font-size:14px;line-height:1.5;text-wrap:pretty}
+.supermarket-list__undo{display:inline-flex;align-items:center;gap:8px;min-height:40px;margin-top:8px;padding:0 16px;border-radius:999px;box-shadow:0 0 0 1px rgba(229,182,95,.45);color:var(--gold);font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-list__footer{display:flex;flex:none;flex-direction:column;gap:12px;padding:16px 22px calc(18px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.supermarket-list__total{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0;color:var(--muted);font-size:14px}
+.supermarket-list__total strong{color:#f3eee2;font-size:20px;font-variant-numeric:tabular-nums}
+.supermarket-list__gap{margin:0;color:var(--muted);font-size:13px;line-height:1.45;text-wrap:pretty}
+.supermarket-list__actions{display:flex;align-items:center;gap:10px}
+.supermarket-list__clear{min-height:46px;padding:0 14px;border-radius:12px;color:var(--muted);font-weight:700;white-space:nowrap;transition-property:scale,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-list__done{flex:1;min-height:46px;padding:0 20px;border-radius:12px;background:var(--gold);color:#111315;font-weight:700;white-space:nowrap;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-list__close:active,.supermarket-list__undo:active,.supermarket-list__clear:active,.supermarket-list__done:active{scale:.96}
+
+@media (hover:hover) and (pointer:fine){
+  .supermarket-store .supermarket-add__less:hover,.supermarket-list__stepper button:not(.supermarket-list__more):hover:not(:disabled){background:rgba(255,255,255,.08)}
+  .supermarket-list__stepper .supermarket-list__more:hover:not(:disabled){background:#f0c979}
+  .supermarket-store .supermarket-basket:hover{background:#f3cd7d}
+  .supermarket-store .store-empty button:hover,.supermarket-list__undo:hover{background:rgba(229,182,95,.1)}
+  .supermarket-list__close:hover{background:rgba(255,255,255,.1)}
+  .supermarket-list__clear:hover{color:#f3eee2;background:rgba(255,255,255,.05)}
+  .supermarket-list__done:hover{background:#f0c979}
+}
+
+/* Phones: one column of row cards (cards.css), the sheet and the list rise from the bottom. */
+@media (max-width:720px){
+  .offering-sheet.supermarket-sheet{width:100vw;box-shadow:0 -1px 0 oklch(1 0 0 / .08),0 -24px 64px rgba(0,0,0,.5)}
+  .supermarket-sheet .offering-sheet__media{min-height:0}
+  @starting-style{
+    .offering-sheet.supermarket-sheet[open]{opacity:1;scale:1;translate:0 40px}
+  }
+}
+@media (max-width:640px){
+  .supermarket-list{inset:auto 0 0 0;width:100vw;height:auto;max-height:88dvh;border-radius:22px 22px 0 0;box-shadow:var(--shadow-ring),0 -24px 64px rgba(0,0,0,.5)}
+  @starting-style{
+    .supermarket-list[open]{translate:0 40px}
+  }
+  .supermarket-list__header{padding:18px 18px 0}
+  .supermarket-list__note{margin:12px 18px 0}
+  .supermarket-list__lines{padding:0 18px}
+  .supermarket-list__line{grid-template-columns:48px minmax(0,1fr) auto;gap:10px}
+  .supermarket-list__photo{width:48px;height:48px;border-radius:10px}
+  .supermarket-list__footer{padding:14px 18px calc(16px + env(safe-area-inset-bottom))}
+}
+@media (max-width:560px){
+  .supermarket-store .supermarket-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+  .supermarket-store .supermarket-notice{margin-top:16px;font-size:13.5px}
+}
+@media (max-width:360px){
+  .supermarket-store .supermarket-basket .supermarket-basket__total{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .supermarket-store .supermarket-add,.supermarket-store .supermarket-add__less,.supermarket-store .supermarket-add__count,
+  .supermarket-store .supermarket-basket,.supermarket-store .store-empty button,
+  .offering-sheet.supermarket-sheet[open],.offering-sheet.supermarket-sheet::backdrop,.supermarket-sheet .offering-stepper button,.supermarket-sheet .offering-sheet__close,
+  .supermarket-list[open],.supermarket-list::backdrop,.supermarket-list button{transition:none}
+}

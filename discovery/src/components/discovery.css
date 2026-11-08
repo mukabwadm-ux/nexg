@@ -1,0 +1,152 @@
+/* Discovery pages (owner, 8 Nov 2026): home, category (L2) and results (L3). Merchants come before their
+   products and activities; every card is the one framed card family; only catalogue facts are shown. */
+
+/* Page frame ------------------------------------------------------------------------------------------ */
+.home-page,.category-page,.results-screen{display:flex;flex-direction:column;min-width:0}
+.category-page-heading,.results-heading{margin:8px 0 14px}
+.category-page-heading h1,.results-heading h1{font-size:clamp(30px,3vw,42px);line-height:1.1;letter-spacing:-.03em;text-wrap:balance}
+.category-discovery__filters{margin:0 0 20px}
+.category-page .filter-bar,.results-screen .filter-bar{padding-top:4px;padding-bottom:4px}
+.discovery-types{margin:0 0 36px;min-width:0}
+.discovery-types__title{margin:0 0 12px;font-size:17px;line-height:1.3;letter-spacing:-.01em}
+.discovery-section{min-width:0;margin:0 0 44px}
+.discovery-section:last-of-type{margin-bottom:12px}
+.home-categories{margin:0 0 4px;min-width:0}
+.rail--merchants{--rail-item:300px}
+/* Rail arrows sit level with the photos rather than the middle of the cards. */
+.discovery-section .rail{--rail-arrow-top:33%}
+
+/* Merchant card: framed cover, logo beside the name, type and place, confirmed facts, "View store". ---- */
+.merchant-card{position:relative;display:flex;min-width:0;padding:6px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow-ring);transition-property:box-shadow,background-color,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.merchant-card:active{scale:.98}
+.merchant-card__main{display:flex;flex-direction:column;flex:1;width:100%;min-width:0;padding:0;border-radius:12px;text-align:left}
+.merchant-card__cover{position:relative;display:block;width:100%;aspect-ratio:16/10;overflow:hidden;border-radius:12px;background:#0c1418}
+.merchant-card__hero{display:block;width:100%;height:100%;object-fit:cover;border-radius:12px;outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.merchant-card__hero.image-fallback{outline:0}
+.merchant-card__promotion{position:absolute;top:8px;left:8px;max-width:calc(100% - 16px);padding:5px 10px;border-radius:999px;background:var(--gold);color:#16120a;font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.merchant-card__body{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;padding:12px 8px 6px}
+.merchant-card__identity{display:flex;align-items:center;gap:12px;min-width:0}
+.merchant-card__text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.merchant-card__name{font-size:15.5px;font-weight:700;line-height:1.3;letter-spacing:-.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.merchant-card__meta{color:var(--muted);font-size:12.5px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.merchant-card__facts{display:flex;flex-wrap:wrap;gap:4px 12px;color:#d5d9d3;font-size:12.5px;line-height:1.4;font-variant-numeric:tabular-nums}
+.merchant-card__facts>span{display:inline-flex;align-items:center;gap:5px}
+.merchant-card__facts svg{flex:none;color:var(--gold)}
+.merchant-card__facts small{color:var(--muted);font-size:inherit}
+.merchant-card__action{display:inline-flex;align-items:center;gap:6px;margin-top:auto;padding-top:2px;color:var(--gold);font-size:13px;font-weight:700}
+.merchant-card__action svg{transition-property:translate;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+/* The small profile row on trip and experience pages. */
+.merchant-card--host .merchant-card__main{display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:16px;padding:16px}
+.merchant-card--host .merchant-card__cover{width:64px;height:64px;aspect-ratio:1;border-radius:50%}
+.merchant-card--host .merchant-card__hero{border-radius:50%}
+.merchant-card--host .merchant-card__body{padding:0;gap:6px}
+
+/* A merchant's logo, or its first letter when there is none. */
+.merchant-logo{flex:none;display:block;width:40px;height:40px;border-radius:12px;object-fit:cover;background:#0b1215;outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.merchant-logo--initial{display:grid;place-items:center;background:linear-gradient(145deg,#2c2517,#16130c);color:var(--gold);font-size:17px;font-weight:700;line-height:1;outline-color:rgba(229,182,95,.24)}
+
+/* Store row: the store's identity, then a rail of its own items. -------------------------------------- */
+.store-rows{display:flex;flex-direction:column;min-width:0}
+.store-rows>.store-row+.store-row{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
+.store-row{display:flex;flex-direction:column;gap:14px;min-width:0}
+.store-row__header{position:relative;display:flex;align-items:center;gap:14px;min-width:0}
+.store-row__logo{width:52px;height:52px;border-radius:15px}
+.store-row__logo.merchant-logo--initial{font-size:21px}
+.store-row__identity{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.store-row__name{margin:0;font-size:18px;line-height:1.25;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition-property:color;transition-duration:150ms}
+.store-row__meta{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.store-row__fact{display:inline-flex;align-items:center;gap:5px;color:#d5d9d3;font-variant-numeric:tabular-nums}
+.store-row__fact svg{flex:none;color:var(--gold)}
+.store-row__fact small{color:var(--muted);font-size:inherit}
+.store-row__promotion{padding:2px 9px;border-radius:999px;background:rgba(229,182,95,.14);color:var(--gold);font-size:12px;font-weight:700}
+/* The whole header opens the store: the button's ::after covers it, so there is one control to tab to. */
+.store-row__open{flex:none;min-height:44px;padding:0;border-radius:999px}
+.store-row__open::after{content:'';position:absolute;inset:-6px -8px;border-radius:16px}
+.store-row__pill{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.05);box-shadow:var(--shadow-ring);color:#f3eee2;font-size:13px;font-weight:700;white-space:nowrap;transition-property:scale,background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.store-row__pill svg{color:var(--gold)}
+.store-row__open:active .store-row__pill{scale:.96}
+.store-row__empty{margin:0;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.025);box-shadow:var(--shadow-ring);color:var(--muted);font-size:13.5px}
+
+@media (hover:hover) and (pointer:fine){
+  .merchant-card:hover{box-shadow:var(--shadow-ring-hover);background-color:#12212a}
+  .merchant-card:hover .merchant-card__action svg{translate:3px 0}
+  .store-row__header:hover .store-row__pill{background:rgba(229,182,95,.12);box-shadow:0 0 0 1px rgba(229,182,95,.35)}
+  .store-row__header:hover .store-row__name{color:#fff}
+}
+
+/* "Saved on this device for this visit only": shown briefly after a heart is filled. */
+.saved-notice{position:fixed;left:50%;bottom:20px;z-index:30;max-width:calc(100vw - 32px);margin:0;padding:11px 18px;border-radius:999px;background:#1d2a30;box-shadow:var(--shadow-ring),0 12px 30px rgba(0,0,0,.45);color:#f3eee2;font-size:13px;font-weight:600;text-align:center;pointer-events:none;opacity:0;visibility:hidden;translate:-50% 8px;transition-property:opacity,translate,visibility;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+.saved-notice.is-visible{opacity:1;visibility:visible;translate:-50% 0}
+
+/* Results (L3) ------------------------------------------------------------------------------------------ */
+.results-divider{margin:14px 0 22px;border-top:1px solid var(--line)}
+.results-summary{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;margin:0 0 16px}
+.results-summary h2{font-size:18px;line-height:1.3}
+.results-count{min-height:0;margin:0;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.results-hosts{margin-bottom:36px}
+.pagination__pages{display:flex;align-items:center;gap:8px}
+.pagination__page{display:grid;place-items:center;min-width:44px;min-height:44px;padding:0 10px;border-radius:999px;box-shadow:var(--shadow-ring);font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;transition-property:scale,background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.pagination__page:active{scale:.96}
+.pagination__page[aria-current=page]{background:var(--gold);color:#16120a;box-shadow:none}
+.pagination__gap{color:var(--muted);padding:0 2px}
+.pagination__status{display:none;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (hover:hover) and (pointer:fine){.pagination__page:not([aria-current=page]):hover{background:rgba(255,255,255,.05);box-shadow:var(--shadow-ring-hover)}}
+
+/* Loading placeholders, at the real cards' size so nothing jumps when the catalogue answers. ----------- */
+@keyframes discovery-pulse{50%{opacity:.5}}
+.catalog-skeleton{min-width:0}
+.loading-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:20px 16px}
+.loading-rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--rail-item,264px);gap:16px;overflow:hidden}
+.catalog-skeleton--merchant .loading-rail{grid-auto-columns:300px}
+.skeleton-card{display:flex;flex-direction:column;gap:10px;min-width:0;padding:6px 6px 16px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow-ring)}
+.skeleton-card__media,.skeleton-card__line,.skeleton-card__logo{display:block;background:#18252b;animation:discovery-pulse 1.6s ease-in-out infinite}
+.skeleton-card__media{aspect-ratio:4/3;border-radius:12px}
+.skeleton-card--merchant .skeleton-card__media{aspect-ratio:16/10}
+.skeleton-card__line{height:12px;margin:0 8px;border-radius:6px}
+.skeleton-card__line--short{width:45%}
+.skeleton-card__identity,.skeleton-row__header{display:flex;align-items:center;gap:12px;padding:4px 8px 0}
+.skeleton-card__logo{flex:none;width:40px;height:40px;border-radius:12px}
+.skeleton-card__lines{display:flex;flex:1;flex-direction:column;gap:8px;min-width:0}
+.skeleton-card__lines .skeleton-card__line{margin:0}
+.skeleton-row{display:flex;flex-direction:column;gap:14px;min-width:0}
+.skeleton-row+.skeleton-row{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
+.skeleton-row__header{max-width:360px;padding:0}
+.skeleton-row__header .skeleton-card__logo{width:52px;height:52px;border-radius:15px}
+
+@media (max-width:760px){
+  .category-page-heading,.results-heading{margin:4px 0 12px}
+  .category-page-heading h1,.results-heading h1{font-size:30px}
+  .category-discovery__filters{margin-bottom:16px}
+  .discovery-types{margin-bottom:28px}
+  .discovery-section{margin-bottom:36px}
+  .rail--merchants{--rail-item-phone:min(78vw,340px)}
+  .loading-rail{grid-auto-columns:min(78vw,320px);gap:12px}
+  .catalog-skeleton--merchant .loading-rail{grid-auto-columns:min(78vw,340px)}
+  .store-rows>.store-row+.store-row,.skeleton-row+.skeleton-row{margin-top:20px;padding-top:20px}
+  .store-row{gap:12px}
+  .store-row__header{gap:12px}
+  .store-row__logo,.skeleton-row__header .skeleton-card__logo{width:44px;height:44px;border-radius:13px}
+  .store-row__name{font-size:16.5px}
+  .store-row__meta{font-size:12.5px;gap:2px 12px}
+  .results-divider{margin:10px 0 18px}
+}
+@media (max-width:560px){
+  .loading-grid{grid-template-columns:1fr;gap:10px}
+  .loading-grid .skeleton-card--offering{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto auto 1fr;gap:10px 12px;min-height:124px;padding:6px}
+  .loading-grid .skeleton-card--offering .skeleton-card__media{grid-row:1/-1;aspect-ratio:auto;height:100%}
+  .loading-grid .skeleton-card--offering .skeleton-card__line{margin:6px 0 0}
+  .loading-rail .skeleton-card--offering{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto auto 1fr;gap:10px 12px;min-height:124px;padding:6px}
+  .loading-rail .skeleton-card--offering .skeleton-card__media{grid-row:1/-1;aspect-ratio:auto;height:100%}
+  .loading-rail .skeleton-card--offering .skeleton-card__line{margin:6px 0 0}
+  .pagination__pages{display:none}
+  .pagination__status{display:inline}
+}
+@media (max-width:480px){
+  /* The pill keeps its arrow; its words stay for screen readers. */
+  .store-row__pill{width:40px;padding:0;justify-content:center}
+  .store-row__label{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .merchant-card,.merchant-card__action svg,.store-row__pill,.store-row__name,.pagination__page,.saved-notice{transition:none}
+  .skeleton-card__media,.skeleton-card__line,.skeleton-card__logo{animation:none}
+}
