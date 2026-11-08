@@ -12864,6 +12864,7 @@ export type Database = {
           verified_at: string | null;
           verified_by: string | null;
           went_live_at: string | null;
+          workspace_profile: Json;
         };
         ComputedFields: never;
         Insert: {
@@ -13266,6 +13267,68 @@ export type Database = {
             referencedColumns: ['host_id'];
           },
         ];
+      };
+      host_unit_guide: {
+        Row: { unit_id: string; revision: number; document: Json; published_id: string | null };
+        Insert: never;
+        Update: never;
+        Relationships: [{
+          foreignKeyName: 'host_unit_guide_unit_id_fkey';
+          columns: ['unit_id'];
+          isOneToOne: true;
+          referencedRelation: 'unit';
+          referencedColumns: ['id'];
+        }];
+      };
+      host_unit_guide_version: {
+        Row: { id: string; unit_id: string; document: Json; article_count: number; published_at: string };
+        Insert: never;
+        Update: never;
+        Relationships: [{
+          foreignKeyName: 'host_unit_guide_version_unit_id_fkey';
+          columns: ['unit_id'];
+          isOneToOne: false;
+          referencedRelation: 'host_unit_guide';
+          referencedColumns: ['unit_id'];
+        }];
+      };
+      host_workspace_task: {
+        Row: {
+          id: string; unit_id: string; stay_id: string | null; repeat_of: string | null;
+          assignee_id: string | null; created_by: string | null;
+          title: string; kind: string; due_at: string; priority: string; status: string;
+          checklist: string[]; completed_checks: string[]; evidence: string; comments: string;
+          cadence: string; inspection: boolean; version: number; updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [{
+          foreignKeyName: 'host_workspace_task_unit_id_fkey';
+          columns: ['unit_id'];
+          isOneToOne: false;
+          referencedRelation: 'unit';
+          referencedColumns: ['id'];
+        }];
+      };
+      host_manual_finance: {
+        Row: {
+          id: string;
+          host_id: string;
+          unit_id: string;
+          stay_id: string | null;
+          kind: string;
+          amount_minor: number;
+          recorded_on: string;
+          description: string;
+          category: string;
+          reference: string;
+          status: string;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
       };
       host_message: {
         Row: {
@@ -50547,6 +50610,7 @@ export type Database = {
       };
       rpc_hospitality_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_apply: { Args: { p_payload: Json }; Returns: Json };
+      rpc_host_manual_finance_record: { Args: { p_host_id: string; p_entry: Json }; Returns: string };
       rpc_host_message_read: { Args: { p_conversation: string }; Returns: Json };
       rpc_host_message_reply: {
         Args: { p_body: string; p_conversation: string; p_idempotency_key?: string };
@@ -50727,6 +50791,45 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_host_workspace_data_share_options: {
+        Args: { p_request_id: string };
+        Returns: { host_id: string; host_name: string; shared: boolean }[];
+      };
+      rpc_host_workspace_data_share_set: {
+        Args: { p_request_id: string; p_host_id: string; p_shared: boolean };
+        Returns: undefined;
+      };
+      rpc_host_workspace_guide_commit: {
+        Args: { p_unit_id: string; p_revision: number; p_action: string; p_document: Json; p_restore_id?: string };
+        Returns: number;
+      };
+      rpc_host_workspace_guide_asset_put: {
+        Args: { p_unit_id: string; p_revision: number; p_kind: string; p_mime: string; p_base64: string };
+        Returns: number;
+      };
+      rpc_host_workspace_published_guide: { Args: { p_code: string }; Returns: Json };
+      rpc_host_workspace_guide_asset: { Args: { p_id: string; p_code?: string }; Returns: Json };
+      rpc_host_workspace_task_save: {
+        Args: { p_id: string; p_unit_id: string; p_version?: number; p_patch?: Json };
+        Returns: undefined;
+      };
+      rpc_host_workspace_shared_data_requests: {
+        Args: { p_host_id: string };
+        Returns: { id: string; kind: string; status: string; verified: boolean; received_at: string; due_at: string | null; fulfilled_at: string | null }[];
+      };
+      rpc_host_workspace_package_cancel: { Args: { p_host_id: string; p_order_id: string }; Returns: undefined };
+      rpc_host_workspace_photos_set: {
+        Args: { p_kind: string; p_id: string; p_expected: Json; p_photos: Json };
+        Returns: undefined;
+      };
+      rpc_host_workspace_profile_save: {
+        Args: { p_host_id: string; p_host_patch: Json; p_profile_patch: Json };
+        Returns: undefined;
+      };
+      rpc_host_workspace_settings_activity: {
+        Args: { p_host_id: string };
+        Returns: { id: number; at: string; action: string; own: boolean }[];
       };
       rpc_host_settings_update: {
         Args: { p_host_id: string; p_patch: Json };

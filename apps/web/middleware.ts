@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { localHostBookmark, localHostWorkspaceEnabled } from '@/lib/host-workspace/routes';
 
 /**
  * The scan happens here, not in the page.
@@ -55,6 +56,7 @@ export const config = {
    */
   matcher: [
     '/',
+    '/host/:path*',
     '/q/:code*',
     '/merchant/:path*',
     '/merchants/register/:path*',
@@ -72,6 +74,16 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  if (pathname === '/host' || pathname.startsWith('/host/')) {
+    const location = (request.method === 'GET' || request.method === 'HEAD') && localHostWorkspaceEnabled()
+      ? localHostBookmark(pathname, request.nextUrl.searchParams)
+      : null;
+    if (!location) return NextResponse.next();
+    // The route handler issues a relative redirect so Next preserves the loopback origin.
+    const bookmark = new URL(location, request.url);
+    bookmark.searchParams.set('bookmark', '1');
+    return NextResponse.rewrite(bookmark);
+  }
   if (
     pathname === '/merchant' ||
     pathname.startsWith('/merchant/') ||

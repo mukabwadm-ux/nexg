@@ -18,6 +18,9 @@ import { isMerchantRegistrationPath } from '@/lib/merchant-journey-navigation';
 export function LocationBannerSlot() {
   const pathname = usePathname();
   if (
+    pathname === '/sign-in' ||
+    pathname === '/host' ||
+    pathname.startsWith('/host/') ||
     isBookingPage(pathname) ||
     isMerchantRegistrationPath(pathname) ||
     pathname === '/merchant-live-preview' ||
@@ -30,6 +33,9 @@ export function LocationBannerSlot() {
 export function LocationSheetSlot() {
   const pathname = usePathname();
   if (
+    pathname === '/sign-in' ||
+    pathname === '/host' ||
+    pathname.startsWith('/host/') ||
     isBookingPage(pathname) ||
     isMerchantRegistrationPath(pathname) ||
     pathname === '/merchant-live-preview' ||

@@ -22,6 +22,6 @@ export function authDestination(
   next?: string,
   redirectTo?: string,
 ): string {
-  if (role === 'merchant' && redirectTo) return redirectTo;
+  if (redirectTo && (role === 'merchant' || redirectTo === '/merchant')) return redirectTo;
   return next ?? redirectTo ?? '/';
 }
