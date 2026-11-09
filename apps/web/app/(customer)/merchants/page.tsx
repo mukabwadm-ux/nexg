@@ -1,3 +1,4 @@
+import { MERCHANT_AGREEMENTS, merchantAgreementHref } from '@nexg/contracts/merchant-agreements';
 import { Button, Card, VALUE_PLACEHOLDER } from '@nexg/ui';
 import {
   ArrowRight,
@@ -35,6 +36,7 @@ import { DashboardPreview } from '@/components/merchants/dashboard-preview';
 import { FeaturedSlots } from '@/components/merchants/featured-slots';
 import { StorefrontPreview } from '@/components/merchants/storefront-preview';
 import { MerchantRegisterCard } from '@/components/merchants/merchant-register-card';
+import { NEW_TAB } from '@/lib/legal-documents';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -518,6 +520,42 @@ export default async function MerchantsPage() {
               <Link href={registrationHref}>Register Your Business</Link>
             </Button>
           </Card>
+        </section>
+
+        {/* Every category's agreement, readable before applying. */}
+        <section
+          id="merchant-agreements"
+          aria-labelledby="merchant-agreements-title"
+          className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16"
+        >
+          <h2
+            id="merchant-agreements-title"
+            className="text-[1.5rem] font-extrabold tracking-tight"
+          >
+            Merchant agreements
+          </h2>
+          <p className="text-muted mt-2 max-w-2xl text-[0.9375rem] font-semibold">
+            Each category has its own NexG Merchant Agreement. You accept the one for your category
+            when you apply.
+          </p>
+          <ul className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {MERCHANT_AGREEMENTS.map((agreement) => (
+              <li key={agreement.id}>
+                <a
+                  href={merchantAgreementHref(agreement)}
+                  {...NEW_TAB}
+                  className="border-border bg-surface hover:border-ink flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-[0.875rem] font-bold transition-colors"
+                >
+                  <span>{agreement.title}</span>
+                  <span className="text-muted-light text-[0.75rem] font-semibold">PDF</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="text-muted-light mt-3 text-[0.75rem] font-semibold">
+            Vehicle Rentals uses the Vehicle Services agreement, Health uses Wellness, and App
+            Services uses Marketplace, until their own agreements are published.
+          </p>
         </section>
       </main>
 
