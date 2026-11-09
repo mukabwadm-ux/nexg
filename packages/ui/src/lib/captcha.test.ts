@@ -6,8 +6,8 @@ function fakeTurnstile(outcome: 'pass' | 'fail' = 'pass') {
   let options: Options | null = null;
   let issued = 0;
   const api = {
-    render: vi.fn((_el: HTMLElement, opts: Options) => {
-      options = opts;
+    render: vi.fn((_el: HTMLElement, opts: Record<string, unknown>) => {
+      options = opts as unknown as Options;
       return 'widget-1';
     }),
     reset: vi.fn(),
