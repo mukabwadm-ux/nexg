@@ -23,7 +23,16 @@ import { localeName } from '@/lib/i18n/dictionaries';
  * their own language is scanning for their own word for it, not for the
  * English name of it in a language they are trying to leave.
  */
-export function LanguageSwitcher({ locale, locales }: { locale: string; locales: string[] }) {
+export function LanguageSwitcher({
+  locale,
+  locales,
+  tone = 'light',
+}: {
+  locale: string;
+  locales: string[];
+  /** 'dark' when it sits on a dark background, such as the footer. */
+  tone?: 'light' | 'dark';
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const [busy, setBusy] = React.useState<string | null>(null);
@@ -54,7 +63,13 @@ export function LanguageSwitcher({ locale, locales }: { locale: string; locales:
               }
             }}
             className={`rounded-full px-2.5 py-1 text-xs font-bold transition-colors ${
-              on ? 'bg-ink text-white' : 'text-muted hover:text-ink disabled:opacity-50'
+              tone === 'dark'
+                ? on
+                  ? 'text-ink bg-white'
+                  : 'text-white/70 hover:text-white disabled:opacity-50'
+                : on
+                  ? 'bg-ink text-white'
+                  : 'text-muted hover:text-ink disabled:opacity-50'
             }`}
           >
             {busy === option ? '…' : localeName(option)}

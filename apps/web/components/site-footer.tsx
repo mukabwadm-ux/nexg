@@ -27,10 +27,11 @@ export async function SiteFooter({
   const { locale, t } = pageTranslations;
   const locales = await availableLocales();
 
+  /* Dark, so the logo reads at its best: the on-dark artwork, with light text. */
   return (
-    <footer className="border-border bg-bg border-t">
+    <footer className="bg-ink text-white">
       <div className="mx-auto flex max-w-[96rem] flex-col items-start gap-4 px-4 py-[3.75rem] sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-16">
-        <Logo className="h-28" />
+        <Logo onDark className="h-28" />
         <div className="flex flex-col gap-2 sm:items-end">
           <nav aria-label="Footer" className="flex flex-wrap gap-4">
             {LINKS.map((link) =>
@@ -40,7 +41,7 @@ export async function SiteFooter({
                   key={link.key}
                   href={link.href}
                   {...NEW_TAB}
-                  className="text-muted hover:text-ink text-sm transition-colors"
+                  className="text-sm text-white/70 transition-colors hover:text-white"
                 >
                   {t(link.key)}
                 </a>
@@ -48,15 +49,15 @@ export async function SiteFooter({
                 <Link
                   key={link.key}
                   href={link.href}
-                  className="text-muted hover:text-ink text-sm transition-colors"
+                  className="text-sm text-white/70 transition-colors hover:text-white"
                 >
                   {t(link.key)}
                 </Link>
               ),
             )}
           </nav>
-          <LanguageSwitcher locale={locale} locales={locales} />
-          <p className="text-muted-light text-xs">
+          <LanguageSwitcher locale={locale} locales={locales} tone="dark" />
+          <p className="text-xs text-white/50">
             © {new Date().getFullYear()} NexG Concierge. All rights reserved.
           </p>
         </div>
