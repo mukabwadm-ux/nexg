@@ -2,9 +2,13 @@
 
 import { Button, ChipGroup, Input, PhoneInput, useToast } from '@nexg/ui';
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { applyAsHost, type HostApplyResult } from '@/app/(customer)/hosts/actions';
+import { HostEmailVerification } from '@/components/hosts/host-email-verification';
+import { createClient } from '@/lib/supabase/client';
 
 /**
  * The "List your Airbnb" form from the `Hosts` artboard.
@@ -30,8 +34,21 @@ const HANDOFFS = [
   { value: 'call_guest_first', label: 'Call guest first' },
 ];
 
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/*
+ * form → verify (email code, which turns the anonymous session into the
+ * host's login) → done (welcome email with a set-password link sent).
+ */
+type Step =
+  | { kind: 'form' }
+  | { kind: 'verify'; actorId: string; email: string; reference?: string }
+  | { kind: 'done'; ok: boolean; message: string; email: string; reference?: string };
+
 export function HostRegisterCard() {
   const { toast } = useToast();
+  const router = useRouter();
+  const [step, setStep] = React.useState<Step>({ kind: 'form' });
   const [name, setName] = React.useState('');
   const [phone, setPhone] = React.useState<string | null>(null);
   const [email, setEmail] = React.useState('');
@@ -41,60 +58,131 @@ export function HostRegisterCard() {
   const [handoff, setHandoff] = React.useState<string | null>(null);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [pending, startTransition] = React.useTransition();
-  const [done, setDone] = React.useState<HostApplyResult | null>(null);
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
     const next: Record<string, string> = {};
     if (!name.trim()) next['name'] = 'We need a name to put on the QR pack.';
     if (!phone) next['phone'] = 'This is how we reach you about your guests.';
+    if (!EMAIL.test(email.trim())) next['email'] = 'This becomes your login. We send a code to it.';
     if (!address.trim()) next['address'] = 'Where is the unit?';
+    if (!handoff) next['handoff'] = 'Choose how riders should hand over.';
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
     startTransition(async () => {
-      const result = await applyAsHost({
+      const cleanEmail = email.trim().toLowerCase();
+      const auth = createClient().auth;
+
+      /* The application belongs to whoever submits it, so it needs a session:
+         an anonymous one becomes the host's login once the email is verified. */
+      let { data } = await auth.getUser();
+      if (!data.user) {
+        const signedIn = await auth.signInAnonymously();
+        if (signedIn.error || !signedIn.data.user) {
+          toast({
+            title: 'That did not save',
+            description: 'We could not start your application. Reload the page and try again.',
+          });
+          return;
+        }
+        data = { user: signedIn.data.user };
+      }
+      const user = data.user!;
+      if (!user.is_anonymous && user.email?.toLowerCase() !== cleanEmail) {
+        toast({
+          title: 'You are signed in with another email',
+          description: `Use ${user.email} or sign out first.`,
+        });
+        return;
+      }
+
+      const result: HostApplyResult = await applyAsHost({
         contact_name: name.trim(),
         display_name: name.trim(),
         phone: phone!,
-        email: email.trim() || null,
+        email: cleanEmail,
         listing_link: listing.trim() || null,
         address: address.trim(),
         units_band: band ?? '1',
-        handoff,
+        handoff: handoff!,
       });
 
       if (!result.ok) {
         toast({ title: 'That did not save', description: result.message });
         return;
       }
-      setDone(result);
+      /* Already a verified account (a guest who signed up earlier): straight in. */
+      if (!user.is_anonymous && user.email_confirmed_at) {
+        router.push('/host');
+        return;
+      }
+      setStep({
+        kind: 'verify',
+        actorId: user.id,
+        email: cleanEmail,
+        ...(result.ticketReference ? { reference: result.ticketReference } : {}),
+      });
     });
   }
 
-  if (done?.ok) {
+  if (step.kind === 'verify') {
+    return (
+      <HostEmailVerification
+        actorId={step.actorId}
+        email={step.email}
+        onDone={(outcome) =>
+          setStep({
+            kind: 'done',
+            ok: outcome.ok,
+            message: outcome.message,
+            email: step.email,
+            ...(step.reference ? { reference: step.reference } : {}),
+          })
+        }
+      />
+    );
+  }
+
+  if (step.kind === 'done') {
     return (
       <div className="rounded-2xl border border-[#ECE8DF] bg-white p-6 sm:p-8">
         <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.12em] text-[#B8901F]">
-          List your Airbnb
+          Email verified
         </p>
         <h3 className="mt-2 text-[1.5rem] font-extrabold leading-tight tracking-tight">
-          Got it. We&rsquo;ll be in touch.
+          {step.ok ? 'Check your inbox to set your password.' : 'Your application is saved.'}
         </h3>
         <p className="mt-3 text-sm font-semibold leading-[1.8] text-[#5B5B5B]">
-          We verify your first unit — usually within one working day — and send your QR pack the
-          moment you&rsquo;re verified. Nothing to pay, now or later: guests pay per order.
+          {step.ok
+            ? `We sent a welcome email to ${step.email} with a link to set your password.`
+            : step.message}
         </p>
-        <p className="mt-3 text-sm font-semibold leading-[1.8] text-[#5B5B5B]">
-          We&rsquo;ve saved what you typed, so setting up the hand-off rule picks up where you left
-          off.
+        <ol className="mt-4 space-y-2 text-sm font-semibold leading-[1.7] text-[#3A352B]">
+          <li>1. Set your password from the email, then sign in to your host workspace.</li>
+          <li>2. Upload your ID or passport and proof of authority to let the property.</li>
+          <li>
+            3. NexG reviews them, usually within one working day. Once approved, you can list and
+            manage your units.
+          </li>
+        </ol>
+        <p className="mt-4 text-sm font-semibold leading-[1.8] text-[#5B5B5B]">
+          Your first month of management is free.
+          {step.reference ? (
+            <>
+              {' '}
+              Your reference is{' '}
+              <span className="font-extrabold text-[#1A1A1A]">{step.reference}</span>.
+            </>
+          ) : null}
         </p>
-        {done.ticketReference ? (
-          <p className="mt-3 text-sm font-semibold leading-[1.8] text-[#5B5B5B]">
-            Your reference is{' '}
-            <span className="font-extrabold text-[#1A1A1A]">{done.ticketReference}</span> &mdash;
-            quote it if you call us.
-          </p>
+        {!step.ok ? (
+          <Link
+            href="/forgot-password"
+            className="mt-4 inline-block text-sm font-extrabold underline underline-offset-4"
+          >
+            Send the password link again
+          </Link>
         ) : null}
       </div>
     );
@@ -131,6 +219,7 @@ export function HostRegisterCard() {
           autoComplete="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          {...(errors['email'] ? { error: errors['email'] } : {})}
         />
         <Input
           id="host_listing"
@@ -171,6 +260,11 @@ export function HostRegisterCard() {
           value={handoff}
           onChange={setHandoff}
         />
+        {errors['handoff'] ? (
+          <p role="alert" className="mt-1.5 text-[0.75rem] font-semibold text-[#B42318]">
+            {errors['handoff']}
+          </p>
+        ) : null}
       </div>
 
       <Button type="submit" className="mt-6 w-full" disabled={pending}>
@@ -179,7 +273,8 @@ export function HostRegisterCard() {
       </Button>
 
       <p className="mt-3 text-center text-[0.6875rem] font-semibold leading-relaxed text-[#8A8A8A]">
-        By continuing you agree to the Host Terms. We use these details only to set up your units.
+        Next we send a code to your email to create your login. By continuing you agree to the Host
+        Terms. We use these details only to set up your units.
       </p>
     </form>
   );
