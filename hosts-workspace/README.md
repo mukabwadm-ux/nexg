@@ -21,4 +21,4 @@ The workspace is live at `/host` on the public site. `apps/web`'s `build` script
 
 - Host Inbox shares conversation records with [Admin Messaging](http://127.0.0.1:3001/messaging). Hosts can send unit-related questions to NexG Concierge.
 - **Direct guest messaging is pending.** The shared booking engine needs to link the reservation to a verified guest before the guest app can open the right conversation. Scheduled guest notifications also need a delivery service.
-- Calendar shows recorded stays and stores iCal connections. Live availability, holds and date blocks need the shared booking engine. Automatic imports need an iCal worker.
+- Calendar shows recorded stays, holds and date blocks, and stores iCal connections. Holds and blocks are kept by the database (`rpc_stay_host_hold`, `rpc_stay_block`): nothing else can take those nights. A host hold ends by itself unless the host confirms it. Automatic imports still need an iCal worker.

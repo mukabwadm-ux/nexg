@@ -40918,15 +40918,19 @@ export type Database = {
           check_out: string | null;
           conflict_flagged: boolean | null;
           guest_first_name: string | null;
+          hold_expired: boolean | null;
+          hold_expires_at: string | null;
           host_id: string | null;
           id: string | null;
           in_stay: boolean | null;
+          notes: string | null;
           orders: number | null;
           party_adults: number | null;
           party_children: number | null;
           phone_masked: string | null;
           property_name: string | null;
           qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
           rate_kes: number | null;
           reviewed_at: string | null;
           scans: number | null;
@@ -55278,6 +55282,171 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_stay_block: {
+        Args: {
+          p_from: string;
+          p_host_id: string;
+          p_note?: string;
+          p_to: string;
+          p_unit_id: string;
+        };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          id: string;
+          notes: string | null;
+          party_adults: number;
+          party_children: number;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_confirm: {
+        Args: { p_reference?: string; p_stay_id: string };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          id: string;
+          notes: string | null;
+          party_adults: number;
+          party_children: number;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_hold: {
+        Args: { p_check_in: string; p_check_out: string; p_guest?: Json; p_unit_id: string };
+        Returns: Json;
+      };
+      rpc_stay_hold_release: {
+        Args: { p_stay_id: string };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          id: string;
+          notes: string | null;
+          party_adults: number;
+          party_children: number;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_host_hold: {
+        Args: { p_host_id: string; p_hours: number; p_stay: Json };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          id: string;
+          notes: string | null;
+          party_adults: number;
+          party_children: number;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_search: {
+        Args: {
+          p_check_in: string;
+          p_check_out: string;
+          p_guests?: number;
+          p_property_id?: string;
+        };
+        Returns: {
+          nightly_rate_kes: number;
+          nights: number;
+          property_id: string;
+          total_kes: number;
+          unit_id: string;
+        }[];
+      };
+      rpc_unit_busy: {
+        Args: { p_from: string; p_to: string; p_unit_id: string };
+        Returns: { ends_on: string; starts_on: string }[];
       };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
