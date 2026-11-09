@@ -35,3 +35,30 @@
 
 @media(max-width:760px){.nxops-reservation-aside{display:none}}
 @media(min-width:761px) and (max-height:720px){.nxops-reservation-image{height:64px;min-height:64px}.nxops-reservation-row{padding:3px 0;line-height:1.2;min-height:19px}.nxops-reservation-row dt svg{width:12px;height:12px}.nxops-reservation-row .badge{font-size:8px;padding:2px 5px}.nxops-reservation-aside{gap:5px}.nxops-reservation-aside>.btn{min-height:26px;padding:4px 7px}.nxops-reservation-aside>.nxops-create-task-link{min-height:24px;font-size:10px}}
+
+/* The search grows from the right edge without moving the Operations content. */
+.app-shell .nxops-main-tabs { position: relative; flex-wrap: nowrap; min-height: 46px; align-items: center; gap: 8px; }
+.nxops-section-tabs { flex: 1; min-width: 0; }
+.nxops-section-tabs > .tabs { width: 100%; }
+.nxops-inline-search { display: flex; align-items: center; width: 44px; flex: 0 0 auto; min-width: 44px; height: 44px; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); transition: width 220ms ease, border-color 220ms ease, box-shadow 220ms ease; }
+.nxops-inline-search.is-open { width: 260px; }
+.nxops-inline-search:focus-within { border-color: var(--gold); box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 22%, transparent); }
+.app-shell .nxops-search-trigger, .app-shell .nxops-search-clear { position: relative; display: grid; place-items: center; flex: 0 0 42px; width: 42px; min-width: 42px; height: 44px; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+.nxops-search-field { display: flex; align-items: center; flex: 1; min-width: 0; opacity: 0; visibility: hidden; transition: opacity 140ms ease; }
+.nxops-inline-search.is-open .nxops-search-field { opacity: 1; visibility: visible; }
+.app-shell .nxops-search-field input { width: 100%; min-width: 0; min-height: 42px; flex: 1; border: 0; box-shadow: none; background: transparent; border-radius: 0; padding: 0 10px 0 0; font-size: 14px; }
+.nxops-search-field input::-webkit-search-cancel-button { appearance: none; }
+.nxops-search-active { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); right: 7px; top: 7px; }
+@media (max-width: 800px) {
+  .app-shell .nxops-main-tabs { margin: 0; }
+  .app-shell .nxops-section-tabs > .tabs { gap: 0; margin: 0; }
+  .app-shell .nxops-section-tabs > .tabs > button { padding-inline: 10px; }
+  .nxops-inline-search.is-open { position: absolute; right: 0; width: 100%; }
+  .nxops-searching .nxops-section-tabs { visibility: hidden; }
+  .app-shell .nxops-search-field input { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nxops-inline-search, .nxops-search-field { transition: none; }
+}
+
+.app-shell .nxops-search-field input:focus { outline: none; border: 0; box-shadow: none; }

@@ -1,0 +1,927 @@
+/* Mobile is a scrolling workspace, not a scaled-down fixed-height desktop. */
+.mobile-nav-close,
+.mobile-property-section,
+.mobile-calendar-link,
+.calendar-scroll-hint {
+  display: none;
+}
+.calendar-agenda {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+.agenda-main {
+  overflow-y: auto;
+}
+.agenda-day {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.agenda-today {
+  border-color: var(--gold);
+}
+.agenda-day-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--paper);
+  padding: 8px 12px;
+}
+.agenda-day-heading h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+.agenda-stay {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 12px;
+  gap: 12px;
+  text-align: left;
+  border-top: 1px solid var(--line);
+}
+.agenda-stay:hover {
+  background: var(--gold-soft);
+}
+.agenda-stay-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.agenda-stay-copy > span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.agenda-stay-state {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.agenda-empty {
+  padding: 14px 12px;
+  font-size: 13px;
+}
+
+@media (max-width: 800px) {
+  :root {
+    --topbar: 64px;
+    --sidebar: min(300px, calc(100vw - 40px));
+  }
+  .app-shell {
+    height: 100dvh;
+  }
+  .main-shell {
+    min-width: 0;
+    width: 100%;
+  }
+  .app-shell .page-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 14px max(24px, env(safe-area-inset-bottom));
+    scroll-padding-block: 12px;
+  }
+  .app-shell
+    .page-content
+    > :is(.page, .overview-page, .nxops-page, .management-page, .platform-page) {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+    gap: 16px;
+  }
+  .app-shell .page-content > .overview-page {
+    min-height: 0;
+  }
+  .page > *,
+  .nxops-page > *,
+  .management-page > *,
+  .platform-page > * {
+    flex-shrink: 0;
+  }
+  .app-shell .topbar {
+    min-height: var(--topbar);
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  .app-shell .topbar .btn {
+    min-height: 44px;
+    font-size: 13px;
+  }
+  .app-shell .mobile-menu {
+    padding: 10px 12px;
+  }
+  .app-shell .breadcrumb {
+    flex: 1;
+    max-width: none;
+    font-size: 14px;
+    line-height: 1.3;
+    gap: 0;
+  }
+  .breadcrumb > :not(:last-child) {
+    display: none;
+  }
+  .breadcrumb > :last-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .app-shell .header-help {
+    margin-left: 0;
+    width: 44px;
+    padding: 10px;
+    font-size: 0;
+    gap: 0;
+  }
+  .app-shell .notification-wrap {
+    display: block;
+  }
+  .notification-button {
+    width: 44px;
+    padding: 8px;
+  }
+  .notification-menu {
+    position: fixed;
+    top: var(--topbar);
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-height: calc(100dvh - var(--topbar) - 24px);
+    overflow-y: auto;
+    z-index: 25;
+  }
+  .notification-menu button {
+    min-height: 44px;
+  }
+  .app-shell .sidebar {
+    width: var(--sidebar);
+    left: calc(-1 * var(--sidebar) - 12px);
+    height: 100dvh;
+    padding: 12px 16px max(20px, env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+  .app-shell .sidebar.mobile-open {
+    left: 0;
+  }
+  .mobile-nav-close {
+    display: flex;
+    align-self: flex-end;
+    min-height: 44px;
+    background: transparent;
+    color: var(--sidebar-text);
+  }
+  .sidebar .brand {
+    margin-block: 14px 8px;
+  }
+  .app-shell .sidebar nav > button {
+    min-height: 48px;
+    height: auto;
+    font-size: 15px;
+  }
+  .app-shell .sidebar .portfolio-switch {
+    min-height: 44px !important;
+    font-size: 16px;
+    margin: 14px 0 20px;
+  }
+  .sidebar-bottom {
+    padding-top: 24px;
+  }
+  .sidebar-bottom nav {
+    margin-bottom: 12px;
+  }
+  .app-shell .sidebar .owner-profile {
+    min-height: 72px;
+  }
+
+  /* Actions always follow the title; primary actions stay easy to find. */
+  .app-shell .page-header,
+  .app-shell .overview-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    min-height: 0;
+    gap: 14px;
+  }
+  .app-shell .page-header h1,
+  .app-shell .overview-header h1 {
+    font-size: 28px;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .app-shell .page-header p {
+    font-size: 13px;
+    max-width: none;
+    line-height: 1.5;
+  }
+  .app-shell .page-actions {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+    width: 100%;
+    gap: 8px;
+  }
+  .app-shell .page-actions:empty {
+    display: none;
+  }
+  .app-shell .page-actions > :is(.btn, a.btn, select) {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 44px;
+    height: auto;
+    font-size: 13px;
+    padding: 10px 12px;
+    white-space: normal;
+  }
+  .app-shell .page-actions > .btn-primary {
+    flex-basis: 100%;
+    order: -1;
+  }
+  .app-shell .page-actions > .scope-select {
+    display: block;
+    flex-basis: 100%;
+    width: 100%;
+    font-size: 16px;
+  }
+  .app-shell .btn,
+  .app-shell .tabs > button,
+  .app-shell .text-action,
+  .app-shell .nxops-text-link {
+    min-height: 44px;
+    font-size: 13px;
+  }
+  .app-shell .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    min-height: 46px;
+    gap: 4px;
+  }
+  .app-shell .tabs > button {
+    flex: 0 0 auto;
+    padding: 10px 12px;
+  }
+  .app-shell :is(input:not([type='checkbox']):not([type='file']), select, textarea) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .app-shell .search-input {
+    min-height: 44px;
+  }
+  .app-shell .search-input input {
+    min-width: 0;
+    width: 100%;
+  }
+  .app-shell .toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .app-shell .table-scroll {
+    flex: none;
+    max-height: none;
+    overflow: auto;
+  }
+  .app-shell .table-scroll :is(th, td) {
+    padding: 12px;
+    font-size: 13px;
+  }
+  .app-shell .pager {
+    min-height: 48px;
+    font-size: 12px;
+    gap: 8px;
+  }
+  .app-shell .pager .btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: auto;
+    height: auto;
+  }
+  .app-shell .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .app-shell .metrics-grid > .metric {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 126px;
+    height: auto;
+    padding: 14px 12px;
+    gap: 8px;
+  }
+  .app-shell .metric .metric-label {
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 28px;
+    font-size: 12px;
+    line-height: 1.35;
+    gap: 7px;
+    white-space: normal;
+  }
+  .app-shell .metric .metric-label > svg {
+    width: 18px;
+    height: 18px;
+    padding: 4px;
+  }
+  .app-shell .metric > strong,
+  .app-shell .metric:has(.sparkline) > strong {
+    font-size: clamp(21px, 6vw, 27px);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+    max-width: 100%;
+  }
+  .app-shell .metric > small {
+    height: auto;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .app-shell .metric > small > .badge {
+    height: auto;
+    font-size: 10px;
+    padding: 3px 5px;
+  }
+  .occupancy-donut {
+    display: none;
+  }
+
+  /* Overview keeps urgent work compact and makes the calendar reachable. */
+  .app-shell .overview-page {
+    display: flex;
+    flex-direction: column;
+  }
+  .app-shell .overview-middle {
+    display: block;
+  }
+  .app-shell .overview-page .attention-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .app-shell .overview-page .attention-panel > .panel-heading {
+    min-height: 44px;
+    padding: 10px 0;
+  }
+  .app-shell .overview-page .attention-panel h2 {
+    font-size: 19px;
+  }
+  .app-shell .overview-page .attention-item {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px 0;
+  }
+  .app-shell .overview-page .attention-actions {
+    grid-column: 2;
+  }
+  .app-shell .overview-page .attention-copy > strong {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .app-shell .overview-page .attention-copy > .attention-metadata {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .app-shell .overview-page .attention-actions > .btn {
+    width: auto;
+    min-height: 44px;
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+  .app-shell .attention-clear > .panel-heading {
+    display: none;
+  }
+  .app-shell .attention-clear > .empty {
+    display: block;
+    flex: none;
+    padding: 14px 0 4px;
+    min-height: 0;
+    text-align: left;
+  }
+  .attention-clear > .empty > svg {
+    display: none;
+  }
+  .attention-clear > .empty > h3 {
+    font-size: 15px;
+  }
+  .attention-clear > .empty > p {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .app-shell .overview-page .inbox-shortcut {
+    height: auto;
+    min-height: 54px;
+    margin: 4px 0 12px;
+    padding: 8px;
+  }
+  .app-shell .overview-page .inbox-shortcut strong {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .app-shell .overview-page .inbox-shortcut p {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .app-shell .overview-page .today-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mobile-calendar-link {
+    display: block;
+  }
+  .mobile-calendar-link .btn {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .mobile-calendar-link .btn svg:last-child {
+    margin-left: auto;
+  }
+  .app-shell .overview-page .today-heading {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .app-shell .overview-page .today-heading h2 {
+    font-size: 22px;
+  }
+  .app-shell .overview-page .today-heading .btn {
+    font-size: 12px;
+    min-height: 44px;
+  }
+  .app-shell .overview-page .activity-toolbar {
+    flex-wrap: wrap;
+  }
+  .app-shell .overview-page .activity-tabs {
+    height: auto;
+  }
+  .app-shell .overview-page .activity-tabs > button {
+    min-height: 44px;
+    font-size: 12px;
+    padding: 9px;
+    gap: 5px;
+  }
+  .app-shell .overview-page .arrival-card {
+    min-height: 170px;
+    padding: 12px;
+    grid-template-columns: 25% minmax(0, 1fr);
+  }
+  .app-shell .overview-page .arrival-info {
+    grid-template-rows: auto auto auto;
+    gap: 10px;
+  }
+  .app-shell .overview-page .arrival-identity {
+    grid-template-columns: 1fr;
+  }
+  .app-shell .overview-page .arrival-identity > .avatar {
+    display: none;
+  }
+  .app-shell .overview-page .arrival-guest-copy > strong {
+    font-size: 15px;
+    line-height: 1.3;
+    white-space: normal;
+  }
+  .app-shell .overview-page .arrival-guest-copy > p,
+  .app-shell .overview-page .arrival-guest-copy > small {
+    white-space: normal;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .app-shell .overview-page .arrival-status-row > small {
+    font-size: 12px;
+  }
+  .app-shell .overview-page .arrival-open {
+    min-height: 44px;
+    font-size: 13px;
+  }
+  .app-shell .overview-page .page-footnote {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .app-shell .property-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0;
+  }
+  .app-shell .property-summary > span {
+    min-height: 75px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 12px;
+    font-size: 12px;
+    gap: 6px;
+    justify-content: flex-start;
+  }
+  .app-shell .property-summary > span:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+  .app-shell .property-summary strong {
+    font-size: 24px;
+  }
+  .app-shell .properties-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    height: auto;
+    padding: 0 0 10px;
+  }
+  .app-shell .properties-navigation .properties-section-links,
+  .app-shell .properties-navigation .unit-more-nav {
+    display: none;
+  }
+  .mobile-property-section {
+    display: block;
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .app-shell .property-unit-switch {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
+  }
+  .app-shell .properties-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .app-shell .properties-toolbar .search-input {
+    grid-column: 1/-1;
+    max-width: none;
+    width: 100%;
+  }
+  .app-shell .properties-toolbar select {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+  .app-shell .property-grid {
+    display: grid;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    gap: 16px;
+    flex: none;
+  }
+  .app-shell .property-card {
+    min-height: 0;
+    height: auto;
+    grid-template-rows: auto auto;
+  }
+  .app-shell .property-card-media {
+    min-height: 140px;
+    height: 160px;
+  }
+  .app-shell .property-card-content {
+    gap: 10px;
+    padding: 14px;
+  }
+  .app-shell .property-card h2 {
+    font-size: 23px;
+  }
+  .app-shell .property-card p {
+    font-size: 13px;
+  }
+  .app-shell .property-card .badge {
+    font-size: 11px;
+  }
+  .app-shell .property-occupancy-row {
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+  .app-shell .property-card-menu summary {
+    min-width: 44px;
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+  }
+  .app-shell .property-open-button {
+    font-size: 14px;
+    min-height: 44px;
+  }
+
+  .calendar-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .app-shell .calendar-toolbar .scope-select {
+    width: 100%;
+  }
+  .app-shell .calendar-toolbar .row {
+    flex-wrap: wrap;
+    font-size: 13px;
+    gap: 4px;
+  }
+  .app-shell .calendar-toolbar .row .btn {
+    min-height: 44px;
+    min-width: 44px;
+    font-size: 13px;
+  }
+  .app-shell .calendar-toolbar .row strong {
+    flex: 1;
+    text-align: center;
+  }
+  .app-shell .calendar-toolbar .tabs {
+    width: 100%;
+    margin: 0;
+  }
+  .app-shell .calendar-toolbar .tabs > button {
+    flex: 1;
+    min-height: 44px;
+    font-size: 13px;
+    padding: 10px;
+  }
+  .app-shell .calendar-main {
+    flex: none;
+    overflow: hidden;
+  }
+  .app-shell .agenda-main {
+    overflow: visible;
+  }
+  .calendar-agenda {
+    gap: 12px;
+    padding: 10px;
+  }
+  .agenda-day-heading {
+    padding: 8px 10px;
+  }
+  .agenda-day-heading h2 {
+    font-size: 14px;
+  }
+  .agenda-stay {
+    flex-wrap: wrap;
+    padding: 14px 10px;
+  }
+  .agenda-stay-copy {
+    flex: 1 1 140px;
+  }
+  .agenda-stay-state {
+    margin-left: auto;
+  }
+  .calendar-scroll-hint {
+    display: block;
+    padding: 12px;
+    font-size: 12px;
+  }
+  .app-shell .calendar-page .booking-grid {
+    --calendar-unit-width: 126px;
+    min-width: 620px;
+  }
+  .app-shell .calendar-page .calendar-scroll {
+    max-height: 60dvh;
+    min-height: 180px;
+  }
+  .app-shell .calendar-page .label-col {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: var(--surface);
+    box-shadow: 2px 0 3px #0000000d;
+  }
+  .app-shell .calendar-page .unit-grid-label {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+    min-height: 54px;
+    padding: 8px;
+  }
+  .app-shell .calendar-page .calendar-cell {
+    min-height: 54px;
+  }
+  .app-shell .calendar-page .booking-bar {
+    min-height: 44px;
+    height: 44px;
+    font-size: 12px;
+  }
+  .app-shell .calendar-page .property-group-row {
+    height: auto;
+    min-height: 44px;
+  }
+  .app-shell .calendar-legend {
+    font-size: 12px;
+    gap: 12px;
+  }
+
+  /* Phone panels grow with content, including when a keyboard reduces height. */
+  .app-shell
+    :is(
+      .mg-reports-content,
+      .mg-finance-grid,
+      .nxops-work-layout,
+      .nxops-board-grid,
+      .nxops-inbox-layout
+    ) {
+    flex: none;
+    height: auto;
+    min-height: 0;
+  }
+  .app-shell .nxops-board-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-shell .nxops-board-column {
+    min-height: 180px;
+  }
+  .app-shell .nxops-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .app-shell .nxops-stat {
+    min-height: 72px;
+    font-size: 13px;
+  }
+  .app-shell .nxops-stat span {
+    font-size: 12px;
+  }
+  .app-shell .nxops-stat strong {
+    font-size: 23px;
+  }
+  .app-shell .nxops-task-actions button {
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .app-shell .nxops-work-aside {
+    display: flex;
+    margin-top: 12px;
+  }
+  .app-shell .nxops-inbox-layout {
+    display: block;
+  }
+  .app-shell .nxops-thread-list,
+  .app-shell .nxops-conversation {
+    height: auto;
+  }
+  .app-shell
+    .platform-inbox
+    .nxops-inbox-layout:not(.nxops-mobile-conversation)
+    .nxops-conversation {
+    display: none;
+  }
+  .app-shell .platform-inbox .nxops-mobile-conversation .nxops-thread-list {
+    display: none;
+  }
+  .app-shell .platform-inbox .nxops-mobile-conversation .nxops-conversation {
+    display: flex;
+  }
+  .app-shell .platform-back-to-inbox {
+    display: inline-flex;
+  }
+  .app-shell .nxops-reservation-aside {
+    display: none;
+  }
+  .app-shell .nxops-message-feed {
+    flex: none;
+    min-height: 120px;
+  }
+  .app-shell .nxops-conversation-header h2 {
+    white-space: normal;
+    font-size: 19px;
+  }
+  .app-shell .nxops-thread {
+    min-height: 88px;
+  }
+  .app-shell .nxops-thread-copy strong {
+    font-size: 15px;
+  }
+  .app-shell .nxops-thread-copy > span {
+    font-size: 12px;
+  }
+  .app-shell .nxops-message-bubble {
+    font-size: 14px;
+  }
+  .app-shell .nxops-composer textarea {
+    min-height: 100px;
+    font-size: 16px;
+  }
+  .app-shell .unit-header .page-actions {
+    margin: 0;
+  }
+  .app-shell .unit-header h1 {
+    white-space: normal;
+    font-size: 24px;
+  }
+  .app-shell .unit-details {
+    grid-template-rows: auto auto;
+  }
+  .app-shell .unit-details > .property-photo {
+    min-height: 150px;
+  }
+  .app-shell .unit-guide-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  .app-shell .unit-map-view {
+    min-height: 240px;
+  }
+  .app-shell .instructions-panel p,
+  .app-shell .instruction-copy ol li:nth-child(n + 4) {
+    display: block;
+  }
+  .app-shell .instruction-copy p,
+  .app-shell .instruction-copy ol {
+    font-size: 13px;
+  }
+  .record-dialog .field > :is(input, select, textarea),
+  .platform-dialog :is(input, select, textarea) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .record-dialog .btn,
+  .platform-dialog .btn {
+    min-height: 44px;
+    font-size: 13px;
+  }
+  .record-dialog .field {
+    font-size: 13px;
+  }
+  .app-shell .mg-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .app-shell .calendar-main {
+    flex-direction: column;
+  }
+  .app-shell .management-page .page-header > .page-actions:not(:empty) {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: auto;
+  }
+  .app-shell .page-actions > .nxops-header-controls {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .app-shell .nxops-header-controls > .nxops-unit-select {
+    width: 100%;
+  }
+  .app-shell .nxops-header-controls select {
+    width: 100%;
+    max-width: none;
+  }
+  .app-shell .nxops-header-controls > .btn {
+    flex: 1;
+    min-height: 44px;
+  }
+  .mobile-operations-view {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .mobile-operations-view select {
+    flex: 1;
+    min-width: 0;
+  }
+  .app-shell .metric:has(.occupancy-donut) > strong {
+    max-width: 100%;
+  }
+  .app-shell .mg-period {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+  .app-shell .mg-period select {
+    flex: 1;
+  }
+}
+@media (max-width: 800px) {
+  .app-shell .topbar .header-help {
+    font-size: 0;
+  }
+  .app-shell .page-actions > .btn.btn-primary {
+    flex-basis: 100%;
+    order: -1;
+  }
+  .app-shell .overview-header .page-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .app-shell .overview-header .page-actions > .btn-primary {
+    grid-column: 1/-1;
+  }
+  .app-shell .overview-page > .overview-header {
+    order: 0;
+  }
+  .app-shell .overview-page > .metrics-grid {
+    order: 1;
+  }
+  .app-shell .overview-page > .overview-middle {
+    order: 2;
+  }
+  .app-shell .overview-page > .today-section {
+    order: 3;
+  }
+  .app-shell .overview-page > .overview-middle:has(.attention-clear) {
+    order: 4;
+  }
+  .app-shell .overview-page > .page-footnote {
+    order: 5;
+  }
+}
