@@ -6584,6 +6584,25 @@ export type Database = {
         };
         Relationships: [];
       };
+      category_tile_click: {
+        Row: {
+          clicks: number;
+          day: string;
+          tile: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          clicks?: number;
+          day?: string;
+          tile: string;
+        };
+        Update: {
+          clicks?: number;
+          day?: string;
+          tile?: string;
+        };
+        Relationships: [];
+      };
       city: {
         Row: {
           centre: unknown;
@@ -24720,6 +24739,7 @@ export type Database = {
           point: unknown;
           slug: string;
           summary: string | null;
+          unlisted_by_staff_at: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -24747,6 +24767,7 @@ export type Database = {
           point?: unknown;
           slug: string;
           summary?: string | null;
+          unlisted_by_staff_at?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -24773,6 +24794,7 @@ export type Database = {
           point?: unknown;
           slug?: string;
           summary?: string | null;
+          unlisted_by_staff_at?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -30593,6 +30615,7 @@ export type Database = {
           sent_at: string | null;
           source: string;
           status: Database['public']['Enums']['stay_request_status'];
+          ticket_id: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -30620,6 +30643,7 @@ export type Database = {
           sent_at?: string | null;
           source?: string;
           status?: Database['public']['Enums']['stay_request_status'];
+          ticket_id?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -30646,6 +30670,7 @@ export type Database = {
           sent_at?: string | null;
           source?: string;
           status?: Database['public']['Enums']['stay_request_status'];
+          ticket_id?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -30725,6 +30750,34 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'waitlist_city_v';
             referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_ticket_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_ticket_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_ticket_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'support_ticket';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -48242,6 +48295,7 @@ export type Database = {
         Returns: boolean;
       };
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
+      fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
       fn_match_deposit: {
@@ -48807,6 +48861,7 @@ export type Database = {
       fn_tax_issue_order_compliant: { Args: { p_order_id: string }; Returns: number };
       fn_tax_next_number: { Args: { p_at?: string }; Returns: string };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
+      fn_unit_listing_ready: { Args: { p_unit_id: string }; Returns: boolean };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
       fn_wa_window: { Args: { p_conversation: string }; Returns: Json };
       fn_web_order_quote: { Args: { p_payload: Json }; Returns: Json };
@@ -49690,6 +49745,14 @@ export type Database = {
         };
       };
       rpc_category_config_save: { Args: { p_category: string; p_config: Json }; Returns: Json };
+      rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
+      rpc_category_tile_popularity: {
+        Args: { p_days?: number };
+        Returns: {
+          clicks: number;
+          tile: string;
+        }[];
+      };
       rpc_change_block: {
         Args: { p_block_id: string; p_note: string; p_patch: Json };
         Returns: {
@@ -53849,6 +53912,7 @@ export type Database = {
           point: unknown;
           slug: string;
           summary: string | null;
+          unlisted_by_staff_at: string | null;
           updated_at: string;
         };
         SetofOptions: {
@@ -53884,6 +53948,7 @@ export type Database = {
           point: unknown;
           slug: string;
           summary: string | null;
+          unlisted_by_staff_at: string | null;
           updated_at: string;
         };
         SetofOptions: {
@@ -53919,6 +53984,7 @@ export type Database = {
           point: unknown;
           slug: string;
           summary: string | null;
+          unlisted_by_staff_at: string | null;
           updated_at: string;
         };
         SetofOptions: {
@@ -55641,11 +55707,6 @@ export type Database = {
           unit: string;
         }[];
       };
-      rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
-      rpc_category_tile_popularity: {
-        Args: { p_days?: number };
-        Returns: { clicks: number; tile: string }[];
-      };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
         Args: {
@@ -55704,6 +55765,7 @@ export type Database = {
           sent_at: string | null;
           source: string;
           status: Database['public']['Enums']['stay_request_status'];
+          ticket_id: string | null;
           updated_at: string;
         };
         SetofOptions: {
