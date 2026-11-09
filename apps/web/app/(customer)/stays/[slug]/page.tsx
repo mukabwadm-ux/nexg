@@ -4,7 +4,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { PhotoSlot, bedroomLabel, KIND_LABEL, rateLabel } from '@/components/stays/listing';
+import {
+  PhotoSlot,
+  SampleChip,
+  bedroomLabel,
+  KIND_LABEL,
+  rateLabel,
+} from '@/components/stays/listing';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -21,7 +27,7 @@ interface PropertyRow {
   summary: string | null;
   description: string | null;
   amenities: string[];
-  photos: { caption?: string }[];
+  photos: { caption?: string; src?: string }[];
   neighbourhood_note: string | null;
   check_in_from: string | null;
   check_out_by: string | null;
@@ -30,6 +36,7 @@ interface PropertyRow {
   bedrooms_max: number | null;
   sleeps_max: number | null;
   from_rate_kes: number | null;
+  is_sample: boolean;
 }
 
 interface UnitRow {
@@ -45,7 +52,7 @@ interface UnitRow {
   nightly_rate_kes: number | null;
   min_nights: number;
   unit_amenities: string[];
-  photos: { caption?: string }[];
+  photos: { caption?: string; src?: string }[];
   floor: string | null;
   handoff_arranged: boolean;
 }
@@ -98,7 +105,9 @@ export default async function PropertyPage({ params }: { params: { slug: string 
     .order('nightly_rate_kes', { nullsFirst: false });
 
   const list = (units as UnitRow[] | null) ?? [];
-  const bookable = list.some((u) => u.nightly_rate_kes !== null);
+  /* A sample listing shows how a stay looks; it is never bookable. */
+  const sample = p.is_sample === true;
+  const bookable = !sample && list.some((u) => u.nightly_rate_kes !== null);
 
   return (
     <>
@@ -121,6 +130,9 @@ export default async function PropertyPage({ params }: { params: { slug: string 
           <PhotoSlot
             seed={p.slug}
             caption={p.photos[0]?.caption}
+            src={p.photos[0]?.src}
+            sizes="(min-width: 640px) 66vw, 100vw"
+            priority
             className="h-56 w-full rounded-xl sm:row-span-2 sm:h-full sm:min-h-[20rem]"
           />
           {[1, 2].map((i) => (
@@ -128,6 +140,8 @@ export default async function PropertyPage({ params }: { params: { slug: string 
               key={i}
               seed={`${p.slug}-${i}`}
               caption={p.photos[i]?.caption}
+              src={p.photos[i]?.src}
+              sizes="33vw"
               className="hidden h-full min-h-[9.5rem] w-full rounded-xl sm:block"
             />
           ))}
@@ -139,6 +153,7 @@ export default async function PropertyPage({ params }: { params: { slug: string 
               <span className="border-border-strong text-muted rounded-full border px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide">
                 {KIND_LABEL[p.kind] ?? p.kind}
               </span>
+              {sample && <SampleChip />}
               <span className="text-muted-light inline-flex items-center gap-1 text-[0.75rem] font-semibold">
                 <MapPin aria-hidden="true" className="h-3.5 w-3.5" />
                 {p.area ?? p.city_name}
@@ -209,6 +224,8 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                     <PhotoSlot
                       seed={u.id}
                       caption={u.photos[0]?.caption}
+                      src={u.photos[0]?.src}
+                      sizes="(min-width: 640px) 13rem, 100vw"
                       className="h-36 w-full sm:h-full sm:min-h-[10rem]"
                     />
                     <div className="p-4 pt-0 sm:py-4 sm:pl-0 sm:pr-5">
@@ -281,7 +298,7 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                       )}
 
                       <div className="mt-4 flex flex-wrap gap-2">
-                        {u.nightly_rate_kes !== null && (
+                        {!sample && u.nightly_rate_kes !== null && (
                           <Button asChild size="sm">
                             <Link href={`/stays/${p.slug}/book?unit=${u.id}`}>Book this unit</Link>
                           </Button>
@@ -311,7 +328,17 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                 <p className="text-muted-light text-[0.75rem] font-semibold">per night</p>
               )}
 
-              {bookable ? (
+              {sample ? (
+                <>
+                  <p className="text-muted mt-4 text-[0.8125rem] font-semibold leading-[1.75]">
+                    This is a sample listing that shows how stays look on NexG. It cannot be booked.
+                    Tell us what you need and we will come back with real places that fit.
+                  </p>
+                  <Button asChild className="mt-4 w-full">
+                    <Link href="/stays#tailor">Find me a stay</Link>
+                  </Button>
+                </>
+              ) : bookable ? (
                 <>
                   <p className="text-muted mt-4 text-[0.8125rem] font-semibold leading-[1.75]">
                     Pick your dates, see what is free, and book instantly with M-Pesa.

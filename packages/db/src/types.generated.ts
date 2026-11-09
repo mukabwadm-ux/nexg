@@ -24709,6 +24709,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -24735,6 +24736,7 @@ export type Database = {
           floors?: number | null;
           host_id: string;
           id?: string;
+          is_sample?: boolean;
           kind?: Database['public']['Enums']['property_kind'];
           listed?: boolean;
           listed_at?: string | null;
@@ -24760,6 +24762,7 @@ export type Database = {
           floors?: number | null;
           host_id?: string;
           id?: string;
+          is_sample?: boolean;
           kind?: Database['public']['Enums']['property_kind'];
           listed?: boolean;
           listed_at?: string | null;
@@ -44519,6 +44522,7 @@ export type Database = {
           description: string | null;
           from_rate_kes: number | null;
           id: string | null;
+          is_sample: boolean | null;
           kind: Database['public']['Enums']['property_kind'] | null;
           name: string | null;
           neighbourhood_note: string | null;
@@ -44612,6 +44616,7 @@ export type Database = {
           floor: string | null;
           handoff_arranged: boolean | null;
           id: string | null;
+          is_sample: boolean | null;
           label_public: string | null;
           max_guests: number | null;
           min_nights: number | null;
@@ -53833,6 +53838,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -53867,6 +53873,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -53901,6 +53908,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
