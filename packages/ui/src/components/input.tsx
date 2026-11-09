@@ -1,5 +1,6 @@
 'use client';
 
+import { Eye, EyeOff } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '../lib/cn';
@@ -32,10 +33,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
     containerClassName,
     required,
     disabled,
+    type,
     ...props
   },
   ref,
 ) {
+  /* Every password field gets an eye button to show what was typed. */
+  const isPassword = type === 'password';
+  const [revealed, setRevealed] = React.useState(false);
+  const toggle = isPassword && !loading;
+
   return (
     <Field
       id={id}
@@ -58,6 +65,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
         <input
           ref={ref}
           id={id}
+          type={isPassword && revealed ? 'text' : type}
           disabled={disabled || loading}
           required={required}
           aria-invalid={error ? true : undefined}
@@ -67,12 +75,31 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
             error ? 'border-danger focus:ring-danger' : 'border-border-strong',
             leadingIcon && 'pl-9',
             loading && 'pr-9',
+            toggle && 'pr-11',
             className,
           )}
           {...props}
         />
         {loading && (
           <Spinner className="text-muted-light absolute right-3 top-1/2 -translate-y-1/2" />
+        )}
+        {toggle && (
+          <button
+            type="button"
+            onClick={() => setRevealed((value) => !value)}
+            disabled={disabled}
+            aria-label={revealed ? 'Hide password' : 'Show password'}
+            aria-pressed={revealed}
+            aria-controls={id}
+            title={revealed ? 'Hide password' : 'Show password'}
+            className="text-muted hover:text-ink focus-visible:ring-ink absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50"
+          >
+            {revealed ? (
+              <EyeOff className="h-[18px] w-[18px]" aria-hidden="true" />
+            ) : (
+              <Eye className="h-[18px] w-[18px]" aria-hidden="true" />
+            )}
+          </button>
         )}
       </div>
     </Field>
