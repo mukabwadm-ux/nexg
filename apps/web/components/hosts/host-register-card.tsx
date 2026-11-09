@@ -1,11 +1,22 @@
 'use client';
 
 import { Button, ChipGroup, Input, PhoneInput, useToast } from '@nexg/ui';
-import { ArrowRight, CheckCircle2, Mail, RefreshCw } from 'lucide-react';
+import {
+  ArrowRight,
+  Bath,
+  BedDouble,
+  CheckCircle2,
+  Mail,
+  RefreshCw,
+  Star,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
 import { applyAsHost } from '@/app/(customer)/hosts/actions';
+import { previewAirbnbListing } from '@/app/(customer)/hosts/listing-actions';
+import { parseAirbnbUrl, type AirbnbListing } from '@/lib/airbnb-listing';
 import { sendHostPasswordSetupLink } from '@/app/(customer)/sign-in/actions';
 import {
   CODE_PATTERN,
@@ -51,7 +62,133 @@ type Done = {
   welcome: 'sending' | 'waiting' | 'sent' | 'failed';
   message?: string;
   wait?: number;
+  imported?: { property: boolean; photo: boolean };
 };
+
+type Preview =
+  | { kind: 'idle' }
+  | { kind: 'loading' }
+  | { kind: 'ready'; listing: AirbnbListing }
+  | { kind: 'error'; message: string };
+
+function plural(n: number, one: string, many: string) {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+/* "Is this your listing?": what we read from the Airbnb link. */
+function ListingCard({
+  listing,
+  confirmed,
+  consent,
+  onConfirm,
+  onReject,
+  onConsent,
+}: {
+  listing: AirbnbListing;
+  confirmed: boolean;
+  consent: boolean;
+  onConfirm: () => void;
+  onReject: () => void;
+  onConsent: (value: boolean) => void;
+}) {
+  const facts = [
+    listing.bedrooms !== null
+      ? {
+          icon: BedDouble,
+          text: listing.bedrooms === 0 ? 'Studio' : plural(listing.bedrooms, 'bedroom', 'bedrooms'),
+        }
+      : null,
+    listing.bathrooms !== null
+      ? { icon: Bath, text: plural(listing.bathrooms, 'bath', 'baths') }
+      : null,
+    listing.maxGuests !== null
+      ? { icon: Users, text: plural(listing.maxGuests, 'guest', 'guests') }
+      : null,
+    listing.rating !== null
+      ? { icon: Star, text: listing.rating.toFixed(2).replace(/0$/, '') }
+      : null,
+  ].filter(Boolean) as { icon: typeof Bath; text: string }[];
+
+  return (
+    <div
+      className={`mt-3 overflow-hidden rounded-xl border transition-colors ${
+        confirmed ? 'border-[#1F7A3A] bg-[#F3FAF5]' : 'border-[#ECE6D8] bg-[#FBF9F4]'
+      }`}
+    >
+      <div className="flex gap-3 p-3">
+        {listing.photoUrl ? (
+          // Airbnb's own preview image, shown as-is; it is copied only on submit, with consent.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={listing.photoUrl}
+            alt=""
+            className="h-20 w-24 shrink-0 rounded-lg object-cover sm:h-24 sm:w-32"
+            referrerPolicy="no-referrer"
+          />
+        ) : null}
+        <div className="min-w-0">
+          <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.1em] text-[#8A6A12]">
+            {confirmed ? 'Your Airbnb listing' : 'Is this your listing?'}
+          </p>
+          <p className="mt-0.5 truncate text-[0.9375rem] font-extrabold text-[#141414]">
+            {listing.name ?? 'Airbnb listing'}
+          </p>
+          <p className="text-[0.8125rem] font-semibold text-[#5B5548]">
+            {[listing.typeLabel, listing.city].filter(Boolean).join(' · ')}
+          </p>
+          <ul className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
+            {facts.map(({ icon: Icon, text }) => (
+              <li
+                key={text}
+                className="flex items-center gap-1 text-[0.75rem] font-bold text-[#3A352B]"
+              >
+                <Icon className="h-3.5 w-3.5 text-[#8A6A12]" aria-hidden="true" />
+                {text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="border-t border-[#ECE6D8] px-3 py-2.5">
+        {confirmed ? (
+          <div className="space-y-2">
+            <p className="flex items-center gap-1.5 text-[0.8125rem] font-bold text-[#1F7A3A]">
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> We will set up your property
+              and first unit from this listing.
+            </p>
+            {listing.photoUrl ? (
+              <label className="flex items-start gap-2 text-[0.8125rem] font-semibold text-[#3A352B]">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 accent-[#141414]"
+                  checked={consent}
+                  onChange={(event) => onConsent(event.target.checked)}
+                />
+                Also copy the cover photo. I own it or have the right to use it.
+              </label>
+            ) : null}
+            <button
+              type="button"
+              onClick={onReject}
+              className="text-[0.8125rem] font-extrabold text-[#5B5548] underline-offset-4 hover:underline"
+            >
+              Don’t use this listing
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" className="h-9" onClick={onConfirm}>
+              Yes, use it
+            </Button>
+            <Button type="button" variant="outline" className="h-9" onClick={onReject}>
+              Not mine
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const errorText = (error: unknown, fallback: string) =>
   error instanceof HostEmailError ? error.message : fallback;
@@ -81,6 +218,35 @@ export function HostRegisterCard() {
   const [listing, setListing] = React.useState('');
   const [address, setAddress] = React.useState('');
   const [band, setBand] = React.useState<string | null>('1');
+  const [preview, setPreview] = React.useState<Preview>({ kind: 'idle' });
+  const [listingConfirmed, setListingConfirmed] = React.useState(false);
+  const [photoConsent, setPhotoConsent] = React.useState(false);
+
+  /* Read the Airbnb listing shortly after a link is pasted or typed. Each
+     link change starts over: the card and the confirmation belong to it. */
+  React.useEffect(() => {
+    setListingConfirmed(false);
+    setPhotoConsent(false);
+    if (!parseAirbnbUrl(listing)) {
+      setPreview({ kind: 'idle' });
+      return;
+    }
+    let current = true;
+    const timer = setTimeout(async () => {
+      setPreview({ kind: 'loading' });
+      const result = await previewAirbnbListing(listing.trim());
+      if (!current) return;
+      setPreview(
+        result.ok
+          ? { kind: 'ready', listing: result.listing }
+          : { kind: 'error', message: result.message },
+      );
+    }, 600);
+    return () => {
+      current = false;
+      clearTimeout(timer);
+    };
+  }, [listing]);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [emailState, setEmailState] = React.useState<EmailState>({ kind: 'idle' });
   const [code, setCode] = React.useState('');
@@ -188,6 +354,8 @@ export function HostRegisterCard() {
         listing_link: listing.trim() || null,
         address: address.trim(),
         units_band: band ?? '1',
+        import_listing: preview.kind === 'ready' && listingConfirmed,
+        photo_consent: preview.kind === 'ready' && listingConfirmed && photoConsent,
       });
       if (!result.ok) {
         toast({ title: 'That did not save', description: result.message });
@@ -197,6 +365,7 @@ export function HostRegisterCard() {
         email: loginEmail,
         welcome: 'sending',
         ...(result.ticketReference ? { reference: result.ticketReference } : {}),
+        ...(result.imported ? { imported: result.imported } : {}),
       };
       setDone(base);
       void sendWelcome(base, lastEmailAt);
@@ -238,6 +407,14 @@ export function HostRegisterCard() {
             )}
           </span>
         </div>
+
+        {done.imported?.property ? (
+          <p className="mt-4 flex items-start gap-2 rounded-xl bg-[#F3FAF5] p-3 text-sm font-semibold leading-[1.6] text-[#1F5B33]">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            Your property and first unit are set up from your Airbnb listing
+            {done.imported.photo ? ', cover photo included' : ''}. Check them in your workspace.
+          </p>
+        ) : null}
 
         <ol className="mt-5 space-y-2 text-sm font-semibold leading-[1.7] text-[#3A352B]">
           <li>1. Open your host workspace. You are already signed in on this device.</li>
@@ -395,7 +572,38 @@ export function HostRegisterCard() {
       </Section>
 
       <Section n={2} title="Your first unit">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <Input
+          id="host_listing"
+          label="Airbnb listing link (optional)"
+          placeholder="airbnb.com/rooms/…"
+          inputMode="url"
+          value={listing}
+          onChange={(event) => setListing(event.target.value)}
+        />
+        <p className="mt-1.5 text-[0.75rem] font-semibold text-[#8A8A8A]">
+          Paste it and we fill in your property and unit for you.
+        </p>
+        {preview.kind === 'loading' ? (
+          <p role="status" className="mt-2 text-[0.8125rem] font-semibold text-[#5B5548]">
+            Reading your listing…
+          </p>
+        ) : preview.kind === 'error' ? (
+          <p className="mt-2 text-[0.8125rem] font-semibold text-[#8A6A12]">{preview.message}</p>
+        ) : preview.kind === 'ready' ? (
+          <ListingCard
+            listing={preview.listing}
+            confirmed={listingConfirmed}
+            consent={photoConsent}
+            onConfirm={() => setListingConfirmed(true)}
+            onReject={() => {
+              setListing('');
+              setPreview({ kind: 'idle' });
+            }}
+            onConsent={setPhotoConsent}
+          />
+        ) : null}
+
+        <div className="mt-4">
           <Input
             id="host_address"
             label="Unit address"
@@ -404,13 +612,9 @@ export function HostRegisterCard() {
             onChange={(event) => setAddress(event.target.value)}
             {...(errors['address'] ? { error: errors['address'] } : {})}
           />
-          <Input
-            id="host_listing"
-            label="Listing link (optional)"
-            placeholder="airbnb.com/rooms/…"
-            value={listing}
-            onChange={(event) => setListing(event.target.value)}
-          />
+          <p className="mt-1.5 text-[0.75rem] font-semibold text-[#8A8A8A]">
+            The exact address riders deliver to. Airbnb does not share it, so we ask.
+          </p>
         </div>
 
         <div className="mt-5">

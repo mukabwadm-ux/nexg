@@ -7,7 +7,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(23);
+select plan(25);
 
 create temp table t (k text primary key, v text);
 do $grant$
@@ -120,7 +120,10 @@ select set_config('request.jwt.claims',
 select lives_ok(
   $$ select public.rpc_host_apply(jsonb_build_object(
        'contact_name','[Second business]','phone','+254700045001',
-       'address','[Address], Westlands')) $$,
+       'address','[Address], Westlands',
+       'listing', jsonb_build_object('airbnb_id','1018163117538277685',
+         'name','Stylish 2 Bedroom apartment in Kilimani','kind','apartment',
+         'bedrooms',2,'bathrooms',1.5,'max_guests',4))) $$,
   'Another login can register a host with a phone number that is already used, and without '
   'a hand-off rule: the form no longer asks; it is set per unit in the workspace.');
 
@@ -141,6 +144,20 @@ select is(
   (select array_agg(email order by email) from public.host where phone = '+254700045001'),
   array['host45@example.test', 'other45@example.test'],
   'Both hosts share the phone, each with its own login email; neither was overwritten.');
+
+/* The second applicant imported their Airbnb listing. */
+select is(
+  (select p.name || ' / ' || p.kind::text from public.property p
+     join public.host h on h.id = p.host_id where h.email = 'other45@example.test'),
+  'Stylish 2 Bedroom apartment in Kilimani / apartment',
+  'An imported listing becomes the first property, named as on Airbnb.');
+
+select is(
+  (select u.bedrooms::text || '/' || u.bathrooms::text || '/' || u.max_guests::text
+          || '/' || (u.property_id is not null)::text
+     from public.unit u join public.host h on h.id = u.host_id where h.email = 'other45@example.test'),
+  '2/1.5/4/true',
+  'And the first unit carries its room counts and sits in that property, so nothing is typed twice.');
 
 -- ══════════════════════════════════ 2. locked until NexG approves the host
 
