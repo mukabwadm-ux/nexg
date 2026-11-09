@@ -18,17 +18,20 @@ export async function GET(request: NextRequest) {
   const tokenHash = request.nextUrl.searchParams.get('token_hash');
   const type = request.nextUrl.searchParams.get('type');
   const next = safeAuthNext(request.nextUrl.searchParams.get('next'));
+  /* The origin the browser used (Host header), so the session cookie set
+     here and the page it lands on share a host. */
+  const origin = `${request.nextUrl.protocol}//${request.headers.get('host') ?? request.nextUrl.host}`;
 
   if (!tokenHash || type !== 'recovery') {
-    return NextResponse.redirect(new URL(INVALID_LINK_PATH, request.url));
+    return NextResponse.redirect(new URL(INVALID_LINK_PATH, origin));
   }
 
   const supabase = createClient();
   const { error } = await supabase.auth.verifyOtp({ type: 'recovery', token_hash: tokenHash });
 
   if (error) {
-    return NextResponse.redirect(new URL(INVALID_LINK_PATH, request.url));
+    return NextResponse.redirect(new URL(INVALID_LINK_PATH, origin));
   }
 
-  return NextResponse.redirect(new URL(next, request.url));
+  return NextResponse.redirect(new URL(next, origin));
 }

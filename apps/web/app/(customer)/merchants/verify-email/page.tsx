@@ -55,7 +55,7 @@ export default async function VerifyMerchantEmail() {
 
   const client = createClient();
   const { data: auth, error } = await client.auth.getUser();
-  if (error || !auth.user) redirect('/sign-in?role=merchant&next=%2Fmerchant');
+  if (error || !auth.user) redirect('/merchants/sign-in?next=%2Fmerchant');
   if (!auth.user.is_anonymous) redirect('/merchant');
 
   const { data: home, error: homeError } = await client.rpc('fn_partner_home');

@@ -254,7 +254,7 @@ export function MerchantShell({
                   Guest preview
                 </span>
                 <Link
-                  href="/sign-in"
+                  href="/merchants/sign-in"
                   className="text-muted hover:text-ink text-[0.75rem] font-extrabold"
                 >
                   Exit

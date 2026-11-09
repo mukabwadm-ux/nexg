@@ -307,6 +307,22 @@ message_service_sid = ""
 # DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
 auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
 
+# Google and Apple sign-in for customers (apps/web/components/auth/social-sign-in.tsx).
+# Off until the provider accounts exist. To test locally, uncomment a block, put the
+# credentials in supabase/.env (never in git), and restart the local stack. The provider's
+# redirect URI must include http://127.0.0.1:54321/auth/v1/callback, and the web app needs
+# NEXT_PUBLIC_AUTH_GOOGLE=on / NEXT_PUBLIC_AUTH_APPLE=on in apps/web/.env.local.
+# [auth.external.google]
+# enabled = true
+# client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+# secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+# skip_nonce_check = true
+#
+# [auth.external.apple]
+# enabled = true
+# client_id = "env(SUPABASE_AUTH_EXTERNAL_APPLE_CLIENT_ID)"
+# secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
+
 # Multi-factor-authentication is available to Supabase Pro plan.
 [auth.mfa]
 # Control how many MFA factors can be enrolled at once per user.

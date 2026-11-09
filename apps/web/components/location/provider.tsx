@@ -21,6 +21,7 @@ import {
   resolveLocation,
   streetFor,
 } from '@/app/location-actions';
+import { isAuthPage } from '@/lib/auth-portals';
 
 /* Inlined at build time, like every NEXT_PUBLIC_ value. Both or neither:
    without a Map ID the confirm view keeps its drawing. */
@@ -111,7 +112,7 @@ export function SiteLocationProvider({
       initial={initial}
       maps={MAPS}
       passive={
-        pathname === '/sign-in' ||
+        isAuthPage(pathname) ||
         pathname === '/host' ||
         pathname.startsWith('/host/') ||
         isBookingPage(pathname) ||

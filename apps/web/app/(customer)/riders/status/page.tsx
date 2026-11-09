@@ -104,7 +104,7 @@ export default async function RiderStatusPage() {
   return (
     <>
       <SiteHeader
-        signIn={{ label: 'Rider sign in', href: '/riders/sign-in' }}
+        signIn={{ label: 'Sign in', href: '/riders/sign-in' }}
         action={{ label: 'Help', href: '/help' }}
       />
       <RiderOnboardingProvider

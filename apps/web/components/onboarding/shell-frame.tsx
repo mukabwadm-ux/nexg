@@ -43,7 +43,10 @@ export function ShellFrame({
   children,
   footer,
   steps,
+  signInHref,
 }: {
+  /** This flow's own sign-in page, for applicants who already have a login. */
+  signInHref?: string;
   /** Named steps; finished ones become links back. Omit for plain bars. */
   steps?: { label: string; href: string }[];
   /** "Merchant onboarding", "Rider application". */
@@ -138,6 +141,14 @@ export function ShellFrame({
               </span>
             )}
             {resume}
+            {signInHref ? (
+              <Link
+                href={signInHref}
+                className="border-border-strong text-ink hover:border-ink rounded-lg border px-3 py-1.5 text-sm font-bold transition-colors"
+              >
+                Sign in
+              </Link>
+            ) : null}
             <Link
               href="/help"
               className="text-muted hover:text-ink text-sm font-bold transition-colors"

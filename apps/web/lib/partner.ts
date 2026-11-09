@@ -6,6 +6,7 @@ import {
   MerchantAccessError,
   type MerchantWorkspaceAccess,
 } from './merchant-access';
+import { PORTALS } from '@/lib/auth-portals';
 
 export interface PartnerHome {
   kind: 'merchant' | 'rider' | 'host' | 'guest' | 'staff' | 'anonymous';
@@ -57,13 +58,14 @@ export async function requireMerchant(
   const workspaceSetup = options.access === 'workspace-setup';
   const setup = options.access === 'setup' || workspaceSetup;
   const me = await partnerHome();
+  if (me.kind === 'anonymous') redirect(PORTALS.merchant.signIn);
   if (me.kind !== 'merchant' || !me.id) redirect(me.home);
   // A supplied target must match the database-selected workspace. Object-level
   // membership and capability checks remain in the existing owner commands.
   if (options.merchantId && options.merchantId !== me.id) redirect('/merchant');
   const client = createClient();
   const auth = await client.auth.getUser();
-  if (auth.error || !auth.data.user) redirect('/sign-in?reason=workspace-session');
+  if (auth.error || !auth.data.user) redirect('/merchants/sign-in?reason=workspace-session');
   // An unknown session type must never be granted operational access.
   const isAnonymous = auth.data.user.is_anonymous !== false;
   if (isAnonymous && !setup && options.access !== 'shell') redirect('/merchant');
@@ -75,7 +77,7 @@ export async function requireMerchant(
     .maybeSingle();
   if (error) throw new MerchantAccessError('Your workspace membership could not be checked.', 503);
   if (!membership || !['owner', 'manager'].includes(membership.role))
-    redirect('/sign-in?reason=workspace-access');
+    redirect('/merchants/sign-in?reason=workspace-access');
   const access = await loadMerchantWorkspaceAccess(client, me.id);
   // Approved operational members can open the shared layout even when the
   // application owner is the only member allowed to edit registration setup.
@@ -83,7 +85,7 @@ export async function requireMerchant(
     // A current rejected application has no workspace capability. Give it a
     // status-only recovery route instead of returning it to sign-in and Home.
     if (access.state === 'rejected') redirect('/merchants/decision');
-    redirect('/sign-in?reason=workspace-session');
+    redirect('/merchants/sign-in?reason=workspace-session');
   }
   if (isAnonymous && (access.state === 'legacy' || !access.setup || access.operations))
     redirect('/merchant');
@@ -127,6 +129,7 @@ export function requireMerchantSetup(): Promise<AuthorizedMerchant> {
  */
 export async function requireHost(): Promise<PartnerHome & { id: string }> {
   const me = await partnerHome();
+  if (me.kind === 'anonymous') redirect(PORTALS.host.signIn);
   if (me.kind !== 'host' || !me.id) redirect(me.home);
   return me as PartnerHome & { id: string };
 }
@@ -134,6 +137,7 @@ export async function requireHost(): Promise<PartnerHome & { id: string }> {
 /** The same, for the same reason: R1 is built for this rider. */
 export async function requireRider(): Promise<PartnerHome & { id: string }> {
   const me = await partnerHome();
+  if (me.kind === 'anonymous') redirect(PORTALS.rider.signIn);
   if (me.kind !== 'rider' || !me.id) redirect(me.home);
   return me as PartnerHome & { id: string };
 }

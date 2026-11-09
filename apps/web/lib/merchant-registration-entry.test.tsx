@@ -75,11 +75,10 @@ describe('real onboarding entry and resume', () => {
   it('returns an expired registrant to onboarding and an owner to Home after sign-in', () => {
     const registration = new URL(merchantSessionSignInHref(false), 'https://nexg.example');
     const home = new URL(merchantSessionSignInHref(true), 'https://nexg.example');
-    expect(registration.pathname).toBe('/sign-in');
+    expect(registration.pathname).toBe('/merchants/sign-in');
     expect(registration.searchParams.get('next')).toBe('/merchants/register');
     expect(home.searchParams.get('next')).toBe('/merchant');
-    expect([...registration.searchParams.keys()].sort()).toEqual(['next', 'reason', 'role']);
-    expect(registration.searchParams.get('role')).toBe('merchant');
+    expect([...registration.searchParams.keys()].sort()).toEqual(['next', 'reason']);
   });
   it('keeps onboarding demo available without enabling connected writes', async () => {
     vi.stubEnv('MERCHANT_ONBOARDING_V1_ENABLED', 'false');

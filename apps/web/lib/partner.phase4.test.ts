@@ -64,7 +64,7 @@ describe('merchant page entry', () => {
   it('does not turn a blocked session or invalid authority into a rejection decision', async () => {
     state.access = { state: 'blocked', setup: false, operations: false };
     await expect(requireMerchant({ access: 'shell' })).rejects.toThrow(
-      'redirect:/sign-in?reason=workspace-session',
+      'redirect:/merchants/sign-in?reason=workspace-session',
     );
     state.access = { state: 'unknown', setup: false, operations: false };
     await expect(requireMerchant({ access: 'shell' })).rejects.toMatchObject({ status: 503 });
@@ -73,7 +73,7 @@ describe('merchant page entry', () => {
     state.role = null;
     state.access = { state: 'rejected', setup: false, operations: false, expires_at: expiry };
     await expect(requireMerchant({ access: 'shell' })).rejects.toThrow(
-      'redirect:/sign-in?reason=workspace-access',
+      'redirect:/merchants/sign-in?reason=workspace-access',
     );
   });
   it('allows pending owner draft setup while the default operational entry redirects', async () => {
@@ -161,7 +161,7 @@ describe('merchant page entry', () => {
     state.accessError = null;
     state.role = null;
     await expect(requireMerchant({ access: 'shell' })).rejects.toThrow(
-      'redirect:/sign-in?reason=workspace-access',
+      'redirect:/merchants/sign-in?reason=workspace-access',
     );
     await expect(requireMerchant({ merchantId: 'merchant-other' })).rejects.toThrow(
       'redirect:/merchant',
@@ -171,7 +171,7 @@ describe('merchant page entry', () => {
     state.user = { id: 'anon-user', is_anonymous: true };
     await expect(requireMerchant()).rejects.toThrow('redirect:/merchant');
     state.user = null;
-    await expect(requireMerchant()).rejects.toThrow('redirect:/sign-in');
+    await expect(requireMerchant()).rejects.toThrow('redirect:/merchants/sign-in');
   });
   it('does not grant operational access when the session type is unknown', async () => {
     state.user = { id: 'user-1' };

@@ -42,7 +42,7 @@ async function currentDecision(): Promise<Decision> {
 
 export default async function MerchantDecisionPage() {
   const decision = await currentDecision();
-  if (decision === 'sign-in') redirect('/sign-in?reason=workspace-session');
+  if (decision === 'sign-in') redirect('/merchants/sign-in?reason=workspace-session');
   if (decision === 'workspace') redirect('/merchant');
   const title =
     decision === 'rejected'
@@ -79,7 +79,7 @@ export default async function MerchantDecisionPage() {
           <a href="/merchants/decision" className="text-sm font-bold underline underline-offset-4">
             Check again
           </a>
-          <SignOut />
+          <SignOut signInPage="/merchants/sign-in" />
         </div>
       </section>
     </main>

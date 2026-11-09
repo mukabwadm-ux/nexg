@@ -112,7 +112,7 @@ export function RiderAccountMenu({
             onClick={async () => {
               setGoing(true);
               await signOut();
-              router.push('/sign-in');
+              router.push('/riders/sign-in');
               router.refresh();
             }}
             className="border-border text-danger hover:bg-danger-bg flex w-full items-center gap-2.5 border-t px-4 py-2.5 text-left text-[0.8125rem] font-extrabold disabled:opacity-50"

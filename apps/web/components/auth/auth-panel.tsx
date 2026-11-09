@@ -1,76 +1,78 @@
 'use client';
 
 import { Button, Card, Input, PhoneInput, useToast, withCaptcha } from '@nexg/ui';
-import { ArrowRight, Bike, Building2, Store, UserRound } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { type AccountRole, createAccount, signIn } from '@/app/(customer)/sign-in/actions';
-import { authDestination } from '@/lib/auth-navigation';
+import { createAccount, signIn } from '@/app/(customer)/sign-in/actions';
+import { goTo } from '@/components/auth/password-recovery';
+import { PORTALS, type Portal } from '@/lib/auth-portals';
 import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
 
-const ROLES: { value: AccountRole; label: string; hint: string; icon: React.ReactNode }[] = [
-  {
-    value: 'guest',
-    label: 'Guest',
-    hint: 'Ordering & requests',
-    icon: <UserRound className="h-4 w-4" />,
+const COPY: Record<Portal, { title: string; lead: string }> = {
+  customer: {
+    title: 'Welcome back',
+    lead: 'Sign in to order, book stays and follow your requests.',
   },
-  {
-    value: 'rider',
-    label: 'Rider',
-    hint: 'Deliveries & earnings',
-    icon: <Bike className="h-4 w-4" />,
+  merchant: {
+    title: 'Merchant sign in',
+    lead: 'Sign in to your merchant workspace: orders, catalogue and setup.',
   },
-  {
-    value: 'merchant',
-    label: 'Merchant',
-    hint: 'Orders & catalogue',
-    icon: <Store className="h-4 w-4" />,
+  rider: {
+    title: 'Rider sign in',
+    lead: 'Sign in to your rider dashboard: jobs, shifts and earnings.',
   },
-  {
-    value: 'host',
-    label: 'Host',
-    hint: 'Units & guests',
-    icon: <Building2 className="h-4 w-4" />,
+  host: {
+    title: 'Host sign in',
+    lead: 'Sign in to your host workspace: units, stays and guests.',
   },
-];
+};
 
 /**
- * The one sign-in page, for everybody.
+ * A sign-in form for one portal.
  *
- * The role buttons decide where you land, not what you are allowed to do —
- * that is settled by the database on every query. Picking "Rider" when you
- * have no application simply takes you to the page where you would start one.
+ * /sign-in is for customers; merchants, riders and hosts each sign in on
+ * their own page. All four use the same server action, the same Turnstile
+ * handling and the same database answer (`fn_partner_home`) for where the
+ * account lands, so a merchant who uses the customer page anyway still ends
+ * up in their workspace.
  *
- * The artboard leads with a phone number and a one-time code. There is no SMS
- * provider yet, so the working path is email and password — which the artboard
- * also offers — and the phone field says so rather than pretending.
+ * The merchant portal keeps a "Create account" tab for one existing path: an
+ * anonymous merchant workspace upgrading to an email and password. Customers
+ * create accounts at /sign-up.
  */
 export function AuthPanel({
+  portal = 'customer',
   initialTab = 'signin',
-  initialRole = 'guest',
   next,
   emailOtpEnabled = false,
   initialEmail,
   setupEmail,
+  notice,
+  social,
 }: {
+  portal?: Portal;
   initialTab?: 'signin' | 'create';
-  initialRole?: AccountRole;
   next?: string;
   emailOtpEnabled?: boolean;
   initialEmail?: string;
   setupEmail?: string;
+  /** A one-line message above the form, e.g. "your session ended". */
+  notice?: string;
+  /** Social sign-in buttons, shown above the email form when enabled. */
+  social?: React.ReactNode;
 }) {
   const { toast } = useToast();
   const router = useRouter();
 
-  const [tab, setTab] = React.useState<'signin' | 'create'>(initialTab);
-  const [role, setRole] = React.useState<AccountRole>(initialRole);
+  const canCreate = portal === 'merchant' && initialTab === 'create';
+  const [tab, setTab] = React.useState<'signin' | 'create'>(canCreate ? 'create' : 'signin');
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [phone, setPhone] = React.useState<string | null>(null);
+  const info = PORTALS[portal];
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -78,7 +80,9 @@ export function AuthPanel({
     setError(null);
 
     const formData = new FormData(event.currentTarget);
-    formData.set('role', role);
+    formData.set('portal', portal);
+    formData.set('role', portal === 'merchant' ? 'merchant' : 'guest');
+    if (next) formData.set('next', next);
     if (phone) formData.set('phone', phone);
     await withCaptcha(formData);
 
@@ -91,45 +95,43 @@ export function AuthPanel({
     }
 
     toast({ title: 'Welcome', description: result.message, tone: 'success' });
-    const destination = authDestination(role, next, result.redirectTo);
-    if (destination === '/host' || destination.startsWith('/host?')) {
-      window.location.assign(destination);
-      return;
-    }
-    router.push(destination);
-    router.refresh();
+    goTo(router, result.redirectTo ?? next ?? info.home);
   };
 
-  return (
-    <div className="w-full max-w-xl">
-      <Card className="p-6 sm:p-8">
-        {/* Tabs */}
-        <div className="bg-bg grid grid-cols-2 gap-1 rounded-xl p-1">
-          {(
-            [
-              ['signin', 'Sign in'],
-              ['create', 'Create account'],
-            ] as const
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => {
-                setTab(value);
-                setError(null);
-              }}
-              aria-pressed={tab === value}
-              className={`rounded-lg py-2.5 text-sm font-extrabold transition-colors ${
-                tab === value ? 'bg-ink text-gold' : 'text-ink hover:text-muted'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+  const forgotHref =
+    portal === 'customer' ? '/forgot-password' : `/forgot-password?portal=${portal}`;
 
-        <h1 className="mt-6 text-3xl font-extrabold tracking-tight">
-          {tab === 'signin' ? 'Welcome back' : 'Create your account'}
+  return (
+    <div className="w-full max-w-md">
+      <Card className="p-6 sm:p-8">
+        {canCreate && (
+          <div className="bg-bg mb-6 grid grid-cols-2 gap-1 rounded-xl p-1">
+            {(
+              [
+                ['signin', 'Sign in'],
+                ['create', 'Create account'],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  setTab(value);
+                  setError(null);
+                }}
+                aria-pressed={tab === value}
+                className={`rounded-lg py-2.5 text-sm font-extrabold transition-colors ${
+                  tab === value ? 'bg-ink text-gold' : 'text-ink hover:text-muted'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          {tab === 'signin' ? COPY[portal].title : 'Create your merchant account'}
         </h1>
         {setupEmail ? (
           <div
@@ -151,55 +153,23 @@ export function AuthPanel({
             </ul>
           </div>
         ) : null}
+        {notice ? (
+          <p
+            role="status"
+            className="bg-surface border-border text-ink mt-4 rounded-xl border px-4 py-3 text-sm font-semibold"
+          >
+            {notice}
+          </p>
+        ) : null}
         <p className="text-muted mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
           {tab === 'signin'
-            ? 'Sign in with your email and password.'
-            : role === 'merchant'
-              ? 'Create your merchant account, then continue your saved registration.'
-              : 'For guests. You can order without an account — this just saves you time next visit.'}
+            ? COPY[portal].lead
+            : 'Create your merchant account, then continue your saved registration.'}
         </p>
 
-        <form method="post" onSubmit={submit} className="mt-6">
-          {tab === 'signin' && (
-            <fieldset className="mb-5">
-              <legend className="text-ink mb-2 text-sm font-bold">I am a…</legend>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {ROLES.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setRole(option.value)}
-                    aria-pressed={role === option.value}
-                    className={`rounded-xl border p-3 text-center transition-colors ${
-                      role === option.value
-                        ? 'border-ink bg-ink text-white'
-                        : 'border-border bg-surface hover:border-border-strong'
-                    }`}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={`mx-auto flex h-8 w-8 items-center justify-center ${
-                        role === option.value ? 'text-gold' : 'text-muted-light'
-                      }`}
-                    >
-                      {option.icon}
-                    </span>
-                    <span className="mt-1 block text-[0.8125rem] font-extrabold">
-                      {option.label}
-                    </span>
-                    <span
-                      className={`mt-0.5 block text-[0.625rem] font-semibold leading-tight ${
-                        role === option.value ? 'text-white/55' : 'text-muted-light'
-                      }`}
-                    >
-                      {option.hint}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-          )}
+        {tab === 'signin' && social ? <div className="mt-6">{social}</div> : null}
 
+        <form method="post" onSubmit={submit} className="mt-6">
           {tab === 'create' && (
             <div className="mb-4 grid gap-4 sm:grid-cols-2">
               <Input
@@ -244,22 +214,23 @@ export function AuthPanel({
           </div>
 
           {tab === 'signin' && (
-            <Link
-              href="/forgot-password"
-              className="text-ink mt-3 inline-block text-sm font-bold underline underline-offset-4"
-            >
-              Forgot password?
-            </Link>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+              <Link
+                href={forgotHref}
+                className="text-ink inline-block text-sm font-bold underline underline-offset-4"
+              >
+                Forgot password?
+              </Link>
+              {portal === 'merchant' && emailOtpEnabled ? (
+                <Link
+                  href="/merchants/sign-in/email"
+                  className="text-ink inline-block text-sm font-bold underline underline-offset-4"
+                >
+                  Sign in with an email code
+                </Link>
+              ) : null}
+            </div>
           )}
-
-          {tab === 'signin' && role === 'merchant' && emailOtpEnabled ? (
-            <Link
-              href="/merchants/sign-in/email"
-              className="text-ink ml-4 mt-3 inline-block text-sm font-bold underline underline-offset-4"
-            >
-              Sign in with an email code
-            </Link>
-          ) : null}
 
           {tab === 'create' && (
             <div className="mt-4">
@@ -267,7 +238,7 @@ export function AuthPanel({
                 id="phone"
                 label="Phone number"
                 fixedCountry
-                hint="So the concierge can reach you about an order."
+                hint="So NexG can reach you about your business."
                 value={phone}
                 onChange={setPhone}
               />
@@ -305,7 +276,7 @@ export function AuthPanel({
                 >
                   Data Protection Policy
                 </a>
-                ). NexG uses my details to run my orders and account, and never sells them.
+                ).
               </span>
             </label>
           )}
@@ -323,38 +294,20 @@ export function AuthPanel({
           </Button>
         </form>
 
-        {/*
-         * The artboard's primary path. It is described rather than offered,
-         * because a button that cannot send a code is worse than a sentence
-         * explaining why.
-         */}
-        <Card tone="muted" className="mt-5 p-4">
-          <p className="text-muted text-xs leading-[1.7]">
-            <span className="text-ink font-bold">One-time codes by SMS</span>, and Google and Apple
-            sign-in, arrive once those accounts are set up.{' '}
-            {emailOtpEnabled
-              ? 'Merchants can also sign in with an email code.'
-              : 'Until then email and password is the way in — and it works on any device.'}
-          </p>
-        </Card>
-
-        <p className="text-muted-light mt-5 text-center text-xs font-semibold">
-          {tab === 'signin' ? (
+        <p className="text-muted-light mt-6 text-center text-xs font-semibold leading-[1.7]">
+          {portal === 'customer' ? (
             <>
-              New here?{' '}
-              <button
-                type="button"
-                onClick={() => setTab('create')}
+              New to NexG?{' '}
+              <Link
+                href={next ? `/sign-up?next=${encodeURIComponent(next)}` : '/sign-up'}
                 className="text-ink font-bold underline underline-offset-4"
               >
                 Create an account
-              </button>{' '}
-              — it takes a minute. Riders, merchants and hosts: your application login works here
-              too.
+              </Link>
             </>
-          ) : (
+          ) : tab === 'create' ? (
             <>
-              Already with us?{' '}
+              Already have a password?{' '}
               <button
                 type="button"
                 onClick={() => setTab('signin')}
@@ -363,37 +316,45 @@ export function AuthPanel({
                 Sign in
               </button>
             </>
+          ) : (
+            <>
+              Not registered yet?{' '}
+              <Link href={info.start} className="text-ink font-bold underline underline-offset-4">
+                {portal === 'host' ? 'List your property' : `Apply as a ${portal}`}
+              </Link>
+            </>
           )}
         </p>
       </Card>
 
-      <div className="bg-ink mt-4 rounded-2xl p-5 text-white">
-        <p className="text-[0.9375rem] font-extrabold">Want to earn with NexG?</p>
-        <p className="mt-1 text-xs font-semibold leading-[1.7] text-white/60">
-          Riders, merchants and hosts apply separately — your login is set up once you’re approved.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button variant="gold" size="sm" asChild>
-            <Link href="/riders/apply">Become a Rider</Link>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            asChild
-            className="border-gold/50 text-gold hover:bg-gold/10"
-          >
-            <Link href="/merchants/apply">Register Your Business</Link>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            asChild
-            className="border-gold/50 text-gold hover:bg-gold/10"
-          >
-            <Link href="/hosts">List Your Airbnb</Link>
-          </Button>
+      {portal === 'customer' ? (
+        <div className="bg-ink mt-4 rounded-2xl p-5 text-white">
+          <p className="text-[0.9375rem] font-extrabold">Merchant, rider or host?</p>
+          <p className="mt-1 text-xs font-semibold leading-[1.7] text-white/60">
+            Partners sign in on their own page.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {(['merchant', 'rider', 'host'] as const).map((partner) => (
+              <Button
+                key={partner}
+                variant="outline"
+                size="sm"
+                asChild
+                className="border-gold/50 text-gold hover:bg-gold/10"
+              >
+                <Link href={PORTALS[partner].signIn}>{PORTALS[partner].label} sign in</Link>
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <p className="text-muted-light mt-4 text-center text-xs font-semibold">
+          Ordering or booking a stay?{' '}
+          <Link href="/sign-in" className="text-ink font-bold underline underline-offset-4">
+            Customer sign in
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

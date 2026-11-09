@@ -126,7 +126,7 @@ export default async function MerchantLayout({ children }: { children: React.Rea
                 href={
                   process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'
                     ? '/merchants/verify-email'
-                    : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'
+                    : '/merchants/sign-in?tab=create&next=%2Fmerchant'
                 }
                 className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold"
               >
@@ -136,7 +136,7 @@ export default async function MerchantLayout({ children }: { children: React.Rea
               </Link>
             ) : (
               <span className="bg-ink inline-flex rounded-lg px-1 py-0.5">
-                <SignOut />
+                <SignOut signInPage="/merchants/sign-in" />
               </span>
             )
           }

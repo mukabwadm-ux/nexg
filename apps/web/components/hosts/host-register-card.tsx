@@ -443,13 +443,20 @@ export function HostRegisterCard() {
           </Button>
           {done.welcome === 'failed' ? (
             <Link
-              href="/forgot-password"
+              href="/forgot-password?portal=host"
               className="text-sm font-extrabold underline underline-offset-4"
             >
               Send the password link again
             </Link>
           ) : null}
         </div>
+        <p className="mt-4 text-sm font-semibold leading-[1.8] text-[#5B5B5B]">
+          Once your password is set, sign in any time at{' '}
+          <Link href="/hosts/sign-in" className="font-extrabold underline underline-offset-4">
+            Host sign in
+          </Link>
+          .
+        </p>
       </div>
     );
   }

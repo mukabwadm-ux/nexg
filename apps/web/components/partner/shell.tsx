@@ -61,7 +61,7 @@ export function PartnerShell({
               <p className="text-[0.8125rem] font-extrabold leading-tight">{name}</p>
               <p className="text-[0.6875rem] font-semibold text-white/50">{subtitle}</p>
             </div>
-            <SignOut />
+            <SignOut signInPage={kind === 'merchant' ? '/merchants/sign-in' : '/riders/sign-in'} />
           </div>
         </div>
 

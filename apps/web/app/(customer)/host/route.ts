@@ -7,6 +7,7 @@ import {
 } from '@/lib/host-workspace/access';
 
 import { localHostWorkspace } from '@/lib/host-workspace/routes';
+import { signInHref } from '@/lib/auth-portals';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,12 +29,12 @@ export async function GET(request: Request) {
     await hostWorkspaceAccess();
   } catch (error) {
     if (error instanceof HostWorkspaceError && error.status === 401) {
-      const signIn = new URLSearchParams();
-      signIn.set('role', 'host');
-      signIn.set('next', location);
       return new Response(null, {
         status: 307,
-        headers: { Location: '/sign-in?' + signIn, 'Cache-Control': 'private, no-store' },
+        headers: {
+          Location: signInHref('host', { next: location }),
+          'Cache-Control': 'private, no-store',
+        },
       });
     }
     const status = error instanceof HostWorkspaceError ? error.status : 503;
