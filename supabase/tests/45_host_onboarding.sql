@@ -7,7 +7,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(22);
+select plan(23);
 
 create temp table t (k text primary key, v text);
 do $grant$
@@ -27,14 +27,23 @@ set local session_replication_role = origin;
 
 -- ─────────────────────────────────────────────────────────── fixtures
 
-insert into auth.users (instance_id, id, aud, role, email, is_anonymous, created_at, updated_at)
+/* 01 starts anonymous and verifies its email mid-test; 02 is another verified
+   applicant; 03 verified an email a host already uses. */
+insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
   ('00000000-0000-0000-0000-000000000000','d4500000-0000-4000-8000-000000000001',
-   'authenticated','authenticated',null,true,now(),now()),
+   'authenticated','authenticated',null,null,true,now(),now()),
   ('00000000-0000-0000-0000-000000000000','d4500000-0000-4000-8000-000000000002',
-   'authenticated','authenticated',null,true,now(),now()),
+   'authenticated','authenticated','other45@example.test',now(),false,now(),now()),
+  ('00000000-0000-0000-0000-000000000000','d4500000-0000-4000-8000-000000000003',
+   'authenticated','authenticated','Taken45@example.test',now(),false,now(),now()),
   ('00000000-0000-0000-0000-000000000000','d4500000-0000-4000-8000-0000000000aa',
-   'authenticated','authenticated','ho.desk@nexgapp.com',false,now(),now());
+   'authenticated','authenticated','ho.desk@nexgapp.com',now(),false,now(),now());
+
+/* A host that already uses taken45@example.test (no login, like the old form's). */
+insert into public.host (kind, display_name, contact_name, phone, email, city_id)
+values ('single_unit', '[Existing]', '[Existing]', '+254700045099', 'taken45@example.test',
+        (select id from public.city where slug = 'nairobi'));
 
 insert into public.staff_user (id, user_id, email, display_name)
 values ('d45000aa-0000-4000-8000-00000000000a','d4500000-0000-4000-8000-0000000000aa',
@@ -53,13 +62,21 @@ select set_config('request.jwt.claims',
 select throws_ok(
   $$ select public.rpc_host_apply(jsonb_build_object(
        'contact_name','[Host]','phone','+254700045001','address','[Address]','handoff','lockbox')) $$,
-  '22023', 'Enter the email address you will sign in with.',
-  'An email is required: it is the login and where the welcome email goes.');
+  '42501', 'Verify your email before submitting.',
+  'An anonymous session cannot apply: the email is verified in the form first.');
+
+/* The form's email code turns the anonymous user into a verified login. */
+reset role;
+update auth.users set is_anonymous = false, email = 'Host45@Example.test', email_confirmed_at = now()
+where id = 'd4500000-0000-4000-8000-000000000001';
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"d4500000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 
 insert into t (k, v)
 select 'apply', public.rpc_host_apply(jsonb_build_object(
   'contact_name','[Host]','display_name','[Host]','phone','+254700045001',
-  'email','Host45@Example.test','address','[Address], Kilimani','handoff','lockbox',
+  'email','someone-else@example.test','address','[Address], Kilimani','handoff','lockbox',
   'units_band','1','kind','single_unit','city','nairobi'))::text;
 
 insert into t (k, v) select 'host', (select v::jsonb ->> 'host_id' from t where k = 'apply');
@@ -77,7 +94,7 @@ select is(
 select is(
   (select email from public.host where id = (select v::uuid from t where k = 'host')),
   'host45@example.test',
-  'The email is stored lower-cased, matching the auth email it will be verified as.');
+  'The host email is the verified login email (lower-cased), not the one in the request.');
 
 select is(
   (select status::text from public.host where id = (select v::uuid from t where k = 'host')),
@@ -95,23 +112,34 @@ select throws_ok(
   '23505', null,
   'One account, one host: applying twice from the same session is refused.');
 
-/* Another visitor reusing the phone used to overwrite the host's email. */
+/* A phone can be shared: the same person may also be a merchant, or run a
+   second host business under another email. */
 select set_config('request.jwt.claims',
-  '{"sub":"d4500000-0000-4000-8000-000000000002","role":"authenticated","is_anonymous":true}', true);
+  '{"sub":"d4500000-0000-4000-8000-000000000002","role":"authenticated"}', true);
+
+select lives_ok(
+  $$ select public.rpc_host_apply(jsonb_build_object(
+       'contact_name','[Second business]','phone','+254700045001',
+       'address','[Address], Westlands','handoff','lockbox')) $$,
+  'Another login can register a host with a phone number that is already used.');
+
+/* But an email is one host. */
+select set_config('request.jwt.claims',
+  '{"sub":"d4500000-0000-4000-8000-000000000003","role":"authenticated"}', true);
 
 select throws_ok(
   $$ select public.rpc_host_apply(jsonb_build_object(
-       'contact_name','[Someone else]','phone','+254700045001','email','attacker@example.test',
+       'contact_name','[Duplicate]','phone','+254700045003',
        'address','[Address]','handoff','lockbox')) $$,
-  '23505', null,
-  'A registered phone number cannot be re-used to take over the host.');
+  '23505', 'That email is already registered as a NexG host. Sign in instead.',
+  'An email already used by a host is refused, whatever its case.');
 
 reset role;
 
 select is(
-  (select email from public.host where phone = '+254700045001'),
-  'host45@example.test',
-  'And the original email is untouched.');
+  (select array_agg(email order by email) from public.host where phone = '+254700045001'),
+  array['host45@example.test', 'other45@example.test'],
+  'Both hosts share the phone, each with its own login email; neither was overwritten.');
 
 -- ══════════════════════════════════ 2. locked until NexG approves the host
 

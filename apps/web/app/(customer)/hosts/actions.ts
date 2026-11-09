@@ -14,7 +14,6 @@ export interface HostApplyInput {
   contact_name: string;
   display_name: string;
   phone: string;
-  email: string;
   listing_link: string | null;
   address: string;
   units_band: string;
@@ -24,9 +23,9 @@ export interface HostApplyInput {
 /**
  * The landing-page form.
  *
- * Runs on the visitor's own session (the card signs them in anonymously
- * first), so `rpc_host_apply` makes them the owner of the host it creates.
- * That session becomes their login once they verify their email. The RPC is
+ * Runs on the visitor's own session, which the form has already turned into
+ * a verified login (email code), so `rpc_host_apply` makes them the owner of
+ * the host it creates, under the email they verified. The RPC is
  * also where the rules live: the host lands as `applied`, the first unit is
  * created, the desk ticket and audit events are written in one transaction.
  */
@@ -46,7 +45,7 @@ export async function applyAsHost(input: HostApplyInput): Promise<HostApplyResul
       contact_name: input.contact_name,
       display_name: input.display_name,
       phone: input.phone,
-      email: input.email,
+      /* No email: rpc_host_apply uses the email this login verified. */
       listing_link: input.listing_link,
       address: input.address,
       units_band: input.units_band,
