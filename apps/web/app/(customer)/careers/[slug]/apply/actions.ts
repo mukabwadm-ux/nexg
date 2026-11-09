@@ -1,6 +1,7 @@
 'use server';
 
 import { createPublicClient } from '@/lib/supabase/public';
+import { CAPTCHA_FAILED_MESSAGE, verifyTurnstile } from '@/lib/turnstile';
 
 export interface ApplyResult {
   ok: boolean;
@@ -21,6 +22,8 @@ export interface ApplyInput {
   answers: Record<string, string>;
   talent_pool: boolean;
   src: string | null;
+  /** Cloudflare Turnstile token, checked before anything is written. */
+  captchaToken?: string;
 }
 
 /**
@@ -35,6 +38,8 @@ export interface ApplyInput {
  * they have not been — a person still reads it.
  */
 export async function applyToJob(input: ApplyInput): Promise<ApplyResult> {
+  if (!(await verifyTurnstile(input.captchaToken)))
+    return { ok: false, message: CAPTCHA_FAILED_MESSAGE };
   if (!input.email?.trim()) {
     return { ok: false, message: 'We need an email — it is how we come back to you.' };
   }

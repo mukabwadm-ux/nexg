@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, ChipGroup, Input, PhoneInput, useToast } from '@nexg/ui';
+import { Button, ChipGroup, Input, PhoneInput, getCaptchaToken, useToast } from '@nexg/ui';
 import {
   ArrowRight,
   Bath,
@@ -315,11 +315,11 @@ export function HostRegisterCard() {
       await new Promise((resolve) => setTimeout(resolve, wait));
     }
     setDone({ ...base, welcome: 'sending' });
-    let result = await sendHostPasswordSetupLink();
+    let result = await sendHostPasswordSetupLink(await getCaptchaToken());
     if (!result.ok && result.rateLimited) {
       setDone({ ...base, welcome: 'waiting', wait: Math.ceil(EMAIL_GAP_MS / 1000) });
       await new Promise((resolve) => setTimeout(resolve, EMAIL_GAP_MS));
-      result = await sendHostPasswordSetupLink();
+      result = await sendHostPasswordSetupLink(await getCaptchaToken());
     }
     setDone({ ...base, welcome: result.ok ? 'sent' : 'failed', message: result.message });
   }, []);

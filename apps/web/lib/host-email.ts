@@ -1,3 +1,4 @@
+import { getCaptchaToken } from '@nexg/ui';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 /*
@@ -38,7 +39,9 @@ function explain(error: { status?: number; code?: string; message?: string }, fa
 async function applicant(auth: Auth): Promise<User> {
   const { data } = await auth.getUser();
   if (data.user) return data.user;
-  const signedIn = await auth.signInAnonymously();
+  const signedIn = await auth.signInAnonymously({
+    options: { captchaToken: await getCaptchaToken() },
+  });
   if (signedIn.error || !signedIn.data.user)
     throw new HostEmailError(
       'We could not start your registration. Reload the page and try again.',

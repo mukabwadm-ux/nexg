@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input, PhoneInput, useToast } from '@nexg/ui';
+import { Button, Card, Input, PhoneInput, useToast, getCaptchaToken } from '@nexg/ui';
 import { ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
@@ -74,6 +74,7 @@ export function ApplyForm({
 
     startTransition(async () => {
       const result = await applyToJob({
+        captchaToken: await getCaptchaToken(),
         job_slug: slug,
         full_name: name.trim(),
         email: email.trim(),

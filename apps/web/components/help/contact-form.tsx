@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input, Select } from '@nexg/ui';
+import { Button, Card, Input, Select, getCaptchaToken } from '@nexg/ui';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import * as React from 'react';
 
@@ -80,6 +80,7 @@ export function ContactForm() {
      * sent with a provider key that must never reach the browser.
      */
     const result = await submitTicket({
+      captchaToken: await getCaptchaToken(),
       body: String(form.get('body') ?? ''),
       fromRole: role,
       topic,

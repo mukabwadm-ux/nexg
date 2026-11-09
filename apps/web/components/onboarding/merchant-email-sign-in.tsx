@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input } from '@nexg/ui';
+import { Button, Card, Input, getCaptchaToken } from '@nexg/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
@@ -29,7 +29,7 @@ async function sendSignInCode(email: string) {
   await checkCurrentApplication();
   const { error } = await createClient().auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: false },
+    options: { shouldCreateUser: false, captchaToken: await getCaptchaToken() },
   });
   // Respond the same way for a missing account so addresses cannot be enumerated.
   if (error && error.code !== 'user_not_found' && error.code !== 'otp_disabled')

@@ -1,5 +1,7 @@
 'use client';
 
+import { getCaptchaToken } from '@nexg/ui';
+
 import { createClient } from '@/lib/supabase/client';
 import { loadMerchantWorkspaceAccess } from './merchant-access';
 import {
@@ -29,7 +31,9 @@ export async function ensureApplicantSession(): Promise<string | null> {
   } = await supabase.auth.getSession();
   if (session?.user) return session.user.id;
 
-  const { data, error } = await supabase.auth.signInAnonymously();
+  const { data, error } = await supabase.auth.signInAnonymously({
+    options: { captchaToken: await getCaptchaToken() },
+  });
   if (error) return null;
   return data.user?.id ?? null;
 }

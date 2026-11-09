@@ -3,6 +3,7 @@
 import { z } from 'zod';
 
 import { createClient } from '@/lib/supabase/server';
+import { CAPTCHA_FAILED_MESSAGE, verifyTurnstile } from '@/lib/turnstile';
 
 export interface ActionResult {
   ok: boolean;
@@ -56,6 +57,8 @@ const leadSchema = z.object({
 });
 
 export async function submitLead(_prev: ActionResult | null, formData: FormData) {
+  if (!(await verifyTurnstile(formData.get('captchaToken'))))
+    return { ok: false, message: CAPTCHA_FAILED_MESSAGE };
   const parsed = leadSchema.safeParse({
     staying_at: formData.get('staying_at'),
     need: formData.get('need'),
@@ -141,6 +144,8 @@ const notifySchema = z.object({
 });
 
 export async function joinAppWaitlist(_prev: ActionResult | null, formData: FormData) {
+  if (!(await verifyTurnstile(formData.get('captchaToken'))))
+    return { ok: false, message: CAPTCHA_FAILED_MESSAGE };
   const parsed = notifySchema.safeParse({ email: formData.get('email') });
 
   if (!parsed.success) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input, useToast } from '@nexg/ui';
+import { Button, Card, Input, getCaptchaToken, useToast } from '@nexg/ui';
 import { Bed, Music, PartyPopper, Sparkles, Ticket, UtensilsCrossed } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -162,7 +162,9 @@ export function Builder({
     setStarting(true);
     setStartError(null);
     try {
-      const result = await ensurePlan(citySlug);
+      /* A first visit starts an anonymous session on the server, which needs
+         a Turnstile token once Supabase captcha is on. */
+      const result = await ensurePlan(citySlug, await getCaptchaToken());
       if (!result.ok || !result.view || !result.planId) {
         const message = result.message ?? 'We could not load your draft. Please try again.';
         setStartError(message);

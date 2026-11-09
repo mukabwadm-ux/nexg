@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input, useToast } from '@nexg/ui';
+import { Button, Card, Input, useToast, withCaptcha } from '@nexg/ui';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -61,7 +61,9 @@ export function ProfileForms({
     (key: string, action: (f: FormData) => Promise<{ ok: boolean; message: string }>) =>
     async (formData: FormData) => {
       setBusy(key);
-      const r = await action(formData);
+      /* Changing the password re-checks the current one with a Supabase
+         sign-in, which needs a Turnstile token once captcha is on. */
+      const r = await action(key === 'password' ? await withCaptcha(formData) : formData);
       setBusy(null);
       report(r);
     };

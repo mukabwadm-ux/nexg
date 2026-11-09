@@ -2,6 +2,7 @@
 
 import { sendTicketReceived } from '@/lib/email';
 import { createClient } from '@/lib/supabase/server';
+import { CAPTCHA_FAILED_MESSAGE, verifyTurnstile } from '@/lib/turnstile';
 
 export interface TicketResult {
   ok: boolean;
@@ -30,7 +31,10 @@ export async function submitTicket(input: {
   email?: string;
   phone?: string;
   orderReference?: string;
+  captchaToken?: string;
 }): Promise<TicketResult> {
+  if (!(await verifyTurnstile(input.captchaToken)))
+    return { ok: false, message: CAPTCHA_FAILED_MESSAGE };
   const supabase = createClient();
 
   const { data, error } = await supabase.rpc('rpc_support_ticket_create', {

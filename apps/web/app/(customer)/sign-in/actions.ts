@@ -6,6 +6,27 @@ import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application'
 import { clearedWelcomeMetadata, welcomeMetadata } from '@/lib/merchant-welcome';
 import { createClient } from '@/lib/supabase/server';
 
+/*
+ * Turnstile tokens for Supabase's own captcha check (sign-in, sign-up and
+ * password reset). The browser adds one per call; Supabase verifies it once
+ * captcha is enabled in the project, and ignores it until then.
+ */
+const CAPTCHA_MESSAGE = 'We could not confirm you are not a bot. Refresh the page and try again.';
+
+function captchaFrom(formData: FormData): string | undefined {
+  const value = formData.get('captchaToken');
+  return typeof value === 'string' && value ? value : undefined;
+}
+
+function cleanToken(token: unknown): string | undefined {
+  return typeof token === 'string' && token.length > 0 && token.length < 4096 ? token : undefined;
+}
+
+function isCaptchaError(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  return error.code === 'captcha_failed' || /captcha/i.test(error.message ?? '');
+}
+
 export interface AuthResult {
   ok: boolean;
   message: string;
@@ -100,8 +121,10 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
   const { error } = await supabase.auth.signInWithPassword({
     email: parsed.data.email.toLowerCase(),
     password: parsed.data.password,
+    options: { captchaToken: captchaFrom(formData) },
   });
 
+  if (isCaptchaError(error)) return { ok: false, message: CAPTCHA_MESSAGE };
   if (error) {
     // Not "no such account" versus "wrong password": the first tells anyone
     // who asks which email addresses are registered.
@@ -129,8 +152,10 @@ export async function requestPasswordRecovery(formData: FormData): Promise<AuthR
   const supabase = createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email.toLowerCase(), {
     redirectTo,
+    captchaToken: captchaFrom(formData),
   });
 
+  if (isCaptchaError(error)) return { ok: false, message: CAPTCHA_MESSAGE };
   if (error) {
     return { ok: false, message: 'We could not send the recovery email. Please try again.' };
   }
@@ -141,7 +166,7 @@ export async function requestPasswordRecovery(formData: FormData): Promise<AuthR
   };
 }
 
-export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
+export async function sendMerchantPasswordSetupLink(captchaToken?: string): Promise<AuthResult> {
   if (
     process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'false' ||
     process.env.MERCHANT_EMAIL_OTP_ENABLED === 'false'
@@ -194,7 +219,9 @@ export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
   redirectTo.searchParams.set('next', '/reset-password?next=%2Fmerchant');
   const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
     redirectTo: redirectTo.toString(),
+    captchaToken: cleanToken(captchaToken),
   });
+  if (isCaptchaError(error)) return { ok: false, message: CAPTCHA_MESSAGE };
   if (error)
     return {
       ok: false,
@@ -213,7 +240,7 @@ export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
  * get, worded for hosts and returning to /host. Sent only once the applicant
  * has verified the email on their host record.
  */
-export async function sendHostPasswordSetupLink(): Promise<AuthResult> {
+export async function sendHostPasswordSetupLink(captchaToken?: string): Promise<AuthResult> {
   const supabase = createClient();
   const { data: auth, error: authError } = await supabase.auth.getUser();
   const user = auth.user;
@@ -248,7 +275,9 @@ export async function sendHostPasswordSetupLink(): Promise<AuthResult> {
   redirectTo.searchParams.set('next', '/reset-password?next=%2Fhost');
   const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
     redirectTo: redirectTo.toString(),
+    captchaToken: cleanToken(captchaToken),
   });
+  if (isCaptchaError(error)) return { ok: false, message: CAPTCHA_MESSAGE };
   if (error) {
     const rateLimited =
       error.status === 429 || `${error.code ?? ''} ${error.message}`.toLowerCase().includes('rate');
@@ -363,9 +392,10 @@ export async function createAccount(formData: FormData): Promise<AuthResult> {
   const { error } = await supabase.auth.signUp({
     email,
     password: parsed.data.password,
-    options: { data: metadata },
+    options: { data: metadata, captchaToken: captchaFrom(formData) },
   });
 
+  if (isCaptchaError(error)) return { ok: false, message: CAPTCHA_MESSAGE };
   if (error) {
     return {
       ok: false,

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, cn, Input, useToast } from '@nexg/ui';
+import { Button, cn, Input, useToast, withCaptcha } from '@nexg/ui';
 import { ArrowRight, Check, MessageCircle } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
@@ -84,7 +84,7 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
 
   return (
     <form
-      action={formAction}
+      action={async (formData: FormData) => formAction(await withCaptcha(formData))}
       id="start"
       className="rounded-[22px] border border-t-4 border-[#ECE5D3] border-t-[#E8B422] bg-white p-5 shadow-[0_24px_60px_rgba(60,40,10,.12)] sm:p-[30px]"
     >

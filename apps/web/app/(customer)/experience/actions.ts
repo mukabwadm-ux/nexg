@@ -39,7 +39,7 @@ async function read(planId: string): Promise<PlanView> {
  * once a concierge has it, tapping Build starts something new rather than
  * quietly editing work somebody is in the middle of.
  */
-export async function ensurePlan(citySlug = 'nairobi'): Promise<PlanResult> {
+export async function ensurePlan(citySlug = 'nairobi', captchaToken?: string): Promise<PlanResult> {
   const supabase = createClient();
 
   /*
@@ -68,7 +68,13 @@ export async function ensurePlan(citySlug = 'nairobi'): Promise<PlanResult> {
   let user = currentUser;
 
   if (!user) {
-    const { data: fresh, error } = await supabase.auth.signInAnonymously();
+    /* Turnstile token from the browser, checked by Supabase once captcha is on. */
+    const { data: fresh, error } = await supabase.auth.signInAnonymously({
+      options: {
+        captchaToken:
+          typeof captchaToken === 'string' && captchaToken.length < 4096 ? captchaToken : undefined,
+      },
+    });
     if (error) return { ok: false, message: error.message };
     user = fresh.user;
   }

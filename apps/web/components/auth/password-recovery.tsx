@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input, useToast } from '@nexg/ui';
+import { Button, Card, Input, useToast, withCaptcha } from '@nexg/ui';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -18,7 +18,9 @@ export function ForgotPasswordForm({ invalidLink = false }: { invalidLink?: bool
     setPending(true);
     setError(null);
 
-    const result = await requestPasswordRecovery(new FormData(event.currentTarget));
+    const result = await requestPasswordRecovery(
+      await withCaptcha(new FormData(event.currentTarget)),
+    );
     setPending(false);
     if (!result.ok) {
       setError(result.message);
