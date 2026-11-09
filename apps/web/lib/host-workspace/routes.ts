@@ -1,13 +1,14 @@
 export const localHostWorkspace = '/host';
 
-export function localHostWorkspaceEnabled() {
-  if (process.env.NODE_ENV !== 'development') return false;
-  try {
-    const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '');
-    return ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
-  } catch {
-    return false;
-  }
+/*
+ * On everywhere, including production. Access is still decided per request
+ * by hostWorkspaceAccess(): a signed-in, non-anonymous user whose partner
+ * home is a host. Set NEXG_HOST_WORKSPACE=off to take /host and its API
+ * offline without a code change (old /host/... bookmarks then fall through
+ * to a 404 instead of redirecting).
+ */
+export function hostWorkspaceEnabled() {
+  return process.env.NEXG_HOST_WORKSPACE !== 'off';
 }
 
 const views: ReadonlyMap<string, string> = new Map([

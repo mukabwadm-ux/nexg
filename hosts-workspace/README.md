@@ -13,6 +13,10 @@ node scripts/dev-host-workspace.mjs
 
 Open [Hosts Workspace](http://127.0.0.1:3010/host) and sign in as a host. Run `npm --prefix hosts-workspace run build` after editing the frontend. The web app serves that build from `apps/web/public/nexg-hosts-workspace`.
 
+## Production
+
+The workspace is live at `/host` on the public site. `apps/web`'s `build` script runs `scripts/build-host-workspace.mjs` before `next build`, so every Vercel deploy compiles it. The output folder is gitignored. Access is checked per request: the user must be signed in with a host account. Set `NEXG_HOST_WORKSPACE=off` in the Vercel project to take `/host` and `/api/host-workspace` offline without a deploy. New migrations under `supabase/migrations` still need to be applied to production by hand.
+
 ## Connections
 
 - Host Inbox shares conversation records with [Admin Messaging](http://127.0.0.1:3001/messaging). Hosts can send unit-related questions to NexG Concierge.
