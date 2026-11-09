@@ -55455,6 +55455,9 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_payment_begin_stay: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_stay_checkout_status: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_stay_confirmation_sent: { Args: { p_stay_id: string }; Returns: boolean };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
         Args: {

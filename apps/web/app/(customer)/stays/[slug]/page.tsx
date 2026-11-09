@@ -98,6 +98,7 @@ export default async function PropertyPage({ params }: { params: { slug: string 
     .order('nightly_rate_kes', { nullsFirst: false });
 
   const list = (units as UnitRow[] | null) ?? [];
+  const bookable = list.some((u) => u.nightly_rate_kes !== null);
 
   return (
     <>
@@ -279,11 +280,22 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                         </p>
                       )}
 
-                      <Button asChild className="mt-4" size="sm">
-                        <Link href={`/stays/${p.slug}/enquire?unit=${u.id}`}>
-                          Ask about this unit
-                        </Link>
-                      </Button>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {u.nightly_rate_kes !== null && (
+                          <Button asChild size="sm">
+                            <Link href={`/stays/${p.slug}/book?unit=${u.id}`}>Book this unit</Link>
+                          </Button>
+                        )}
+                        <Button
+                          asChild
+                          size="sm"
+                          variant={u.nightly_rate_kes === null ? 'black' : 'outline'}
+                        >
+                          <Link href={`/stays/${p.slug}/enquire?unit=${u.id}`}>
+                            Ask about this unit
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
                   </Card>
                 </li>
@@ -299,18 +311,32 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                 <p className="text-muted-light text-[0.75rem] font-semibold">per night</p>
               )}
 
-              <p className="text-muted mt-4 text-[0.8125rem] font-semibold leading-[1.75]">
-                Tell us your dates and who is coming. Somebody on the desk checks what is actually
-                free and comes back — usually the same day.
-              </p>
-
-              <Button asChild className="mt-4 w-full">
-                <Link href={`/stays/${p.slug}/enquire`}>Check these dates</Link>
-              </Button>
-
-              <p className="text-muted-light mt-3 text-center text-[0.6875rem] font-semibold">
-                Nothing is booked or charged here.
-              </p>
+              {bookable ? (
+                <>
+                  <p className="text-muted mt-4 text-[0.8125rem] font-semibold leading-[1.75]">
+                    Pick your dates, see what is free, and book instantly with M-Pesa.
+                  </p>
+                  <Button asChild className="mt-4 w-full">
+                    <Link href={`/stays/${p.slug}/book`}>Check dates and book</Link>
+                  </Button>
+                  <Button asChild className="mt-2 w-full" variant="outline">
+                    <Link href={`/stays/${p.slug}/enquire`}>Ask the desk instead</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-muted mt-4 text-[0.8125rem] font-semibold leading-[1.75]">
+                    Tell us your dates and who is coming. Somebody on the desk checks what is
+                    actually free and comes back — usually the same day.
+                  </p>
+                  <Button asChild className="mt-4 w-full">
+                    <Link href={`/stays/${p.slug}/enquire`}>Check these dates</Link>
+                  </Button>
+                  <p className="text-muted-light mt-3 text-center text-[0.6875rem] font-semibold">
+                    Nothing is booked or charged here.
+                  </p>
+                </>
+              )}
 
               <div className="border-border mt-5 border-t pt-4">
                 <p className="text-[0.8125rem] font-extrabold">Concierge included</p>
