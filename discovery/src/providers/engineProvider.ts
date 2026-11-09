@@ -2,6 +2,7 @@ import type { BoundedPage, CollectionResult, DiscoveryProvider, DiscoveryQuery, 
 import { EngineTransport } from './engineTransport';
 import { ProviderReadError } from './readState';
 import { findCategory } from '../data/taxonomy';
+import { collectionDefinitions } from '../data/discoveryConfiguration';
 
 export const engineCapabilities = { availabilityFilter: false, nearestSort: false, priceRangeFilter: false, transactions: false,
   resultSemantics: 'bounded/v2' as const, supportedSorts: ['recommended'] as const };
@@ -147,9 +148,10 @@ export class EngineDiscoveryProvider implements DiscoveryProvider {
   async getCollections(categoryId: string, query: Pick<DiscoveryQuery, 'area' | 'search' | 'sort' | 'openNow'> = {}, signal?: AbortSignal): Promise<CollectionResult> {
     const release = await this.#context(signal);
     const definitions = release.collections.filter(item => item.categoryId === categoryId);
-    if (!definitions.length) return { collections: [], partial: false, reasonCodes: [] };
+    if (!definitions.length) return this.#subcategoryRows(categoryId, query, signal);
     const request = await this.#request({ ...query, categoryId, limit: 24 }, signal);
     const result = await this.http.read('/api/discovery/collections', 'CollectionPage', { request, definitionIds: definitions.slice(0, 8).map(item => item.id) }, signal);
+    if (!result.sections.length && result.reasonCodes.includes('COLLECTION_DISABLED')) return this.#subcategoryRows(categoryId, query, signal);
     let previousDefinition = -1;
     const collections = result.sections.map(section => {
       const definition = definitions.find(item => item.id === section.definitionId);
@@ -166,6 +168,31 @@ export class EngineDiscoveryProvider implements DiscoveryProvider {
         ...(section.page.exposureToken ? { observations: section.page.refs.map((ref, position) => ({ token: section.page.exposureToken!, ref, position })) } : {}) };
     });
     return { collections, partial: result.partial || definitions.length > 8, reasonCodes: [...result.reasonCodes, ...(definitions.length > 8 ? ['COLLECTION_REQUEST_WINDOW_LIMIT'] : [])] };
+  }
+  /**
+   * A category whose release publishes no collection (none defined, or the engine reports COLLECTION_DISABLED) shows one
+   * row per subcategory instead: the same rows the Supabase provider shows. Each row holds that subcategory's first stores
+   * in engine order, needs at least `minimumDistinctMerchants`, never repeats another row's stores, and only restaurants
+   * and tours show more than four rows. A row that can't load is left out and the result marked partial.
+   */
+  async #subcategoryRows(categoryId: string, query: Pick<DiscoveryQuery, 'area' | 'search' | 'sort' | 'openNow'>, signal?: AbortSignal): Promise<CollectionResult> {
+    const definitions = collectionDefinitions(categoryId);
+    const reads = await Promise.allSettled(definitions.map(definition =>
+      this.getMerchants({ ...query, categoryId, subcategoryId: definition.subcategoryId, limit: definition.maximumMerchants }, signal)));
+    const failed = reads.filter(read => read.status === 'rejected');
+    if (definitions.length && failed.length === definitions.length) throw (failed[0] as PromiseRejectedResult).reason;
+    const signatures = new Set<string>();
+    const collections = definitions.flatMap((definition, index) => {
+      const read = reads[index]!;
+      if (read.status !== 'fulfilled' || read.value.merchants.length < definition.minimumDistinctMerchants) return [];
+      const signature = read.value.merchants.map(item => item.id).sort().join('|');
+      if (signatures.has(signature)) return [];
+      signatures.add(signature);
+      return [{ id: definition.id, title: definition.title, subcategoryId: definition.subcategoryId, merchants: read.value.merchants,
+        ...('observations' in read.value && read.value.observations ? { observations: read.value.observations } : {}) }];
+    });
+    if (categoryId !== 'restaurants-food' && categoryId !== 'travel-tours') collections.splice(4);
+    return { collections, partial: failed.length > 0, reasonCodes: failed.length ? ['SUBCATEGORY_ROW_UNAVAILABLE'] : [] };
   }
   async getMerchant(id: string, signal?: AbortSignal): Promise<Merchant> {
     const row = await this.http.read(`/api/discovery/merchants/${encodeURIComponent(id)}`, 'PublicMerchant', undefined, signal);

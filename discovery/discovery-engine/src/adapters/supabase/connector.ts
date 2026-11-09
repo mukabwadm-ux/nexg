@@ -164,7 +164,7 @@ export class SupabaseConnector implements ServerDiscoveryProvider {
   async getMerchants(scope: CatalogScope, budget: ReadBudget): Promise<ObservedMerchant[]> {
     budget.assertOpen();
     if (!scope.sourceSubcategoryIds.length) return [];
-    if (!Number.isSafeInteger(scope.limit) || scope.limit < 1 || scope.limit > 48
+    if (!Number.isSafeInteger(scope.limit) || scope.limit < 1 || scope.limit > 200
       || scope.sourceSubcategoryIds.some(id => typeof id !== 'string' || !id || id.length > 256)
       || (scope.area !== undefined && (!scope.area || scope.area === 'all' || scope.area.length > 256))) throw sourceUnavailable(false);
     const observedAt = this.#fresh();

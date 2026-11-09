@@ -8,6 +8,11 @@ type Session = Readonly<{
   versions: Schemas['Versions']; candidateCount: number; unmapped: boolean; bytes: number; retrievalSnapshot?: string;
 }>;
 export interface SessionLimits { maxSessions?: number; maxPerCaller?: number; maxBytes?: number; now?: () => number }
+/**
+ * The most stores one results window holds (9 Nov 2026, owner-approved; was 48). Pages of up to 48 are cut from it,
+ * so a whole category can be paged. It matches the ranking core's and the search window's 200-candidate limit.
+ */
+export const MAX_WINDOW_REFS = 200;
 export const restartPaging = (code: 'CURSOR_EXPIRED' | 'CURSOR_RESTART_REQUIRED' = 'CURSOR_RESTART_REQUIRED') =>
   new ReadServiceError(code, 409, false, 'restart_preserving_constraints', ['/cursor', '/offset']);
 
@@ -67,7 +72,7 @@ export class ResultSessions {
   }
   create(caller: string, binding: string, refs: readonly string[], versions: Schemas['Versions'], candidateCount: number, unmapped: boolean, retrievalSnapshot?: string): Session {
     this.#prune();
-    if (refs.length > 48 || new Set(refs).size !== refs.length) throw restartPaging();
+    if (refs.length > MAX_WINDOW_REFS || new Set(refs).size !== refs.length) throw restartPaging();
     const state = { id: randomUUID(), caller, binding, refs: [...refs], versions: structuredClone(versions), candidateCount, unmapped, created: this.#now(), ...(retrievalSnapshot ? { retrievalSnapshot } : {}) };
     const session: Session = { ...state, bytes: Buffer.byteLength(JSON.stringify(state)) };
     if (session.bytes > this.#limits.maxBytes) throw new ReadServiceError('LIMIT_EXCEEDED', 422, false, 'correct_request');

@@ -126,7 +126,9 @@ test('stores keep Supabase IDs and gain taxonomy paths, listed KES prices, coord
   assert.deepEqual(await withBudget(budget => source.getMerchants({ sourceSubcategoryIds: ['financial-services_banking'], limit: 24 }, budget)), []);
   assert.equal((await withBudget(budget => source.getMerchants({ sourceSubcategoryIds: [...cafes, 'beauty_makeup'], limit: 2 }, budget))).length, 2);
   assert.deepEqual(await withBudget(budget => source.getMerchants({ sourceSubcategoryIds: [], limit: 24 }, budget)), []);
-  await assert.rejects(withBudget(budget => source.getMerchants({ sourceSubcategoryIds: cafes, limit: 49 }, budget)), unavailable(false));
+  // A window holds up to 200 stores (9 Nov 2026); more is refused.
+  assert.equal((await withBudget(budget => source.getMerchants({ sourceSubcategoryIds: [...cafes, 'beauty_makeup'], limit: 200 }, budget))).length, 4);
+  await assert.rejects(withBudget(budget => source.getMerchants({ sourceSubcategoryIds: cafes, limit: 201 }, budget)), unavailable(false));
   await assert.rejects(withBudget(budget => source.getMerchants({ sourceSubcategoryIds: cafes, area: 'all', limit: 24 }, budget)), unavailable(false));
 });
 

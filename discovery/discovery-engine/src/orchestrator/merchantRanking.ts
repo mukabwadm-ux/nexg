@@ -38,6 +38,32 @@ export function rankMerchants(request: EngineRequest, rows: readonly ObservedMer
   });
   const ranked = rankRecommendations({ release, request, checkedAt: new Date().toISOString(), candidates });
   const presentations = new Map(rows.map(row => [row.presentation.ref.id, row]));
+  const ordered = ranked.items.map(item => presentations.get(item.ref.id)!);
+  const categoryBrowse = request.sort === 'recommended' && !request.query && !request.sourceScope && request.selection.categoryId !== undefined
+    && request.selection.subcategoryId === undefined && request.selection.optionId === undefined;
   budget.assertOpen();
-  return { rows: ranked.items.map(item => presentations.get(item.ref.id)!), rankerRevision: ranked.rankerRevision };
+  return { rows: categoryBrowse ? interleaveBySubcategory(ordered, release, request.selection.categoryId!) : ordered, rankerRevision: ranked.rankerRevision };
+}
+
+/**
+ * Category browsing without a search takes turns across the category's subcategories, in taxonomy order, so every type
+ * shows on the first page (9 Nov 2026). Within each subcategory the neutral original-ID order stays, so nothing implies
+ * popularity or quality. A store's subcategory is its own taxonomy path; stores without one follow in their ranked order.
+ */
+export function interleaveBySubcategory(rows: readonly ObservedMerchant[], release: Pick<ReleaseArtifact, 'nodes'>, categoryId: string): ObservedMerchant[] {
+  const order = release.nodes.filter(node => node.kind === 'subcategory' && node.parentId === categoryId)
+    .sort((left, right) => left.order - right.order).map(node => node.id);
+  const buckets = new Map<string, ObservedMerchant[]>(order.map(id => [id, []]));
+  const rest: ObservedMerchant[] = [];
+  for (const row of rows) {
+    const id = row.presentation.taxonomyPaths?.find(path => path.categoryId === categoryId)?.subcategoryId;
+    const bucket = id === undefined ? undefined : buckets.get(id);
+    (bucket ?? rest).push(row);
+  }
+  const turns: ObservedMerchant[] = [];
+  const rounds = Math.max(0, ...[...buckets.values()].map(bucket => bucket.length));
+  for (let round = 0; round < rounds; round++) {
+    for (const bucket of buckets.values()) { const row = bucket[round]; if (row) turns.push(row); }
+  }
+  return [...turns, ...rest];
 }

@@ -99,6 +99,10 @@ const KIND_ICON: Record<SearchItem['kind'], LucideIcon> = {
  * (discovery/scripts/build-for-web.mjs) and served at /discover (next.config.mjs). Its links load it in full.
  */
 const DISCOVER_PATH = '/discover';
+// Discovery has no stays yet, so searches for a place to stay keep going to the Stays pages.
+const STAYS_PATH = '/stays';
+const STAY_WORDS =
+  /\b(stays?|hotels?|motels?|airbnbs?|b ?& ?bs?|bnbs?|guest ?houses?|lodges?|lodging|accommodation|villas?|cottages?|resorts?|hostels?)\b/i;
 function discoverUrl(q?: string): string {
   return q ? `${DISCOVER_PATH}?q=${encodeURIComponent(q)}` : DISCOVER_PATH;
 }
@@ -187,7 +191,7 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
           copy={copy}
           citySlug={citySlug}
           discovery
-          onSubmit={(q) => window.location.assign(discoverUrl(q))}
+          onSubmit={(q) => window.location.assign(STAY_WORDS.test(q) ? STAYS_PATH : discoverUrl(q))}
         />
 
         {/* Popular searches */}

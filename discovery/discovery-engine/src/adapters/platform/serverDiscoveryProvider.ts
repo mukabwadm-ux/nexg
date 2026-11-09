@@ -31,16 +31,18 @@ export class PlatformDiscoveryProvider implements ServerDiscoveryProvider {
   async getMerchants(scope: CatalogScope, budget: ReadBudget): Promise<ObservedMerchant[]> {
     budget.assertOpen();
     if (!scope.sourceSubcategoryIds.length) return [];
-    if (!Number.isSafeInteger(scope.limit) || scope.limit < 1 || scope.limit > 48
+    if (!Number.isSafeInteger(scope.limit) || scope.limit < 1 || scope.limit > 200
       || scope.sourceSubcategoryIds.some(id => typeof id !== 'string' || !id || id.length > 256)
       || (scope.area !== undefined && (!scope.area || scope.area === 'all' || scope.area.length > 256))) throw sourceUnavailable(false);
     const connection = this.#connection();
     const groups = [...new Set(scope.sourceSubcategoryIds)];
+    // One HTTP page per source group stays at 48 stores, inside the 2 MiB response limit.
+    const perGroup = Math.min(scope.limit, 48);
     const pages = await Promise.all(groups.map(async id => {
-      const params = new URLSearchParams({ subcategory: id, limit: String(scope.limit), offset: '0', sort: 'recommended' });
+      const params = new URLSearchParams({ subcategory: id, limit: String(perGroup), offset: '0', sort: 'recommended' });
       if (scope.area) params.set('area', scope.area);
       const raw = await connection.get('/api/merchants', params, budget);
-      const rows = normalizeMerchantPage(raw, this.ownerId, this.#now(), scope.limit, scope.area, this.#normalize);
+      const rows = normalizeMerchantPage(raw, this.ownerId, this.#now(), perGroup, scope.area, this.#normalize);
       budget.assertOpen(); return rows;
     }));
     // Preserve source observations as complete rows; never merge conflicting fields.

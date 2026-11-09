@@ -6,10 +6,11 @@ import type { QueryPlan } from '../../engines/query-understanding/src/index.js';
 import type { CandidateWindow, RetrievalCandidatePort } from '../../engines/search-retrieval/src/ports.js';
 import { lexicalMatch } from '../../engines/search-retrieval/src/lexical.js';
 import { sourceUnavailable } from '../contracts/readErrors.js';
+import { MAX_WINDOW_REFS } from './resultSessions.js';
 
 /** Candidate hints intersect a current bounded source read in the SAME scope.
- * The existing owner cannot validate an arbitrary 200-ref pool. Withhold anything
- * outside its 48-merchant observation window instead of assuming index authority.
+ * The owner cannot validate an arbitrary ref pool. Withhold anything outside its current
+ * observation window (up to MAX_WINDOW_REFS stores) instead of assuming index authority.
  */
 export async function retrieveMerchants(request: EngineRequest, plan: QueryPlan | undefined, scope: CatalogScope,
   release: Readonly<ReleaseArtifact>, provider: ServerDiscoveryProvider, budget: ReadBudget, retrieval?: RetrievalCandidatePort) {
@@ -21,7 +22,8 @@ export async function retrieveMerchants(request: EngineRequest, plan: QueryPlan 
       || ref.ownerId !== provider.ownerId || ref.id !== ref.merchantId) || new Set(window.refs.map(ref => ref.id)).size !== window.refs.length) throw sourceUnavailable(false);
     budget.assertOpen();
   }
-  const observed = await provider.getMerchants({ ...scope, limit: 48 }, budget);
+  // The whole window is read so every store in scope can be paged; providers choose their own per-group read sizes.
+  const observed = await provider.getMerchants({ ...scope, limit: MAX_WINDOW_REFS }, budget);
   const candidates = window ? new Set(window.refs.map(ref => ref.id)) : undefined;
   const rows = candidates ? observed.filter(row => candidates.has(row.presentation.ref.id)) : observed;
   // Only labels on the actual selected branch; never all child labels of a category.
