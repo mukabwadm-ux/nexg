@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input, PhoneInput, useToast } from '@nexg/ui';
+import { Button, Card, Input, PhoneInput, useToast, withCaptcha } from '@nexg/ui';
 import { ArrowRight, Bike, Building2, Store, UserRound } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -79,6 +79,7 @@ export function AuthPanel({
     const formData = new FormData(event.currentTarget);
     formData.set('role', role);
     if (phone) formData.set('phone', phone);
+    await withCaptcha(formData);
 
     const result = tab === 'signin' ? await signIn(formData) : await createAccount(formData);
     setPending(false);

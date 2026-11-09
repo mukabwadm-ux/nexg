@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input, useToast } from '@nexg/ui';
+import { Button, Card, Input, useToast, withCaptcha } from '@nexg/ui';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -26,7 +26,7 @@ export function SignInForm({ next }: { next?: string }) {
     setPending(true);
     setError(null);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = await withCaptcha(new FormData(event.currentTarget));
     const result = await signIn(formData);
     setPending(false);
 

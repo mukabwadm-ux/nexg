@@ -8,6 +8,7 @@
 // Utilities
 export { cn } from './lib/cn';
 export { MAP_COLOURS, loadGoogleMaps, type MapsLoad } from './lib/google-maps';
+export { CAPTCHA_FIELD, captchaSiteKey, getCaptchaToken, withCaptcha } from './lib/captcha';
 /* Capabilities are imported from '@nexg/ui/capabilities', not from
    here. They read environment rather than rendering anything, and a
    barrel of components is the wrong door for that — `maps` is also

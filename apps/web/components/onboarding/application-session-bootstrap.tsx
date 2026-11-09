@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getCaptchaToken } from '@nexg/ui';
 import { createClient } from '@/lib/supabase/client';
 
 /** Starts the existing Supabase anonymous session used to own a public draft. */
@@ -19,9 +20,11 @@ export function ApplicationSessionBootstrap() {
         return;
       }
       if (!pending.current) {
-        pending.current = client.auth.signInAnonymously().then(({ error }) => {
-          if (error) throw error;
-        });
+        pending.current = getCaptchaToken()
+          .then((captchaToken) => client.auth.signInAnonymously({ options: { captchaToken } }))
+          .then(({ error }) => {
+            if (error) throw error;
+          });
       }
       await pending.current;
       router.refresh();

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Input, useToast } from '@nexg/ui';
+import { Button, Input, useToast, withCaptcha } from '@nexg/ui';
 import * as React from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 
@@ -24,7 +24,10 @@ export function NotifyForm() {
   }, [state, toast]);
 
   return (
-    <form action={formAction} className="mt-3">
+    <form
+      action={async (formData: FormData) => formAction(await withCaptcha(formData))}
+      className="mt-3"
+    >
       <p className="text-ink text-sm font-bold">Be first to know when it lands</p>
       <div className="bg-surface shadow-card mt-2 flex items-end gap-2 rounded-xl p-1.5">
         <Input

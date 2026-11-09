@@ -1,6 +1,7 @@
 'use server';
 
 import { createPublicClient } from '@/lib/supabase/public';
+import { CAPTCHA_FAILED_MESSAGE, verifyTurnstile } from '@/lib/turnstile';
 
 export interface StayRequestResult {
   ok: boolean;
@@ -24,6 +25,8 @@ export interface StayRequestInput {
   notes: string | null;
   consent_marketing: boolean;
   source?: string;
+  /** Cloudflare Turnstile token, checked before anything is written. */
+  captchaToken?: string;
 }
 
 /**
@@ -36,6 +39,8 @@ export interface StayRequestInput {
  * answer is not a request.
  */
 export async function requestStay(input: StayRequestInput): Promise<StayRequestResult> {
+  if (!(await verifyTurnstile(input.captchaToken)))
+    return { ok: false, message: CAPTCHA_FAILED_MESSAGE };
   if (!input.phone?.trim() && !input.email?.trim()) {
     return {
       ok: false,

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, ChipGroup, Input, PhoneInput, useToast } from '@nexg/ui';
+import { Button, ChipGroup, Input, PhoneInput, useToast, getCaptchaToken } from '@nexg/ui';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import * as React from 'react';
 
@@ -115,6 +115,7 @@ export function TailorForm({
 
     startTransition(async () => {
       const result = await requestStay({
+        captchaToken: await getCaptchaToken(),
         name: name.trim(),
         phone,
         email: email.trim() || null,

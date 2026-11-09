@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
+import { getCaptchaToken } from '@nexg/ui';
 import SharedRegistration from '../../../../merchant-onboarding/src/MerchantOnboarding';
 import {
   applicationCapture,
@@ -410,7 +411,7 @@ export function ConnectedApplication({
   async function completeSubmission(email: string) {
     if (anonymousSession && emailOtpEnabled) {
       if (!setupLinkSent.current) {
-        const result = await sendMerchantPasswordSetupLink();
+        const result = await sendMerchantPasswordSetupLink(await getCaptchaToken());
         if (!result.ok) throw new Error(result.message);
         setupLinkSent.current = true;
       }
