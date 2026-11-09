@@ -143,10 +143,7 @@ export function MerchantEmailSignIn() {
         </Button>
       </form>
       <p className="mt-5 text-center text-sm">
-        <Link
-          href="/sign-in?role=merchant"
-          className="text-ink font-bold underline underline-offset-4"
-        >
+        <Link href="/merchants/sign-in" className="text-ink font-bold underline underline-offset-4">
           Sign in with a password
         </Link>
       </p>

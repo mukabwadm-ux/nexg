@@ -4,6 +4,7 @@ import { LocationBanner, LocationSheet } from '@nexg/location';
 import { usePathname } from 'next/navigation';
 import { isBookingPage } from '@/lib/booking/routes';
 import { isMerchantRegistrationPath } from '@/lib/merchant-journey-navigation';
+import { isAuthPage } from '@/lib/auth-portals';
 
 /**
  * The precision banner and first-visit sheet, outside flows that should
@@ -18,7 +19,7 @@ import { isMerchantRegistrationPath } from '@/lib/merchant-journey-navigation';
 export function LocationBannerSlot() {
   const pathname = usePathname();
   if (
-    pathname === '/sign-in' ||
+    isAuthPage(pathname) ||
     pathname === '/host' ||
     pathname.startsWith('/host/') ||
     isBookingPage(pathname) ||
@@ -33,7 +34,7 @@ export function LocationBannerSlot() {
 export function LocationSheetSlot() {
   const pathname = usePathname();
   if (
-    pathname === '/sign-in' ||
+    isAuthPage(pathname) ||
     pathname === '/host' ||
     pathname.startsWith('/host/') ||
     isBookingPage(pathname) ||

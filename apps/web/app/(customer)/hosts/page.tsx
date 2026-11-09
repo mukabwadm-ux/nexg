@@ -269,7 +269,7 @@ export default async function HostsPage() {
     <>
       <SiteHeader
         action={{ label: 'List your Airbnb', href: '#list' }}
-        signIn={{ label: 'Host sign in', href: '/sign-in' }}
+        signIn={{ label: 'Sign in', href: '/hosts/sign-in' }}
       />
 
       <main id="main">

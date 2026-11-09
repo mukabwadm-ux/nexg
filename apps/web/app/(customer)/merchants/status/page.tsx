@@ -109,7 +109,7 @@ export default async function StatusPage() {
   return (
     <>
       <SiteHeader
-        signIn={{ label: 'Merchant sign in', href: '/merchants/sign-in' }}
+        signIn={{ label: 'Sign in', href: '/merchants/sign-in' }}
         action={{ label: 'Help', href: '/help' }}
       />
       <OnboardingProvider

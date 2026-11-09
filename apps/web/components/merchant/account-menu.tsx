@@ -133,7 +133,7 @@ export function AccountMenu({
               setGoing(true);
               setError('');
               try {
-                await signOutBrowser();
+                await signOutBrowser('/merchants/sign-in');
               } catch (cause) {
                 setError(
                   cause instanceof Error ? cause.message : 'Sign out could not be completed.',

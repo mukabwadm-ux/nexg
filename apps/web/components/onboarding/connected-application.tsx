@@ -420,13 +420,8 @@ export function ConnectedApplication({
         throw new Error(
           'Your password setup link was sent, but we could not sign out. Please try again.',
         );
-      const params = new URLSearchParams({
-        role: 'merchant',
-        next: '/merchant',
-        setup: 'sent',
-        email,
-      });
-      router.push(`/sign-in?${params.toString()}`);
+      const params = new URLSearchParams({ next: '/merchant', setup: 'sent', email });
+      router.push(`/merchants/sign-in?${params.toString()}`);
     } else {
       router.push('/merchant');
     }
@@ -590,7 +585,7 @@ export function ConnectedApplication({
             href={
               emailOtpEnabled
                 ? '/merchants/verify-email'
-                : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'
+                : '/merchants/sign-in?tab=create&next=%2Fmerchant'
             }
             prefetch={false}
             className="bg-gold text-ink mt-3 inline-flex rounded-lg px-4 py-2.5 font-bold"

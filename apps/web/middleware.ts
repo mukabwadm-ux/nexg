@@ -67,6 +67,8 @@ export const config = {
     '/auth/:path*',
     '/merchants/sign-in/:path*',
     '/riders/sign-in/:path*',
+    '/hosts/sign-in/:path*',
+    '/sign-up/:path*',
     '/forgot-password/:path*',
     '/reset-password/:path*',
   ],
@@ -105,6 +107,10 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/merchants/sign-in/') ||
     pathname === '/riders/sign-in' ||
     pathname.startsWith('/riders/sign-in/') ||
+    pathname === '/hosts/sign-in' ||
+    pathname.startsWith('/hosts/sign-in/') ||
+    pathname === '/sign-up' ||
+    pathname.startsWith('/sign-up/') ||
     pathname === '/forgot-password' ||
     pathname.startsWith('/forgot-password/') ||
     pathname === '/reset-password' ||

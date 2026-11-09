@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { signOutBrowser } from '@/lib/supabase/logout';
 
-export function SignOut() {
+export function SignOut({ signInPage = '/sign-in' }: { signInPage?: string } = {}) {
   const [going, setGoing] = React.useState(false);
   const [error, setError] = React.useState('');
 
@@ -17,7 +17,7 @@ export function SignOut() {
           setGoing(true);
           setError('');
           try {
-            await signOutBrowser();
+            await signOutBrowser(signInPage);
           } catch (cause) {
             setError(cause instanceof Error ? cause.message : 'Sign out could not be completed.');
             setGoing(false);

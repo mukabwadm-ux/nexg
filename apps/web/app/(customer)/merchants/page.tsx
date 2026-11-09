@@ -183,7 +183,7 @@ export default async function MerchantsPage() {
   return (
     <>
       <SiteHeader
-        signIn={{ label: 'Merchant sign in', href: '/merchants/sign-in' }}
+        signIn={{ label: 'Sign in', href: '/merchants/sign-in' }}
         action={{ label: 'List your business', href: registrationHref }}
       />
 
