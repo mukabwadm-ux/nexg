@@ -54,7 +54,8 @@ const PRICE = {
 } as const;
 
 /* Non-breaking space, so "KES" never wraps away from its number. */
-const kes = (n: number) => `KES ${n.toLocaleString('en-KE')}`;
+const NBSP = String.fromCharCode(160);
+const kes = (n: number) => `KES${NBSP}${n.toLocaleString('en-KE')}`;
 
 const HOST_BENEFITS: readonly { icon: LucideIcon; title: string; body: string }[] = [
   {
@@ -754,8 +755,9 @@ export default async function HostsPage() {
                   Ten minutes now. Better reviews all year.
                 </h2>
                 <p className="mt-4 text-[0.875rem] font-semibold leading-[1.8] text-[#5B5B5B]">
-                  Tell us about your first unit. We verify you&rsquo;re the host or manager, send
-                  your QR pack within two working days, and you&rsquo;re live.
+                  Tell us about your first unit and confirm your email. Then sign in, upload your ID
+                  and proof of authority to let, and you&rsquo;re live as soon as NexG approves
+                  them.
                 </p>
                 <ul className="mt-5 space-y-2.5">
                   {[

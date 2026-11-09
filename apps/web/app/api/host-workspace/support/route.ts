@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { HOST_SUPPORT_DESKS } from '@/lib/host-workspace/vocab';
 import {
   HostWorkspaceError,
-  localHostWorkspaceEnabled,
+  hostWorkspaceEnabled,
   hostWorkspaceAccess,
   hostWorkspaceError,
   hostWorkspaceJson,
@@ -33,7 +33,7 @@ const actionSchema = z.discriminatedUnion('action', [
 ]);
 
 export async function GET(request: Request) {
-  if (!localHostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
+  if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
     const params = new URL(request.url).searchParams;
     const access = await hostWorkspaceAccess();
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!localHostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
+  if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
     requireWorkspaceOrigin(request);
     if (

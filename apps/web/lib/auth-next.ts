@@ -3,7 +3,11 @@
  * Only these exact destinations are allowed, so a link can never be turned
  * into an open redirect.
  */
-const ALLOWED_NEXT = new Set(['/reset-password', '/reset-password?next=%2Fmerchant']);
+const ALLOWED_NEXT = new Set([
+  '/reset-password',
+  '/reset-password?next=%2Fmerchant',
+  '/reset-password?next=%2Fhost',
+]);
 
 export function safeAuthNext(requested: string | null): string {
   return requested && ALLOWED_NEXT.has(requested) ? requested : '/';
