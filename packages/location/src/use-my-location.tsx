@@ -106,6 +106,8 @@ export function UseMyLocation({
   }
 
   const dark = variant === 'sheet';
+  /* The first-visit sheet is kept small, so its sub-label is one short line. */
+  const compact = variant === 'sheet';
 
   return (
     <div>
@@ -125,13 +127,15 @@ export function UseMyLocation({
             {busy ? 'Waiting for your browser…' : 'Use my current location'}
           </span>
           <span className="block text-[0.6875rem] font-semibold text-white/70">
-            {subLabel(consent)}
+            {compact ? shortSubLabel(consent) : subLabel(consent)}
           </span>
         </span>
-        <span className="hidden shrink-0 items-center gap-1 text-[0.6875rem] font-extrabold text-white/70 sm:flex">
-          <Lock className="h-3 w-3" aria-hidden="true" />
-          {consent === 'granted' ? 'Allowed earlier' : 'Asks first'}
-        </span>
+        {compact ? null : (
+          <span className="hidden shrink-0 items-center gap-1 text-[0.6875rem] font-extrabold text-white/70 sm:flex">
+            <Lock className="h-3 w-3" aria-hidden="true" />
+            {consent === 'granted' ? 'Allowed earlier' : 'Asks first'}
+          </span>
+        )}
       </button>
 
       {error ? (
@@ -141,6 +145,19 @@ export function UseMyLocation({
       ) : null}
     </div>
   );
+}
+
+function shortSubLabel(consent: ConsentState): string {
+  switch (consent) {
+    case 'granted':
+      return 'Allowed earlier · tap to refresh';
+    case 'denied':
+      return 'Blocked · re-enable from the padlock';
+    case 'unavailable':
+      return 'Not available here · search instead';
+    default:
+      return 'Your browser asks first';
+  }
 }
 
 function subLabel(consent: ConsentState): string {
