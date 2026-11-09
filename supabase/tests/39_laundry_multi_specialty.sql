@@ -22,8 +22,8 @@ select is(
     where category.category = 'laundry_cleaning'
       and question.value ->> 'key' = 'business_types'
   ),
-  5,
-  'all five laundry and cleaning specialties are selectable'
+  17,
+  'all seventeen laundry and cleaning specialties are selectable (the original five plus twelve)'
 );
 
 select is(
