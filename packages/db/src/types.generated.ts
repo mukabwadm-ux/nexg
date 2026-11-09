@@ -6584,6 +6584,25 @@ export type Database = {
         };
         Relationships: [];
       };
+      category_tile_click: {
+        Row: {
+          clicks: number;
+          day: string;
+          tile: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          clicks?: number;
+          day?: string;
+          tile: string;
+        };
+        Update: {
+          clicks?: number;
+          day?: string;
+          tile?: string;
+        };
+        Relationships: [];
+      };
       city: {
         Row: {
           centre: unknown;
@@ -49685,6 +49704,14 @@ export type Database = {
         };
       };
       rpc_category_config_save: { Args: { p_category: string; p_config: Json }; Returns: Json };
+      rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
+      rpc_category_tile_popularity: {
+        Args: { p_days?: number };
+        Returns: {
+          clicks: number;
+          tile: string;
+        }[];
+      };
       rpc_change_block: {
         Args: { p_block_id: string; p_note: string; p_patch: Json };
         Returns: {
@@ -55632,11 +55659,6 @@ export type Database = {
           stay_id: string;
           unit: string;
         }[];
-      };
-      rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
-      rpc_category_tile_popularity: {
-        Args: { p_days?: number };
-        Returns: { clicks: number; tile: string }[];
       };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
