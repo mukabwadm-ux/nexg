@@ -30281,10 +30281,13 @@ export type Database = {
         Row: {
           check_in: string;
           check_out: string;
+          confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
           external_ref_hash: string | null;
           guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
           host_id: string;
           id: string;
           notes: string | null;
@@ -30293,6 +30296,7 @@ export type Database = {
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
           rate_kes: number | null;
           source: string;
           status: string;
@@ -30303,10 +30307,13 @@ export type Database = {
         Insert: {
           check_in: string;
           check_out: string;
+          confirmed_at?: string | null;
           conflict_flagged?: boolean;
           created_at?: string;
           external_ref_hash?: string | null;
           guest_first_name?: string | null;
+          guest_user_id?: string | null;
+          hold_expires_at?: string | null;
           host_id: string;
           id?: string;
           notes?: string | null;
@@ -30315,6 +30322,7 @@ export type Database = {
           phone?: string | null;
           property_id?: string | null;
           qr_link_sent_at?: string | null;
+          quote_total_kes?: number | null;
           rate_kes?: number | null;
           source?: string;
           status?: string;
@@ -30324,10 +30332,13 @@ export type Database = {
         Update: {
           check_in?: string;
           check_out?: string;
+          confirmed_at?: string | null;
           conflict_flagged?: boolean;
           created_at?: string;
           external_ref_hash?: string | null;
           guest_first_name?: string | null;
+          guest_user_id?: string | null;
+          hold_expires_at?: string | null;
           host_id?: string;
           id?: string;
           notes?: string | null;
@@ -30336,6 +30347,7 @@ export type Database = {
           phone?: string | null;
           property_id?: string | null;
           qr_link_sent_at?: string | null;
+          quote_total_kes?: number | null;
           rate_kes?: number | null;
           source?: string;
           status?: string;
@@ -48706,6 +48718,16 @@ export type Database = {
           user_id: string;
         }[];
       };
+      fn_stay_dates_check: {
+        Args: { p_check_in: string; p_check_out: string };
+        Returns: undefined;
+      };
+      fn_stay_occupies: { Args: { p_hold_expires_at: string; p_status: string }; Returns: boolean };
+      fn_stay_release_expired_holds: { Args: { p_unit_id?: string }; Returns: number };
+      fn_stay_window: {
+        Args: { p_check_in: string; p_check_out: string; p_unit_id: string };
+        Returns: unknown;
+      };
       fn_swap_options: {
         Args: { p_block_id: string };
         Returns: {
@@ -55253,15 +55275,24 @@ export type Database = {
         Returns: Database['public']['Enums']['staff_status'];
       };
       rpc_staff_sign_out_everywhere: { Args: { p_staff_id: string }; Returns: number };
-      rpc_stay_cancel: {
-        Args: { p_reason?: string; p_stay_id: string };
+      rpc_stay_block: {
+        Args: {
+          p_from: string;
+          p_host_id: string;
+          p_note?: string;
+          p_to: string;
+          p_unit_id: string;
+        };
         Returns: {
           check_in: string;
           check_out: string;
+          confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
           external_ref_hash: string | null;
           guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
           host_id: string;
           id: string;
           notes: string | null;
@@ -55270,6 +55301,7 @@ export type Database = {
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
           rate_kes: number | null;
           source: string;
           status: string;
@@ -55283,14 +55315,8 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_stay_block: {
-        Args: {
-          p_from: string;
-          p_host_id: string;
-          p_note?: string;
-          p_to: string;
-          p_unit_id: string;
-        };
+      rpc_stay_cancel: {
+        Args: { p_reason?: string; p_stay_id: string };
         Returns: {
           check_in: string;
           check_out: string;
@@ -55429,25 +55455,6 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_stay_search: {
-        Args: {
-          p_check_in: string;
-          p_check_out: string;
-          p_guests?: number;
-          p_property_id?: string;
-        };
-        Returns: {
-          nightly_rate_kes: number;
-          nights: number;
-          property_id: string;
-          total_kes: number;
-          unit_id: string;
-        }[];
-      };
-      rpc_unit_busy: {
-        Args: { p_from: string; p_to: string; p_unit_id: string };
-        Returns: { ends_on: string; starts_on: string }[];
-      };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
         Args: {
@@ -55515,15 +55522,33 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_search: {
+        Args: {
+          p_check_in: string;
+          p_check_out: string;
+          p_guests?: number;
+          p_property_id?: string;
+        };
+        Returns: {
+          nightly_rate_kes: number;
+          nights: number;
+          property_id: string;
+          total_kes: number;
+          unit_id: string;
+        }[];
+      };
       rpc_stay_upsert: {
         Args: { p_host_id: string; p_stay: Json; p_stay_id?: string };
         Returns: {
           check_in: string;
           check_out: string;
+          confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
           external_ref_hash: string | null;
           guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
           host_id: string;
           id: string;
           notes: string | null;
@@ -55532,6 +55557,7 @@ export type Database = {
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
           rate_kes: number | null;
           source: string;
           status: string;
@@ -55664,6 +55690,13 @@ export type Database = {
         Returns: Json;
       };
       rpc_translations_put: { Args: { p_locale: string; p_rows: Json }; Returns: number };
+      rpc_unit_busy: {
+        Args: { p_from: string; p_to: string; p_unit_id: string };
+        Returns: {
+          ends_on: string;
+          starts_on: string;
+        }[];
+      };
       rpc_unit_caretaker_confirm: { Args: { p_token?: string; p_unit_id: string }; Returns: Json };
       rpc_unit_caretaker_invite: { Args: { p_unit_id: string }; Returns: Json };
       rpc_unit_photos_set: {
