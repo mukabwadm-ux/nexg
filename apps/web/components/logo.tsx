@@ -11,11 +11,15 @@ import Image from 'next/image';
  * scripts/build-brand-assets.py turns into the favicon, the app icons and
  * the QR centre mark — at 16 px the full lockup is a smudge.
  *
- * The lockup is stacked and close to square (771 × 736), so it needs more
- * height than the old wordmark did to stay legible; size it with a height
- * class and the width follows.
+ * The light-ground lockup is the 2026 artwork: a deeper gold that holds up on
+ * white, plus the "YOUR COMFORT, SIMPLIFIED" tagline. The dark-ground one is
+ * still the earlier white version. Both are stacked and close to square, so
+ * size them with a height class and the width follows.
  */
-const LOCKUP = { width: 771, height: 736 } as const;
+const LOCKUP = {
+  light: { src: '/brand/nexg-logo-light.png', width: 787, height: 825 },
+  dark: { src: '/brand/nexg-logo-on-dark.png', width: 771, height: 736 },
+} as const;
 
 export function Logo({
   className,
@@ -30,11 +34,12 @@ export function Logo({
   /** In a header, so it is not lazy-loaded. */
   priority?: boolean;
 }) {
+  const art = onDark ? LOCKUP.dark : LOCKUP.light;
   return (
     <Image
-      src={onDark ? '/brand/nexg-logo-on-dark.png' : '/brand/nexg-logo.png'}
-      width={LOCKUP.width}
-      height={LOCKUP.height}
+      src={art.src}
+      width={art.width}
+      height={art.height}
       alt={title ?? ''}
       {...(title ? {} : { 'aria-hidden': true })}
       priority={priority}
