@@ -1,5 +1,6 @@
 import type { BookingModel } from '@nexg/booking-config/profiles';
 import type { BookingOffering } from '../booking/types';
+import { withSubcategoryVariants } from '@nexg/booking-config/variants';
 import config from './config.json';
 import { modelSchema, schemas } from './schemas';
 import type { CatalogueOptions } from './catalogue-options';
@@ -19,7 +20,12 @@ export type OfferingProfile = {
   models: string[];
   attributes: Attribute[];
 };
-export const profiles = config.profiles as OfferingProfile[];
+/* The audited profiles plus the subcategory variants, which reuse their base's editor. */
+export const profiles = withSubcategoryVariants(
+  config.profiles as OfferingProfile[],
+  (profile) => profile.id,
+  (base, variant) => ({ ...base, id: variant.subcategoryId, name: variant.name }),
+);
 export type MerchantOfferingConfiguration = {
   subcategoryId: string;
   /** Explicitly enabled by scoped onboarding/configuration, never by a category candidate alone. */

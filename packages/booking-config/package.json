@@ -11,7 +11,8 @@
     "./specialists": "./src/specialists.ts",
     "./onboarding": "./src/onboarding.ts",
     "./onboarding-home": "./src/onboarding-home.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./variants": "./src/variants.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",

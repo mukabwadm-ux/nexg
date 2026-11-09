@@ -3,8 +3,42 @@ import addFormats from 'ajv-formats';
 import type { ValidateFunction } from 'ajv';
 import data from './data/registry.generated';
 import type { JSONSchema, QuestionDefinition, Registry } from './types';
+import {
+  VARIANT_BASE_REVISION,
+  VARIANT_REGISTRY_REVISION,
+  withSubcategoryVariants,
+} from './variants';
 
-export const registry = data as unknown as Registry;
+const snapshot = data as unknown as Registry;
+if (snapshot.revision !== VARIANT_BASE_REVISION)
+  throw new Error(
+    `Subcategory variants extend ${VARIANT_BASE_REVISION}, but the registry is ${snapshot.revision}. Re-check src/data/subcategory-variants.json.`,
+  );
+
+/**
+ * The audited snapshot plus the subcategory variants (see variants.ts).
+ * A variant copies its base profile's model, questions, bindings and rules;
+ * rule ids are re-keyed so they stay unique.
+ */
+export const registry: Registry = {
+  ...snapshot,
+  revision: VARIANT_REGISTRY_REVISION,
+  profiles: withSubcategoryVariants(
+    snapshot.profiles,
+    (profile) => profile.subcategoryId,
+    (base, variant) => ({
+      ...structuredClone(base),
+      categoryId: variant.categoryId,
+      subcategoryId: variant.subcategoryId,
+      name: variant.name,
+      specialtyNeeds: variant.specialtyNeeds,
+      rules: base.rules.map((rule) => ({
+        ...structuredClone(rule),
+        id: rule.id.replace(`_${base.subcategoryId}_`, `_${variant.subcategoryId}_`),
+      })),
+    }),
+  ),
+};
 export const questions = new Map(registry.questions.map((question) => [question.id, question]));
 export const aliases = new Map(
   registry.aliases.map((alias) => [alias.sourceQuestionId, alias.targetQuestionId]),

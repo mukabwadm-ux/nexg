@@ -1,3 +1,8 @@
+import { SUBCATEGORY_VARIANTS } from '@nexg/booking-config/variants';
+
+/** The audited 128 specialties plus the subcategory variants. */
+const PROFILE_COUNT = 128 + SUBCATEGORY_VARIANTS.length;
+
 import { describe, expect, it } from 'vitest';
 import { profiles, seedCatalogue } from '../offerings/model';
 import { sampleCsv } from './export';
@@ -152,7 +157,7 @@ describe('source-scoped sample payouts', () => {
   });
 
   it('requires an explicit example source and supports that source for all registered specialties', async () => {
-    expect(profiles).toHaveLength(128);
+    expect(profiles).toHaveLength(PROFILE_COUNT);
     for (const profile of profiles) {
       const { context, source } = setup(profile.id);
       let snapshot = await source.load(context);

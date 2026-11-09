@@ -1,0 +1,91 @@
+{
+  "revision": "nexg-booking-2026-11-09.1",
+  "baseRevision": "nexg-booking-2026-10-31.1",
+  "note": "Hand-maintained. Subcategories added after the audited 128-profile snapshot. Each one reuses an existing profile's booking model, questions and rules (baseSubcategoryId) and changes only its id, name and description. Bump revision when this list changes and add a migration that inserts the matching merchant_application_registry row.",
+  "variants": [
+    {
+      "subcategoryId": "wash_and_fold",
+      "name": "Wash and Fold",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "laundry",
+      "specialtyNeeds": "Weighed or bagged everyday laundry washed, dried and folded, with drop-off or collection and a turnaround window."
+    },
+    {
+      "subcategoryId": "stain_removal",
+      "name": "Stain Removal",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "dry_cleaning",
+      "specialtyNeeds": "Per-item stain treatment with garment and fabric details, an honest outcome note and a turnaround window."
+    },
+    {
+      "subcategoryId": "clothing_alterations",
+      "name": "Clothing Alterations and Repairs",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "dry_cleaning",
+      "specialtyNeeds": "Per-item alterations and repairs (hems, zips, fitting) with the garment, the requested change and a ready date."
+    },
+    {
+      "subcategoryId": "curtain_cleaning",
+      "name": "Curtain Cleaning",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "dry_cleaning",
+      "specialtyNeeds": "Curtains and drapes collected or dropped off, priced per panel or size, cleaned and returned within a turnaround window."
+    },
+    {
+      "subcategoryId": "carpet_cleaning",
+      "name": "Carpet Cleaning",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "dry_cleaning",
+      "specialtyNeeds": "Carpets and rugs collected or dropped off, priced per item or size, cleaned, dried and returned within a turnaround window."
+    },
+    {
+      "subcategoryId": "wedding_gown_cleaning",
+      "name": "Wedding Gown Cleaning",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "dry_cleaning",
+      "specialtyNeeds": "Specialist cleaning of wedding and occasion gowns, per item, with fabric and embellishment notes and a ready date."
+    },
+    {
+      "subcategoryId": "corporate_uniform_laundry",
+      "name": "Corporate and Uniform Laundry",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "laundry",
+      "specialtyNeeds": "Recurring laundry for businesses, staff uniforms and linen, collected and returned on an agreed schedule."
+    },
+    {
+      "subcategoryId": "fumigation",
+      "name": "Fumigation",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "home_cleaning",
+      "specialtyNeeds": "On-site pest control and fumigation visits to homes and offices within a coverage area, with the treatment and re-entry time stated."
+    },
+    {
+      "subcategoryId": "express_laundry",
+      "name": "Express Laundry (2-hour service)",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "laundry",
+      "specialtyNeeds": "Fast-turnaround laundry, ready in about two hours, with a cut-off time and capacity limit stated up front."
+    },
+    {
+      "subcategoryId": "laundry_pickup_delivery",
+      "name": "Laundry Pickup and Delivery",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "laundry",
+      "specialtyNeeds": "Laundry collected from and returned to the customer's door in booked pickup and return windows."
+    },
+    {
+      "subcategoryId": "garment_care",
+      "name": "Garment Care and Finishing",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "ironing",
+      "specialtyNeeds": "Pressing, steaming, folding and finishing of garments, per item, ready for collection or return."
+    },
+    {
+      "subcategoryId": "laundry_order_tracking",
+      "name": "Laundry Order Tracking",
+      "categoryId": "laundry_cleaning",
+      "baseSubcategoryId": "laundry",
+      "specialtyNeeds": "Laundry service where the customer follows each order's status from intake to return."
+    }
+  ]
+}

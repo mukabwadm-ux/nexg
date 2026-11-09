@@ -1,3 +1,8 @@
+import { SUBCATEGORY_VARIANTS } from '@nexg/booking-config/variants';
+
+/** The audited 128 specialties plus the subcategory variants. */
+const PROFILE_COUNT = 128 + SUBCATEGORY_VARIANTS.length;
+
 import { describe, expect, it } from 'vitest';
 import {
   availableSchemas,
@@ -36,7 +41,7 @@ const profile = profiles.find((p) => p.id === 'makeup')!;
 
 describe('adaptive promotions', () => {
   it('resolves every registered specialty through its actual offering schema', () => {
-    expect(profiles).toHaveLength(128);
+    expect(profiles).toHaveLength(PROFILE_COUNT);
     expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(21);
     const models = new Set<string>();
     for (const entry of profiles) {

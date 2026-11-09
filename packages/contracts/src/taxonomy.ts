@@ -1,7 +1,8 @@
 /**
  * @nexg/contracts/taxonomy — The authoritative NexG Merchant Taxonomy.
  *
- * 21 Top-Level Merchant Verticals and 128 Subcategories.
+ * 21 Top-Level Merchant Verticals and 140 Subcategories (the audited 128 plus
+ * the Laundry & Cleaning additions in packages/booking-config/src/data/subcategory-variants.json).
  * Derived from the official NexG Nairobi Merchant Seed Catalog & Taxonomy spec.
  */
 import { z } from 'zod';
@@ -1686,7 +1687,7 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
     icon: 'Sparkles',
     color: '#0891b2',
     bg: '#ecfeff',
-    desc: 'Laundry, dry cleaning, ironing and home or office cleaning',
+    desc: 'Laundry, dry cleaning, ironing, garment care, fumigation and home or office cleaning',
     cardKind: 'services',
     etaStyle: 'turnaround',
     sort: 12,
@@ -1766,6 +1767,187 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
           'eco_products',
           'min_hours_session',
           'coverage_area_text',
+        ],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'wash_and_fold',
+        name: 'Wash and Fold',
+        icon: 'Shirt',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: [
+          'pickup_delivery',
+          'turnaround_time',
+          'per_kg_pricing',
+          'per_item_pricing',
+          'weight_limit',
+        ],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'stain_removal',
+        name: 'Stain Removal',
+        icon: 'Sparkles',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: ['pickup_delivery', 'turnaround_time', 'per_item_pricing', 'garment_types'],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'clothing_alterations',
+        name: 'Clothing Alterations and Repairs',
+        icon: 'Scissors',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: ['pickup_delivery', 'turnaround_time', 'per_item_pricing', 'garment_types'],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'curtain_cleaning',
+        name: 'Curtain Cleaning',
+        icon: 'Sparkles',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: ['pickup_delivery', 'turnaround_time', 'per_item_pricing', 'garment_types'],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'carpet_cleaning',
+        name: 'Carpet Cleaning',
+        icon: 'Sparkles',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: ['pickup_delivery', 'turnaround_time', 'per_item_pricing', 'garment_types'],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'wedding_gown_cleaning',
+        name: 'Wedding Gown Cleaning',
+        icon: 'Heart',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: ['pickup_delivery', 'turnaround_time', 'per_item_pricing', 'garment_types'],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'corporate_uniform_laundry',
+        name: 'Corporate and Uniform Laundry',
+        icon: 'Briefcase',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: [
+          'pickup_delivery',
+          'turnaround_time',
+          'per_kg_pricing',
+          'per_item_pricing',
+          'weight_limit',
+        ],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'fumigation',
+        name: 'Fumigation',
+        icon: 'ShieldAlert',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'service_dispatch',
+        workflowHint: 'booking_dispatch',
+        fields: [
+          'one_time_bookings',
+          'recurring_sub',
+          'equipment_provided',
+          'eco_products',
+          'min_hours_session',
+          'coverage_area_text',
+        ],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'express_laundry',
+        name: 'Express Laundry (2-hour service)',
+        icon: 'Shirt',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: [
+          'pickup_delivery',
+          'turnaround_time',
+          'per_kg_pricing',
+          'per_item_pricing',
+          'weight_limit',
+        ],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'laundry_pickup_delivery',
+        name: 'Laundry Pickup and Delivery',
+        icon: 'Truck',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: [
+          'pickup_delivery',
+          'turnaround_time',
+          'per_kg_pricing',
+          'per_item_pricing',
+          'weight_limit',
+        ],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'garment_care',
+        name: 'Garment Care and Finishing',
+        icon: 'Shirt',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: ['pickup_delivery', 'turnaround_time', 'per_item_pricing'],
+        suggestedItemCount: 20,
+        defaultWorkflow:
+          'Select service → address → scope/details → schedule → quote or fixed price → confirmation → assigned provider → completion',
+      },
+      {
+        id: 'laundry_order_tracking',
+        name: 'Laundry Order Tracking',
+        icon: 'Map',
+        categoryId: 'laundry_cleaning',
+        fulfillmentHint: 'pickup_dropoff',
+        workflowHint: 'scheduled_dispatch',
+        fields: [
+          'pickup_delivery',
+          'turnaround_time',
+          'per_kg_pricing',
+          'per_item_pricing',
+          'weight_limit',
         ],
         suggestedItemCount: 20,
         defaultWorkflow:
@@ -2718,7 +2900,7 @@ export const ALL_CATEGORIES: readonly MerchantCategory[] = MERCHANT_TAXONOMY.map
   image: getCategoryImage(cat.id),
 }));
 
-/** Flat list of all 128 subcategories */
+/** Flat list of all subcategories */
 export const ALL_SUBCATEGORIES: readonly MerchantSubcategory[] = MERCHANT_TAXONOMY.flatMap(
   (cat) => cat.subcategories,
 );
