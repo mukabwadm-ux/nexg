@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BOOKING_REGISTRY_REVISION, validateBookingAnswer } from '@nexg/booking-config';
+import { BOOKING_REGISTRY_REVISIONS, validateBookingAnswer } from '@nexg/booking-config';
 import {
   listOnboardingCategories,
   resolveOnboardingSelection,
@@ -135,7 +135,7 @@ const scopeParents = new Map(
 );
 /** Validate retained scopes against the shared registry without inventing missing setup. */
 export function validateReviewCapture(capture: MerchantApplicationCapture) {
-  if (capture.registryRevision !== BOOKING_REGISTRY_REVISION)
+  if (!BOOKING_REGISTRY_REVISIONS.includes(capture.registryRevision))
     throw new Error('Unsupported application registry.');
   for (const [subcategory, answers] of Object.entries(capture.answersBySubcategory)) {
     const category = scopeParents.get(subcategory);

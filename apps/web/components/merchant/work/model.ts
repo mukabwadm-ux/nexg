@@ -1,6 +1,7 @@
 import type { BookingModel, BookingProfileSummary } from '@nexg/booking-config/profiles';
 import type { ResolvedBookingConfiguration } from '@nexg/booking-config';
 import profileViews from './work-profile-views.json';
+import { baseSubcategoryId } from '@nexg/booking-config/profiles';
 
 export type WorkflowId =
   | 'WF_ORDER'
@@ -408,14 +409,18 @@ const modelViews: Record<BookingModel, WorkflowId[]> = {
 };
 
 export function candidateWorkflows(profile: BookingProfileSummary): WorkflowId[] {
-  const entry = profileViews.find((item) => item.subcategoryId === profile.subcategoryId);
+  const entry = profileViews.find(
+    (item) => item.subcategoryId === baseSubcategoryId(profile.subcategoryId),
+  );
   const choices = entry
     ? entry.views.flatMap((view) => view.workflowIds)
     : profile.candidateModels.flatMap((model) => modelViews[model] ?? []);
   return [...new Set(choices)].filter((id): id is WorkflowId => id in templates);
 }
 export function defaultWorkflow(profile: BookingProfileSummary): WorkflowId | undefined {
-  const entry = profileViews.find((item) => item.subcategoryId === profile.subcategoryId);
+  const entry = profileViews.find(
+    (item) => item.subcategoryId === baseSubcategoryId(profile.subcategoryId),
+  );
   const model = entry?.views.find((view) => view.modelId === profile.defaultModelId);
   return (
     model?.workflowIds.find((id): id is WorkflowId => id in templates) ??
@@ -427,7 +432,7 @@ export function modelForWorkflow(
   workflow: WorkflowId,
 ): BookingModel | undefined {
   return profileViews
-    .find((item) => item.subcategoryId === profile.subcategoryId)
+    .find((item) => item.subcategoryId === baseSubcategoryId(profile.subcategoryId))
     ?.views.find((view) => view.workflowIds.includes(workflow))?.modelId as
     | BookingModel
     | undefined;

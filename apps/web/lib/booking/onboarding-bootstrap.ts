@@ -1,4 +1,4 @@
-import { validateBookingAnswer } from '@nexg/booking-config';
+import { BOOKING_REGISTRY_REVISIONS, validateBookingAnswer } from '@nexg/booking-config';
 import { resolveOnboardingSelection } from '@nexg/booking-config/onboarding';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
 import { createClient } from '../supabase/server';
@@ -43,7 +43,7 @@ export async function merchantBookingBootstrapIdentity(
   const primary = capture.subcategories[0];
   if (
     selection.issues.length ||
-    capture.registryRevision !== selection.revision ||
+    !BOOKING_REGISTRY_REVISIONS.includes(capture.registryRevision) ||
     !primary ||
     primary !== identity.subcategoryId
   )

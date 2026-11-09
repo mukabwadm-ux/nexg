@@ -1,3 +1,8 @@
+import { SUBCATEGORY_VARIANTS } from '@nexg/booking-config/variants';
+
+/** The audited 128 specialties plus the subcategory variants. */
+const PROFILE_COUNT = 128 + SUBCATEGORY_VARIANTS.length;
+
 import { listBookingProfiles } from '@nexg/booking-config/profiles';
 import { describe, expect, it } from 'vitest';
 import {
@@ -11,9 +16,9 @@ import {
 } from './model';
 
 describe('Work preview configuration', () => {
-  it('offers a supported explicitly selected activity for each of the 128 shared booking profiles', () => {
+  it('offers a supported explicitly selected activity for each shared booking profile', () => {
     const profiles = listBookingProfiles();
-    expect(profiles).toHaveLength(128);
+    expect(profiles).toHaveLength(PROFILE_COUNT);
     for (const profile of profiles) {
       expect(candidateWorkflows(profile).length, profile.subcategoryId).toBeGreaterThan(0);
       expect(defaultWorkflow(profile), profile.subcategoryId).toBeDefined();
