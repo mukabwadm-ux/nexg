@@ -11,6 +11,8 @@ export interface AuthResult {
   message: string;
   /** Where the caller should go next, decided by the role they picked. */
   redirectTo?: string;
+  /** Supabase allows one auth email per address per minute; try again after it. */
+  rateLimited?: boolean;
 }
 
 export type AccountRole = 'guest' | 'rider' | 'merchant' | 'host';
@@ -247,12 +249,17 @@ export async function sendHostPasswordSetupLink(): Promise<AuthResult> {
   const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
     redirectTo: redirectTo.toString(),
   });
-  if (error)
+  if (error) {
+    const rateLimited =
+      error.status === 429 || `${error.code ?? ''} ${error.message}`.toLowerCase().includes('rate');
     return {
       ok: false,
-      message:
-        'Your email is verified, but we could not send the password setup link. Try again in a minute.',
+      rateLimited,
+      message: rateLimited
+        ? 'Your welcome email is queued: we can send one email a minute to the same address.'
+        : 'Your account is ready, but we could not send the welcome email. Use "Forgot password" on the sign-in page to get the link.',
     };
+  }
 
   return { ok: true, message: 'Check your inbox for your welcome email and password link.' };
 }

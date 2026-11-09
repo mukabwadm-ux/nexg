@@ -41,16 +41,16 @@ values
   ('00000000-0000-0000-0000-000000000000','c1111111-1111-1111-1111-111111111111',
    'authenticated','authenticated','ht.desk@nexgapp.com','',now(),now(),now());
 
-/* Applicants. Each holds the session the page gives them (anonymous until
-   they verify their email); one account applies for one host. */
-insert into auth.users (instance_id, id, aud, role, is_anonymous, created_at, updated_at)
+/* Applicants. The form verifies the email before submitting, so each one is
+   a login with a confirmed email; one login applies for one host. */
+insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
   ('00000000-0000-0000-0000-000000000000','c2000000-0000-4000-8000-000000000001',
-   'authenticated','authenticated',true,now(),now()),
+   'authenticated','authenticated','host@example.test',now(),false,now(),now()),
   ('00000000-0000-0000-0000-000000000000','c2000000-0000-4000-8000-000000000002',
-   'authenticated','authenticated',true,now(),now()),
+   'authenticated','authenticated','two@example.test',now(),false,now(),now()),
   ('00000000-0000-0000-0000-000000000000','c2000000-0000-4000-8000-000000000003',
-   'authenticated','authenticated',true,now(),now());
+   'authenticated','authenticated','three@example.test',now(),false,now(),now());
 
 insert into public.staff_user (id, user_id, email, display_name)
 values ('cccccccc-0000-0000-0000-00000000000a','c1111111-1111-1111-1111-111111111111',
@@ -64,7 +64,7 @@ from public.staff_user s where s.email = 'ht.desk@nexgapp.com';
 -- the form
 
 select set_config('request.jwt.claims',
-  '{"sub":"c2000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":true}', true);
+  '{"sub":"c2000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 
 select lives_ok(
   $$ select public.rpc_host_apply(jsonb_build_object(
@@ -123,7 +123,7 @@ select is(
  * invisible to the second half of it.
  */
 select set_config('request.jwt.claims',
-  '{"sub":"c2000000-0000-4000-8000-000000000002","role":"authenticated","is_anonymous":true}', true);
+  '{"sub":"c2000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 
 insert into t (k, v)
 select 'reference', public.rpc_host_apply(jsonb_build_object(
@@ -151,16 +151,16 @@ select throws_ok(
        'phone', '+254700009004', 'contact_name', '[Nobody]', 'email', 'n@example.test',
        'handoff', 'lockbox', 'address', '[Address], Karen')) $$,
   '42501', null,
-  'the anonymous key alone cannot apply; the page signs the visitor in anonymously first');
+  'the anonymous key alone cannot apply; the form verifies an email login first');
 
 /*
- * The page's anonymous session is the path that has to work. It is also
+ * The form's verified login is the path that has to work. It is also
  * the path where a mistake would leak: the ticket holds a name, a phone
  * number and an address.
  */
 set local role authenticated;
 select set_config('request.jwt.claims',
-  '{"sub":"c2000000-0000-4000-8000-000000000003","role":"authenticated","is_anonymous":true}', true);
+  '{"sub":"c2000000-0000-4000-8000-000000000003","role":"authenticated"}', true);
 
 insert into t (k, v)
 select 'anon_reference', public.rpc_host_apply(jsonb_build_object(
@@ -184,7 +184,7 @@ reset role;
 select is(
   (select v from t where k = 'anon_reference'),
   (select reference from public.support_ticket where phone = '+254700009003'),
-  'a visitor with only an anonymous session can apply, and the desk still gets it'
+  'a verified applicant can apply, and the desk still gets it'
 );
 
 select is(
