@@ -24697,7 +24697,6 @@ export type Database = {
       };
       property: {
         Row: {
-          is_sample: boolean;
           amenities: string[];
           area: string | null;
           check_in_from: string | null;
@@ -24710,6 +24709,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -24724,7 +24724,6 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
-          is_sample?: boolean;
           amenities?: string[];
           area?: string | null;
           check_in_from?: string | null;
@@ -24737,6 +24736,7 @@ export type Database = {
           floors?: number | null;
           host_id: string;
           id?: string;
+          is_sample?: boolean;
           kind?: Database['public']['Enums']['property_kind'];
           listed?: boolean;
           listed_at?: string | null;
@@ -24750,7 +24750,6 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
-          is_sample?: boolean;
           amenities?: string[];
           area?: string | null;
           check_in_from?: string | null;
@@ -24763,6 +24762,7 @@ export type Database = {
           floors?: number | null;
           host_id?: string;
           id?: string;
+          is_sample?: boolean;
           kind?: Database['public']['Enums']['property_kind'];
           listed?: boolean;
           listed_at?: string | null;
@@ -44511,7 +44511,6 @@ export type Database = {
       };
       property_public: {
         Row: {
-          is_sample: boolean | null;
           amenities: string[] | null;
           area: string | null;
           bedrooms_max: number | null;
@@ -44523,6 +44522,7 @@ export type Database = {
           description: string | null;
           from_rate_kes: number | null;
           id: string | null;
+          is_sample: boolean | null;
           kind: Database['public']['Enums']['property_kind'] | null;
           name: string | null;
           neighbourhood_note: string | null;
@@ -44609,7 +44609,6 @@ export type Database = {
       };
       property_unit_public: {
         Row: {
-          is_sample: boolean | null;
           area: string | null;
           bathrooms: number | null;
           bed_setup: string | null;
@@ -44617,6 +44616,7 @@ export type Database = {
           floor: string | null;
           handoff_arranged: boolean | null;
           id: string | null;
+          is_sample: boolean | null;
           label_public: string | null;
           max_guests: number | null;
           min_nights: number | null;
@@ -53838,6 +53838,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -53872,6 +53873,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -53906,6 +53908,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
