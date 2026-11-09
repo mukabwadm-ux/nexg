@@ -12864,7 +12864,7 @@ export type Database = {
           verified_at: string | null;
           verified_by: string | null;
           went_live_at: string | null;
-          workspace_profile: Json;
+          workspace_profile: NonNullable<Json>;
         };
         ComputedFields: never;
         Insert: {
@@ -12912,6 +12912,7 @@ export type Database = {
           verified_at?: string | null;
           verified_by?: string | null;
           went_live_at?: string | null;
+          workspace_profile?: NonNullable<Json>;
         };
         Update: {
           areas?: string[];
@@ -12958,6 +12959,7 @@ export type Database = {
           verified_at?: string | null;
           verified_by?: string | null;
           went_live_at?: string | null;
+          workspace_profile?: NonNullable<Json>;
         };
         Relationships: [
           {
@@ -13158,6 +13160,122 @@ export type Database = {
           },
         ];
       };
+      host_document: {
+        Row: {
+          file_name: string;
+          host_id: string;
+          id: string;
+          kind: string;
+          mime: string;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          size_bytes: number;
+          status: string;
+          storage_path: string;
+          superseded_at: string | null;
+          uploaded_at: string;
+          uploaded_by: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          file_name: string;
+          host_id: string;
+          id?: string;
+          kind: string;
+          mime: string;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          size_bytes: number;
+          status?: string;
+          storage_path: string;
+          superseded_at?: string | null;
+          uploaded_at?: string;
+          uploaded_by: string;
+        };
+        Update: {
+          file_name?: string;
+          host_id?: string;
+          id?: string;
+          kind?: string;
+          mime?: string;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          size_bytes?: number;
+          status?: string;
+          storage_path?: string;
+          superseded_at?: string | null;
+          uploaded_at?: string;
+          uploaded_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+        ];
+      };
       host_invoice: {
         Row: {
           created_at: string;
@@ -13268,67 +13386,188 @@ export type Database = {
           },
         ];
       };
-      host_unit_guide: {
-        Row: { unit_id: string; revision: number; document: Json; published_id: string | null };
-        Insert: never;
-        Update: never;
-        Relationships: [{
-          foreignKeyName: 'host_unit_guide_unit_id_fkey';
-          columns: ['unit_id'];
-          isOneToOne: true;
-          referencedRelation: 'unit';
-          referencedColumns: ['id'];
-        }];
-      };
-      host_unit_guide_version: {
-        Row: { id: string; unit_id: string; document: Json; article_count: number; published_at: string };
-        Insert: never;
-        Update: never;
-        Relationships: [{
-          foreignKeyName: 'host_unit_guide_version_unit_id_fkey';
-          columns: ['unit_id'];
-          isOneToOne: false;
-          referencedRelation: 'host_unit_guide';
-          referencedColumns: ['unit_id'];
-        }];
-      };
-      host_workspace_task: {
-        Row: {
-          id: string; unit_id: string; stay_id: string | null; repeat_of: string | null;
-          assignee_id: string | null; created_by: string | null;
-          title: string; kind: string; due_at: string; priority: string; status: string;
-          checklist: string[]; completed_checks: string[]; evidence: string; comments: string;
-          cadence: string; inspection: boolean; version: number; updated_at: string;
-        };
-        Insert: never;
-        Update: never;
-        Relationships: [{
-          foreignKeyName: 'host_workspace_task_unit_id_fkey';
-          columns: ['unit_id'];
-          isOneToOne: false;
-          referencedRelation: 'unit';
-          referencedColumns: ['id'];
-        }];
-      };
       host_manual_finance: {
         Row: {
-          id: string;
-          host_id: string;
-          unit_id: string;
-          stay_id: string | null;
-          kind: string;
           amount_minor: number;
-          recorded_on: string;
-          description: string;
           category: string;
+          created_at: string;
+          created_by: string;
+          description: string;
+          host_id: string;
+          id: string;
+          kind: string;
+          recorded_on: string;
           reference: string;
           status: string;
-          created_by: string;
-          created_at: string;
+          stay_id: string | null;
+          unit_id: string;
         };
-        Insert: never;
-        Update: never;
-        Relationships: [];
+        ComputedFields: never;
+        Insert: {
+          amount_minor: number;
+          category?: string;
+          created_at?: string;
+          created_by: string;
+          description?: string;
+          host_id: string;
+          id: string;
+          kind: string;
+          recorded_on: string;
+          reference?: string;
+          status?: string;
+          stay_id?: string | null;
+          unit_id: string;
+        };
+        Update: {
+          amount_minor?: number;
+          category?: string;
+          created_at?: string;
+          created_by?: string;
+          description?: string;
+          host_id?: string;
+          id?: string;
+          kind?: string;
+          recorded_on?: string;
+          reference?: string;
+          status?: string;
+          stay_id?: string | null;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_handoff_rule_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_readiness_v';
+            referencedColumns: ['unit_id'];
+          },
+        ];
       };
       host_message: {
         Row: {
@@ -14040,6 +14279,154 @@ export type Database = {
           },
         ];
       };
+      host_unit_guide: {
+        Row: {
+          document: NonNullable<Json>;
+          published_id: string | null;
+          revision: number;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          document?: NonNullable<Json>;
+          published_id?: string | null;
+          revision?: number;
+          unit_id: string;
+        };
+        Update: {
+          document?: NonNullable<Json>;
+          published_id?: string | null;
+          revision?: number;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_handoff_rule_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_unit_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'unit_readiness_v';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
+      host_unit_guide_asset: {
+        Row: {
+          body: string;
+          digest: string;
+          id: string;
+          kind: string;
+          mime: string;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          body: string;
+          digest: string;
+          id?: string;
+          kind: string;
+          mime: string;
+          unit_id: string;
+        };
+        Update: {
+          body?: string;
+          digest?: string;
+          id?: string;
+          kind?: string;
+          mime?: string;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_unit_guide_asset_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_guide';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
+      host_unit_guide_version: {
+        Row: {
+          article_count: number | null;
+          document: NonNullable<Json>;
+          id: string;
+          published_at: string;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          article_count?: never;
+          document: NonNullable<Json>;
+          id?: string;
+          published_at?: string;
+          unit_id: string;
+        };
+        Update: {
+          article_count?: never;
+          document?: NonNullable<Json>;
+          id?: string;
+          published_at?: string;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_unit_guide_version_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_guide';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
       host_user: {
         Row: {
           accepted_at: string | null;
@@ -14132,6 +14519,255 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'host_today_v';
             referencedColumns: ['host_id'];
+          },
+        ];
+      };
+      host_workspace_data_share: {
+        Row: {
+          host_id: string;
+          request_id: string;
+          shared_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          host_id: string;
+          request_id: string;
+          shared_at?: string;
+        };
+        Update: {
+          host_id?: string;
+          request_id?: string;
+          shared_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_data_request_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'data_request';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_data_request_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      host_workspace_task: {
+        Row: {
+          assignee_id: string | null;
+          cadence: string;
+          checklist: string[];
+          comments: string;
+          completed_checks: string[];
+          created_by: string | null;
+          due_at: string;
+          evidence: string;
+          id: string;
+          inspection: boolean;
+          kind: string;
+          priority: string;
+          repeat_of: string | null;
+          status: string;
+          stay_id: string | null;
+          title: string;
+          unit_id: string;
+          updated_at: string;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          assignee_id?: string | null;
+          cadence?: string;
+          checklist?: string[];
+          comments?: string;
+          completed_checks?: string[];
+          created_by?: string | null;
+          due_at: string;
+          evidence?: string;
+          id: string;
+          inspection?: boolean;
+          kind: string;
+          priority?: string;
+          repeat_of?: string | null;
+          status?: string;
+          stay_id?: string | null;
+          title: string;
+          unit_id: string;
+          updated_at?: string;
+          version?: number;
+        };
+        Update: {
+          assignee_id?: string | null;
+          cadence?: string;
+          checklist?: string[];
+          comments?: string;
+          completed_checks?: string[];
+          created_by?: string | null;
+          due_at?: string;
+          evidence?: string;
+          id?: string;
+          inspection?: boolean;
+          kind?: string;
+          priority?: string;
+          repeat_of?: string | null;
+          status?: string;
+          stay_id?: string | null;
+          title?: string;
+          unit_id?: string;
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_workspace_task_repeat_of_fkey';
+            columns: ['repeat_of'];
+            isOneToOne: true;
+            referencedRelation: 'host_workspace_task';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_handoff_rule_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_readiness_v';
+            referencedColumns: ['unit_id'];
           },
         ];
       };
@@ -47517,6 +48153,7 @@ export type Database = {
       };
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
+      fn_host_documents_missing: { Args: { p_host_id: string }; Returns: string[] };
       fn_integration_rotation_due: {
         Args: {
           i: Omit<
@@ -50610,7 +51247,50 @@ export type Database = {
       };
       rpc_hospitality_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_apply: { Args: { p_payload: Json }; Returns: Json };
-      rpc_host_manual_finance_record: { Args: { p_host_id: string; p_entry: Json }; Returns: string };
+      rpc_host_document_add: {
+        Args: {
+          p_file_name: string;
+          p_host_id: string;
+          p_kind: string;
+          p_mime: string;
+          p_size_bytes: number;
+          p_storage_path: string;
+        };
+        Returns: string;
+      };
+      rpc_host_document_review: {
+        Args: { p_approve: boolean; p_document_id: string; p_reason?: string };
+        Returns: {
+          file_name: string;
+          host_id: string;
+          id: string;
+          kind: string;
+          mime: string;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          size_bytes: number;
+          status: string;
+          storage_path: string;
+          superseded_at: string | null;
+          uploaded_at: string;
+          uploaded_by: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'host_document';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_host_documents_submit: {
+        Args: { p_host_id: string };
+        Returns: Database['public']['Enums']['host_status'];
+      };
+      rpc_host_manual_finance_record: {
+        Args: { p_entry: Json; p_host_id: string };
+        Returns: string;
+      };
       rpc_host_message_read: { Args: { p_conversation: string }; Returns: Json };
       rpc_host_message_reply: {
         Args: { p_body: string; p_conversation: string; p_idempotency_key?: string };
@@ -50792,45 +51472,6 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_host_workspace_data_share_options: {
-        Args: { p_request_id: string };
-        Returns: { host_id: string; host_name: string; shared: boolean }[];
-      };
-      rpc_host_workspace_data_share_set: {
-        Args: { p_request_id: string; p_host_id: string; p_shared: boolean };
-        Returns: undefined;
-      };
-      rpc_host_workspace_guide_commit: {
-        Args: { p_unit_id: string; p_revision: number; p_action: string; p_document: Json; p_restore_id?: string };
-        Returns: number;
-      };
-      rpc_host_workspace_guide_asset_put: {
-        Args: { p_unit_id: string; p_revision: number; p_kind: string; p_mime: string; p_base64: string };
-        Returns: number;
-      };
-      rpc_host_workspace_published_guide: { Args: { p_code: string }; Returns: Json };
-      rpc_host_workspace_guide_asset: { Args: { p_id: string; p_code?: string }; Returns: Json };
-      rpc_host_workspace_task_save: {
-        Args: { p_id: string; p_unit_id: string; p_version?: number; p_patch?: Json };
-        Returns: undefined;
-      };
-      rpc_host_workspace_shared_data_requests: {
-        Args: { p_host_id: string };
-        Returns: { id: string; kind: string; status: string; verified: boolean; received_at: string; due_at: string | null; fulfilled_at: string | null }[];
-      };
-      rpc_host_workspace_package_cancel: { Args: { p_host_id: string; p_order_id: string }; Returns: undefined };
-      rpc_host_workspace_photos_set: {
-        Args: { p_kind: string; p_id: string; p_expected: Json; p_photos: Json };
-        Returns: undefined;
-      };
-      rpc_host_workspace_profile_save: {
-        Args: { p_host_id: string; p_host_patch: Json; p_profile_patch: Json };
-        Returns: undefined;
-      };
-      rpc_host_workspace_settings_activity: {
-        Args: { p_host_id: string };
-        Returns: { id: number; at: string; action: string; own: boolean }[];
-      };
       rpc_host_settings_update: {
         Args: { p_host_id: string; p_patch: Json };
         Returns: {
@@ -50878,6 +51519,7 @@ export type Database = {
           verified_at: string | null;
           verified_by: string | null;
           went_live_at: string | null;
+          workspace_profile: NonNullable<Json>;
         };
         SetofOptions: {
           from: '*';
@@ -50933,6 +51575,7 @@ export type Database = {
           verified_at: string | null;
           verified_by: string | null;
           went_live_at: string | null;
+          workspace_profile: NonNullable<Json>;
         };
         SetofOptions: {
           from: '*';
@@ -50940,6 +51583,77 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_host_workspace_data_share_options: {
+        Args: { p_request_id: string };
+        Returns: {
+          host_id: string;
+          host_name: string;
+          shared: boolean;
+        }[];
+      };
+      rpc_host_workspace_data_share_set: {
+        Args: { p_host_id: string; p_request_id: string; p_shared: boolean };
+        Returns: undefined;
+      };
+      rpc_host_workspace_guide_asset: { Args: { p_code?: string; p_id: string }; Returns: Json };
+      rpc_host_workspace_guide_asset_put: {
+        Args: {
+          p_base64: string;
+          p_kind: string;
+          p_mime: string;
+          p_revision: number;
+          p_unit_id: string;
+        };
+        Returns: number;
+      };
+      rpc_host_workspace_guide_commit: {
+        Args: {
+          p_action: string;
+          p_document: Json;
+          p_restore_id: string;
+          p_revision: number;
+          p_unit_id: string;
+        };
+        Returns: number;
+      };
+      rpc_host_workspace_package_cancel: {
+        Args: { p_host_id: string; p_order_id: string };
+        Returns: undefined;
+      };
+      rpc_host_workspace_photos_set: {
+        Args: { p_expected: Json; p_id: string; p_kind: string; p_photos: Json };
+        Returns: undefined;
+      };
+      rpc_host_workspace_profile_save: {
+        Args: { p_host_id: string; p_host_patch: Json; p_profile_patch: Json };
+        Returns: undefined;
+      };
+      rpc_host_workspace_published_guide: { Args: { p_code: string }; Returns: Json };
+      rpc_host_workspace_settings_activity: {
+        Args: { p_host_id: string };
+        Returns: {
+          action: string;
+          at: string;
+          id: number;
+          own: boolean;
+        }[];
+      };
+      rpc_host_workspace_shared_data_requests: {
+        Args: { p_host_id: string };
+        Returns: {
+          due_at: string;
+          fulfilled_at: string;
+          id: string;
+          kind: string;
+          received_at: string;
+          status: string;
+          verified: boolean;
+        }[];
+      };
+      rpc_host_workspace_task_save: {
+        Args: { p_id: string; p_patch?: Json; p_unit_id: string; p_version?: number };
+        Returns: undefined;
       };
       rpc_hotel_access_rule_publish: {
         Args: {
