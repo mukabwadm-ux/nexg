@@ -8,6 +8,7 @@ import {
   WELCOME_BUSINESS,
   WELCOME_FIRST_NAME,
   WELCOME_FLAG,
+  WELCOME_HOST,
   clearedWelcomeMetadata,
   welcomeMetadata,
 } from './merchant-welcome';
@@ -19,7 +20,12 @@ describe('welcomeMetadata', () => {
       [WELCOME_FLAG]: true,
       [WELCOME_FIRST_NAME]: 'Jane',
       [WELCOME_BUSINESS]: 'Jane s Cafe',
+      [WELCOME_HOST]: null,
     });
+  });
+
+  it('marks hosts so the email says host workspace and links to /host', () => {
+    expect(welcomeMetadata({ name: 'Kilimani Stays' }, 'host')[WELCOME_HOST]).toBe(true);
   });
 
   it('uses null for missing or non-text names and caps their length', () => {
@@ -46,7 +52,7 @@ describe('password recovery template', () => {
   );
 
   it('reads the same metadata keys the app writes', () => {
-    for (const key of [WELCOME_FLAG, WELCOME_FIRST_NAME, WELCOME_BUSINESS])
+    for (const key of [WELCOME_FLAG, WELCOME_FIRST_NAME, WELCOME_BUSINESS, WELCOME_HOST])
       expect(template).toContain(`.Data.${key}`);
   });
 
@@ -64,11 +70,15 @@ describe('password recovery template', () => {
     const links = template.match(
       /href="\{\{ \.SiteURL \}\}\/auth\/confirm\?token_hash=\{\{ \.TokenHash \}\}&amp;type=recovery&amp;next=[^"]+"/g,
     );
-    expect(links).toHaveLength(2);
+    expect(links).toHaveLength(3);
     const nexts = links!.map((link) =>
       new URLSearchParams(link.replace(/&amp;/g, '&').split('?')[1]!.replace(/"$/, '')).get('next'),
     );
-    expect(nexts).toEqual(['/reset-password?next=%2Fmerchant', '/reset-password']);
+    expect(nexts).toEqual([
+      '/reset-password?next=%2Fhost',
+      '/reset-password?next=%2Fmerchant',
+      '/reset-password',
+    ]);
     for (const next of nexts) expect(safeAuthNext(next)).toBe(next);
   });
 });

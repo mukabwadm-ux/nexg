@@ -206,6 +206,57 @@ export async function sendMerchantPasswordSetupLink(): Promise<AuthResult> {
   };
 }
 
+/**
+ * The host welcome email: the same single-use password setup link merchants
+ * get, worded for hosts and returning to /host. Sent only once the applicant
+ * has verified the email on their host record.
+ */
+export async function sendHostPasswordSetupLink(): Promise<AuthResult> {
+  const supabase = createClient();
+  const { data: auth, error: authError } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (authError || !user || user.is_anonymous || !user.email || !user.email_confirmed_at)
+    return { ok: false, message: 'Verify your email before setting up a password.' };
+
+  const { data: home, error: homeError } = await supabase.rpc('fn_partner_home');
+  const partner = home as { kind?: string; id?: string } | null;
+  if (homeError || partner?.kind !== 'host' || !partner.id)
+    return { ok: false, message: 'We could not find your host application. Contact NexG support.' };
+
+  const { data: host, error: hostError } = await supabase
+    .from('host')
+    .select('email, contact_name, display_name')
+    .eq('id', partner.id)
+    .maybeSingle();
+  if (hostError || !host || host.email?.trim().toLowerCase() !== user.email.trim().toLowerCase())
+    return {
+      ok: false,
+      message: 'We could not confirm the application for this email. Contact NexG support.',
+    };
+
+  await supabase.auth.updateUser({
+    data: welcomeMetadata(
+      { firstName: host.contact_name?.split(/\s+/)[0], name: host.display_name },
+      'host',
+    ),
+  });
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nexgapp.com';
+  const redirectTo = new URL('/auth/callback', siteUrl);
+  redirectTo.searchParams.set('next', '/reset-password?next=%2Fhost');
+  const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+    redirectTo: redirectTo.toString(),
+  });
+  if (error)
+    return {
+      ok: false,
+      message:
+        'Your email is verified, but we could not send the password setup link. Try again in a minute.',
+    };
+
+  return { ok: true, message: 'Check your inbox for your welcome email and password link.' };
+}
+
 export async function updateRecoveredPassword(formData: FormData): Promise<AuthResult> {
   const password = newPassword.safeParse(formData.get('password'));
   const confirmation = newPassword.safeParse(formData.get('confirmPassword'));

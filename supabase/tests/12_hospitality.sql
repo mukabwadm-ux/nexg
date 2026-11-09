@@ -68,13 +68,20 @@ values ('bbbbbbbb-0000-0000-0000-00000000000a',
 
 -- ═════════════════════════════════════ a host applies
 
+/* The applicant holds a session (anonymous on the page); the host is theirs. */
+select set_config('request.jwt.claims',
+  '{"sub":"a3333333-3333-3333-3333-333333333333","role":"authenticated"}', true);
+
 select lives_ok(
   $$ select public.rpc_host_apply(jsonb_build_object(
        'phone', '+254700000900', 'contact_name', '[Host]', 'kind', 'single_unit',
+       'email', 'hp.host@example.test',
        'address', '[Address], Kilimani', 'unit_name', 'Apartment 4B',
        'handoff', 'leave_with_askari', 'city', 'nairobi')) $$,
   'a host can apply from the public page'
 );
+
+select set_config('request.jwt.claims', '', true);
 
 select is(
   (select status::text from public.host where phone = '+254700000900'),
@@ -141,6 +148,14 @@ select lives_ok(
        %L) $$, (select v from t_hosp where k = 'caretaker_token')),
   'the caretaker confirms by tapping the link'
 );
+
+/* Approval needs an approved ID and proof of authority (see 45_host_onboarding). */
+insert into public.host_document (host_id, kind, storage_path, file_name, mime, size_bytes,
+                                  status, uploaded_by, reviewed_at)
+select h.id, d.kind, 'host/' || h.id || '/' || d.kind || '/fixture.pdf', 'fixture.pdf',
+       'application/pdf', 1000, 'approved', 'a3333333-3333-3333-3333-333333333333', now()
+from public.host h, (values ('id_document'), ('authority')) as d(kind)
+where h.phone = '+254700000900';
 
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a1111111-1111-1111-1111-111111111111","role":"authenticated"}';

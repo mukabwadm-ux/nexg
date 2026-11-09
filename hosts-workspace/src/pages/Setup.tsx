@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { dateText } from '../model';
 import { Badge, Button, Empty, Icon, PageHeader, Pager, Panel, Table, Tabs } from '../ui';
 import { useWorkspace } from '../workspace';
+import { DocumentsPanel } from './Documents';
 
 const views = { checklist: 'Setup checklist', verify: 'Verification', readiness: 'Unit readiness' };
 
@@ -16,7 +17,7 @@ export function SetupPage() {
     { label: 'First unit', detail: 'Address and check-in details for the first unit.', done: setup.steps.unit, open: () => go('properties') },
     { label: 'Delivery handoff', detail: 'Set the handoff rule and confirm the contact.', done: setup.steps.handoff, open: () => first ? go('unit', first.id, 'access') : go('properties') },
     { label: 'Guests & packages', detail: 'Welcome packages, billing and guest preferences.', done: setup.steps.packages, open: () => go('operations','packages') },
-    { label: 'Verify & go live', detail: 'Ask NexG to verify your listing.', done: setup.steps.verification, open: () => go('setup','','verify') },
+    { label: 'Documents & approval', detail: 'Upload your ID and proof of authority. Properties unlock once NexG approves them.', done: setup.live, open: () => go('setup','','verify') },
   ];
   const readiness = setup.readiness.filter(row => units.some(unit => unit.id === row.unitId));
   const pageSize = 6;
@@ -45,20 +46,14 @@ export function SetupPage() {
         </Table>
         {!readiness.length && <Empty title="No units in this view" description="Add a unit or choose another property."/>}
         <Pager page={current} total={readiness.length} pageSize={pageSize} onChange={setPage}/>
-      </Panel> : <Panel className="mg-fill-panel">
-        <div className="mg-panel-heading"><h2>{setup.live ? 'Your listing is verified' : 'Verify & go live'}</h2><Badge tone={setup.live ? 'success' : 'warning'}>{setup.status}</Badge></div>
-        {setup.live ? <p className="mg-small-note">NexG verified your account{setup.verifiedAt ? ' on '+dateText(setup.verifiedAt) : ''}. Each unit goes live after its readiness checks.</p> : <>
-          {setup.submittedAt && <p className="mg-small-note">Submitted {dateText(setup.submittedAt)}{setup.verificationMethod ? ' · '+setup.verificationMethod.replaceAll('_',' ') : ''}. NexG reviews your proof.</p>}
-          <div className="mg-panel-heading"><h2>Paste a code into your listing</h2></div>
-          <p className="mg-small-note">Add your code to the listing description for 24 hours so NexG can verify it.</p>
-          {setup.verificationCode && <div className="mg-row-actions"><strong>{setup.verificationCode}</strong><Button onClick={async () => {
-            try { await navigator.clipboard.writeText(setup.verificationCode ?? ''); notify('Verification code copied.'); }
-            catch { notify('Select the code to copy it.'); }
-          }}>Copy code</Button></div>}
-          <p className="mg-small-note">You can also send a screenshot of your listing dashboard or arrange a five-minute verification call.</p>
-          <div className="mg-row-actions"><Button variant="primary" onClick={() => go('inbox','new')}>Contact NexG to submit proof</Button></div>
-        </>}
-      </Panel>}
+      </Panel> : <>
+        {setup.live && <Panel className="mg-fill-panel">
+          <div className="mg-panel-heading"><h2>Your account is approved</h2><Badge tone="success">{setup.status}</Badge></div>
+          <p className="mg-small-note">NexG approved your account{setup.verifiedAt ? ' on '+dateText(setup.verifiedAt) : ''}. Each unit goes live after its readiness checks.</p>
+        </Panel>}
+        <DocumentsPanel/>
+        {!setup.live && <div className="mg-row-actions"><Button onClick={() => go('inbox','new')}>Questions? Message NexG</Button></div>}
+      </>}
     </div>
   );
 }
