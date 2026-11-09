@@ -709,10 +709,10 @@ export default async function HostsPage() {
           <section className="bg-ink py-14 text-white">
             <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
               <p className="text-gold text-[0.6875rem] font-extrabold uppercase tracking-[0.14em]">
-                Already listed
+                How a listing looks
               </p>
               <h2 className="mt-2 text-[1.75rem] font-extrabold tracking-[-0.02em] sm:text-[2rem]">
-                Your unit, in front of guests looking now.
+                This is how your unit looks to guests.
               </h2>
               <p className="mt-3 max-w-[38rem] text-[0.875rem] font-semibold leading-[1.8] text-white/70">
                 Verified hosts can have their property shown on NexG, with each unit listed

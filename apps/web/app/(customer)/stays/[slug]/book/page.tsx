@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { StayCheckout } from '@/components/stays/stay-checkout';
 import { PhotoSlot } from '@/components/stays/listing';
@@ -24,6 +24,7 @@ interface PropertyRow {
   area: string | null;
   check_in_from: string | null;
   check_out_by: string | null;
+  is_sample: boolean;
 }
 
 interface UnitRow {
@@ -33,7 +34,7 @@ interface UnitRow {
   max_guests: number | null;
   nightly_rate_kes: number | null;
   min_nights: number | null;
-  photos: { caption?: string }[] | null;
+  photos: { caption?: string; src?: string }[] | null;
 }
 
 /**
@@ -55,11 +56,13 @@ export default async function BookPage({
   const pub = createPublicClient();
   const { data: propertyData } = await pub
     .from('property_public')
-    .select('id, slug, name, area, check_in_from, check_out_by')
+    .select('id, slug, name, area, check_in_from, check_out_by, is_sample')
     .eq('slug', params.slug)
     .maybeSingle();
   if (!propertyData) notFound();
   const property = propertyData as PropertyRow;
+  /* A sample listing is never bookable: back to its page, which says so. */
+  if (property.is_sample) redirect(`/stays/${property.slug}`);
 
   const { data: units } = await pub
     .from('property_unit_public')
@@ -123,7 +126,13 @@ export default async function BookPage({
           />
 
           <Card className="overflow-hidden p-0">
-            <PhotoSlot seed={unit.id} caption={unit.photos?.[0]?.caption} className="h-40 w-full" />
+            <PhotoSlot
+              seed={unit.id}
+              caption={unit.photos?.[0]?.caption}
+              src={unit.photos?.[0]?.src}
+              sizes="22rem"
+              className="h-40 w-full"
+            />
             <div className="p-5">
               <p className="text-[1rem] font-extrabold">{property.name}</p>
               <p className="text-muted mt-1 text-[0.8125rem] font-semibold">

@@ -1,5 +1,6 @@
 import { Card } from '@nexg/ui';
 import { BedDouble, MapPin, Users } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import midnight from './midnight.module.css';
@@ -15,12 +16,14 @@ export interface PropertyCardRow {
   city_name: string | null;
   summary: string | null;
   amenities: string[];
-  photos: { placeholder?: boolean; caption?: string; path?: string }[];
+  photos: { placeholder?: boolean; caption?: string; path?: string; src?: string }[];
   units_available: number;
   bedrooms_min: number | null;
   bedrooms_max: number | null;
   sleeps_max: number | null;
   from_rate_kes: number | null;
+  /** A demonstration listing: shown and labelled, never bookable. */
+  is_sample?: boolean;
 }
 
 export const KIND_LABEL: Record<string, string> = {
@@ -51,7 +54,10 @@ export function rateLabel(kes: number | null): string {
 }
 
 /**
- * A photo slot with nothing in it yet.
+ * The listing's photograph, or a slot with nothing in it yet.
+ *
+ * `src` is a photograph served by the site from /images/: only sample
+ * listings have one, and they are labelled as samples wherever they appear.
  *
  * A deliberate, deterministic tile rather than a grey box or a stock
  * photograph: these properties have no photography, and borrowing
@@ -63,11 +69,31 @@ export function PhotoSlot({
   seed,
   caption,
   className,
+  src,
+  sizes = '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw',
+  priority = false,
 }: {
   seed: string;
   caption?: string;
   className?: string;
+  src?: string;
+  sizes?: string;
+  priority?: boolean;
 }) {
+  if (src?.startsWith('/images/')) {
+    return (
+      <span className={`relative block overflow-hidden bg-[#EDE9E0] ${className ?? ''}`}>
+        <Image
+          src={src}
+          alt={caption ?? ''}
+          fill
+          sizes={sizes}
+          priority={priority}
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+        />
+      </span>
+    );
+  }
   let h = 0;
   for (let i = 0; i < seed.length; i += 1) h = (h * 31 + seed.charCodeAt(i)) % 360;
   const a = `hsl(${h} 32% 86%)`;
@@ -98,11 +124,12 @@ export function PropertyCard({
 }) {
   if (tone === 'midnight') return <MidnightPropertyCard property={property} />;
   return (
-    <Card className="group overflow-hidden p-0 transition-shadow hover:shadow-md">
+    <Card className="text-ink group overflow-hidden p-0 transition-shadow hover:shadow-md">
       <Link href={`/stays/${property.slug}`} className="block">
         <PhotoSlot
           seed={property.slug}
           caption={property.photos[0]?.caption}
+          src={property.photos[0]?.src}
           className="h-44 w-full"
         />
 
@@ -111,6 +138,7 @@ export function PropertyCard({
             <span className="border-border-strong text-muted rounded-full border px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide">
               {KIND_LABEL[property.kind] ?? property.kind}
             </span>
+            {property.is_sample && <SampleChip />}
             <span className="text-muted-light inline-flex items-center gap-1 text-[0.6875rem] font-semibold">
               <MapPin aria-hidden="true" className="h-3 w-3" />
               {property.area ?? property.city_name ?? '—'}
@@ -165,6 +193,7 @@ function MidnightPropertyCard({ property }: { property: PropertyCardRow }) {
       <PhotoSlot
         seed={property.slug}
         caption={property.photos[0]?.caption}
+        src={property.photos[0]?.src}
         className="h-44 w-full rounded-[10px]"
       />
 
@@ -173,6 +202,7 @@ function MidnightPropertyCard({ property }: { property: PropertyCardRow }) {
           <span className="rounded-full border border-white/30 px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide text-white/85">
             {KIND_LABEL[property.kind] ?? property.kind}
           </span>
+          {property.is_sample && <SampleChip />}
           <span className="inline-flex items-center gap-1 text-[0.6875rem] font-semibold text-white/70">
             <MapPin aria-hidden="true" className="h-3 w-3" />
             {property.area ?? property.city_name ?? '—'}
@@ -216,5 +246,17 @@ function MidnightPropertyCard({ property }: { property: PropertyCardRow }) {
         </span>
       </span>
     </Link>
+  );
+}
+
+/** Marks a demonstration listing, which cannot be booked. */
+export function SampleChip() {
+  return (
+    <span
+      title="A sample listing that shows how stays look on NexG. It cannot be booked."
+      className="bg-gold text-ink rounded-full px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide"
+    >
+      Sample listing
+    </span>
   );
 }

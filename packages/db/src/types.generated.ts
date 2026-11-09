@@ -24697,6 +24697,7 @@ export type Database = {
       };
       property: {
         Row: {
+          is_sample: boolean;
           amenities: string[];
           area: string | null;
           check_in_from: string | null;
@@ -24723,6 +24724,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          is_sample?: boolean;
           amenities?: string[];
           area?: string | null;
           check_in_from?: string | null;
@@ -24748,6 +24750,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          is_sample?: boolean;
           amenities?: string[];
           area?: string | null;
           check_in_from?: string | null;
@@ -44508,6 +44511,7 @@ export type Database = {
       };
       property_public: {
         Row: {
+          is_sample: boolean | null;
           amenities: string[] | null;
           area: string | null;
           bedrooms_max: number | null;
@@ -44605,6 +44609,7 @@ export type Database = {
       };
       property_unit_public: {
         Row: {
+          is_sample: boolean | null;
           area: string | null;
           bathrooms: number | null;
           bed_setup: string | null;
