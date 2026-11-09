@@ -16972,6 +16972,193 @@ export type Database = {
           },
         ];
       };
+      merchant_agreement: {
+        Row: {
+          created_at: string;
+          id: string;
+          path: string;
+          published_on: string;
+          sha256: string;
+          title: string;
+          version: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id: string;
+          path: string;
+          published_on: string;
+          sha256: string;
+          title: string;
+          version: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          path?: string;
+          published_on?: string;
+          sha256?: string;
+          title?: string;
+          version?: string;
+        };
+        Relationships: [];
+      };
+      merchant_agreement_acceptance: {
+        Row: {
+          accepted_at: string;
+          accepted_by: string | null;
+          agreement_id: string;
+          category: string;
+          id: string;
+          merchant_id: string;
+          version: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          accepted_at?: string;
+          accepted_by?: string | null;
+          agreement_id: string;
+          category: string;
+          id?: string;
+          merchant_id: string;
+          version: string;
+        };
+        Update: {
+          accepted_at?: string;
+          accepted_by?: string | null;
+          agreement_id?: string;
+          category?: string;
+          id?: string;
+          merchant_id?: string;
+          version?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_agreement_id_version_fkey';
+            columns: ['agreement_id', 'version'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_agreement';
+            referencedColumns: ['id', 'version'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_agreement_category: {
+        Row: {
+          agreement_id: string;
+          category: string;
+          interim: boolean;
+        };
+        ComputedFields: never;
+        Insert: {
+          agreement_id: string;
+          category: string;
+          interim?: boolean;
+        };
+        Update: {
+          agreement_id?: string;
+          category?: string;
+          interim?: boolean;
+        };
+        Relationships: [];
+      };
       merchant_application: {
         Row: {
           approved_revision: number | null;
@@ -48394,6 +48581,25 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      fn_merchant_agreement_category: { Args: { p_merchant_id: string }; Returns: string };
+      fn_merchant_agreement_for_category: {
+        Args: { p_category: string };
+        Returns: {
+          created_at: string;
+          id: string;
+          path: string;
+          published_on: string;
+          sha256: string;
+          title: string;
+          version: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant_agreement';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       fn_merchant_application_mirror: {
         Args: { p_merchant_id: string; p_payload: Json };
         Returns: undefined;
@@ -52447,6 +52653,11 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_merchant_agreement_accept: {
+        Args: { p_agreement_id: string; p_merchant_id: string; p_version: string };
+        Returns: Json;
+      };
+      rpc_merchant_agreement_status: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_application_operation_read: { Args: { p_operation_id: string }; Returns: Json };
       rpc_merchant_application_payout_read: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_application_payout_save: {

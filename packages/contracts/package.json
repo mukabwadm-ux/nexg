@@ -9,6 +9,7 @@
     "./api": "./src/api.ts",
     "./merchant-application": "./src/merchant-application.ts",
     "./integration-connection": "./src/integration-connection.ts",
+    "./merchant-agreements": "./src/merchant-agreements.ts",
     "./package.json": "./package.json"
   },
   "scripts": {
