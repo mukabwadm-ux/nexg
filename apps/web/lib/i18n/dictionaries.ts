@@ -206,6 +206,7 @@ const en: Dictionary = {
   'footer.terms': 'Terms',
   'footer.privacy': 'Privacy',
   'footer.cookies': 'Cookies',
+  'footer.dataProtection': 'Data Protection Policy',
   'footer.contact': 'Contact',
   'footer.language': 'Language',
 
@@ -377,6 +378,7 @@ const sw: Dictionary = {
   'footer.terms': 'Masharti',
   'footer.privacy': 'Faragha',
   'footer.cookies': 'Vidakuzi',
+  'footer.dataProtection': 'Sera ya Ulinzi wa Data',
   'footer.contact': 'Wasiliana nasi',
   'footer.language': 'Lugha',
 

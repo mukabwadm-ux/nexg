@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { AuthPanel } from '@/components/auth/auth-panel';
 import { Logo } from '@/components/logo';
 import { authRoleFromRequest } from '@/lib/auth-navigation';
+import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
 
 export const metadata: Metadata = {
   title: 'Sign in',
@@ -76,6 +77,13 @@ export default function SignInPage({
             <Link href="/legal/privacy" className="transition-colors hover:text-white/70">
               Privacy
             </Link>
+            <a
+              href={DATA_PROTECTION_POLICY_URL}
+              {...NEW_TAB}
+              className="transition-colors hover:text-white/70"
+            >
+              Data protection
+            </a>
             <Link href="/help" className="transition-colors hover:text-white/70">
               Help
             </Link>

@@ -15,9 +15,11 @@ import { uploadCatalogueImage } from '@/lib/catalogue-images';
 import type { CatalogueExample } from '@nexg/contracts';
 
 import { Panel, Pill } from './bits';
+import { CatalogueCsv } from './catalogue-csv';
 
 export interface ItemRow {
   id: string;
+  section_id?: string | null;
   name: string;
   description: string | null;
   price_kes: number;
@@ -207,6 +209,13 @@ export function Menu({
           })}
         </ul>
       </Panel>
+
+      <CatalogueCsv
+        merchantId={merchantId}
+        items={items}
+        sections={sections}
+        example={catalogueExample}
+      />
 
       <AddItem
         merchantId={merchantId}
