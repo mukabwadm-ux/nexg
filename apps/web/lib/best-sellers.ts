@@ -27,7 +27,7 @@ export const BEST_SELLERS: BestSeller[] = [
   {
     id: 'pizza',
     name: 'Large veggie supreme pizza',
-    merchant: '[Pizzeria] · Westlands',
+    merchant: 'Pizzeria · Westlands',
     category: 'restaurant',
     image: 'restaurant',
     priceKes: 1450,
@@ -39,7 +39,7 @@ export const BEST_SELLERS: BestSeller[] = [
   {
     id: 'avocados',
     name: 'Hass avocados, 4 pack',
-    merchant: '[Green grocer] · Kilimani',
+    merchant: 'Green grocer · Kilimani',
     category: 'supermarket',
     image: 'groceries',
     priceKes: 320,
@@ -51,7 +51,7 @@ export const BEST_SELLERS: BestSeller[] = [
   {
     id: 'vitamin-c',
     name: 'Vitamin C 1000mg, 30 tablets',
-    merchant: '[Pharmacy] · CBD',
+    merchant: 'Pharmacy · CBD',
     category: 'pharmacy',
     image: 'pharmacy',
     priceKes: 850,
@@ -63,7 +63,7 @@ export const BEST_SELLERS: BestSeller[] = [
   {
     id: 'lipstick',
     name: 'Satin lipstick, Ruby red',
-    merchant: '[Beauty store] · Lavington',
+    merchant: 'Beauty store · Lavington',
     category: 'beauty_fashion',
     image: 'beauty',
     priceKes: 1900,
@@ -75,7 +75,7 @@ export const BEST_SELLERS: BestSeller[] = [
   {
     id: 'mojito',
     name: 'Fresh lemon mojito',
-    merchant: '[Cocktail bar] · Westlands',
+    merchant: 'Cocktail bar · Westlands',
     category: 'bar_liquor',
     image: 'drinks',
     priceKes: 750,
@@ -87,7 +87,7 @@ export const BEST_SELLERS: BestSeller[] = [
   {
     id: 'roses',
     name: 'Pink roses, dozen',
-    merchant: '[Florist] · Karen',
+    merchant: 'Florist · Karen',
     category: 'florist',
     image: 'flowers',
     priceKes: 3200,
@@ -99,7 +99,7 @@ export const BEST_SELLERS: BestSeller[] = [
   {
     id: 'shirts',
     name: 'Shirts washed & pressed, 5',
-    merchant: '[Laundry] · Kilimani',
+    merchant: 'Laundry · Kilimani',
     category: 'laundry',
     image: 'laundry',
     priceKes: 1000,
@@ -111,7 +111,7 @@ export const BEST_SELLERS: BestSeller[] = [
   {
     id: 'gift-box',
     name: 'Birthday gift box',
-    merchant: '[Gift shop] · Sarit',
+    merchant: 'Gift shop · Sarit',
     category: 'gift_shop',
     image: 'gifts',
     priceKes: 4500,

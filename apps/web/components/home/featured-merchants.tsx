@@ -1,4 +1,4 @@
-import { Tag, VALUE_PLACEHOLDER } from '@nexg/ui';
+import { Tag } from '@nexg/ui';
 import { Flower2, Pill, Shirt, ShoppingCart, Sparkles, UtensilsCrossed, Wine } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,10 +18,9 @@ import type { Translate } from '@/lib/i18n/dictionaries';
  * label comes from the same query as the card.
  *
  * When nothing is sold — production, until the first slot goes live —
- * the designed placeholder cards render instead, bracketed as the
- * artboard draws them. A real card links to that merchant; a
- * placeholder does not, because there is no page behind
- * `[Italian restaurant]`.
+ * placeholder cards render instead, named by kind of business. A real
+ * card links to that merchant; a placeholder opens Explore for its
+ * kind, because there is no merchant page behind "Italian restaurant".
  */
 
 /**
@@ -81,33 +80,33 @@ const CATEGORY_CTA: Record<string, string> = {
 /** The cards the artboard draws for an empty homepage. */
 /*
  * Shown until a featured slot is sold. Each opens Explore for its kind of
- * business, so the card leads somewhere real even though the name in
- * brackets is not a merchant yet.
+ * business, so the card leads somewhere real even though the name is
+ * not a merchant yet.
  */
 const PLACEHOLDERS = [
   {
-    name: '[Italian restaurant]',
+    name: 'Italian restaurant',
     meta: 'Fine dining · Westlands',
     cta: 'merchant.cta.menu',
     category: 'restaurant',
     image: 'restaurants',
   },
   {
-    name: '[Wine & spirits shop]',
+    name: 'Wine & spirits shop',
     meta: 'Drinks · Parklands',
     cta: 'merchant.cta.shop',
     category: 'bar_liquor',
     image: 'drinks',
   },
   {
-    name: '[Florist]',
+    name: 'Florist',
     meta: 'Flowers & gifts · Kilimani',
     cta: 'merchant.cta.shop',
     category: 'florist',
     image: 'flowers',
   },
   {
-    name: '[Laundry & dry cleaning]',
+    name: 'Laundry & dry cleaning',
     meta: 'Wash, iron, press · Kilimani',
     cta: 'merchant.cta.services',
     category: 'laundry',
@@ -141,14 +140,15 @@ function Sponsored({ label }: { label: string }) {
 }
 
 /*
- * Delivery time is a business number and none is recorded — there is no prep
- * or delivery data in the schema yet — so it renders as [—] rather than an
- * estimate a guest might plan around (ground rule 3).
+ * The merchant's own preparation time, when they have set one. With none
+ * recorded the chip is left out rather than showing a guess a guest might
+ * plan around (ground rule 3).
  */
-function Eta({ unit }: { unit: string }) {
+function Eta({ minutes, unit }: { minutes: number | null; unit: string }) {
+  if (minutes == null || !Number.isFinite(minutes) || minutes <= 0) return null;
   return (
     <span className="bg-gold text-ink absolute bottom-2 right-2 z-10 rounded-full px-2 py-0.5 text-[0.625rem] font-bold">
-      {VALUE_PLACEHOLDER} {unit}
+      {Math.round(minutes)} {unit}
     </span>
   );
 }
@@ -183,7 +183,6 @@ export function FeaturedMerchants({
                   className="object-cover opacity-90 transition-transform duration-300 group-hover:scale-105"
                 />
                 <Sponsored label={t('merchant.sponsored')} />
-                <Eta unit={t('merchant.min')} />
               </Cover>
               <div className="p-3">
                 <p className="truncate text-sm font-bold">{merchant.name}</p>
@@ -247,7 +246,7 @@ export function FeaturedMerchants({
                     <Icon className="h-10 w-10" />
                   </span>
                 )}
-                <Eta unit={t('merchant.min')} />
+                <Eta minutes={merchant.prep_minutes} unit={t('merchant.min')} />
               </Cover>
               <div className="p-3">
                 <p className="truncate text-sm font-bold">{merchant.trading_name}</p>
