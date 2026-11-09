@@ -23563,6 +23563,7 @@ export type Database = {
           provider_ref: string | null;
           reference: string;
           state: Database['public']['Enums']['payment_state'];
+          stay_id: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -23591,6 +23592,7 @@ export type Database = {
           provider_ref?: string | null;
           reference: string;
           state?: Database['public']['Enums']['payment_state'];
+          stay_id?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -23618,6 +23620,7 @@ export type Database = {
           provider_ref?: string | null;
           reference?: string;
           state?: Database['public']['Enums']['payment_state'];
+          stay_id?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -23913,6 +23916,20 @@ export type Database = {
             columns: ['order_id'];
             isOneToOne: false;
             referencedRelation: 'rider_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'payment_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'payment_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'stay';
             referencedColumns: ['id'];
           },
         ];
@@ -30281,6 +30298,8 @@ export type Database = {
         Row: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
@@ -30289,15 +30308,19 @@ export type Database = {
           guest_user_id: string | null;
           hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -30307,6 +30330,8 @@ export type Database = {
         Insert: {
           check_in: string;
           check_out: string;
+          commission_kes?: number | null;
+          confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
           conflict_flagged?: boolean;
           created_at?: string;
@@ -30315,15 +30340,19 @@ export type Database = {
           guest_user_id?: string | null;
           hold_expires_at?: string | null;
           host_id: string;
+          host_share_kes?: number | null;
           id?: string;
           notes?: string | null;
+          paid_kes?: number | null;
           party_adults?: number;
           party_children?: number;
+          payment_reference?: string | null;
           phone?: string | null;
           property_id?: string | null;
           qr_link_sent_at?: string | null;
           quote_total_kes?: number | null;
           rate_kes?: number | null;
+          refund_due_at?: string | null;
           source?: string;
           status?: string;
           unit_id?: string | null;
@@ -30332,6 +30361,8 @@ export type Database = {
         Update: {
           check_in?: string;
           check_out?: string;
+          commission_kes?: number | null;
+          confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
           conflict_flagged?: boolean;
           created_at?: string;
@@ -30340,15 +30371,19 @@ export type Database = {
           guest_user_id?: string | null;
           hold_expires_at?: string | null;
           host_id?: string;
+          host_share_kes?: number | null;
           id?: string;
           notes?: string | null;
+          paid_kes?: number | null;
           party_adults?: number;
           party_children?: number;
+          payment_reference?: string | null;
           phone?: string | null;
           property_id?: string | null;
           qr_link_sent_at?: string | null;
           quote_total_kes?: number | null;
           rate_kes?: number | null;
+          refund_due_at?: string | null;
           source?: string;
           status?: string;
           unit_id?: string | null;
@@ -40928,15 +40963,18 @@ export type Database = {
         Row: {
           check_in: string | null;
           check_out: string | null;
+          commission_kes: number | null;
           conflict_flagged: boolean | null;
           guest_first_name: string | null;
           hold_expired: boolean | null;
           hold_expires_at: string | null;
           host_id: string | null;
+          host_share_kes: number | null;
           id: string | null;
           in_stay: boolean | null;
           notes: string | null;
           orders: number | null;
+          paid_kes: number | null;
           party_adults: number | null;
           party_children: number | null;
           phone_masked: string | null;
@@ -48718,6 +48756,7 @@ export type Database = {
           user_id: string;
         }[];
       };
+      fn_stay_commission_rate: { Args: Record<PropertyKey, never>; Returns: number };
       fn_stay_dates_check: {
         Args: { p_check_in: string; p_check_out: string };
         Returns: undefined;
@@ -53665,6 +53704,7 @@ export type Database = {
       };
       rpc_payment_begin_featured: { Args: { p_booking_id: string }; Returns: Json };
       rpc_payment_begin_order: { Args: { p_order_id: string }; Returns: Json };
+      rpc_payment_begin_stay: { Args: { p_stay_id: string }; Returns: Json };
       rpc_payment_method_toggle: {
         Args: { p_enabled: boolean; p_key: string; p_reason: string };
         Returns: Json;
@@ -55286,6 +55326,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
@@ -55294,15 +55336,19 @@ export type Database = {
           guest_user_id: string | null;
           hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55320,6 +55366,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
@@ -55328,15 +55376,19 @@ export type Database = {
           guest_user_id: string | null;
           hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55349,11 +55401,14 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_checkout_status: { Args: { p_stay_id: string }; Returns: Json };
       rpc_stay_confirm: {
         Args: { p_reference?: string; p_stay_id: string };
         Returns: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
@@ -55362,15 +55417,19 @@ export type Database = {
           guest_user_id: string | null;
           hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55383,6 +55442,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_confirmation_sent: { Args: { p_stay_id: string }; Returns: boolean };
       rpc_stay_hold: {
         Args: { p_check_in: string; p_check_out: string; p_guest?: Json; p_unit_id: string };
         Returns: Json;
@@ -55392,6 +55452,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
@@ -55400,15 +55462,19 @@ export type Database = {
           guest_user_id: string | null;
           hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55426,6 +55492,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
@@ -55434,15 +55502,19 @@ export type Database = {
           guest_user_id: string | null;
           hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55455,9 +55527,6 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_payment_begin_stay: { Args: { p_stay_id: string }; Returns: Json };
-      rpc_stay_checkout_status: { Args: { p_stay_id: string }; Returns: Json };
-      rpc_stay_confirmation_sent: { Args: { p_stay_id: string }; Returns: boolean };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
         Args: {
@@ -55545,6 +55614,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
@@ -55553,15 +55624,19 @@ export type Database = {
           guest_user_id: string | null;
           hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -56363,7 +56438,7 @@ export type Database = {
         | 'paused'
         | 'suspended'
         | 'delisted';
-      payment_intent: 'order' | 'featured_slot' | 'rider_float';
+      payment_intent: 'order' | 'featured_slot' | 'rider_float' | 'stay';
       payment_state: 'pending' | 'authorised' | 'paid' | 'failed' | 'abandoned' | 'reversed';
       placement_kind: 'homepage' | 'category_top' | 'popular_request';
       plan_block_status: 'proposed' | 'confirmed' | 'changed' | 'unavailable' | 'removed' | 'done';
@@ -58173,7 +58248,7 @@ export const Constants = {
         'suspended',
         'delisted',
       ],
-      payment_intent: ['order', 'featured_slot', 'rider_float'],
+      payment_intent: ['order', 'featured_slot', 'rider_float', 'stay'],
       payment_state: ['pending', 'authorised', 'paid', 'failed', 'abandoned', 'reversed'],
       placement_kind: ['homepage', 'category_top', 'popular_request'],
       plan_block_status: ['proposed', 'confirmed', 'changed', 'unavailable', 'removed', 'done'],
