@@ -51287,6 +51287,10 @@ export type Database = {
         Args: { p_host_id: string };
         Returns: Database['public']['Enums']['host_status'];
       };
+      rpc_host_listing_photo_set: {
+        Args: { p_alt?: string; p_host_id: string; p_path: string; p_unit_id: string };
+        Returns: undefined;
+      };
       rpc_host_manual_finance_record: {
         Args: { p_entry: Json; p_host_id: string };
         Returns: string;

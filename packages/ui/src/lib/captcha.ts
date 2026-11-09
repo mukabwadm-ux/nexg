@@ -23,6 +23,10 @@ declare global {
   }
 }
 
+/* Packages that typecheck @nexg/ui without Node's types (packages/location)
+   still compile. Next inlines the literal process.env.NEXT_PUBLIC_… at build. */
+declare const process: { env: { NEXT_PUBLIC_TURNSTILE_SITE_KEY?: string } };
+
 const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 /** Long enough for a visitor to finish an interactive challenge. */
 const TOKEN_TIMEOUT_MS = 120_000;
