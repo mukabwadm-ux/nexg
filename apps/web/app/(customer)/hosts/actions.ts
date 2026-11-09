@@ -105,7 +105,16 @@ export async function applyAsHost(input: HostApplyInput): Promise<HostApplyResul
   /* The cover photo, copied into NexG's own storage with the applicant's
      consent. Best effort: a failure only means they add photos later. */
   let photo = false;
-  if (listing?.photoUrl && input.photo_consent && result?.host_id && result.unit_id) {
+  /* Only when the database actually imported the listing (property_id is
+     returned by 20261117000100 onwards): otherwise the photo would be
+     uploaded and then have nowhere to go. */
+  if (
+    listing?.photoUrl &&
+    input.photo_consent &&
+    result?.host_id &&
+    result.unit_id &&
+    result.property_id
+  ) {
     try {
       const path = await copyAirbnbCoverPhoto(
         supabase,
