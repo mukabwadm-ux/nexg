@@ -113,24 +113,109 @@ a.btn,
   }
 }
 
-:root[data-host-theme="light"] { --paper:#f8f8f7; --surface:#fff; --line:#dededc; }
-:root[data-host-theme="dark"] { --paper:#17181d; --surface:#23252c; --line:#44474f; --ink:#faf8f1; --muted:#c4c5cc; --gold-soft:#39311a; --gold-text:#f1ca67; }
-:root[data-host-theme="contrast"] { --paper:#fff; --surface:#fff; --line:#252525; --ink:#111; --muted:#343434; --gold-soft:#fff3c2; --gold-text:#674700; }
-:root[data-host-theme="custom"] { --accent:var(--host-personal-accent,#141414); }
-:root[data-host-sidebar="light"] .sidebar { --sidebar-bg:#fff; --sidebar-text:#3a3630; --shell-border:#dedbd4; }
-:root[data-host-sidebar="light"] .sidebar .brand, :root[data-host-sidebar="light"] .sidebar .owner-profile, :root[data-host-sidebar="light"] .sidebar .portfolio-switch { color:#171b24; }
-:root[data-host-density="compact"] .table-scroll td, :root[data-host-density="compact"] .table-scroll th { padding-block:5px; }
-:root[data-host-font="large"] { font-size:16px; }
-.notification-menu>p { padding:8px 10px; color:var(--muted); font-size:12px; }
+:root[data-host-theme='light'] {
+  --paper: #f8f8f7;
+  --surface: #fff;
+  --line: #dededc;
+}
+:root[data-host-theme='dark'] {
+  --paper: #17181d;
+  --surface: #23252c;
+  --line: #44474f;
+  --ink: #faf8f1;
+  --muted: #c4c5cc;
+  --gold-soft: #39311a;
+  --gold-text: #f1ca67;
+}
+:root[data-host-theme='contrast'] {
+  --paper: #fff;
+  --surface: #fff;
+  --line: #252525;
+  --ink: #111;
+  --muted: #343434;
+  --gold-soft: #fff3c2;
+  --gold-text: #674700;
+}
+:root[data-host-theme='custom'] {
+  --accent: var(--host-personal-accent, #141414);
+}
+:root[data-host-sidebar='light'] .sidebar {
+  --sidebar-bg: #fff;
+  --sidebar-text: #3a3630;
+  --shell-border: #dedbd4;
+}
+:root[data-host-sidebar='light'] .sidebar .brand,
+:root[data-host-sidebar='light'] .sidebar .owner-profile,
+:root[data-host-sidebar='light'] .sidebar .portfolio-switch {
+  color: #171b24;
+}
+:root[data-host-density='compact'] .table-scroll td,
+:root[data-host-density='compact'] .table-scroll th {
+  padding-block: 5px;
+}
+:root[data-host-font='large'] {
+  font-size: 16px;
+}
+.notification-menu > p {
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
 
-.sidebar-bottom>.btn{color:var(--sidebar-text)}
+.sidebar-bottom > .btn {
+  color: var(--sidebar-text);
+}
 
-.host-gallery{padding:14px;gap:10px}
-.host-gallery-photo{flex:1;min-height:65px;max-height:300px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
-.host-gallery-photo img{width:100%;height:100%;min-height:0;object-fit:contain}
-.host-gallery-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) auto;gap:8px;align-items:end}
-.host-gallery-form input{width:100%;min-width:0}
-.host-gallery-removal{border-top:1px solid var(--line);padding-top:8px}
-@media(max-width:620px){.host-gallery-form{grid-template-columns:minmax(0,1fr) auto}.host-gallery-form .field:first-child{grid-column:1/-1}}
+.host-gallery {
+  padding: 14px;
+  gap: 10px;
+}
+.host-gallery-photo {
+  flex: 1;
+  min-height: 65px;
+  max-height: 300px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+.host-gallery-photo img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+.host-gallery-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: 8px;
+  align-items: end;
+}
+.host-gallery-form input {
+  width: 100%;
+  min-width: 0;
+}
+.host-gallery-removal {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+@media (max-width: 620px) {
+  .host-gallery-form {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .host-gallery-form .field:first-child {
+    grid-column: 1/-1;
+  }
+}
 
-.host-workflow-form{padding:12px}.host-workflow-form form{align-items:end}.host-workflow-form .mg-form-grid{max-width:none}
+.host-workflow-form {
+  padding: 12px;
+}
+.host-workflow-form form {
+  align-items: end;
+}
+.host-workflow-form .mg-form-grid {
+  max-width: none;
+}

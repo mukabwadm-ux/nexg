@@ -75,9 +75,10 @@ export const config = {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   if (pathname === '/host' || pathname.startsWith('/host/')) {
-    const location = (request.method === 'GET' || request.method === 'HEAD') && localHostWorkspaceEnabled()
-      ? localHostBookmark(pathname, request.nextUrl.searchParams)
-      : null;
+    const location =
+      (request.method === 'GET' || request.method === 'HEAD') && localHostWorkspaceEnabled()
+        ? localHostBookmark(pathname, request.nextUrl.searchParams)
+        : null;
     if (!location) return NextResponse.next();
     // The route handler issues a relative redirect so Next preserves the loopback origin.
     const bookmark = new URL(location, request.url);

@@ -1416,7 +1416,8 @@ export function DataRequestsTab({
               <th className="px-4 py-3">Received</th>
               <th className="px-4 py-3">Due</th>
               <th className="px-4 py-3">Handled by</th>
-              <th className="px-4 py-3">Blocking</th><th className="px-4 py-3">Host status</th>
+              <th className="px-4 py-3">Blocking</th>
+              <th className="px-4 py-3">Host status</th>
             </tr>
           </thead>
           <tbody>
@@ -1453,7 +1454,9 @@ export function DataRequestsTab({
                     ? Object.keys(r.blocking_reasons).join(', ')
                     : '—'}
                 </td>
-                <td className="px-4 py-3"><HostPrivacyShare requestId={r.id}/></td>
+                <td className="px-4 py-3">
+                  <HostPrivacyShare requestId={r.id} />
+                </td>
               </tr>
             ))}
             {visible.length === 0 && <EmptyRow colSpan={8}>Nothing matches that filter.</EmptyRow>}
