@@ -88,8 +88,13 @@ export async function runGuideCommand(access: HostWorkspaceAccess, command: Guid
   } else if (action === 'restore') {
     restoreId = z.object({ versionId: uuid }).parse(command.record).versionId;
   }
+  /* p_restore_id has no SQL default, so it must always be sent: an undefined
+     key is dropped from the request and PostgREST then finds no matching
+     function. The generated type says string; null is what non-restore
+     actions mean. */
   const { error } = await db.rpc('rpc_host_workspace_guide_commit', {
-    p_unit_id: unitId, p_revision: revision, p_action: action, p_document: document, p_restore_id: restoreId ?? undefined,
+    p_unit_id: unitId, p_revision: revision, p_action: action, p_document: document,
+    p_restore_id: (restoreId ?? null) as unknown as string,
   });
   requireGuideWrite(error);
   return { message: action === 'draft' ? 'Guide draft saved.' : action === 'unpublish' ? 'Guest guide unpublished.' : 'Guest guide published.' };
