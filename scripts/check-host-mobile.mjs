@@ -177,6 +177,7 @@ try {
     await page.locator('.page-content').evaluate((e) => (e.scrollTop = 0));
   }
   async function check(label, fn) {
+    if (process.env.HOST_CHECK_MATCH && !label.includes(process.env.HOST_CHECK_MATCH)) return;
     try {
       await fn();
       results.push(label);
@@ -304,6 +305,55 @@ try {
     const save = page.getByRole('button', { name: /Save/ }).first();
     await save.scrollIntoViewIfNeeded();
     assert.ok(await save.isVisible());
+  });
+  await check('Operations search expands, preserves filters and collapses in place', async () => {
+    for (const width of [320, 390, 430, 768, 800, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      await go('operations');
+      const trigger = page.locator('.nxops-search-trigger');
+      const input = page.getByRole('searchbox', { name: 'Find a task' });
+      const tabs = page.locator('.nxops-section-tabs');
+      const triggerBox = await trigger.boundingBox();
+      const tabsBox = await tabs.boundingBox();
+      assert.ok(
+        Math.abs(triggerBox.y + triggerBox.height / 2 - tabsBox.y - tabsBox.height / 2) < 4,
+      );
+      assert.ok(triggerBox.x >= tabsBox.x + tabsBox.width);
+      assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+      if (width === 390)
+        await page.screenshot({ path: path.join(output, 'operations-search-collapsed.png') });
+      await trigger.click();
+      await input.fill('guest');
+      assert.equal(await input.evaluate((el) => el === document.activeElement), true);
+      await page.waitForTimeout(250);
+      await noOverflow();
+      assert.equal(await page.locator('.nxops-task-card').count(), 1);
+      if (width === 390)
+        await page.screenshot({ path: path.join(output, 'operations-search-expanded.png') });
+      await input.fill('No matching task fixture');
+      assert.equal(await page.locator('.nxops-task-card').count(), 0);
+      await page.getByRole('heading', { name: 'Operations', exact: true }).click();
+      assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+      assert.match(await trigger.getAttribute('aria-label'), /filter active/);
+      await trigger.click();
+      assert.equal(await input.inputValue(), 'No matching task fixture');
+      await input.press('Escape');
+      assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+      assert.equal(await trigger.evaluate((el) => el === document.activeElement), true);
+      await trigger.click();
+      await page.getByRole('button', { name: 'Clear task search' }).click();
+      assert.equal(await input.inputValue(), '');
+      assert.equal(await input.evaluate((el) => el === document.activeElement), true);
+      await input.press('Tab');
+      assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+      assert.equal(await page.locator('.nxops-task-card').count(), 1);
+      await page.getByRole('tab', { name: 'Packages', exact: true }).click();
+      assert.equal(await page.locator('.nxops-inline-search').count(), 0);
+      await page.getByRole('tab', { name: 'Tasks', exact: true }).click();
+      assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+      await noOverflow();
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
   });
   await check('Empty finance is honest', async () => {
     await go('finances');
