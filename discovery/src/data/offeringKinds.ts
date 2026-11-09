@@ -61,9 +61,9 @@ const examples: Record<TransferDirection | 'any', { pickup: string; dropoff: str
 export const transferExamples = (direction?: TransferDirection) => examples[direction ?? 'any'];
 
 /**
- * Wording for each kind. The website can't order, book or send requests yet, so whatever a shopper
- * chooses is kept on their device (a list for products, a saved request for everything else), and the
- * expanded card says so in one short line. Nothing here claims a fact the catalogue doesn't hold.
+ * Wording for each kind. Products and dishes go in the NexG web cart and check out on the NexG website.
+ * The website can't book or send requests yet, so every other kind is a request kept on the shopper's
+ * device, and the expanded card says so in one short line. Nothing here claims a fact the catalogue doesn't hold.
  */
 export interface KindPresentation {
   /** A plain name for the list when a store has no words of its own (see catalogNaming). */
@@ -75,21 +75,22 @@ export interface KindPresentation {
   noPrice: string;
   /** The expanded card's main button. */
   sheetAction: string;
-  /** Shown once the choice is kept on the device. */
+  /** Shown once the choice is in the cart or kept on the device. */
   saved: string;
-  /** Shown beside the main button before anything is kept: where the choice goes. One short line. */
+  /** Shown beside the main button before anything is chosen: where the choice goes. One short line. */
   pending: string;
 }
 
 const kept = 'Saved on this device. Nothing has been sent yet.';
-const added = 'Added to your list on this device.';
-const listOnDevice = 'Your list stays on this device. Ordering isn’t on the website yet.';
+const added = 'Added to your cart.';
+/** The cart pieces' line while the website's checkout isn't reachable from here (checkoutNote in cart/useStoreCart.ts). */
+const checkoutElsewhere = 'Checkout happens on the NexG website.';
 const requestOnDevice = 'Requests stay on this device. Sending them isn’t on the website yet.';
 export const kindPresentation: Record<OfferingKind, KindPresentation> = {
-  product: { section: 'Products', intro: 'Add what you need to your list.', cardAction: 'View product', pricePrefix: '', noPrice: 'Price on request',
-    sheetAction: 'Add to list', saved: added, pending: listOnDevice },
-  dish: { section: 'Menu', intro: 'Add dishes to your list.', cardAction: 'View dish', pricePrefix: '', noPrice: 'Price on request',
-    sheetAction: 'Add to list', saved: added, pending: listOnDevice },
+  product: { section: 'Products', intro: 'Add what you need to your cart.', cardAction: 'View product', pricePrefix: '', noPrice: 'Price on request',
+    sheetAction: 'Add to cart', saved: added, pending: checkoutElsewhere },
+  dish: { section: 'Menu', intro: 'Add dishes to your cart.', cardAction: 'View dish', pricePrefix: '', noPrice: 'Price on request',
+    sheetAction: 'Add to cart', saved: added, pending: checkoutElsewhere },
   service: { section: 'Services', intro: 'Choose a service, then the day and time that suit you.', cardAction: 'View service', pricePrefix: '', noPrice: 'Price on request',
     sheetAction: 'Save request', saved: kept, pending: requestOnDevice },
   activity: { section: 'Experiences', intro: 'Choose an experience, then a date and your group.', cardAction: 'Choose a date', pricePrefix: 'From ', noPrice: 'Price on request',
@@ -100,7 +101,7 @@ export const kindPresentation: Record<OfferingKind, KindPresentation> = {
     sheetAction: 'Save request', saved: kept, pending: requestOnDevice },
 };
 
-/** Products and dishes go on a list; every other kind is a request. */
+/** Products and dishes go in the NexG cart; every other kind is a request. (The name is kept for existing imports.) */
 export const isListKind = (kind: OfferingKind) => kind === 'product' || kind === 'dish';
 
 /**

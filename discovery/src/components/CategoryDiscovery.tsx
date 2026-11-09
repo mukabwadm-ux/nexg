@@ -12,6 +12,7 @@ import { ExperienceGrid, SavedNotice, interleaveOfferings } from './ExperienceCa
 import { MerchantCard } from './MerchantCard';
 import { StoreRow } from './MerchantInventoryRow';
 import { Rail, RailHeading } from './Rail';
+import { TransferSearch } from './transfers/TransferSearch';
 import './discovery.css';
 
 /** A category's page title, worded the way its tile on the home page says it ("Restaurants & Food"). */
@@ -53,14 +54,24 @@ function hostsOf(collections: readonly DiscoveryCollection[]): { merchant: Merch
  * Tours and Experiences show their operators or hosts first, then each collection as a rail of trips or
  * experiences.
  */
-export function CategoryDiscovery({ category, provider, query, onChange, onSubcategory, onOpen, onExperience, onTour, onViewAll }: {
+type CategoryDiscoveryProps = {
   category: DiscoveryCategory; provider: DiscoveryProvider; query: DiscoveryQuery;
   onChange: (change: Partial<DiscoveryQuery>) => void;
   onExperience: (id: string, itemId?: string) => void;
   onTour: (id: string, itemId?: string) => void;
   onSubcategory: (id: string) => void; onOpen: (id: string, itemId?: string) => void;
   onViewAll: (query: DiscoveryQuery) => void;
-}) {
+};
+
+export function CategoryDiscovery(props: CategoryDiscoveryProps) {
+  const { category, query, provider, onOpen } = props;
+  // Airport transfers are trip first (owner, 8 Nov 2026): the ride, then matching vehicles across operators.
+  // The choice is made here, before any hooks, so switching between the two pages swaps whole components.
+  if (category.id === 'airport-transfers' && !query.subcategoryId && !query.optionId && !query.search?.trim()) return <TransferSearch title={categoryTitle(category)} provider={provider} onOpen={onOpen} />;
+  return <CategoryDiscoveryPage {...props} />;
+}
+
+function CategoryDiscoveryPage({ category, provider, query, onChange, onSubcategory, onOpen, onExperience, onTour, onViewAll }: CategoryDiscoveryProps) {
   const ids = useId();
   const catalog = useProviderRead(`category:${category.id}:${query.area ?? ''}:${query.sort ?? 'recommended'}:${query.openNow ? 'open' : 'all'}`, (signal) => provider.getCollections(category.id, { area: query.area, sort: query.sort, openNow: query.openNow }, signal));
   const tours = category.id === 'travel-tours';

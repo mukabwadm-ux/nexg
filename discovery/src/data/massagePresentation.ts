@@ -51,6 +51,18 @@ export function serviceProfile(merchant: Merchant): ServiceProfile {
   return profiles[subcategory?.id ?? 'beauty-wellness:massage']!;
 }
 
+/**
+ * The card's action. It opens the booking request, and says "request" because the provider confirms the
+ * time: the website can't book on its own yet.
+ */
+export const bookingAction = 'Request to book';
+
+/** The search field's prompt: "Search treatments", "Search memberships & classes", and "Search programmes" for "Training". */
+export function servicesSearchPrompt(naming: { list: string; items: string }): string {
+  const list = naming.list.toLocaleLowerCase('en-KE');
+  return list.endsWith('s') ? `Search ${list}` : `Search ${naming.items.toLocaleLowerCase('en-KE')}`;
+}
+
 const plain = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim().toLocaleLowerCase('en-KE');
 
 /**
@@ -68,6 +80,7 @@ export function ownDescription(item: Pick<CatalogItem, 'name' | 'description'>, 
 /**
  * A booking request kept on this device. Booking isn't connected on the website yet, so nothing is sent:
  * the shopper's preferred day and notes wait here, and the provider confirms the time once booking opens.
+ * The shelf below is the one place appointment requests are kept, so a booking adapter can replace it.
  */
 export interface AppointmentRequest {
   /** Preferred day, "YYYY-MM-DD". */

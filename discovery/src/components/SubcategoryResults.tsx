@@ -1,10 +1,12 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { findCategory, findSubcategory } from '../data/taxonomy';
-import type { DiscoveryProvider, DiscoveryQuery, MerchantResult, OfferingResult } from '../providers/DiscoveryProvider';
+import type { CatalogItem, DiscoveryProvider, DiscoveryQuery, Merchant, MerchantResult, OfferingResult } from '../providers/DiscoveryProvider';
+import { offeringKind } from '../data/offeringKinds';
+import { OfferingSheet } from './cards/OfferingSheet';
 import { useProviderRead } from '../hooks/useProviderRead';
 import { countLabel, windowMessage } from '../providers/readState';
 import { observationFor } from '../observations/client';
-import { ExperienceGrid, SavedNotice } from './ExperienceCard';
+import { ExperienceGrid, SavedNotice, useSavedItems } from './ExperienceCard';
 import { MerchantCard } from './MerchantCard';
 import { StoreRow } from './MerchantInventoryRow';
 import { CatalogSkeleton, CatalogState } from './CatalogState';
@@ -63,6 +65,15 @@ export function SubcategoryResults({ query, provider, onChange, onOpen, onExperi
   const totalPages = page && page.semantics !== 'bounded/v2' ? Math.max(1, Math.ceil(page.total / pageSize)) : undefined;
   const restart = () => { provider.restart?.({ ...query, limit: pageSize }); onChange({ cursor: undefined, offset: 0 }); catalog.retry(); };
   const openOffering = (id: string, itemId?: string) => offeringRoute(offerings?.find((entry) => entry.merchant.id === id)?.merchant, { onTour, onExperience, onOpen })(id, itemId);
+  // A trip or experience opens the one item sheet here first; its main button goes to the trip's or event's page.
+  const { saved, toggle } = useSavedItems();
+  const [selected, setSelected] = useState<{ merchant: Merchant; item: CatalogItem }>();
+  const showOffering = (id: string, itemId?: string) => {
+    const entry = itemId ? offerings?.find((offering) => offering.merchant.id === id && offering.item.id === itemId) : undefined;
+    if (entry) setSelected(entry); else openOffering(id, itemId);
+  };
+  // Trips and tickets are activities; anything else keeps its own kind (as the cards do).
+  const sheetKind = (merchant: Merchant) => { const kind = offeringKind(merchant); return kind === 'product' || kind === 'dish' ? 'activity' : kind; };
   const hostList = hosts.value?.merchants ?? [];
   const hostObservations = hosts.value?.semantics === 'bounded/v2' ? hosts.value.observations : undefined;
 
@@ -76,7 +87,7 @@ export function SubcategoryResults({ query, provider, onChange, onOpen, onExperi
         : <Rail label={hostsTitle} className="rail--merchants rail--bleed">{hostList.map((merchant) => <MerchantCard key={merchant.id} merchant={merchant} mode="compact" onOpen={onOpen} observation={observationFor(provider, hostObservations, merchant.id)} />)}</Rail>}
     </section>}
     <div className="results-summary"><h2>Matching results</h2><p className="results-count" role="status" aria-live="polite">{count}</p></div>
-    {offerings?.length ? <ExperienceGrid offerings={offerings} onOpen={openOffering} omitTag={scopeLabel} />
+    {offerings?.length ? <ExperienceGrid offerings={offerings} onOpen={showOffering} omitTag={scopeLabel} />
       : merchants?.length ? <div className="store-rows merchant-results-list">{merchants.map((merchant) => <StoreRow key={merchant.id} merchant={merchant}
         onOpen={(id, itemId) => (itemId ? offeringRoute(merchant, { onTour, onExperience, onOpen })(id, itemId) : onOpen(id))} observation={observationFor(provider, bounded ? page.observations : undefined, merchant.id)} />)}</div>
       : <CatalogState loading={catalog.loading} error={catalog.error} failure={catalog.failure} retry={catalog.retry} restart={restart}
@@ -95,6 +106,9 @@ export function SubcategoryResults({ query, provider, onChange, onOpen, onExperi
       </> : <span>Page {currentPage}</span>}
       <button type="button" className="button" disabled={!next} onClick={() => onChange({ cursor: bounded ? page.nextCursor : undefined, offset: page.offset + pageSize })}>Next</button>
     </nav>}
+    {selected && <OfferingSheet key={`${selected.merchant.id}:${selected.item.id}`} context="discovery" merchant={selected.merchant} item={selected.item}
+      kind={sheetKind(selected.merchant)} saved={saved.has(selected.item.id)} onSave={toggle} onClose={() => setSelected(undefined)}
+      onOpenStore={() => onOpen(selected.merchant.id)} onOpenDetail={() => openOffering(selected.merchant.id, selected.item.id)} />}
     <SavedNotice />
   </section>;
 }

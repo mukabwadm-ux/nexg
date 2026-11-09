@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from './ImageWithFallback';
 
@@ -14,38 +14,18 @@ function displayCategoryLabel(item: { id: string; label: string }) {
   return item.label.replace(/\s+and\s+/gi, ' & ');
 }
 
-/** A touch-friendly, full-bleed category rail with native horizontal scrolling. */
+/**
+ * A touch-friendly, full-bleed category rail with native horizontal scrolling. Mouse users get a pair of arrows
+ * while the tiles overflow: at the end of the heading row when the rail has one ("Browse by type"), the arrow with
+ * nothing further that way dimmed; otherwise at the rail's edges.
+ */
 export function CategoryRail({ items, selectedId, onSelect, label }: CategoryRailProps) {
   const railId = useId();
   const railRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const pageScrollingRef = useRef(false);
   const boundsRef = useRef({ start: 0, end: 0 });
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [isPageScrolling, setIsPageScrolling] = useState(false);
-
-  useEffect(() => {
-    let scrollEndTimer: number | undefined;
-    const handlePageScroll = () => {
-      if (!pageScrollingRef.current) {
-        pageScrollingRef.current = true;
-        setIsPageScrolling(true);
-      }
-      window.clearTimeout(scrollEndTimer);
-      scrollEndTimer = window.setTimeout(() => {
-        pageScrollingRef.current = false;
-        setIsPageScrolling(false);
-        scrollEndTimer = undefined;
-      }, 220);
-    };
-
-    window.addEventListener('scroll', handlePageScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handlePageScroll);
-      window.clearTimeout(scrollEndTimer);
-    };
-  }, []);
 
   useLayoutEffect(() => {
     const rail = railRef.current;
@@ -108,27 +88,29 @@ export function CategoryRail({ items, selectedId, onSelect, label }: CategoryRai
   };
 
   return (
-    <section className={`category-rail${isPageScrolling ? ' category-rail--page-scrolling' : ''}`} aria-label={label}>
-      <div className="category-rail__controls">
-        {canScrollLeft && <button
+    <section className="category-rail" aria-label={label}>
+      {(canScrollLeft || canScrollRight) && <div className="category-rail__controls">
+        <button
           type="button"
-          className="icon-button category-rail__arrow category-rail__arrow--previous"
+          className="category-rail__arrow category-rail__arrow--previous"
           aria-label={`Previous ${label.toLowerCase()}`}
           aria-controls={railId}
+          disabled={!canScrollLeft}
           onClick={() => scroll(-1)}
         >
-          <ChevronLeft size={14} aria-hidden="true" />
-        </button>}
-        {canScrollRight && <button
+          <ChevronLeft size={18} strokeWidth={1.75} aria-hidden="true" />
+        </button>
+        <button
           type="button"
-          className="icon-button category-rail__arrow category-rail__arrow--next"
+          className="category-rail__arrow category-rail__arrow--next"
           aria-label={`Next ${label.toLowerCase()}`}
           aria-controls={railId}
+          disabled={!canScrollRight}
           onClick={() => scroll(1)}
         >
-          <ChevronRight size={14} aria-hidden="true" />
-        </button>}
-      </div>
+          <ChevronRight size={18} strokeWidth={1.75} aria-hidden="true" />
+        </button>
+      </div>}
       <div id={railId} ref={railRef} className="category-rail__items">
         {items.map((item, index) => (
           <button

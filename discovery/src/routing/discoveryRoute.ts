@@ -2,7 +2,15 @@ import type { DiscoveryQuery } from '../providers/DiscoveryProvider';
 
 export interface RouteState extends DiscoveryQuery {
   view?: 'results' | 'experience' | 'tour'; merchantId?: string; itemId?: string; operatorSearch?: string; operatorOffset?: number;
+  /**
+   * A grocery store's open department (`&department=`), kept with the store it belongs to, so it never follows the
+   * shopper into another store. Each department change is its own history step, so Back walks back through them.
+   */
+  department?: { merchantId: string; id: string };
 }
+/** The department for the store the route shows, if the route names one for it. */
+export const routeDepartment = (route: Pick<RouteState, 'merchantId' | 'department'>) =>
+  route.merchantId && route.department?.merchantId === route.merchantId ? route.department.id : undefined;
 export function parseRoute(search: string, state?: { discoveryRequest?: DiscoveryQuery['engineRequest'] }): RouteState {
   const params = new URLSearchParams(search);
   const offset = Number(params.get('offset')); const operatorOffset = Number(params.get('operatorOffset'));
@@ -19,6 +27,7 @@ export function parseRoute(search: string, state?: { discoveryRequest?: Discover
       : params.get('view') === 'experience' && params.get('merchant') && params.get('item') ? 'experience'
       : params.get('view') === 'results' || params.get('subcategory') || params.get('option') ? 'results' : undefined,
     merchantId: params.get('merchant') || undefined, itemId: params.get('item') || undefined,
+    department: params.get('merchant') && params.get('department') ? { merchantId: params.get('merchant')!, id: params.get('department')! } : undefined,
     operatorSearch: params.get('merchant') ? params.get('operatorSearch') || undefined : undefined,
     operatorOffset: params.get('merchant') && Number.isSafeInteger(operatorOffset) && operatorOffset >= 0 ? operatorOffset : 0,
     ...(state?.discoveryRequest ? { engineRequest: state.discoveryRequest, limit: state.discoveryRequest.limit } : {}),
@@ -29,6 +38,7 @@ export function routeUrl(route: RouteState): string {
   const values = { category: route.categoryId, subcategory: route.subcategoryId, option: route.optionId, q: route.search, area: route.area,
     open: route.openNow ? '1' : undefined, sort: route.sort && route.sort !== 'recommended' ? route.sort : undefined,
     offset: route.offset || undefined, cursor: route.cursor, context: route.engineRequest || route.contextRequired ? 'required' : undefined, view: route.view, merchant: route.merchantId, item: route.itemId,
+    department: routeDepartment(route),
     operatorSearch: route.operatorSearch, operatorOffset: route.operatorOffset || undefined };
   for (const [key, value] of Object.entries(values)) if (value !== undefined) params.set(key, String(value));
   return params.size ? `/?${params}` : '/';

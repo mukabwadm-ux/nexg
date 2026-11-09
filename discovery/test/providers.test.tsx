@@ -8,7 +8,7 @@ import { startProviderRead, type ReadSnapshot } from '../src/providers/providerR
 import { createDiscoveryProvider } from '../src/providers/providerFactory';
 import type { DiscoveryQuery, EngineSchemas } from '../src/providers/DiscoveryProvider';
 import { platformMerchantProvider } from '../src/providers/platformMerchantProvider';
-import { applyQueryChange, parseRoute, routeUrl } from '../src/routing/discoveryRoute';
+import { applyQueryChange, parseRoute, routeDepartment, routeUrl } from '../src/routing/discoveryRoute';
 import { CatalogState } from '../src/components/CatalogState';
 import { VisibilityQualifier } from '../src/observations/visibility';
 import { observationFor, sendObservation } from '../src/observations/client';
@@ -197,6 +197,19 @@ test('route/Back parsing keeps source IDs and cursor, while changed filters inva
   const changed = applyQueryChange(route, { area: 'another-area' });
   assert.equal(changed.cursor, undefined); assert.equal(changed.offset, 0); assert.equal(changed.search, 'Protocol'); assert.equal(changed.subcategoryId, 'retired-child');
   const paged = applyQueryChange(route, { offset: 4, cursor: 'next-opaque' }); assert.equal(paged.cursor, 'next-opaque'); assert.equal(paged.area, 'area-control');
+});
+
+test('a grocery department rides in the address with its own store, so Back walks through departments and never into another store', () => {
+  const store = parseRoute('?category=groceries-essentials&merchant=store-control&department=groceries%3Abakery');
+  assert.deepEqual(store.department, { merchantId: 'store-control', id: 'groceries:bakery' });
+  assert.equal(routeDepartment(store), 'groceries:bakery');
+  assert.equal(new URLSearchParams(routeUrl(store).slice(2)).get('department'), 'groceries:bakery');
+  assert.equal(parseRoute(routeUrl(store)).department?.id, 'groceries:bakery');
+  const elsewhere = { ...store, merchantId: 'other-store' };
+  assert.equal(routeDepartment(elsewhere), undefined);
+  assert.equal(new URLSearchParams(routeUrl(elsewhere).slice(2)).get('department'), null);
+  assert.equal(parseRoute('?category=groceries-essentials&department=groceries%3Abakery').department, undefined, 'only a store has departments');
+  assert.equal(routeDepartment({ ...store, merchantId: undefined }), undefined);
 });
 
 test('exact collection destinations survive adaptation/history; source context is never replaced by a category browse', async () => {

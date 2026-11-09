@@ -26,10 +26,14 @@ interface StorefrontProps {
   operatorSearch?: string;
   operatorOffset?: number;
   onOperatorChange: (search: string, offset: number) => void;
+  /** A grocery store's open department, from the page address. */
+  department?: string;
+  /** Opens a grocery department (undefined: the store's home) as a new step in the page's history. */
+  onDepartment?: (id?: string) => void;
 }
 
 /** L4 reads a platform merchant by its original identity and selects a category presentation. */
-export function Storefront({ merchantId, provider, onBack, onHome, itemId, categoryId, onExperience, onTour, operatorSearch, operatorOffset, onOperatorChange }: StorefrontProps) {
+export function Storefront({ merchantId, provider, onBack, onHome, itemId, categoryId, onExperience, onTour, operatorSearch, operatorOffset, onOperatorChange, department, onDepartment }: StorefrontProps) {
   const [merchant, setMerchant] = useState<Merchant>();
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState<ReadFailure>();
@@ -101,8 +105,9 @@ export function Storefront({ merchantId, provider, onBack, onHome, itemId, categ
       <button type="button" className="store-back" onClick={onBack}><ArrowLeft size={17} strokeWidth={2} aria-hidden="true" />Back</button>
       <CatalogState failure={failed} retry={() => setRetry(value => value + 1)} />
     </>}
-    {merchant && (massage ? <MassageStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} /> : supermarket ? <SupermarketStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} /> : isTourOperator(merchant) ? <TourOperatorStorefront key={merchant.id} merchant={merchant} onBack={onBack} onOpen={onTour} search={operatorSearch} offset={operatorOffset} onChange={onOperatorChange} /> : isRestaurant
+    {merchant && (massage ? <MassageStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} /> : supermarket ? <SupermarketStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} department={department} onDepartment={onDepartment} /> : isTourOperator(merchant) ? <TourOperatorStorefront key={merchant.id} merchant={merchant} onBack={onBack} onOpen={onTour} search={operatorSearch} offset={operatorOffset} onChange={onOperatorChange} /> : isRestaurant
       ? <RestaurantStorefront
+        key={merchant.id}
         merchant={merchant}
         activeItem={activeItem}
         itemMissing={itemMissing}

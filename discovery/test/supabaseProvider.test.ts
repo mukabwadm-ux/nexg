@@ -13,7 +13,7 @@ import { findSubcategory } from '../src/data/taxonomy';
 import type { DiscoveryProvider } from '../src/providers/DiscoveryProvider';
 
 // Isolated Supabase controls (plan step E2). These rows stand in for PostgREST replies and are never served as catalog data.
-const KEY = 'public-control-key-7f3a91';
+const KEY = 'sb_publishable_control-key-7f3a91';
 const LOCAL = 'http://127.0.0.1:54321';
 const id = (prefix: 'c1' | 'f1' | 'f2', value: number) => `${prefix}000000-0000-4000-8000-${String(value).padStart(12, '0')}`;
 const REAL = '7d3f0b6e-1c2a-4f5e-9a8b-0c1d2e3f4a5b';
@@ -89,10 +89,30 @@ function condition(value: unknown, filter: string): boolean {
   if (operator === 'match') return typeof value === 'string' && new RegExp(operand.replace(/\[\[:space:\]\]/g, '\\s')).test(value);
   return assert.fail(`unexpected filter ${filter}`);
 }
-function anyGroup(row: Row, value: string): boolean {
-  const groups = [...value.matchAll(/and\(category_key\.eq\.([a-z0-9_-]+),subcategory\.in\.\(([a-z0-9_,-]+)\)\)/g)];
-  assert.equal(`(${groups.map((group) => group[0]).join(',')})`, value, 'or=() holds only category key groups');
-  return groups.some(([, category, list]) => row.category_key === category && list!.split(',').includes(String(row.subcategory)));
+/** Splits a PostgREST logic list at top-level commas, respecting parentheses and double-quoted values. */
+function splitTop(text: string): string[] {
+  const parts: string[] = [];
+  let depth = 0; let inQuote = false; let start = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (inQuote) { if (character === '\\') index += 1; else if (character === '"') inQuote = false; continue; }
+    if (character === '"') inQuote = true;
+    else if (character === '(') depth += 1;
+    else if (character === ')') depth -= 1;
+    else if (character === ',' && depth === 0) { parts.push(text.slice(start, index)); start = index + 1; }
+  }
+  parts.push(text.slice(start));
+  return parts;
+}
+/** Evaluates and(...)/or(...) trees and their column.operator.value leaves, unquoting "..." values. */
+function logic(row: Row, expression: string): boolean {
+  const tree = /^(and|or)\((.*)\)$/s.exec(expression);
+  if (tree) { const results = splitTop(tree[2]!).map((part) => logic(row, part)); return tree[1] === 'and' ? results.every(Boolean) : results.some(Boolean); }
+  const [column, ...rest] = expression.split('.');
+  let filter = rest.join('.');
+  const quotedValue = /^(\w+)\."((?:[^"\\]|\\.)*)"$/.exec(filter);
+  if (quotedValue) filter = `${quotedValue[1]}.${quotedValue[2]!.replace(/\\(.)/g, '$1')}`;
+  return condition(row[column!], filter);
 }
 function ordering(order: string | null) {
   const keys = (order ?? '').split(',').filter(Boolean).map((part) => {
@@ -130,7 +150,7 @@ function postgrest(stub: Stub = {}) {
     let rows = tables[view] ?? assert.fail(`unexpected view ${url.pathname}`);
     for (const [key, value] of url.searchParams) {
       if (['select', 'order', 'limit', 'offset'].includes(key)) continue;
-      rows = rows.filter((row) => key === 'or' ? anyGroup(row, value) : condition(row[key], value));
+      rows = rows.filter((row) => key === 'or' || key === 'and' ? logic(row, `${key}${value}`) : condition(row[key], value));
     }
     rows = [...rows].sort(ordering(url.searchParams.get('order')));
     const total = rows.length;
@@ -168,6 +188,9 @@ test('settings accept the project URL and a public key only, and errors never re
   assert.equal(supabaseKeyRole(jwt('service_role')), 'service_role');
   assert.equal(supabaseKeyRole('sb_secret_control'), 'secret');
   assert.equal(supabaseKeyRole('opaque-control'), undefined);
+  // Fail closed: anything not recognisably public is refused, including a JWT without a role.
+  assert.throws(() => supabaseSettings(LOCAL, 'opaque-control-value'), /anon or publishable/);
+  assert.throws(() => supabaseSettings(LOCAL, `header.${btoa('{"iss":"supabase"}')}.signature`), /anon or publishable/);
   assert.equal(supabaseSettings(LOCAL, jwt('anon')).anonKey, jwt('anon'));
   const refused: [unknown, string][] = [
     ['http://example.com', KEY], ['https://abcdefgh.supabase.co/rest/v1', KEY], ['https://user:pass@abcdefgh.supabase.co', KEY], ['https://abcdefgh.supabase.co?x=1', KEY],
@@ -201,8 +224,8 @@ test('a subcategory page reads only its merchants and their items, with the publ
   const [page, itemsRead] = calls;
   assert.equal(page!.url.pathname, '/rest/v1/merchant_public');
   assert.deepEqual(Object.fromEntries(page!.url.searchParams), {
-    select: 'id,trading_name,category_key,subcategory,branch_address,branch_latitude,branch_longitude,accepting_orders,busy_mode_until,closed_today,opens_today,closes_today',
-    category_key: 'eq.restaurants_food', subcategory: 'in.(caf,cafe)', order: 'trading_name.asc,id.asc', limit: '2', offset: '0' });
+    select: 'id,trading_name,category_key,subcategory,branch_address,branch_latitude,branch_longitude,accepting_orders,busy_mode_until,closed_today,opens_today,closes_today,featured,closed_early_at',
+    category_key: 'eq.restaurants_food', subcategory: 'in.(caf,cafe)', order: 'featured.desc.nullslast,trading_name.asc,id.asc', limit: '2', offset: '0' });
   assert.equal(itemsRead!.url.pathname, '/rest/v1/catalogue_public');
   assert.equal(itemsRead!.url.searchParams.get('merchant_id'), `in.(${id('c1', 2)},${id('c1', 10)})`);
   assert.equal(itemsRead!.url.searchParams.get('order'), 'merchant_id.asc,sort.asc.nullsfirst,id.asc');
@@ -243,7 +266,11 @@ test('search escapes LIKE wildcards, and the area filter matches exactly what ar
   const wild = await provider.getMerchants({ search: ' %_ ' });
   assert.deepEqual(names(wild), ['Hodari 50%_Off Café']);
   assert.equal(calls[0]!.url.searchParams.get('trading_name'), 'ilike.*\\%\\_*');
-  assert.deepEqual(names(await provider.getMerchants({ search: 'CAFÉ' })), ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café']);
+  // As on the demo API, a search also matches category and subcategory names: "cafe" finds every Café merchant.
+  assert.deepEqual(names(await provider.getMerchants({ search: 'CAFE' })), ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café', 'Kahawa House']);
+  assert.deepEqual(names(await provider.getMerchants({ search: 'kahawa' })), ['Kahawa House']);
+  assert.deepEqual(names(await provider.getMerchants({ categoryId: 'travel-tours', search: 'safari' })), ['Mara Safaris']);
+  assert.match(calls.at(-2)!.url.searchParams.get('and') ?? '', /^\(or\(and\(category_key\.eq\.travel_tours,subcategory\.in\.\([a-z_,-]+\)\)\),or\(trading_name\.ilike\."\*safari\*",and\(category_key\.eq\.travel_tours,subcategory\.in\.\([a-z_,-]+\)\)\)\)$/);
   const kilimani = await provider.getMerchants({ area: 'Kilimani', limit: 8, sort: 'recommended' });
   assert.deepEqual(names(kilimani), ['Jua Café', 'Kahawa House', 'Utulivu Spa']);
   assert.ok(kilimani.merchants.every((row) => row.area === 'Kilimani'));
@@ -336,6 +363,17 @@ test("storefronts carry the merchant's own sections only when it has two or more
   assert.deepEqual(list.merchants[0]!.items.map((entry) => [entry.name, entry.section]), [['Mara day trip', undefined], ['Amboseli in two days', undefined], ['Nairobi National Park', undefined]], 'lists keep catalogue order');
   const failing = setup({ failView: 'catalogue_section' });
   assert.deepEqual((await failing.provider.getMerchant(id('c1', 3))).items.map((entry) => entry.section), [undefined, undefined, undefined], 'a failed section read still opens the storefront');
+});
+
+test('recommended puts featured merchants first, and a merchant that closed early today is closed', async () => {
+  const changed = merchants.map((row) => row.trading_name === 'Mara Safaris' ? { ...row, featured: true }
+    : row.trading_name === 'Amani Café' ? { ...row, closed_early_at: '2026-11-09T06:30:00Z' }
+    : row.trading_name === 'Jua Café' ? { ...row, opens_today: '08:00:00', closes_today: '17:00:00', closed_early_at: '2026-11-08T15:00:00Z' } : row);
+  const { provider } = setup({ merchants: changed });
+  const home = await provider.getMerchants({ limit: 3, sort: 'recommended' });
+  assert.deepEqual(home.merchants.map((row) => [row.name, row.isFeatured]), [['Mara Safaris', true], ['Amani Café', false], ['Hodari 50%_Off Café', false]]);
+  assert.equal(home.merchants[1]!.isOpen, false, 'closed early this morning (Nairobi), although its hours say open');
+  assert.equal((await provider.getMerchant(id('c1', 1))).isOpen, true, "yesterday's early close no longer applies");
 });
 
 test('areas come from mapped merchants with two-part Nairobi addresses, sorted, and two screens share one read', async () => {

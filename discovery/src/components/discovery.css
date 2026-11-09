@@ -1,19 +1,20 @@
 /* Discovery pages (owner, 8 Nov 2026): home, category (L2) and results (L3). Merchants come before their
-   products and activities; every card is the one framed card family; only catalogue facts are shown. */
+   products and activities; every card is the one framed card family; only catalogue facts are shown.
+   Spacing follows Wolt (owner, 9 Nov 2026): an 8px rhythm, 40px between sections (32px on phones), 16px from a
+   heading to its content, 40px chips. */
 
 /* Page frame ------------------------------------------------------------------------------------------ */
 .home-page,.category-page,.results-screen{display:flex;flex-direction:column;min-width:0}
-.category-page-heading,.results-heading{margin:8px 0 14px}
+.category-page-heading,.results-heading{margin:8px 0 16px}
 .category-page-heading h1,.results-heading h1{font-size:clamp(30px,3vw,42px);line-height:1.1;letter-spacing:-.03em;text-wrap:balance}
-.category-discovery__filters{margin:0 0 20px}
-.category-page .filter-bar,.results-screen .filter-bar{padding-top:4px;padding-bottom:4px}
-.discovery-types{margin:0 0 36px;min-width:0}
-.discovery-types__title{margin:0 0 12px;font-size:17px;line-height:1.3;letter-spacing:-.01em}
-.discovery-section{min-width:0;margin:0 0 44px}
-.discovery-section:last-of-type{margin-bottom:12px}
-.home-categories{margin:0 0 4px;min-width:0}
+.category-discovery__filters{margin:0 0 24px}
+.discovery-types{margin:0 0 28px;min-width:0}
+.discovery-types__title{display:flex;align-items:center;min-height:40px;margin:0 0 12px;font-size:20px;line-height:1.2;letter-spacing:-.015em}
+.discovery-section{min-width:0;margin:0 0 36px}
+.discovery-section:last-of-type{margin-bottom:16px}
+.home-categories{margin:0;min-width:0}
 .rail--merchants{--rail-item:300px}
-/* Rail arrows sit level with the photos rather than the middle of the cards. */
+/* Rails without a heading row keep their arrows level with the photos rather than the middle of the cards. */
 .discovery-section .rail{--rail-arrow-top:33%}
 
 /* Merchant card: framed cover, logo beside the name, type and place, confirmed facts, "View store". ---- */
@@ -45,33 +46,36 @@
 .merchant-logo{flex:none;display:block;width:40px;height:40px;border-radius:12px;object-fit:cover;background:#0b1215;outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
 .merchant-logo--initial{display:grid;place-items:center;background:linear-gradient(145deg,#2c2517,#16130c);color:var(--gold);font-size:17px;font-weight:700;line-height:1;outline-color:rgba(229,182,95,.24)}
 
-/* Store row: the store's identity, then a rail of its own items. -------------------------------------- */
-.store-rows{display:flex;flex-direction:column;min-width:0}
-.store-rows>.store-row+.store-row{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
+/* Store row (Wolt's store rows): logo, the name with a small chevron, one muted line, then the store's own items.
+   The whole header opens the store: the name's button stretches over it (::after), so there is one control. */
+.store-rows{display:flex;flex-direction:column;gap:40px;min-width:0}
 .store-row{display:flex;flex-direction:column;gap:14px;min-width:0}
-.store-row__header{position:relative;display:flex;align-items:center;gap:14px;min-width:0}
-.store-row__logo{width:52px;height:52px;border-radius:15px}
-.store-row__logo.merchant-logo--initial{font-size:21px}
+.store-row__header{position:relative;display:flex;align-items:center;gap:14px;min-width:0;min-height:56px}
+.store-row__logo{width:56px;height:56px;border-radius:16px}
+.store-row__logo.merchant-logo--initial{font-size:22px}
 .store-row__identity{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
-.store-row__name{margin:0;font-size:18px;line-height:1.25;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition-property:color;transition-duration:150ms}
+.store-row__name{min-width:0;margin:0;font-size:18px;line-height:1.25;letter-spacing:-.01em}
+.store-row__open{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-height:0;padding:0;border-radius:0;color:#f3eee2;font:inherit;text-align:left;transform-origin:left center;transition-property:scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.store-row__open::after{content:'';position:absolute;inset:-6px -8px;border-radius:16px}
+.store-row__open:active{scale:.98}
+.store-row__open:focus-visible{outline:0}
+.store-row__open:focus-visible::after{outline:2px solid var(--gold);outline-offset:0}
+.store-row__title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition-property:color;transition-duration:150ms}
+.store-row__open svg{flex:none;color:var(--muted);transition-property:translate,color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
 .store-row__meta{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;margin:0;color:var(--muted);font-size:13px;line-height:1.45}
 .store-row__fact{display:inline-flex;align-items:center;gap:5px;color:#d5d9d3;font-variant-numeric:tabular-nums}
 .store-row__fact svg{flex:none;color:var(--gold)}
 .store-row__fact small{color:var(--muted);font-size:inherit}
 .store-row__promotion{padding:2px 9px;border-radius:999px;background:rgba(229,182,95,.14);color:var(--gold);font-size:12px;font-weight:700}
-/* The whole header opens the store: the button's ::after covers it, so there is one control to tab to. */
-.store-row__open{flex:none;min-height:44px;padding:0;border-radius:999px}
-.store-row__open::after{content:'';position:absolute;inset:-6px -8px;border-radius:16px}
-.store-row__pill{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.05);box-shadow:var(--shadow-ring);color:#f3eee2;font-size:13px;font-weight:700;white-space:nowrap;transition-property:scale,background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
-.store-row__pill svg{color:var(--gold)}
-.store-row__open:active .store-row__pill{scale:.96}
+/* Grocery rows: compact square-photo cards, about seven across a laptop and two and a bit across a phone. */
+.store-row__rail--compact{--rail-item:172px;--rail-item-phone:148px}
 .store-row__empty{margin:0;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.025);box-shadow:var(--shadow-ring);color:var(--muted);font-size:13.5px}
 
 @media (hover:hover) and (pointer:fine){
   .merchant-card:hover{box-shadow:var(--shadow-ring-hover);background-color:#12212a}
   .merchant-card:hover .merchant-card__action svg{translate:3px 0}
-  .store-row__header:hover .store-row__pill{background:rgba(229,182,95,.12);box-shadow:0 0 0 1px rgba(229,182,95,.35)}
-  .store-row__header:hover .store-row__name{color:#fff}
+  .store-row__header:hover .store-row__title{color:#fff}
+  .store-row__header:hover .store-row__open svg{translate:2px 0;color:var(--gold)}
 }
 
 /* "Saved on this device for this visit only": shown briefly after a heart is filled. */
@@ -79,7 +83,7 @@
 .saved-notice.is-visible{opacity:1;visibility:visible;translate:-50% 0}
 
 /* Results (L3) ------------------------------------------------------------------------------------------ */
-.results-divider{margin:14px 0 22px;border-top:1px solid var(--line)}
+.results-divider{margin:16px 0 24px;border-top:1px solid var(--line)}
 .results-summary{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;margin:0 0 16px}
 .results-summary h2{font-size:18px;line-height:1.3}
 .results-count{min-height:0;margin:0;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
@@ -109,26 +113,30 @@
 .skeleton-card__lines{display:flex;flex:1;flex-direction:column;gap:8px;min-width:0}
 .skeleton-card__lines .skeleton-card__line{margin:0}
 .skeleton-row{display:flex;flex-direction:column;gap:14px;min-width:0}
-.skeleton-row+.skeleton-row{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
+.skeleton-row+.skeleton-row{margin-top:40px}
 .skeleton-row__header{max-width:360px;padding:0}
-.skeleton-row__header .skeleton-card__logo{width:52px;height:52px;border-radius:15px}
+.skeleton-row__header .skeleton-card__logo{width:56px;height:56px;border-radius:16px}
 
 @media (max-width:760px){
   .category-page-heading,.results-heading{margin:4px 0 12px}
   .category-page-heading h1,.results-heading h1{font-size:30px}
-  .category-discovery__filters{margin-bottom:16px}
-  .discovery-types{margin-bottom:28px}
-  .discovery-section{margin-bottom:36px}
+  .category-discovery__filters{margin-bottom:20px}
+  .discovery-types{margin-bottom:16px}
+  .discovery-types__title{font-size:18px}
+  .discovery-section{margin-bottom:24px}
   .rail--merchants{--rail-item-phone:min(78vw,340px)}
   .loading-rail{grid-auto-columns:min(78vw,320px);gap:12px}
   .catalog-skeleton--merchant .loading-rail{grid-auto-columns:min(78vw,340px)}
-  .store-rows>.store-row+.store-row,.skeleton-row+.skeleton-row{margin-top:20px;padding-top:20px}
-  .store-row{gap:12px}
-  .store-row__header{gap:12px}
-  .store-row__logo,.skeleton-row__header .skeleton-card__logo{width:44px;height:44px;border-radius:13px}
-  .store-row__name{font-size:16.5px}
-  .store-row__meta{font-size:12.5px;gap:2px 12px}
-  .results-divider{margin:10px 0 18px}
+  .store-rows{gap:32px}
+  .skeleton-row+.skeleton-row{margin-top:32px}
+  .store-row,.skeleton-row{gap:12px}
+  .store-row__header{gap:12px;min-height:48px}
+  .store-row__logo,.skeleton-row__header .skeleton-card__logo{width:48px;height:48px;border-radius:14px}
+  .store-row__logo.merchant-logo--initial{font-size:19px}
+  .store-row__name{font-size:16px}
+  .store-row__meta{gap:2px 12px;font-size:12.5px}
+  .results-divider{margin:12px 0 20px}
+  .results-hosts{margin-bottom:24px}
 }
 @media (max-width:560px){
   .loading-grid{grid-template-columns:1fr;gap:10px}
@@ -141,12 +149,7 @@
   .pagination__pages{display:none}
   .pagination__status{display:inline}
 }
-@media (max-width:480px){
-  /* The pill keeps its arrow; its words stay for screen readers. */
-  .store-row__pill{width:40px;padding:0;justify-content:center}
-  .store-row__label{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-}
 @media (prefers-reduced-motion:reduce){
-  .merchant-card,.merchant-card__action svg,.store-row__pill,.store-row__name,.pagination__page,.saved-notice{transition:none}
+  .merchant-card,.merchant-card__action svg,.store-row__open,.store-row__open svg,.store-row__title,.pagination__page,.saved-notice{transition:none}
   .skeleton-card__media,.skeleton-card__line,.skeleton-card__logo{animation:none}
 }

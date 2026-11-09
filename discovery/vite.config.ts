@@ -70,7 +70,7 @@ function discoveryIconAssets(): Plugin {
   };
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, root, '');
   const apiPort = env.API_PORT || '3001';
   if (!/^\d{2,5}$/.test(apiPort) || Number(apiPort) > 65535) throw new Error('API_PORT must be a valid port');
@@ -79,7 +79,13 @@ export default defineConfig(({ mode }) => {
   if (!/^\d{2,5}$/.test(enginePort) || Number(enginePort) > 65535) throw new Error('DISCOVERY_ENGINE_PORT must be a valid port');
   if (env.VITE_DISCOVERY_PROVIDER && !['platform', 'engine', 'supabase'].includes(env.VITE_DISCOVERY_PROVIDER)) throw new Error('VITE_DISCOVERY_PROVIDER must be platform or engine or supabase');
   // The browser reads Supabase directly with the public key, so its settings are checked before anything is served or built.
-  if (env.VITE_DISCOVERY_PROVIDER === 'supabase') supabaseSettings(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY);
+  if (env.VITE_DISCOVERY_PROVIDER === 'supabase') {
+    const { origin } = supabaseSettings(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY);
+    // A build for visitors must not point their browsers at the builder's own machine; local checks opt in.
+    if (command === 'build' && new URL(origin).protocol === 'http:' && env.DISCOVERY_ALLOW_LOCAL_SUPABASE !== '1') {
+      throw new Error('VITE_SUPABASE_URL points at a local Supabase. Set the hosted project URL for a release build, or DISCOVERY_ALLOW_LOCAL_SUPABASE=1 for a local check');
+    }
+  }
   const proxy = { '/api/discovery': { target: `http://127.0.0.1:${enginePort}`, changeOrigin: false }, '/api': { target: `http://127.0.0.1:${apiPort}`, changeOrigin: false } };
   return {
     plugins: [react(), discoveryIconAssets(), demoMediaModule()],

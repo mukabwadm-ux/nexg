@@ -1,27 +1,27 @@
-import { Plus } from 'lucide-react';
 import type { CatalogItem } from '../../../providers/DiscoveryProvider';
-import { formatPrice } from '../../../lib/formatPrice';
-import { ImageWithFallback } from '../../ImageWithFallback';
+import { kindPresentation, type OfferingKind } from '../../../data/offeringKinds';
+import { cartBlock } from '../../../data/restaurantPresentation';
+import { OfferingCard } from '../../cards/OfferingCard';
 
-interface RestaurantMenuItemCardProps {
+/**
+ * One dish on the menu: the card family's small card (cards.css) with the restaurant's rules. The + adds one
+ * to the cart and grows into a stepper in place; it never opens a sheet. A dish the cart can't take (no menu
+ * price, or a choice the cart can't hold yet) offers "View dish" instead of a +.
+ */
+export function RestaurantMenuItemCard({ item, kind, saved, quantity, onSave, onOpen, onAdd, onRemove }: {
   item: CatalogItem;
+  kind: OfferingKind;
+  saved: boolean;
+  /** How many are in the cart already. */
+  quantity: number;
+  onSave: (id: string) => void;
   onOpen: (item: CatalogItem) => void;
-}
-
-export function RestaurantMenuItemCard({ item, onOpen }: RestaurantMenuItemCardProps) {
-  const price = formatPrice(item);
-  return <article className="restaurant-dish-card" data-discovery-item={item.id}>
-    <button type="button" className="restaurant-dish-card__main" onClick={() => onOpen(item)} aria-label={`View ${item.name} details`}>
-      <ImageWithFallback src={item.image} alt="" width={420} height={280} className="restaurant-dish-card__image" loading="lazy" referrerPolicy="no-referrer" />
-      <span className="restaurant-dish-card__body">
-        <span className="restaurant-dish-card__name">{item.name}</span>
-        {item.description && <span className="restaurant-dish-card__description">{item.description}</span>}
-        {price && <span className="restaurant-dish-card__price">{price}</span>}
-        {item.isAvailable === false && <span className="restaurant-dish-card__unavailable">Unavailable</span>}
-      </span>
-    </button>
-    <button type="button" className="restaurant-dish-card__open" onClick={() => onOpen(item)} aria-label={`View ${item.name} details`} disabled={item.isAvailable === false}>
-      <Plus size={20} aria-hidden="true" />
-    </button>
-  </article>;
+  onAdd: (item: CatalogItem) => void;
+  onRemove: (item: CatalogItem) => void;
+}) {
+  const block = cartBlock(item);
+  // An unavailable dish keeps its + (disabled by the card) so a dish already in the cart can still come out.
+  const view = block !== undefined && block !== 'unavailable';
+  return <OfferingCard item={item} kind={kind} saved={saved} onSave={onSave} onOpen={onOpen} quantity={quantity}
+    {...(view ? { actionLabel: kindPresentation[kind].cardAction } : { onAdd, onRemove })} />;
 }

@@ -1,15 +1,18 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Bike, CalendarCheck, Car, ClipboardCheck, ClipboardList, Clock3, Flame, Info, MapPin, Package, PackageOpen, Percent, Search, ShoppingBag, Sparkles, Star, Ticket, Timer } from 'lucide-react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { Bike, CalendarCheck, Car, ClipboardCheck, ClipboardList, Clock3, Flame, Info, MapPin, Package, PackageOpen, Percent, Search, Sparkles, Star, Ticket, Timer } from 'lucide-react';
 import type { CatalogItem, Merchant } from '../../providers/DiscoveryProvider';
 import { catalogNaming, catalogSections, searchSections, sectionAnchor } from '../../data/catalogSections';
 import { isBikeHire, isListKind, offeringKind, subcategoryOf, transferCardAction, transferDirection, vehicleJourney } from '../../data/offeringKinds';
-import { listEntries, listSummary, MAX_LIST_QUANTITY, readGroceryList, setListQuantity, writeGroceryList, type SupermarketListLine } from '../../data/supermarketPresentation';
 import { localDateKey } from '../../data/massagePresentation';
 import { formatPrice } from '../../lib/formatPrice';
 import { OfferingCard } from '../cards/OfferingCard';
-import { OfferingListSheet, OfferingSheet, type KeptRequest, type OfferingAnswers } from '../cards/OfferingSheet';
+import { OfferingSheet, type KeptRequest, type OfferingAnswers } from '../cards/OfferingSheet';
+import { cleanAnswers } from '../../data/itemSheet';
+import { CartPill } from '../cart/CartPill';
+import { CartSheet, CartSwitchDialog } from '../cart/CartSheet';
+import { cartable, MAX_CART_QUANTITY, useStoreCart, type CartOutcome } from '../cart/useStoreCart';
 import { RentalTripPanel, TransferTripPanel, emptyRentalTrip, emptyTransferTrip, transferReady, transferSummary, tripReady, tripSummary } from '../cards/RentalTripPanel';
-import { SectionNav } from './SectionNav';
+import { SectionNav, showStoreBar } from './SectionNav';
 import { StoreHero } from './StoreHero';
 
 interface GenericStorefrontProps {
@@ -25,8 +28,8 @@ interface GenericStorefrontProps {
 
 /*
  * What a shopper keeps for one store on this device: saved hearts and requests. The website can't send
- * requests yet, so they stay here and the page says so. Products go on the shared Discovery list
- * ("nexg.discovery.list.v1"), the same one the grocery storefront uses.
+ * requests yet, so they stay here and the page says so. Products and dishes go in the NexG cart instead
+ * (src/components/cart, "nexg.cart.v1"): one store per cart, the same cart the website checks out.
  */
 interface Shelf { saved: string[]; requests: Record<string, KeptRequest> }
 const shelfKey = (merchantId: string) => `nexg.discovery.shelf.v1:${merchantId}`;
@@ -39,27 +42,7 @@ function deviceStorage(): Storage | undefined {
   }
 }
 
-const day = (value: unknown) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
-const clock = (value: unknown) => typeof value === 'string' && /^\d{2}:\d{2}$/.test(value) ? value : undefined;
-const words = (value: unknown, max: number) => typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : undefined;
-const whole = (value: unknown, min: number, max: number) => typeof value === 'number' && Number.isInteger(value) ? Math.min(max, Math.max(min, value)) : undefined;
-const flag = (value: unknown) => typeof value === 'boolean' ? value : undefined;
-const oneOf = (value: unknown, options: readonly string[]) => typeof value === 'string' && options.includes(value) ? value : undefined;
-
-/** Stored answers, read defensively: storage can be empty, blocked or edited by hand. */
-function cleanAnswers(value: unknown): OfferingAnswers {
-  const entry = value && typeof value === 'object' ? value as Record<string, unknown> : {};
-  const answers: OfferingAnswers = {
-    date: day(entry.date), endDate: day(entry.endDate), time: clock(entry.time), endTime: clock(entry.endTime),
-    part: oneOf(entry.part, ['morning', 'afternoon', 'evening']), adults: whole(entry.adults, 1, 20), children: whole(entry.children, 0, 20),
-    place: words(entry.place, 120), returnPlace: words(entry.returnPlace, 120), dropoff: words(entry.dropoff, 120), brief: words(entry.brief, 600),
-    budget: typeof entry.budget === 'string' && /^\d{1,9}$/.test(entry.budget) ? entry.budget : undefined,
-    contact: oneOf(entry.contact, ['call', 'whatsapp', 'email']), driver: flag(entry.driver), meetGreet: flag(entry.meetGreet),
-    travellers: whole(entry.travellers, 1, 20), bags: whole(entry.bags, 0, 20), notes: words(entry.notes, 300),
-  };
-  return Object.fromEntries(Object.entries(answers).filter(([, field]) => field !== undefined)) as OfferingAnswers;
-}
-
+// Stored answers are read with the item sheet's own cleaner (itemSheet.ts), the one every request shares.
 function readShelf(merchant: Merchant, today: string): Shelf {
   const shelf: Shelf = { saved: [], requests: {} };
   try {
@@ -96,17 +79,14 @@ function writeShelf(merchantId: string, shelf: Shelf) {
   }
 }
 
-const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-/** "Search the shop", "Search the fleet", but "Search services". */
-const searchPrompt = (list: string) => { const name = list.toLocaleLowerCase('en-KE'); return name.endsWith('s') ? `Search ${name}` : `Search the ${name}`; };
 const kindIcon = { product: Package, dish: Package, service: ClipboardList, activity: Ticket, task: ClipboardList, vehicle: Car } as const;
 
 /**
  * The shared L4 for every store without its own designed storefront: electronics, fashion, flowers, drinks,
  * pharmacy, laundry, concierge, car hire, transfers and more. The store hero, then (for car hire and
  * transfers) the trip first, then the store's own list in sections under a sticky, Wolt-style section bar
- * with search. Products go on a list kept on this device; everything else is a request kept on this device.
- * Only catalogue facts are shown; nothing is ordered, booked or paid for here.
+ * with search. Products and dishes go in the NexG cart ("View cart"); services, tasks, vehicles and activities are
+ * requests kept on this device, since they aren't purchases. Only catalogue facts are shown; nothing is paid for here.
  */
 export function GenericStorefront({ merchant, activeItem, itemMissing = false, onBack, onSelectItem, onCloseItem }: GenericStorefrontProps) {
   const kind = useMemo(() => offeringKind(merchant), [merchant]);
@@ -120,14 +100,10 @@ export function GenericStorefront({ merchant, activeItem, itemMissing = false, o
   const catalog = useRef<HTMLDivElement>(null);
   const [announcement, setAnnouncement] = useState('');
 
-  // Products: the shopper's list for this store, kept on this device.
+  // Products and dishes: Derrick NexG's web cart, one store at a time.
   const list = isListKind(kind);
-  const [lines, setLines] = useState<SupermarketListLine[]>(() => list ? readGroceryList(merchant) : []);
-  const [listOpen, setListOpen] = useState(false);
-  useEffect(() => { if (list) writeGroceryList(merchant.id, lines); }, [list, merchant.id, lines]);
-  const quantities = useMemo(() => new Map(lines.map((line) => [line.itemId, line.quantity])), [lines]);
-  const entries = useMemo(() => listEntries(items, lines), [items, lines]);
-  const summary = listSummary(entries);
+  const cart = useStoreCart(merchant);
+  const [cartOpen, setCartOpen] = useState(false);
 
   // Everything else: saved hearts and requests, kept on this device.
   const [shelf, setShelf] = useState<Shelf>(() => readShelf(merchant, localDateKey()));
@@ -149,29 +125,43 @@ export function GenericStorefront({ merchant, activeItem, itemMissing = false, o
   const open = activeItem && activeItem.merchantId === merchant.id && items.some((item) => item.id === activeItem.id) ? activeItem : undefined;
   const requested = items.filter((item) => shelf.requests[item.id])
     .sort((a, b) => shelf.requests[b.id]!.savedAt.localeCompare(shelf.requests[a.id]!.savedAt));
-  const basket = list ? summary.quantity > 0 : requested.length > 0;
+  const basket = list ? cart.count > 0 : requested.length > 0;
 
-  /** Brings the top of the list (the section bar) up under the site header. */
-  const showCatalog = (onlyWhenPast: boolean) => {
-    const element = catalog.current;
-    if (!element) return;
-    const header = document.querySelector<HTMLElement>('.discovery-header')?.offsetHeight ?? 0;
-    const top = Math.max(0, element.getBoundingClientRect().top + window.scrollY - header);
-    if (onlyWhenPast && window.scrollY <= top) return;
-    window.scrollTo({ top, behavior: onlyWhenPast || reducedMotion() ? 'auto' : 'smooth' });
-  };
+  /** Brings the top of the list (the section bar) up to where it pins: under the site header, or docked on phones. */
+  const showCatalog = (onlyWhenPast: boolean) => showStoreBar(catalog.current, { onlyWhenPast, smooth: !onlyWhenPast });
   const changeSearch = (value: string) => { setSearch(value); showCatalog(true); };
   const showVehicles = () => { setPlanned(true); requestAnimationFrame(() => showCatalog(false)); };
 
-  const changeQuantity = (item: CatalogItem, quantity: number) => {
-    if (item.merchantId !== merchant.id || !items.some((entry) => entry.id === item.id)) return;
-    const next = Math.max(0, Math.min(MAX_LIST_QUANTITY, Math.trunc(quantity)));
-    if (item.isAvailable === false && next > (quantities.get(item.id) ?? 0)) return;
-    setLines((current) => setListQuantity(current, item.id, next));
-    setAnnouncement(next ? `${item.name}: ${next} on your list.` : `${item.name} taken off your list.`);
+  /** Says where an add went; "Start a new cart?" speaks for itself while an add waits on it. */
+  const said = (item: CatalogItem, outcome: CartOutcome, quantity: number) => {
+    if (outcome !== 'waiting') setAnnouncement(outcome === 'refused' ? `${item.name} can’t go in the cart.` : `${item.name}: ${quantity} in your cart.`);
   };
-  const addOne = (item: CatalogItem) => changeQuantity(item, (quantities.get(item.id) ?? 0) + 1);
-  const removeOne = (item: CatalogItem) => changeQuantity(item, (quantities.get(item.id) ?? 0) - 1);
+  const inCart = (item: CatalogItem) => cart.quantities.get(item.id) ?? 0;
+  const addOne = (item: CatalogItem) => {
+    // Without a price in shillings an item can't go in the cart, so its + opens it instead.
+    if (!cartable(item)) { onSelectItem(item); return; }
+    said(item, cart.add(item), Math.min(MAX_CART_QUANTITY, inCart(item) + 1));
+  };
+  const removeOne = (item: CatalogItem) => {
+    const next = Math.max(0, inCart(item) - 1);
+    cart.set(item.id, next);
+    setAnnouncement(next ? `${item.name}: ${next} in your cart.` : `${item.name} taken out of your cart.`);
+  };
+  /** From the item sheet: a chosen quantity; 0 takes it out. The outcome tells the sheet whether to close. */
+  const changeQuantity = (item: CatalogItem, quantity: number): CartOutcome | undefined => {
+    if (quantity <= 0) { cart.set(item.id, 0); setAnnouncement(`${item.name} taken out of your cart.`); return undefined; }
+    const outcome = cart.add(item, quantity, 'sheet');
+    said(item, outcome, Math.min(MAX_CART_QUANTITY, quantity));
+    return outcome;
+  };
+  const startNewCart = () => {
+    const waiting = cart.pending;
+    const outcome = cart.startNewCart();
+    if (!waiting) return;
+    said(waiting.item, outcome, Math.min(MAX_CART_QUANTITY, waiting.quantity ?? 1));
+    // The sheet waited under "Start a new cart?"; once the new cart starts it has done its job.
+    if (waiting.source === 'sheet' && outcome === 'added') onCloseItem();
+  };
   const toggleSaved = (id: string) => updateShelf((current) => ({ ...current, saved: current.saved.includes(id) ? current.saved.filter((entry) => entry !== id) : [...current.saved, id] }));
   const keepRequest = (item: CatalogItem, answers: OfferingAnswers) => {
     updateShelf((current) => ({ ...current, requests: { ...current.requests, [item.id]: { answers, savedAt: new Date().toISOString() } } }));
@@ -204,7 +194,7 @@ export function GenericStorefront({ merchant, activeItem, itemMissing = false, o
     const kept = Boolean(shelf.requests[item.id]);
     return <OfferingCard key={item.id} item={item} kind={kind} saved={savedIds.has(item.id)} onSave={toggleSaved} onOpen={onSelectItem}
       tag={kept ? 'Request saved' : undefined} actionLabel={kept ? 'View request' : selectAction}
-      {...(list ? { quantity: quantities.get(item.id) ?? 0, onAdd: addOne, onRemove: removeOne } : {})} />;
+      {...(list ? { quantity: inCart(item), onAdd: addOne, onRemove: removeOne } : {})} />;
   };
 
   return <div className={`generic-store${basket ? ' has-basket' : ''}`}>
@@ -217,7 +207,7 @@ export function GenericStorefront({ merchant, activeItem, itemMissing = false, o
 
     {items.length > 0 ? <div ref={catalog} className="generic-store__catalog">
       <SectionNav label={`${naming.list} sections`} sections={shown.map((section) => ({ anchor: sectionAnchor(section), title: section.title, count: section.items.length }))}
-        search={{ value: search, onChange: changeSearch, placeholder: searchPrompt(naming.list), label: `Search ${merchant.name}` }} />
+        search={{ value: search, onChange: changeSearch, placeholder: `Search ${merchant.name}`, label: `Search ${merchant.name}` }} />
       {tripPlanned && <p className="store-intro store-intro--trip"><CalendarCheck size={17} strokeWidth={1.75} aria-hidden="true" />
         <span>For your {rental ? 'trip' : 'ride'}: {rental ? tripSummary(trip) : transferSummary(ride)}. {merchant.name} confirms availability and the final price.</span></p>}
       {term && matches > 0 && <p className="store-intro" role="status">{naming.count(matches)} {matches === 1 ? 'matches' : 'match'} “{term}”</p>}
@@ -227,7 +217,7 @@ export function GenericStorefront({ merchant, activeItem, itemMissing = false, o
           const history = section.source === 'history';
           const Mark = section.id.endsWith(':new') ? Sparkles : Flame;
           return <section key={section.id} id={anchor} tabIndex={-1} aria-labelledby={`${anchor}-title`} className={`store-section${history ? ' store-section--history' : ''}`}>
-            <div className="store-section__heading"><h2 id={`${anchor}-title`}>{history && <Mark size={20} strokeWidth={2} aria-hidden="true" />}{section.title}</h2><span>{naming.count(section.items.length)}</span></div>
+            <div className="store-section__heading"><h2 id={`${anchor}-title`}>{history && <Mark size={20} strokeWidth={1.75} aria-hidden="true" />}{section.title}</h2><span>{naming.count(section.items.length)}</span></div>
             <div className={`offering-grid${list ? '' : ' offering-grid--roomy'}`}>{section.items.map(card)}</div>
           </section>;
         })}</div>
@@ -245,22 +235,18 @@ export function GenericStorefront({ merchant, activeItem, itemMissing = false, o
 
     {/* The pill stays mounted behind an open sheet, so closing the sheet hands focus back to it. */}
     {basket && (list
-      ? <div className="store-basket generic-store__basket">
-        <ShoppingBag size={18} strokeWidth={2} aria-hidden="true" />
-        <div className="store-basket__text"><strong>{naming.count(summary.quantity)}{summary.total ? ` · ${summary.total}` : ''}</strong><span>Your list, on this device</span></div>
-        <button type="button" aria-label={`View your list: ${naming.count(summary.quantity)}${summary.total ? `, ${summary.total}` : ''}`} onClick={() => setListOpen(true)}>View list</button>
-      </div>
+      ? <CartPill count={cart.count} subtotalKes={cart.subtotalKes} onOpen={() => setCartOpen(true)} />
       : <div className="store-basket generic-store__basket">
-        <ClipboardCheck size={18} strokeWidth={2} aria-hidden="true" />
+        <ClipboardCheck size={18} strokeWidth={1.75} aria-hidden="true" />
         <div className="store-basket__text"><strong>{requested.length === 1 ? '1 request' : `${requested.length} requests`} on this device</strong><span>Not sent to {merchant.name} yet</span></div>
         <button type="button" onClick={() => onSelectItem(requested[0]!)}>Review</button>
       </div>)}
 
-    {open && <OfferingSheet key={open.id} merchant={merchant} item={open} kind={kind} saved={savedIds.has(open.id)} onSave={toggleSaved} onClose={onCloseItem}
+    {open && <OfferingSheet key={open.id} context="store" merchant={merchant} item={open} kind={kind} saved={savedIds.has(open.id)} onSave={toggleSaved} onClose={onCloseItem}
       trip={tripStarted ? trip : undefined} ride={rideStarted ? ride : undefined}
-      {...(list ? { listed: quantities.get(open.id) ?? 0, onList: changeQuantity } : { request: shelf.requests[open.id], onKeep: keepRequest, onForget: forgetRequest })} />}
-    {listOpen && <OfferingListSheet merchant={merchant} kind={kind} lines={entries} total={summary.total} max={MAX_LIST_QUANTITY}
-      onQuantity={changeQuantity} onClear={() => { setLines([]); setAnnouncement('Your list is empty.'); }} onClose={() => setListOpen(false)} />}
+      {...(list ? { listed: inCart(open), onList: changeQuantity } : { request: shelf.requests[open.id], onKeep: keepRequest, onForget: forgetRequest })} />}
+    {cartOpen && <CartSheet merchant={merchant} cart={cart} items={items} onClose={() => setCartOpen(false)} />}
+    {cart.pending && <CartSwitchDialog current={cart.otherStore ?? 'another store'} onKeep={cart.keepCurrentCart} onStart={startNewCart} />}
     <p className="sr-only" role="status">{announcement}</p>
   </div>;
 }

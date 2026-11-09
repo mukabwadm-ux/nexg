@@ -19,7 +19,9 @@ import { ProviderReadError } from './readState';
 import { SUPABASE_PROVIDER_VERSION, supabaseCapabilities, supabaseSettings } from './supabaseSettings';
 
 /** The catalog bridge's columns. */
-const MERCHANT_COLUMNS = 'id,trading_name,category_key,subcategory,branch_address,branch_latitude,branch_longitude,accepting_orders,busy_mode_until,closed_today,opens_today,closes_today';
+const MERCHANT_COLUMNS = 'id,trading_name,category_key,subcategory,branch_address,branch_latitude,branch_longitude,accepting_orders,busy_mode_until,closed_today,opens_today,closes_today,featured,closed_early_at';
+/** Recommended, as on the platform: featured merchants first, then by name. Supabase has no ratings. */
+const MERCHANT_ORDER = 'featured.desc.nullslast,trading_name.asc,id.asc';
 const ITEM_COLUMNS = 'id,merchant_id,section_id,name,description,price_kes,sort';
 /** Items per merchant: the catalog bridge's list and detail limits. */
 const LIST_ITEMS = 30;
@@ -30,8 +32,6 @@ const COLLECTION_ITEMS = 12;
 const PAGE_ROWS = 1000;
 /** Merchants per item read: 30 merchants × 30 items fit one reply, and the URL stays near 1 KB. */
 const ITEM_BATCH = 30;
-/** Merchants read one at a time after a cut-short reply, this many at once. */
-const ITEM_FALLBACK_CONCURRENCY = 4;
 /** The platform adapter's limit for one complete inventory. */
 const MAX_INVENTORY = 10_000;
 /** The bridge's limit on a search or area value. */
@@ -123,15 +123,23 @@ const fields = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw unavailable();
   return value as Record<string, unknown>;
 };
-function merchantRow(value: unknown): MerchantRow {
+/** The bridge's merchant row, plus the paid featured flag and the merchant console's "close early" time. */
+type SupabaseMerchantRow = MerchantRow & { featured: boolean | null; closed_early_at: string | null };
+function merchantRow(value: unknown): SupabaseMerchantRow {
   const row = fields(value);
   return {
     id: uuid(row.id), trading_name: required(row.trading_name), category_key: text(row.category_key), subcategory: text(row.subcategory),
     branch_address: text(row.branch_address), branch_latitude: finite(row.branch_latitude), branch_longitude: finite(row.branch_longitude),
     accepting_orders: flag(row.accepting_orders), busy_mode_until: text(row.busy_mode_until), closed_today: flag(row.closed_today),
-    opens_today: text(row.opens_today), closes_today: text(row.closes_today),
+    opens_today: text(row.opens_today), closes_today: text(row.closes_today), featured: flag(row.featured), closed_early_at: text(row.closed_early_at),
   };
 }
+const nairobiDate = (time: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Nairobi' }).format(time);
+/** A merchant that pressed "Close early" today is closed now, whatever its hours say (the bridge's openState doesn't read it). */
+const closedEarly = (row: SupabaseMerchantRow, now: number) => {
+  const closedAt = row.closed_early_at ? Date.parse(row.closed_early_at) : Number.NaN;
+  return Number.isFinite(closedAt) && closedAt <= now && nairobiDate(closedAt) === nairobiDate(now);
+};
 /** A catalogue_public row; section_id points at the merchant's own catalogue_section. */
 type SupabaseItemRow = ItemRow & { section_id: string | null };
 function itemRow(value: unknown): SupabaseItemRow {
@@ -153,28 +161,46 @@ function countFrom(header: string | null): number | undefined {
 
 /** ILIKE pattern for a literal search. Escapes \ % _; PostgREST reads * as %, so it becomes a one-character match. */
 const likePattern = (search: string) => search.replace(/[\\%_]/g, '\\$&').replace(/\*/g, '_');
+/** A double-quoted value inside a PostgREST and()/or() tree: backslash and quote are escaped. */
+const quoted = (value: string) => `"${value.replace(/[\\"]/g, '\\$&')}"`;
+/** Search folding: case and accents ignored, so "cafe" finds "Café". */
+export const fold = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase('en-KE');
 
 /** ASCII punctuation. In a PostgreSQL regular expression, a backslash before it means the character itself. */
 const PUNCTUATION = /[!-\/:-@\[-`{-~]/g;
+/** Exactly the characters JavaScript's trim() removes, as areaFromAddress uses it; PostgreSQL's [[:space:]] differs by locale. */
+const TRIMMED = `[${String.fromCharCode(9, 10, 11, 12, 13, 32, 0xa0, 0x1680, 0x2000)}-${String.fromCharCode(0x200a, 0x2028, 0x2029, 0x202f, 0x205f, 0x3000, 0xfeff)}]`;
 /** Server-side twin of areaFromAddress: exactly "<area>, Nairobi", with spaces around the parts and any case of Nairobi. */
 const areaPattern = (area: string) => {
   const literal = area.replace(PUNCTUATION, '\\$&');
-  return `^[[:space:]]*${literal}[[:space:]]*,[[:space:]]*[Nn][Aa][Ii][Rr][Oo][Bb][Ii][[:space:]]*$`;
+  return `^${TRIMMED}*${literal}${TRIMMED}*,${TRIMMED}*[Nn][Aa][Ii][Rr][Oo][Bb][Ii]${TRIMMED}*$`;
 };
 
-interface Scope { rows: readonly BridgeMapRow[]; search?: string; area?: string }
+interface Scope { rows: readonly BridgeMapRow[]; search?: string; area?: string; labelRows?: readonly BridgeMapRow[] }
 
-/** PostgREST filters for the scope's Supabase keys, name search and area. Deterministic, so pages stay stable. */
-function merchantFilters(scope: Scope): Record<string, string> {
+/** and(category_key.eq.X,subcategory.in.(a,b)) groups for the rows' Supabase keys, in a stable order. */
+function keyGroups(rows: readonly BridgeMapRow[]): [string, string][] {
   const groups = new Map<string, Set<string>>();
-  for (const row of scope.rows) groups.set(row.supabase.category, (groups.get(row.supabase.category) ?? new Set<string>()).add(row.supabase.subcategory));
-  const sorted = [...groups].sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
-    .map(([category, subcategories]) => [category, [...subcategories].sort().join(',')] as const);
+  for (const row of rows) groups.set(row.supabase.category, (groups.get(row.supabase.category) ?? new Set<string>()).add(row.supabase.subcategory));
+  return [...groups].sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+    .map(([category, subcategories]) => [category, [...subcategories].sort().join(',')]);
+}
+const groupTerm = ([category, list]: [string, string]) => `and(category_key.eq.${category},subcategory.in.(${list}))`;
+
+/**
+ * PostgREST filters for the scope's Supabase keys, search and area. Deterministic, so pages stay stable.
+ * Search matches the merchant's name, or, as on the demo API, its category or subcategory name.
+ */
+function merchantFilters(scope: Scope): Record<string, string> {
+  const sorted = keyGroups(scope.rows);
   const [only] = sorted;
-  const params: Record<string, string> = sorted.length === 1 && only
+  let params: Record<string, string> = sorted.length === 1 && only
     ? { category_key: `eq.${only[0]}`, subcategory: `in.(${only[1]})` }
-    : { or: `(${sorted.map(([category, list]) => `and(category_key.eq.${category},subcategory.in.(${list}))`).join(',')})` };
-  if (scope.search) params.trading_name = `ilike.*${likePattern(scope.search)}*`;
+    : { or: `(${sorted.map(groupTerm).join(',')})` };
+  if (scope.search && scope.labelRows?.length) {
+    const name = `trading_name.ilike.${quoted(`*${likePattern(scope.search)}*`)}`;
+    params = { and: `(or(${sorted.map(groupTerm).join(',')}),or(${[name, ...keyGroups(scope.labelRows).map(groupTerm)].join(',')}))` };
+  } else if (scope.search) params.trading_name = `ilike.*${likePattern(scope.search)}*`;
   if (scope.area) params.branch_address = `match.${areaPattern(scope.area)}`;
   return params;
 }
@@ -252,7 +278,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     const scope = this.#scope(query);
     if (typeof scope === 'string') return { merchants: [], total: 0, offset, hasMore: false, mapping: scope === 'unmapped' ? 'unmapped' : 'mapped' };
     const { rows, total } = await this.#read('merchant_public', {
-      select: MERCHANT_COLUMNS, ...merchantFilters(scope), order: 'trading_name.asc,id.asc', limit: String(limit), offset: String(offset),
+      select: MERCHANT_COLUMNS, ...merchantFilters(scope), order: MERCHANT_ORDER, limit: String(limit), offset: String(offset),
     }, true, signal);
     const page = rows.map(merchantRow);
     // A shorter page than the count allows means the server capped the reply; paging on would skip merchants.
@@ -275,7 +301,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     if (!definitions.length) return { collections: [], partial: false };
     const scope = this.#scope({ ...query, categoryId });
     if (typeof scope === 'string') return { collections: [], partial: false };
-    const rows = (await this.#readAll('merchant_public', { select: MERCHANT_COLUMNS, ...merchantFilters(scope), order: 'trading_name.asc,id.asc' }, signal)).map(merchantRow);
+    const rows = (await this.#readAll('merchant_public', { select: MERCHANT_COLUMNS, ...merchantFilters(scope), order: MERCHANT_ORDER }, signal)).map(merchantRow);
     const byPair = new Map(this.#rows.map((row) => [pairKey(row), row.demoSubcategoryId]));
     const demoSubcategory = (row: MerchantRow) => byPair.get(`${row.category_key}/${row.subcategory}`);
     const signatures = new Set<string>();
@@ -339,7 +365,14 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     const rows = this.#rows.filter((row) => row.status === 'mapped' && row.discovery
       && (sourceIds ? sourceIds.includes(row.demoSubcategoryId) : !category || row.discovery.categoryId === category.id));
     if (!rows.length) return 'unmapped';
-    return { rows, ...(search ? { search } : {}), ...(area ? { area } : {}) };
+    // The demo API's search also matched category and subcategory names; these rows' merchants match by label.
+    const term = search ? fold(search) : '';
+    const labelRows = term ? rows.filter((row) => {
+      const discoveryCategory = findCategory(row.discovery?.categoryId);
+      const labels = [row.demoLabel, row.demoCategoryLabel, discoveryCategory?.label, findSubcategory(row.discovery?.categoryId, row.discovery?.subcategoryId)?.label];
+      return labels.some((label) => label && fold(label).includes(term));
+    }) : [];
+    return { rows, ...(search ? { search } : {}), ...(area ? { area } : {}), ...(labelRows.length ? { labelRows } : {}) };
   }
 
   /** Offerings need the complete scoped inventory, as on the platform: search covers item and host names. */
@@ -349,7 +382,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     const selection = { ...query, categoryId, search: undefined };
     const scope = this.#scope(selection);
     if (typeof scope === 'string') return pageOfferings([], query, scope === 'unmapped' ? 'unmapped' : 'mapped');
-    const rows = (await this.#readAll('merchant_public', { select: MERCHANT_COLUMNS, ...merchantFilters(scope), order: 'trading_name.asc,id.asc' }, signal)).map(merchantRow);
+    const rows = (await this.#readAll('merchant_public', { select: MERCHANT_COLUMNS, ...merchantFilters(scope), order: MERCHANT_ORDER }, signal)).map(merchantRow);
     if (new Set(rows.map((row) => row.id)).size !== rows.length) throw unavailable();
     return pageOfferings(await this.#hydrate(rows, LIST_ITEMS, selection, signal), query, 'mapped');
   }
@@ -366,18 +399,21 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
   }
 
   /** Items for the merchants, then the bridge's shaping, then the platform's. Keeps the server's merchant order. */
-  async #hydrate(rows: readonly MerchantRow[], perMerchant: number, selection: DiscoveryQuery | undefined, signal?: AbortSignal, sections = false): Promise<Merchant[]> {
+  async #hydrate(rows: readonly SupabaseMerchantRow[], perMerchant: number, selection: DiscoveryQuery | undefined, signal?: AbortSignal, sections = false): Promise<Merchant[]> {
     if (!rows.length) return [];
     const media = rows.some((row) => DEMO_MERCHANT.test(row.id)) ? this.#loadMedia() : Promise.resolve(NO_MEDIA);
     const ids = rows.map((row) => row.id);
     const batches: string[][] = [];
     for (let index = 0; index < ids.length; index += ITEM_BATCH) batches.push(ids.slice(index, index + ITEM_BATCH));
     const items = (await Promise.all(batches.map((batch) => this.#itemBatch(batch, perMerchant, signal)))).flat();
+    const now = this.#now();
     const bridge = new CatalogBridge(this.#rows, await media);
-    bridge.replace({ merchants: [...rows], items }, this.#now());
+    bridge.replace({ merchants: [...rows], items }, now);
     const merchants = rows.map((row) => {
       const merchant = bridge.merchant(row.id);
-      return toMerchant({ ...merchant, items: merchant.items.slice(0, perMerchant) }, selection);
+      // The platform mapper reads featured placements from the badges, as the demo API sent them.
+      const shaped = toMerchant({ ...merchant, badges: row.featured ? ['Featured'] : [], items: merchant.items.slice(0, perMerchant) }, selection);
+      return closedEarly(row, now) ? { ...shaped, isOpen: false } : shaped;
     });
     if (!sections) return merchants;
     const sectionOf = new Map(items.map((item) => [item.id, item.section_id]));
@@ -412,7 +448,9 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
 
   /** One read per batch. If the reply was cut short, the merchants past the cut are read one at a time. */
   async #itemBatch(ids: readonly string[], perMerchant: number, signal?: AbortSignal): Promise<SupabaseItemRow[]> {
-    const { items, total } = await this.#readItems(ids, Math.min(PAGE_ROWS, perMerchant * ids.length), signal);
+    // A full page, capped per store afterwards: asking for perMerchant × stores would cut the reply short whenever one
+    // store has more items than the cap, and the fallback would then re-read stores one at a time.
+    const { items, total } = await this.#readItems(ids, ids.length === 1 ? perMerchant : PAGE_ROWS, signal);
     if (ids.length === 1 || items.length >= total) return items;
     // Replies are ordered by merchant UUID, so every merchant before the last one in the reply is complete.
     const last = items.at(-1)?.merchant_id;
@@ -420,12 +458,9 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     for (const item of items) received.set(item.merchant_id, (received.get(item.merchant_id) ?? 0) + 1);
     const pending = ids.filter((id) => last === undefined || id > last || (id === last && (received.get(id) ?? 0) < perMerchant));
     const kept = items.filter((item) => !pending.includes(item.merchant_id));
-    const rest: SupabaseItemRow[] = [];
-    for (let index = 0; index < pending.length; index += ITEM_FALLBACK_CONCURRENCY) {
-      const reads = await Promise.all(pending.slice(index, index + ITEM_FALLBACK_CONCURRENCY).map((id) => this.#readItems([id], perMerchant, signal)));
-      for (const read of reads) rest.push(...read.items);
-    }
-    return [...kept, ...rest];
+    // All at once: sequential waves cost a round trip (and a CORS pre-flight) each.
+    const rest = await Promise.all(pending.map((id) => this.#readItems([id], perMerchant, signal)));
+    return [...kept, ...rest.flatMap((read) => read.items)];
   }
 
   async #readItems(ids: readonly string[], limit: number, signal?: AbortSignal): Promise<{ items: SupabaseItemRow[]; total: number }> {

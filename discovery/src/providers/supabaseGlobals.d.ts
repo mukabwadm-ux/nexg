@@ -3,6 +3,7 @@ interface ImportMetaEnv {
   readonly VITE_DISCOVERY_PROVIDER?: string;
   readonly VITE_SUPABASE_URL?: string;
   readonly VITE_SUPABASE_ANON_KEY?: string;
+  readonly VITE_NEXG_CHECKOUT_URL?: string;
 }
 
 /** Demo photos for the Supabase provider, packed by vite.config.ts from demo-seed/source/demo-api-snapshot.json. */

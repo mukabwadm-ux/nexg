@@ -24,7 +24,9 @@ export interface CatalogSection {
 }
 
 interface VocabularySection { id: string; title: string; keywords: string[]; priority?: number }
-export interface SectionScheme { id: string; categories: string[]; allTitle: string; sections: VocabularySection[] }
+/** A department groups aisles for stores with thousands of products (owner, 9 Nov 2026). */
+interface VocabularyDepartment { id: string; title: string; icon: string; image?: string; keywords: string[]; sections: string[] }
+export interface SectionScheme { id: string; categories: string[]; allTitle: string; sections: VocabularySection[]; departments?: VocabularyDepartment[] }
 interface Naming { list: string; item: string; items: string; demand: string }
 interface Vocabulary {
   version: string; schemes: SectionScheme[]; shared: VocabularySection[]; fallback: { id: string; title: string };
@@ -153,3 +155,82 @@ export function searchSections(sections: readonly CatalogSection[], term: string
 
 /** The DOM id a section's heading block uses, for the sticky section bar. */
 export const sectionAnchor = (section: Pick<CatalogSection, 'id'>) => `section-${section.id.replace(/[^a-z0-9]+/gi, '-')}`;
+
+/**
+ * A department and its aisles, for stores with thousands of products: the grocery sidebar's rows (owner,
+ * 9 Nov 2026). Departments come only from schemes that define them.
+ */
+export interface CatalogDepartment {
+  /** `<scheme>:<department>`; `<scheme>:more` holds what no department claims. */
+  id: string;
+  title: string;
+  /** A lucide-react icon name, such as "Apple". */
+  icon: string;
+  /** Department art the owner may supply later. */
+  image?: string;
+  /** The department's aisles: the merchant's own first, in catalogue order, then the vocabulary's. */
+  sections: CatalogSection[];
+  /** How many items the department holds, each counted once. */
+  count: number;
+}
+
+/** The icon of the department that gathers whatever no other department claims. */
+const MORE_ICON = 'LayoutGrid';
+
+interface DepartmentRules { home: Map<string, number>; words: (Rule | undefined)[] }
+const departmentRules = new Map<string, DepartmentRules>();
+function departmentsFor(scheme: SectionScheme): DepartmentRules {
+  const cached = departmentRules.get(scheme.id);
+  if (cached) return cached;
+  const home = new Map<string, number>();
+  const departments = scheme.departments ?? [];
+  departments.forEach((department, index) => department.sections.forEach((section) => {
+    const id = `${scheme.id}:${section}`;
+    if (!home.has(id)) home.set(id, index);
+  }));
+  // A department without words of its own places merchant sections only through its aisles' words.
+  const words = departments.map((department, index) => department.keywords.some((word) => word.trim())
+    ? compile(scheme.id, { id: department.id, title: department.title, keywords: department.keywords.filter((word) => word.trim()) }, index) : undefined);
+  const rules = { home, words };
+  departmentRules.set(scheme.id, rules);
+  return rules;
+}
+
+/**
+ * Groups a store's aisles into its scheme's departments, dropping empty ones. Pass the store's
+ * `catalogSections` when they are already at hand. History sections ("Frequently ordered", "New") stay
+ * out: they belong to the store's home. A vocabulary aisle joins the department that lists it; a merchant's
+ * own section joins the department its name matches, by the aisle words first and then the department's
+ * own words; anything left goes to "More", last. A scheme without departments returns none.
+ */
+export function catalogDepartments(merchant: Pick<Merchant, 'subcategoryId'>, items: readonly CatalogItem[], sections: readonly CatalogSection[] = catalogSections(merchant, items)): CatalogDepartment[] {
+  const scheme = sectionScheme(merchant);
+  const departments = scheme?.departments;
+  if (!scheme || !departments?.length) return [];
+  const { home, words } = departmentsFor(scheme);
+  const own = departments.map(() => [] as CatalogSection[]);
+  const listed = departments.map(() => [] as CatalogSection[]);
+  const more: CatalogSection[] = [];
+  for (const section of sections) {
+    if (section.source === 'history') continue;
+    if (section.source === 'catalogue') {
+      const aisle = ruleSection(scheme, section.title);
+      const title = fold(section.title);
+      const index = (aisle && home.get(aisle.id)) ?? words.findIndex((rule) => rule?.pattern.test(title));
+      if (index < 0) more.push(section); else own[index]!.push(section);
+      continue;
+    }
+    const index = home.get(section.id);
+    if (index === undefined) more.push(section); else listed[index]!.push(section);
+  }
+  const count = (list: readonly CatalogSection[]) => list.reduce((total, section) => total + section.items.length, 0);
+  const result: CatalogDepartment[] = departments.flatMap((department, index) => {
+    const order = (section: CatalogSection) => department.sections.indexOf(section.id.slice(scheme.id.length + 1));
+    const aisles = [...own[index]!, ...[...listed[index]!].sort((a, b) => order(a) - order(b))];
+    const total = count(aisles);
+    if (!total) return [];
+    return [{ id: `${scheme.id}:${department.id}`, title: department.title, icon: department.icon, ...(department.image ? { image: department.image } : {}), sections: aisles, count: total }];
+  });
+  if (count(more)) result.push({ id: `${scheme.id}:${fallback.id}`, title: fallback.title, icon: MORE_ICON, sections: more, count: count(more) });
+  return result;
+}

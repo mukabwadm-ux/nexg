@@ -18,11 +18,11 @@ interface MerchantCardProps {
 
 const initial = (name: string) => (/[\p{L}\p{N}]/u.exec(name)?.[0] ?? '•').toLocaleUpperCase('en-KE');
 
-/** The merchant's logo, or its first letter when the catalogue has no logo or the image fails. */
-export function MerchantLogo({ merchant, className = '' }: { merchant: Pick<Merchant, 'name' | 'logoUrl'>; className?: string }) {
+/** The merchant's logo, or its first letter when the catalogue has no logo or the image fails. `eager` for a logo above the fold. */
+export function MerchantLogo({ merchant, className = '', eager = false }: { merchant: Pick<Merchant, 'name' | 'logoUrl'>; className?: string; eager?: boolean }) {
   const [failed, setFailed] = useState<string>();
   if (merchant.logoUrl && failed !== merchant.logoUrl) {
-    return <img className={`merchant-logo ${className}`.trim()} src={merchant.logoUrl} alt="" width={96} height={96} loading="lazy" decoding="async"
+    return <img className={`merchant-logo ${className}`.trim()} src={merchant.logoUrl} alt="" width={96} height={96} loading={eager ? 'eager' : 'lazy'} decoding="async"
       referrerPolicy="no-referrer" onError={() => setFailed(merchant.logoUrl)} />;
   }
   return <span className={`merchant-logo merchant-logo--initial ${className}`.trim()} aria-hidden="true">{initial(merchant.name)}</span>;
@@ -45,7 +45,7 @@ export function merchantFacts(merchant: Merchant): { key: string; content: React
   const rating = facts?.rating;
   if (rating && Number.isFinite(rating.value) && rating.value >= 0 && rating.value <= 5) {
     const count = rating.count !== undefined && Number.isFinite(rating.count) && rating.count >= 0 ? rating.count : undefined;
-    list.push({ key: 'rating', content: <><Star size={14} strokeWidth={2} fill="currentColor" aria-hidden="true" /><span className="sr-only">Rated </span>{rating.value.toFixed(1)}
+    list.push({ key: 'rating', content: <><Star size={14} strokeWidth={1.75} fill="currentColor" aria-hidden="true" /><span className="sr-only">Rated </span>{rating.value.toFixed(1)}
       <span className="sr-only"> out of 5</span>{count !== undefined && <small>({new Intl.NumberFormat('en-KE', { notation: 'compact' }).format(count)}<span className="sr-only"> reviews</span>)</small>}</> });
   }
   const fee = facts?.deliveryFee && formatPrice(facts.deliveryFee, 'code');
@@ -79,7 +79,7 @@ export function MerchantCard({ merchant, onOpen, mode = 'standard', observation 
           </span>
         </span>
         {facts.length > 0 && <span className="merchant-card__facts">{facts.map((fact) => <span key={fact.key}>{fact.content}</span>)}</span>}
-        <span className="merchant-card__action">View store<ArrowRight size={16} strokeWidth={2} aria-hidden="true" /></span>
+        <span className="merchant-card__action">View store<ArrowRight size={16} strokeWidth={1.75} aria-hidden="true" /></span>
       </span>
     </button>
   </article>;

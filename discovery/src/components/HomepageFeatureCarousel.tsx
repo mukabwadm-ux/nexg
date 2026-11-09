@@ -41,7 +41,7 @@ function initialCardCount() {
 
 function TagIcon({ categoryId }: { categoryId: string }) {
   const Icon = iconByCategory[categoryId] ?? Sparkles;
-  return <Icon className="homepage-feature-card__tag-icon" size={15} strokeWidth={2} aria-hidden="true" />;
+  return <Icon className="homepage-feature-card__tag-icon" size={15} strokeWidth={1.75} aria-hidden="true" />;
 }
 
 export function HomepageFeatureCarousel({ onCategory }: { onCategory: (id: string) => void }) {
@@ -221,7 +221,7 @@ export function HomepageFeatureCarousel({ onCategory }: { onCategory: (id: strin
                     <span className="homepage-feature-card__title">{feature.title}</span>
                     <span className="homepage-feature-card__description">{feature.description}</span>
                   </span>
-                  <span className="homepage-feature-card__action">{feature.action}<ChevronRight size={17} strokeWidth={2} aria-hidden="true" /></span>
+                  <span className="homepage-feature-card__action">{feature.action}<ChevronRight size={17} strokeWidth={1.75} aria-hidden="true" /></span>
                 </span>
               </button>
               );
@@ -234,7 +234,7 @@ export function HomepageFeatureCarousel({ onCategory }: { onCategory: (id: strin
           aria-label="Previous featured ideas"
           onClick={() => move(-1)}
         >
-          <ChevronLeft size={20} strokeWidth={2} aria-hidden="true" />
+          <ChevronLeft size={20} strokeWidth={1.75} aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -242,7 +242,7 @@ export function HomepageFeatureCarousel({ onCategory }: { onCategory: (id: strin
           aria-label="Next featured ideas"
           onClick={() => move(1)}
         >
-          <ChevronRight size={20} strokeWidth={2} aria-hidden="true" />
+          <ChevronRight size={20} strokeWidth={1.75} aria-hidden="true" />
         </button>
       </div>
 
@@ -260,7 +260,7 @@ export function HomepageFeatureCarousel({ onCategory }: { onCategory: (id: strin
             title={playing ? 'Pause featured ideas' : 'Play featured ideas'}
             onClick={() => setPlaying((current) => !current)}
           >
-            {playing ? <Pause size={16} strokeWidth={2} aria-hidden="true" /> : <Play size={16} strokeWidth={2} aria-hidden="true" />}
+            {playing ? <Pause size={16} strokeWidth={1.75} aria-hidden="true" /> : <Play size={16} strokeWidth={1.75} aria-hidden="true" />}
           </button>
         </div>
       </div>

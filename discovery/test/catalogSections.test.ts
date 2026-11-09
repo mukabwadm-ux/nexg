@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { categories } from '../src/data/taxonomy';
-import { catalogNaming, catalogSections, ruleSection, searchSections, sectionAnchor, sectionScheme } from '../src/data/catalogSections';
+import { catalogDepartments, catalogNaming, catalogSections, ruleSection, searchSections, sectionAnchor, sectionScheme } from '../src/data/catalogSections';
+import { departmentIconNames } from '../src/components/storefronts/supermarket/departmentIcons';
 import type { CatalogItem, Merchant } from '../src/providers/DiscoveryProvider';
 
 // Every store's menu is sectioned one consistent way (owner, 8 Nov 2026). These checks read files only.
@@ -122,4 +123,99 @@ test('"Frequently ordered" and "New" come only from real history, first, repeati
   assert.ok(searchSections(sections, 'curry').every((section) => section.source !== 'history'), 'search drops the repeating sections');
   const fleet = catalogSections({ subcategoryId: 'vehicle-rentals_car-rental' }, [item('Compact SUV', { orders: 3 }), item('Economy Sedan', { orders: 9 })]);
   assert.equal(fleet[0]!.title, 'Most hired');
+});
+
+// Groceries get two levels for stores with thousands of products (owner, 9 Nov 2026): departments, then aisles.
+const grocer = { subcategoryId: 'groceries-essentials_supermarket' };
+const groceries = (vocabulary as unknown as { schemes: { id: string; sections: { id: string; priority?: number }[];
+  departments: { id: string; title: string; icon: string; keywords: string[]; sections: string[] }[] }[] })
+  .schemes.find((entry) => entry.id === 'groceries')!;
+const placeOf = (name: string) => catalogDepartments(grocer, [item(name)])
+  .flatMap((department) => department.sections.map((section) => `${department.title} › ${section.title}`))[0];
+
+test('grocery departments: every aisle sits in exactly one department, with an icon the storefront draws', () => {
+  const aisles = groceries.sections.map((section) => section.id);
+  const shared = vocabulary.shared.map((section) => section.id);
+  const listed = groceries.departments.flatMap((department) => department.sections);
+  assert.equal(new Set(listed).size, listed.length, 'an aisle is listed twice');
+  for (const aisle of aisles) assert.ok(listed.includes(aisle), `${aisle} has no department`);
+  for (const aisle of listed) assert.ok(aisles.includes(aisle) || shared.includes(aisle), `${aisle} is not a section`);
+  assert.equal(new Set(groceries.departments.map((department) => department.id)).size, groceries.departments.length);
+  for (const department of groceries.departments) {
+    assert.ok(departmentIconNames.includes(department.icon), `${department.id} draws ${department.icon}`);
+    assert.ok(department.keywords.length && department.keywords.every((word) => word.trim()), department.id);
+  }
+  // Every grocery aisle has a priority, so the most specific product words win whatever the display order.
+  assert.ok(groceries.sections.every((section) => typeof section.priority === 'number'));
+});
+
+test('catalogDepartments puts aisles in their departments, drops empty ones and leaves other schemes alone', () => {
+  const departments = catalogDepartments(grocer, ['Milk', 'Bread', 'Rice', 'Cooking Oil', 'Bottled Water', 'Toilet paper, 10 rolls', 'Eggs'].map((name) => item(name)));
+  assert.deepEqual(departments.map((department) => [department.id, department.title, department.icon, department.count]), [
+    ['groceries:dairy-eggs', 'Dairy & eggs', 'Milk', 2], ['groceries:bakery', 'Bakery', 'Croissant', 1], ['groceries:pantry', 'Pantry', 'Wheat', 2],
+    ['groceries:drinks', 'Drinks', 'CupSoda', 1], ['groceries:household', 'Household & cleaning', 'SprayCan', 1],
+  ]);
+  assert.deepEqual(departments[0]!.sections.map((section) => section.title), ['Milk & cream', 'Eggs']);
+  assert.deepEqual(departments[2]!.sections.map((section) => section.title), ['Rice, pasta & grains', 'Oils, spices & sauces']);
+  assert.deepEqual(catalogDepartments({ subcategoryId: 'restaurants-food_restaurant' }, [item('Beef Burger')]), []);
+  assert.deepEqual(catalogDepartments({ subcategoryId: 'no-such-group' }, [item('Milk')]), []);
+  // History repeats items on the store's home, so it never counts inside a department.
+  const withHistory = catalogDepartments(grocer, [item('Milk', { orders: 9 }), item('Eggs', { orders: 4 })]);
+  assert.deepEqual(withHistory.map((department) => [department.title, department.count]), [['Dairy & eggs', 2]]);
+});
+
+test('in departments the merchant’s own sections win, then the engine’s, then the rules, else "More"', () => {
+  const departments = catalogDepartments(grocer, [
+    item('Fresh Milk 500ml', { section: 'Dairy' }),
+    item('Weekly Special', { section: 'This week' }),
+    item('Mystery Item', { sectionId: 'groceries:fruit' }),
+    item('Basmati Rice 2kg', { section: 'Rice & Grains' }),
+    item('Tomato Box'),
+    item('Gadget'),
+  ]);
+  assert.deepEqual(departments.map((department) => [department.title, department.sections.map((section) => [section.title, section.source])]), [
+    ['Fruit & veg', [['Fruit', 'engine'], ['Vegetables & herbs', 'rules']]],
+    ['Dairy & eggs', [['Dairy', 'catalogue']]],
+    ['Pantry', [['Rice & Grains', 'catalogue']]],
+    ['More', [['This week', 'catalogue'], ['More', 'rules']]],
+  ]);
+  assert.equal(departments.at(-1)!.id, 'groceries:more');
+  assert.equal(departments.at(-1)!.icon, 'LayoutGrid');
+});
+
+test('specific grocery words win over general ones', () => {
+  const cases: [string, string][] = [
+    ['Coconut milk 400ml', 'Pantry › Tins & jars'], ['Vegetable oil 3L', 'Pantry › Oils, spices & sauces'], ['Tuna Steak', 'Meat & fish › Fish'],
+    ['Peanut butter 400g', 'Pantry › Breakfast & spreads'], ['Fish & Chips Pack', 'Meat & fish › Fish'], ['Salt & vinegar crisps', 'Snacks & sweets › Crisps, nuts & popcorn'],
+    ['Hot dog rolls', 'Bakery › Bread'], ['Beef smokies', 'Meat & fish › Sausages & burgers'], ['Chicken samosa', 'Deli & ready meals › Ready meals'],
+    ['Dry dog food 2kg', 'Pets › Pet food & care'], ['Baby wipes', 'Baby & kids › Nappies & wipes'], ['Iced tea 500ml', 'Drinks › Soft drinks & juice'],
+    ['Strawberry yoghurt', 'Dairy & eggs › Yoghurt'], ['Laundry bar soap', 'Household & cleaning › Laundry'], ['Bar soap, 3 pack', 'Personal care › Bath & body'],
+    ['Farm Basket', 'Fruit & veg › Fruit & veg boxes'], ['Seasonal Fruit Box', 'Fruit & veg › Fruit'], ['Quick Breakfast Box', 'Boxes & baskets › Boxes & baskets'],
+    ['BBQ Meat Box', 'Meat & fish › BBQ & mixed meat'], ['Sweet potatoes 1kg', 'Fruit & veg › Vegetables & herbs'], ['Ice cream 1L', 'Frozen › Ice cream & ice'],
+  ];
+  for (const [name, place] of cases) assert.equal(placeOf(name), place, name);
+});
+
+test('every grocery product in the demo catalogue and the gap fill finds a department; under 1% lands in "More"', () => {
+  const snapshot = JSON.parse(readFileSync('demo-seed/source/demo-api-snapshot.json', 'utf8')) as { merchants: Merchant[] };
+  const gapFill = JSON.parse(readFileSync('demo-seed/source/gap-fill.json', 'utf8')) as { groups: { demoSubcategoryId: string; demoCategoryId: string; items: [string, number][] }[] };
+  const stores: Merchant[] = snapshot.merchants.filter((merchant) => merchant.categoryId === 'groceries-essentials');
+  for (const group of gapFill.groups.filter((entry) => entry.demoCategoryId === 'groceries-essentials')) {
+    const id = `gap-${group.demoSubcategoryId}`;
+    stores.push({ id, name: group.demoSubcategoryId, subcategoryId: group.demoSubcategoryId,
+      items: group.items.map(([name, price], index) => ({ id: `${id}-${index}`, merchantId: id, name, price, currency: 'KES' })) });
+  }
+  let products = 0; let more = 0; let single = 0;
+  for (const store of stores) {
+    const own = store.items.filter((entry) => entry.merchantId === store.id);
+    const departments = catalogDepartments(store, own);
+    assert.equal(departments.reduce((total, department) => total + department.count, 0), own.length, `${store.id} loses products`);
+    products += own.length;
+    more += departments.filter((department) => department.id.endsWith(':more')).reduce((total, department) => total + department.count, 0);
+    if (departments.length < 2) single += 1;
+  }
+  assert.ok(products >= 900, `only ${products} grocery products`);
+  assert.ok(more / products < 0.01, `${more} of ${products} grocery products fell into More`);
+  // The butcheries, fishmongers and greengrocers keep one department and show their aisles straight away.
+  assert.equal(single, 15);
 });

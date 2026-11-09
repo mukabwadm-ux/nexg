@@ -52,19 +52,58 @@ test('small cards share one anatomy and change only their wording and action by 
   assert.doesNotMatch(product, /offering-card__footer--action/);
 });
 
-test('cards leave out a line that only repeats the name, and products show what is already on the list', () => {
+test('cards leave out a line that only repeats the name, and a product’s + adds it to the cart', () => {
   assert.equal(cardLine({ name: 'Entry Smartphone', description: 'Entry Smartphone from Amani Smartphones Atelier. Unlocked, with a charger.' }), undefined);
   assert.equal(sheetDescription({ name: 'Entry Smartphone', description: 'Entry Smartphone from Amani Smartphones Atelier. Unlocked, with a charger.' }), 'Unlocked, with a charger.');
   assert.equal(sheetDescription({ name: 'Entry Smartphone', description: 'Entry Smartphone from Amani Smartphones Atelier.' }), undefined);
   assert.equal(cardLine({ name: 'Grilled Chicken', description: 'Chargrilled with herbs. Served with chips.' }), 'Chargrilled with herbs.');
   assert.equal(sheetDescription({ name: 'Grilled Chicken', description: 'Chargrilled with herbs. Served with chips.' }), 'Chargrilled with herbs. Served with chips.');
-  const chosen = renderToStaticMarkup(<OfferingCard item={item(64500)} kind="product" saved={false} onSave={noop} onOpen={noop} quantity={2} onAdd={noop} onRemove={noop} />);
-  assert.match(chosen, /offering-card offering-card--product is-chosen/);
-  assert.match(chosen, /aria-label="Remove one Control offering"/);
-  assert.match(chosen, /aria-label="Add another Control offering, 2 on your list"/);
   const fresh = renderToStaticMarkup(<OfferingCard item={item(64500)} kind="product" saved={false} onSave={noop} onOpen={noop} onAdd={noop} onRemove={noop} />);
-  assert.match(fresh, /aria-label="Add Control offering to your list"/);
-  assert.doesNotMatch(fresh, /Remove one/);
+  assert.match(fresh, /aria-label="Add Control offering to cart"/);
+  assert.doesNotMatch(fresh, /Remove|offering-card__stepper/);
+});
+
+test('the + adds in place and rests as a gold count; its − n + pill opens only when tapped (owner, 9 Nov 2026)', () => {
+  const card = (quantity: number, handlers = true) => renderToStaticMarkup(<OfferingCard item={item(64500)} kind="product" saved={false} onSave={noop} onOpen={noop}
+    quantity={quantity} {...(handlers ? { onAdd: noop, onRemove: noop } : { onAdd: noop })} />);
+  const two = card(2);
+  assert.match(two, /offering-card offering-card--product is-chosen/);
+  // Folded: one round button showing the count, which reopens the pill; the − and the count wait, inert, inside it.
+  assert.match(two, /class="offering-card__quantity is-folded"/);
+  assert.match(two, /aria-label="Change quantity of Control offering, 2 in cart"/);
+  assert.match(two, /<span class="offering-card__stepper" inert="">/);
+  assert.match(two, /aria-label="Remove one Control offering from cart"/);
+  assert.match(two, /class="offering-card__total" aria-hidden="true">2</);
+  // At one the − becomes the bin; a polite live region says what changed.
+  assert.match(card(1), /aria-label="Remove Control offering from cart"/);
+  assert.match(card(1), /aria-live="polite"/);
+  // Without a way to take one out, the + only adds and a badge shows the count.
+  assert.match(card(2, false), /class="offering-card__badge" aria-hidden="true">2</);
+  assert.match(card(2, false), /aria-label="Add one more Control offering, 2 in cart"/);
+  assert.doesNotMatch(card(2, false), /offering-card__stepper/);
+  // Without onAdd the + opens the item, as before.
+  assert.match(renderToStaticMarkup(<OfferingCard item={item(64500)} kind="product" saved={false} onSave={noop} onOpen={noop} />), /aria-label="Choose Control offering"/);
+});
+
+test('the compact card: a square tile with the + on it, then the price and the name, and nothing more', () => {
+  const compact = (extra: Partial<CatalogItem> = {}) => renderToStaticMarkup(<OfferingCard item={{ ...item(1700), image: 'https://example.test/milk.jpg', ...extra }} kind="product" variant="compact"
+    saved={false} onSave={noop} onOpen={noop} onAdd={noop} onRemove={noop} />);
+  const html = compact();
+  assert.match(html, /class="offering-card offering-card--compact offering-card--product"/);
+  assert.match(html, /loading="lazy"/);
+  assert.match(html, /decoding="async"/);
+  assert.match(html, /KES\s*1,700/);
+  assert.match(html, /aria-label="Add Control offering to cart"/);
+  assert.ok(html.indexOf('offering-card__quantity') < html.indexOf('offering-card__body'), 'the + sits on the photo tile');
+  assert.doesNotMatch(html, /offering-card__save|offering-card__description|offering-card__tag|offering-card__footer/);
+  const gone = compact({ isAvailable: false });
+  assert.match(gone, /is-unavailable/);
+  assert.match(gone, />Unavailable</);
+  assert.match(gone, /class="offering-card__add" disabled=""/);
+  // The standard card keeps its anatomy.
+  const standard = renderToStaticMarkup(<OfferingCard item={item(1700)} kind="product" saved={false} onSave={noop} onOpen={noop} onAdd={noop} onRemove={noop} />);
+  for (const part of [/offering-card__save/, /offering-card__description/, /offering-card__footer/]) assert.match(standard, part);
+  assert.doesNotMatch(standard, /offering-card--compact/);
 });
 
 test('expanded states ask kind-specific questions and say plainly that nothing is sent yet', () => {
@@ -86,15 +125,15 @@ test('expanded states ask kind-specific questions and say plainly that nothing i
   assert.doesNotMatch(render('service'), /At my place/);
 });
 
-test('wording is production wording, and every kind says its choices stay on this device', () => {
+test('wording is production wording: purchases go to the NexG cart, requests stay on this device', () => {
   for (const kind of kinds) {
     for (const text of Object.values(kindPresentation[kind])) assert.doesNotMatch(text, /demo|sample/i, kind);
-    assert.match(kindPresentation[kind].pending, /this device/, kind);
+    assert.match(kindPresentation[kind].pending, kind === 'product' || kind === 'dish' ? /cart|checkout/i : /this device/, kind);
   }
   assert.equal(transferCardAction, 'Select');
 });
 
-test('the expanded card only claims what it keeps: products join the list, requests stay on the device', () => {
+test('the expanded card only claims what it keeps: products join the cart, requests stay on the device', () => {
   const sheet = (props: Partial<OfferingSheetProps> & { kind: OfferingKind }) =>
     renderToStaticMarkup(<OfferingSheet merchant={merchant} item={item(1500)} saved={false} onSave={noop} onClose={noop} {...props} />);
   // Without somewhere to keep the choice, the main button can't claim to keep it.
@@ -102,8 +141,8 @@ test('the expanded card only claims what it keeps: products join the list, reque
   assert.match(sheet({ kind: 'task' }), /class="offering-sheet__primary" disabled=""/);
   assert.doesNotMatch(sheet({ kind: 'product', onList: noop }), /class="offering-sheet__primary" disabled=""/);
   const listed = sheet({ kind: 'product', listed: 2, onList: noop });
-  assert.match(listed, /2 on your list/);
-  assert.match(listed, /On your list/);
+  assert.match(listed, /2 in your cart/);
+  assert.match(listed, /In your cart/);
   assert.match(listed, /Remove<\/button>/);
   const kept = sheet({ kind: 'task', onKeep: noop, onForget: noop,
     request: { answers: { brief: 'Collect a parcel in Westlands', contact: 'call' }, savedAt: '2026-11-08T10:00:00.000Z' } });
@@ -134,16 +173,16 @@ test('the generic storefront: one hero with confirmed facts, then the store’s 
   assert.match(shop, /Westlands/);
   assert.match(shop, /2 products/);
   assert.doesNotMatch(shop, /Open now|Closed now/);
-  assert.match(shop, /placeholder="Search the shop"/);
+  assert.match(shop, /placeholder="Search Control Phones"/);
   assert.match(shop, /Flagship &amp; foldable phones/);
-  assert.match(shop, /aria-label="Add Foldable Smartphone to your list"/);
+  assert.match(shop, /aria-label="Add Foldable Smartphone to cart"/);
   assert.doesNotMatch(shop, /Back to discovery|demo/i);
   assert.match(render({ ...phones, isOpen: false }), /Closed now/);
   assert.match(render({ ...phones, items: [] }), /No products listed yet/);
 
   const hire = render({ id: 'merchant-control', name: 'Control Hire', subcategoryId: 'vehicle-rentals_car-rental', items: [named('item-c', 'Compact SUV', 6500)] });
   assert.match(hire, /Plan your car hire/);
-  assert.match(hire, /placeholder="Search the fleet"/);
+  assert.match(hire, /placeholder="Search Control Hire"/);
   assert.match(hire, /1 vehicle/);
   assert.ok(hire.indexOf('Plan your car hire') < hire.indexOf('class="section-nav'), 'the trip comes before the fleet');
 

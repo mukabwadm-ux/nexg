@@ -51,9 +51,10 @@ export function supabaseSettings(url: unknown, key: unknown): SupabaseSettings {
   if (typeof key !== 'string' || !key || /\s/.test(key)) {
     throw new Error("VITE_SUPABASE_ANON_KEY is missing. Paste the project's public anon or publishable key into .env.local");
   }
+  // Fail closed: only a recognisable public key passes, so a secret of any other shape can't ship by mistake.
   const role = supabaseKeyRole(key);
-  if (role !== undefined && role !== 'anon' && role !== 'publishable') {
-    throw new Error('VITE_SUPABASE_ANON_KEY must be the public anon or publishable key. A service-role or secret key would be sent to every visitor');
+  if (role !== 'anon' && role !== 'publishable') {
+    throw new Error('VITE_SUPABASE_ANON_KEY must be the public anon or publishable key. A service-role key, secret key or other value would be sent to every visitor');
   }
   return { origin: parsed.origin, anonKey: key };
 }

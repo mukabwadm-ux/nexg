@@ -1,7 +1,7 @@
 /* Home page feature carousel (HomepageFeatureCarousel): category ideas that run past the content column, with
    the neighbouring cards peeking in. On wide screens the first card lines up with the page (see the component). */
 
-.homepage-feature-carousel{position:relative;margin:26px calc(50% - 50vw) 36px}
+.homepage-feature-carousel{position:relative;margin:24px calc(50% - 50vw) 40px}
 .homepage-feature-carousel__stage{position:relative}
 .homepage-feature-carousel__viewport{position:relative;overflow:hidden;isolation:isolate;touch-action:pan-y}
 .homepage-feature-carousel__track{display:flex;gap:18px;transition:transform 300ms var(--ease-out);will-change:transform}
@@ -50,11 +50,13 @@
   .homepage-feature-card{aspect-ratio:1.9;min-height:232px;padding:22px 26px}
 }
 @media (max-width:760px){
-  .homepage-feature-carousel{margin-top:22px;margin-bottom:30px}
+  .homepage-feature-carousel{margin-top:20px;margin-bottom:28px}
   .homepage-feature-card{aspect-ratio:1.32;min-height:250px;padding:22px}
   .homepage-feature-card__title{font-size:21px}
   .homepage-feature-card__description{font-size:12px}
 }
+/* Touch screens swipe the cards; the arrows are for mouse users and would sit on the text of a phone-width card. */
+@media (hover:none){.homepage-feature-carousel__arrow{display:none}}
 @media (max-width:640px){
   .homepage-feature-carousel__arrow{width:40px;height:40px;min-height:40px;margin-top:-20px}
   .homepage-feature-carousel__footer{padding:10px 20px 0}

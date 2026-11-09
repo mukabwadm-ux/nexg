@@ -2,7 +2,8 @@ import type { CatalogItem, Merchant, TripDetails } from '../../providers/Discove
 import { formatPrice } from '../../lib/formatPrice';
 import { fromKey } from '../../lib/calendar';
 
-export type TripFactKey = 'duration' | 'location' | 'style' | 'season' | 'type' | 'base' | 'price';
+/** Trip facts, plus the experience page's type facts (`event`, `class`, `sport`), which share the strip. */
+export type TripFactKey = 'duration' | 'location' | 'style' | 'season' | 'type' | 'base' | 'price' | 'event' | 'class' | 'sport';
 export interface TripFact { key: TripFactKey; label: string; value: string }
 export interface TripDeparture { start: string; end?: string }
 
@@ -13,7 +14,7 @@ export function tripPrice(item: Pick<CatalogItem, 'price' | 'currency'>): string
 }
 
 /**
- * The facts strip. The operator's own trip facts come first; when there are none (every demo trip),
+ * The facts strip. The operator's own trip facts come first; when there are none (no listing has them yet),
  * it shows only what the listing does say. The operator's base is labelled as such, never as the destination.
  */
 export function tripFacts(item: CatalogItem, merchant: Merchant, tripType?: string): TripFact[] {
