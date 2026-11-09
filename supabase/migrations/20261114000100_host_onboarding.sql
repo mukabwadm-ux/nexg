@@ -597,9 +597,64 @@ $$;
 -- ══════════════ 6. audit the Hosts Workspace writes added in 20261113*
 --
 -- fn_wiring_check fails any rpc_* that changes state without audit.log.
--- These three from the workspace migrations did, which has kept the
+-- These four from the workspace migrations did, which has kept the
 -- database CI job red on main since #79. Bodies are unchanged apart from
 -- the audit.log call.
+
+create or replace function public.rpc_host_workspace_photos_set(
+  p_kind text, p_id uuid, p_expected jsonb, p_photos jsonb
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_host uuid;
+  v_current jsonb;
+begin
+  if p_kind = 'property' then
+    select property.host_id, property.photos into v_host, v_current
+    from public.property property
+    join public.host_user member on member.host_id = property.host_id
+    where property.id = p_id and property.deleted_at is null
+      and member.user_id = (select auth.uid()) and member.units is null
+    for update of property;
+  elsif p_kind = 'unit' then
+    select unit.host_id, unit.photos into v_host, v_current
+    from public.unit unit
+    where unit.id = p_id and unit.archived_at is null and authz.can_see_unit(unit.id)
+    for update;
+  end if;
+
+  if v_host is null then
+    raise exception 'This gallery is outside your workspace access.' using errcode = '42501';
+  end if;
+  if coalesce(v_current, '[]'::jsonb) is distinct from coalesce(p_expected, '[]'::jsonb) then
+    raise exception 'The gallery changed. Reload it and try again.' using errcode = '40001';
+  end if;
+  if jsonb_typeof(p_photos) is distinct from 'array' or exists (
+    select 1 from jsonb_array_elements(p_photos) as item
+    where coalesce(item ->> 'path', '') = ''
+      or (split_part(item ->> 'path','/',1) <> v_host::text and not exists (
+        select 1 from jsonb_array_elements(coalesce(v_current,'[]'::jsonb)) as previous
+        where previous ->> 'path' = item ->> 'path'
+      ))
+  ) then
+    raise exception 'Choose photos from this gallery.' using errcode = '22023';
+  end if;
+
+  if p_kind = 'property' then
+    perform public.rpc_property_photos_set(p_id,p_photos);
+  else
+    perform public.rpc_unit_photos_set(p_id,p_photos);
+  end if;
+
+  perform audit.log('host_user'::public.actor_type, 'hotels', 'host.gallery_saved',
+    p_actor_id => auth.uid(), p_target_type => p_kind, p_target_id => p_id,
+    p_after => jsonb_build_object('photos', jsonb_array_length(p_photos)));
+end;
+$$;
 
 create or replace function public.rpc_host_workspace_task_save(p_id uuid, p_unit_id uuid, p_version integer default null, p_patch jsonb default '{}'::jsonb)
 returns void
