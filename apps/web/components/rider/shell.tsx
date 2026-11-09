@@ -7,6 +7,7 @@ import {
   HelpCircle,
   LayoutDashboard,
   MessageSquare,
+  ReceiptText,
   Settings,
   TriangleAlert,
   UserPlus,
@@ -77,6 +78,7 @@ export function riderNav({
       badge: active && cashDue ? 1 : null,
       tone: 'danger',
     },
+    { href: '/rider/receipts', label: 'Receipts', icon: i(<ReceiptText className="h-4 w-4" />) },
     {
       href: '/rider/shifts',
       label: 'Shifts',

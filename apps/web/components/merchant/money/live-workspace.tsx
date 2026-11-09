@@ -7,6 +7,8 @@ import { useState } from 'react';
 
 import { dateTime, kes, type TxnRow } from '@/components/merchant-money/breakdown';
 import { day, kesWhole } from '@/components/partner/bits';
+import { ReceiptList } from '@/components/receipts/receipt-list';
+import type { Receipt } from '@/lib/receipts';
 
 import {
   DataTable,
@@ -46,7 +48,7 @@ type MoneyTransaction = Pick<TxnRow, 'id' | 'reference' | 'placed_at'> & {
 };
 
 type MoneyHome = { payout_rail: string | null; earned_today_cents: number | null };
-const tabs = ['Overview', 'Transactions', 'Payouts', 'Statements'] as const;
+const tabs = ['Overview', 'Transactions', 'Payouts', 'Statements', 'Receipts'] as const;
 type LiveTab = (typeof tabs)[number];
 
 function statusLabel(status: string | null | undefined) {
@@ -80,10 +82,13 @@ export function LiveMoneyWorkspace({
   home,
   statements,
   transactions,
+  receipts,
 }: {
   home: MoneyHome | null;
   statements: MoneyStatement[] | null;
   transactions: MoneyTransaction[] | null;
+  /** Payouts and payments to NexG, each with a printable receipt. */
+  receipts: Receipt[] | null;
 }) {
   const [tab, setTab] = useState<LiveTab>('Overview');
   const [selectedId, setSelectedId] = useState('');
@@ -98,7 +103,8 @@ export function LiveMoneyWorkspace({
     .sort((a, b) => (b.paid_at ?? '').localeCompare(a.paid_at ?? ''));
   const financeRows = payoutView ? payouts : (statements ?? []);
   const orderRows = tab === 'Overview' ? transactions?.slice(0, 8) : transactions;
-  const sourceAvailable = orderView ? transactions !== null : statements !== null;
+  const sourceAvailable =
+    tab === 'Receipts' ? true : orderView ? transactions !== null : statements !== null;
   const title =
     tab === 'Overview' ? 'Recent transactions' : payoutView ? 'Payouts & settlements' : tab;
 
@@ -197,7 +203,12 @@ export function LiveMoneyWorkspace({
             destination.
           </p>
         )}
-        {!sourceAvailable ? (
+        {tab === 'Receipts' ? (
+          <ReceiptList
+            receipts={receipts}
+            empty="No receipts yet. You get one, here and by email, for every payout and every payment to NexG."
+          />
+        ) : !sourceAvailable ? (
           <p className="mo-note mo-note-error" role="alert">
             {orderView ? 'Transactions' : 'Statements'} could not be loaded.{' '}
             <Link href="/merchant/money" className="mo-link">

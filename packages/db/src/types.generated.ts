@@ -26398,6 +26398,80 @@ export type Database = {
         };
         Relationships: [];
       };
+      receipt: {
+        Row: {
+          currency: string;
+          emailed_at: string | null;
+          id: string;
+          issued_at: string;
+          kind: string;
+          lines: NonNullable<Json>;
+          method: string | null;
+          method_ref: string | null;
+          number: string;
+          party_id: string;
+          party_type: string;
+          source_id: string;
+          source_type: string;
+          title: string;
+          total_cents: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          currency?: string;
+          emailed_at?: string | null;
+          id?: string;
+          issued_at?: string;
+          kind: string;
+          lines?: NonNullable<Json>;
+          method?: string | null;
+          method_ref?: string | null;
+          number: string;
+          party_id: string;
+          party_type: string;
+          source_id: string;
+          source_type: string;
+          title: string;
+          total_cents: number;
+        };
+        Update: {
+          currency?: string;
+          emailed_at?: string | null;
+          id?: string;
+          issued_at?: string;
+          kind?: string;
+          lines?: NonNullable<Json>;
+          method?: string | null;
+          method_ref?: string | null;
+          number?: string;
+          party_id?: string;
+          party_type?: string;
+          source_id?: string;
+          source_type?: string;
+          title?: string;
+          total_cents?: number;
+        };
+        Relationships: [];
+      };
+      receipt_counter: {
+        Row: {
+          last_value: number;
+          prefix: string;
+          year: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          last_value?: number;
+          prefix: string;
+          year: number;
+        };
+        Update: {
+          last_value?: number;
+          prefix?: string;
+          year?: number;
+        };
+        Relationships: [];
+      };
       referral: {
         Row: {
           bonus_amount_kes: number | null;
@@ -48649,6 +48723,62 @@ export type Database = {
       };
       fn_qr_new_code: { Args: Record<PropertyKey, never>; Returns: string };
       fn_qr_scan_partition: { Args: { p_month: string }; Returns: string };
+      fn_receipt_email: { Args: { p_party_id: string; p_party_type: string }; Returns: string };
+      fn_receipt_for_deposit: { Args: { p_email?: boolean; p_id: string }; Returns: undefined };
+      fn_receipt_for_host_invoice: {
+        Args: { p_email?: boolean; p_id: string };
+        Returns: undefined;
+      };
+      fn_receipt_for_payment: {
+        Args: { p_email?: boolean; p_payment_id: string };
+        Returns: undefined;
+      };
+      fn_receipt_for_rider_payout: {
+        Args: { p_email?: boolean; p_id: string };
+        Returns: undefined;
+      };
+      fn_receipt_for_statement: { Args: { p_email?: boolean; p_id: string }; Returns: undefined };
+      fn_receipt_for_stay: { Args: { p_email?: boolean; p_stay_id: string }; Returns: undefined };
+      fn_receipt_issue: {
+        Args: {
+          p_email?: boolean;
+          p_issued_at?: string;
+          p_kind: string;
+          p_lines: Json;
+          p_method?: string;
+          p_method_ref?: string;
+          p_party_id: string;
+          p_party_type: string;
+          p_source_id: string;
+          p_source_type: string;
+          p_title: string;
+          p_total_cents: number;
+        };
+        Returns: {
+          currency: string;
+          emailed_at: string | null;
+          id: string;
+          issued_at: string;
+          kind: string;
+          lines: NonNullable<Json>;
+          method: string | null;
+          method_ref: string | null;
+          number: string;
+          party_id: string;
+          party_type: string;
+          source_id: string;
+          source_type: string;
+          title: string;
+          total_cents: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'receipt';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      fn_receipt_next_number: { Args: { p_prefix: string }; Returns: string };
       fn_refund_routes: { Args: { p_order_id: string }; Returns: Json };
       fn_render_featured_pitch: { Args: { p_payload: Json }; Returns: Json };
       fn_review_checks: { Args: { p_body: string; p_plan_id: string }; Returns: Json };

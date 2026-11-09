@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { LiveMoneyWorkspace } from '@/components/merchant/money/live-workspace';
 import { requireMerchant } from '@/lib/partner';
+import { RECEIPT_COLUMNS, toReceipts } from '@/lib/receipts';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Money' };
@@ -24,7 +25,7 @@ const transactionRows = z.array(
 export default async function MerchantMoney() {
   const merchant = await requireMerchant();
   const client = createClient();
-  const [home, statements, transactions] = await Promise.all([
+  const [home, statements, transactions, receipts] = await Promise.all([
     client
       .from('merchant_home_v')
       .select('payout_rail, earned_today_cents')
@@ -43,6 +44,13 @@ export default async function MerchantMoney() {
       p_limit: 30,
       p_offset: 0,
     }),
+    client
+      .from('receipt' as never)
+      .select(RECEIPT_COLUMNS)
+      .eq('party_type', 'merchant')
+      .eq('party_id', merchant.id)
+      .order('issued_at', { ascending: false })
+      .limit(100),
   ]);
   const rows = transactionRows.safeParse(transactions.data);
 
@@ -51,6 +59,7 @@ export default async function MerchantMoney() {
       home={home.error ? null : home.data}
       statements={statements.error ? null : statements.data}
       transactions={!transactions.error && rows.success ? rows.data : null}
+      receipts={receipts.error ? null : toReceipts(receipts.data)}
     />
   );
 }

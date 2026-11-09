@@ -28,8 +28,10 @@ export interface SiteHeaderProps {
  * click into Explore is already placed.
  */
 export async function SiteHeader({ action, signIn }: SiteHeaderProps) {
-  const { locale, t } = await getTranslations();
-  const account = signIn ?? { label: t('nav.signIn'), href: '/sign-in' };
+  const { locale } = await getTranslations();
+  /* /account sends a signed-out visitor to sign in and back again, so the
+     icon needs no session check here (which would stop the header caching). */
+  const account = signIn ?? { label: 'Your account', href: '/account' };
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0907] text-white">

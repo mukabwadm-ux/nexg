@@ -6,6 +6,7 @@ import { coverOf, handoffLabel, photosOf, spotLabel } from '@/lib/host-workspace
 import { dateKey, nights } from '../../../../hosts-workspace/src/model';
 import type { Stay, WorkspaceData, WorkspaceSnapshot } from '../../../../hosts-workspace/src/model';
 import { HostWorkspaceError, type HostWorkspaceAccess } from './access';
+import { RECEIPT_COLUMNS, toReceipts } from '@/lib/receipts';
 
 const defaultZone = 'Africa/Nairobi';
 
@@ -181,6 +182,13 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
     id: access.userId, name: settings?.display_name || access.name, email: access.email,
     role: access.role, propertyIds: unitScope ? propertyIds : [],
   };
+  /* Receipts cover the whole host account, so staff scoped to some units do not get them. */
+  const receipts = unitScope
+    ? []
+    : toReceipts(loaded(await db.from('receipt' as never).select(RECEIPT_COLUMNS)
+        .eq('party_type', 'host').eq('party_id', hostId)
+        .order('issued_at', { ascending: false }).limit(200)));
+
   const data: WorkspaceData = {
     properties: properties.map((row) => ({
       id: row.id, name: row.name, area: row.area ?? '', description: row.description ?? '',
@@ -248,6 +256,11 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
       guest:row.guest_first_name ?? '', minutesLeft:row.minutes_left, requestType:row.type ?? 'other',
       updatedAt: row.resolved_at ? localDateTime(row.resolved_at) : undefined,
     }] : [])],
+    receipts: receipts.map((row) => ({
+      id: row.id, title: row.number, number: row.number, kind: row.kind, description: row.title,
+      amountMinor: row.total_cents, date: localDate(row.issued_at), method: row.method ?? '',
+      reference: row.method_ref ?? '',
+    })),
     invoices: invoices.map((row) => ({
       id: row.id, title: 'NexG invoice · ' + row.period, type: 'NexG service',
       amountMinor: row.total, date: localDate(row.created_at), due: row.due_at ?? '',

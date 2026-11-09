@@ -261,9 +261,16 @@ export function StayCheckout({
           </>
         )}
         {status && !status.refundDue && summary}
-        <Button asChild className="mt-6" variant="outline">
-          <Link href="/stays">Back to stays</Link>
-        </Button>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {!status?.refundDue && (
+            <Button asChild>
+              <Link href="/account?tab=receipts">See your receipt</Link>
+            </Button>
+          )}
+          <Button asChild variant="outline">
+            <Link href="/stays">Back to stays</Link>
+          </Button>
+        </div>
       </Card>
     );
   }

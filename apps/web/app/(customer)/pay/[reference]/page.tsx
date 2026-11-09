@@ -73,12 +73,19 @@ export default async function PaymentReturn({ params }: { params: { reference: s
         <p className="text-muted-light mt-3 text-[0.8125rem] font-semibold">
           Reference {payment.reference}. Keep it if you need to ask us anything about this payment.
         </p>
-        {payment.intent === 'featured_slot' && (
+        {payment.intent === 'featured_slot' ? (
           <Link
             href="/merchant/featured"
             className="bg-ink mt-5 inline-block rounded-lg px-4 py-2.5 text-[0.8125rem] font-extrabold text-white"
           >
             Back to your slots
+          </Link>
+        ) : (
+          <Link
+            href="/account?tab=receipts"
+            className="bg-ink mt-5 inline-block rounded-lg px-4 py-2.5 text-[0.8125rem] font-extrabold text-white"
+          >
+            See your receipt
           </Link>
         )}
       </Shell>
