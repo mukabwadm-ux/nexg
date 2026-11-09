@@ -1,17 +1,9 @@
 import '@nexg/ui/globals.css';
 
 import { ToastProvider } from '@nexg/ui';
+// Manrope 400/600/700/800 from the repo, never fetched at build time.
+import { manrope } from '@nexg/ui/fonts/manrope';
 import type { Metadata, Viewport } from 'next';
-import { Manrope } from 'next/font/google';
-
-/** Manrope 400/600/700/800 (spec section 2), self-hosted by next/font. */
-const manrope = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '600', '700', '800'],
-  variable: '--font-manrope',
-  display: 'swap',
-  fallback: ['system-ui', 'sans-serif'],
-});
 
 export const metadata: Metadata = {
   title: {

@@ -108,8 +108,11 @@ carries the same colour as RGB channels so Tailwind opacity modifiers (`bg-gold/
 **Change both or neither.** Use the Tailwind classes — `bg-bg`, `text-ink`, `border-border-strong`,
 `text-gold-text` — rather than raw hex anywhere in app code.
 
-Manrope is loaded per app with `next/font` and bound to `--font-manrope`, which the preset reads as
-the `font-sans` stack.
+Manrope is bundled in the repo and bound to `--font-manrope`, which the preset reads as the
+`font-sans` stack. Admin and API import it from `@nexg/ui/fonts/manrope` (`next/font/local` over
+[`packages/ui/fonts/manrope`](packages/ui/fonts/manrope)); web serves its own copy from
+`public/fonts`. Do not use `next/font/google`: it downloads fonts at build time, and a rate limit
+or network blip at fonts.googleapis.com then fails the whole build.
 
 ### Adding a component
 

@@ -1,8 +1,8 @@
 /**
  * The CSS variable the Tailwind preset reads for the sans stack.
  *
- * Each app loads Manrope with `next/font` and binds it to this name, so the
- * font is declared once per app but named once here.
+ * Each app binds its bundled Manrope to this name (admin and api through
+ * `@nexg/ui/fonts/manrope`), so the font is named once here.
  */
 export const FONT_VARIABLE = '--font-manrope';
 

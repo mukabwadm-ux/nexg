@@ -61,7 +61,7 @@ importers:
         version: 0.469.0(react@18.3.1)
       next:
         specifier: 14.2.21
-        version: 14.2.21(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.21(@babel/core@7.29.7)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -134,7 +134,7 @@ importers:
         version: 0.469.0(react@18.3.1)
       next:
         specifier: 14.2.21
-        version: 14.2.21(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.21(@babel/core@7.29.7)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -293,7 +293,7 @@ importers:
         version: 0.469.0(react@18.3.1)
       next:
         specifier: 14.2.21
-        version: 14.2.21(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.21(@babel/core@7.29.7)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
@@ -598,6 +598,9 @@ importers:
       jsdom:
         specifier: 25.0.1
         version: 25.0.1
+      next:
+        specifier: 14.2.21
+        version: 14.2.21(@babel/core@7.29.7)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       postcss:
         specifier: 8.4.49
         version: 8.4.49
@@ -3927,6 +3930,7 @@ packages:
   image-size@2.0.2:
     resolution: {integrity: sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==}
     engines: {node: '>=16.x'}
+    deprecated: Use latest 2.x please
     hasBin: true
 
   import-fresh@3.3.1:
@@ -9248,7 +9252,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@14.2.21(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@14.2.21(@babel/core@7.29.7)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 14.2.21
       '@swc/helpers': 0.5.5
@@ -9258,7 +9262,7 @@ snapshots:
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.1(react@18.3.1)
+      styled-jsx: 5.1.1(@babel/core@7.29.7)(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 14.2.21
       '@next/swc-darwin-x64': 14.2.21
@@ -10195,10 +10199,12 @@ snapshots:
     dependencies:
       '@tokenizer/token': 0.3.0
 
-  styled-jsx@5.1.1(react@18.3.1):
+  styled-jsx@5.1.1(@babel/core@7.29.7)(react@18.3.1):
     dependencies:
       client-only: 0.0.1
       react: 18.3.1
+    optionalDependencies:
+      '@babel/core': 7.29.7
 
   styled-jsx@5.1.6(react@19.2.1):
     dependencies:
