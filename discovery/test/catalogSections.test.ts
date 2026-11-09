@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { categories } from '../src/data/taxonomy';
 import { catalogDepartments, catalogNaming, catalogSections, ruleSection, searchSections, sectionAnchor, sectionScheme } from '../src/data/catalogSections';
 import { departmentIconNames } from '../src/components/storefronts/supermarket/departmentIcons';
+import { isRetailStore } from '../src/data/supermarketPresentation';
 import type { CatalogItem, Merchant } from '../src/providers/DiscoveryProvider';
 
 // Every store's menu is sectioned one consistent way (owner, 8 Nov 2026). These checks read files only.
@@ -32,7 +33,7 @@ test('specific words win over general ones, whatever the display order', () => {
     ['restaurants-food_catering', 'Breakfast Catering (per person)', 'Packages & events'],
     ['fashion-apparel_watches', 'Dress Watch', 'Watches'],
     ['fashion-apparel_womens-fashion', 'Denim Jacket', 'Jackets & blazers'],
-    ['alcohol-beverages_spirits', 'White Rum', 'Spirits'],
+    ['alcohol-beverages_spirits', 'White Rum', 'Rum'],
     ['alcohol-beverages_non-alcoholic-drinks', 'Ginger beer 330ml', 'Mixers'],
     ['alcohol-beverages_champagne', 'Rosé Champagne', 'Champagne & sparkling'],
     ['tech-electronics_accessories', 'Phone Case', 'Accessories'],
@@ -42,7 +43,33 @@ test('specific words win over general ones, whatever the display order', () => {
     ['beauty_haircare', 'Leave-In Cream', 'Haircare'],
     ['vehicle-services_car-wash', 'Monthly Wash Plan', 'Washes'],
     ['vehicle-rentals_car-rental', 'Compact SUV', 'SUVs & 4x4s'],
-    ['marketplace_stationery', 'Desk Organizer', 'Stationery & office'],
+    ['marketplace_stationery', 'Desk Organizer', 'Office supplies'],
+    // The retail departments' finer aisles (owner, 9 Nov 2026).
+    ['tech-electronics_smart-devices', 'Smart TV', 'TVs & projectors'],
+    ['tech-electronics_smart-devices', 'Robot Vacuum', 'Home appliances'],
+    ['tech-electronics_gaming', 'Gaming Monitor', 'Gaming gear'],
+    ['tech-electronics_gaming', 'Gaming Laptop', 'Laptops'],
+    ['tech-electronics_smartphones', 'Camera Smartphone', 'Smartphones'],
+    ['tech-electronics_accessories', 'Cable Organizer', 'Cables & adapters'],
+    ['tech-electronics_accessories', 'Fast Charger', 'Chargers & power banks'],
+    ['tech-electronics_accessories', 'Laptop Stand', 'Keyboards, mice & webcams'],
+    ['tech-electronics_device-repairs', 'Basic data recovery', 'Repairs'],
+    ['alcohol-beverages_wine', 'Cabernet Sauvignon', 'Red wine'],
+    ['alcohol-beverages_wine', 'Sauvignon Blanc', 'White wine'],
+    ['alcohol-beverages_spirits', 'Craft Gin', 'Gin'],
+    ['alcohol-beverages_beer', 'Non-Alcoholic Beer', 'Beer & cider'],
+    ['alcohol-beverages_non-alcoholic-drinks', 'Sports drink 500ml', 'Soft drinks'],
+    ['pharmacy_supplements', 'Protein Powder', 'Sports nutrition'],
+    ['pharmacy_baby-products', 'Wipes Pack', 'Nappies & wipes'],
+    ['health_clinics', 'Chronic Care Review', 'Consultations & visits'],
+    ['fashion-apparel_accessories', 'Phone Case', 'Phone & tech accessories'],
+    ['fashion-apparel_watches', 'Smart Hybrid', 'Watches'],
+    ['fashion-apparel_bags', 'Laptop Bag', 'Backpacks & work bags'],
+    ['marketplace_decor', 'Table Lamp', 'Lighting'],
+    ['marketplace_hardware-diy', 'Masking tape 48mm', 'Tools & hardware'],
+    ['marketplace_pet-supplies', 'Dry dog food 3kg', 'Pet food & treats'],
+    ['adults-only_cigarettes', 'Classic Pack', 'Cigarettes'],
+    ['flowers-gifts_chocolates', 'Premium Tasting Box', 'Chocolates'],
   ];
   for (const [subcategoryId, name, title] of cases) assert.equal(ruleSection(scheme(subcategoryId), name)?.title, title, name);
 });
@@ -133,17 +160,29 @@ const groceries = (vocabulary as unknown as { schemes: { id: string; sections: {
 const placeOf = (name: string) => catalogDepartments(grocer, [item(name)])
   .flatMap((department) => department.sections.map((section) => `${department.title} › ${section.title}`))[0];
 
-test('grocery departments: every aisle sits in exactly one department, with an icon the storefront draws', () => {
-  const aisles = groceries.sections.map((section) => section.id);
+// Every product store uses the retail storefront (owner, 9 Nov 2026), so every retail scheme groups its aisles into departments.
+const retailSchemes = ['groceries', 'tech', 'health', 'drinks', 'fashion', 'beauty', 'gifts', 'home', 'adults'];
+/** Beauty's departments cover its products only: its service sections stay out. */
+const serviceOnly: Record<string, string[]> = { beauty: ['hair-services', 'nails-lashes', 'massages', 'facials', 'body', 'spa-days', 'memberships', 'training'] };
+type SchemeEntry = { id: string; sections: { id: string }[]; departments?: { id: string; icon: string; keywords: string[]; sections: string[] }[] };
+
+test('every retail scheme: each aisle sits in exactly one department, with an icon the storefront draws', () => {
   const shared = vocabulary.shared.map((section) => section.id);
-  const listed = groceries.departments.flatMap((department) => department.sections);
-  assert.equal(new Set(listed).size, listed.length, 'an aisle is listed twice');
-  for (const aisle of aisles) assert.ok(listed.includes(aisle), `${aisle} has no department`);
-  for (const aisle of listed) assert.ok(aisles.includes(aisle) || shared.includes(aisle), `${aisle} is not a section`);
-  assert.equal(new Set(groceries.departments.map((department) => department.id)).size, groceries.departments.length);
-  for (const department of groceries.departments) {
-    assert.ok(departmentIconNames.includes(department.icon), `${department.id} draws ${department.icon}`);
-    assert.ok(department.keywords.length && department.keywords.every((word) => word.trim()), department.id);
+  for (const entry of (vocabulary as unknown as { schemes: SchemeEntry[] }).schemes) {
+    if (!retailSchemes.includes(entry.id)) { assert.equal(entry.departments, undefined, `${entry.id} is not a retail scheme`); continue; }
+    const departments = entry.departments ?? [];
+    assert.ok(departments.length >= 2, `${entry.id} has no departments`);
+    const aisles = entry.sections.map((section) => section.id);
+    const listed = departments.flatMap((department) => department.sections);
+    const unlisted = serviceOnly[entry.id] ?? [];
+    assert.equal(new Set(listed).size, listed.length, `${entry.id}: an aisle is listed twice`);
+    for (const aisle of aisles) assert.ok(listed.includes(aisle) !== unlisted.includes(aisle), `${entry.id}:${aisle} needs exactly one department`);
+    for (const aisle of listed) assert.ok(aisles.includes(aisle) || shared.includes(aisle), `${entry.id}:${aisle} is not a section`);
+    assert.equal(new Set(departments.map((department) => department.id)).size, departments.length, `${entry.id} repeats a department`);
+    for (const department of departments) {
+      assert.ok(departmentIconNames.includes(department.icon), `${entry.id}:${department.id} draws ${department.icon}`);
+      assert.ok(department.keywords.length && department.keywords.every((word) => word.trim()), `${entry.id}:${department.id}`);
+    }
   }
   // Every grocery aisle has a priority, so the most specific product words win whatever the display order.
   assert.ok(groceries.sections.every((section) => typeof section.priority === 'number'));
@@ -218,4 +257,47 @@ test('every grocery product in the demo catalogue and the gap fill finds a depar
   assert.ok(more / products < 0.01, `${more} of ${products} grocery products fell into More`);
   // The butcheries, fishmongers and greengrocers keep one department and show their aisles straight away.
   assert.equal(single, 15);
+});
+
+test('an electronics store gets Wolt’s departments, each with its own aisles', () => {
+  const departments = catalogDepartments({ subcategoryId: 'tech-electronics_smart-devices' },
+    ['Foldable Smartphone', 'Phone Case', 'USB-C Cable', 'Fast Charger', 'Smart TV', 'Gaming Monitor', 'Robot Vacuum'].map((name) => item(name)));
+  assert.deepEqual(departments.map((department) => [department.id, department.title, department.icon, department.sections.map((section) => section.title)]), [
+    ['tech:phones', 'Phones & smart tech', 'Smartphone', ['Flagship & foldable phones', 'Accessories']],
+    ['tech:tv', 'TV & entertainment', 'Tv', ['TVs & projectors']],
+    ['tech:cables-chargers', 'Cables & chargers', 'Cable', ['Chargers & power banks', 'Cables & adapters']],
+    ['tech:gaming', 'Gaming', 'Gamepad2', ['Gaming gear']],
+    ['tech:appliances', 'Kitchen & home appliances', 'Refrigerator', ['Home appliances']],
+  ]);
+});
+
+test('every demo retail store finds departments for its products; under 2% lands in "More" in each scheme', () => {
+  const snapshot = JSON.parse(readFileSync('demo-seed/source/demo-api-snapshot.json', 'utf8')) as { merchants: Merchant[] };
+  const gapFill = JSON.parse(readFileSync('demo-seed/source/gap-fill.json', 'utf8')) as { groups: { demoSubcategoryId: string; items: [string, number][] }[] };
+  const stores: Merchant[] = [...snapshot.merchants, ...gapFill.groups.map((group): Merchant => {
+    const id = `gap-${group.demoSubcategoryId}`;
+    return { id, name: group.demoSubcategoryId, subcategoryId: group.demoSubcategoryId,
+      items: group.items.map(([name, price], index) => ({ id: `${id}-${index}`, merchantId: id, name, price, currency: 'KES' })) };
+  })];
+  const totals = new Map<string, { products: number; more: number }>();
+  const layout = new Map<string, string[]>();
+  for (const store of stores.filter((entry) => isRetailStore(entry))) {
+    const own = store.items.filter((entry) => entry.merchantId === store.id);
+    const departments = catalogDepartments(store, own);
+    assert.equal(departments.reduce((total, department) => total + department.count, 0), own.length, `${store.id} loses products`);
+    const scheme = sectionScheme(store)!.id;
+    const total = totals.get(scheme) ?? { products: 0, more: 0 };
+    total.products += own.length;
+    total.more += departments.filter((department) => department.id.endsWith(':more')).reduce((sum, department) => sum + department.count, 0);
+    totals.set(scheme, total);
+    layout.set(store.id, departments.map((department) => department.id));
+  }
+  assert.deepEqual([...totals.keys()].sort(), [...retailSchemes].sort());
+  for (const [scheme, { products, more }] of totals) assert.ok(more / products < 0.02, `${scheme}: ${more} of ${products} products fell into More`);
+  // A phone shop keeps one department and shows its aisles straight away; mixed shops get the sidebar.
+  assert.deepEqual(layout.get('M0462'), ['tech:phones']);
+  assert.deepEqual(layout.get('M0494'), ['tech:phones', 'tech:tv', 'tech:appliances']);
+  assert.deepEqual(layout.get('M0467'), ['tech:phones', 'tech:cables-chargers']);
+  assert.deepEqual(layout.get('M0416'), ['health:medicines', 'health:care', 'health:services']);
+  assert.deepEqual(layout.get('M0079'), ['drinks:wine', 'drinks:spirits', 'drinks:beer', 'drinks:soft', 'drinks:gifts']);
 });

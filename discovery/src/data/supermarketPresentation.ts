@@ -1,11 +1,25 @@
 import type { CatalogItem, Merchant } from '../providers/DiscoveryProvider';
+import { offeringKind, subcategoryOf } from './offeringKinds';
 import { findCategory, findSubcategory } from './taxonomy';
 
-export const isSupermarket = (merchant: Merchant) => Boolean(merchant.subcategoryId && findSubcategory('groceries-essentials', 'groceries-essentials:supermarket')?.sourceIds.includes(merchant.subcategoryId));
+// Each check accepts a Discovery subcategory ID (engine mode) or one of its source groups (Supabase and platform modes).
+export const isSupermarket = (merchant: Merchant) => Boolean(merchant.subcategoryId && (merchant.subcategoryId === 'groceries-essentials:supermarket'
+  || findSubcategory('groceries-essentials', 'groceries-essentials:supermarket')?.sourceIds.includes(merchant.subcategoryId)));
 
-/** Every Groceries And Essentials shop (supermarket, butchery, fresh produce…) uses the grocery storefront. */
+/**
+ * Every Groceries And Essentials shop (supermarket, butchery, fresh produce…). In the retail storefront a grocer calls
+ * its list "Aisles" and counts its products with a basket.
+ */
 export const isGroceryStore = (merchant: Merchant) => Boolean(merchant.subcategoryId
-  && findCategory('groceries-essentials')?.subcategories.some((entry) => entry.sourceIds.includes(merchant.subcategoryId!)));
+  && findCategory('groceries-essentials')?.subcategories.some((entry) => entry.id === merchant.subcategoryId || entry.sourceIds.includes(merchant.subcategoryId!)));
+
+/**
+ * Every product store uses the retail storefront (owner, 9 Nov 2026): groceries, electronics, pharmacy, fashion, beauty
+ * products, drinks, flowers and gifts, marketplace and adults. It needs a subcategory Discovery knows whose journey is a
+ * purchase. Restaurants (dishes), services, requests, vehicles and activities keep their own storefronts, and a store
+ * whose subcategory Discovery doesn't know keeps the generic one.
+ */
+export const isRetailStore = (merchant: Pick<Merchant, 'subcategoryId'>) => Boolean(subcategoryOf(merchant)) && offeringKind(merchant) === 'product';
 
 const plain = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim().toLocaleLowerCase('en-KE');
 

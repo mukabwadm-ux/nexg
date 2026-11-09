@@ -5,7 +5,9 @@ import { ReadBudget } from '../orchestrator/readBudget.js';
 import { DiscoveryReadService } from '../orchestrator/readService.js';
 import type { ServerDiscoveryProvider } from '../providers/DiscoveryProvider.js';
 import { PlatformDiscoveryProvider } from '../adapters/platform/serverDiscoveryProvider.js';
+import { SupabaseConnector } from '../adapters/supabase/connector.js';
 import { BaselineReleaseReader } from '../releases/baselineReleaseReader.js';
+import { taxonomyPathIndex } from '../releases/taxonomyPaths.js';
 import { validateReleaseArtifact, type ReleaseArtifact } from '../releases/artifact.js';
 import { parseSchema } from '../contracts/validate.js';
 import { ReadServiceError, safeError } from '../contracts/readErrors.js';
@@ -50,11 +52,15 @@ export interface ReadServerOptions {
 export async function buildReadOnlyServer(options: ReadServerOptions) {
   const release = options.release ? validateReleaseArtifact(options.release)
     : await new BaselineReleaseReader(options.workspaceRoot ?? fileURLToPath(new URL('../../../../', import.meta.url))).resolvePublishedRelease();
-  const provider = options.provider ?? new PlatformDiscoveryProvider(options.config.sourceOrigin ? { origin: options.config.sourceOrigin } : {});
+  const root = options.workspaceRoot ?? fileURLToPath(new URL('../../../../', import.meta.url));
+  const taxonomyPaths = taxonomyPathIndex(release);
+  // The Supabase connector starts reading only once the whole server is built (see the end of this function).
+  const connector = !options.provider && options.config.supabase ? await SupabaseConnector.fromWorkspace(root, options.config.supabase, taxonomyPaths) : undefined;
+  const provider = options.provider ?? connector
+    ?? new PlatformDiscoveryProvider({ ...(options.config.sourceOrigin ? { origin: options.config.sourceOrigin } : {}), taxonomyPaths });
   const retrieval = options.retrieval ?? (options.config.search ? new TypesenseServingRetrieval(new TypesenseIndexAdapter(options.config.search), release) : undefined);
   const sessions = new ResultSessions(options.sessionLimits);
   const events = options.events ? new InteractionPipeline(options.events) : undefined;
-  const root = options.workspaceRoot ?? fileURLToPath(new URL('../../../../', import.meta.url));
   const controlStore = options.controlStore ?? (options.config.operationsEnabled ? new ControlFileStore(join(root, 'discovery-engine/.runtime/operations')) : undefined);
   const initial = await controlStore?.read();
   const controls = new RuntimeController({ search: Boolean(retrieval), events: Boolean(events && options.interactionContext), quality: false }, initial);
@@ -118,7 +124,7 @@ export async function buildReadOnlyServer(options: ReadServerOptions) {
   app.setNotFoundHandler((request, reply) => reply.code(404).send(parseSchema('EngineError', {
     contractVersion: '1', requestId: request.id, code: 'NOT_FOUND', retryable: false, recovery: 'none', fieldPaths: [],
   })));
-  app.addHook('onClose', async () => { clearInterval(poll); await refresh; unsubscribe(); for (const cleanup of [...cleanups]) cleanup(); sessions.clear(); events?.revoke(); await telemetry.close(); });
+  app.addHook('onClose', async () => { clearInterval(poll); await refresh; unsubscribe(); for (const cleanup of [...cleanups]) cleanup(); sessions.clear(); events?.revoke(); await telemetry.close(); await connector?.close(); });
   const callerFor = (request: FastifyRequest) => callers.get(request) ?? 'public-no-paging';
   const context = { service, budgetFor, callerFor,
     deliver: async (page: import('../contracts/index.js').Schemas['EnginePage'], request: FastifyRequest) => {
@@ -138,6 +144,7 @@ export async function buildReadOnlyServer(options: ReadServerOptions) {
   registerCatalogRoutes(app, context);
   registerCollectionRoutes(app, context);
   registerEventRoutes(app, context);
-  return { app, release, stats: () => ({ active, completed, overloads }), sessionStats: () => sessions.stats(),
+  await connector?.start();
+  return { app, release, sourceStatus: () => connector?.status, stats: () => ({ active, completed, overloads }), sessionStats: () => sessions.stats(),
     controls, refreshOperatorControls, telemetryStats: () => telemetry.snapshot(), eventStats: () => events?.stats() };
 }

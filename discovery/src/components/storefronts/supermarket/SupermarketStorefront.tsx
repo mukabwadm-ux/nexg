@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { Bike, ChevronRight, Clock3, Info, MapPin, Percent, Search, ShoppingBasket, Star, Timer } from 'lucide-react';
+import { Bike, ChevronRight, Clock3, Info, MapPin, Package, PackageOpen, Percent, Search, ShoppingBasket, Star, Timer } from 'lucide-react';
 import type { CatalogItem, Merchant } from '../../../providers/DiscoveryProvider';
 import { catalogDepartments, catalogNaming, catalogSections, searchSections, sectionAnchor, type CatalogDepartment, type CatalogNaming, type CatalogSection } from '../../../data/catalogSections';
 import { offeringKind, subcategoryOf } from '../../../data/offeringKinds';
-import { readSavedProducts, writeSavedProducts } from '../../../data/supermarketPresentation';
+import { isGroceryStore, readSavedProducts, writeSavedProducts } from '../../../data/supermarketPresentation';
 import { formatPrice } from '../../../lib/formatPrice';
 import { readNexgCart } from '../../../cart/nexgCart';
 import { CartPill } from '../../cart/CartPill';
@@ -61,19 +61,25 @@ function useHeaderHeight() {
 }
 
 /**
- * The grocery storefront for every Groceries And Essentials shop (owner, 9 Nov 2026: Bolt Food's sidebar and
- * aisle chips, Wolt Market's look and phone layout). Under the shared store hero, a store with two or more
- * departments gets the department sidebar (a row of round tiles on phones) beside its main column: the home
- * ("Discover") with one rail per department, or one department with a breadcrumb and its aisles under the
- * sticky section bar. Smaller shops (most butcheries, fishmongers and greengrocers) show their aisles
- * straight away. Search covers the whole store, grouped by aisle. The + on each product fills the NexG cart
- * in place; the "View cart" pill opens it. Only one department draws at a time, rails stop at a dozen
- * products and images load lazily, so a store of thousands stays quick.
+ * The retail storefront for every product store (owner, 9 Nov 2026; isRetailStore): groceries, electronics, pharmacy,
+ * fashion, beauty products, drinks, flowers and gifts, marketplace and adults. Bolt Food's sidebar and aisle chips in
+ * Wolt Market's look, with Wolt's phone layout. Under the shared store hero, a store whose products fall into two or
+ * more departments (CATALOG_SECTIONS_V1.json) gets the department sidebar (a row of round tiles on phones) beside its
+ * main column: the home ("Discover") with one rail per department, or one department with a breadcrumb and its aisles
+ * under the sticky section bar. Smaller shops (a phone shop, most butcheries and greengrocers) show their aisles
+ * straight away. Words come from catalogNaming: a grocer's "Aisles" and basket, a liquor store's "drinks". Search
+ * covers the whole store, grouped by aisle. The + on each product fills the NexG cart in place; the "View cart" pill
+ * opens it. Only one department draws at a time, rails stop at a dozen products and images load lazily, so a store of
+ * thousands stays quick.
  */
 export function SupermarketStorefront({ merchant, activeItem, itemMissing = false, onBack, onSelectItem, onCloseItem, department: routed, onDepartment }: SupermarketStorefrontProps) {
   const products = useMemo(() => merchant.items.filter((item) => item.merchantId === merchant.id), [merchant]);
   const naming = useMemo(() => catalogNaming(merchant), [merchant]);
   const kind = useMemo(() => offeringKind(merchant), [merchant]);
+  // A grocer counts its products with a basket and calls its sections "Aisles"; other shops use a box and "{list} sections".
+  const grocer = useMemo(() => isGroceryStore(merchant), [merchant]);
+  const CountIcon = grocer ? ShoppingBasket : Package;
+  const EmptyIcon = grocer ? ShoppingBasket : PackageOpen;
   const sections = useMemo(() => catalogSections(merchant, products), [merchant, products]);
   const departments = useMemo(() => catalogDepartments(merchant, products, sections), [merchant, products, sections]);
   const history = useMemo(() => sections.filter((section) => section.source === 'history'), [sections]);
@@ -200,7 +206,7 @@ export function SupermarketStorefront({ merchant, activeItem, itemMissing = fals
   const place = merchant.area || merchant.address;
   const heroFacts: ReactNode[] = [
     place && <><MapPin size={16} strokeWidth={1.75} aria-hidden="true" />{place}</>,
-    products.length > 0 && <><ShoppingBasket size={16} strokeWidth={1.75} aria-hidden="true" />{naming.count(products.length)}</>,
+    products.length > 0 && <><CountIcon size={16} strokeWidth={1.75} aria-hidden="true" />{naming.count(products.length)}</>,
     typeof merchant.isOpen === 'boolean' && <><Clock3 size={16} strokeWidth={1.75} aria-hidden="true" />{merchant.isOpen ? 'Open now' : 'Closed now'}</>,
     facts?.deliveryTime && <><Timer size={16} strokeWidth={1.75} aria-hidden="true" />{facts.deliveryTime}</>,
     deliveryFee && <><Bike size={16} strokeWidth={1.75} aria-hidden="true" />Delivery {deliveryFee}</>,
@@ -228,7 +234,7 @@ export function SupermarketStorefront({ merchant, activeItem, itemMissing = fals
       items={entry.sections.flatMap((section) => section.items).slice(0, RAIL_LIMIT)} renderCard={card}
       seeAll={{ label: `See all ${entry.title}`, onClick: () => openView(entry.id) }} />)}
   </div>;
-  const bar = <SectionNav label={naming.list} sections={shown.map((section) => ({ anchor: sectionAnchor(section), title: section.title, count: section.items.length }))}
+  const bar = <SectionNav label={grocer ? naming.list : `${naming.list} sections`} sections={shown.map((section) => ({ anchor: sectionAnchor(section), title: section.title, count: section.items.length }))}
     search={{ value: search, onChange: changeSearch, placeholder: `Search ${merchant.name}`, label: `Search ${merchant.name}` }} />;
 
   const basket = cart.count > 0;
@@ -237,7 +243,7 @@ export function SupermarketStorefront({ merchant, activeItem, itemMissing = fals
     {itemMissing && <p className="store-notice" role="status"><Info size={18} strokeWidth={1.75} aria-hidden="true" />That {naming.item} isn’t listed at {merchant.name} any more. Here’s what is.</p>}
     {products.length === 0
       ? <div className="store-empty">
-        <ShoppingBasket size={26} strokeWidth={1.5} aria-hidden="true" />
+        <EmptyIcon size={26} strokeWidth={1.5} aria-hidden="true" />
         <h2>No {naming.items} listed yet</h2>
         <p>{merchant.name} hasn’t added {naming.items} to NexG yet.</p>
       </div>

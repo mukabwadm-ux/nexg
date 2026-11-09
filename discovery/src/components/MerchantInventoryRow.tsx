@@ -2,10 +2,11 @@ import { useId, useMemo, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import type { CatalogItem, Merchant, ObservationBinding } from '../providers/DiscoveryProvider';
 import { useResultObservation } from '../hooks/useResultObservation';
-import { isListKind, kindPresentation, offeringKind, subcategoryOf, transferCardAction, vehicleJourney } from '../data/offeringKinds';
+import { isListKind, kindPresentation, offeringKind, transferCardAction, vehicleJourney } from '../data/offeringKinds';
 import { catalogNaming, catalogSections } from '../data/catalogSections';
 import { detailPage } from '../data/itemSheet';
 import { cartBlock } from '../data/restaurantPresentation';
+import { isRetailStore } from '../data/supermarketPresentation';
 import { OfferingCard } from './cards/OfferingCard';
 import { OfferingSheet } from './cards/OfferingSheet';
 import { CartSwitchDialog } from './cart/CartSheet';
@@ -62,8 +63,8 @@ export function StoreRow({ merchant, onOpen, observation }: StoreRowProps) {
   const promotion = merchant.displayFacts?.promotion;
   const actionLabel = kind === 'vehicle' && vehicleJourney(merchant) === 'transfer' ? transferCardAction : undefined;
   const list = isListKind(kind);
-  // Grocery shelves use the compact product card (owner, 9 Nov 2026): a square photo, the price, then the name.
-  const compact = list && subcategoryOf(merchant)?.category.id === 'groceries-essentials';
+  // Every product store's row uses the compact card its store uses (owner, 9 Nov 2026): a square photo, the price, then the name.
+  const compact = isRetailStore(merchant);
   const cart = useStoreCart(merchant);
   const [selected, setSelected] = useState<CatalogItem>();
   const [said, setSaid] = useState('');
@@ -99,11 +100,12 @@ export function StoreRow({ merchant, onOpen, observation }: StoreRowProps) {
   };
 
   const card = (item: CatalogItem) => {
-    // Only an item the cart can take gets a +; one it can't (no price, a required choice) opens in words instead.
+    // Only an item the cart can take gets a + that adds; one it can't (no price, a required choice) opens instead:
+    // in words on a standard card, from its + on a compact one, as in the store.
     const block = list ? cartBlock(item) : undefined;
     const viewOnly = block !== undefined && block !== 'unavailable';
     return <OfferingCard key={item.id} item={item} kind={kind} saved={saved.has(item.id)} onSave={toggle} onOpen={openItem} tag={tags.get(item.id)}
-      actionLabel={viewOnly ? kindPresentation[kind].cardAction : actionLabel} variant={compact ? 'compact' : 'standard'}
+      actionLabel={viewOnly && !compact ? kindPresentation[kind].cardAction : actionLabel} variant={compact ? 'compact' : 'standard'}
       {...(list && !viewOnly ? { quantity: inCart(item), onAdd: addOne, onRemove: removeOne } : {})} />;
   };
 

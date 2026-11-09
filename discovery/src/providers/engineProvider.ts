@@ -1,6 +1,7 @@
 import type { BoundedPage, CollectionResult, DiscoveryProvider, DiscoveryQuery, EngineSchemas, Merchant, MerchantResult, OfferingResult } from './DiscoveryProvider';
 import { EngineTransport } from './engineTransport';
 import { ProviderReadError } from './readState';
+import { findCategory } from '../data/taxonomy';
 
 export const engineCapabilities = { availabilityFilter: false, nearestSort: false, priceRangeFilter: false, transactions: false,
   resultSemantics: 'bounded/v2' as const, supportedSorts: ['recommended'] as const };
@@ -21,13 +22,28 @@ function image(value?: string): string | undefined {
   if (value.startsWith('/') && !value.startsWith('//')) return value;
   try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password ? value : undefined; } catch { return undefined; }
 }
+/**
+ * Where the engine's release places the store (its first taxonomy path, in Discovery IDs such as restaurants-food:caf).
+ * The IDs pick the storefront (restaurant, retail, appointment, tour); the labels name the store on cards. Unknown stays unset.
+ */
+function placement(row: EngineSchemas['PublicMerchant']): Pick<Merchant, 'categoryId' | 'category' | 'subcategoryId' | 'subcategory'> {
+  const path = row.taxonomyPaths?.[0];
+  if (!path) return {};
+  const category = findCategory(path.categoryId);
+  const subcategory = category?.subcategories.find(entry => entry.id === path.subcategoryId);
+  const option = path.optionId ? subcategory?.options.find(entry => entry.id === path.optionId) : undefined;
+  return { categoryId: path.categoryId, subcategoryId: path.subcategoryId,
+    ...(category ? { category: category.label } : {}), ...(subcategory ? { subcategory: option?.label ?? subcategory.label } : {}) };
+}
 /** Presentations arrive hydrated by the engine; no browser detail fan-out. */
 function merchant(row: EngineSchemas['PublicMerchant']): Merchant {
   if (row.ref.kind !== 'merchant' || row.ref.id !== row.ref.merchantId
     || row.items.some(item => item.ref.kind !== 'offering' || item.ref.ownerId !== row.ref.ownerId || item.ref.merchantId !== row.ref.id)
     || new Set(row.items.map(item => item.ref.id)).size !== row.items.length
     || (row.itemsCount.kind !== 'unknown' && row.itemsCount.value < row.items.length)) throw unavailable();
-  return { id: row.ref.id, name: row.name, area: row.area, heroImage: image(row.image), itemsCount: row.itemsCount, itemsCompletion: row.itemsCompletion,
+  return { id: row.ref.id, name: row.name, area: row.area, ...placement(row),
+    ...(row.location ? { latitude: row.location.latitude, longitude: row.location.longitude } : {}),
+    heroImage: image(row.image), itemsCount: row.itemsCount, itemsCompletion: row.itemsCompletion,
     items: row.items.map(item => ({ id: item.ref.id, merchantId: row.ref.id, merchantName: row.name, name: item.name,
       description: item.description, image: image(item.image),
       // Source money knownness is retained by the wire contract. Only a verified

@@ -9,13 +9,13 @@ const limit = (error: unknown) => error instanceof ReadServiceError && error.cod
 test('one shared budget limits concurrency and all nested source calls', async () => {
   const budget = new ReadBudget(); let running = 0; let peak = 0;
   try {
-    const values = await Promise.all(Array.from({ length: 12 }, (_, index) => budget.run(async () => {
+    const values = await Promise.all(Array.from({ length: 16 }, (_, index) => budget.run(async () => {
       running++; peak = Math.max(peak, running);
       await new Promise(resolve => setTimeout(resolve, 2)); running--; return index;
     })));
-    assert.deepEqual(values, Array.from({ length: 12 }, (_, index) => index));
-    assert.equal(peak, 4); assert.equal(budget.snapshot.calls, 12);
-    await assert.rejects(budget.run(async () => 'thirteenth'), limit);
+    assert.deepEqual(values, Array.from({ length: 16 }, (_, index) => index));
+    assert.equal(peak, 4); assert.equal(budget.snapshot.calls, 16);
+    await assert.rejects(budget.run(async () => 'seventeenth'), limit);
   } finally { budget.dispose(); }
 });
 
@@ -54,7 +54,7 @@ test('deadline aborts an active read and queued reads without starting more work
 test('parent cancellation and disposal prevent further reads; budgets cannot be enlarged', async () => {
   const controller = new AbortController(); const budget = new ReadBudget({ signal: controller.signal });
   controller.abort(); await assert.rejects(budget.run(async () => 'unexpected'), unavailable); budget.dispose();
-  assert.throws(() => new ReadBudget({ maxCalls: 13 }));
+  assert.throws(() => new ReadBudget({ maxCalls: 17 }));
   assert.throws(() => new ReadBudget({ maxDetails: 9 }));
   assert.throws(() => new ReadBudget({ concurrency: 5 }));
   assert.throws(() => new ReadBudget({ timeoutMs: 1001 }));

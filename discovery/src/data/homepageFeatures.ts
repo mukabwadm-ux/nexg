@@ -1,15 +1,15 @@
 import { findCategory } from './taxonomy';
 import type { DiscoveryCategory } from './taxonomy';
-import restaurantsImage from '../../assets/homepage-features/01-restaurants-kenyan.png';
+import restaurantsImage from '../../assets/homepage-features/01-restaurants-kenyan.webp';
 import groceriesImage from '../../assets/homepage-features/02-groceries.webp';
 import marketplaceImage from '../../assets/homepage-features/03-marketplace-tech.webp';
 import wellnessImage from '../../assets/homepage-features/04-health-wellness.webp';
-import apparelImage from '../../assets/homepage-features/05-apparel-family.png';
+import apparelImage from '../../assets/homepage-features/05-apparel-family.webp';
 import mobilityImage from '../../assets/homepage-features/06-mobility-transfers.webp';
 import giftsImage from '../../assets/homepage-features/07-flowers-gifts.webp';
 import homeServicesImage from '../../assets/homepage-features/08-laundry-concierge.webp';
 import experiencesImage from '../../assets/homepage-features/09-experiences.webp';
-import toursImage from '../../assets/homepage-features/10-safari-kenya.png';
+import toursImage from '../../assets/homepage-features/10-safari-kenya.webp';
 
 interface HomepageFeatureSeed {
   id: string;

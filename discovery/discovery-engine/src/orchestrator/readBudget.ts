@@ -18,8 +18,8 @@ export class ReadBudget {
   readonly #externalAbort: () => void;
   constructor(private readonly options: ReadBudgetOptions = {}) {
     const timeout = options.timeoutMs ?? 1000;
-    this.#maxCalls = options.maxCalls ?? 12; this.#maxDetails = options.maxDetails ?? 8; this.#concurrency = options.concurrency ?? 4;
-    for (const [value, maximum] of [[timeout, 1000], [this.#maxCalls, 12], [this.#maxDetails, 8], [this.#concurrency, 4]]) {
+    this.#maxCalls = options.maxCalls ?? 16; this.#maxDetails = options.maxDetails ?? 8; this.#concurrency = options.concurrency ?? 4;
+    for (const [value, maximum] of [[timeout, 1000], [this.#maxCalls, 16], [this.#maxDetails, 8], [this.#concurrency, 4]]) {
       if (!Number.isSafeInteger(value) || value! < 1 || value! > maximum!) throw new Error('Invalid read budget');
     }
     this.#deadline = performance.now() + timeout;

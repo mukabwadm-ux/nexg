@@ -8,9 +8,9 @@
   },
   "encoder": "sharp 0.34.5, libwebp 1.6.0",
   "totals": {
-    "icons": 114,
-    "sourceBytes": 166201251,
-    "bytes": 1790444
+    "icons": 133,
+    "sourceBytes": 199699783,
+    "bytes": 2101318
   },
   "icons": [
     {
@@ -170,6 +170,26 @@
       "file": "00_Main_Category_Icons/16_concierge_services.webp",
       "bytes": 14242,
       "sha256": "6e256527847b71300e81acbdc64253a6191453b45d09956cce0543f3cc7bf6eb",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/17_play.png",
+      "sourceBytes": 1524774,
+      "sourceSha256": "b7df269d07ad2e963cf31964f436f490ff30a64a22836b917dd5a6cfc144eab7",
+      "file": "00_Main_Category_Icons/17_play.webp",
+      "bytes": 12982,
+      "sha256": "1dd655443abcad973eaafb5ebae1d9c109b8cac74a43f58c63ab5320259c56cc",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/18_flights.png",
+      "sourceBytes": 655790,
+      "sourceSha256": "73b183771e964364a7dcd784c018b7beb4c07035fcc7efbdce2d98d064e79692",
+      "file": "00_Main_Category_Icons/18_flights.webp",
+      "bytes": 12138,
+      "sha256": "5e40e17f0e781a10b7adfde76d05fd22bfd7a677cad98031a4b5bb295d22373c",
       "width": 256,
       "height": 256
     },
@@ -1150,6 +1170,176 @@
       "file": "16_Concierge_Services/16_10_Courier_And_Errands.webp",
       "bytes": 11044,
       "sha256": "16584d6ac08e3f45a4d56e2b429aaa5a792e67252a72b0d62156f6faacb14b10",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_01_Bowling.png",
+      "sourceBytes": 1659103,
+      "sourceSha256": "87a5319189ff5a09136caba7d64360097db57201a5d10dc3d20d55b9a07a35cf",
+      "file": "17_Play/17_01_Bowling.webp",
+      "bytes": 12906,
+      "sha256": "ec03ff26297769e4eed2a8a04ac83740b96368df8473f927ae3442e16dadcdad",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_02_Arcade_And_Timed_Play.png",
+      "sourceBytes": 1574098,
+      "sourceSha256": "5fa7369215c7f1eb86dcb66bf17cfa2c1c8612c98d7dac939a4510c55afb0bf2",
+      "file": "17_Play/17_02_Arcade_And_Timed_Play.webp",
+      "bytes": 11770,
+      "sha256": "62488cf03823ad012ca25fa2a74edc4af69a6ae3a420a88d230e7b6ad38fad18",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_03_Escape_Rooms.png",
+      "sourceBytes": 2532025,
+      "sourceSha256": "a3f3a4692579177e527d1100f69e0b6b3c008d99d731ebb0d08a69cf0f372d9e",
+      "file": "17_Play/17_03_Escape_Rooms.webp",
+      "bytes": 23106,
+      "sha256": "0a2c399a9b798851b087a193e756b35b45c3c47f146a2e4b55cc8ef9bd810a37",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_04_Indoor_Sports_Courts.png",
+      "sourceBytes": 1994070,
+      "sourceSha256": "68b058cbda0db2be36201adb199c49cf3e3738206772336df1a0db7cb1a14274",
+      "file": "17_Play/17_04_Indoor_Sports_Courts.webp",
+      "bytes": 14490,
+      "sha256": "76cc03596f6f07ec3080b962dbbe00aed02efdd8230f7ce15e49df6324dc7a88",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_05_Outdoor_Sports_Courts.png",
+      "sourceBytes": 2049742,
+      "sourceSha256": "98c8b82ff17a1a9d1ff71fc746e5294f1584d6d0465c8588de37cd327a296c0b",
+      "file": "17_Play/17_05_Outdoor_Sports_Courts.webp",
+      "bytes": 25398,
+      "sha256": "1c05fbbc2e7f4ccb606d30e725b124a88dd5659f80eaebe21f795cb0eab180bd",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_06_Football_Pitches.png",
+      "sourceBytes": 1836768,
+      "sourceSha256": "876046a03e2eb8e7ab01cd924c25bde7edafc405b91c38b977d0ae179a755836",
+      "file": "17_Play/17_06_Football_Pitches.webp",
+      "bytes": 14174,
+      "sha256": "4a2fb3a44c7203ed17956ad862d71d091a44902de9c55b8dca9e2a7ec4db70c9",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_07_Outdoor_Team_Games.png",
+      "sourceBytes": 2210957,
+      "sourceSha256": "d9125627b4756715ef3c41080563b03e22e91b885076c015b532d12f21b0a671",
+      "file": "17_Play/17_07_Outdoor_Team_Games.webp",
+      "bytes": 14848,
+      "sha256": "edf5679e705a67167cc62aabcf8f0ec46dccf0df950223cc9e2665a5894cf45a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_08_Go_Karting.png",
+      "sourceBytes": 1724488,
+      "sourceSha256": "4bea495cfaaeb837a7932fce8ca16bd202c18f1d60fdc3306d57ef3b4980743f",
+      "file": "17_Play/17_08_Go_Karting.webp",
+      "bytes": 14800,
+      "sha256": "93f489e80a2774db7af34893216033078f74d2e688ee8d10148d3c042eb4485c",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_09_Paintball.png",
+      "sourceBytes": 2181116,
+      "sourceSha256": "640df6d8e1a657445c56fa60f4f7b92a5459da2c090e62e618774f1dc488e8e3",
+      "file": "17_Play/17_09_Paintball.webp",
+      "bytes": 15436,
+      "sha256": "99d3a1f3b6a2a7e93c6f544572e2926308e984d433cac25609baefea5dc90a7a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_10_Ziplining_And_High_Ropes.png",
+      "sourceBytes": 2055434,
+      "sourceSha256": "d7c7764218cd9d7cafe1cb7f9943dd8fd1de0c5f3d3af367bb1aa7b0c0feb288",
+      "file": "17_Play/17_10_Ziplining_And_High_Ropes.webp",
+      "bytes": 20550,
+      "sha256": "4538a393df7eed505e2eacc24ef3b09eefb1efb851354a69ff33ccb846470dcb",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_11_Public_Swim_Sessions.png",
+      "sourceBytes": 1979959,
+      "sourceSha256": "39d0a81221627afb01fab0ed6962554ac39cba930ad1d758f317884788f728c3",
+      "file": "17_Play/17_11_Public_Swim_Sessions.webp",
+      "bytes": 16690,
+      "sha256": "44e0a56e83a9260890eae18c72f8b4a87e82edc9db30924f5039c16e1962cd91",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_12_Swimming_Lessons.png",
+      "sourceBytes": 1875842,
+      "sourceSha256": "1be1cce322e680eef83bfc2dc5f60071b2d22a4c99894e8bb08be403d498c9f3",
+      "file": "17_Play/17_12_Swimming_Lessons.webp",
+      "bytes": 12494,
+      "sha256": "d3a215e78444c753d048e64f69992a4323d53fbd2f7e59c801e3d7ae3874a6a1",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_13_Pool_Lane_Hire.png",
+      "sourceBytes": 1518517,
+      "sourceSha256": "731468615ebd6cc222d6aa5a1e79bec9920d8db5befeb2f4b0da8e31602b34ed",
+      "file": "17_Play/17_13_Pool_Lane_Hire.webp",
+      "bytes": 13544,
+      "sha256": "f0f69ade26da2cc705983268aca87ad9850d396699b56891f87833a661571d73",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "18_Flights/18_01_Helicopter_Charters.png",
+      "sourceBytes": 1361026,
+      "sourceSha256": "3cedd6a1965272fd553dc295979368e272f76f0d4e7e96fb83b4c5a5ec17c552",
+      "file": "18_Flights/18_01_Helicopter_Charters.webp",
+      "bytes": 18070,
+      "sha256": "062167282a48e9327e1d6ea0aebfa04d86bf15bf2fdcd2e059089ea7078abcab",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "18_Flights/18_02_Scenic_Flights.png",
+      "sourceBytes": 2109040,
+      "sourceSha256": "fb2de96b4898d7df420223af59f0248460d70967dd031c92324d6ce2934cba81",
+      "file": "18_Flights/18_02_Scenic_Flights.webp",
+      "bytes": 25054,
+      "sha256": "6a3d122683dfeab66d75559213bb802ba615c832612aa85fdfeda4e50063b85a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "18_Flights/18_03_Safari_Flights.png",
+      "sourceBytes": 1725002,
+      "sourceSha256": "010d0827eee13f5a660ac505e8a1ca55da5cd2d073d4efbf69817f801c37163f",
+      "file": "18_Flights/18_03_Safari_Flights.webp",
+      "bytes": 20064,
+      "sha256": "9fc4ac248729c0b57fe03cfaeefe4b2e395997bc429bfc0849a01f82cae7fd21",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "18_Flights/18_04_Private_Charters.png",
+      "sourceBytes": 930781,
+      "sourceSha256": "de701c7bfd687dc3d31193965c523f303708e2f66065cf28fea016915c972309",
+      "file": "18_Flights/18_04_Private_Charters.webp",
+      "bytes": 12360,
+      "sha256": "661c4944aa9a82f89a0babdbffe04e1f70d56946efc6d1bb9656a6d97e7af3bc",
       "width": 256,
       "height": 256
     }

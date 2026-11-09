@@ -90,7 +90,7 @@ test('every current category and subcategory resolves its own approved source gr
       : release.nodes.filter(child => child.kind === 'subcategory' && child.parentId === node.id)
         .flatMap(child => release.mappings.find(mapping => mapping.nodeId === child.id)!.sourceSubcategoryIds);
     assert.deepEqual(urls.map(url => url.searchParams.get('subcategory')), [...new Set(expected)], node.id);
-    assert.ok(urls.length <= 12); parseSchema('EnginePage', response.json());
+    assert.ok(urls.length <= 16); parseSchema('EnginePage', response.json());
   }
   assert.equal(nodes.length, release.declaredCounts.categories + release.declaredCounts.subcategories);
 });

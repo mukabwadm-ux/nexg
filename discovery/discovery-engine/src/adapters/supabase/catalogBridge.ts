@@ -222,6 +222,54 @@ export function merchantQuery(params: Record<string, unknown>): MerchantQuery {
     ...(area ? { area } : {}), limit: integer('limit', 24, 1, 200), offset: integer('offset', 0, 0, 100_000) };
 }
 
+/**
+ * Derrick NexG's category_config spells ten subcategory keys differently from the demo seed (checked against its
+ * migrations on 8 Nov 2026; labels identical). Merchants onboarded through the merchant portal use the config
+ * spelling, so both spellings select the same reviewed map row. Key: the seed's pair.
+ * Keep equal to SUBCATEGORY_KEY_ALIASES in the website's src/providers/supabaseProvider.ts.
+ */
+export const PORTAL_SUBCATEGORY_SPELLINGS: Readonly<Record<string, string>> = {
+  'airport_transfers/airport_drop-off': 'airport_dropoff',
+  'airport_transfers/meet__greet': 'meet_greet',
+  'vehicle_rentals/long-term_rental': 'long_term_rental',
+  'restaurants_food/caf': 'cafe',
+  'marketplace/home__living': 'home_living',
+  'pharmacy/pharmacy': 'pharmacy_retail',
+  'health/mental_health_therapy': 'mental_health',
+  'tech_electronics/accessories': 'tech_accessories',
+  'logistics_shipping/road_freight__trucking': 'road_freight',
+  'logistics_shipping/warehousing__storage': 'warehousing',
+};
+const MAP_KEY = /^[a-z0-9_-]+$/;
+const mapPair = (row: Pick<BridgeMapRow, 'supabase'>) => `${row.supabase.category}/${row.supabase.subcategory}`;
+
+/** Checks demo-seed/subcategory-map.json row by row and adds the portal's spellings. A stale spelling is skipped. */
+export function portalMapRows(source: unknown): BridgeMapRow[] {
+  const rows = source && typeof source === 'object' ? (source as { subcategories?: unknown }).subcategories : undefined;
+  if (!Array.isArray(rows)) throw new Error('Invalid subcategory map');
+  const checked = rows.map((value): BridgeMapRow => {
+    const row = (value ?? {}) as Partial<BridgeMapRow>;
+    const discovery = row.discovery;
+    const ok = typeof row.demoSubcategoryId === 'string' && typeof row.demoLabel === 'string' && typeof row.demoCategoryId === 'string'
+      && typeof row.demoCategoryLabel === 'string' && !!row.supabase && typeof row.supabase.category === 'string' && typeof row.supabase.subcategory === 'string'
+      && MAP_KEY.test(row.supabase.category) && MAP_KEY.test(row.supabase.subcategory)
+      && (row.status === 'mapped' ? !!discovery && typeof discovery.categoryId === 'string' && typeof discovery.subcategoryId === 'string'
+        : row.status === 'unmapped' && !discovery);
+    if (!ok) throw new Error('Invalid subcategory map row');
+    return { demoSubcategoryId: row.demoSubcategoryId!, demoLabel: row.demoLabel!, demoCategoryId: row.demoCategoryId!, demoCategoryLabel: row.demoCategoryLabel!,
+      supabase: { category: row.supabase!.category, subcategory: row.supabase!.subcategory },
+      discovery: discovery ? { categoryId: discovery.categoryId, subcategoryId: discovery.subcategoryId } : null, status: row.status! };
+  });
+  const pairs = new Set(checked.map(mapPair));
+  if (pairs.size !== checked.length) throw new Error('Duplicate Supabase keys in the subcategory map');
+  const spellings = Object.entries(PORTAL_SUBCATEGORY_SPELLINGS).flatMap(([pair, subcategory]) => {
+    const row = checked.find(entry => mapPair(entry) === pair);
+    const alias = row ? { ...row, supabase: { category: row.supabase.category, subcategory } } : undefined;
+    return alias && MAP_KEY.test(subcategory) && !pairs.has(mapPair(alias)) ? [alias] : [];
+  });
+  return [...checked, ...spellings];
+}
+
 /** The demo IDs in the seed are fixed: merchant M0384 is c1…384 and item I12476 is f1…12476. */
 const fixedId = (prefix: string, code: string, letter: 'M' | 'I'): string | undefined => {
   const match = new RegExp(`^${letter}(\\d{1,12})$`).exec(code);

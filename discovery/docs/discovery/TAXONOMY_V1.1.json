@@ -3,11 +3,11 @@
   "date": "2026-10-12",
   "status": "Current owner-authorized taxonomy derived from updated icon pack; earlier 16/99 list superseded",
   "source": "Latest owner directive: images and new icons are final source of truth for artwork AND category/subcategory changes. Exact navigation labels/order follow NexG_Discovery_Icons_Manifest.csv and its current individual assets. Embedded historical master-board label differences are recorded in ICON_ASSET_AUDIT_V1.1.md.",
-  "main_category_count": 16,
-  "subcategory_count": 98,
+  "main_category_count": 18,
+  "subcategory_count": 115,
   "discovery_level_count": 3,
   "position_meaning": "Official customer-facing navigation order; not database IDs.",
-  "nested_options_status": "Nested option candidates require actual catalog predicates and remain inside Category dropdown; not counted among the 98 navigation entries.",
+  "nested_options_status": "Nested option candidates require actual catalog predicates and remain inside Category dropdown; not counted among the 115 navigation entries.",
   "excluded_main_categories": [
     "Financial Services",
     "Logistics & Shipping"
@@ -630,6 +630,107 @@
           "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_10_Courier_And_Errands.png"
         }
       ]
+    },
+    {
+      "position": 17,
+      "name": "Play",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/17_play.png",
+      "subcategory_count": 13,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Bowling",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_01_Bowling.png"
+        },
+        {
+          "position": 2,
+          "name": "Arcade & Timed Play",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_02_Arcade_And_Timed_Play.png"
+        },
+        {
+          "position": 3,
+          "name": "Escape Rooms",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_03_Escape_Rooms.png"
+        },
+        {
+          "position": 4,
+          "name": "Indoor Sports Courts",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_04_Indoor_Sports_Courts.png"
+        },
+        {
+          "position": 5,
+          "name": "Outdoor Sports Courts",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_05_Outdoor_Sports_Courts.png"
+        },
+        {
+          "position": 6,
+          "name": "Football Pitches",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_06_Football_Pitches.png"
+        },
+        {
+          "position": 7,
+          "name": "Outdoor Team Games",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_07_Outdoor_Team_Games.png"
+        },
+        {
+          "position": 8,
+          "name": "Go-Karting",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_08_Go_Karting.png"
+        },
+        {
+          "position": 9,
+          "name": "Paintball",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_09_Paintball.png"
+        },
+        {
+          "position": 10,
+          "name": "Ziplining & High Ropes",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_10_Ziplining_And_High_Ropes.png"
+        },
+        {
+          "position": 11,
+          "name": "Public Swim Sessions",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_11_Public_Swim_Sessions.png"
+        },
+        {
+          "position": 12,
+          "name": "Swimming Lessons",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_12_Swimming_Lessons.png"
+        },
+        {
+          "position": 13,
+          "name": "Pool Lane Hire",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_13_Pool_Lane_Hire.png"
+        }
+      ]
+    },
+    {
+      "position": 18,
+      "name": "Flights",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/18_flights.png",
+      "subcategory_count": 4,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Helicopter Charters",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_01_Helicopter_Charters.png"
+        },
+        {
+          "position": 2,
+          "name": "Scenic Flights",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_02_Scenic_Flights.png"
+        },
+        {
+          "position": 3,
+          "name": "Safari Flights",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_03_Safari_Flights.png"
+        },
+        {
+          "position": 4,
+          "name": "Private Charters",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_04_Private_Charters.png"
+        }
+      ]
     }
   ],
   "nested_option_examples": [
@@ -646,5 +747,19 @@
   "master_board_discrepancies": [
     "Alcohol master still labels Soft Drinks & Water; current manifest and individual asset label are Non-Alcoholic Drinks.",
     "Health master labels Labs and shows eight illustrations; current manifest and individual folder have nine entries including Mobile Diagnostic Services, Mental Health and Therapy."
+  ],
+  "owner_additions": [
+    {
+      "date": "2026-11-09",
+      "category": "Play",
+      "subcategories": 13,
+      "note": "Owner direction, 9 Nov 2026: Derrick NexG's Activities, Games & Sports category (activities_games_sports) joins Discovery under the one-word name Play. Icons made for it on 9 Nov 2026."
+    },
+    {
+      "date": "2026-11-09",
+      "category": "Flights",
+      "subcategories": 4,
+      "note": "Owner direction, 9 Nov 2026: Derrick NexG's Flights & aviation specialties (Heliflight merchant-portal demo) join Discovery as Flights. Unmapped until Derrick NexG has a flights category in its database."
+    }
   ]
 }

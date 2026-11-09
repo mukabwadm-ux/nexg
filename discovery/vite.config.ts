@@ -86,8 +86,12 @@ export default defineConfig(({ command, mode }) => {
       throw new Error('VITE_SUPABASE_URL points at a local Supabase. Set the hosted project URL for a release build, or DISCOVERY_ALLOW_LOCAL_SUPABASE=1 for a local check');
     }
   }
+  // Where the app is served: "/" on its own, "/discover/" inside the NexG website (scripts/build-for-web.mjs).
+  const base = env.DISCOVERY_BASE || '/';
+  if (!base.startsWith('/') || !base.endsWith('/') || base.includes('//') || /[^a-zA-Z0-9_/-]/.test(base)) throw new Error('DISCOVERY_BASE must look like / or /discover/');
   const proxy = { '/api/discovery': { target: `http://127.0.0.1:${enginePort}`, changeOrigin: false }, '/api': { target: `http://127.0.0.1:${apiPort}`, changeOrigin: false } };
   return {
+    base,
     plugins: [react(), discoveryIconAssets(), demoMediaModule()],
     publicDir: false,
     server: { host: '127.0.0.1', port, strictPort: true, proxy },

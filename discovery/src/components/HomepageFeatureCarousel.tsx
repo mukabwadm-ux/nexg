@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FocusEvent, type TransitionEvent } from 'react';
 import { Binoculars, CarFront, ChevronLeft, ChevronRight, ConciergeBell, Flower2, Pause, Pill, Plane, Play, Shirt, ShoppingBasket, Smartphone,
-  Sparkles, Store, Ticket, UtensilsCrossed, WashingMachine, Wine, type LucideIcon } from 'lucide-react';
+  Sparkles, Store, Ticket, Trophy, UtensilsCrossed, WashingMachine, Wine, type LucideIcon } from 'lucide-react';
 import { homepageFeatures } from '../data/homepageFeatures';
 import './homepage.css';
 
@@ -26,6 +26,7 @@ const iconByCategory: Record<string, LucideIcon> = {
   'airport-transfers': Plane,
   'flowers-gifts': Flower2,
   experiences: Ticket,
+  play: Trophy,
   'laundry-cleaning': WashingMachine,
   'concierge-services': ConciergeBell,
   'travel-tours': Binoculars,

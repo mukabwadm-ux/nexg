@@ -82,10 +82,11 @@ function writeShelf(merchantId: string, shelf: Shelf) {
 const kindIcon = { product: Package, dish: Package, service: ClipboardList, activity: Ticket, task: ClipboardList, vehicle: Car } as const;
 
 /**
- * The shared L4 for every store without its own designed storefront: electronics, fashion, flowers, drinks,
- * pharmacy, laundry, concierge, car hire, transfers and more. The store hero, then (for car hire and
- * transfers) the trip first, then the store's own list in sections under a sticky, Wolt-style section bar
- * with search. Products and dishes go in the NexG cart ("View cart"); services, tasks, vehicles and activities are
+ * The shared L4 for every store without its own designed storefront: services and requests (laundry and cleaning,
+ * concierge, clinics, device repairs, telecom plans, photography, catering), car and bike hire, transfers, and any
+ * store whose subcategory Discovery doesn't know. Every other product store uses the retail storefront (owner,
+ * 9 Nov 2026). The store hero, then (for car hire and transfers) the trip first, then the store's own list in
+ * sections under a sticky, Wolt-style section bar with search. Products and dishes go in the NexG cart ("View cart"); services, tasks, vehicles and activities are
  * requests kept on this device, since they aren't purchases. Only catalogue facts are shown; nothing is paid for here.
  */
 export function GenericStorefront({ merchant, activeItem, itemMissing = false, onBack, onSelectItem, onCloseItem }: GenericStorefrontProps) {

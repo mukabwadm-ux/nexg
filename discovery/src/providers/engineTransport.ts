@@ -13,7 +13,8 @@ function bounded<T>(operation: Promise<T>, signal: AbortSignal): Promise<T> {
 }
 /** Same-origin catalog/observation transport. No automatic retry or provider fallback. */
 export class EngineTransport {
-  constructor(private readonly fetcher: BrowserFetch = fetch, private readonly timeoutMs = 5000) {}
+  // Browsers only accept fetch called on the window: a stored `fetch` called as this.fetcher(...) throws "Illegal invocation".
+  constructor(private readonly fetcher: BrowserFetch = (input, init) => fetch(input, init), private readonly timeoutMs = 5000) {}
   async read<K extends keyof EngineSchemas>(path: string, name: K, body?: unknown, signal?: AbortSignal): Promise<EngineSchemas[K]> {
     if (!/^\/api\/discovery\/(release|capabilities|areas|results|collections|events|merchants\/[^/?]+)(\?[^#]*)?$/.test(path)) throw new ProviderReadError({ kind: 'invalid' });
     const controller = new AbortController();

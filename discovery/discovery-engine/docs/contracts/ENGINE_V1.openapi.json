@@ -5936,6 +5936,18 @@
             "minLength": 1,
             "maxLength": 2048
           },
+          "taxonomyPaths": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxonomyPath"
+            },
+            "minItems": 1,
+            "maxItems": 8,
+            "description": "Where the published release places this merchant in the Discovery taxonomy. Omitted when the source gives no mapped subcategory."
+          },
+          "location": {
+            "$ref": "#/components/schemas/GeoPoint"
+          },
           "items": {
             "type": "array",
             "items": {
@@ -5962,6 +5974,53 @@
           "items",
           "itemsCount",
           "itemsCompletion"
+        ],
+        "additionalProperties": false
+      },
+      "TaxonomyPath": {
+        "type": "object",
+        "description": "Where the published release places a merchant in the Discovery taxonomy. Resolved from the source's own subcategory through the release's source mappings; never inferred from names, text or the request.",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "subcategoryId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "optionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "categoryId",
+          "subcategoryId"
+        ],
+        "additionalProperties": false
+      },
+      "GeoPoint": {
+        "type": "object",
+        "description": "WGS 84 coordinates of the merchant's branch, as the source records them.",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
         ],
         "additionalProperties": false
       },

@@ -7,7 +7,7 @@ import './storefronts/restaurant/storefront.css';
 import { isDirectExperienceMerchant } from '../data/experiencePresentation';
 import { isTourOperator } from '../data/tourPresentation';
 import { TourOperatorStorefront } from './storefronts/TourOperatorStorefront';
-import { isGroceryStore } from '../data/supermarketPresentation';
+import { isRetailStore } from '../data/supermarketPresentation';
 import { SupermarketStorefront } from './storefronts/supermarket/SupermarketStorefront';
 import { isAppointmentProvider } from '../data/massagePresentation';
 import { MassageStorefront } from './storefronts/massage/MassageStorefront';
@@ -26,9 +26,9 @@ interface StorefrontProps {
   operatorSearch?: string;
   operatorOffset?: number;
   onOperatorChange: (search: string, offset: number) => void;
-  /** A grocery store's open department, from the page address. */
+  /** A retail store's open department, from the page address. */
   department?: string;
-  /** Opens a grocery department (undefined: the store's home) as a new step in the page's history. */
+  /** Opens a retail store's department (undefined: the store's home) as a new step in the page's history. */
   onDepartment?: (id?: string) => void;
 }
 
@@ -91,7 +91,8 @@ export function Storefront({ merchantId, provider, onBack, onHome, itemId, categ
   );
   const closeItem = () => setActiveItem(undefined);
   const selectItem = (item: CatalogItem) => { setItemMissing(false); setActiveItem(item); };
-  const supermarket = merchant && isGroceryStore(merchant);
+  // Every product store (groceries, electronics, pharmacy, fashion, drinks…) uses the retail storefront (owner, 9 Nov 2026).
+  const retail = merchant && isRetailStore(merchant);
   const massage = merchant && isAppointmentProvider(merchant);
 
   // Every storefront draws its own back pill in its hero; only a store that failed to load needs one here.
@@ -105,7 +106,7 @@ export function Storefront({ merchantId, provider, onBack, onHome, itemId, categ
       <button type="button" className="store-back" onClick={onBack}><ArrowLeft size={17} strokeWidth={2} aria-hidden="true" />Back</button>
       <CatalogState failure={failed} retry={() => setRetry(value => value + 1)} />
     </>}
-    {merchant && (massage ? <MassageStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} /> : supermarket ? <SupermarketStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} department={department} onDepartment={onDepartment} /> : isTourOperator(merchant) ? <TourOperatorStorefront key={merchant.id} merchant={merchant} onBack={onBack} onOpen={onTour} search={operatorSearch} offset={operatorOffset} onChange={onOperatorChange} /> : isRestaurant
+    {merchant && (massage ? <MassageStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} /> : retail ? <SupermarketStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} department={department} onDepartment={onDepartment} /> : isTourOperator(merchant) ? <TourOperatorStorefront key={merchant.id} merchant={merchant} onBack={onBack} onOpen={onTour} search={operatorSearch} offset={operatorOffset} onChange={onOperatorChange} /> : isRestaurant
       ? <RestaurantStorefront
         key={merchant.id}
         merchant={merchant}

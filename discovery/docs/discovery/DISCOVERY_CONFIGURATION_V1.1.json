@@ -17,7 +17,9 @@
     "airport-transfers",
     "laundry-cleaning",
     "experiences",
+    "play",
     "travel-tours",
+    "flights",
     "concierge-services",
     "alcohol-beverages",
     "adults-only"
@@ -2596,10 +2598,319 @@
       "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/16_concierge_services.png",
       "navigation_position": 16,
       "subcategory_count": 10
+    },
+    {
+      "category": "Play",
+      "discovery_key": "play",
+      "customer_task": "Book a lane, court, pitch, session or game",
+      "result_intent": "offering + provider",
+      "availability_label": "Available on selected date",
+      "context_controls": "Date; time; players; supported venue options",
+      "source_category_ids": [
+        "activities-games-sports"
+      ],
+      "collections": [
+        {
+          "key": "play:collection-1",
+          "kind": "occasion",
+          "title": "Games and thrills",
+          "eligibility": "Mapped bowling, arcade, escape room, karting, paintball and zipline offerings with bookable sessions",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "play:collection-2",
+          "kind": "convenience",
+          "title": "Courts and pitches",
+          "eligibility": "Mapped court and pitch offerings with real time slots",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "play:collection-3",
+          "kind": "product",
+          "title": "Swimming",
+          "eligibility": "Mapped swim sessions, lessons and lane hire with real schedules",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Bowling",
+          "discovery_key": "play:bowling",
+          "source_subcategory_ids": [
+            "activities-games-sports_bowling"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/bowling",
+          "journey": "TICKET",
+          "configuration_candidates": "Lane and game length; players; shoe hire where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_01_Bowling.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Arcade & Timed Play",
+          "discovery_key": "play:arcade-timed-play",
+          "source_subcategory_ids": [
+            "activities-games-sports_arcade-games"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/arcade_games",
+          "journey": "TICKET",
+          "configuration_candidates": "Play time or credits; players; supported party packages",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_02_Arcade_And_Timed_Play.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Escape Rooms",
+          "discovery_key": "play:escape-rooms",
+          "source_subcategory_ids": [
+            "activities-games-sports_escape-rooms"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/escape_rooms",
+          "journey": "TICKET",
+          "configuration_candidates": "Room and session time; team size within the room limits",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_03_Escape_Rooms.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Indoor Sports Courts",
+          "discovery_key": "play:indoor-sports-courts",
+          "source_subcategory_ids": [
+            "activities-games-sports_indoor-courts"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/indoor_courts",
+          "journey": "TICKET",
+          "configuration_candidates": "Sport, court and time slot; players; equipment hire where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_04_Indoor_Sports_Courts.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Outdoor Sports Courts",
+          "discovery_key": "play:outdoor-sports-courts",
+          "source_subcategory_ids": [
+            "activities-games-sports_outdoor-courts"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/outdoor_courts",
+          "journey": "TICKET",
+          "configuration_candidates": "Sport, court and time slot; floodlights; equipment hire where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_05_Outdoor_Sports_Courts.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Football Pitches",
+          "discovery_key": "play:football-pitches",
+          "source_subcategory_ids": [
+            "activities-games-sports_football-pitches"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/football_pitches",
+          "journey": "TICKET",
+          "configuration_candidates": "Pitch size and time slot; floodlights; bibs and balls where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_06_Football_Pitches.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Outdoor Team Games",
+          "discovery_key": "play:outdoor-team-games",
+          "source_subcategory_ids": [
+            "activities-games-sports_outdoor-team-games"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/outdoor_team_games",
+          "journey": "TICKET",
+          "configuration_candidates": "Game or package; group size; date and venue",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_07_Outdoor_Team_Games.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Go-Karting",
+          "discovery_key": "play:go-karting",
+          "source_subcategory_ids": [
+            "activities-games-sports_go-karting"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/go_karting",
+          "journey": "TICKET",
+          "configuration_candidates": "Laps or race format; drivers; age and height limits from the track",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_08_Go_Karting.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Paintball",
+          "discovery_key": "play:paintball",
+          "source_subcategory_ids": [
+            "activities-games-sports_paintball"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/paintball",
+          "journey": "TICKET",
+          "configuration_candidates": "Paintball package; players; age limits from the venue",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_09_Paintball.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Ziplining & High Ropes",
+          "discovery_key": "play:ziplining-high-ropes",
+          "source_subcategory_ids": [
+            "activities-games-sports_ziplining"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/ziplining",
+          "journey": "TICKET",
+          "configuration_candidates": "Ride or course; riders; weight and age limits from the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_10_Ziplining_And_High_Ropes.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Public Swim Sessions",
+          "discovery_key": "play:public-swim-sessions",
+          "source_subcategory_ids": [
+            "activities-games-sports_swimming-sessions"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/swimming_sessions",
+          "journey": "TICKET",
+          "configuration_candidates": "Session time; adults and children; passes where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_11_Public_Swim_Sessions.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Swimming Lessons",
+          "discovery_key": "play:swimming-lessons",
+          "source_subcategory_ids": [
+            "activities-games-sports_swimming-lessons"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/swimming_lessons",
+          "journey": "TICKET",
+          "configuration_candidates": "Lesson or course; learner age and level; group or private",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_12_Swimming_Lessons.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Pool Lane Hire",
+          "discovery_key": "play:pool-lane-hire",
+          "source_subcategory_ids": [
+            "activities-games-sports_pool-lane-hire"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/pool_lane_hire",
+          "journey": "TICKET",
+          "configuration_candidates": "Lanes and time slot; club or private use",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_13_Pool_Lane_Hire.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/17_play.png",
+      "navigation_position": 17,
+      "subcategory_count": 13
+    },
+    {
+      "category": "Flights",
+      "discovery_key": "flights",
+      "customer_task": "Charter an aircraft or book a seat on a scenic or safari flight",
+      "result_intent": "offering + provider",
+      "availability_label": "Available on selected date",
+      "context_controls": "Route; date; passengers; supported aircraft options",
+      "source_category_ids": [],
+      "collections": [
+        {
+          "key": "flights:collection-1",
+          "kind": "convenience",
+          "title": "Charter a helicopter or jet",
+          "eligibility": "Mapped charter operators that quote routes and aircraft",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "flights:collection-2",
+          "kind": "occasion",
+          "title": "Scenic and safari flights",
+          "eligibility": "Mapped flights with real departures and seats",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Helicopter Charters",
+          "discovery_key": "flights:helicopter-charters",
+          "source_subcategory_ids": [],
+          "nested_option_candidates": [],
+          "mapping_status": "Unmapped until Derrick NexG publishes a flights category (flights_aviation is a merchant-portal meeting demo on 9 Nov 2026)",
+          "journey": "SERVICE",
+          "configuration_candidates": "Route, date and departure time; passengers and bags; aircraft quoted by the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_01_Helicopter_Charters.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Scenic Flights",
+          "discovery_key": "flights:scenic-flights",
+          "source_subcategory_ids": [],
+          "nested_option_candidates": [],
+          "mapping_status": "Unmapped until Derrick NexG publishes a flights category (flights_aviation is a merchant-portal meeting demo on 9 Nov 2026)",
+          "journey": "TICKET",
+          "configuration_candidates": "Flight and departure slot; passengers; weight limits from the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_02_Scenic_Flights.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Safari Flights",
+          "discovery_key": "flights:safari-flights",
+          "source_subcategory_ids": [],
+          "nested_option_candidates": [],
+          "mapping_status": "Unmapped until Derrick NexG publishes a flights category (flights_aviation is a merchant-portal meeting demo on 9 Nov 2026)",
+          "journey": "TICKET",
+          "configuration_candidates": "Route, date and seats; luggage allowance from the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_03_Safari_Flights.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Private Charters",
+          "discovery_key": "flights:private-charters",
+          "source_subcategory_ids": [],
+          "nested_option_candidates": [],
+          "mapping_status": "Unmapped until Derrick NexG publishes a flights category (flights_aviation is a merchant-portal meeting demo on 9 Nov 2026)",
+          "journey": "SERVICE",
+          "configuration_candidates": "Route, dates and passengers; aircraft class quoted by the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_04_Private_Charters.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/18_flights.png",
+      "navigation_position": 18,
+      "subcategory_count": 4
     }
   ],
   "taxonomy_authority": "Current icon pack manifest and individual images, per latest owner directive; no inherited source IDs based solely on position",
-  "main_category_count": 16,
-  "subcategory_count": 98,
+  "main_category_count": 18,
+  "subcategory_count": 115,
   "authority_revision": "icon-pack-2026-10-12"
 }

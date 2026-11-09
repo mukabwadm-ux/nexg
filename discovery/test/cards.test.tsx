@@ -19,12 +19,15 @@ const kinds = ['product', 'dish', 'service', 'activity', 'task', 'vehicle'] as c
 test('every subcategory gets a card kind from its journey, and restaurant purchases are dishes', () => {
   const counts: Partial<Record<OfferingKind, number>> = {};
   for (const category of categories) for (const subcategory of category.subcategories) {
+    // Flights waits for a flights category in Derrick NexG (owner, 9 Nov 2026); everything else has a source group.
     const source = subcategory.sourceIds[0];
-    assert.ok(source, `${subcategory.id} has a source group`);
-    const kind = offeringKind({ subcategoryId: source });
+    if (category.id !== 'flights') assert.ok(source, `${subcategory.id} has a source group`);
+    const kind = offeringKind({ subcategoryId: source ?? subcategory.id });
+    if (source) assert.equal(offeringKind({ subcategoryId: subcategory.id }), kind, subcategory.id);
     counts[kind] = (counts[kind] ?? 0) + 1;
   }
-  assert.deepEqual(counts, { product: 46, dish: 6, service: 11, activity: 8, task: 21, vehicle: 6 });
+  // Play adds 13 activities; Flights adds 2 activities (scenic, safari) and 2 quoted charters (task).
+  assert.deepEqual(counts, { product: 46, dish: 6, service: 11, activity: 23, task: 23, vehicle: 6 });
   assert.equal(offeringKind({ subcategoryId: 'restaurants-food_restaurant' }), 'dish');
   assert.equal(offeringKind({ subcategoryId: 'restaurants-food_catering' }), 'task');
   assert.equal(offeringKind({ subcategoryId: 'beauty-wellness:massage' }), 'service');

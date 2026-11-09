@@ -1,4 +1,4 @@
-/* Grocery storefront (owner, 9 Nov 2026): every Groceries And Essentials shop. Bolt Food's layout (a department
+/* Retail storefront (owner, 9 Nov 2026): every product store, groceries first. Bolt Food's layout (a department
    sidebar, a breadcrumb, aisle chips) in Wolt Market's look, and Wolt's phone layout (a row of departments,
    rails that peek, two-column aisles). The frame comes from store.css (hero, sticky section bar, sections,
    basket pill), the compact card from cards.css, the product sheet from item-sheet.css, the cart from
@@ -106,7 +106,8 @@
   .supermarket-store .grocery-department{flex-direction:column;justify-content:flex-start;gap:8px;width:80px;min-height:0;padding:4px 2px;border-radius:16px;font-size:12px;line-height:1.25;text-align:center}
   .supermarket-store .grocery-department__tile{width:56px;height:56px}
   .supermarket-store .grocery-department__tile svg{width:24px;height:24px}
-  .supermarket-store .grocery-department__title{display:-webkit-box;flex:none;width:100%;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:balance}
+  /* Up to three lines, and a long word ("entertainment") breaks rather than being clipped by the 80px tile. */
+  .supermarket-store .grocery-department__title{display:-webkit-box;flex:none;width:100%;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;hyphens:auto;text-wrap:balance}
   .supermarket-store .grocery-department__count,.supermarket-store .grocery-department__subs{display:none}
   .supermarket-store .grocery-department[aria-current=true]{background:none}
   .supermarket-store .grocery-head{margin:8px 0 0}

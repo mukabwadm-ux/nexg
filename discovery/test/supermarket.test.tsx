@@ -2,8 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { CatalogItem, Merchant } from '../src/providers/DiscoveryProvider';
-import { isGroceryStore, readSavedProducts, writeSavedProducts } from '../src/data/supermarketPresentation';
+import { isGroceryStore, isRetailStore, readSavedProducts, writeSavedProducts } from '../src/data/supermarketPresentation';
 import { SupermarketStorefront } from '../src/components/storefronts/supermarket/SupermarketStorefront';
+import { StoreRow } from '../src/components/MerchantInventoryRow';
 
 // Hearts live in the browser's localStorage; this file runs in its own process, so a stand-in is safe.
 const kept = new Map<string, string>();
@@ -124,4 +125,79 @@ test('hearts share the store shelf: unknown products drop out, requests already 
   assert.deepEqual(readSavedProducts(shop), []);
   writeSavedProducts(uuid(1), [uuid(12)]);
   assert.match(render(), /aria-label="Add Bread to cart"/);
+});
+
+// Every product store uses the retail storefront (owner, 9 Nov 2026): electronics, pharmacy, drinks, fashion and the rest.
+const gadgets: Merchant = { id: uuid(3), name: 'Control Electronics', subcategoryId: 'tech-electronics_smart-devices', area: 'Westlands',
+  items: [product(3, 31, 'Smart Speaker', 9500), product(3, 32, 'Smart Lock', 14000), product(3, 33, 'Smart TV', 65000), product(3, 34, 'Robot Vacuum', 42000)] };
+const phones: Merchant = { id: uuid(4), name: 'Control Phones', subcategoryId: 'tech-electronics_smartphones', area: 'Kilimani',
+  items: [product(4, 41, 'Foldable Smartphone', 98000), product(4, 42, 'Entry Smartphone', 12000), product(4, 43, 'Midrange Smartphone', 35000)] };
+const liquor: Merchant = { id: uuid(5), name: 'Control Liquor', subcategoryId: 'alcohol-beverages_liquor-stores', area: 'Karen',
+  items: [product(5, 51, 'London Dry Gin', 3200), product(5, 52, 'Premium Lager', 250), product(5, 53, 'Tonic Water', 150)] };
+/** What a shopper reads: the markup's text, without tags or attributes. */
+const words = (html: string) => html.replace(/<[^>]+>/g, ' ');
+
+test('every product store, and only a product store, uses the retail storefront', () => {
+  const retail = (subcategoryId?: string) => isRetailStore({ subcategoryId });
+  for (const id of ['groceries-essentials_supermarket', 'tech-electronics_smartphones', 'tech-electronics_smart-devices', 'pharmacy_pharmacy', 'pharmacy_supplements',
+    'fashion-apparel_mens-fashion', 'beauty_skincare', 'alcohol-beverages_liquor-stores', 'alcohol-beverages_non-alcoholic-drinks', 'flowers-gifts_flowers', 'marketplace_books',
+    'adults-only_cigars']) assert.ok(retail(id), id);
+  for (const id of ['restaurants-food_restaurant', 'wellness_spa', 'health_clinics', 'tech-electronics_telecom-services', 'tech-electronics_device-repairs',
+    'vehicle-rentals_car-rental', 'travel-tours_safaris', 'experiences_concerts', 'laundry-cleaning_laundry', 'no-such-group', undefined]) assert.ok(!retail(id), String(id));
+});
+
+test('an electronics store opens on its home: departments, rails of compact cards, and none of the grocer’s words', () => {
+  kept.clear();
+  assert.ok(isRetailStore(gadgets) && !isGroceryStore(gadgets));
+  const html = render(gadgets);
+  assert.match(html, /<nav class="grocery-departments" aria-label="Departments">/);
+  const order = ['Phones &amp; smart tech', 'TV &amp; entertainment', 'Kitchen &amp; home appliances'].map((title) => html.indexOf(`grocery-department__title">${title}<`));
+  assert.ok(order.every((index, position) => index > 0 && (position === 0 || index > order[position - 1]!)), 'departments in the scheme’s order');
+  assert.match(html, /aria-label="See all TV &amp; entertainment">See all</);
+  assert.match(html, /offering-card offering-card--compact offering-card--product/);
+  assert.match(html, /aria-label="Add Smart TV to cart"/);
+  assert.match(html, /placeholder="Search Control Electronics"/);
+  assert.match(html, /lucide-package/);
+  assert.match(words(html), /4 products/);
+  assert.doesNotMatch(words(html), /aisle|grocer|supermarket|basket|demo/i);
+  assert.doesNotMatch(html, /lucide-shopping-basket/);
+});
+
+test('a phone shop has one department, so it shows its aisles straight away', () => {
+  kept.clear();
+  const html = render(phones);
+  assert.doesNotMatch(html, /aria-label="Departments"/);
+  assert.match(html, /aria-label="Shop sections"/);
+  for (const aisle of [/Flagship &amp; foldable phones/, /Entry &amp; refurbished phones/, />Smartphones<\/h2>/]) assert.match(html, aisle);
+  assert.match(html, /class="offering-grid offering-grid--compact"/);
+  assert.doesNotMatch(words(html), /aisle|grocer|supermarket/i);
+});
+
+test('the page address opens an electronics department under its breadcrumb', () => {
+  kept.clear();
+  const html = renderToStaticMarkup(<SupermarketStorefront merchant={gadgets} onBack={noop} onSelectItem={noop} onCloseItem={noop} department="tech:tv" onDepartment={noop} />);
+  assert.match(html, /<button type="button">Control Electronics<\/button>/);
+  assert.match(html, /<span aria-current="page">TV &amp; entertainment<\/span>/);
+  assert.match(html, /aria-label="Add Smart TV to cart"/);
+  assert.doesNotMatch(html, /aria-label="Add Smart Lock to cart"/, 'only the open department draws');
+});
+
+test('a liquor store counts drinks and groups them into its departments', () => {
+  kept.clear();
+  const html = render(liquor);
+  assert.match(words(html), /3 drinks/);
+  for (const title of ['Spirits', 'Beer &amp; cider', 'Soft drinks &amp; mixers']) assert.match(html, new RegExp(`grocery-department__title">${title}<`));
+});
+
+test('store rows on discovery pages use the compact card for every product store, as its store does', () => {
+  kept.clear();
+  const row = (merchant: Merchant) => renderToStaticMarkup(<StoreRow merchant={merchant} onOpen={noop} />);
+  const shop = row(phones);
+  assert.match(shop, /store-row__rail--compact/);
+  assert.match(shop, /offering-card offering-card--compact offering-card--product/);
+  assert.match(shop, /aria-label="Add Foldable Smartphone to cart"/);
+  const spa: Merchant = { id: uuid(6), name: 'Control Spa', subcategoryId: 'wellness_spa', items: [product(6, 61, 'Swedish Massage', 4500)] };
+  assert.doesNotMatch(row(spa), /offering-card--compact/);
+  // A product the cart can't take keeps its +, which opens it, as in the store.
+  assert.match(row({ ...phones, items: [product(4, 44, 'Refurbished Smartphone')] }), /aria-label="Choose Refurbished Smartphone"/);
 });

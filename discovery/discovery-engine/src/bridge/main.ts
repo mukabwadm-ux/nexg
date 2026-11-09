@@ -10,7 +10,7 @@
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-import { CatalogBridge, SupabaseCatalogReader, demoMediaFromSnapshot, type BridgeMapRow } from '../adapters/supabase/catalogBridge.js';
+import { CatalogBridge, SupabaseCatalogReader, demoMediaFromSnapshot, portalMapRows } from '../adapters/supabase/catalogBridge.js';
 import { buildBridgeServer } from './server.js';
 
 const root = fileURLToPath(new URL('../../../../', import.meta.url));
@@ -19,7 +19,8 @@ if (host !== '127.0.0.1' && host !== '0.0.0.0') throw new Error('DISCOVERY_BRIDG
 const port = Number(process.env.DISCOVERY_BRIDGE_PORT ?? '3002');
 if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error('Invalid DISCOVERY_BRIDGE_PORT');
 const reader = new SupabaseCatalogReader(process.env.SUPABASE_URL ?? 'http://127.0.0.1:54321', process.env.SUPABASE_ANON_KEY ?? '');
-const map = (JSON.parse(await readFile(join(root, 'demo-seed/subcategory-map.json'), 'utf8')) as { subcategories: BridgeMapRow[] }).subcategories;
+// The reviewed map plus the merchant portal's own spellings of ten subcategory keys.
+const map = portalMapRows(JSON.parse(await readFile(join(root, 'demo-seed/subcategory-map.json'), 'utf8')));
 const media = demoMediaFromSnapshot(JSON.parse(await readFile(join(root, 'demo-seed/source/demo-api-snapshot.json'), 'utf8')));
 const bridge = new CatalogBridge(map, media);
 const { app, refresh } = buildBridgeServer({ bridge, load: () => reader.load() });

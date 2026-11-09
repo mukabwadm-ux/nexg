@@ -24,7 +24,7 @@ export interface CatalogSection {
 }
 
 interface VocabularySection { id: string; title: string; keywords: string[]; priority?: number }
-/** A department groups aisles for stores with thousands of products (owner, 9 Nov 2026). */
+/** A department groups aisles in the retail storefront, which every product store uses (owner, 9 Nov 2026). */
 interface VocabularyDepartment { id: string; title: string; icon: string; image?: string; keywords: string[]; sections: string[] }
 export interface SectionScheme { id: string; categories: string[]; allTitle: string; sections: VocabularySection[]; departments?: VocabularyDepartment[] }
 interface Naming { list: string; item: string; items: string; demand: string }
@@ -157,7 +157,7 @@ export function searchSections(sections: readonly CatalogSection[], term: string
 export const sectionAnchor = (section: Pick<CatalogSection, 'id'>) => `section-${section.id.replace(/[^a-z0-9]+/gi, '-')}`;
 
 /**
- * A department and its aisles, for stores with thousands of products: the grocery sidebar's rows (owner,
+ * A department and its aisles: the retail storefront's sidebar rows, for every product store (owner,
  * 9 Nov 2026). Departments come only from schemes that define them.
  */
 export interface CatalogDepartment {

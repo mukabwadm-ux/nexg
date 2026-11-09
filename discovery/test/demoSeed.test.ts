@@ -40,14 +40,16 @@ test('journeys are read per category and subcategory label', () => {
 
 test('the committed map covers every demo subcategory and every Discovery subcategory', () => {
   assert.deepEqual({ ...committed.summary, discoverySubcategoriesWithoutDemo: committed.summary.discoverySubcategoriesWithoutDemo.length },
-    { demoSubcategories: 137, mapped: 125, unmapped: 12, merchants: 685, mappedMerchants: 625, items: 15435, discoverySubcategoriesWithoutDemo: 0 });
+    { demoSubcategories: 150, mapped: 138, unmapped: 12, merchants: 750, mappedMerchants: 690, items: 15780, discoverySubcategoriesWithoutDemo: 4 });
   for (const row of committed.subcategories) {
     if (row.status === 'mapped') assert.ok(row.discovery && row.journey && row.action, row.demoSubcategoryId);
     else assert.ok(!row.discovery && !row.journey && !row.action, row.demoSubcategoryId);
   }
   const discovery = configuration.categories.flatMap(category => category.subcategories.map(subcategory => subcategory.discovery_key));
   const covered = new Set([...committed.subcategories.flatMap(row => row.discovery ? [row.discovery.subcategoryId] : []), ...committed.summary.discoverySubcategoriesWithoutDemo]);
-  assert.equal(discovery.length, 98);
+  assert.equal(discovery.length, 115);
+  // Flights waits for a flights category in Derrick NexG (owner, 9 Nov 2026), so only its four subcategories have no stores.
+  assert.deepEqual(committed.summary.discoverySubcategoriesWithoutDemo, discovery.filter(id => id.startsWith("flights:")));
   assert.deepEqual([...covered].sort(), [...discovery].sort());
   // Only categories that Discovery keeps off customer screens, plus Health Coaching, stay unmapped.
   assert.deepEqual(committed.subcategories.filter(row => row.status === 'unmapped').map(row => row.demoSubcategoryId).filter(id => !/^(financial-services|logistics-shipping)_/.test(id)),
@@ -68,8 +70,8 @@ test('the committed map is what the sources produce today', () => {
 });
 
 test('gap-fill merchants fill exactly the empty Discovery subcategories, in the demo style, with whole-shilling prices', () => {
-  const added = snapshot.merchants.slice(-45);
-  assert.deepEqual([added[0]?.id, added.at(-1)?.id], ['M0641', 'M0685']);
+  const added = snapshot.merchants.slice(-gapFill.groups.length * 5);
+  assert.deepEqual([added[0]?.id, added.at(-1)?.id], ['M0641', 'M0750']);
   assert.equal(new Set(snapshot.merchants.map(merchant => merchant.name)).size, snapshot.merchants.length);
   for (const group of gapFill.groups) {
     const row = committed.subcategories.find(entry => entry.demoSubcategoryId === group.demoSubcategoryId);
@@ -108,7 +110,7 @@ test('the committed seed SQL is current, guarded and complete', () => {
     && ['adults-only', 'alcohol-beverages'].includes(row.discovery?.categoryId ?? '')).map(row => row.demoSubcategoryId));
   const restrictedMerchants = snapshot.merchants.filter(merchant => restrictedGroups.has(merchant.subcategoryId) && merchant.items.length);
   assert.deepEqual([...tables].map(([table, entry]) => [table, entry.rows.length]),
-    [['merchant', 685], ['merchant_branch', 685], ['catalogue_section', 685], ['catalogue_item', 15435], ['document', restrictedMerchants.length]]);
+    [['merchant', 750], ['merchant_branch', 750], ['catalogue_section', 750], ['catalogue_item', 15780], ['document', restrictedMerchants.length]]);
   const column = (table: string, name: string) => { const entry = tables.get(table)!; const at = entry.columns.indexOf(name); return entry.rows.map(row => row[at]); };
   const merchants = new Set(column('merchant', 'id'));
   const sections = new Set(column('catalogue_section', 'id'));

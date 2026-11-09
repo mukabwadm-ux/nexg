@@ -13,6 +13,8 @@ concurrency:
 env:
   TURBO_TELEMETRY_DISABLED: 1
   NEXT_TELEMETRY_DISABLED: 1
+  # NexG Discovery (apps/web build) refuses a local Supabase unless asked; CI builds against one.
+  DISCOVERY_ALLOW_LOCAL_SUPABASE: '1'
 
 jobs:
   database:

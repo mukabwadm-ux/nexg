@@ -31,6 +31,7 @@ Planning resumed 19 October 2026. Start with the [planning status/decision ledge
 | [Documentation index](docs/README.md) | Ownership, status and reading order |
 | [Foundation runtime](docs/FOUNDATION_RUNTIME.md) | Implemented reader/contracts/policy, commands, trust boundaries and remaining work |
 | [Read-only service runtime](docs/READ_SERVICE_RUNTIME.md) | Modular HTTP service, server provider, configuration, budgets, supported routes and failure behavior |
+| [Supabase connector](docs/SUPABASE_CONNECTOR.md) | How the engine reads merchants' portal inventory from Supabase: settings, facts, freshness, limits and going live |
 | [Typesense/indexing runtime](docs/INDEXING_RUNTIME.md) | Local Docker index, modular projection/lifecycle, trusted source requirements, safe preview/rebuild/delta/rollback and evidence |
 | [Query/retrieval runtime](docs/QUERY_RUNTIME.md) | Bounded lexical merchant search, safe clarification, release-bound rule extension and guarded serving integration |
 | [Ranking/diversification runtime](docs/RANKING_RUNTIME.md) | Eligibility-first deterministic ranking, bounded explicit preferences, owner-sort preservation, safe offering diversity and current R1 composition |

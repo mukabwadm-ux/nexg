@@ -9,7 +9,7 @@ import { resolveSelection, sealRelease, validateReleaseArtifact, safeRelativePat
 import { release, releaseWithUnmappedSubcategory, workspace } from './helpers.js';
 
 test('B00 imports approved identities, dynamic counts and separate L1 order', () => {
-  assert.deepEqual(release.declaredCounts, { categories: 16, subcategories: 98, options: 37 });
+  assert.deepEqual(release.declaredCounts, { categories: 18, subcategories: 115, options: 37 });
   assert.deepEqual(release.nodes.filter(node => node.kind === 'category').slice(0, 2).map(node => node.id), ['adults-only', 'airport-transfers']);
   assert.equal(release.placements.find(placement => placement.surface === 'L1' && placement.order === 1)?.nodeId, 'restaurants-food');
   assert.deepEqual(release.mappings.find(mapping => mapping.nodeId === 'adults-only:tobacco-smoking:cigarettes')?.sourceSubcategoryIds, ['adults-only_cigarettes']);
@@ -18,10 +18,13 @@ test('B00 imports approved identities, dynamic counts and separate L1 order', ()
 test('unmapped branches stay explicit and collections cannot execute prose predicates', () => {
   const unmappedIn = (selected: typeof release) => selected.nodes.filter(node => node.kind === 'subcategory'
     && selected.mappings.find(mapping => mapping.nodeId === node.id)?.status === 'unmapped');
-  // Every baseline subcategory is mapped since the owner's 8 Nov 2026 decision; an isolated copy keeps one unmapped.
-  assert.equal(unmappedIn(release).length, 0);
+  // Every baseline subcategory is mapped since the owner's 8 Nov 2026 decision, except Flights (owner, 9 Nov 2026), which
+  // waits for a flights category in Derrick NexG. An isolated copy keeps one more unmapped.
+  const flights = ['flights:helicopter-charters', 'flights:scenic-flights', 'flights:safari-flights', 'flights:private-charters'];
+  assert.deepEqual(unmappedIn(release).map(node => node.id), flights);
+  assert.equal(release.mappings.find(mapping => mapping.nodeId === 'flights')?.status, 'unmapped');
   const variant = releaseWithUnmappedSubcategory();
-  const unmapped = unmappedIn(variant);
+  const unmapped = unmappedIn(variant).filter(node => !flights.includes(node.id));
   assert.deepEqual(unmapped.map(node => node.id), ['beauty-wellness:salon-barber']);
   const node = unmapped[0]!;
   assert.deepEqual(resolveSelection(variant, { categoryId: node.parentId!, subcategoryId: node.id }), { state: 'unmapped', nodeId: node.id });
@@ -41,12 +44,12 @@ test('validated artifacts reject count/hash/compatibility/hierarchy and dangling
 });
 test('future compatible taxonomy counts are derived while existing IDs and source mappings survive', () => {
   const parts = structuredClone(release) as ReleaseParts;
-  parts.nodes.push({ id: 'reviewed-future-node', kind: 'category', label: 'Reviewed future context', lifecycle: 'active', order: 17, assetPath: parts.assets[0]!.path });
+  parts.nodes.push({ id: 'reviewed-future-node', kind: 'category', label: 'Reviewed future context', lifecycle: 'active', order: 19, assetPath: parts.assets[0]!.path });
   parts.mappings.push({ nodeId: 'reviewed-future-node', sourceCategoryIds: [], sourceSubcategoryIds: [], status: 'unmapped', note: 'Isolated release validation control.' });
   // sealRelease consumes concern payloads, not the metadata of a prior artifact.
   const { nodes, placements, mappings, collections, assets, sourceFiles, policy, fallback, schemaVersion, compatibility } = parts;
   const next = sealRelease({ nodes, placements, mappings, collections, assets, sourceFiles, policy, fallback, schemaVersion, compatibility });
-  assert.deepEqual(next.declaredCounts, { categories: 17, subcategories: 98, options: 37 });
+  assert.deepEqual(next.declaredCounts, { categories: 19, subcategories: 115, options: 37 });
   assert.deepEqual(next.mappings[0], release.mappings[0]);
   assert.deepEqual(resolveSelection(next, { categoryId: 'reviewed-future-node' }), { state: 'unmapped', nodeId: 'reviewed-future-node' });
   const incompatible = structuredClone(next);

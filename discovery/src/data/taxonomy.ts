@@ -51,7 +51,7 @@ const config = (configuration as DiscoveryConfiguration).categories;
 export function iconUrl(reference: string | null | undefined): string | undefined {
   if (!reference) return undefined;
   const icon = reference.replace(/^references\/icons-v1\.1\/NexG_Discovery_Icons\//, '');
-  return webIcons.get(icon) ?? '/icons/' + icon;
+  return webIcons.get(icon) ?? ((import.meta.env?.BASE_URL as string | undefined) ?? '/') + 'icons/' + icon;
 }
 
 /** Navigation is generated from the final pack-derived V1.1 docs, never the old platform registry. */

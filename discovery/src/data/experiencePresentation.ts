@@ -5,8 +5,10 @@ import { findCategory } from './taxonomy';
 
 const experiences = findCategory('experiences');
 
+// A Discovery subcategory ID (engine mode) or one of its source groups (Supabase and platform modes).
 function experienceSubcategory(merchant: Pick<Merchant, 'subcategoryId'>) {
-  return experiences?.subcategories.find((subcategory) => merchant.subcategoryId && subcategory.sourceIds.includes(merchant.subcategoryId));
+  return experiences?.subcategories.find((subcategory) => merchant.subcategoryId
+    && (subcategory.id === merchant.subcategoryId || subcategory.sourceIds.includes(merchant.subcategoryId)));
 }
 
 /** Route recognized activity/event offerings directly; commissioned photography stays with its provider. */

@@ -7,7 +7,7 @@ import { departmentIcon } from './departmentIcons';
 export const DISCOVER = 'discover';
 
 /**
- * The grocery departments (owner, 9 Nov 2026: Bolt Food's sidebar in Wolt Market's look). On laptops a
+ * A retail store's departments (owner, 9 Nov 2026: Bolt Food's sidebar in Wolt Market's look). On laptops a
  * sticky sidebar: "Discover" (the store's home) first, then one row per department with its round tinted
  * icon tile, its name and how many products it holds; the open one is a soft gold pill. Under "Discover",
  * the history sections ("Frequently ordered", "New") appear only when real history exists. On phones the

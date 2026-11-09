@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BridgeError, CatalogBridge, SupabaseCatalogReader, areaFromAddress, demoMediaFromSnapshot, merchantQuery, openState,
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { BridgeError, CatalogBridge, PORTAL_SUBCATEGORY_SPELLINGS, SupabaseCatalogReader, areaFromAddress, demoMediaFromSnapshot, merchantQuery, openState, portalMapRows,
   type BridgeFetch, type BridgeMapRow, type CatalogRows, type MerchantRow } from '../src/adapters/supabase/catalogBridge.js';
+import { workspace } from './helpers.js';
 import { buildBridgeServer } from '../src/bridge/server.js';
 import { normalizeMerchantPage } from '../src/adapters/platform/normalize.js';
 
@@ -90,6 +93,24 @@ test('the engine\'s existing source reader accepts bridge pages unchanged, inclu
   const page = loaded().merchants({ subcategory: 'restaurants-food_café', area: 'Kilimani', limit: 5, offset: 0 });
   const observed = normalizeMerchantPage(JSON.parse(JSON.stringify(page)), 'platform-catalog', '2026-11-09T07:00:00Z', 5, 'Kilimani');
   assert.deepEqual(observed.map(row => [row.presentation.ref.id, row.presentation.area, row.presentation.items.length]), [[id('c1', 1), 'Kilimani', 2]]);
+});
+
+test('the reviewed map is checked row by row and gains the merchant portal\'s ten spellings', async () => {
+  const raw = JSON.parse(await readFile(join(workspace, 'demo-seed/subcategory-map.json'), 'utf8')) as { subcategories: BridgeMapRow[] };
+  const rows = portalMapRows(raw);
+  const pair = (category: string, subcategory: string) => rows.filter(row => row.supabase.category === category && row.supabase.subcategory === subcategory);
+  assert.equal(pair('restaurants_food', 'cafe').length, 1);
+  assert.equal(pair('restaurants_food', 'cafe')[0]!.demoSubcategoryId, pair('restaurants_food', 'caf')[0]!.demoSubcategoryId);
+  const present = Object.keys(PORTAL_SUBCATEGORY_SPELLINGS).filter(key => raw.subcategories.some(row => `${row.supabase.category}/${row.supabase.subcategory}` === key));
+  assert.equal(present.length, 10, 'every spelling still names a pair in the reviewed map');
+  assert.equal(rows.length, raw.subcategories.length + present.length);
+  assert.throws(() => portalMapRows({}), /Invalid subcategory map/);
+  assert.throws(() => portalMapRows({ subcategories: [{ ...map[0]!, discovery: null }] }), /Invalid subcategory map row/);
+  assert.throws(() => portalMapRows({ subcategories: [{ ...map[0]!, supabase: { category: 'Restaurants Food', subcategory: 'caf' } }] }), /Invalid subcategory map row/);
+  assert.throws(() => portalMapRows({ subcategories: [map[0], map[0]] }), /Duplicate/);
+  // A spelling never replaces a pair the map already has.
+  const both = portalMapRows({ subcategories: [map[0], { ...map[1]!, supabase: { category: 'restaurants_food', subcategory: 'cafe' } }] });
+  assert.deepEqual(both.filter(row => row.supabase.subcategory === 'cafe').map(row => row.demoSubcategoryId), [map[1]!.demoSubcategoryId]);
 });
 
 test('list parameters keep the demo API defaults and reject malformed paging', () => {

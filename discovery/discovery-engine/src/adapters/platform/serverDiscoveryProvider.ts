@@ -3,19 +3,22 @@ import type { ReadBudget } from '../../orchestrator/readBudget.js';
 import { sourceUnavailable } from '../../contracts/readErrors.js';
 import { parseSchema } from '../../contracts/validate.js';
 import { CatalogHttpTransport, sourcePathId, type CatalogFetch } from './httpTransport.js';
-import { normalizeMerchant, normalizeMerchantPage } from './normalize.js';
+import { normalizeMerchant, normalizeMerchantPage, type NormalizeOptions } from './normalize.js';
 import { catalogAdapterManifest } from './manifest.js';
+import type { TaxonomyPathIndex } from '../../releases/taxonomyPaths.js';
 
-export interface PlatformProviderOptions { origin?: string; fetcher?: CatalogFetch; now?: () => string }
+export interface PlatformProviderOptions { origin?: string; fetcher?: CatalogFetch; now?: () => string; taxonomyPaths?: TaxonomyPathIndex }
 
 /** All legacy catalog semantics are confined to this replaceable adapter. */
 export class PlatformDiscoveryProvider implements ServerDiscoveryProvider {
   readonly ownerId = catalogAdapterManifest.ownerId;
   readonly #http: CatalogHttpTransport | undefined;
   readonly #now: () => string;
+  readonly #normalize: NormalizeOptions;
   constructor(options: PlatformProviderOptions = {}) {
     this.#http = options.origin ? new CatalogHttpTransport(options.origin, options.fetcher) : undefined;
     this.#now = options.now ?? (() => new Date().toISOString());
+    this.#normalize = options.taxonomyPaths ? { taxonomyPaths: options.taxonomyPaths } : {};
   }
   get configured(): boolean { return this.#http !== undefined; }
   #connection(): CatalogHttpTransport { if (!this.#http) throw sourceUnavailable(false); return this.#http; }
@@ -37,7 +40,7 @@ export class PlatformDiscoveryProvider implements ServerDiscoveryProvider {
       const params = new URLSearchParams({ subcategory: id, limit: String(scope.limit), offset: '0', sort: 'recommended' });
       if (scope.area) params.set('area', scope.area);
       const raw = await connection.get('/api/merchants', params, budget);
-      const rows = normalizeMerchantPage(raw, this.ownerId, this.#now(), scope.limit, scope.area);
+      const rows = normalizeMerchantPage(raw, this.ownerId, this.#now(), scope.limit, scope.area, this.#normalize);
       budget.assertOpen(); return rows;
     }));
     // Preserve source observations as complete rows; never merge conflicting fields.
@@ -48,7 +51,7 @@ export class PlatformDiscoveryProvider implements ServerDiscoveryProvider {
   async getMerchant(id: string, budget: ReadBudget) {
     const path = sourcePathId(id);
     const raw = await this.#connection().get(`/api/merchants/${path}`, new URLSearchParams(), budget, id);
-    const merchant = normalizeMerchant(raw, this.ownerId, this.#now(), id).presentation;
+    const merchant = normalizeMerchant(raw, this.ownerId, this.#now(), id, this.#normalize).presentation;
     budget.assertOpen(); return merchant;
   }
   async getAreas(budget: ReadBudget) {

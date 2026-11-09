@@ -218,6 +218,37 @@ L2: [category blueprint](CATEGORY_BLUEPRINTS.md); one rail in the order below. L
 | 9. VIP Assistance | Actual VIP task/scope/date/location; supported needs without invented privileges | **REQUEST** — Submit request → provider review → actual quote → customer acceptance → task status |
 | 10. Courier & Errands | Collection/destination/date; actual parcel/task scope and provider-supported restrictions | **REQUEST** — Submit request → provider review → actual quote → customer acceptance → task status |
 
+## 17. Play — 13 subcategories
+
+L2: [category blueprint](CATEGORY_BLUEPRINTS.md); one rail in the order below. L3 uses offering + provider as contextual intent, retaining one common structure. Added by the owner on 9 Nov 2026 (Derrick NexG activities_games_sports).
+
+| Order / exact subcategory | L4 configuration candidates (require real capabilities) | Checkout journey / destination |
+| --- | --- | --- |
+| 1. Bowling | Lane and game length; players; shoe hire where offered | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 2. Arcade & Timed Play | Play time or credits; players; supported party packages | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 3. Escape Rooms | Room and session time; team size within the room limits | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 4. Indoor Sports Courts | Sport, court and time slot; players; equipment hire where offered | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 5. Outdoor Sports Courts | Sport, court and time slot; floodlights; equipment hire where offered | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 6. Football Pitches | Pitch size and time slot; floodlights; bibs and balls where offered | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 7. Outdoor Team Games | Game or package; group size; date and venue | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 8. Go-Karting | Laps or race format; drivers; age and height limits from the track | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 9. Paintball | Paintball package; players; age limits from the venue | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 10. Ziplining & High Ropes | Ride or course; riders; weight and age limits from the operator | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 11. Public Swim Sessions | Session time; adults and children; passes where offered | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 12. Swimming Lessons | Lesson or course; learner age and level; group or private | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 13. Pool Lane Hire | Lanes and time slot; club or private use | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+
+## 18. Flights — 4 subcategories
+
+L2: [category blueprint](CATEGORY_BLUEPRINTS.md); one rail in the order below. L3 uses offering + provider as contextual intent, retaining one common structure. Added by the owner on 9 Nov 2026; unmapped until Derrick NexG has a flights category in its database (today only the Heliflight merchant-portal demo).
+
+| Order / exact subcategory | L4 configuration candidates (require real capabilities) | Checkout journey / destination |
+| --- | --- | --- |
+| 1. Helicopter Charters | Route, date and departure time; passengers and bags; aircraft quoted by the operator | **SERVICE** — Service feasibility → fixed-price review or quote → request/booking → provider status |
+| 2. Scenic Flights | Flight and departure slot; passengers; weight limits from the operator | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 3. Safari Flights | Route, date and seats; luggage allowance from the operator | **TICKET** — Capacity/hold → review → ticket payment if supported → issued tickets/status |
+| 4. Private Charters | Route, dates and passengers; aircraft class quoted by the operator | **SERVICE** — Service feasibility → fixed-price review or quote → request/booking → provider status |
+
 ## Taxonomy safeguards
 
 Financial Services and Logistics & Shipping are not customer-facing main categories; preserve their original data and direct operational relationships. Vehicle Repair remains under Vehicle Rentals. Nested options do not increment the 98 count. The updated icon-authority V1.1 supersedes the previous 16/99 baseline and older V5/91/94 navigational groupings in presentation only; it does not rewrite merchant/source IDs or erase catalog history. New labels with no verified mapping remain valid navigation entries with truthful empty/capability states.

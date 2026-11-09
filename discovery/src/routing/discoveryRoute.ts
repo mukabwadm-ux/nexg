@@ -3,7 +3,7 @@ import type { DiscoveryQuery } from '../providers/DiscoveryProvider';
 export interface RouteState extends DiscoveryQuery {
   view?: 'results' | 'experience' | 'tour'; merchantId?: string; itemId?: string; operatorSearch?: string; operatorOffset?: number;
   /**
-   * A grocery store's open department (`&department=`), kept with the store it belongs to, so it never follows the
+   * A retail store's open department (`&department=`), kept with the store it belongs to, so it never follows the
    * shopper into another store. Each department change is its own history step, so Back walks back through them.
    */
   department?: { merchantId: string; id: string };
@@ -41,7 +41,11 @@ export function routeUrl(route: RouteState): string {
     department: routeDepartment(route),
     operatorSearch: route.operatorSearch, operatorOffset: route.operatorOffset || undefined };
   for (const [key, value] of Object.entries(values)) if (value !== undefined) params.set(key, String(value));
-  return params.size ? `/?${params}` : '/';
+  // The app's own path: "/" on its own, "/discover" when the NexG website serves it (Vite `base` "/discover/").
+  // Without the trailing slash, so a reload or a shared link isn't redirected first.
+  const base = (import.meta.env?.BASE_URL as string | undefined) ?? '/';
+  const path = base === '/' ? '/' : base.slice(0, -1);
+  return params.size ? `${path}?${params}` : path;
 }
 /** Pagination can reuse context. Changing semantics always starts a new window. */
 export function applyQueryChange(route: RouteState, change: Partial<DiscoveryQuery>): RouteState {

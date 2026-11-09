@@ -120,6 +120,175 @@
         ["Pharmacy pickup errand", 500], ["Bill payment errand", 400], ["Gift drop-off", 700], ["Large parcel delivery, up to 20kg", 1500],
         ["Bank queue errand", 800], ["Laundry drop-off and pickup", 600], ["Airport parcel drop-off", 1500], ["Half-day errand assistant", 2500]
       ]
+    },
+    {
+      "discoverySubcategoryId": "play:bowling",
+      "demoSubcategoryId": "activities-games-sports_bowling",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Bowling",
+      "supabase": { "category": "activities_games_sports", "subcategory": "bowling" },
+      "nameWord": "Bowling",
+      "items": [
+        ["Bowling lane, 1 game (up to 6 players)", 1500], ["Bowling lane, 1 hour", 3000], ["Weekday afternoon game, per person", 500], ["Shoe hire", 200],
+        ["Kids bowling party, 10 children", 15000], ["Corporate lane booking, 2 hours", 8000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:arcade-timed-play",
+      "demoSubcategoryId": "activities-games-sports_arcade-games",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Arcade & Timed Play",
+      "supabase": { "category": "activities_games_sports", "subcategory": "arcade_games" },
+      "nameWord": "Arcade",
+      "items": [
+        ["Arcade play card, 30 minutes", 1000], ["Arcade play card, 1 hour", 1800], ["VR experience, 15 minutes", 1200], ["Unlimited play day pass", 3500],
+        ["Air hockey, per game", 200], ["Birthday arcade package, 10 children", 18000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:escape-rooms",
+      "demoSubcategoryId": "activities-games-sports_escape-rooms",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Escape Rooms",
+      "supabase": { "category": "activities_games_sports", "subcategory": "escape_rooms" },
+      "nameWord": "Escape Rooms",
+      "items": [
+        ["Escape room, 60 minutes, 2 to 4 players", 6000], ["Escape room, 60 minutes, 5 to 6 players", 8500], ["Kids escape room, 45 minutes", 4500], ["Horror room, 60 minutes", 7000],
+        ["Team-building escape, up to 12 players", 18000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:indoor-sports-courts",
+      "demoSubcategoryId": "activities-games-sports_indoor-courts",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Indoor Sports Courts",
+      "supabase": { "category": "activities_games_sports", "subcategory": "indoor_courts" },
+      "nameWord": "Courts",
+      "items": [
+        ["Padel court, 1 hour", 4000], ["Squash court, 45 minutes", 1500], ["Badminton court, 1 hour", 1200], ["Indoor basketball court, 1 hour", 5000],
+        ["Table tennis table, 1 hour", 800], ["Racket hire", 300]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:outdoor-sports-courts",
+      "demoSubcategoryId": "activities-games-sports_outdoor-courts",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Outdoor Sports Courts",
+      "supabase": { "category": "activities_games_sports", "subcategory": "outdoor_courts" },
+      "nameWord": "Tennis",
+      "items": [
+        ["Tennis court, 1 hour", 1500], ["Floodlit tennis court, 1 hour", 2200], ["Basketball court, 1 hour", 2500], ["Netball court, 1 hour", 2000],
+        ["Volleyball court, 1 hour", 2000], ["Ball and racket hire", 300]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:football-pitches",
+      "demoSubcategoryId": "activities-games-sports_football-pitches",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Football Pitches",
+      "supabase": { "category": "activities_games_sports", "subcategory": "football_pitches" },
+      "nameWord": "Pitches",
+      "items": [
+        ["5-a-side pitch, 1 hour", 4000], ["Floodlit 5-a-side pitch, 1 hour", 5000], ["7-a-side pitch, 1 hour", 6000], ["Full pitch, 90 minutes", 15000],
+        ["Bibs and balls hire", 500]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:outdoor-team-games",
+      "demoSubcategoryId": "activities-games-sports_outdoor-team-games",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Outdoor Team Games",
+      "supabase": { "category": "activities_games_sports", "subcategory": "outdoor_team_games" },
+      "nameWord": "Games",
+      "items": [
+        ["Outdoor laser tag, 30 minutes, per person", 1200], ["Archery tag, per person", 1500], ["Treasure hunt, up to 15 people", 9000], ["Tug of war and sack race package, 20 people", 12000],
+        ["Team-building games day, 30 people", 45000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:go-karting",
+      "demoSubcategoryId": "activities-games-sports_go-karting",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Go-Karting",
+      "supabase": { "category": "activities_games_sports", "subcategory": "go_karting" },
+      "nameWord": "Karting",
+      "items": [
+        ["Go-kart, 10 laps", 2000], ["Go-kart, 20 laps", 3500], ["Junior kart, 8 laps", 1500], ["Two-seater kart, 10 laps", 3000],
+        ["Grand prix race, up to 8 drivers", 20000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:paintball",
+      "demoSubcategoryId": "activities-games-sports_paintball",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Paintball",
+      "supabase": { "category": "activities_games_sports", "subcategory": "paintball" },
+      "nameWord": "Paintball",
+      "items": [
+        ["Paintball game, 100 balls", 2500], ["Paintball game, 300 balls", 4500], ["Extra 100 paintballs", 1000], ["Kids paintball, 50 balls", 1800],
+        ["Group battle, 10 players", 25000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:ziplining-high-ropes",
+      "demoSubcategoryId": "activities-games-sports_ziplining",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Ziplining & High Ropes",
+      "supabase": { "category": "activities_games_sports", "subcategory": "ziplining" },
+      "nameWord": "Zipline",
+      "items": [
+        ["Single zipline ride", 1500], ["Tandem zipline ride", 2500], ["Zipline and high ropes combo", 3000], ["Kids low ropes course", 1000],
+        ["Group adventure, 10 people", 25000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:public-swim-sessions",
+      "demoSubcategoryId": "activities-games-sports_swimming-sessions",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Public Swim Sessions",
+      "supabase": { "category": "activities_games_sports", "subcategory": "swimming_sessions" },
+      "nameWord": "Swim",
+      "items": [
+        ["Adult swim session, 2 hours", 500], ["Child swim session, 2 hours", 300], ["Weekend day pass", 800], ["Family swim pass, 4 people", 1500],
+        ["Monthly swim pass", 6000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:swimming-lessons",
+      "demoSubcategoryId": "activities-games-sports_swimming-lessons",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Swimming Lessons",
+      "supabase": { "category": "activities_games_sports", "subcategory": "swimming_lessons" },
+      "nameWord": "Swim School",
+      "items": [
+        ["Beginner lesson, 45 minutes", 1500], ["Stroke improvement lesson, 1 hour", 2500], ["Private lesson, 1 hour", 3000], ["Kids group lessons, 4 weeks", 8000],
+        ["Adult learn-to-swim, 6 lessons", 12000]
+      ]
+    },
+    {
+      "discoverySubcategoryId": "play:pool-lane-hire",
+      "demoSubcategoryId": "activities-games-sports_pool-lane-hire",
+      "demoCategoryId": "activities-games-sports",
+      "demoCategoryLabel": "Activities, Games & Sports",
+      "demoLabel": "Pool Lane Hire",
+      "supabase": { "category": "activities_games_sports", "subcategory": "pool_lane_hire" },
+      "nameWord": "Aquatics",
+      "items": [
+        ["Single lane, early morning hour", 1500], ["Single lane, 1 hour", 2000], ["Two lanes, 1 hour", 3800], ["Whole pool hire, 2 hours", 20000],
+        ["Club training lane, monthly", 25000]
+      ]
     }
   ]
 }

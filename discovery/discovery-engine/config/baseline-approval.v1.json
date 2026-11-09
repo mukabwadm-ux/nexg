@@ -457,6 +457,82 @@
     {
       "manifestPath": "16_Concierge_Services/16_10_Courier_And_Errands.png",
       "assetPath": "ICONS/NexG_Discovery_Icons/16_Concierge_Services/16_10_Courier_And_Errands.png"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/17_Play.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/00_Main_Category_Icons/17_play.png"
+    },
+    {
+      "manifestPath": "17_Play/17_01_Bowling.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_01_Bowling.png"
+    },
+    {
+      "manifestPath": "17_Play/17_02_Arcade_And_Timed_Play.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_02_Arcade_And_Timed_Play.png"
+    },
+    {
+      "manifestPath": "17_Play/17_03_Escape_Rooms.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_03_Escape_Rooms.png"
+    },
+    {
+      "manifestPath": "17_Play/17_04_Indoor_Sports_Courts.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_04_Indoor_Sports_Courts.png"
+    },
+    {
+      "manifestPath": "17_Play/17_05_Outdoor_Sports_Courts.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_05_Outdoor_Sports_Courts.png"
+    },
+    {
+      "manifestPath": "17_Play/17_06_Football_Pitches.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_06_Football_Pitches.png"
+    },
+    {
+      "manifestPath": "17_Play/17_07_Outdoor_Team_Games.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_07_Outdoor_Team_Games.png"
+    },
+    {
+      "manifestPath": "17_Play/17_08_Go_Karting.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_08_Go_Karting.png"
+    },
+    {
+      "manifestPath": "17_Play/17_09_Paintball.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_09_Paintball.png"
+    },
+    {
+      "manifestPath": "17_Play/17_10_Ziplining_And_High_Ropes.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_10_Ziplining_And_High_Ropes.png"
+    },
+    {
+      "manifestPath": "17_Play/17_11_Public_Swim_Sessions.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_11_Public_Swim_Sessions.png"
+    },
+    {
+      "manifestPath": "17_Play/17_12_Swimming_Lessons.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_12_Swimming_Lessons.png"
+    },
+    {
+      "manifestPath": "17_Play/17_13_Pool_Lane_Hire.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/17_Play/17_13_Pool_Lane_Hire.png"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/18_Flights.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/00_Main_Category_Icons/18_flights.png"
+    },
+    {
+      "manifestPath": "18_Flights/18_01_Helicopter_Charters.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/18_Flights/18_01_Helicopter_Charters.png"
+    },
+    {
+      "manifestPath": "18_Flights/18_02_Scenic_Flights.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/18_Flights/18_02_Scenic_Flights.png"
+    },
+    {
+      "manifestPath": "18_Flights/18_03_Safari_Flights.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/18_Flights/18_03_Safari_Flights.png"
+    },
+    {
+      "manifestPath": "18_Flights/18_04_Private_Charters.png",
+      "assetPath": "ICONS/NexG_Discovery_Icons/18_Flights/18_04_Private_Charters.png"
     }
   ],
   "files": [
@@ -523,6 +599,14 @@
     {
       "path": "ICONS/NexG_Discovery_Icons/00_Main_Category_Icons/16_concierge_services.png",
       "sha256": "e12f31345aaa01badd732fe5cb708839b6f860125d2e890a160ca6c4b63c3c28"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/00_Main_Category_Icons/17_play.png",
+      "sha256": "b7df269d07ad2e963cf31964f436f490ff30a64a22836b917dd5a6cfc144eab7"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/00_Main_Category_Icons/18_flights.png",
+      "sha256": "73b183771e964364a7dcd784c018b7beb4c07035fcc7efbdce2d98d064e79692"
     },
     {
       "path": "ICONS/NexG_Discovery_Icons/01_Adults_Only/01_01_Erotic_Products.png",
@@ -917,16 +1001,84 @@
       "sha256": "6ac59243354f4bbd4524a4246e7faab823026543d9fe9100cef168226ae8ad6a"
     },
     {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_01_Bowling.png",
+      "sha256": "87a5319189ff5a09136caba7d64360097db57201a5d10dc3d20d55b9a07a35cf"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_02_Arcade_And_Timed_Play.png",
+      "sha256": "5fa7369215c7f1eb86dcb66bf17cfa2c1c8612c98d7dac939a4510c55afb0bf2"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_03_Escape_Rooms.png",
+      "sha256": "a3f3a4692579177e527d1100f69e0b6b3c008d99d731ebb0d08a69cf0f372d9e"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_04_Indoor_Sports_Courts.png",
+      "sha256": "68b058cbda0db2be36201adb199c49cf3e3738206772336df1a0db7cb1a14274"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_05_Outdoor_Sports_Courts.png",
+      "sha256": "98c8b82ff17a1a9d1ff71fc746e5294f1584d6d0465c8588de37cd327a296c0b"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_06_Football_Pitches.png",
+      "sha256": "876046a03e2eb8e7ab01cd924c25bde7edafc405b91c38b977d0ae179a755836"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_07_Outdoor_Team_Games.png",
+      "sha256": "d9125627b4756715ef3c41080563b03e22e91b885076c015b532d12f21b0a671"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_08_Go_Karting.png",
+      "sha256": "4bea495cfaaeb837a7932fce8ca16bd202c18f1d60fdc3306d57ef3b4980743f"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_09_Paintball.png",
+      "sha256": "640df6d8e1a657445c56fa60f4f7b92a5459da2c090e62e618774f1dc488e8e3"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_10_Ziplining_And_High_Ropes.png",
+      "sha256": "d7c7764218cd9d7cafe1cb7f9943dd8fd1de0c5f3d3af367bb1aa7b0c0feb288"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_11_Public_Swim_Sessions.png",
+      "sha256": "39d0a81221627afb01fab0ed6962554ac39cba930ad1d758f317884788f728c3"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_12_Swimming_Lessons.png",
+      "sha256": "1be1cce322e680eef83bfc2dc5f60071b2d22a4c99894e8bb08be403d498c9f3"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/17_Play/17_13_Pool_Lane_Hire.png",
+      "sha256": "731468615ebd6cc222d6aa5a1e79bec9920d8db5befeb2f4b0da8e31602b34ed"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/18_Flights/18_01_Helicopter_Charters.png",
+      "sha256": "3cedd6a1965272fd553dc295979368e272f76f0d4e7e96fb83b4c5a5ec17c552"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/18_Flights/18_02_Scenic_Flights.png",
+      "sha256": "fb2de96b4898d7df420223af59f0248460d70967dd031c92324d6ce2934cba81"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/18_Flights/18_03_Safari_Flights.png",
+      "sha256": "010d0827eee13f5a660ac505e8a1ca55da5cd2d073d4efbf69817f801c37163f"
+    },
+    {
+      "path": "ICONS/NexG_Discovery_Icons/18_Flights/18_04_Private_Charters.png",
+      "sha256": "de701c7bfd687dc3d31193965c523f303708e2f66065cf28fea016915c972309"
+    },
+    {
       "path": "ICONS/NexG_Discovery_Icons/NexG_Discovery_Icons_Manifest.csv",
-      "sha256": "6130a835d4ea6d9a8f8ba160360a551163ef6ca1e34e1b0a2397f22b7c50a87b"
+      "sha256": "2326830f0e4e1ddc0b49f9e1d0f82ad9ff5a21040ce8ac6ca23ebe0a1cf60d54"
     },
     {
       "path": "docs/discovery/DISCOVERY_CONFIGURATION_V1.1.json",
-      "sha256": "7ae411baa782717e29e0d69856d08a81699925c7467c38e9169c37423b28b15c"
+      "sha256": "88db951eb711080e3412833b5ae21d54625b4042ca84942336ef1b0a47da30b7"
     },
     {
       "path": "docs/discovery/TAXONOMY_V1.1.json",
-      "sha256": "a7922666537099c0e4f66f9f71bd18cbc9341d6f1567089f88fdf396f1eeed2b"
+      "sha256": "0add84674a9a744e84e978934969c2209e4dea501266f90f50486cca6bf29972"
     }
   ]
 }

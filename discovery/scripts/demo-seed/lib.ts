@@ -210,6 +210,8 @@ export function buildSubcategoryMap(input: { snapshot: Snapshot; seed: SeedMerch
 /** New synthetic demo merchants for subcategories with none (owner decision, 8 Nov 2026). Source: demo-seed/source/gap-fill.json. */
 export interface GapFillGroup {
   discoverySubcategoryId: string; demoSubcategoryId: string; demoCategoryId: string; demoLabel: string;
+  /** Needed only for a category the demo API never had (Play, owner, 9 Nov 2026); otherwise its demo label is reused. */
+  demoCategoryLabel?: string;
   supabase: { category: string; subcategory: string }; nameWord: string; items: [string, number][];
 }
 export interface GapFill { firstMerchantNumber: number; firstItemNumber: number; priceLevels: number[]; groups: GapFillGroup[] }
@@ -234,7 +236,7 @@ export function demoCatalog(input: { snapshot: Snapshot; seed: SeedMerchant[]; g
   const seed: SeedMerchant[] = [];
   let nextItem = input.gapFill.firstItemNumber;
   input.gapFill.groups.forEach((group, groupIndex) => {
-    const category = labels.get(group.demoCategoryId) ?? fail(`No demo merchants in category ${group.demoCategoryId}`);
+    const category = labels.get(group.demoCategoryId) ?? group.demoCategoryLabel ?? fail(`No demo merchants in category ${group.demoCategoryId}`);
     if (!group.items.length) fail(`${group.demoSubcategoryId} has no items`);
     suffixes.forEach((suffix, index) => {
       const slot = groupIndex * suffixes.length + index;

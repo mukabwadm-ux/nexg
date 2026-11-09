@@ -13,7 +13,7 @@ export class PlatformCatalogPreviewSource implements CatalogIndexSource {
     requireIndex(this.release.nodes.some(node => node.id === this.categoryId && node.kind === 'category'), 'INVALID_PREVIEW_SELECTION');
     const groups = [...new Set(this.release.nodes.filter(node => node.kind === 'subcategory' && node.parentId === this.categoryId)
       .flatMap(node => this.release.mappings.find(mapping => mapping.nodeId === node.id)!.sourceSubcategoryIds))];
-    requireIndex(groups.length > 0 && groups.length <= 12, 'PREVIEW_SCOPE_UNAVAILABLE');
+    requireIndex(groups.length > 0 && groups.length <= 16, 'PREVIEW_SCOPE_UNAVAILABLE');
     const budget = new ReadBudget({ signal });
     try {
       const pages = await Promise.all(groups.map(async group => ({ group, rows: await this.provider.getMerchants({ sourceSubcategoryIds: [group], limit: 48 }, budget) })));

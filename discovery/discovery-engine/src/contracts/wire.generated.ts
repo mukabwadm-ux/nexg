@@ -1176,10 +1176,24 @@ export interface components {
             name: string;
             area?: string;
             image?: string;
+            /** @description Where the published release places this merchant in the Discovery taxonomy. Omitted when the source gives no mapped subcategory. */
+            taxonomyPaths?: components["schemas"]["TaxonomyPath"][];
+            location?: components["schemas"]["GeoPoint"];
             items: components["schemas"]["PublicOffering"][];
             itemsCount: components["schemas"]["Count"];
             /** @enum {string} */
             itemsCompletion: "complete_scope" | "bounded_window" | "unknown";
+        };
+        /** @description Where the published release places a merchant in the Discovery taxonomy. Resolved from the source's own subcategory through the release's source mappings; never inferred from names, text or the request. */
+        TaxonomyPath: {
+            categoryId: string;
+            subcategoryId: string;
+            optionId?: string;
+        };
+        /** @description WGS 84 coordinates of the merchant's branch, as the source records them. */
+        GeoPoint: {
+            latitude: number;
+            longitude: number;
         };
         Areas: {
             areas: string[];

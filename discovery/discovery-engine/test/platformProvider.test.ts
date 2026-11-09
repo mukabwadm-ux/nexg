@@ -4,7 +4,9 @@ import { CatalogHttpTransport, sourcePathId, validateSourceOrigin } from '../src
 import { normalizeMerchant, normalizeMerchantPage } from '../src/adapters/platform/normalize.js';
 import { PlatformDiscoveryProvider } from '../src/adapters/platform/serverDiscoveryProvider.js';
 import { ReadServiceError } from '../src/contracts/readErrors.js';
+import { taxonomyPathIndex } from '../src/releases/taxonomyPaths.js';
 import { controlFetch, jsonResponse, sourceControl, withBudget } from './readControls.js';
+import { release } from './helpers.js';
 
 const unavailable = (error: unknown) => error instanceof ReadServiceError && error.code === 'CATALOG_UNAVAILABLE';
 const observedAt = new Date().toISOString();
@@ -23,6 +25,27 @@ test('normalization preserves source IDs and rejects legacy operational and mone
   }
   const empty = sourceControl(); empty.items = [];
   assert.deepEqual(normalizeMerchant(empty, 'owner', observedAt).presentation.itemsCount, { kind: 'lower_bound', value: 0 });
+});
+
+test('the bridge path keeps taxonomy paths and branch coordinates, while legacy prices stay unknown', async () => {
+  const taxonomyPaths = taxonomyPathIndex(release);
+  const control = { ...sourceControl(), subcategoryId: 'restaurants-food_café', latitude: -1.2921, longitude: 36.7856 };
+  const { presentation } = normalizeMerchant(control, 'platform-catalog', observedAt, undefined, { taxonomyPaths });
+  assert.deepEqual(presentation.taxonomyPaths, [{ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:caf' }]);
+  assert.deepEqual(presentation.location, { latitude: -1.2921, longitude: 36.7856 });
+  assert.deepEqual(presentation.items[0]!.listedPrice, { state: 'unknown', reason: 'not_verified' });
+  for (const [latitude, longitude] of [[0, 0], [91, 36.78], [-1.29, 181], ['-1.29', 36.78], [null, null], [Number.NaN, 36.78]]) {
+    assert.equal('location' in normalizeMerchant({ ...control, latitude, longitude }, 'platform-catalog', observedAt, undefined, { taxonomyPaths }).presentation, false);
+  }
+  // No release index, or a group the release doesn't map: no taxonomy paths.
+  assert.equal('taxonomyPaths' in normalizeMerchant(control, 'platform-catalog', observedAt).presentation, false);
+  assert.equal('taxonomyPaths' in normalizeMerchant({ ...control, subcategoryId: 'unknown-group' }, 'platform-catalog', observedAt, undefined, { taxonomyPaths }).presentation, false);
+  // The provider passes the index to both list and detail reads.
+  const provider = new PlatformDiscoveryProvider({ origin: 'http://catalog.test', taxonomyPaths,
+    fetcher: async url => url.pathname === '/api/merchants' ? jsonResponse({ merchants: [control], total: 1 }) : jsonResponse(control) });
+  const listed = await withBudget(budget => provider.getMerchants({ sourceSubcategoryIds: ['restaurants-food_café'], limit: 24 }, budget));
+  assert.deepEqual(listed[0]!.presentation.taxonomyPaths, presentation.taxonomyPaths);
+  assert.deepEqual((await withBudget(budget => provider.getMerchant(control.id, budget))).location, presentation.location);
 });
 
 test('bad ownership, duplicate IDs, inactive records and malformed pages fail closed', () => {
