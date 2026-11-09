@@ -72,10 +72,12 @@ export async function requestStay(input: StayRequestInput): Promise<StayRequestR
 
   if (error) return { ok: false, message: error.message };
 
-  const result = data as { ok: boolean; reference: string } | null;
+  /* The request is also a support ticket now; its reference is the one the
+     desk works from, so that is the one the guest is given to quote. */
+  const result = data as { ok: boolean; reference: string; ticket_reference?: string } | null;
   return {
     ok: true,
     message: 'We will come back with a shortlist.',
-    reference: result?.reference,
+    reference: result?.ticket_reference ?? result?.reference,
   };
 }
