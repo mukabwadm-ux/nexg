@@ -21,6 +21,8 @@ function run(command) {
 }
 
 if (!existsSync(join(workspace, 'node_modules', 'vite'))) {
-  run('npm ci --no-audit --no-fund');
+  // --include=dev: Vercel builds with NODE_ENV=production, which would
+  // otherwise skip vite and typescript (both devDependencies).
+  run('npm ci --include=dev --no-audit --no-fund');
 }
 run('npm run build');
