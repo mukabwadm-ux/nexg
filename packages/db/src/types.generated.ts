@@ -55527,6 +55527,11 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_refund_record: {
+        Args: { p_note?: string; p_reference: string; p_stay_id: string };
+        Returns: Json;
+      };
+      rpc_stay_refunds: { Args: { p_show?: string }; Returns: Json[] };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
         Args: {

@@ -109,3 +109,31 @@ export async function setHostPrivacyShare(requestId: string, hostId: string, sha
   revalidatePath('/hotels');
   return { ok: true };
 }
+
+/** Record the M-Pesa reference of a stay refund that has been sent back to the guest. */
+export async function recordStayRefund(input: {
+  stayId: string;
+  reference: string;
+  note: string;
+}): Promise<{ error?: string; success?: boolean }> {
+  const staff = await requireStaff();
+  requireModule(staff, 'hotels');
+  if (!uuid.test(input.stayId)) return { error: 'The stay ID is invalid.' };
+  const reference = input.reference.trim();
+  if (!reference) return { error: 'Enter the M-Pesa reference of the refund.' };
+
+  const { error } = await createClient().rpc('rpc_stay_refund_record', {
+    p_stay_id: input.stayId,
+    p_reference: reference.slice(0, 64),
+    p_note: input.note.trim().slice(0, 500) || undefined,
+  });
+  if (error)
+    return {
+      error:
+        error.code === '22023' || error.code === '42501'
+          ? error.message
+          : 'The refund could not be recorded. Try again.',
+    };
+  revalidatePath('/hotels');
+  return { success: true };
+}

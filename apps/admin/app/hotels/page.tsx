@@ -9,6 +9,7 @@ import {
   type QrScanRow,
   type QrSummary,
 } from '@/components/hotels/qr-tab';
+import { RefundsTab, type StayRefundRow } from '@/components/hotels/refunds';
 import { HOTEL_TABS, HotelTabs, TAB_TITLE } from '@/components/hotels/shell';
 import {
   num,
@@ -65,13 +66,20 @@ export default async function HotelsPage({
   const supabase = createClient();
 
   const tab = HOTEL_TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'hosts';
-  const filter = searchParams?.filter ?? (tab === 'charge' || tab === 'qr' ? 'live' : 'all');
+  const filter =
+    searchParams?.filter ??
+    (tab === 'charge' || tab === 'qr' ? 'live' : tab === 'refunds' ? 'due' : 'all');
   const selected = searchParams?.selected ?? null;
 
   /* Matches authz.handles_guest_data(). */
   const handlesGuestData =
     staff.isSuperAdmin ||
     staff.roles.some((r) => ['dpo', 'concierge_agent', 'concierge_lead'].includes(r));
+
+  /* Matches authz.works_hospitality(), which the refund functions check. */
+  const worksHospitality =
+    staff.isSuperAdmin ||
+    staff.roles.some((r) => ['ops_manager', 'partnerships', 'city_lead'].includes(r));
 
   const { data: badgesRaw } = await supabase.rpc('rpc_hospitality_counts', {});
   const badges = (badgesRaw as Badges | null) ?? ({} as Badges);
@@ -95,6 +103,17 @@ export default async function HotelsPage({
 
         {tab === 'hosts' && (await loadHosts(supabase, badges, filter, selected))}
         {tab === 'listings' && (await loadListings(supabase, filter, selected))}
+        {tab === 'refunds' &&
+          (worksHospitality ? (
+            await loadRefunds(supabase, filter)
+          ) : (
+            <Card className="mt-6 p-5">
+              <p className="text-sm font-extrabold">Stay refunds are for hospitality staff</p>
+              <p className="text-muted mt-1 text-sm font-semibold">
+                Ops managers, partnerships and city leads work this queue.
+              </p>
+            </Card>
+          ))}
         {tab === 'hotels' && (await loadHotels(supabase, badges, filter, selected))}
         {tab === 'charge' && (await loadCharge(supabase, badges, filter))}
         {tab === 'desk' && (await loadDesk(supabase))}
@@ -143,6 +162,25 @@ async function loadHosts(
       badges={badges}
       filter={filter}
       selected={selected}
+    />
+  );
+}
+
+async function loadRefunds(supabase: Supabase, filter: string) {
+  const { data, error } = await supabase.rpc('rpc_stay_refunds', { p_show: 'all' });
+  if (error) {
+    return (
+      <Card className="mt-6 p-5">
+        <p className="text-danger text-sm font-extrabold">The refund queue could not be loaded.</p>
+        <p className="text-muted mt-1 text-sm font-semibold">{error.message}</p>
+      </Card>
+    );
+  }
+  return (
+    <RefundsTab
+      rows={(data as unknown as StayRefundRow[] | null) ?? []}
+      filter={['due', 'refunded', 'all'].includes(filter) ? filter : 'due'}
+      canRecord
     />
   );
 }
