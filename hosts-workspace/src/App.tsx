@@ -1,4 +1,5 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
+import {useMobile} from './use-mobile';
 
 import {errorMessage,workspaceRequest,WorkspaceConnectionError} from './client';
 import type {WorkspaceSnapshot} from './model';
@@ -79,6 +80,24 @@ function WorkspacePage() {
 function Shell() {
   const w=useWorkspace();
   const [menu,setMenu]=useState(false);
+  const mobile=useMobile(),navigation=useRef<HTMLElement>(null);
+  useEffect(()=>{if(!mobile)setMenu(false);},[mobile]);
+  useEffect(()=>{
+    if(!menu||!mobile)return;
+    const previous=document.activeElement as HTMLElement|null;
+    const sidebar=navigation.current;
+    sidebar?.querySelector<HTMLButtonElement>('.mobile-nav-close')?.focus();
+    const onKey=(event:KeyboardEvent)=>{
+      if(event.key==='Escape'){event.preventDefault();setMenu(false);}
+      if(event.key!=='Tab'||!sidebar)return;
+      const focusable=Array.from(sidebar.querySelectorAll<HTMLElement>('button:not(:disabled),select,a[href]')).filter(element=>element.getClientRects().length);
+      const first=focusable[0],last=focusable.at(-1);
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+    };
+    document.addEventListener('keydown',onKey);
+    return()=>{document.removeEventListener('keydown',onKey);previous?.focus();};
+  },[menu,mobile]);
   const active=groups[w.page]??w.page;
   const {theme,accent,sidebar,density,font_size}=personalAppearance(w.data.settings);
   useEffect(()=>setMenu(false),[w.page,w.recordId,w.section]);
@@ -100,8 +119,9 @@ function Shell() {
   },[theme,accent,sidebar,density,font_size]);
   return <div className="app-shell">
     <a className="skip-link" href="#page-content">Skip to workspace</a>
-    {menu&&<button className="mobile-backdrop" aria-label="Close navigation" onClick={()=>setMenu(false)}/>}
-    <aside className={'sidebar '+(menu?'mobile-open':'')}>
+    {menu&&<button className="mobile-backdrop" tabIndex={-1} aria-label="Dismiss navigation" onClick={()=>setMenu(false)}/>}
+    <aside id="workspace-navigation" ref={navigation} className={'sidebar '+(menu?'mobile-open':'')} inert={mobile&&!menu} role={mobile&&menu?'dialog':undefined} aria-modal={mobile&&menu?true:undefined} aria-label="Workspace navigation">
+      <Button className="mobile-nav-close" aria-label="Close navigation" onClick={()=>setMenu(false)}><Icon name="close"/>Close menu</Button>
       <button className="brand" onClick={()=>w.go('overview')} aria-label="NexG Stays overview"><strong>NEXG</strong><span>STAYS</span></button>
       <select className="portfolio-switch" aria-label="Filter workspace by property" value={w.scope} onChange={event=>w.setScope(event.target.value)}>
         <option value="all">{w.actor.name.split(' ')[0]}’s portfolio</option>
@@ -122,15 +142,15 @@ function Shell() {
         <Button variant="ghost" onClick={()=>void w.signOut()}>Sign out</Button>
       </div>
     </aside>
-    <div className="main-shell">
-      <WorkspaceHeader toggleMenu={()=>setMenu(value=>!value)}/>
+    <div className="main-shell" inert={mobile&&menu}>
+      <WorkspaceHeader menuOpen={menu} toggleMenu={()=>setMenu(value=>!value)}/>
       <main id="page-content" className="page-content" tabIndex={-1}><WorkspacePage/></main>
     </div>
     <RecordDialog/>
   </div>;
 }
 
-function WorkspaceHeader({toggleMenu}:{toggleMenu:()=>void}) {
+function WorkspaceHeader({toggleMenu,menuOpen}:{toggleMenu:()=>void;menuOpen:boolean}) {
   const w=useWorkspace();
   const [query,setQuery]=useState('');
   const [alerts,setAlerts]=useState(false);
@@ -146,7 +166,7 @@ function WorkspaceHeader({toggleMenu}:{toggleMenu:()=>void}) {
   ].slice(0,5):[];
   const reminders=workspaceReminders(w.data,w.units,w.stays,w.today);
   return <header className="topbar">
-    <Button className="mobile-menu" aria-label="Open navigation" onClick={toggleMenu}><Icon name="home"/></Button>
+    <Button className="mobile-menu" aria-label="Open navigation" aria-expanded={menuOpen} aria-controls="workspace-navigation" onClick={toggleMenu}>Menu</Button>
     <WorkspaceBreadcrumb/>
     <span className="preview-pill">Connected workspace</span>
     <div className="global-search"><Icon name="search" size={20}/>
@@ -157,7 +177,7 @@ function WorkspaceHeader({toggleMenu}:{toggleMenu:()=>void}) {
     </div>
     <Button className="header-help" onClick={()=>w.go('help')}><Icon name="help" size={20}/>Help</Button>
     <div className="notification-wrap">
-      <Button className="notification-button" aria-label="Notifications" onClick={()=>setAlerts(!alerts)}><Icon name="notification" size={25}/>{(reminders.requests.length>0||reminders.arrivals.length>0)&&<i/>}</Button>
+      <Button className="notification-button" aria-label="Notifications" aria-expanded={alerts} onClick={()=>setAlerts(!alerts)}><Icon name="notification" size={25}/>{(reminders.requests.length>0||reminders.arrivals.length>0)&&<i/>}</Button>
       {alerts&&<Panel className="notification-menu">
         <h3>Needs attention</h3>{reminders.daily&&<p>{reminders.daily}</p>}
         {reminders.arrivals.slice(0,3).map(stay=><button key={stay.id} onClick={()=>{w.inspect('stays',stay.id);setAlerts(false);}}>

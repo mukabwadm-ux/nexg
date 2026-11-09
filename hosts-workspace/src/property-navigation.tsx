@@ -39,6 +39,7 @@ export function PropertiesNavigation({value='overview',propertyId,unitId}:{value
     if(propertyId)w.edit('units',undefined,{propertyId});
   };
   return <nav className="unit-navigation properties-navigation" aria-label="Properties sections">
+    <select className="mobile-property-section" aria-label="Property section" value={value} onChange={event=>navigate(event.target.value)}>{[...primarySections,...extraSections].map(item=><option key={item.slug} value={item.slug}>{item.label==='History'?'Guide history':item.label}</option>)}</select>
     <div className="properties-section-links">
       {primarySections.map(item=><button key={item.slug} className={value===item.slug?'active':''} aria-current={value===item.slug?'page':undefined} onClick={()=>navigate(item.slug)}><Icon name={item.icon} size={19}/><span>{item.label}</span></button>)}
     </div>
