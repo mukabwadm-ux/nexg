@@ -187,3 +187,57 @@ export async function sendTicketResolved(
   const { subject, text } = ticketResolved(parts);
   return deliver(to, subject, text);
 }
+
+export function stayConfirmed({
+  name,
+  property,
+  unit,
+  checkIn,
+  checkOut,
+  nights,
+  paidKes,
+  reference,
+}: {
+  name: string | null;
+  property: string;
+  unit: string;
+  checkIn: string;
+  checkOut: string;
+  nights: number;
+  paidKes: number;
+  reference: string;
+}): { subject: string; text: string } {
+  const greeting = name ? `Hi ${name},` : 'Hi,';
+  const kes = `KES ${paidKes.toLocaleString('en-KE')}`;
+
+  return {
+    subject: `Your stay is booked: ${property}, ${checkIn}`,
+    text: `${greeting}
+
+Your stay is booked and paid.
+
+  ${property} · ${unit}
+  Check in   ${checkIn}
+  Check out  ${checkOut}
+  ${nights} night${nights === 1 ? '' : 's'} · paid ${kes} by M-Pesa
+  Payment reference ${reference}
+
+The exact address and how to get in come from your host before you arrive.
+Food, drinks, laundry and transfers can be ordered to the door through NexG
+for the whole of your stay.
+
+If anything needs changing, write to us from nexgapp.com/help and quote
+${reference}.
+
+— The NexG concierge desk
+`,
+  };
+}
+
+export async function sendStayConfirmed(
+  to: string,
+  parts: Parameters<typeof stayConfirmed>[0],
+): Promise<SendOutcome> {
+  const { subject, text } = stayConfirmed(parts);
+  return deliver(to, subject, text);
+}
