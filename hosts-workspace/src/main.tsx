@@ -11,6 +11,7 @@ import './properties.css';
 import './pages/amenities.css';
 import './connected.css';
 import './platform.css';
+import './lively.css';
 const guestCode = /^\/q\/([^/]+)\/guide\/?$/.exec(window.location.pathname)?.[1];
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>{guestCode ? <GuestGuidePage code={guestCode}/> : <App/>}</React.StrictMode>,

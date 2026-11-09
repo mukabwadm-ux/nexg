@@ -1,0 +1,300 @@
+/*
+ * NexG brand layer for the Hosts Workspace, loaded last.
+ *
+ * Matches the merchant workspace: a #141414 sidebar, gold wordmark and a
+ * solid gold pill for the current page. On top of that, each section has
+ * its own icon colour so the navigation reads at a glance, and everything
+ * you can press answers the pointer. All motion stops under reduced motion.
+ */
+
+:root {
+  --nx-gold: #d4a72c;
+  --nx-gold-bright: #f2c94c;
+  --nx-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Section colours, readable on #141414 and as soft chips on white. */
+  --nx-overview: #f2c94c;
+  --nx-properties: #3cc2b0;
+  --nx-calendar: #5aa9f2;
+  --nx-inbox: #f2836b;
+  --nx-operations: #8ccf6b;
+  --nx-finances: #f0a23b;
+  --nx-reports: #ec6f9a;
+  --nx-settings: #a9b2c3;
+}
+
+/* ───────────────────────────────────────────── sidebar: always NexG black */
+
+.app-shell .sidebar {
+  --sidebar-bg: #141414;
+  --sidebar-text: #c7c6c1;
+  --shell-border: #2a2a28;
+  background: #141414;
+  color: #c7c6c1;
+  border-right: 1px solid #ffffff10;
+}
+
+.app-shell .sidebar .brand {
+  color: var(--nx-gold);
+  transition: transform 180ms var(--nx-ease);
+}
+.app-shell .sidebar .brand:hover {
+  transform: translateY(-1px);
+}
+.app-shell .sidebar .brand span {
+  color: #b1aea7;
+}
+
+.app-shell .sidebar .portfolio-switch {
+  background: #ffffff0d;
+  border: 1px solid #ffffff1c;
+  color: #f4f2ec;
+  transition:
+    border-color 150ms,
+    background 150ms;
+}
+.app-shell .sidebar .portfolio-switch:hover {
+  border-color: #d4a72c80;
+  background: #ffffff14;
+}
+
+/* Per-item colour, set on the button so the icon and the hover use it. */
+.app-shell .sidebar nav[aria-label='Main navigation'] > button:nth-child(1) {
+  --nav-c: var(--nx-overview);
+}
+.app-shell .sidebar nav[aria-label='Main navigation'] > button:nth-child(2) {
+  --nav-c: var(--nx-properties);
+}
+.app-shell .sidebar nav[aria-label='Main navigation'] > button:nth-child(3) {
+  --nav-c: var(--nx-calendar);
+}
+.app-shell .sidebar nav[aria-label='Main navigation'] > button:nth-child(4) {
+  --nav-c: var(--nx-inbox);
+}
+.app-shell .sidebar nav[aria-label='Main navigation'] > button:nth-child(5) {
+  --nav-c: var(--nx-operations);
+}
+.app-shell .sidebar nav[aria-label='Main navigation'] > button:nth-child(6) {
+  --nav-c: var(--nx-finances);
+}
+.app-shell .sidebar nav[aria-label='Workspace settings'] > button:nth-child(1) {
+  --nav-c: var(--nx-reports);
+}
+.app-shell .sidebar nav[aria-label='Workspace settings'] > button:nth-child(2) {
+  --nav-c: var(--nx-settings);
+}
+
+.app-shell .sidebar nav > button {
+  position: relative;
+  color: #c7c6c1;
+  background: transparent;
+  transition:
+    background 160ms var(--nx-ease),
+    color 160ms var(--nx-ease),
+    transform 160ms var(--nx-ease);
+}
+.app-shell .sidebar nav > button > svg {
+  color: var(--nav-c, #c7c6c1);
+  transition: transform 200ms var(--nx-ease);
+}
+.app-shell .sidebar nav > button::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--nav-c, var(--nx-gold));
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition:
+    opacity 160ms,
+    transform 200ms var(--nx-ease);
+}
+.app-shell .sidebar nav > button:hover {
+  background: #ffffff0f;
+  color: #ffffff;
+  transform: translateX(3px);
+}
+.app-shell .sidebar nav > button:hover > svg {
+  transform: scale(1.12) rotate(-4deg);
+}
+.app-shell .sidebar nav > button:hover::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+.app-shell .sidebar nav > button:active {
+  transform: translateX(3px) scale(0.98);
+}
+
+/* The current page: solid gold, as in the merchant workspace (overview.css
+   used to soften it on the overview only). */
+.app-shell .sidebar nav > button.active,
+.app-shell:has(.overview-page) .sidebar nav > button.active {
+  background: var(--nx-gold);
+  color: #17130b;
+  font-weight: 750;
+  box-shadow: 0 6px 18px #d4a72c33;
+}
+.app-shell .sidebar nav > button.active > svg {
+  color: #17130b;
+}
+.app-shell .sidebar nav > button.active::before {
+  opacity: 0;
+}
+.app-shell .sidebar nav > button.active:hover {
+  background: var(--nx-gold-bright);
+}
+
+.app-shell .sidebar .owner-profile {
+  color: #f4f2ec;
+  border-radius: 10px;
+  transition: background 160ms;
+}
+.app-shell .sidebar .owner-profile:hover {
+  background: #ffffff0d;
+}
+.app-shell .sidebar .owner-profile small {
+  color: #b1aea7;
+}
+.app-shell .sidebar-bottom > .btn {
+  color: #c7c6c1;
+}
+.app-shell .sidebar-bottom > .btn:hover {
+  color: #ffffff;
+  background: #ffffff0d;
+}
+
+/* ─────────────────────────────────────────────── buttons step and press */
+
+.app-shell .btn {
+  transition:
+    transform 140ms var(--nx-ease),
+    box-shadow 160ms var(--nx-ease),
+    background 140ms,
+    border-color 140ms,
+    color 140ms;
+}
+.app-shell .btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px #171b2414;
+}
+.app-shell .btn:not(:disabled):active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}
+.app-shell .btn-ghost:not(:disabled):hover {
+  box-shadow: none;
+}
+.app-shell .btn-primary:not(:disabled):hover {
+  box-shadow: 0 6px 16px #d4a72c40;
+}
+
+/* ─────────────────────────────────────── overview metrics: colour + lift */
+
+.app-shell .metrics-grid > .metric {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 200ms var(--nx-ease),
+    box-shadow 200ms var(--nx-ease),
+    border-color 200ms;
+}
+.app-shell .metrics-grid > .metric:nth-child(4n + 1) {
+  --metric-c: #b8901f;
+  --metric-soft: #fbf3dc;
+}
+.app-shell .metrics-grid > .metric:nth-child(4n + 2) {
+  --metric-c: #1f8a7d;
+  --metric-soft: #e2f5f2;
+}
+.app-shell .metrics-grid > .metric:nth-child(4n + 3) {
+  --metric-c: #2f6fb3;
+  --metric-soft: #e5f0fb;
+}
+.app-shell .metrics-grid > .metric:nth-child(4n + 4) {
+  --metric-c: #c4553c;
+  --metric-soft: #fdebe6;
+}
+
+/* A thin top rule in the card's colour, drawn in on hover. */
+.app-shell .metrics-grid > .metric::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--metric-c);
+  transform: scaleX(0.18);
+  transform-origin: left;
+  transition: transform 260ms var(--nx-ease);
+}
+.app-shell .metrics-grid > .metric:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px #171b2414;
+  border-color: color-mix(in srgb, var(--metric-c) 35%, var(--line));
+}
+.app-shell .metrics-grid > .metric:hover::after {
+  transform: scaleX(1);
+}
+.app-shell .metrics-grid > .metric .metric-label > svg {
+  box-sizing: content-box;
+  padding: 6px;
+  border-radius: 9px;
+  background: var(--metric-soft);
+  color: var(--metric-c);
+  transition: transform 200ms var(--nx-ease);
+}
+.app-shell .metrics-grid > .metric:hover .metric-label > svg {
+  transform: scale(1.08) rotate(-5deg);
+}
+
+/* ─────────────────────────────── panels, cards and rows answer the pointer */
+
+.app-shell .overview-middle > .panel,
+.app-shell .property-card,
+.app-shell .mg-summary-card {
+  transition:
+    transform 200ms var(--nx-ease),
+    box-shadow 200ms var(--nx-ease);
+}
+.app-shell .overview-middle > .panel:hover,
+.app-shell .mg-summary-card:hover {
+  box-shadow: 0 10px 24px #171b240f;
+}
+.app-shell .property-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px #171b2414;
+}
+.app-shell .attention-item,
+.app-shell table tbody tr {
+  transition: background 140ms;
+}
+.app-shell .attention-item:hover,
+.app-shell table tbody tr:hover {
+  background: var(--gold-soft);
+}
+.app-shell .tabs > button {
+  transition:
+    color 140ms,
+    background 140ms;
+}
+
+/* ───────────────────────────────────────────────────── reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *,
+  .app-shell *::before,
+  .app-shell *::after {
+    transition: none !important;
+  }
+  .app-shell .sidebar nav > button:hover,
+  .app-shell .sidebar nav > button:active,
+  .app-shell .btn:not(:disabled):hover,
+  .app-shell .btn:not(:disabled):active,
+  .app-shell .metrics-grid > .metric:hover,
+  .app-shell .property-card:hover,
+  .app-shell .sidebar nav > button:hover > svg,
+  .app-shell .metrics-grid > .metric:hover .metric-label > svg {
+    transform: none;
+  }
+}

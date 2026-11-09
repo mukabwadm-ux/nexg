@@ -13,7 +13,9 @@ export function personalAppearance(settings: Settings) {
   return {
     theme,
     accent: typeof value.accent === 'string' && /^#[0-9a-f]{6}$/i.test(value.accent) ? value.accent : null,
-    sidebar: value.sidebar === 'light' ? 'light' : 'dark',
+    /* The sidebar is always the NexG black one (lively.css); an older saved
+       "light" preference no longer applies. */
+    sidebar: 'dark',
     density: value.density === 'compact' ? 'compact' : 'comfortable',
     font_size: value.font_size === 'large' ? 'large' : 'default',
   } as const;

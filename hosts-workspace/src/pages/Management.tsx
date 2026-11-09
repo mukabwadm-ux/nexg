@@ -338,9 +338,6 @@ export function SettingsPage() {
             <FormField label="Density"><select value={appearance.density} onChange={e => setAppearance({...appearance,density:e.target.value === 'compact' ? 'compact' : 'comfortable'})}>
               <option value="comfortable">Comfortable</option><option value="compact">Compact</option>
             </select></FormField>
-            <FormField label="Sidebar"><select value={appearance.sidebar} onChange={e => setAppearance({...appearance,sidebar:e.target.value === 'dark' ? 'dark' : 'light'})}>
-              <option value="light">Light</option><option value="dark">Dark</option>
-            </select></FormField>
             <FormField label="Text size"><select value={appearance.font_size} onChange={e => setAppearance({...appearance,font_size:e.target.value === 'large' ? 'large' : 'default'})}>
               <option value="default">Default</option><option value="large">Large</option>
             </select></FormField>
