@@ -54,7 +54,8 @@ const PRICE = {
 } as const;
 
 /* Non-breaking space, so "KES" never wraps away from its number. */
-const kes = (n: number) => `KES ${n.toLocaleString('en-KE')}`;
+const NBSP = String.fromCharCode(160);
+const kes = (n: number) => `KES${NBSP}${n.toLocaleString('en-KE')}`;
 
 const HOST_BENEFITS: readonly { icon: LucideIcon; title: string; body: string }[] = [
   {

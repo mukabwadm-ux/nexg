@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createClient } from '@/lib/supabase/server';
 
-export { localHostWorkspaceEnabled } from './routes';
+export { hostWorkspaceEnabled } from './routes';
 
 export class HostWorkspaceError extends Error {
   constructor(

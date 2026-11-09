@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { localHostBookmark, localHostWorkspaceEnabled } from '@/lib/host-workspace/routes';
+import { localHostBookmark, hostWorkspaceEnabled } from '@/lib/host-workspace/routes';
 
 /**
  * The scan happens here, not in the page.
@@ -75,14 +75,18 @@ export const config = {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   if (pathname === '/host' || pathname.startsWith('/host/')) {
-    const location = (request.method === 'GET' || request.method === 'HEAD') && localHostWorkspaceEnabled()
-      ? localHostBookmark(pathname, request.nextUrl.searchParams)
-      : null;
+    const location =
+      (request.method === 'GET' || request.method === 'HEAD') && hostWorkspaceEnabled()
+        ? localHostBookmark(pathname, request.nextUrl.searchParams)
+        : null;
     if (!location) return NextResponse.next();
-    // The route handler issues a relative redirect so Next preserves the loopback origin.
-    const bookmark = new URL(location, request.url);
-    bookmark.searchParams.set('bookmark', '1');
-    return NextResponse.rewrite(bookmark);
+    // Redirect here rather than rewriting to the route handler, which saw the
+    // original /host/... URL and dropped `open`. The Host header keeps the
+    // origin the browser used (127.0.0.1 in dev, the public host in production).
+    const origin = `${request.nextUrl.protocol}//${request.headers.get('host') ?? request.nextUrl.host}`;
+    const redirect = NextResponse.redirect(new URL(location, origin), 307);
+    redirect.headers.set('Cache-Control', 'private, no-store');
+    return redirect;
   }
   if (
     pathname === '/merchant' ||

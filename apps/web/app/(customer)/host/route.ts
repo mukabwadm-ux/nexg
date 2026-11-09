@@ -2,7 +2,7 @@ import { hostWorkspaceHtml } from '@/lib/host-workspace/shell';
 
 import {
   HostWorkspaceError,
-  localHostWorkspaceEnabled,
+  hostWorkspaceEnabled,
   hostWorkspaceAccess,
 } from '@/lib/host-workspace/access';
 
@@ -11,12 +11,13 @@ import { localHostWorkspace } from '@/lib/host-workspace/routes';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  if (!localHostWorkspaceEnabled()) return new Response('Not found.', { status: 404 });
+  if (!hostWorkspaceEnabled()) return new Response('Not found.', { status: 404 });
   const params = new URL(request.url).searchParams;
   const open = params.get('open');
-  const location = open && open.length <= 100
-    ? localHostWorkspace + '?' + new URLSearchParams({ open })
-    : localHostWorkspace;
+  const location =
+    open && open.length <= 100
+      ? localHostWorkspace + '?' + new URLSearchParams({ open })
+      : localHostWorkspace;
   if (params.get('bookmark') === '1') {
     return new Response(null, {
       status: 307,
