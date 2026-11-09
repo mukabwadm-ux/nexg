@@ -120,8 +120,9 @@ select set_config('request.jwt.claims',
 select lives_ok(
   $$ select public.rpc_host_apply(jsonb_build_object(
        'contact_name','[Second business]','phone','+254700045001',
-       'address','[Address], Westlands','handoff','lockbox')) $$,
-  'Another login can register a host with a phone number that is already used.');
+       'address','[Address], Westlands')) $$,
+  'Another login can register a host with a phone number that is already used, and without '
+  'a hand-off rule: the form no longer asks; it is set per unit in the workspace.');
 
 /* But an email is one host. */
 select set_config('request.jwt.claims',

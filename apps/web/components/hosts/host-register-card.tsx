@@ -21,7 +21,8 @@ import { createClient } from '@/lib/supabase/client';
  *
  * 1. About you: name, phone (may be shared with a merchant account) and the
  *    login email, verified right here with a code before submitting.
- * 2. The first unit: address, listing link, size and hand-off rule.
+ * 2. The first unit: address, listing link and how many units they manage.
+ *    The rider hand-off rule is set per unit later, in the workspace.
  *
  * Submitting creates the host on the verified login and sends the welcome
  * email (set-password link + how to reach the workspace), as for merchants.
@@ -32,13 +33,6 @@ const UNIT_BANDS = [
   { value: '2_5', label: '2–5' },
   { value: '6_20', label: '6–20' },
   { value: '20_plus', label: '20+' },
-];
-
-const HANDOFFS = [
-  { value: 'guest_meets_at_gate', label: 'Guest meets at gate' },
-  { value: 'leave_with_askari', label: 'Leave with askari · caretaker' },
-  { value: 'lockbox', label: 'Lockbox' },
-  { value: 'call_guest_first', label: 'Call guest first' },
 ];
 
 /* Supabase sends one auth email per address per minute. */
@@ -87,7 +81,6 @@ export function HostRegisterCard() {
   const [listing, setListing] = React.useState('');
   const [address, setAddress] = React.useState('');
   const [band, setBand] = React.useState<string | null>('1');
-  const [handoff, setHandoff] = React.useState<string | null>(null);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [emailState, setEmailState] = React.useState<EmailState>({ kind: 'idle' });
   const [code, setCode] = React.useState('');
@@ -183,7 +176,6 @@ export function HostRegisterCard() {
     if (!phone) next['phone'] = 'This is how we reach you about your guests.';
     if (!verified) next['email'] = 'Verify your email first. It becomes your login.';
     if (!address.trim()) next['address'] = 'Where is the unit?';
-    if (!handoff) next['handoff'] = 'Choose how riders should hand over.';
     setErrors(next);
     if (Object.keys(next).length > 0 || emailState.kind !== 'verified') return;
     const loginEmail = emailState.email;
@@ -196,7 +188,6 @@ export function HostRegisterCard() {
         listing_link: listing.trim() || null,
         address: address.trim(),
         units_band: band ?? '1',
-        handoff: handoff!,
       });
       if (!result.ok) {
         toast({ title: 'That did not save', description: result.message });
@@ -431,21 +422,6 @@ export function HostRegisterCard() {
             onChange={setBand}
             selectedTone="gold"
           />
-        </div>
-
-        <div className="mt-5">
-          <ChipGroup
-            id="host_handoff"
-            label="How should riders hand over?"
-            options={HANDOFFS}
-            value={handoff}
-            onChange={setHandoff}
-          />
-          {errors['handoff'] ? (
-            <p role="alert" className="mt-1.5 text-[0.75rem] font-semibold text-[#B42318]">
-              {errors['handoff']}
-            </p>
-          ) : null}
         </div>
       </Section>
 

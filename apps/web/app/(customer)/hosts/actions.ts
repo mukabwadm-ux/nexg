@@ -17,7 +17,8 @@ export interface HostApplyInput {
   listing_link: string | null;
   address: string;
   units_band: string;
-  handoff: string;
+  /** Optional: hosts set the rider hand-off rule per unit in the workspace. */
+  handoff?: string | null;
 }
 
 /**
@@ -49,7 +50,7 @@ export async function applyAsHost(input: HostApplyInput): Promise<HostApplyResul
       listing_link: input.listing_link,
       address: input.address,
       units_band: input.units_band,
-      handoff: input.handoff,
+      handoff: input.handoff ?? null,
       kind:
         input.units_band === '1'
           ? 'single_unit'
