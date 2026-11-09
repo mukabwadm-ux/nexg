@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./table-viewport": "./src/components/table-viewport.tsx",
     "./capabilities": "./src/lib/capabilities.ts",
+    "./fonts/manrope": "./src/fonts/manrope.ts",
     "./tokens.css": "./src/tokens.css",
     "./globals.css": "./src/globals.css",
     "./tailwind": "./tailwind.config.cjs",
@@ -23,6 +24,7 @@
     "clean": "rimraf .turbo node_modules coverage"
   },
   "peerDependencies": {
+    "next": "^14.2.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -52,6 +54,7 @@
     "autoprefixer": "10.4.20",
     "eslint": "8.57.1",
     "jsdom": "25.0.1",
+    "next": "14.2.21",
     "postcss": "8.4.49",
     "react": "18.3.1",
     "react-dom": "18.3.1",

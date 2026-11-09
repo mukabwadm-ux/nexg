@@ -1,8 +1,9 @@
 import '@nexg/ui/globals.css';
 
 import { ToastProvider } from '@nexg/ui';
+// Manrope 400/600/700/800 from the repo, never fetched at build time.
+import { manrope } from '@nexg/ui/fonts/manrope';
 import type { Metadata } from 'next';
-import { Manrope } from 'next/font/google';
 
 /**
  * The NexG public API.
@@ -10,20 +11,6 @@ import { Manrope } from 'next/font/google';
  * Read-only endpoints for public consumers, plus the documentation and
  * the developer console that make them usable.
  */
-
-/**
- * Manrope 400/600/700/800, self-hosted by next/font so there is no
- * render-blocking request to Google. The same face the marketing site
- * and the staff console use, so the API does not feel like a different
- * product.
- */
-const manrope = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '600', '700', '800'],
-  variable: '--font-manrope',
-  display: 'swap',
-  fallback: ['system-ui', 'sans-serif'],
-});
 
 export const metadata: Metadata = {
   title: {
