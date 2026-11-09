@@ -1,19 +1,68 @@
-.guest-guide-page { height: 100dvh; overflow: auto; padding: 24px; }
-.guest-guide-content { display: grid; gap: 12px; max-width: 680px; margin: 0 auto; }
-.guest-guide-content > .panel { padding: 18px 20px; }
-.guest-guide-heading p { margin: 0 0 6px; }
-.guest-guide-heading h1 { margin: 0 0 6px; }
-.guest-guide-content summary { cursor: pointer; }
-.guest-guide-content summary small { margin-left: 8px; }
-.guest-guide-content .guest-guide-article { padding-top: 12px; }
-.guest-guide-article p { white-space: pre-line; }
-.guest-guide-article ol { padding-left: 24px; }
-.guest-guide-article a { text-decoration: underline; }
-.guest-guide-preview { min-height: 0; overflow: auto; }
-.unit-guide-grid .map-panel { min-height: 0; }
-.unit-guide-grid .connected-model-stage { height: clamp(140px, 29vh, 330px); min-height: 140px; }
-.unit-guide-plan { overflow: hidden; }
-.unit-guide-plan img { height: clamp(140px, 29vh, 330px); width: 100%; object-fit: contain; }
-.map-panel .map-footer { flex-wrap: wrap; }
-.map-panel .map-footer input { max-width: min(100%, 240px); }
-@media (max-width: 600px) { .guest-guide-page { padding: 14px; } }
+.guest-guide-page {
+  height: 100dvh;
+  overflow: auto;
+  padding: 24px;
+}
+.guest-guide-content {
+  display: grid;
+  gap: 12px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.guest-guide-content > .panel {
+  padding: 18px 20px;
+}
+.guest-guide-heading p {
+  margin: 0 0 6px;
+}
+.guest-guide-heading h1 {
+  margin: 0 0 6px;
+}
+.guest-guide-content summary {
+  cursor: pointer;
+}
+.guest-guide-content summary small {
+  margin-left: 8px;
+}
+.guest-guide-content .guest-guide-article {
+  padding-top: 12px;
+}
+.guest-guide-article p {
+  white-space: pre-line;
+}
+.guest-guide-article ol {
+  padding-left: 24px;
+}
+.guest-guide-article a {
+  text-decoration: underline;
+}
+.guest-guide-preview {
+  min-height: 0;
+  overflow: auto;
+}
+.unit-guide-grid .map-panel {
+  min-height: 0;
+}
+.unit-guide-grid .connected-model-stage {
+  height: clamp(140px, 29vh, 330px);
+  min-height: 140px;
+}
+.unit-guide-plan {
+  overflow: hidden;
+}
+.unit-guide-plan img {
+  height: clamp(140px, 29vh, 330px);
+  width: 100%;
+  object-fit: contain;
+}
+.map-panel .map-footer {
+  flex-wrap: wrap;
+}
+.map-panel .map-footer input {
+  max-width: min(100%, 240px);
+}
+@media (max-width: 600px) {
+  .guest-guide-page {
+    padding: 14px;
+  }
+}
