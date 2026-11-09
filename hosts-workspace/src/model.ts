@@ -32,7 +32,7 @@ export function nextDate(date: string, days: number) {
 }
 export const money=(minor:number,currency='KES')=>new Intl.NumberFormat('en-KE',{style:'currency',currency,currencyDisplay:'code',minimumFractionDigits:0,maximumFractionDigits:2}).format(minor/100);
 export const dateText=(date:string)=>date?new Date(date.slice(0,10)+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'—';
-export const activeStay=(s:Stay)=>!['Cancelled','Completed','Draft'].includes(s.status);
+export const activeStay=(s:Stay)=>!['Cancelled','Completed','Draft','Blocked'].includes(s.status);
 export const nights=(s:Stay)=>Math.max(0,Math.round((Date.parse(s.end)-Date.parse(s.start))/86400000));
 export const totals=(data:WorkspaceData,stayId?:string)=>{
  const p=data.payments.filter(p=>(!stayId||p.stayId===stayId)&&p.status==='Recorded');

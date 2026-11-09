@@ -23,7 +23,7 @@ function checked(result: { error: { code: string; message: string } | null }, me
   const { error } = result;
   if (!error) return { message };
   if (error.code === '42501') throw scopeError();
-  if (['22023', '23505'].includes(error.code)) throw invalid(error.message);
+  if (['22023', '23505', '23P01'].includes(error.code)) throw invalid(error.message);
   throw new HostWorkspaceError(503, 'Saving could not be confirmed. Refresh before trying again.');
 }
 
@@ -35,7 +35,45 @@ async function requireUnit(access: HostWorkspaceAccess, id: string) {
   if (!data) throw scopeError();
 }
 
+/* Close a unit for some nights. `end` is the morning it opens again. */
+async function blockDates(access: HostWorkspaceAccess, input: unknown) {
+  const block = z.object({ kind: z.literal('block'), unitId: uuid, start: day, end: day, note: note.max(500).optional() })
+    .parse(input);
+  if (block.end <= block.start) throw invalid('The block has to end after it starts.');
+  await requireUnit(access, block.unitId);
+  return checked(await access.db.rpc('rpc_stay_block', {
+    p_host_id: access.hostId, p_unit_id: block.unitId, p_from: block.start, p_to: block.end,
+    p_note: block.note || undefined,
+  }), 'Dates blocked.');
+}
+
+/* Keep dates for somebody who has not confirmed; they free up by themselves. */
+async function holdDates(access: HostWorkspaceAccess, input: unknown) {
+  const hold = z.object({
+    kind: z.literal('hold'), unitId: uuid, guest: name, start: day, end: day,
+    arrivalTime: time, departTime: time, adults: positiveInt.max(100),
+    hours: z.number().int().min(1).max(168), phone: z.string().max(50).optional(),
+  }).parse(input);
+  if (hold.end <= hold.start) throw invalid('Check-out has to be after check-in.');
+  await requireUnit(access, hold.unitId);
+  const { data: settings, error } = await access.db.from('host_settings_v').select('time_zone')
+    .eq('host_id', access.hostId).maybeSingle();
+  if (error) throw new HostWorkspaceError(503, 'The workspace time zone could not be checked.');
+  const zone = validZone(settings?.time_zone);
+  return checked(await access.db.rpc('rpc_stay_host_hold', {
+    p_host_id: access.hostId, p_hours: hold.hours,
+    p_stay: {
+      unit_id: hold.unitId, guest_first_name: hold.guest, party_adults: hold.adults, phone: hold.phone,
+      check_in: hold.start + ' ' + hold.arrivalTime + ':00 ' + zone,
+      check_out: hold.end + ' ' + hold.departTime + ':00 ' + zone,
+    },
+  }), 'Dates held for ' + hold.hours + (hold.hours === 1 ? ' hour.' : ' hours.'));
+}
+
 async function saveReservation(access: HostWorkspaceAccess, id: string | undefined, input: unknown) {
+  const kind = (input as { kind?: unknown } | null)?.kind;
+  if (!id && kind === 'block') return blockDates(access, input);
+  if (!id && kind === 'hold') return holdDates(access, input);
   const booking = z.object({
     unitId: uuid, guest: name, start: day, end: day, arrivalTime: time, departTime: time,
     adults: positiveInt.max(100), children: z.number().int().min(0).max(100),
@@ -294,7 +332,17 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
     if (!data?.unit_id || data.status === 'cancelled') throw scopeError();
     await requireUnit(access, data.unit_id);
     const { detail } = z.object({ detail: note.optional() }).parse(record ?? {});
-    return checked(await db.rpc('rpc_stay_cancel', { p_stay_id: id, p_reason: detail }), 'Reservation cancelled.');
+    return checked(await db.rpc('rpc_stay_cancel', { p_stay_id: id, p_reason: detail }),
+      data.status === 'blocked' ? 'Block lifted.' : data.status === 'held' ? 'Hold released.' : 'Reservation cancelled.');
+  }
+
+  if (command.type === 'transition' && collection === 'stays' && id && status === 'Confirmed') {
+    const { data, error } = await db.from('host_stay_v').select('unit_id, status, source')
+      .eq('host_id', hostId).eq('id', id).maybeSingle();
+    if (error) throw new HostWorkspaceError(503, 'The hold could not be checked.');
+    if (!data?.unit_id || data.status !== 'held' || data.source === 'nexg') throw scopeError();
+    await requireUnit(access, data.unit_id);
+    return checked(await db.rpc('rpc_stay_confirm', { p_stay_id: id }), 'Hold confirmed as a reservation.');
   }
 
   if (collection === 'packages' && (command.type === 'save' || command.type === 'delete')) {

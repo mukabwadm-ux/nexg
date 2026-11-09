@@ -61,7 +61,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
     }),
     unitScope?.length === 0 ? [] : allRows((from, to) => {
       const query = db.from('host_stay_v')
-        .select('id, unit_id, guest_first_name, check_in, check_out, party_adults, party_children, source, status, rate_kes, conflict_flagged, reviewed_at, stay_rating, stay_review')
+        .select('id, unit_id, guest_first_name, check_in, check_out, party_adults, party_children, source, status, rate_kes, conflict_flagged, reviewed_at, stay_rating, stay_review, hold_expires_at, hold_expired, notes')
         .eq('host_id', hostId);
       if (unitScope) query.in('unit_id', unitScope);
       return query.order('check_in', { ascending: false }).order('id').range(from, to);
@@ -175,6 +175,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
 
   const stayStatus: Record<string, string> = {
     booked: 'Confirmed', in_stay: 'Checked in', departed: 'Completed', cancelled: 'Cancelled',
+    held: 'Hold', blocked: 'Blocked',
   };
   const actor = {
     id: access.userId, name: settings?.display_name || access.name, email: access.email,
@@ -216,9 +217,13 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
       const end = localDate(row.check_out);
       const stay: Stay = {
         id: row.id, ref: row.id.slice(0, 8).toUpperCase(), unitId: row.unit_id,
-        guest: row.guest_first_name ?? 'Guest', start, end, arrivalTime: clock.format(new Date(row.check_in)),
-        status: stayStatus[row.status ?? ''] ?? label(row.status),
-        departTime: clock.format(new Date(row.check_out)), source: row.source, kind: label(row.source), guests: (row.party_adults ?? 0) + (row.party_children ?? 0),
+        guest: row.status === 'blocked' ? (row.notes ? 'Blocked · ' + row.notes : 'Blocked') : row.guest_first_name ?? 'Guest',
+        start, end, arrivalTime: clock.format(new Date(row.check_in)),
+        /* A hold that ran out is gone, even before the minute cron releases it. */
+        status: row.hold_expired ? 'Cancelled' : stayStatus[row.status ?? ''] ?? label(row.status),
+        holdUntil: row.status === 'held' && row.hold_expires_at ? row.hold_expires_at : undefined,
+        departTime: clock.format(new Date(row.check_out)), source: row.source,
+        kind: row.source === 'nexg' ? 'NexG' : label(row.source), guests: (row.party_adults ?? 0) + (row.party_children ?? 0),
         adults: row.party_adults ?? 1, children: row.party_children ?? 0, rateKes: row.rate_kes,
         totalMinor: 0, conflict: row.conflict_flagged,
       };
