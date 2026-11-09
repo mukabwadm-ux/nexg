@@ -31,7 +31,20 @@ const CONFIG_CATEGORY_BY_TILE: Record<string, string> = {
   gift_shop: 'flowers_gifts',
 };
 
-/** The tiles with their labels translated, as PopularCategories takes them. */
+/** Tile ids the click counter accepts: the tile's image name, which is unique. */
+export const TILE_IDS: readonly string[] = POPULAR_CATEGORIES.map((item) => item.image);
+
+/**
+ * The tiles with their labels translated, as PopularCategories takes them,
+ * most tapped first.
+ *
+ * `clicks` is taps per tile over the last 30 days (rpc_category_tile_popularity).
+ * Ties, and a site with no taps yet, keep the order above.
+ *
+ * Two tiles can share one configured category (Flowers and Gifts are both
+ * flowers_gifts). Its label would then appear twice, so those tiles keep
+ * their own names.
+ */
 export function categoryTiles(
   t: (key: string) => string,
   configured: {
@@ -40,11 +53,19 @@ export function categoryTiles(
     image_path: string | null;
     image_url?: string | null;
   }[] = [],
+  clicks: Record<string, number> = {},
 ) {
-  return POPULAR_CATEGORIES.map((item) => ({
+  const shared = new Set(
+    Object.values(CONFIG_CATEGORY_BY_TILE).filter(
+      (config, index, all) => all.indexOf(config) !== index,
+    ),
+  );
+  const tiles = POPULAR_CATEGORIES.map((item) => ({
     key: item.key,
+    tile: item.image,
     label:
       ('category' in item &&
+        !shared.has(CONFIG_CATEGORY_BY_TILE[item.category]!) &&
         configured.find((category) => category.category === CONFIG_CATEGORY_BY_TILE[item.category])
           ?.label) ||
       t(item.key),
@@ -57,6 +78,10 @@ export function categoryTiles(
         : null,
     ...('category' in item ? { category: item.category } : { href: item.href }),
   }));
+  return tiles
+    .map((tile, index) => ({ tile, index, taps: clicks[tile.tile] ?? 0 }))
+    .sort((a, b) => b.taps - a.taps || a.index - b.index)
+    .map(({ tile }) => tile);
 }
 
 export { CATEGORY_IMAGE_MAP, getCategoryImage } from '@nexg/contracts';

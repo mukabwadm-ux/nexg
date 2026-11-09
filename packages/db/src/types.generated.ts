@@ -55641,6 +55641,11 @@ export type Database = {
           unit: string;
         }[];
       };
+      rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
+      rpc_category_tile_popularity: {
+        Args: { p_days?: number };
+        Returns: { clicks: number; tile: string }[];
+      };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
         Args: {

@@ -52,6 +52,22 @@ const getHomeData = unstable_cache(
   { revalidate: 300 },
 );
 
+/* Taps per category tile over the last 30 days. Refreshed every five minutes;
+   if it cannot be read, the tiles keep their usual order. */
+const getTileTaps = unstable_cache(
+  async (): Promise<Record<string, number>> => {
+    const { data, error } = await createPublicClient().rpc('rpc_category_tile_popularity', {
+      p_days: 30,
+    });
+    if (error || !data) return {};
+    return Object.fromEntries(
+      (data as { tile: string; clicks: number }[]).map((row) => [row.tile, Number(row.clicks)]),
+    );
+  },
+  ['homepage-tile-taps'],
+  { revalidate: 300 },
+);
+
 export async function HomePageContent({
   locale,
   translate,
@@ -60,7 +76,10 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const { cities: allCities, zones, featured } = await getHomeData();
+  const [{ cities: allCities, zones, featured }, tileTaps] = await Promise.all([
+    getHomeData(),
+    getTileTaps(),
+  ]);
   const supabase = createPublicClient();
   const { data: categoryRows, error: categoryError } = await supabase
     .from('category_config')
@@ -117,7 +136,7 @@ export async function HomePageContent({
             heading={t('home.popular.heading')}
             sub={t('home.popular.sub')}
             allLabel={t('home.popular.all')}
-            items={categoryTiles(t, categories)}
+            items={categoryTiles(t, categories, tileTaps)}
           />
         </section>
 
