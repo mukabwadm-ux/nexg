@@ -30321,6 +30321,10 @@ export type Database = {
           quote_total_kes: number | null;
           rate_kes: number | null;
           refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -30353,6 +30357,10 @@ export type Database = {
           quote_total_kes?: number | null;
           rate_kes?: number | null;
           refund_due_at?: string | null;
+          refund_note?: string | null;
+          refund_reference?: string | null;
+          refunded_at?: string | null;
+          refunded_by?: string | null;
           source?: string;
           status?: string;
           unit_id?: string | null;
@@ -30384,6 +30392,10 @@ export type Database = {
           quote_total_kes?: number | null;
           rate_kes?: number | null;
           refund_due_at?: string | null;
+          refund_note?: string | null;
+          refund_reference?: string | null;
+          refunded_at?: string | null;
+          refunded_by?: string | null;
           source?: string;
           status?: string;
           unit_id?: string | null;
@@ -30486,6 +30498,13 @@ export type Database = {
             columns: ['property_id'];
             isOneToOne: false;
             referencedRelation: 'property_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_refunded_by_fkey';
+            columns: ['refunded_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
           {
@@ -55349,6 +55368,10 @@ export type Database = {
           quote_total_kes: number | null;
           rate_kes: number | null;
           refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55389,6 +55412,10 @@ export type Database = {
           quote_total_kes: number | null;
           rate_kes: number | null;
           refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55430,6 +55457,10 @@ export type Database = {
           quote_total_kes: number | null;
           rate_kes: number | null;
           refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55475,6 +55506,10 @@ export type Database = {
           quote_total_kes: number | null;
           rate_kes: number | null;
           refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55515,6 +55550,10 @@ export type Database = {
           quote_total_kes: number | null;
           rate_kes: number | null;
           refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -55529,9 +55568,71 @@ export type Database = {
       };
       rpc_stay_refund_record: {
         Args: { p_note?: string; p_reference: string; p_stay_id: string };
-        Returns: Json;
+        Returns: {
+          check_in: string;
+          check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
-      rpc_stay_refunds: { Args: { p_show?: string }; Returns: Json[] };
+      rpc_stay_refunds: {
+        Args: { p_show?: string };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          guest_email: string;
+          guest_name: string;
+          host: string;
+          mpesa_receipt: string;
+          paid_kes: number;
+          payer_phone: string;
+          payment_reference: string;
+          property: string;
+          reason: string;
+          refund_due_at: string;
+          refund_note: string;
+          refund_reference: string;
+          refunded_at: string;
+          refunded_by: string;
+          stay_id: string;
+          unit: string;
+        }[];
+      };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
         Args: {
@@ -55642,6 +55743,10 @@ export type Database = {
           quote_total_kes: number | null;
           rate_kes: number | null;
           refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
