@@ -116,9 +116,14 @@ export function LocationSheet({
           <a href="/legal/privacy" className="underline">
             How we use location
           </a>{' '}
-          ·{' '}
-          <a href="/legal/privacy" className="underline">
-            Privacy (KDPA)
+          · {/* The published policy (apps/web/public/legal), in a new tab. */}
+          <a
+            href="/legal/nexg-data-protection-policy.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Data protection (KDPA)
           </a>
         </p>
       </div>

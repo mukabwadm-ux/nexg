@@ -8,6 +8,7 @@ import * as React from 'react';
 
 import { type AccountRole, createAccount, signIn } from '@/app/(customer)/sign-in/actions';
 import { authDestination } from '@/lib/auth-navigation';
+import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
 
 const ROLES: { value: AccountRole; label: string; hint: string; icon: React.ReactNode }[] = [
   {
@@ -295,8 +296,16 @@ export function AuthPanel({
                   className="text-ink font-bold underline underline-offset-2"
                 >
                   Privacy Policy
-                </Link>
-                . NexG uses my details to run my orders and account, and never sells them.
+                </Link>{' '}
+                (see our{' '}
+                <a
+                  href={DATA_PROTECTION_POLICY_URL}
+                  {...NEW_TAB}
+                  className="text-ink font-bold underline underline-offset-2"
+                >
+                  Data Protection Policy
+                </a>
+                ). NexG uses my details to run my orders and account, and never sells them.
               </span>
             </label>
           )}
