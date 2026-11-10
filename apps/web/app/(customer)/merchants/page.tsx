@@ -42,7 +42,7 @@ const BENEFITS = [
   },
   {
     title: 'Paid without chasing',
-    body: 'Guests pay NexG by card or M-Pesa. You get settled to your M-Pesa or bank every week, with a statement per order.',
+    body: 'Guests pay NexG by M-Pesa. You get settled to your M-Pesa or bank every week, with a statement per order.',
   },
   {
     title: 'One simple dashboard',

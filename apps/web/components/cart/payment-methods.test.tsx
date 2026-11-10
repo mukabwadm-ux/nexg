@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { type Method, methodOptions, PaymentMethods } from './payment-methods';
 
-const all = methodOptions({ cardReady: true, mpesaReady: true, bankEnabled: false });
+const all = methodOptions({ mpesaReady: true, bankEnabled: false });
 
 function render(
   value: Method,
@@ -32,27 +32,28 @@ function render(
 }
 
 describe('payment methods', () => {
-  it('offers card, M-Pesa and pay on delivery, and bank only when it is connected', () => {
-    expect(all.map((o) => o.value)).toEqual(['card', 'mpesa_stk', 'cash_on_delivery']);
-    expect(
-      methodOptions({ cardReady: true, mpesaReady: true, bankEnabled: true }).map((o) => o.value),
-    ).toEqual(['card', 'mpesa_stk', 'bank_transfer', 'cash_on_delivery']);
+  it('offers M-Pesa and pay on delivery, and bank only when it is connected', () => {
+    expect(all.map((o) => o.value)).toEqual(['mpesa_stk', 'cash_on_delivery']);
+    expect(methodOptions({ mpesaReady: true, bankEnabled: true }).map((o) => o.value)).toEqual([
+      'mpesa_stk',
+      'bank_transfer',
+      'cash_on_delivery',
+    ]);
   });
 
   it('shows a method with nothing connected behind it as coming soon, and does not let it be picked', () => {
-    const options = methodOptions({ cardReady: false, mpesaReady: true, bankEnabled: false });
-    const html = render('mpesa_stk', { options });
+    const options = methodOptions({ mpesaReady: false, bankEnabled: false });
+    const html = render('cash_on_delivery', { options });
     expect(html).toContain('Coming soon');
-    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*?Card/);
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*?M-Pesa/);
   });
 
-  it('explains card payments without asking for the card here', () => {
-    const html = render('card');
-    expect(html).toContain('Pay by card on Paystack');
-    expect(html).toContain('VISA');
-    expect(html).toContain('Mastercard');
-    expect(html).toContain('NexG never sees or stores your card number.');
-    expect(html).not.toMatch(/card number<\/label>|name="card/);
+  it('offers no card payment and names no card provider', () => {
+    const options = methodOptions({ mpesaReady: true, bankEnabled: true });
+    for (const method of ['mpesa_stk', 'bank_transfer', 'cash_on_delivery'] as const) {
+      const html = render(method, { options });
+      expect(html).not.toMatch(/Paystack|Visa|Mastercard|>Card</i);
+    }
   });
 
   it('says which phone the M-Pesa prompt goes to', () => {

@@ -1,7 +1,6 @@
 import { Card, VALUE_PLACEHOLDER } from '@nexg/ui';
 import {
   Bike,
-  CreditCard,
   MapPin,
   MessageSquare,
   RotateCcw,
@@ -9,6 +8,7 @@ import {
   Sparkles,
   Store,
   UserRound,
+  Wallet,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -37,9 +37,9 @@ const TOPICS = [
     anchor: 'ordering',
   },
   {
-    icon: CreditCard,
+    icon: Wallet,
     title: 'Payments',
-    body: 'M-Pesa, cards, pay on delivery, charge to room, receipts',
+    body: 'M-Pesa, pay on delivery, charge to room, receipts',
     anchor: 'payments',
   },
   {
@@ -109,7 +109,7 @@ const ANSWERS = [
   {
     group: 'payments',
     q: 'How will payment work?',
-    a: 'M-Pesa, cards and pay on delivery at participating merchants, with charge-to-room at partner hotels. None of it is switched on yet, and no price on this site is a real figure until it is.',
+    a: 'M-Pesa, and pay on delivery at participating merchants, with charge-to-room at partner hotels. None of it is switched on yet, and no price on this site is a real figure until it is.',
   },
   {
     group: 'refunds',

@@ -44,12 +44,9 @@ const field =
 
 export function CheckoutForm({
   bankEnabled = false,
-  cardReady = true,
   mpesaReady = true,
 }: {
   bankEnabled?: boolean;
-  /** Whether a card provider is connected; when not, Card is shown as coming soon. */
-  cardReady?: boolean;
   /** Whether M-Pesa prompts can be sent. */
   mpesaReady?: boolean;
 } = {}) {
@@ -58,8 +55,8 @@ export function CheckoutForm({
   const { place, openSheet } = useLocation();
 
   const options = React.useMemo(
-    () => methodOptions({ cardReady, mpesaReady, bankEnabled }),
-    [cardReady, mpesaReady, bankEnabled],
+    () => methodOptions({ mpesaReady, bankEnabled }),
+    [mpesaReady, bankEnabled],
   );
   const [method, setMethod] = React.useState<Method>(
     () => options.find((o) => o.ready)?.value ?? 'cash_on_delivery',
@@ -230,36 +227,14 @@ export function CheckoutForm({
         return;
       }
 
-      const res = await fetch('/api/payments/paystack/start', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderId: result.order_id }),
-      });
-      const body = (await res.json()) as {
-        ok: boolean;
-        message?: string;
-        reference?: string;
-        authorization_url?: string;
-      };
-      if (!body.ok || !body.authorization_url) {
-        cart.clear();
-        /* The order and its payment are saved: the pay page says where it
-           stands, as it does when an M-Pesa prompt or a bank cannot start. */
-        if (body.reference) {
-          router.push(`/pay/${body.reference}`);
-          return;
-        }
-        setError(
-          `Your order ${result.reference} is saved, but payment could not start. ${body.message ?? ''}`,
-        );
-        return;
-      }
+      /* Every online method is handled above. Should one ever reach here,
+         the order is saved and the pay page offers a way to pay it. */
       cart.clear();
-      window.location.href = body.authorization_url;
+      router.push(`/pay/${result.reference}`);
     } catch {
       /* The connection dropped mid-way: the order may already be saved.
          Nothing is charged without the guest confirming on their phone or
-         card page, so the safe advice is to look before ordering again. */
+         at their bank, so the safe advice is to look before ordering again. */
       setError(
         'The connection dropped. Your order may already be saved: check Your account → Orders before placing it again. Nothing is charged until you confirm the payment.',
       );

@@ -47,7 +47,7 @@ $grant$;
 grant select on d to authenticated;
 grant all on t to authenticated;
 
-/* Settle a payment the way the M-Pesa and Paystack callbacks do. */
+/* Settle a payment the way the M-Pesa and bank callbacks do. */
 create function pg_temp.settle(p_reference text, p_amount bigint) returns jsonb
 language sql as $$
   select public.rpc_payment_webhook(

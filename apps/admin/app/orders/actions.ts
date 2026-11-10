@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { paystackConfigured, refund as sendRefund } from '@/lib/paystack';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -131,24 +130,31 @@ export async function createManualOrder(payload: Record<string, unknown>): Promi
 }
 
 /**
- * Actually send an approved refund.
+ * Record an approved refund as sent.
  *
  * Two steps on purpose. `rpc_order_refund` decides whether the
- * refund is allowed and whether a second person is needed; this
- * carries it out. Separating them means a provider outage leaves a
- * queue of approved refunds rather than a queue of lost decisions,
- * and `refunds_to_issue_v` is that queue.
+ * refund is allowed and whether a second person is needed. Finance
+ * then sends the money back by M-Pesa or bank transfer and records
+ * the reference here. `refunds_to_issue_v` is the queue of refunds
+ * approved and not yet sent.
  *
- * Nothing is marked issued until the provider has said yes. A
- * refund marked sent that was not is the one mistake a guest
- * notices and Finance cannot explain.
+ * Nothing is marked sent without the reference of the money that
+ * moved. A refund marked sent that was not is the one mistake a
+ * guest notices and Finance cannot explain.
  */
-export async function issueRefund(refundId: string): Promise<Outcome> {
-  const supabase = createClient();
+export async function recordRefundSent(refundId: string, reference: string): Promise<Outcome> {
+  const ref = reference.trim();
+  if (ref.length < 4) {
+    return {
+      ok: false,
+      message: 'Enter the M-Pesa or bank reference of the money you sent back.',
+    };
+  }
 
+  const supabase = createClient();
   const { data, error } = await supabase
     .from('refunds_to_issue_v')
-    .select('*')
+    .select('refund_id')
     .eq('refund_id', refundId)
     .maybeSingle();
 
@@ -156,65 +162,14 @@ export async function issueRefund(refundId: string): Promise<Outcome> {
   if (!data) {
     return {
       ok: false,
-      message: 'That refund is not waiting to be sent — it may already be out, or not approved.',
-    };
-  }
-
-  const row = data as {
-    refund_id: string;
-    amount_cents: number;
-    reason_code: string;
-    reason_text: string | null;
-    original_provider_ref: string | null;
-    method: string;
-  };
-
-  if (!paystackConfigured()) {
-    return {
-      ok: false,
       message:
-        'No payment provider is connected, so this stays approved and unsent. Finance settles it by hand until PAYSTACK_SECRET_KEY is set.',
+        'That refund is not waiting to be sent: it may already be recorded, or not approved.',
     };
   }
-
-  if (row.method === 'wallet_credit') {
-    return {
-      ok: false,
-      message:
-        'A wallet credit does not go through the provider. There is no wallet ledger yet, so Finance applies it by hand.',
-    };
-  }
-
-  if (!row.original_provider_ref) {
-    return {
-      ok: false,
-      message:
-        'There is no provider transaction to refund against — this order was not paid online. Send it by M-Pesa and record the reference.',
-    };
-  }
-
-  const sent = await sendRefund({
-    transactionRef: row.original_provider_ref,
-    amountCents: row.amount_cents,
-    reason: `${row.reason_code}${row.reason_text ? ` · ${row.reason_text}` : ''}`,
-  });
-
-  if (!sent.ok) return { ok: false, message: sent.message };
 
   const { data: done, error: markError } = await supabase.rpc('rpc_refund_issued', {
     p_refund_id: refundId,
-    p_provider_ref: sent.providerRef ?? 'sent',
+    p_provider_ref: ref.slice(0, 120),
   });
-
-  if (markError) {
-    /* The money has gone and we failed to write it down. Say so
-       exactly — the provider reference is the only way to find it
-       again. */
-    return {
-      ok: false,
-      message: `Sent (provider ${sent.providerRef ?? 'unknown'}) but we could not record it: ${markError.message}. Give Finance that reference.`,
-    };
-  }
-
-  return unwrap(done, null, PATHS);
+  return unwrap(done, markError, PATHS);
 }

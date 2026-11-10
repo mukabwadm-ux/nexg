@@ -6,7 +6,6 @@ import {
   ArrowRight,
   BedDouble,
   ChevronDown,
-  CreditCard,
   Flower2,
   Gem,
   Headphones,
@@ -20,6 +19,7 @@ import {
   CalendarDays,
   User,
   UtensilsCrossed,
+  Wallet,
   Zap,
   type LucideIcon,
 } from 'lucide-react';
@@ -82,7 +82,7 @@ const FEATURES: { icon: LucideIcon; title: string; body: string }[] = [
   { icon: Zap, title: 'Speed', body: 'Fast, reliable and convenient' },
   { icon: ShieldCheck, title: 'Verified Partners', body: 'Trusted and quality service providers' },
   { icon: Headphones, title: '24/7 Support', body: 'Personal assistance anytime' },
-  { icon: CreditCard, title: 'Secure Payments', body: 'Card, M-Pesa and more' },
+  { icon: Wallet, title: 'Secure Payments', body: 'M-Pesa and pay on delivery' },
   { icon: Gem, title: 'NexG Plus', body: 'Exclusive access and priority service' },
 ];
 

@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(7);
+select plan(8);
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
 values
@@ -20,7 +20,7 @@ select 'c0590000-0000-4000-8000-000000000012', r.id,
        'c0590000-0000-4000-8000-000000000011'
 from public.role r where r.key = 'ops_manager';
 
-delete from vault.secrets where name in ('paystack_secret_key', 'bank_webhook_secret');
+delete from vault.secrets where name in ('daraja_callback_secret', 'bank_webhook_secret');
 select vault.create_secret('ci-only-overview-bank-secret-0123456789', 'bank_webhook_secret');
 
 insert into public.payment_event (provider, event, dedupe_key, reference, payload, signature_ok, handled, handled_note)
@@ -32,10 +32,12 @@ values
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"c0590000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 
-select is(jsonb_array_length(public.rpc_api_overview() -> 'webhooks'), 3, 'three incoming webhooks are reported');
+select is(jsonb_array_length(public.rpc_api_overview() -> 'webhooks'), 2, 'two incoming webhooks are reported: M-Pesa and banks');
+select ok(not exists (select 1 from jsonb_array_elements(public.rpc_api_overview() -> 'webhooks') w where w ->> 'key' = 'paystack'),
+  'Paystack is not one of them');
 select is((select w ->> 'secret_set' from jsonb_array_elements(public.rpc_api_overview() -> 'webhooks') w where w ->> 'key' = 'bank'),
   'true', 'a webhook secret in Vault shows as set');
-select is((select w ->> 'secret_set' from jsonb_array_elements(public.rpc_api_overview() -> 'webhooks') w where w ->> 'key' = 'paystack'),
+select is((select w ->> 'secret_set' from jsonb_array_elements(public.rpc_api_overview() -> 'webhooks') w where w ->> 'key' = 'mpesa'),
   'false', 'a missing one shows as not set');
 select ok((select (w ->> 'events_30d')::int >= 2 from jsonb_array_elements(public.rpc_api_overview() -> 'webhooks') w where w ->> 'key' = 'bank'),
   'bank events from the last 30 days are counted');

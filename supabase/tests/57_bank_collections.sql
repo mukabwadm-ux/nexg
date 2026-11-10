@@ -66,7 +66,7 @@ select throws_ok(
   'opening a collection needs the server''s bank secret');
 
 select throws_ok(
-  format($$select public.rpc_payment_bank_started(%L, 'paystack', 'col_paid', 'http://bank.test/checkout/col_paid', 'ci-only-bank-webhook-secret-0123456789')$$,
+  format($$select public.rpc_payment_bank_started(%L, 'card_provider', 'col_paid', 'http://bank.test/checkout/col_paid', 'ci-only-bank-webhook-secret-0123456789')$$,
          current_setting('t.ref_paid')),
   '22023', null,
   'only bank providers can be recorded this way');

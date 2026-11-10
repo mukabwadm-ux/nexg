@@ -57,9 +57,10 @@ export const terms: LegalDocument = {
       id: 'payments',
       heading: 'Payments',
       body: [
-        'We accept M-Pesa, cards, pay on delivery (where offered) and charge-to-room at participating hotels. Card payments are processed by our payment provider; we do not store full card numbers. Pay-on-delivery orders may be limited in value or require a confirmed phone number.',
+        'We accept M-Pesa, pay on delivery (where offered) and charge-to-room at participating hotels. Pay-on-delivery orders may be limited in value or require a confirmed phone number.',
       ],
-      plainEnglish: 'Pay how you like. We never store your full card number.',
+      plainEnglish:
+        'Pay by M-Pesa, on delivery where it is offered, or to your room at partner hotels.',
     },
     {
       id: 'cancellations-and-refunds',

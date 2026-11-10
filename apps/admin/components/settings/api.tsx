@@ -58,7 +58,7 @@ export interface ApiOrigins {
 }
 
 export interface WebhookStatus {
-  key: 'paystack' | 'mpesa' | 'bank';
+  key: 'mpesa' | 'bank';
   secret_set: boolean;
   last_event_at: string | null;
   events_30d: number;
@@ -385,13 +385,6 @@ const WEBHOOKS: {
   check: string;
   secret: string;
 }[] = [
-  {
-    key: 'paystack',
-    name: 'Paystack (cards)',
-    path: '/api/payments/paystack/webhook',
-    check: 'HMAC-SHA512 of the raw body (x-paystack-signature), checked again in the database',
-    secret: 'paystack_secret_key',
-  },
   {
     key: 'mpesa',
     name: 'M-Pesa (Safaricom Daraja)',
@@ -965,11 +958,6 @@ function ApiDocs({ origins }: { origins: ApiOrigins }) {
       'M-Pesa callback',
       `${origins.web}/api/payments/mpesa/callback`,
       'Safaricom Daraja results (secret token in the URL).',
-    ],
-    [
-      'Paystack webhook',
-      `${origins.web}/api/payments/paystack/webhook`,
-      'Card and Paystack payments (signed).',
     ],
   ];
   return (

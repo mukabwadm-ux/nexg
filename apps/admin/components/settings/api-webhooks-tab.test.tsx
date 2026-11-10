@@ -14,8 +14,8 @@ vi.mock('next/cache', () => ({ revalidatePath: () => undefined }));
 const integrations: IntegrationRow[] = [
   {
     key: 'payments',
-    label: 'Card & M-Pesa payments',
-    provider: 'Paystack',
+    label: 'M-Pesa payments',
+    provider: 'Safaricom Daraja',
     status: 'to_do',
     enabled: false,
     config: {},
@@ -74,7 +74,6 @@ const connection: ApiConnectionRow = {
 
 const overview: ApiOverview = {
   webhooks: [
-    { key: 'paystack', secret_set: false, last_event_at: null, events_30d: 0, unhandled_30d: 0 },
     {
       key: 'mpesa',
       secret_set: true,
@@ -125,12 +124,20 @@ describe('API & Webhooks tab', () => {
     expect(html).toContain('Integrations healthy');
     expect(html).toContain('1 / 2');
     expect(html).toContain('Keys due rotation');
-    expect(html).toContain('Card &amp; M-Pesa payments');
+    expect(html).toContain('M-Pesa payments');
+    expect(html).toContain('[Safaricom Daraja]');
     expect(html).toContain('ROTATE KEY');
     expect(html).toContain('Webhooks');
     expect(html).toContain('https://nexgapp.com/api/payments/bank/webhook');
-    expect(html).toContain('NO SECRET');
     expect(html).toContain('SECRET SET');
+    expect(
+      apiTab({
+        ...overview,
+        webhooks: overview.webhooks.map((w) =>
+          w.key === 'bank' ? { ...w, secret_set: false } : w,
+        ),
+      }),
+    ).toContain('NO SECRET');
     expect(html).toContain('5 in 30 days · 1 not handled');
     expect(html).toContain('API keys: 2 active (1 for merchants, 1 platform)');
     expect(html).toContain('Sandbox environment');
@@ -145,7 +152,9 @@ describe('API & Webhooks tab', () => {
 
   it('still shows the webhooks before their status can be read', () => {
     const html = apiTab(null);
-    expect(html).toContain('Paystack (cards)');
+    expect(html).toContain('M-Pesa (Safaricom Daraja)');
+    expect(html).toContain('Banks');
+    expect(html).not.toContain('Paystack');
     expect(html).toContain('Live webhook status appears once the database update');
     expect(html).not.toContain('SECRET SET');
   });

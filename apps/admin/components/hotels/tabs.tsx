@@ -849,7 +849,7 @@ export function ChargeTab({
                 'Front desk gets an SMS/portal prompt · confirms guest is in-house · 60 min SLA',
                 'Order proceeds · line posted to folio with NexG reference',
                 'Hotel invoiced net 14 for the month · commission netted',
-                'Rejected or checked-out · guest re-charged to saved card or M-Pesa',
+                'Rejected or checked-out · guest pays by M-Pesa instead',
               ].map((step, i) => (
                 <li key={i} className="flex gap-2.5">
                   <span className="bg-ink flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-extrabold text-white">

@@ -3,7 +3,7 @@
  *
  * Providers explain a failure in their own words: Safaricom's ResultDesc
  * ("Request cancelled by user", "DS timeout user cannot be reached"),
- * Paystack's gateway_response, or the bank's failure reason. The payment
+ * or the bank's failure reason. The payment
  * keeps that text as failure_reason; this turns it into something a guest
  * can act on. Nothing here decides whether a payment happened; that is
  * the database's job.
