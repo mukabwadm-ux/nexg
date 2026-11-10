@@ -185,6 +185,7 @@ const en: Dictionary = {
 
   // ── chrome
   'nav.explore': 'Explore',
+  'nav.discovery': 'Discovery',
   'nav.experience': 'Experience',
   'nav.experience.note': 'Build a day to your budget',
   'nav.stays': 'Stays',
@@ -357,6 +358,8 @@ const sw: Dictionary = {
 
   // ── menyu
   'nav.explore': 'Gundua',
+  // The page's name, kept as it is so it reads the same next to Explore.
+  'nav.discovery': 'Discovery',
   'nav.experience': 'Panga siku yako',
   'nav.experience.note': 'Jenga siku kulingana na bajeti yako',
   'nav.stays': 'Malazi',

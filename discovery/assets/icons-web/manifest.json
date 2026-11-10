@@ -1,0 +1,1347 @@
+{
+  "generator": "scripts/icons/build-web-icons.mjs",
+  "source": "docs/discovery/TAXONOMY_V1.1.json",
+  "settings": {
+    "size": 256,
+    "format": "webp",
+    "quality": 80
+  },
+  "encoder": "sharp 0.34.5, libwebp 1.6.0",
+  "totals": {
+    "icons": 133,
+    "sourceBytes": 199699783,
+    "bytes": 2101318
+  },
+  "icons": [
+    {
+      "icon": "00_Main_Category_Icons/01_adults_only.png",
+      "sourceBytes": 943527,
+      "sourceSha256": "b7038ae23aa7576c2b3198c8676d85adde5fffa7d6c0037beea137dffe8f2b34",
+      "file": "00_Main_Category_Icons/01_adults_only.webp",
+      "bytes": 11514,
+      "sha256": "a4a53ce8f4f58b780574262d4a80d9272e0620f7c75d2887d71562343bcc6d27",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/02_airport_transfers.png",
+      "sourceBytes": 888403,
+      "sourceSha256": "a2f07726a4dcf7a1f4ba796fe2767fcd96ec9091888a24e2e9719ebf42d62fcf",
+      "file": "00_Main_Category_Icons/02_airport_transfers.webp",
+      "bytes": 13436,
+      "sha256": "69bae5e8ed5e44c20931e70ffda72ddc6e691801ecbf53f42f386663a7c21800",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/03_alcohol_beverages.png",
+      "sourceBytes": 650486,
+      "sourceSha256": "0f94f4bd992397fae0493a244015af42712433a1b524cce18d4804544e4886c2",
+      "file": "00_Main_Category_Icons/03_alcohol_beverages.webp",
+      "bytes": 6912,
+      "sha256": "236404f5c62d79677b90d5dab84be1c1ba3272d0400f18ee10376d14dc0bb69f",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/04_apparel.png",
+      "sourceBytes": 2176903,
+      "sourceSha256": "9b5d6b5e4131d8719f4df6b273f9e410924bef4a9437c188dfff906699704968",
+      "file": "00_Main_Category_Icons/04_apparel.webp",
+      "bytes": 18312,
+      "sha256": "a5f705c29dcb22cf55a37c9be54a00a23904a0166bab0aef9e0e6834a8ced743",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/05_beauty_wellness.png",
+      "sourceBytes": 1445325,
+      "sourceSha256": "43609ecf5f99b946a1ee62854f2641abcf6ec309a0bbd44c1a2d67c3e567e0d0",
+      "file": "00_Main_Category_Icons/05_beauty_wellness.webp",
+      "bytes": 15748,
+      "sha256": "f2c5a6d787c18622c2e549f211f05e7f256964623f2666ee692042a6dd93453f",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/06_vehicle_rentals.png",
+      "sourceBytes": 1342111,
+      "sourceSha256": "d071ed5d87976f93cf1804015fc5f10c175a7c31989c01230ca363c933405a81",
+      "file": "00_Main_Category_Icons/06_vehicle_rentals.webp",
+      "bytes": 14550,
+      "sha256": "9425d3c94f6d51f5fc5046d84a0b271e0427f9fae2b68eee71d81195bb0903cc",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/07_experiences.png",
+      "sourceBytes": 1613999,
+      "sourceSha256": "e4704977f0ce6325011f87043f5380b148c258a1a69fb3a8737693bd34cfc01e",
+      "file": "00_Main_Category_Icons/07_experiences.webp",
+      "bytes": 12838,
+      "sha256": "fa70514347ce5b1c800cf890ac58676d0b266c3f66d8c0e9f76169c2ceedde92",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/08_flowers_gifts.png",
+      "sourceBytes": 1979723,
+      "sourceSha256": "08a5271aea62c8e443691a8afe706e1441ac77a000c656ad56865c123b095d1e",
+      "file": "00_Main_Category_Icons/08_flowers_gifts.webp",
+      "bytes": 19980,
+      "sha256": "532cd82e5da9fa6255acf06c7f22c49e8db2544bb923c857c9de4d46e13b335b",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/09_marketplace.png",
+      "sourceBytes": 1285052,
+      "sourceSha256": "fd242beab35a4815823bf9c4dacd07078251286d84695a31f2579aa91d8eeccc",
+      "file": "00_Main_Category_Icons/09_marketplace.webp",
+      "bytes": 14248,
+      "sha256": "970146aee15d7b91872d86ce0a5b135327c03bea8aa530e23d5e53e0cd06f79e",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/10_restaurants_food.png",
+      "sourceBytes": 1232958,
+      "sourceSha256": "ad617cf381190400ed9edbb76175f06e1851ce916a50369b3ec40237fff51002",
+      "file": "00_Main_Category_Icons/10_restaurants_food.webp",
+      "bytes": 15140,
+      "sha256": "f4e4867fad4c4e557a34849d12014edfc2a8891ff8cecaf4e07a7b2cb89db274",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/11_groceries_essentials.png",
+      "sourceBytes": 1597884,
+      "sourceSha256": "c161bb0ded027c7dff751271072cb305693360c044f06748ce9b63331bba3960",
+      "file": "00_Main_Category_Icons/11_groceries_essentials.webp",
+      "bytes": 20070,
+      "sha256": "494e8af91ed1d3915387d6c90dd6985a34ee5ce349491184b546583231cee29d",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/12_laundry_cleaning.png",
+      "sourceBytes": 1886439,
+      "sourceSha256": "261a5a4611aa3732863389323192030a1b26806a3f2c84288bdbcbbae371541f",
+      "file": "00_Main_Category_Icons/12_laundry_cleaning.webp",
+      "bytes": 15432,
+      "sha256": "34bb97e388493e8cadb020750f252153e5f0a80dc351c7bb0c5564fa8ff385e6",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/13_health_pharmacy.png",
+      "sourceBytes": 1202413,
+      "sourceSha256": "5a6a8254229ae1524e9b06b1e5c35a4249ad02da392174fd1d91c1faeadb0ed0",
+      "file": "00_Main_Category_Icons/13_health_pharmacy.webp",
+      "bytes": 11542,
+      "sha256": "f054aa5e30d557a765ab2d6c8ea4c561bb2f17f5a70f2fe3a01323e5c39b0b50",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/14_tech_electronics.png",
+      "sourceBytes": 1045585,
+      "sourceSha256": "6418e7444676336fa6785e031a9269bef2e6a20c7818d8cf0f6b8dd2ff80fa77",
+      "file": "00_Main_Category_Icons/14_tech_electronics.webp",
+      "bytes": 12386,
+      "sha256": "ef8ea3172d3dc4c2fc9901eb844c17bb71b7d820fd9d97e2b40ed21880456049",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/15_safaris_tours.png",
+      "sourceBytes": 1601866,
+      "sourceSha256": "4be0f1d62c3633ceeed7ec15e6dd524efa1f18d6d1b3e8e185f9a90050928a8d",
+      "file": "00_Main_Category_Icons/15_safaris_tours.webp",
+      "bytes": 21602,
+      "sha256": "7565e2285c265d715ca5e21b6b0075aeaaf7eec7593b01be1d371c21dc55ec0a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/16_concierge_services.png",
+      "sourceBytes": 1177805,
+      "sourceSha256": "e12f31345aaa01badd732fe5cb708839b6f860125d2e890a160ca6c4b63c3c28",
+      "file": "00_Main_Category_Icons/16_concierge_services.webp",
+      "bytes": 14242,
+      "sha256": "6e256527847b71300e81acbdc64253a6191453b45d09956cce0543f3cc7bf6eb",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/17_play.png",
+      "sourceBytes": 1524774,
+      "sourceSha256": "b7df269d07ad2e963cf31964f436f490ff30a64a22836b917dd5a6cfc144eab7",
+      "file": "00_Main_Category_Icons/17_play.webp",
+      "bytes": 12982,
+      "sha256": "1dd655443abcad973eaafb5ebae1d9c109b8cac74a43f58c63ab5320259c56cc",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "00_Main_Category_Icons/18_flights.png",
+      "sourceBytes": 655790,
+      "sourceSha256": "73b183771e964364a7dcd784c018b7beb4c07035fcc7efbdce2d98d064e79692",
+      "file": "00_Main_Category_Icons/18_flights.webp",
+      "bytes": 12138,
+      "sha256": "5e40e17f0e781a10b7adfde76d05fd22bfd7a677cad98031a4b5bb295d22373c",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "01_Adults_Only/01_01_Erotic_Products.png",
+      "sourceBytes": 1438789,
+      "sourceSha256": "beeb98e247b2b2ebcb4d906d4c7be4d188fb1adb163bbfe1b9dac6d5eb883b2d",
+      "file": "01_Adults_Only/01_01_Erotic_Products.webp",
+      "bytes": 16992,
+      "sha256": "4af05c5f2844743dfd7ce775629a1cff85849d43b1a8d3fe1bca687d9cfb890a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "01_Adults_Only/01_02_Tobacco_And_Vapes.png",
+      "sourceBytes": 1358103,
+      "sourceSha256": "8411d9fee505a030eef6b9e699e331a902e1bc1caf1f034a9e0a63402963ba6e",
+      "file": "01_Adults_Only/01_02_Tobacco_And_Vapes.webp",
+      "bytes": 12372,
+      "sha256": "dc0fb0f1b8937c2a8abc08d92b751f5d06e3b1219b0915c07d21feeba5dc74a4",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "01_Adults_Only/01_03_Adult_Wellness.png",
+      "sourceBytes": 1413346,
+      "sourceSha256": "d6fc725e84e891afa81544c6ce034af7e2e04bb963b99c9d315c26539637227e",
+      "file": "01_Adults_Only/01_03_Adult_Wellness.webp",
+      "bytes": 13846,
+      "sha256": "a3ab685ce855da806af74653c8fbef90fc640c4be1689cd638f5ac5fb9aeadd5",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "02_Airport_Transfers/02_01_Airport_Pickup.png",
+      "sourceBytes": 1270175,
+      "sourceSha256": "9eaecf531ba545e59876c8c1d54eb5b97ec004d2f44bf3217bf27bf6257628ea",
+      "file": "02_Airport_Transfers/02_01_Airport_Pickup.webp",
+      "bytes": 18970,
+      "sha256": "0b5d2f3fa9a2ed7f36f9e1e5f1c72854bff5a551820a7bbe222fdc94b01945a3",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "02_Airport_Transfers/02_02_Airport_Dropoff.png",
+      "sourceBytes": 1077218,
+      "sourceSha256": "315216122c447747585ff283f31a4019245b0fb9f53303810fab8e8f6390d6de",
+      "file": "02_Airport_Transfers/02_02_Airport_Dropoff.webp",
+      "bytes": 15980,
+      "sha256": "43d0ad653b36518fec3f311da0a0ddf0a29c669b8ff15504668a4e2cf310b957",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "02_Airport_Transfers/02_03_Meet_And_Greet.png",
+      "sourceBytes": 1258654,
+      "sourceSha256": "ab7954be58f97ae98c5018ea685c414e8d8c9fb62a0fca0e03e0b67178b9f87a",
+      "file": "02_Airport_Transfers/02_03_Meet_And_Greet.webp",
+      "bytes": 12788,
+      "sha256": "b679fa7928ccb9b9cd3227c5bf759bc6beb632cb7261ccdf7de274f520828aa1",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "02_Airport_Transfers/02_04_Executive_Transfer.png",
+      "sourceBytes": 941180,
+      "sourceSha256": "ac7e1d901d617f02b27e8701f1617178bb1c9080addb694ba958ea2cac13cc1a",
+      "file": "02_Airport_Transfers/02_04_Executive_Transfer.webp",
+      "bytes": 11060,
+      "sha256": "9b0596567ae15c87ebae5937ae921f5553f74b1eabd516bcf1570c4677aba9b6",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "03_Alcohol_And_Beverages/03_01_Wine.png",
+      "sourceBytes": 772305,
+      "sourceSha256": "ea6772bacfa29bdadac60d1e449a908188494890797146f1a35fdd0168597b87",
+      "file": "03_Alcohol_And_Beverages/03_01_Wine.webp",
+      "bytes": 10780,
+      "sha256": "457757fa7df71ecfd75c7dfa378f94e8d5fe8b665aa3c7224e561777b39ac195",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "03_Alcohol_And_Beverages/03_02_Spirits.png",
+      "sourceBytes": 1267288,
+      "sourceSha256": "ed6cc10a671c32415dbd38d86ce830a665a6e9f72818f6651872da153e4c27a1",
+      "file": "03_Alcohol_And_Beverages/03_02_Spirits.webp",
+      "bytes": 16198,
+      "sha256": "308adac1e50f7e9338a3790400badc9752fe68f62a1012addb72f147750dd7a5",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "03_Alcohol_And_Beverages/03_03_Beer.png",
+      "sourceBytes": 1062344,
+      "sourceSha256": "b49e76533248caf8fb0d34a0bd3633c7113aac99065f3ec70f1deda2e5d4c49e",
+      "file": "03_Alcohol_And_Beverages/03_03_Beer.webp",
+      "bytes": 10270,
+      "sha256": "a571427faa1001e054830ef9ca547b8df25e1aafa0ee5acb0cc8919e785ca384",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "03_Alcohol_And_Beverages/03_04_Champagne.png",
+      "sourceBytes": 1037697,
+      "sourceSha256": "aeaa4021197017a3c0603a9bc31e3fd30641f3e875b2b4485278af64ad4a344d",
+      "file": "03_Alcohol_And_Beverages/03_04_Champagne.webp",
+      "bytes": 13388,
+      "sha256": "cbee41584a321805dd63fb2c6ac84d6bdf7eedb84a1c90c02dc388005eb6a675",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "03_Alcohol_And_Beverages/03_05_Cocktail_Mixers.png",
+      "sourceBytes": 776618,
+      "sourceSha256": "4199e99c1ba4d7ee75a60785911b34c8def164d266492aa0ee15baa0fbcd945f",
+      "file": "03_Alcohol_And_Beverages/03_05_Cocktail_Mixers.webp",
+      "bytes": 11250,
+      "sha256": "2a0d46e4c3d4892cffb9a730223974a39701bfa68d8166fe10fa55b926e8d392",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "03_Alcohol_And_Beverages/03_06_Liquor_Stores.png",
+      "sourceBytes": 1656414,
+      "sourceSha256": "2a106342522d3ec48fe12656638e6804b417190daed76d5a6cce85db50079239",
+      "file": "03_Alcohol_And_Beverages/03_06_Liquor_Stores.webp",
+      "bytes": 12926,
+      "sha256": "05150fae4eef9cc20c2b5cccf650c3b11cedcf1f7cc626963e8bf0014fe8d27c",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "03_Alcohol_And_Beverages/03_07_NonAlcoholic_Drinks.png",
+      "sourceBytes": 1037576,
+      "sourceSha256": "820eb8d0fec3cba42fdfc10840e035b51a20567644a5891e3e8a981b3c05210c",
+      "file": "03_Alcohol_And_Beverages/03_07_NonAlcoholic_Drinks.webp",
+      "bytes": 12646,
+      "sha256": "31d4302263700fbbb44b6de08c1b35b67e07015cbc3a72643101a7446fab6e51",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "04_Apparel/04_01_Mens_Fashion.png",
+      "sourceBytes": 2381546,
+      "sourceSha256": "34beeacf402e3848b6aa2dca25ec6be00488151806f134324cb03f0896cad275",
+      "file": "04_Apparel/04_01_Mens_Fashion.webp",
+      "bytes": 13254,
+      "sha256": "b736f7d39efbf108f0889beb9494eba45325dff7c740c65e0e3c2a2f3aa98198",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "04_Apparel/04_02_Womens_Fashion.png",
+      "sourceBytes": 1437020,
+      "sourceSha256": "219626582dc108178ad76f6e6d9948f132905da3bd4104e0faa2ee977bf24ba5",
+      "file": "04_Apparel/04_02_Womens_Fashion.webp",
+      "bytes": 14296,
+      "sha256": "2b7a6f984c62c82e3a304d567d9d4068edc866549597334d85e227e7839f5dc7",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "04_Apparel/04_03_Kids_Fashion.png",
+      "sourceBytes": 1931560,
+      "sourceSha256": "e2335dac59edc2f8f2edd4d2f41ed8d97f1170e3a18ff4eca9cffdf962f84309",
+      "file": "04_Apparel/04_03_Kids_Fashion.webp",
+      "bytes": 13994,
+      "sha256": "b2ed1dea385bc6b1b854e29d409c88e2720ca8e7ddd40f3498516080b4780c22",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "04_Apparel/04_04_Shoes.png",
+      "sourceBytes": 1228364,
+      "sourceSha256": "bfadec73f80d3681c4978222f58507f682069b55c5b5d33499b254c7335d7e73",
+      "file": "04_Apparel/04_04_Shoes.webp",
+      "bytes": 9708,
+      "sha256": "569c26200dcbe3f6da701cf4b43dcbf27e1750499185665192f376620f142cb5",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "04_Apparel/04_05_Bags.png",
+      "sourceBytes": 1634597,
+      "sourceSha256": "be6818a33d9773750706e3723046caf9713a6c321d50baff5cdf166ee458df26",
+      "file": "04_Apparel/04_05_Bags.webp",
+      "bytes": 12662,
+      "sha256": "cd7c78af2738542a981890f1c773a4970b7d89df8a4e8235e3d2b74f06ffe1fa",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "04_Apparel/04_06_Watches.png",
+      "sourceBytes": 1134701,
+      "sourceSha256": "a4a0d53adfcf971a3193070eee9764ac0e8ef3d2c57286d45392f1feaf45f627",
+      "file": "04_Apparel/04_06_Watches.webp",
+      "bytes": 11428,
+      "sha256": "879c68a32c4788b7b27791df069601447d92201cb2906d7f6e2de5a8600fb0fe",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "04_Apparel/04_07_Fashion_Accessories.png",
+      "sourceBytes": 1040891,
+      "sourceSha256": "33772330e576046227883145b5a8745a83a9c7db7475a8641986234f6bfcc391",
+      "file": "04_Apparel/04_07_Fashion_Accessories.webp",
+      "bytes": 17798,
+      "sha256": "73c8d4c85b34fd2b20e218ec41d620c27c8552fa14a07d2fad841109945865be",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "05_Beauty_And_Wellness/05_01_Beauty_Products.png",
+      "sourceBytes": 1365888,
+      "sourceSha256": "aec6530c68e4f0249cd62f8cd23c9a31a9931e4c117562cb1bae45baececd15d",
+      "file": "05_Beauty_And_Wellness/05_01_Beauty_Products.webp",
+      "bytes": 16460,
+      "sha256": "3dcf80e6567f15be82213fa662a9f743f2cb8b380e5015c82a05c7010ec611bf",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "05_Beauty_And_Wellness/05_02_Spa.png",
+      "sourceBytes": 1687018,
+      "sourceSha256": "d54219c16e9ddb34cd088a483d7fb5ff48a69bb818ab18c8af14f2831a560d8e",
+      "file": "05_Beauty_And_Wellness/05_02_Spa.webp",
+      "bytes": 17294,
+      "sha256": "ab4276a578e7008ea3b15ab7f52c7755f8815d9498dd8755c44982eb9c80b881",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "05_Beauty_And_Wellness/05_03_Massage.png",
+      "sourceBytes": 1610306,
+      "sourceSha256": "11207076d370736f7c6a790a83e30a51978f9054c18bf84b0dcfb4f685205468",
+      "file": "05_Beauty_And_Wellness/05_03_Massage.webp",
+      "bytes": 16670,
+      "sha256": "cce7a590b7c00ed0c04eb938446ce43d5593630fd8f7fe34640eecaeb29f5413",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "05_Beauty_And_Wellness/05_04_Gym.png",
+      "sourceBytes": 1533960,
+      "sourceSha256": "3215911800a4f9b502e646002d30ff8e5bdeb1d5974164b0bee7f34ba60a2711",
+      "file": "05_Beauty_And_Wellness/05_04_Gym.webp",
+      "bytes": 12768,
+      "sha256": "1e606603eede68c3771a9a32f8228ea2664cd415882e07728078b8288517ed29",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "05_Beauty_And_Wellness/05_05_Personal_Training.png",
+      "sourceBytes": 1360721,
+      "sourceSha256": "ec1eff30dfbd189c7380125b8d9976e7f90527156422bd5db7c348f96cfeedac",
+      "file": "05_Beauty_And_Wellness/05_05_Personal_Training.webp",
+      "bytes": 13734,
+      "sha256": "925235707296e2d80b0b670bb4f1d5aa92c8b30d8f7ca964647d2c6f4853c094",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+      "sourceBytes": 1230521,
+      "sourceSha256": "c9955dfc83863c9fb9273f7a530e065cbc97dcf0ce92f66095c8e1156fc781b3",
+      "file": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.webp",
+      "bytes": 19478,
+      "sha256": "099d782bb030e59d00828c0a0af2f9d202fa9363c7938d3f7e0ae06c81721432",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "05_Beauty_And_Wellness/05_07_Nails_And_Beauty_Services.png",
+      "sourceBytes": 1150550,
+      "sourceSha256": "19e876edade4f1ba8a4964ca33bd5f9860665613b990b71f6d51bde3aee97d44",
+      "file": "05_Beauty_And_Wellness/05_07_Nails_And_Beauty_Services.webp",
+      "bytes": 12980,
+      "sha256": "6d5d64097d0bbaccfed9f924f07e2b3c7e31a189e44f248e88b1b3e451c5faf9",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "06_Vehicle_Rentals/06_01_Car_Rental.png",
+      "sourceBytes": 1243067,
+      "sourceSha256": "5255e4316a6c3cbcd373d8406f97037502756b412aa735c22f24e00bb66689c7",
+      "file": "06_Vehicle_Rentals/06_01_Car_Rental.webp",
+      "bytes": 14102,
+      "sha256": "3a7412fe3e93710286197a401adcb71446261f3a8836993fa8bafd87613b7e90",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "06_Vehicle_Rentals/06_02_Bike_Rental.png",
+      "sourceBytes": 1936441,
+      "sourceSha256": "91c806bda4543310f79af0fe115d7942911549d0b78ea0805d944dccf30f6682",
+      "file": "06_Vehicle_Rentals/06_02_Bike_Rental.webp",
+      "bytes": 33318,
+      "sha256": "82c4f7b825c567d74837737c89633b08ee8d0c18812c6b4949b3f65333d2fbbe",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "06_Vehicle_Rentals/06_03_Vehicle_Repair.png",
+      "sourceBytes": 1793826,
+      "sourceSha256": "0001e436083c2ae08aacff5a22f19fb19a625cf419f850eada329939c966d4e8",
+      "file": "06_Vehicle_Rentals/06_03_Vehicle_Repair.webp",
+      "bytes": 16592,
+      "sha256": "1d55b9a2860a886878dc66aad3ba5c64c888f9ea8e4f7eed8410cfefb8b886c1",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "06_Vehicle_Rentals/06_04_Car_Wash.png",
+      "sourceBytes": 1932057,
+      "sourceSha256": "179c07bada1777fed83394c538fccb0646faa3eee2e417a38d6ac28148fee0c4",
+      "file": "06_Vehicle_Rentals/06_04_Car_Wash.webp",
+      "bytes": 21742,
+      "sha256": "3f3dde08cbbffa5c1b126db9e323317753cf9a892cb006aa93e970fb1bdb39d7",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "07_Experiences/07_01_Events.png",
+      "sourceBytes": 1717254,
+      "sourceSha256": "292ac1bc4aa474c2cf71aa3e0e5a97da5ec79aad2d12f5290d3392c46dfffc66",
+      "file": "07_Experiences/07_01_Events.webp",
+      "bytes": 21548,
+      "sha256": "0764176bbc795b96a9d83b04f2a4b932690d6ed3e70956849751cf76c1c79451",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "07_Experiences/07_02_Photography.png",
+      "sourceBytes": 1732542,
+      "sourceSha256": "c8aa01c5aa1ebb7756fa020664d003b9711a818db7993e11696a8c1c8c7231a0",
+      "file": "07_Experiences/07_02_Photography.webp",
+      "bytes": 16268,
+      "sha256": "80c8207cb15eb071bd32235df60b80722ea7dbddb1ebd5c05bf8a8808f90eb53",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "07_Experiences/07_03_Workshops_And_Classes.png",
+      "sourceBytes": 1351560,
+      "sourceSha256": "25b08bce0749e32a159d02304ef763493e080ac9a9447a3770701c6b3e12aace",
+      "file": "07_Experiences/07_03_Workshops_And_Classes.webp",
+      "bytes": 16020,
+      "sha256": "2841907adc4c77d67ca7e572e42275697d5a7a025c528d1bc3807b965866facd",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "07_Experiences/07_04_Sports_And_Recreation.png",
+      "sourceBytes": 1453919,
+      "sourceSha256": "ddcae3a6f53e9b2690ff6df7001b4e91ac2ace9b2c35105c6f9aa1e6d00d1c67",
+      "file": "07_Experiences/07_04_Sports_And_Recreation.webp",
+      "bytes": 13230,
+      "sha256": "b775ff7991ff2f684c615a8fe47c809ff7b251866361ef99013621c65a0d79cc",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "08_Flowers_And_Gifts/08_01_Flowers.png",
+      "sourceBytes": 2090879,
+      "sourceSha256": "b2c2dad6ecccabb9652d964a012e818b81e0b7c62897b6ec8072a267d013fffc",
+      "file": "08_Flowers_And_Gifts/08_01_Flowers.webp",
+      "bytes": 24752,
+      "sha256": "5465df3429b53404fa70ad5630be5a6be3f80a600e6b06eece8ca74c9d704d5b",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "08_Flowers_And_Gifts/08_02_Gift_Hampers.png",
+      "sourceBytes": 1912944,
+      "sourceSha256": "32078a42c3d88356d94af2c0b09b3f9e4daf0eb9d1ddc25666e3a9c4dbee13f6",
+      "file": "08_Flowers_And_Gifts/08_02_Gift_Hampers.webp",
+      "bytes": 22774,
+      "sha256": "8dec1a7d92e19f4e5475b9e0004c406dee160c81ae4d19684fc2b6f44d3ca9fe",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "08_Flowers_And_Gifts/08_03_Cakes.png",
+      "sourceBytes": 2293614,
+      "sourceSha256": "ea71ac32ab1b09ddcd967dd184559e84d30fd33b302e1238089d6bdd43065af7",
+      "file": "08_Flowers_And_Gifts/08_03_Cakes.webp",
+      "bytes": 22862,
+      "sha256": "d29180faf42509691307b155420a7f5bcb47e2838c4f809dfadb9ecdb6753807",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "08_Flowers_And_Gifts/08_04_Chocolates.png",
+      "sourceBytes": 1702475,
+      "sourceSha256": "2452efed1a155bd83da5e160ce13c80962cd3908331f3c04d9fbb85286389b6b",
+      "file": "08_Flowers_And_Gifts/08_04_Chocolates.webp",
+      "bytes": 18708,
+      "sha256": "c6f48d0029eb625a6fc29e985edeb602327be9fc74bf216a80576921ba23b56d",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "08_Flowers_And_Gifts/08_05_Personalized_Gifts.png",
+      "sourceBytes": 1752590,
+      "sourceSha256": "c99c850f98a525f67161ca5a6ae539b5630a0eadae68a1e5815ef6eac3e91d69",
+      "file": "08_Flowers_And_Gifts/08_05_Personalized_Gifts.webp",
+      "bytes": 18414,
+      "sha256": "0efd05720e360c96f691e93b778b3ca25b64517f1de9e263cb0711ca0e0d090a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "08_Flowers_And_Gifts/08_06_Occasion_Gifts.png",
+      "sourceBytes": 1801996,
+      "sourceSha256": "0cd660c3043caa318fa4a7d6a0ddd4269c506f9692be2d558c2501190c54519d",
+      "file": "08_Flowers_And_Gifts/08_06_Occasion_Gifts.webp",
+      "bytes": 21738,
+      "sha256": "c94c2827b1fc5eedbf23c2111eac05c7397733aed76be84a7d29cc5d8d4e986e",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "09_Marketplace/09_01_Home_And_Living.png",
+      "sourceBytes": 1662293,
+      "sourceSha256": "f2124f2e7b41bab80cc61f6244a65d324b3a110a1581b8b86796671642d79fa2",
+      "file": "09_Marketplace/09_01_Home_And_Living.webp",
+      "bytes": 15146,
+      "sha256": "c65215e1af814f15e1d65b290f6c8b6ac440fad6bdffdbe082f26dd8e38b0124",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "09_Marketplace/09_02_Books_And_Stationery.png",
+      "sourceBytes": 1614296,
+      "sourceSha256": "0605426b49f944b57db1b84a4e6576634eb5850fbd15a214fe41b3055dee3f79",
+      "file": "09_Marketplace/09_02_Books_And_Stationery.webp",
+      "bytes": 12964,
+      "sha256": "2552dc356b912e1bb8093ec7d77f07438b92589b95545bc02248ad616a06cf81",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "09_Marketplace/09_03_General_Retail.png",
+      "sourceBytes": 1348482,
+      "sourceSha256": "db31a493e1025a1da6b1598222d7025e2f75366bf7951dcf2d5b4dd9d6ac577b",
+      "file": "09_Marketplace/09_03_General_Retail.webp",
+      "bytes": 12014,
+      "sha256": "39b4a2c1380ca52752849cc9b3a44d2ed33f975206c15e5ae2389de1c2697225",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "09_Marketplace/09_04_Hardware_And_DIY.png",
+      "sourceBytes": 1215233,
+      "sourceSha256": "ffa53ad53c8de43071e8a835208060ba2fd21105d44d77754fb1e57b4b3d05fc",
+      "file": "09_Marketplace/09_04_Hardware_And_DIY.webp",
+      "bytes": 16636,
+      "sha256": "4a9f2a8a895724b9e65911f22b1f2482571c109fda70d619fe0443f59d1237da",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "09_Marketplace/09_05_Pet_Supplies.png",
+      "sourceBytes": 1268929,
+      "sourceSha256": "d703ec504bd02db53b64248b6e9c07451cde55d9def4487f07762d2a9544b7e5",
+      "file": "09_Marketplace/09_05_Pet_Supplies.webp",
+      "bytes": 12870,
+      "sha256": "d04a98a33816c704a9d7c9ae50bbffc5d43d80b569b638f55ff6bb8c90f58ebb",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "10_Restaurants_And_Food/10_01_Restaurant.png",
+      "sourceBytes": 1543895,
+      "sourceSha256": "d4e64ed1599a197ef9f3b93d85216cc0df0393747d8b0d566b9e9162f691936a",
+      "file": "10_Restaurants_And_Food/10_01_Restaurant.webp",
+      "bytes": 19846,
+      "sha256": "b977fc47805154451c70d08df160f307a30cd84e7e4bae13b58e22e5af958146",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "10_Restaurants_And_Food/10_02_Fast_Food.png",
+      "sourceBytes": 1871725,
+      "sourceSha256": "bf46842c457dd76ca29a05f0d95c4978e20ea428e3f92d3362c8eed465cdc8da",
+      "file": "10_Restaurants_And_Food/10_02_Fast_Food.webp",
+      "bytes": 22478,
+      "sha256": "b3dc66a5559620c8888dd674d07048bc978ba65ece6cdd7710e98acb5474fdb9",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "10_Restaurants_And_Food/10_03_Cafe.png",
+      "sourceBytes": 1558031,
+      "sourceSha256": "a624a20144cd5e7b4b7b26304f511220377ff0731f7cb339e3a12750546e78b1",
+      "file": "10_Restaurants_And_Food/10_03_Cafe.webp",
+      "bytes": 20704,
+      "sha256": "d206bdf5845dae37d3f575116f564d660f815f3d0ee5df4c52dcda96dfa71e4d",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "10_Restaurants_And_Food/10_04_Bakery.png",
+      "sourceBytes": 2277535,
+      "sourceSha256": "1d2932b7eb86c7e3844e8bafadcf58f621cb57fda317a53e584a7474887c03dd",
+      "file": "10_Restaurants_And_Food/10_04_Bakery.webp",
+      "bytes": 24356,
+      "sha256": "093d6aee2768a7b718634288e0d5f301a1e4c8ef87b1c27579b8153d500adf93",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "10_Restaurants_And_Food/10_05_Desserts.png",
+      "sourceBytes": 1476414,
+      "sourceSha256": "21259fe2b40c053257ea72eacf5fa5c3140f0c99003abfdbec6309cd675f2411",
+      "file": "10_Restaurants_And_Food/10_05_Desserts.webp",
+      "bytes": 16786,
+      "sha256": "f7524af530e93eb9023f1a753c65e9cc275623046e4eb6f90133ba9713f448c5",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "10_Restaurants_And_Food/10_06_Juice_Bar.png",
+      "sourceBytes": 1808966,
+      "sourceSha256": "e86b416a0a1f85311fbdc916afe9777619ac9a3fd074ae8167fc51080469bcbf",
+      "file": "10_Restaurants_And_Food/10_06_Juice_Bar.webp",
+      "bytes": 22744,
+      "sha256": "75f8867a173e9a428ddd5138c0e3f6d425101c5240e873a2c1c824e8625a0927",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "10_Restaurants_And_Food/10_07_Catering.png",
+      "sourceBytes": 1364209,
+      "sourceSha256": "25c087217f379152187fba325b090f75dadbd04c5bc4c175784cb1bbea2ab56d",
+      "file": "10_Restaurants_And_Food/10_07_Catering.webp",
+      "bytes": 20262,
+      "sha256": "6f98980a394912b965d418d09f877d0c81249b58d2fb8f0a9cd48c7fe7a98f3d",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "11_Groceries_And_Essentials/11_01_Supermarket.png",
+      "sourceBytes": 2114674,
+      "sourceSha256": "51291f1ff9cc9362ad88b8fb793a804a85bb10a9f3f18edbddaa2e1b9a060947",
+      "file": "11_Groceries_And_Essentials/11_01_Supermarket.webp",
+      "bytes": 16156,
+      "sha256": "ec58831ee991aa07017cb8f980e23340024460de383bb9c5513eca06dcc39508",
+      "width": 256,
+      "height": 171
+    },
+    {
+      "icon": "11_Groceries_And_Essentials/11_02_Convenience_Store.png",
+      "sourceBytes": 1858278,
+      "sourceSha256": "4143df38bd69f4889698db42c819f08fb98289904ad2c88c677e5eb7fd8d57c8",
+      "file": "11_Groceries_And_Essentials/11_02_Convenience_Store.webp",
+      "bytes": 24616,
+      "sha256": "893bc7bee25fd09bd2af6b51a6aa2983739e5200d6f92ef9e7cfef17b5e13515",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "11_Groceries_And_Essentials/11_03_Fresh_Produce.png",
+      "sourceBytes": 2106292,
+      "sourceSha256": "1e31afc52c660ec5e1b12e592efb40e22cb4223dfbc5c9f0ba1c976cd575db6c",
+      "file": "11_Groceries_And_Essentials/11_03_Fresh_Produce.webp",
+      "bytes": 24644,
+      "sha256": "c1787619715f58628b9db26acecd04f0d2dce0a74c809871c14edf83cc973db6",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "11_Groceries_And_Essentials/11_04_Butchery.png",
+      "sourceBytes": 2302519,
+      "sourceSha256": "18239ef60fb4f7f5516b1a5bd1531e304488591ab5c96cb9d92fb631cbbcb365",
+      "file": "11_Groceries_And_Essentials/11_04_Butchery.webp",
+      "bytes": 25768,
+      "sha256": "ccee62fcce3b0f742f82709af5346c51b479b48de2e4b2cf969ae7cd020b6129",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "11_Groceries_And_Essentials/11_05_Seafood.png",
+      "sourceBytes": 2589921,
+      "sourceSha256": "a3dee9e0920e8cca96f2af91195691b46fa6601ded62395122aa7bce9d21d7c9",
+      "file": "11_Groceries_And_Essentials/11_05_Seafood.webp",
+      "bytes": 17500,
+      "sha256": "ba6bb36a783e587623457a3b915222b49ab34668d8f6826f9023245cad2c37e1",
+      "width": 256,
+      "height": 171
+    },
+    {
+      "icon": "11_Groceries_And_Essentials/11_06_Organic_Store.png",
+      "sourceBytes": 1196738,
+      "sourceSha256": "a45cd5f374bf178cd91e3039bc7ecf2efd1a200b66264bc80dfd41e01cd9fc76",
+      "file": "11_Groceries_And_Essentials/11_06_Organic_Store.webp",
+      "bytes": 13364,
+      "sha256": "6551c556d2316e4e5aea04de6d11a85f4330d33eac4483153ed3bc1648f64588",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "11_Groceries_And_Essentials/11_07_Household_Essentials.png",
+      "sourceBytes": 1653190,
+      "sourceSha256": "15f1a2ec870c8170606d41708e7475ed345354a0147162cddccf0035de7a2a05",
+      "file": "11_Groceries_And_Essentials/11_07_Household_Essentials.webp",
+      "bytes": 16858,
+      "sha256": "ad318c4f4c36c95cb99ba0721740d9a5cf09e67d88a59c23a9d47bd7c0a8437c",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "12_Laundry_And_Cleaning/12_01_Laundry.png",
+      "sourceBytes": 1584540,
+      "sourceSha256": "5cefdd068b4ba51d7b0a9737ab237dffc0f8c99cf23d90f6985ac3c96ff281aa",
+      "file": "12_Laundry_And_Cleaning/12_01_Laundry.webp",
+      "bytes": 12804,
+      "sha256": "9857fb41da4f22ed7bd47889cec2d59cf5d74ffc656954b9148043b321180fa9",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "12_Laundry_And_Cleaning/12_02_Dry_Cleaning.png",
+      "sourceBytes": 1613352,
+      "sourceSha256": "1ce3bf096b6a2098adcb5a9a800952c7f028e68129c9231df94d0e18834214a5",
+      "file": "12_Laundry_And_Cleaning/12_02_Dry_Cleaning.webp",
+      "bytes": 14688,
+      "sha256": "af7a1c30a7670ef3692025babdcfe2ab9785bfd10166812b5f2fe547616016d4",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "12_Laundry_And_Cleaning/12_03_Ironing.png",
+      "sourceBytes": 1302803,
+      "sourceSha256": "ccb9ee3a66468bd1ceb9c3df179597c087647c6562b3faabb2b9fa947dca2da6",
+      "file": "12_Laundry_And_Cleaning/12_03_Ironing.webp",
+      "bytes": 13932,
+      "sha256": "120474b7d0598743f9a61ca9905f795181f3ebd45ccce17c8d12a189f861fef3",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "12_Laundry_And_Cleaning/12_04_Home_Cleaning.png",
+      "sourceBytes": 1562674,
+      "sourceSha256": "1e6dd424b3cec6b4b00166e58958ae0e5ce74936ce842d5fbfbcfcba2533b83b",
+      "file": "12_Laundry_And_Cleaning/12_04_Home_Cleaning.webp",
+      "bytes": 18168,
+      "sha256": "6aa7c014f6d98d86b6fb4b53ed8bfc7d716fe5afaa24c833a3a757a521357535",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "12_Laundry_And_Cleaning/12_05_Office_Cleaning.png",
+      "sourceBytes": 773020,
+      "sourceSha256": "74fa89954ace24204b9d661ce659966ba823c0feaefa4d74db4265f4a2082e87",
+      "file": "12_Laundry_And_Cleaning/12_05_Office_Cleaning.webp",
+      "bytes": 13636,
+      "sha256": "d3ac47d1a52f2ccab1c856693d8fce46a0b588b5564b915f3e25451b986ca44e",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_01_Pharmacy.png",
+      "sourceBytes": 900044,
+      "sourceSha256": "e46d6b0480aff0ebbd1b22e24ac503a1150daf3e4a79e4a042303c1979409d1e",
+      "file": "13_Health_And_Pharmacy/13_01_Pharmacy.webp",
+      "bytes": 10392,
+      "sha256": "32a2d0a74035d6f69198e02be21633d7d0a09c6aa90dcfc8d3baabe25aa1e5eb",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_02_Medical_Supplies.png",
+      "sourceBytes": 1438672,
+      "sourceSha256": "c08c62e029ddeb124a8183b2a80d9f11b39155e3d9b168b099239c301b16b0d3",
+      "file": "13_Health_And_Pharmacy/13_02_Medical_Supplies.webp",
+      "bytes": 15100,
+      "sha256": "2c1edb1940bcabbb21d7a0b03fbd48c91d658715745a8a7768823732cd7dbbdc",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_03_Baby_Products.png",
+      "sourceBytes": 1637754,
+      "sourceSha256": "d56e43d0bac458dd472cd327972424a57511193a37daa8144377b1dbced23b2d",
+      "file": "13_Health_And_Pharmacy/13_03_Baby_Products.webp",
+      "bytes": 16292,
+      "sha256": "2da9fb0eef2ea2a1e0092822cfacc62c96a691629329787aa8e51a5d0b1e2772",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_04_Supplements.png",
+      "sourceBytes": 1138138,
+      "sourceSha256": "a7b3ce3941fa02f01697d448b36893b0c4e6256ad25c173ea1c0317ee9c666a4",
+      "file": "13_Health_And_Pharmacy/13_04_Supplements.webp",
+      "bytes": 12974,
+      "sha256": "84226baabef13fa294e80dd34affd40d33d41a3edac3ff035f4f8db896ea8b2b",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_05_Hospitals_And_Clinics.png",
+      "sourceBytes": 1203322,
+      "sourceSha256": "7ec13044e811bf45ea698757c0cf9b8b98d2ce7e3db3f0c3ccfec6ce40e51ced",
+      "file": "13_Health_And_Pharmacy/13_05_Hospitals_And_Clinics.webp",
+      "bytes": 15112,
+      "sha256": "0e08e219f713d2979d1d1c406de86fd2a0cb7bb0af20fac8c099965daa109c74",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_06_Telemedicine.png",
+      "sourceBytes": 1254398,
+      "sourceSha256": "27058657186c658831a592d4cb2b86f7835a8b001d135e62459032884a111a31",
+      "file": "13_Health_And_Pharmacy/13_06_Telemedicine.webp",
+      "bytes": 17368,
+      "sha256": "693e55f21412d8cb9b588ee9c5a93dcac972fc2044fccfca20a3be19cebd45e4",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_07_Mobile_Diagnostic_Services.png",
+      "sourceBytes": 1103851,
+      "sourceSha256": "895cce81cf30a802a758f63c9d2e6cf9481d88cdcd80855da2e4669fc7976580",
+      "file": "13_Health_And_Pharmacy/13_07_Mobile_Diagnostic_Services.webp",
+      "bytes": 15592,
+      "sha256": "ee175fd5157eb281d23c9e86efb06b3ad4b268873999616b4fb9540569d3c366",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_08_Mental_Health.png",
+      "sourceBytes": 1458721,
+      "sourceSha256": "bc3ccde494b886810f6ac74c7ec96c667e8dd96298d3672961ad1b846de416c6",
+      "file": "13_Health_And_Pharmacy/13_08_Mental_Health.webp",
+      "bytes": 14182,
+      "sha256": "dc93a0a7a9713e989f7daa86faefab9c5c80d88983551953875c0e12917e9270",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "13_Health_And_Pharmacy/13_09_Therapy.png",
+      "sourceBytes": 1447496,
+      "sourceSha256": "05f7593cad97b8888bd9d35aa4a3e3d946a67b696b8395508fdbafd41648c990",
+      "file": "13_Health_And_Pharmacy/13_09_Therapy.webp",
+      "bytes": 15028,
+      "sha256": "b690daa3e749ad1da96ce6b0d89e391c0d08565c9255adf73e0b912ec1b1f3af",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "14_Tech_And_Electronics/14_01_Smartphones.png",
+      "sourceBytes": 1060433,
+      "sourceSha256": "5d24565ccb57e97aa3f9139be479bc117ac4fa806c293abc3ef215889f7b93bb",
+      "file": "14_Tech_And_Electronics/14_01_Smartphones.webp",
+      "bytes": 8486,
+      "sha256": "ecfe9f4f9da2ffdda954d9c966227a9e99e3f73987b558408cab4639c0983b3d",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "14_Tech_And_Electronics/14_02_Tech_Accessories.png",
+      "sourceBytes": 1031880,
+      "sourceSha256": "d5b24fb674c5a009cca26c1d34fc4ede4375b323334ae5a1373f080f0347c45d",
+      "file": "14_Tech_And_Electronics/14_02_Tech_Accessories.webp",
+      "bytes": 9820,
+      "sha256": "2aeb4b7b7d53ea2df0b6e6edbf1fe756c1f8f4088b6b3cfd7164168ef8e516ac",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "14_Tech_And_Electronics/14_03_Computers.png",
+      "sourceBytes": 1034327,
+      "sourceSha256": "a2b24b23a29f7d1f2811c74b405a546cbfb80c5b4c7e2ae74642fa398516ca85",
+      "file": "14_Tech_And_Electronics/14_03_Computers.webp",
+      "bytes": 11650,
+      "sha256": "da60be1ab5c0702cc424fa91da0ba3a969daef924cf11089b5bf09a4fbc4c1f0",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "14_Tech_And_Electronics/14_04_Gaming.png",
+      "sourceBytes": 1024001,
+      "sourceSha256": "55c4c2e2cb403840b0fb2cd7c274605f8309d0c9a2a96fb347ca381a67874ad0",
+      "file": "14_Tech_And_Electronics/14_04_Gaming.webp",
+      "bytes": 12044,
+      "sha256": "74773ab10ad7637c8092acf2366d857cf71ab4a0291497e411f845fb3aa67e3f",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "14_Tech_And_Electronics/14_05_Audio.png",
+      "sourceBytes": 1355735,
+      "sourceSha256": "1f640be05fafcb0b52864e6f6e7e41b135709fb591b645caabc335b4a37bb696",
+      "file": "14_Tech_And_Electronics/14_05_Audio.webp",
+      "bytes": 11196,
+      "sha256": "81533aa091b6d4316613a8407f22b134180036e2f4345cab0cca87cb69ba5865",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "14_Tech_And_Electronics/14_06_Telecom_Services.png",
+      "sourceBytes": 748734,
+      "sourceSha256": "8ece6c042c9ddcc8b768ef175b86544a8b9d85244bcfa8d0d70800d3c733825a",
+      "file": "14_Tech_And_Electronics/14_06_Telecom_Services.webp",
+      "bytes": 11008,
+      "sha256": "0380c63187c14e57c9790138bbc372c560261b185847c98eaa679d54b4eef4cd",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "14_Tech_And_Electronics/14_07_Smart_Devices.png",
+      "sourceBytes": 1225518,
+      "sourceSha256": "b96059e4612b36f77896a24d944dc2e68c924f5dabf6ce1d4315ece78715d94b",
+      "file": "14_Tech_And_Electronics/14_07_Smart_Devices.webp",
+      "bytes": 9712,
+      "sha256": "bb7da5ee662fd1efa7fbb92c3c8fe01864403d9fc67a701f3550f3de546d1a9d",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "14_Tech_And_Electronics/14_08_Device_Repairs.png",
+      "sourceBytes": 1256301,
+      "sourceSha256": "758c672c42e9b34469d000468f80e61399d1179f5cdbd6fc3ae031ae5ee8e38b",
+      "file": "14_Tech_And_Electronics/14_08_Device_Repairs.webp",
+      "bytes": 14886,
+      "sha256": "e087bed023713868183867a70660a13f49e4f8e1aa4a5e8d2fe98d9a96ee1cd0",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "15_Safaris_And_Tours/15_01_Safaris.png",
+      "sourceBytes": 1674802,
+      "sourceSha256": "805d0960443f879440bb1173d9c713954555ed1204fabd3de977d5a6d350a024",
+      "file": "15_Safaris_And_Tours/15_01_Safaris.webp",
+      "bytes": 23396,
+      "sha256": "94376bc48d4d932ca677a247a8311382e595e3f6fece274612f89c031da9a8a4",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "15_Safaris_And_Tours/15_02_City_Tours.png",
+      "sourceBytes": 1659273,
+      "sourceSha256": "00b872fb84f64e2668be9d9eeec96be307e30ca82dcc40515547d6b287c4f989",
+      "file": "15_Safaris_And_Tours/15_02_City_Tours.webp",
+      "bytes": 24290,
+      "sha256": "b2166ccea888b694ea47dfd638999d49d7bc967f783f510ddbafe12792a0cd2a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "15_Safaris_And_Tours/15_03_Cultural_Tours.png",
+      "sourceBytes": 1704946,
+      "sourceSha256": "1bdfd0e1cbcdb50341acfd382e8764e6b8951ae05bfccefffd2e6f440da7854f",
+      "file": "15_Safaris_And_Tours/15_03_Cultural_Tours.webp",
+      "bytes": 16904,
+      "sha256": "3564ecb2ca5313ea91e4b593a970971fba80760e89ac294b3a286eda2b048cf5",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "15_Safaris_And_Tours/15_04_Adventure_Tours.png",
+      "sourceBytes": 2349628,
+      "sourceSha256": "933eeb2133c45fd23c296e755003b4e131177094149d9ef3da2d79d3b57ca9c8",
+      "file": "15_Safaris_And_Tours/15_04_Adventure_Tours.webp",
+      "bytes": 18484,
+      "sha256": "1727857f2e2b6878f465c7f7a62a6edbcd573399e312220cfdf35565f6010e10",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "15_Safaris_And_Tours/15_05_Travel_Packages.png",
+      "sourceBytes": 1561252,
+      "sourceSha256": "b4bd9bae03992dc2fce03e13ce97566f11321ed9e1b5f49c53d9baf78bd0cce5",
+      "file": "15_Safaris_And_Tours/15_05_Travel_Packages.webp",
+      "bytes": 14324,
+      "sha256": "0b248bc2b88b62cd8706d68af10574d4bbd6e4f5ad7c0ede8c5ff36d68e27b14",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_01_Reservations.png",
+      "sourceBytes": 956450,
+      "sourceSha256": "d538548571087fa1e71f24ff696ad8debf8b242ea8aa8d90d8359c73cff2516b",
+      "file": "16_Concierge_Services/16_01_Reservations.webp",
+      "bytes": 12594,
+      "sha256": "ab4ef05880b8c1469bef3a139b2727cebd4ec086d860a239ef1e11d5642fdeda",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_02_Personal_Assistance.png",
+      "sourceBytes": 1870032,
+      "sourceSha256": "7b290a79d11096a891a594542651f9577ceba6f3f84e29f30ab5e8d2f057dcad",
+      "file": "16_Concierge_Services/16_02_Personal_Assistance.webp",
+      "bytes": 10570,
+      "sha256": "3c3f6db587a588a19d5572191f20a3a3ec1ebbfea6d5a40a33299152c402c89d",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_03_Shopping_Assistance.png",
+      "sourceBytes": 1394053,
+      "sourceSha256": "d828134ccd54c036a28edb321a9f259d5d94007772f2eaa098c7db23adc543cd",
+      "file": "16_Concierge_Services/16_03_Shopping_Assistance.webp",
+      "bytes": 13166,
+      "sha256": "01ceb5ceab584fa60a9a365c56a9defad9c95bc1b88e4a5aa42b0ebb21dcbc56",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_04_Gift_Sourcing.png",
+      "sourceBytes": 1380111,
+      "sourceSha256": "b211626f1f16e1bd1c8b4e7c71cfee2e6813092780282420f719e7059c20783e",
+      "file": "16_Concierge_Services/16_04_Gift_Sourcing.webp",
+      "bytes": 10622,
+      "sha256": "c94b366ee549213854f4b777a452300692b2af7fdb34722c3bfebc6b4012d453",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_05_Travel_Planning.png",
+      "sourceBytes": 1409725,
+      "sourceSha256": "03dca0d1846ba456bf818b8b4aa2c5e1ade2ce6ac7fb96720374717db65f52e3",
+      "file": "16_Concierge_Services/16_05_Travel_Planning.webp",
+      "bytes": 13700,
+      "sha256": "e75ddcfecb91fed5c50113563bc6b42e244059cdaf6fb712ce0c7ed47bc841f0",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_06_Property_Coordination.png",
+      "sourceBytes": 1683112,
+      "sourceSha256": "5353eb29e9b84d76cbffc3d87660dd76696fee57b0955eea8770f947ed695218",
+      "file": "16_Concierge_Services/16_06_Property_Coordination.webp",
+      "bytes": 17650,
+      "sha256": "5f8c20812fd696050a3089d1df23ec05e83cda61074dab53d1221fd1d5e89bdc",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_07_Moving_Assistance.png",
+      "sourceBytes": 1346348,
+      "sourceSha256": "5afc8aa7fab90a7e4f7314129d44e759dc9cc06928e08a90c31a5508b3b604ca",
+      "file": "16_Concierge_Services/16_07_Moving_Assistance.webp",
+      "bytes": 12592,
+      "sha256": "0c199a21a47009f04df7d65fdf609ac80e77401902032ef357e19cd4b0caf4b9",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_08_Cleaning_Coordination.png",
+      "sourceBytes": 1528266,
+      "sourceSha256": "5669d65e5a895a34f591baa29c3ec9a9c5e999f88bd8fd0fffe4ee357d4e833c",
+      "file": "16_Concierge_Services/16_08_Cleaning_Coordination.webp",
+      "bytes": 17184,
+      "sha256": "33d45a52cc42bcd3da0c438517d16bebfdb83fca0061175ab01675e16f55b89e",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_09_VIP_Assistance.png",
+      "sourceBytes": 661901,
+      "sourceSha256": "11bc7cede39fed6222dc88d3aeeec99e6a255ec083d9a951ed6e45acb14bb954",
+      "file": "16_Concierge_Services/16_09_VIP_Assistance.webp",
+      "bytes": 12132,
+      "sha256": "fcf33b6d9124e39097b7cae65a7186357db807e0510813a76bbef5a327e4b0ae",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "16_Concierge_Services/16_10_Courier_And_Errands.png",
+      "sourceBytes": 1153025,
+      "sourceSha256": "6ac59243354f4bbd4524a4246e7faab823026543d9fe9100cef168226ae8ad6a",
+      "file": "16_Concierge_Services/16_10_Courier_And_Errands.webp",
+      "bytes": 11044,
+      "sha256": "16584d6ac08e3f45a4d56e2b429aaa5a792e67252a72b0d62156f6faacb14b10",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_01_Bowling.png",
+      "sourceBytes": 1659103,
+      "sourceSha256": "87a5319189ff5a09136caba7d64360097db57201a5d10dc3d20d55b9a07a35cf",
+      "file": "17_Play/17_01_Bowling.webp",
+      "bytes": 12906,
+      "sha256": "ec03ff26297769e4eed2a8a04ac83740b96368df8473f927ae3442e16dadcdad",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_02_Arcade_And_Timed_Play.png",
+      "sourceBytes": 1574098,
+      "sourceSha256": "5fa7369215c7f1eb86dcb66bf17cfa2c1c8612c98d7dac939a4510c55afb0bf2",
+      "file": "17_Play/17_02_Arcade_And_Timed_Play.webp",
+      "bytes": 11770,
+      "sha256": "62488cf03823ad012ca25fa2a74edc4af69a6ae3a420a88d230e7b6ad38fad18",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_03_Escape_Rooms.png",
+      "sourceBytes": 2532025,
+      "sourceSha256": "a3f3a4692579177e527d1100f69e0b6b3c008d99d731ebb0d08a69cf0f372d9e",
+      "file": "17_Play/17_03_Escape_Rooms.webp",
+      "bytes": 23106,
+      "sha256": "0a2c399a9b798851b087a193e756b35b45c3c47f146a2e4b55cc8ef9bd810a37",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_04_Indoor_Sports_Courts.png",
+      "sourceBytes": 1994070,
+      "sourceSha256": "68b058cbda0db2be36201adb199c49cf3e3738206772336df1a0db7cb1a14274",
+      "file": "17_Play/17_04_Indoor_Sports_Courts.webp",
+      "bytes": 14490,
+      "sha256": "76cc03596f6f07ec3080b962dbbe00aed02efdd8230f7ce15e49df6324dc7a88",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_05_Outdoor_Sports_Courts.png",
+      "sourceBytes": 2049742,
+      "sourceSha256": "98c8b82ff17a1a9d1ff71fc746e5294f1584d6d0465c8588de37cd327a296c0b",
+      "file": "17_Play/17_05_Outdoor_Sports_Courts.webp",
+      "bytes": 25398,
+      "sha256": "1c05fbbc2e7f4ccb606d30e725b124a88dd5659f80eaebe21f795cb0eab180bd",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_06_Football_Pitches.png",
+      "sourceBytes": 1836768,
+      "sourceSha256": "876046a03e2eb8e7ab01cd924c25bde7edafc405b91c38b977d0ae179a755836",
+      "file": "17_Play/17_06_Football_Pitches.webp",
+      "bytes": 14174,
+      "sha256": "4a2fb3a44c7203ed17956ad862d71d091a44902de9c55b8dca9e2a7ec4db70c9",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_07_Outdoor_Team_Games.png",
+      "sourceBytes": 2210957,
+      "sourceSha256": "d9125627b4756715ef3c41080563b03e22e91b885076c015b532d12f21b0a671",
+      "file": "17_Play/17_07_Outdoor_Team_Games.webp",
+      "bytes": 14848,
+      "sha256": "edf5679e705a67167cc62aabcf8f0ec46dccf0df950223cc9e2665a5894cf45a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_08_Go_Karting.png",
+      "sourceBytes": 1724488,
+      "sourceSha256": "4bea495cfaaeb837a7932fce8ca16bd202c18f1d60fdc3306d57ef3b4980743f",
+      "file": "17_Play/17_08_Go_Karting.webp",
+      "bytes": 14800,
+      "sha256": "93f489e80a2774db7af34893216033078f74d2e688ee8d10148d3c042eb4485c",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_09_Paintball.png",
+      "sourceBytes": 2181116,
+      "sourceSha256": "640df6d8e1a657445c56fa60f4f7b92a5459da2c090e62e618774f1dc488e8e3",
+      "file": "17_Play/17_09_Paintball.webp",
+      "bytes": 15436,
+      "sha256": "99d3a1f3b6a2a7e93c6f544572e2926308e984d433cac25609baefea5dc90a7a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_10_Ziplining_And_High_Ropes.png",
+      "sourceBytes": 2055434,
+      "sourceSha256": "d7c7764218cd9d7cafe1cb7f9943dd8fd1de0c5f3d3af367bb1aa7b0c0feb288",
+      "file": "17_Play/17_10_Ziplining_And_High_Ropes.webp",
+      "bytes": 20550,
+      "sha256": "4538a393df7eed505e2eacc24ef3b09eefb1efb851354a69ff33ccb846470dcb",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_11_Public_Swim_Sessions.png",
+      "sourceBytes": 1979959,
+      "sourceSha256": "39d0a81221627afb01fab0ed6962554ac39cba930ad1d758f317884788f728c3",
+      "file": "17_Play/17_11_Public_Swim_Sessions.webp",
+      "bytes": 16690,
+      "sha256": "44e0a56e83a9260890eae18c72f8b4a87e82edc9db30924f5039c16e1962cd91",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_12_Swimming_Lessons.png",
+      "sourceBytes": 1875842,
+      "sourceSha256": "1be1cce322e680eef83bfc2dc5f60071b2d22a4c99894e8bb08be403d498c9f3",
+      "file": "17_Play/17_12_Swimming_Lessons.webp",
+      "bytes": 12494,
+      "sha256": "d3a215e78444c753d048e64f69992a4323d53fbd2f7e59c801e3d7ae3874a6a1",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "17_Play/17_13_Pool_Lane_Hire.png",
+      "sourceBytes": 1518517,
+      "sourceSha256": "731468615ebd6cc222d6aa5a1e79bec9920d8db5befeb2f4b0da8e31602b34ed",
+      "file": "17_Play/17_13_Pool_Lane_Hire.webp",
+      "bytes": 13544,
+      "sha256": "f0f69ade26da2cc705983268aca87ad9850d396699b56891f87833a661571d73",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "18_Flights/18_01_Helicopter_Charters.png",
+      "sourceBytes": 1361026,
+      "sourceSha256": "3cedd6a1965272fd553dc295979368e272f76f0d4e7e96fb83b4c5a5ec17c552",
+      "file": "18_Flights/18_01_Helicopter_Charters.webp",
+      "bytes": 18070,
+      "sha256": "062167282a48e9327e1d6ea0aebfa04d86bf15bf2fdcd2e059089ea7078abcab",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "18_Flights/18_02_Scenic_Flights.png",
+      "sourceBytes": 2109040,
+      "sourceSha256": "fb2de96b4898d7df420223af59f0248460d70967dd031c92324d6ce2934cba81",
+      "file": "18_Flights/18_02_Scenic_Flights.webp",
+      "bytes": 25054,
+      "sha256": "6a3d122683dfeab66d75559213bb802ba615c832612aa85fdfeda4e50063b85a",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "18_Flights/18_03_Safari_Flights.png",
+      "sourceBytes": 1725002,
+      "sourceSha256": "010d0827eee13f5a660ac505e8a1ca55da5cd2d073d4efbf69817f801c37163f",
+      "file": "18_Flights/18_03_Safari_Flights.webp",
+      "bytes": 20064,
+      "sha256": "9fc4ac248729c0b57fe03cfaeefe4b2e395997bc429bfc0849a01f82cae7fd21",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "icon": "18_Flights/18_04_Private_Charters.png",
+      "sourceBytes": 930781,
+      "sourceSha256": "de701c7bfd687dc3d31193965c523f303708e2f66065cf28fea016915c972309",
+      "file": "18_Flights/18_04_Private_Charters.webp",
+      "bytes": 12360,
+      "sha256": "661c4944aa9a82f89a0babdbffe04e1f70d56946efc6d1bb9656a6d97e7af3bc",
+      "width": 256,
+      "height": 256
+    }
+  ]
+}

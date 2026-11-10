@@ -104,3 +104,5 @@ apps/web/.next-dev-3141/
 
 # Generated host workspace preview assets
 /apps/web/public/nexg-hosts-workspace/
+# NexG Discovery, built from /discovery by `pnpm --filter web discover` (and by `build`).
+/apps/web/public/discover/

@@ -1,0 +1,82 @@
+/* The cart pieces any storefront can share (owner, 9 Nov 2026: "its view cart, we have to connect to the cart"):
+   the "View cart" pill (its frame is .store-basket in store.css), "Your cart" (a drawer on the right on desktop,
+   a bottom sheet on phones) and "Start a new cart?". Rings instead of borders, concentric radii, press at .96,
+   named transitions under 300ms with ease-out, hover only on mouse devices, no motion under reduced motion. */
+
+.cart-pill .store-basket__text strong{font-size:14px}
+
+/* Your cart. */
+.cart-sheet{position:fixed;inset:0 0 0 auto;width:min(440px,100vw);height:100dvh;max-width:100vw;max-height:100dvh;margin:0;padding:0;border:0;border-radius:24px 0 0 24px;background:#121b1f;color:#f3eee2;box-shadow:var(--shadow-ring),-28px 0 80px rgba(0,0,0,.5);overflow:hidden}
+.cart-sheet[open]{display:flex;flex-direction:column;transition-property:translate,opacity;transition-duration:260ms;transition-timing-function:var(--ease-out)}
+.cart-sheet::backdrop{background:rgba(3,6,8,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);transition-property:opacity;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+@starting-style{
+  .cart-sheet[open]{translate:40px 0;opacity:0}
+  .cart-sheet[open]::backdrop{opacity:0}
+}
+.cart-sheet__header{display:flex;flex:none;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px 24px 8px}
+.cart-sheet__header h2{margin:0;font-size:22px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+.cart-sheet__header p{margin:4px 0 0;color:var(--muted);font-size:13.5px;line-height:1.4;font-variant-numeric:tabular-nums}
+.cart-sheet__close{display:grid;place-items:center;flex:none;width:40px;height:40px;min-height:40px;padding:0;border-radius:50%;background:rgba(255,255,255,.05);box-shadow:var(--shadow-ring);color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.cart-sheet__lines{flex:1 1 auto;min-height:0;margin:0;padding:0 24px;list-style:none;overflow-y:auto;overscroll-behavior:contain}
+.cart-line{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.cart-line:last-child{border-bottom:0}
+.cart-line__photo{display:block;width:56px;height:56px;border-radius:12px;object-fit:cover;background:#16222a;outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.cart-line__photo.image-fallback{display:grid;place-items:center;color:var(--muted)}
+.cart-line__copy{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cart-line__copy strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14.5px;line-height:1.3;text-wrap:pretty}
+.cart-line__copy span{color:var(--muted);font-size:13px;line-height:1.4;font-variant-numeric:tabular-nums}
+/* The shared stepper without its visible label: the line's name labels it for screen readers. */
+.cart-line .offering-stepper{min-height:0}
+.cart-line .offering-stepper>span{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.cart-line .offering-stepper output{min-width:24px}
+.cart-sheet__empty{display:flex;flex:1 1 auto;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:32px 28px;color:var(--muted);text-align:center}
+.cart-sheet__empty>svg{margin-bottom:4px;color:var(--gold)}
+.cart-sheet__empty h3{margin:0;color:#f3eee2;font-size:18px;line-height:1.3}
+.cart-sheet__empty p{margin:0;font-size:14px;line-height:1.5;text-wrap:pretty}
+.cart-sheet__undo{display:inline-flex;align-items:center;gap:8px;min-height:40px;margin-top:8px;padding:0 16px;border-radius:999px;box-shadow:0 0 0 1px rgba(229,182,95,.45);color:var(--gold);font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.cart-sheet__footer{display:flex;flex:none;flex-direction:column;gap:12px;padding:16px 24px calc(20px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.cart-sheet__subtotal{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0;color:var(--muted);font-size:14px}
+.cart-sheet__subtotal strong{color:#f3eee2;font-size:20px;font-variant-numeric:tabular-nums}
+.cart-sheet__note{margin:0;color:var(--muted);font-size:13px;line-height:1.45;text-wrap:pretty}
+.cart-sheet__actions{display:flex;align-items:center;gap:8px}
+.cart-sheet__clear{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px;border-radius:999px;color:var(--muted);font-weight:700;white-space:nowrap;transition-property:scale,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.cart-sheet__primary{display:inline-flex;align-items:center;justify-content:center;flex:1;min-height:48px;padding:0 20px;border-radius:999px;background:var(--gold);color:#111315;font-weight:700;text-decoration:none;white-space:nowrap;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.cart-sheet__primary:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.cart-sheet__close:active,.cart-sheet__undo:active,.cart-sheet__clear:active,.cart-sheet__primary:active{scale:.96}
+
+/* Start a new cart? A small centred card; Escape keeps the current cart. */
+.cart-switch{width:min(420px,calc(100vw - 32px));max-width:none;margin:auto;padding:24px;border:0;border-radius:24px;background:#121b1f;color:#f3eee2;box-shadow:var(--shadow-ring),0 30px 80px rgba(0,0,0,.55);transition-property:opacity,scale;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+@starting-style{.cart-switch[open]{opacity:0;scale:.96}}
+.cart-switch::backdrop{background:rgba(3,6,8,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition-property:opacity;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+@starting-style{.cart-switch[open]::backdrop{opacity:0}}
+.cart-switch h2{margin:0;font-size:20px;line-height:1.25;letter-spacing:-.01em;text-wrap:balance}
+.cart-switch p{margin:8px 0 0;color:#d2d6cf;font-size:14px;line-height:1.55;text-wrap:pretty}
+.cart-switch__actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:24px}
+.cart-switch__keep,.cart-switch__start{min-height:44px;padding:0 18px;border-radius:999px;font-weight:700;white-space:nowrap;transition-property:scale,background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.cart-switch__keep{box-shadow:var(--shadow-ring);color:#f3eee2}
+.cart-switch__start{background:var(--gold);color:#111315}
+.cart-switch__keep:active,.cart-switch__start:active{scale:.96}
+
+@media (hover:hover) and (pointer:fine){
+  .cart-sheet__close:hover{background:rgba(255,255,255,.1)}
+  .cart-sheet__undo:hover{background:rgba(229,182,95,.1)}
+  .cart-sheet__clear:hover{color:#f3eee2;background:rgba(255,255,255,.05)}
+  .cart-sheet__primary:hover,.cart-switch__start:hover{background:#f0c979}
+  .cart-switch__keep:hover{box-shadow:var(--shadow-ring-hover);background:rgba(255,255,255,.04)}
+}
+
+/* Phones: the cart rises from the bottom at full width. */
+@media (max-width:640px){
+  .cart-sheet{inset:auto 0 0 0;width:100vw;height:auto;max-height:88dvh;border-radius:24px 24px 0 0;box-shadow:var(--shadow-ring),0 -24px 64px rgba(0,0,0,.5)}
+  @starting-style{.cart-sheet[open]{translate:0 40px}}
+  .cart-sheet__header{padding:20px 16px 8px}
+  .cart-sheet__lines{padding:0 16px}
+  .cart-line{grid-template-columns:48px minmax(0,1fr) auto;gap:12px}
+  .cart-line__photo{width:48px;height:48px;border-radius:10px}
+  .cart-sheet__footer{padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  .cart-switch__actions{flex-direction:column-reverse;align-items:stretch}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .cart-sheet[open],.cart-sheet::backdrop,.cart-switch,.cart-switch::backdrop,.cart-sheet button,.cart-sheet__primary,.cart-switch button{transition:none}
+}

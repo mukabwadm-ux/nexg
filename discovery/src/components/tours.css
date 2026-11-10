@@ -1,0 +1,85 @@
+/* Tour operator storefront (TourOperatorStorefront.tsx): the shared store frame (storefronts/store.css) with
+   roomier trip cards and what the operator confirms. Rings instead of borders; dividers stay borders. */
+.tour-store__grid>.offering-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.tour-store__about .store-section__heading{margin-bottom:14px}
+.tour-store__facts{max-width:760px;margin:0;padding:4px 20px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow-ring)}
+.tour-store__facts>div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 20px;padding:14px 0}
+.tour-store__facts>div+div{border-top:1px solid var(--line)}
+.tour-store__facts dt{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tour-store__facts dt svg{flex:none;color:var(--gold)}
+.tour-store__facts dd{margin:0;color:#e7e9e4;font-size:15px;line-height:1.55;text-wrap:pretty}
+@media (max-width:640px){
+  .tour-store__facts{padding:2px 16px}
+  .tour-store__facts>div{grid-template-columns:1fr}
+}
+
+/* Trip planner (TourPlanner.tsx, "Customise this tour"): preferences only; the calendar is TripCalendar. */
+.tour-planner__hero{position:relative;isolation:isolate;min-height:160px;border-radius:12px;overflow:hidden;margin-bottom:20px}
+.tour-planner__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tour-planner__hero::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#031017ed,#03101755);z-index:1}
+.tour-planner__hero>div{position:relative;z-index:2;padding:24px 28px}
+.tour-planner__tag{display:inline-block;padding:5px 12px;border-radius:999px;background:rgba(7,16,21,.9);box-shadow:0 0 0 1px rgba(229,182,95,.7);color:var(--gold);font-size:11px}
+.tour-planner__hero h1{font-size:32px;margin:7px 0}
+.tour-planner__hero p{font-size:12px}
+.tour-planner__layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,29%);gap:22px}
+.tour-planner__steps{display:flex;gap:28px;padding:0;list-style:none;margin:0 0 18px}
+.tour-planner__steps li{display:flex;align-items:center;gap:12px;flex:1;color:var(--muted)}
+.tour-planner__steps li>span{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:50%}
+.tour-planner__steps li[aria-current=step]{color:#f3eee2}
+.tour-planner__steps li[aria-current=step]>span{background:var(--gold);color:#071015;border-color:var(--gold)}
+.tour-planner__steps strong{font-size:13px}
+.tour-planner__steps p{font-size:10px;margin-top:4px;color:var(--muted)}
+.tour-plan-block{border:1px solid var(--line);border-radius:10px;background:#07151bc9;padding:14px;margin-bottom:10px}
+.tour-plan-block h2{display:flex;align-items:center;gap:10px;font-size:15px;margin-bottom:12px}
+.tour-plan-block h2>svg,.tour-plan-block label>svg{color:var(--gold);flex-shrink:0}
+.tour-plan-number{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:var(--gold);color:#071015;font-size:12px;flex-shrink:0}
+.tour-plan-dates{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.trip-calendar{border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+.trip-calendar__month{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.trip-calendar__month h3{font-size:13px}
+.trip-calendar__month button{width:32px;min-height:30px;display:grid;place-items:center}
+.trip-calendar__week,.trip-calendar__days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.trip-calendar__week{font-size:10px;color:var(--muted);text-align:center;padding:7px 0}
+.trip-calendar__days button{font-size:12px;min-height:32px;border:1px solid #ffffff07;border-radius:4px;padding:0}
+.trip-calendar__days button[aria-current=date]{border-color:var(--gold)}
+.trip-calendar__days button[aria-pressed=true]{background:var(--gold);color:#061013;font-weight:700;border-radius:20px}
+.trip-calendar__days .trip-calendar__range{background:#e5b65f26;color:var(--gold)}
+.trip-calendar__hint{font-size:10px;line-height:1.5;color:var(--muted);margin-top:8px}
+.tour-plan-dates__selection{display:flex;flex-direction:column;align-items:flex-start;gap:12px;background:#101f27;border:1px solid var(--line);border-radius:8px;padding:18px}
+.tour-plan-dates__selection>svg{color:var(--gold)}
+.tour-plan-dates__selection>span{font-size:11px;color:var(--muted)}
+.tour-plan-dates__selection>strong{font-size:17px;line-height:1.5}
+.tour-plan-dates__selection p{font-size:12px;line-height:1.6;color:var(--muted)}
+.tour-plan-travellers{display:flex;justify-content:space-between;gap:16px}
+.tour-plan-counter{display:flex;align-items:center;gap:12px}
+.tour-plan-counter>span{text-transform:capitalize;font-size:12px}
+.tour-plan-counter>div{display:flex;align-items:center;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.tour-plan-counter button{width:30px;min-height:30px;display:grid;place-items:center;color:var(--gold)}
+.tour-plan-counter output{width:28px;text-align:center;font-size:12px}
+.tour-plan-vehicles{display:flex;gap:10px}
+.tour-plan-vehicles button{flex:1;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;min-height:40px}
+.tour-plan-vehicles button[aria-pressed=true]{border-color:var(--gold);background:#e5b65f12;color:var(--gold)}
+.tour-plan-block__note{font-size:10px;line-height:1.5;margin-top:7px;color:var(--muted)}
+.tour-plan-requests{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tour-plan-block label{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:700;margin-bottom:10px}
+.tour-plan-block input{border:1px solid var(--line);border-radius:6px;background:#101c24;width:100%;min-width:0;color:inherit;font-size:12px;padding:10px}
+.tour-plan-summary{background:#07131b;border:1px solid var(--line);border-radius:12px;overflow:hidden;padding:14px;display:flex;flex-direction:column;gap:12px}
+.tour-plan-summary__image{width:calc(100% + 28px);max-width:none;margin:-14px -14px 0;height:155px;object-fit:cover}
+.tour-plan-summary h2{font-size:20px;line-height:1.3}
+.tour-plan-summary>p{font-size:11px;color:var(--muted);line-height:1.5}
+.tour-plan-summary h3{font-size:13px;border-left:3px solid var(--gold);padding-left:10px}
+.tour-plan-summary dl{margin:0}
+.tour-plan-summary dl>div{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line);padding:8px 0;font-size:11px}
+.tour-plan-summary dd{margin:0;text-align:right;max-width:70%;overflow-wrap:anywhere}
+.tour-plan-summary dt{color:var(--muted)}
+.tour-plan-summary__price{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px}
+.tour-plan-summary__price strong{color:var(--gold);font-size:21px;font-variant-numeric:tabular-nums}
+.tour-plan-review{border:1px solid var(--line);border-radius:12px;padding:24px}
+.tour-plan-review h2{font-size:24px}
+.tour-plan-review__notice{font-size:13px;color:var(--gold);line-height:1.5;margin:12px 0}
+.tour-plan-review dl{margin:10px 0 20px}
+.tour-plan-review dl>div{display:grid;grid-template-columns:160px minmax(0,1fr);gap:18px;padding:14px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.5}
+.tour-plan-review dt{color:var(--muted)}
+.tour-plan-review dd{margin:0;overflow-wrap:anywhere}
+@media(max-width:1099px){.tour-planner__layout{grid-template-columns:minmax(0,1fr) 300px}.tour-plan-travellers{flex-wrap:wrap}.tour-plan-counter{flex:1}.tour-plan-dates{grid-template-columns:1fr}.tour-plan-dates__selection{padding:14px}}
+@media(max-width:760px){.tour-planner__layout{display:flex;flex-direction:column}.tour-planner__hero h1{font-size:26px}.tour-planner__hero>div{padding:20px}.tour-plan-travellers{flex-direction:column}.tour-plan-counter{justify-content:space-between}.tour-plan-vehicles{flex-wrap:wrap}.tour-plan-vehicles button{flex:1 0 40%}.tour-plan-requests{grid-template-columns:1fr}.tour-plan-review{padding:18px}.tour-plan-review dl>div{grid-template-columns:1fr;gap:5px}}

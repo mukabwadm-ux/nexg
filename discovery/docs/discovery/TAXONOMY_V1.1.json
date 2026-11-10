@@ -1,0 +1,765 @@
+{
+  "version": "V1.1",
+  "date": "2026-10-12",
+  "status": "Current owner-authorized taxonomy derived from updated icon pack; earlier 16/99 list superseded",
+  "source": "Latest owner directive: images and new icons are final source of truth for artwork AND category/subcategory changes. Exact navigation labels/order follow NexG_Discovery_Icons_Manifest.csv and its current individual assets. Embedded historical master-board label differences are recorded in ICON_ASSET_AUDIT_V1.1.md.",
+  "main_category_count": 18,
+  "subcategory_count": 115,
+  "discovery_level_count": 3,
+  "position_meaning": "Official customer-facing navigation order; not database IDs.",
+  "nested_options_status": "Nested option candidates require actual catalog predicates and remain inside Category dropdown; not counted among the 115 navigation entries.",
+  "excluded_main_categories": [
+    "Financial Services",
+    "Logistics & Shipping"
+  ],
+  "categories": [
+    {
+      "position": 1,
+      "name": "Adults Only",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/01_adults_only.png",
+      "subcategory_count": 3,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Erotic Products",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/01_Adults_Only/01_01_Erotic_Products.png"
+        },
+        {
+          "position": 2,
+          "name": "Tobacco & Vapes",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/01_Adults_Only/01_02_Tobacco_And_Vapes.png"
+        },
+        {
+          "position": 3,
+          "name": "Adult Wellness",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/01_Adults_Only/01_03_Adult_Wellness.png"
+        }
+      ]
+    },
+    {
+      "position": 2,
+      "name": "Airport Transfers",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/02_airport_transfers.png",
+      "subcategory_count": 4,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Airport Pickup",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/02_Airport_Transfers/02_01_Airport_Pickup.png"
+        },
+        {
+          "position": 2,
+          "name": "Airport Drop-off",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/02_Airport_Transfers/02_02_Airport_Dropoff.png"
+        },
+        {
+          "position": 3,
+          "name": "Meet & Greet",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/02_Airport_Transfers/02_03_Meet_And_Greet.png"
+        },
+        {
+          "position": 4,
+          "name": "Executive Transfer",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/02_Airport_Transfers/02_04_Executive_Transfer.png"
+        }
+      ]
+    },
+    {
+      "position": 3,
+      "name": "Alcohol And Beverages",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/03_alcohol_beverages.png",
+      "subcategory_count": 7,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Wine",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_01_Wine.png"
+        },
+        {
+          "position": 2,
+          "name": "Spirits",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_02_Spirits.png"
+        },
+        {
+          "position": 3,
+          "name": "Beer",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_03_Beer.png"
+        },
+        {
+          "position": 4,
+          "name": "Champagne",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_04_Champagne.png"
+        },
+        {
+          "position": 5,
+          "name": "Cocktail Mixers",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_05_Cocktail_Mixers.png"
+        },
+        {
+          "position": 6,
+          "name": "Liquor Stores",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_06_Liquor_Stores.png"
+        },
+        {
+          "position": 7,
+          "name": "Non-Alcoholic Drinks",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_07_NonAlcoholic_Drinks.png"
+        }
+      ]
+    },
+    {
+      "position": 4,
+      "name": "Apparel",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/04_apparel.png",
+      "subcategory_count": 7,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Men's Fashion",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_01_Mens_Fashion.png"
+        },
+        {
+          "position": 2,
+          "name": "Women's Fashion",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_02_Womens_Fashion.png"
+        },
+        {
+          "position": 3,
+          "name": "Kids Fashion",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_03_Kids_Fashion.png"
+        },
+        {
+          "position": 4,
+          "name": "Shoes",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_04_Shoes.png"
+        },
+        {
+          "position": 5,
+          "name": "Bags",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_05_Bags.png"
+        },
+        {
+          "position": 6,
+          "name": "Watches",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_06_Watches.png"
+        },
+        {
+          "position": 7,
+          "name": "Fashion Accessories",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_07_Fashion_Accessories.png"
+        }
+      ]
+    },
+    {
+      "position": 5,
+      "name": "Beauty And Wellness",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/05_beauty_wellness.png",
+      "subcategory_count": 7,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Beauty Products",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_01_Beauty_Products.png"
+        },
+        {
+          "position": 2,
+          "name": "Spa",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_02_Spa.png"
+        },
+        {
+          "position": 3,
+          "name": "Massage",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_03_Massage.png"
+        },
+        {
+          "position": 4,
+          "name": "Gym",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_04_Gym.png"
+        },
+        {
+          "position": 5,
+          "name": "Personal Training",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_05_Personal_Training.png"
+        },
+        {
+          "position": 6,
+          "name": "Salon & Barber",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_06_Salon_And_Barber.png"
+        },
+        {
+          "position": 7,
+          "name": "Nails & Beauty Services",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_07_Nails_And_Beauty_Services.png"
+        }
+      ]
+    },
+    {
+      "position": 6,
+      "name": "Vehicle Rentals",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/06_vehicle_rentals.png",
+      "subcategory_count": 4,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Car Rental",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/06_Vehicle_Rentals/06_01_Car_Rental.png"
+        },
+        {
+          "position": 2,
+          "name": "Bike Rental",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/06_Vehicle_Rentals/06_02_Bike_Rental.png"
+        },
+        {
+          "position": 3,
+          "name": "Vehicle Repair",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/06_Vehicle_Rentals/06_03_Vehicle_Repair.png"
+        },
+        {
+          "position": 4,
+          "name": "Car Wash",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/06_Vehicle_Rentals/06_04_Car_Wash.png"
+        }
+      ]
+    },
+    {
+      "position": 7,
+      "name": "Experiences",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/07_experiences.png",
+      "subcategory_count": 4,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Events",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/07_Experiences/07_01_Events.png"
+        },
+        {
+          "position": 2,
+          "name": "Photography",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/07_Experiences/07_02_Photography.png"
+        },
+        {
+          "position": 3,
+          "name": "Workshops & Classes",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/07_Experiences/07_03_Workshops_And_Classes.png"
+        },
+        {
+          "position": 4,
+          "name": "Sports & Recreation",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/07_Experiences/07_04_Sports_And_Recreation.png"
+        }
+      ]
+    },
+    {
+      "position": 8,
+      "name": "Flowers And Gifts",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/08_flowers_gifts.png",
+      "subcategory_count": 6,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Flowers",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_01_Flowers.png"
+        },
+        {
+          "position": 2,
+          "name": "Gift Hampers",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_02_Gift_Hampers.png"
+        },
+        {
+          "position": 3,
+          "name": "Cakes",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_03_Cakes.png"
+        },
+        {
+          "position": 4,
+          "name": "Chocolates",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_04_Chocolates.png"
+        },
+        {
+          "position": 5,
+          "name": "Personalized Gifts",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_05_Personalized_Gifts.png"
+        },
+        {
+          "position": 6,
+          "name": "Occasion Gifts",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_06_Occasion_Gifts.png"
+        }
+      ]
+    },
+    {
+      "position": 9,
+      "name": "Marketplace",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/09_marketplace.png",
+      "subcategory_count": 5,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Home & Living",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_01_Home_And_Living.png"
+        },
+        {
+          "position": 2,
+          "name": "Books & Stationery",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_02_Books_And_Stationery.png"
+        },
+        {
+          "position": 3,
+          "name": "General Retail",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_03_General_Retail.png"
+        },
+        {
+          "position": 4,
+          "name": "Hardware & DIY",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_04_Hardware_And_DIY.png"
+        },
+        {
+          "position": 5,
+          "name": "Pet Supplies",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_05_Pet_Supplies.png"
+        }
+      ]
+    },
+    {
+      "position": 10,
+      "name": "Restaurants And Food",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/10_restaurants_food.png",
+      "subcategory_count": 7,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Restaurant",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_01_Restaurant.png"
+        },
+        {
+          "position": 2,
+          "name": "Fast Food",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_02_Fast_Food.png"
+        },
+        {
+          "position": 3,
+          "name": "Café",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_03_Cafe.png"
+        },
+        {
+          "position": 4,
+          "name": "Bakery",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_04_Bakery.png"
+        },
+        {
+          "position": 5,
+          "name": "Desserts",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_05_Desserts.png"
+        },
+        {
+          "position": 6,
+          "name": "Juice Bar",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_06_Juice_Bar.png"
+        },
+        {
+          "position": 7,
+          "name": "Catering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_07_Catering.png"
+        }
+      ]
+    },
+    {
+      "position": 11,
+      "name": "Groceries And Essentials",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/11_groceries_essentials.png",
+      "subcategory_count": 7,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Supermarket",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_01_Supermarket.png"
+        },
+        {
+          "position": 2,
+          "name": "Convenience Store",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_02_Convenience_Store.png"
+        },
+        {
+          "position": 3,
+          "name": "Fresh Produce",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_03_Fresh_Produce.png"
+        },
+        {
+          "position": 4,
+          "name": "Butchery",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_04_Butchery.png"
+        },
+        {
+          "position": 5,
+          "name": "Seafood",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_05_Seafood.png"
+        },
+        {
+          "position": 6,
+          "name": "Organic Store",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_06_Organic_Store.png"
+        },
+        {
+          "position": 7,
+          "name": "Household Essentials",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_07_Household_Essentials.png"
+        }
+      ]
+    },
+    {
+      "position": 12,
+      "name": "Laundry And Cleaning",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/12_laundry_cleaning.png",
+      "subcategory_count": 5,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Laundry",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_01_Laundry.png"
+        },
+        {
+          "position": 2,
+          "name": "Dry Cleaning",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_02_Dry_Cleaning.png"
+        },
+        {
+          "position": 3,
+          "name": "Ironing",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_03_Ironing.png"
+        },
+        {
+          "position": 4,
+          "name": "Home Cleaning",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_04_Home_Cleaning.png"
+        },
+        {
+          "position": 5,
+          "name": "Office Cleaning",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_05_Office_Cleaning.png"
+        }
+      ]
+    },
+    {
+      "position": 13,
+      "name": "Health And Pharmacy",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/13_health_pharmacy.png",
+      "subcategory_count": 9,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Pharmacy",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_01_Pharmacy.png"
+        },
+        {
+          "position": 2,
+          "name": "Medical Supplies",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_02_Medical_Supplies.png"
+        },
+        {
+          "position": 3,
+          "name": "Baby Products",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_03_Baby_Products.png"
+        },
+        {
+          "position": 4,
+          "name": "Supplements",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_04_Supplements.png"
+        },
+        {
+          "position": 5,
+          "name": "Hospitals & Clinics",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_05_Hospitals_And_Clinics.png"
+        },
+        {
+          "position": 6,
+          "name": "Telemedicine",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_06_Telemedicine.png"
+        },
+        {
+          "position": 7,
+          "name": "Mobile Diagnostic Services",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_07_Mobile_Diagnostic_Services.png"
+        },
+        {
+          "position": 8,
+          "name": "Mental Health",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_08_Mental_Health.png"
+        },
+        {
+          "position": 9,
+          "name": "Therapy",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_09_Therapy.png"
+        }
+      ]
+    },
+    {
+      "position": 14,
+      "name": "Tech And Electronics",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/14_tech_electronics.png",
+      "subcategory_count": 8,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Smartphones",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_01_Smartphones.png"
+        },
+        {
+          "position": 2,
+          "name": "Tech Accessories",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_02_Tech_Accessories.png"
+        },
+        {
+          "position": 3,
+          "name": "Computers",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_03_Computers.png"
+        },
+        {
+          "position": 4,
+          "name": "Gaming",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_04_Gaming.png"
+        },
+        {
+          "position": 5,
+          "name": "Audio",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_05_Audio.png"
+        },
+        {
+          "position": 6,
+          "name": "Telecom Services",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_06_Telecom_Services.png"
+        },
+        {
+          "position": 7,
+          "name": "Smart Devices",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_07_Smart_Devices.png"
+        },
+        {
+          "position": 8,
+          "name": "Device Repairs",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_08_Device_Repairs.png"
+        }
+      ]
+    },
+    {
+      "position": 15,
+      "name": "Safaris And Tours",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/15_safaris_tours.png",
+      "subcategory_count": 5,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Safaris",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_01_Safaris.png"
+        },
+        {
+          "position": 2,
+          "name": "City Tours",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_02_City_Tours.png"
+        },
+        {
+          "position": 3,
+          "name": "Cultural Tours",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_03_Cultural_Tours.png"
+        },
+        {
+          "position": 4,
+          "name": "Adventure Tours",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_04_Adventure_Tours.png"
+        },
+        {
+          "position": 5,
+          "name": "Travel Packages",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_05_Travel_Packages.png"
+        }
+      ]
+    },
+    {
+      "position": 16,
+      "name": "Concierge Services",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/16_concierge_services.png",
+      "subcategory_count": 10,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Reservations",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_01_Reservations.png"
+        },
+        {
+          "position": 2,
+          "name": "Personal Assistance",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_02_Personal_Assistance.png"
+        },
+        {
+          "position": 3,
+          "name": "Shopping Assistance",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_03_Shopping_Assistance.png"
+        },
+        {
+          "position": 4,
+          "name": "Gift Sourcing",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_04_Gift_Sourcing.png"
+        },
+        {
+          "position": 5,
+          "name": "Travel Planning",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_05_Travel_Planning.png"
+        },
+        {
+          "position": 6,
+          "name": "Property Coordination",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_06_Property_Coordination.png"
+        },
+        {
+          "position": 7,
+          "name": "Moving Assistance",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_07_Moving_Assistance.png"
+        },
+        {
+          "position": 8,
+          "name": "Cleaning Coordination",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_08_Cleaning_Coordination.png"
+        },
+        {
+          "position": 9,
+          "name": "VIP Assistance",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_09_VIP_Assistance.png"
+        },
+        {
+          "position": 10,
+          "name": "Courier & Errands",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_10_Courier_And_Errands.png"
+        }
+      ]
+    },
+    {
+      "position": 17,
+      "name": "Play",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/17_play.png",
+      "subcategory_count": 13,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Bowling",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_01_Bowling.png"
+        },
+        {
+          "position": 2,
+          "name": "Arcade & Timed Play",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_02_Arcade_And_Timed_Play.png"
+        },
+        {
+          "position": 3,
+          "name": "Escape Rooms",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_03_Escape_Rooms.png"
+        },
+        {
+          "position": 4,
+          "name": "Indoor Sports Courts",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_04_Indoor_Sports_Courts.png"
+        },
+        {
+          "position": 5,
+          "name": "Outdoor Sports Courts",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_05_Outdoor_Sports_Courts.png"
+        },
+        {
+          "position": 6,
+          "name": "Football Pitches",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_06_Football_Pitches.png"
+        },
+        {
+          "position": 7,
+          "name": "Outdoor Team Games",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_07_Outdoor_Team_Games.png"
+        },
+        {
+          "position": 8,
+          "name": "Go-Karting",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_08_Go_Karting.png"
+        },
+        {
+          "position": 9,
+          "name": "Paintball",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_09_Paintball.png"
+        },
+        {
+          "position": 10,
+          "name": "Ziplining & High Ropes",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_10_Ziplining_And_High_Ropes.png"
+        },
+        {
+          "position": 11,
+          "name": "Public Swim Sessions",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_11_Public_Swim_Sessions.png"
+        },
+        {
+          "position": 12,
+          "name": "Swimming Lessons",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_12_Swimming_Lessons.png"
+        },
+        {
+          "position": 13,
+          "name": "Pool Lane Hire",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_13_Pool_Lane_Hire.png"
+        }
+      ]
+    },
+    {
+      "position": 18,
+      "name": "Flights",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/18_flights.png",
+      "subcategory_count": 4,
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Helicopter Charters",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_01_Helicopter_Charters.png"
+        },
+        {
+          "position": 2,
+          "name": "Scenic Flights",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_02_Scenic_Flights.png"
+        },
+        {
+          "position": 3,
+          "name": "Safari Flights",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_03_Safari_Flights.png"
+        },
+        {
+          "position": 4,
+          "name": "Private Charters",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_04_Private_Charters.png"
+        }
+      ]
+    }
+  ],
+  "nested_option_examples": [
+    {
+      "category": "Beauty & Wellness",
+      "subcategory": "Massage",
+      "option": "Deep Tissue Massage",
+      "status": "Example supplied by the user; complete nested option list pending",
+      "included_in_subcategory_count": false
+    }
+  ],
+  "authority_revision": "icon-pack-2026-10-12",
+  "previous_baseline": "history/pre-icon-authority-2026-10-12/TAXONOMY_V1.1.json",
+  "master_board_discrepancies": [
+    "Alcohol master still labels Soft Drinks & Water; current manifest and individual asset label are Non-Alcoholic Drinks.",
+    "Health master labels Labs and shows eight illustrations; current manifest and individual folder have nine entries including Mobile Diagnostic Services, Mental Health and Therapy."
+  ],
+  "owner_additions": [
+    {
+      "date": "2026-11-09",
+      "category": "Play",
+      "subcategories": 13,
+      "note": "Owner direction, 9 Nov 2026: Derrick NexG's Activities, Games & Sports category (activities_games_sports) joins Discovery under the one-word name Play. Icons made for it on 9 Nov 2026."
+    },
+    {
+      "date": "2026-11-09",
+      "category": "Flights",
+      "subcategories": 4,
+      "note": "Owner direction, 9 Nov 2026: Derrick NexG's Flights & aviation specialties (Heliflight merchant-portal demo) join Discovery as Flights. Unmapped until Derrick NexG has a flights category in its database."
+    }
+  ]
+}

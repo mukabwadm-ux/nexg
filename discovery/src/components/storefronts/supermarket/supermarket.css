@@ -1,0 +1,125 @@
+/* Retail storefront (owner, 9 Nov 2026): every product store, groceries first. Bolt Food's layout (a department
+   sidebar, a breadcrumb, aisle chips) in Wolt Market's look, and Wolt's phone layout (a row of departments,
+   rails that peek, two-column aisles). The frame comes from store.css (hero, sticky section bar, sections,
+   basket pill), the compact card from cards.css, the product sheet from item-sheet.css, the cart from
+   cart/cart.css. It loads with the app, so every rule stays inside .supermarket-store. Rings instead of borders,
+   concentric radii, press at .96, hover only on mouse devices, motion under 300ms with ease-out and none
+   under reduced motion. Spacing keeps Wolt's 8px rhythm. */
+
+/* The page's side gutter (discovery-main's padding): rails and the phone department row run edge to edge
+   and snap their first item back to it. */
+.supermarket-store{--grocery-gutter:32px}
+@media (max-width:760px){.supermarket-store{--grocery-gutter:20px}}
+
+/* Room under the last aisle for the floating "View cart" pill. */
+.supermarket-store.has-basket{padding-bottom:88px}
+.supermarket-store .grocery-main:focus{outline:none}
+
+/* Two columns under the hero: the sticky department sidebar and the main column. */
+.supermarket-store .grocery-layout{display:grid;grid-template-columns:248px minmax(0,1fr);gap:32px;align-items:start;margin-top:32px}
+.supermarket-store .grocery-main{min-width:0}
+
+/* Department sidebar: Wolt Market's rows (a round tinted tile, the name, a muted count); the open one is a soft gold pill. */
+.supermarket-store .grocery-departments{position:sticky;top:calc(var(--grocery-top,0px) + 16px);max-height:calc(100dvh - var(--grocery-top,0px) - 32px);margin:0 -8px 0 -6px;padding:0 8px 16px 6px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.14) transparent}
+.supermarket-store .grocery-departments__list{display:flex;flex-direction:column;gap:2px;margin:0;padding:0;list-style:none}
+.supermarket-store .grocery-department{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 14px 6px 6px;border-radius:26px;color:#d9ddd8;font-size:14.5px;font-weight:700;line-height:1.25;text-align:left;transition-property:background-color,color,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .grocery-department:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.supermarket-store .grocery-department__tile{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:50%;background:rgba(229,182,95,.1);color:var(--gold);overflow:hidden;transition-property:background-color,color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .grocery-department__tile img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover;outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+.supermarket-store .grocery-department__title{flex:1;min-width:0;text-wrap:pretty}
+.supermarket-store .grocery-department__count{flex:none;color:var(--muted);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.supermarket-store .grocery-department[aria-current=true]{background:rgba(229,182,95,.12);color:var(--gold)}
+.supermarket-store .grocery-department[aria-current=true] .grocery-department__tile{background:var(--gold);color:#111315}
+.supermarket-store .grocery-department[aria-current=true] .grocery-department__count{color:rgba(229,182,95,.8)}
+/* "Frequently ordered" and "New" under Discover, only when real history exists. */
+.supermarket-store .grocery-department__subs{display:flex;flex-direction:column;gap:2px;margin:2px 0 8px;padding:0 0 0 52px;list-style:none}
+.supermarket-store .grocery-department__subs a{display:flex;align-items:center;min-height:40px;padding:0 12px;border-radius:20px;color:#b9bfba;font-size:14px;font-weight:600;text-decoration:none;transition-property:background-color,color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .grocery-department__subs a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+
+/* A department: the breadcrumb back to the store's home, then its name. */
+.supermarket-store .grocery-head{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.supermarket-store .grocery-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0;padding:0;list-style:none;color:#c8cdc8;font-size:14px;font-weight:600}
+.supermarket-store .grocery-crumbs li{display:inline-flex;align-items:center;gap:4px;min-width:0}
+.supermarket-store .grocery-crumbs svg{flex:none;color:var(--muted)}
+.supermarket-store .grocery-crumbs button{min-height:40px;margin-left:-8px;padding:0 8px;border-radius:999px;color:var(--gold);font-weight:700;text-align:left;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .grocery-head h2{margin:0;font-size:clamp(24px,2.2vw,30px);line-height:1.15;letter-spacing:-.02em;text-wrap:balance}
+.supermarket-store .grocery-head h2:focus{outline:none}
+
+/* With no chips to show (the store's home, a one-aisle department) the search takes the whole bar. */
+.supermarket-store .grocery-main .section-nav:not(:has(.section-nav__rail-wrap)) .section-nav__search{flex:1;width:auto}
+
+/* Rails on the store's home: one per department, a dozen products, "See all" opens the department. */
+.supermarket-store .grocery-home{margin-top:16px}
+.supermarket-store .grocery-rail{min-width:0}
+.supermarket-store .grocery-rail__head{display:flex;align-items:center;gap:8px 12px;margin:0 0 12px}
+.supermarket-store .grocery-rail__head h2{display:inline-flex;align-items:center;gap:8px;min-width:0;margin:0;font-size:clamp(20px,1.6vw,24px);line-height:1.2;letter-spacing:-.015em;text-wrap:balance}
+.supermarket-store .grocery-rail__head h2 svg{flex:none;color:var(--gold)}
+.supermarket-store .grocery-rail__count{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.supermarket-store .grocery-rail__tools{display:flex;align-items:center;gap:8px;margin-left:auto}
+.supermarket-store .grocery-rail__all{min-height:40px;padding:0 14px;border-radius:999px;color:var(--gold);font-size:14px;font-weight:700;white-space:nowrap;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.supermarket-store .grocery-rail__arrow{display:none}
+.supermarket-store .grocery-rail__track{display:grid;grid-auto-flow:column;grid-auto-columns:176px;gap:16px;margin:0 -6px;padding:4px 6px 6px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;scroll-padding-inline:6px;scrollbar-width:none}
+.supermarket-store .grocery-rail__track::-webkit-scrollbar{display:none}
+.supermarket-store .grocery-rail__track>*{scroll-snap-align:start}
+
+/* Aisles: compact grids, and "Show all" for a long one. */
+.supermarket-store .grocery-aisle .store-section__heading h3{margin:0;font-size:clamp(18px,1.5vw,22px);line-height:1.25;letter-spacing:-.01em;text-wrap:balance}
+.supermarket-store .grocery-aisle__more{display:flex;align-items:center;justify-content:center;min-height:44px;margin:24px auto 0;padding:0 20px;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(229,182,95,.45);color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+
+.supermarket-store .grocery-department:active,.supermarket-store .grocery-crumbs button:active,.supermarket-store .grocery-rail__all:active,.supermarket-store .grocery-aisle__more:active{scale:.96}
+
+@media (hover:hover) and (pointer:fine){
+  .supermarket-store .grocery-department:hover{background:rgba(255,255,255,.05);color:#f3eee2}
+  .supermarket-store .grocery-department[aria-current=true]:hover{background:rgba(229,182,95,.16);color:var(--gold)}
+  .supermarket-store .grocery-department__subs a:hover{background:rgba(255,255,255,.05);color:#f3eee2}
+  .supermarket-store .grocery-crumbs button:hover,.supermarket-store .grocery-rail__all:hover,.supermarket-store .grocery-aisle__more:hover{background:rgba(229,182,95,.1)}
+  /* Arrows for mouse users only; touch scrolls the rail. */
+  .supermarket-store .grocery-rail__arrow{position:relative;display:grid;place-items:center;width:36px;height:36px;min-height:36px;padding:0;border-radius:50%;background:#1a2428;box-shadow:var(--shadow-ring);color:#f3eee2;transition-property:scale,background-color,opacity;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+  .supermarket-store .grocery-rail__arrow::after{content:'';position:absolute;inset:-4px;border-radius:50%}
+  .supermarket-store .grocery-rail__arrow:hover:not(:disabled){background:#243238}
+  .supermarket-store .grocery-rail__arrow:active:not(:disabled){scale:.96}
+  .supermarket-store .grocery-rail__arrow:disabled{opacity:.35}
+}
+
+/* Narrow laptops and tablets in landscape: a slimmer sidebar. */
+@media (max-width:1099px){
+  .supermarket-store .grocery-layout{grid-template-columns:216px minmax(0,1fr);gap:24px}
+  .supermarket-store .grocery-department{font-size:14px}
+}
+
+@media (min-width:900px){
+  /* Beside the sidebar, the sticky section bar paints only behind the main column, never over the sidebar. */
+  .supermarket-store .grocery-layout .section-nav::before{inset:0 -16px}
+  /* A soft fade where a rail runs on past the edge. */
+  .supermarket-store .grocery-rail__track[data-end=false]{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
+}
+
+/* Phones and tablets in portrait (Wolt on an iPhone 14 Pro): no sidebar. Departments become one row of round
+   tiles with labels under the hero; the section bar is the sticky one; rails run to the screen's edge so
+   the next card peeks. */
+@media (max-width:899px){
+  .supermarket-store .grocery-layout{display:block;margin-top:16px}
+  .supermarket-store .grocery-departments{position:static;max-height:none;margin:0;padding:0;overflow:visible}
+  .supermarket-store .grocery-departments__list{flex-direction:row;gap:4px;margin:0 calc(-1 * var(--grocery-gutter));padding:4px var(--grocery-gutter);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;scroll-padding-inline:var(--grocery-gutter);scrollbar-width:none}
+  .supermarket-store .grocery-departments__list::-webkit-scrollbar{display:none}
+  .supermarket-store .grocery-departments__list>li{flex:none;scroll-snap-align:start}
+  .supermarket-store .grocery-department{flex-direction:column;justify-content:flex-start;gap:8px;width:80px;min-height:0;padding:4px 2px;border-radius:16px;font-size:12px;line-height:1.25;text-align:center}
+  .supermarket-store .grocery-department__tile{width:56px;height:56px}
+  .supermarket-store .grocery-department__tile svg{width:24px;height:24px}
+  /* Up to three lines, and a long word ("entertainment") breaks rather than being clipped by the 80px tile. */
+  .supermarket-store .grocery-department__title{display:-webkit-box;flex:none;width:100%;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;hyphens:auto;text-wrap:balance}
+  .supermarket-store .grocery-department__count,.supermarket-store .grocery-department__subs{display:none}
+  .supermarket-store .grocery-department[aria-current=true]{background:none}
+  .supermarket-store .grocery-head{margin:8px 0 0}
+  .supermarket-store .grocery-home{margin-top:8px}
+  .supermarket-store .grocery-rail__head{margin-bottom:8px}
+  .supermarket-store .grocery-rail__track{grid-auto-columns:150px;gap:12px;margin:0 calc(-1 * var(--grocery-gutter));padding:4px var(--grocery-gutter) 6px;scroll-padding-inline:var(--grocery-gutter)}
+}
+@media (max-width:640px){
+  .supermarket-store.has-basket{padding-bottom:80px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .supermarket-store .grocery-department,.supermarket-store .grocery-department__tile,.supermarket-store .grocery-department__subs a,.supermarket-store .grocery-crumbs button,
+  .supermarket-store .grocery-rail__all,.supermarket-store .grocery-rail__arrow,.supermarket-store .grocery-aisle__more{transition:none}
+}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.vite/
+.test-dist/
+work/discovery-engine/*.proof.mjs
+*.log
+.env
+.env.local
+.env.*.local
+docs/discovery/references/icons-v1.1/
+# The original ICONS pack is tracked; the hash-checked documentation copy is redundant.
