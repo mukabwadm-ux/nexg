@@ -19278,6 +19278,172 @@ export type Database = {
           },
         ];
       };
+      merchant_promotion: {
+        Row: {
+          catalogue_item_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          ends_at: string | null;
+          id: string;
+          kind: string;
+          merchant_id: string;
+          name: string;
+          starts_at: string;
+          status: string;
+          updated_at: string;
+          value: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          kind: string;
+          merchant_id: string;
+          name: string;
+          starts_at?: string;
+          status?: string;
+          updated_at?: string;
+          value: number;
+        };
+        Update: {
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          kind?: string;
+          merchant_id?: string;
+          name?: string;
+          starts_at?: string;
+          status?: string;
+          updated_at?: string;
+          value?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       merchant_review: {
         Row: {
           checklist: NonNullable<Json>;
@@ -24271,6 +24437,63 @@ export type Database = {
             columns: ['disabled_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      payment_prompt: {
+        Row: {
+          checkout_request_id: string;
+          id: string;
+          last_queried_at: string | null;
+          merchant_request_id: string | null;
+          outcome: string | null;
+          payment_id: string;
+          phone: string | null;
+          receipt: string | null;
+          resolved_at: string | null;
+          resolved_via: string | null;
+          result_code: number | null;
+          result_desc: string | null;
+          sent_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          checkout_request_id: string;
+          id?: string;
+          last_queried_at?: string | null;
+          merchant_request_id?: string | null;
+          outcome?: string | null;
+          payment_id: string;
+          phone?: string | null;
+          receipt?: string | null;
+          resolved_at?: string | null;
+          resolved_via?: string | null;
+          result_code?: number | null;
+          result_desc?: string | null;
+          sent_at?: string;
+        };
+        Update: {
+          checkout_request_id?: string;
+          id?: string;
+          last_queried_at?: string | null;
+          merchant_request_id?: string | null;
+          outcome?: string | null;
+          payment_id?: string;
+          phone?: string | null;
+          receipt?: string | null;
+          resolved_at?: string | null;
+          resolved_via?: string | null;
+          result_code?: number | null;
+          result_desc?: string | null;
+          sent_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payment_prompt_payment_id_fkey';
+            columns: ['payment_id'];
+            isOneToOne: false;
+            referencedRelation: 'payment';
             referencedColumns: ['id'];
           },
         ];
@@ -48579,6 +48802,15 @@ export type Database = {
         };
         Returns: boolean;
       };
+      fn_item_promo_price: {
+        Args: { p_at?: string; p_item_id: string; p_merchant_id: string; p_price_kes: number };
+        Returns: {
+          ends_at: string;
+          price_kes: number;
+          promotion_id: string;
+          promotion_name: string;
+        }[];
+      };
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
       fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
@@ -53086,6 +53318,23 @@ export type Database = {
         };
       };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_promotion_save: {
+        Args: {
+          p_ends_at: string;
+          p_item_id: string;
+          p_kind: string;
+          p_merchant_id: string;
+          p_name: string;
+          p_promotion_id: string;
+          p_starts_at: string;
+          p_value: number;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_promotion_set_status: {
+        Args: { p_promotion_id: string; p_status: string };
+        Returns: Json;
+      };
       rpc_merchant_rename_store: {
         Args: { p_address?: string; p_branch_id: string; p_name: string };
         Returns: Json;
@@ -54199,6 +54448,14 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_payment_mpesa_open_prompts: {
+        Args: { p_reference: string };
+        Returns: {
+          amount_cents: number;
+          checkout_request_id: string;
+        }[];
+      };
+      rpc_payment_mpesa_prompt_wait: { Args: { p_reference: string }; Returns: Json };
       rpc_payment_mpesa_ready: { Args: { p_callback_secret: string }; Returns: boolean };
       rpc_payment_mpesa_sent: {
         Args: {
@@ -54271,6 +54528,17 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_promoted_prices: {
+        Args: { p_merchant_id: string };
+        Returns: {
+          catalogue_item_id: string;
+          ends_at: string;
+          price_kes: number;
+          promo_price_kes: number;
+          promotion_id: string;
+          promotion_name: string;
+        }[];
       };
       rpc_property_delete: {
         Args: { p_confirm_name: string; p_property_id: string };
