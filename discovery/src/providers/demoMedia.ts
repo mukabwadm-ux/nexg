@@ -1,4 +1,4 @@
-import type { DemoMedia } from '../../discovery-engine/src/adapters/supabase/catalogBridge';
+import type { DemoMedia } from './catalogBridge';
 
 /**
  * Demo photos for the Supabase provider, packed small enough for the browser (plan steps E1 and E2).

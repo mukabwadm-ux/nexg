@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import { demoMediaFromSnapshot } from './discovery-engine/src/adapters/supabase/catalogBridge';
+import { demoMediaFromSnapshot } from './src/providers/catalogBridge';
 import { packDemoMedia } from './src/providers/demoMedia';
 import { supabaseSettings } from './src/providers/supabaseSettings';
 

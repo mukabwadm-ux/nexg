@@ -54,8 +54,15 @@ export function iconUrl(reference: string | null | undefined): string | undefine
   return webIcons.get(icon) ?? ((import.meta.env?.BASE_URL as string | undefined) ?? '/') + 'icons/' + icon;
 }
 
+/**
+ * Categories in the V1.1 docs that the NexG website doesn't show yet, because the platform has no category for
+ * them on main: Play needs `activities_games_sports`, and Flights has no platform category at all. Remove an id
+ * here once its platform category lands. The docs stay as they are, so nothing else needs to change.
+ */
+export const HIDDEN_CATEGORY_IDS: ReadonlySet<string> = new Set(['play', 'flights']);
+
 /** Navigation is generated from the final pack-derived V1.1 docs, never the old platform registry. */
-export const categories: DiscoveryCategory[] = taxonomy.categories.map((category, index) => {
+const allCategories: DiscoveryCategory[] = taxonomy.categories.map((category, index) => {
   const details = config[index];
   if (!details || details.category !== category.name) throw new Error(`Discovery configuration mismatch: ${category.name}`);
   return {
@@ -79,12 +86,15 @@ export const categories: DiscoveryCategory[] = taxonomy.categories.map((category
     }),
   };
 });
+if ([...HIDDEN_CATEGORY_IDS].some((id) => !allCategories.some((category) => category.id === id))) throw new Error('A hidden category is not in the taxonomy');
+/** The categories on screen: every category in the docs except the hidden ones. */
+export const categories: DiscoveryCategory[] = allCategories.filter((category) => !HIDDEN_CATEGORY_IDS.has(category.id));
 
 export const taxonomyVersion = taxonomy.version;
 export const categoryCount = categories.length;
 export const subcategoryCount = categories.reduce((total, category) => total + category.subcategories.length, 0);
 const categoriesById = new Map(categories.map((category) => [category.id, category]));
-const homepageOrder = (configuration as DiscoveryConfiguration).homepage_category_order;
+const homepageOrder = (configuration as DiscoveryConfiguration).homepage_category_order.filter((id) => !HIDDEN_CATEGORY_IDS.has(id));
 if (
   homepageOrder.length !== categories.length ||
   new Set(homepageOrder).size !== categories.length ||

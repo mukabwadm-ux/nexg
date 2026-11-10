@@ -82,7 +82,10 @@ function CategoryDiscoveryPage({ category, provider, query, onChange, onSubcateg
   const hosts = offeringCategory ? hostsOf(collections) : [];
   const merchantsById = new Map(collections.flatMap((collection) => collection.merchants.map((merchant) => [merchant.id, merchant] as const)));
   const openOffering = (id: string, itemId?: string) => offeringRoute(merchantsById.get(id), { onTour, onExperience, onOpen })(id, itemId);
-  const viewAll = (collection: DiscoveryCollection) => collection.viewAllQuery ? onViewAll(collection.viewAllQuery) : onSubcategory(collection.subcategoryId);
+  const viewAll = (collection: DiscoveryCollection) => {
+    if (collection.viewAllQuery) onViewAll(collection.viewAllQuery);
+    else if (collection.subcategoryId) onSubcategory(collection.subcategoryId);
+  };
 
   return <div className={`category-page${offeringCategory ? ' category-page--offerings' : ''}`}>
     <header className="category-page-heading"><h1>{title}</h1></header>

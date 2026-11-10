@@ -4,6 +4,9 @@
  * Serves the demo catalog API's three reads (/api/merchants, /api/merchants/{id}, /api/areas) from
  * Supabase's public views. The website, the engine and the Consumer app then read Supabase IDs after a
  * setting change only. It sends GET requests with the public key: never the service-role key, never a write.
+ *
+ * Moved here from discovery-engine/src/adapters/supabase/ when the website took Discovery without the engine
+ * (the website's Supabase provider is its only user here). Keep it equal to the engine's copy when that returns.
  */
 
 /** One row of demo-seed/subcategory-map.json. */
@@ -129,11 +132,16 @@ const DETAIL_ITEMS = 200;
 /** Shapes Supabase rows like the demo API, using the reviewed subcategory map for categories. */
 export class CatalogBridge {
   readonly #byPair = new Map<string, BridgeMapRow>();
+  /** A platform category's demo category, from its mapped rows: the label for a store with no mapped subcategory. */
+  readonly #byCategory = new Map<string, BridgeMapRow>();
   #merchants: { merchant: BridgeMerchant; row: BridgeMapRow | undefined }[] = [];
   #byId = new Map<string, BridgeMerchant>();
   #loadedAt: number | undefined;
   constructor(map: readonly BridgeMapRow[], private readonly media: DemoMedia = { merchants: new Map(), items: new Map() }) {
-    for (const row of map) this.#byPair.set(`${row.supabase.category}/${row.supabase.subcategory}`, row);
+    for (const row of map) {
+      this.#byPair.set(`${row.supabase.category}/${row.supabase.subcategory}`, row);
+      if (row.status === 'mapped' && !this.#byCategory.has(row.supabase.category)) this.#byCategory.set(row.supabase.category, row);
+    }
   }
   get loadedAt(): number | undefined { return this.#loadedAt; }
   get size(): { merchants: number; items: number } { return { merchants: this.#merchants.length, items: this.#merchants.reduce((total, entry) => total + entry.merchant.items.length, 0) }; }
@@ -144,12 +152,15 @@ export class CatalogBridge {
     for (const item of rows.items) items.set(item.merchant_id, [...(items.get(item.merchant_id) ?? []), item]);
     const merchants = rows.merchants.map(row => {
       const map = row.category_key && row.subcategory ? this.#byPair.get(`${row.category_key}/${row.subcategory}`) : undefined;
+      // No subcategory, or one the map doesn't know: the store keeps its category, without an invented subcategory.
+      const category = map ? undefined : row.category_key ? this.#byCategory.get(row.category_key) : undefined;
       const area = areaFromAddress(row.branch_address);
       const open = openState(row, now);
       const media = this.media.merchants.get(row.id);
       const merchant: BridgeMerchant = {
         id: row.id, name: row.trading_name,
-        ...(map ? { categoryId: map.demoCategoryId, category: map.demoCategoryLabel, subcategoryId: map.demoSubcategoryId, subcategory: map.demoLabel } : {}),
+        ...(map ? { categoryId: map.demoCategoryId, category: map.demoCategoryLabel, subcategoryId: map.demoSubcategoryId, subcategory: map.demoLabel }
+          : category ? { categoryId: category.demoCategoryId, category: category.demoCategoryLabel } : {}),
         ...(area ? { nairobiArea: area } : {}), ...(row.branch_address ? { address: row.branch_address } : {}),
         ...(row.branch_latitude !== null && row.branch_longitude !== null ? { latitude: row.branch_latitude, longitude: row.branch_longitude } : {}),
         ...(open !== undefined ? { isOpen: open } : {}),

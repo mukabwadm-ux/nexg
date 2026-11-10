@@ -1,7 +1,7 @@
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import type { ValidateFunction } from 'ajv';
-import document from '../../discovery-engine/docs/contracts/ENGINE_V1.openapi.json';
+import document from './engineContract/ENGINE_V1.openapi.json';
 import type { EngineSchemas } from './DiscoveryProvider';
 import { ProviderReadError } from './readState';
 

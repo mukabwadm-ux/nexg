@@ -5,12 +5,16 @@
  * over PostgREST, with GET requests and the public key only. It filters and pages on the server, so a
  * page reads its own merchants and their items, never the whole catalogue.
  *
- * Rows are shaped by the reviewed catalog bridge (discovery-engine/src/adapters/supabase/catalogBridge.ts:
- * subcategory map, area, coordinates, Nairobi open state, whole-shilling prices, demo photos for demo IDs)
- * and then by the platform provider's mapper. Every screen gets the shape it gets today, with Supabase IDs.
+ * Rows are shaped by the reviewed catalog bridge (./catalogBridge.ts: subcategory map, area, coordinates,
+ * Nairobi open state, whole-shilling prices, demo photos for demo IDs) and then by the platform provider's
+ * mapper. Every screen gets the shape it gets today, with Supabase IDs.
+ *
+ * A category (or everything) is read by whole platform categories, so a store with no subcategory, or with one
+ * the reviewed map doesn't know yet, is still listed under its category. Live stores often have no subcategory
+ * yet. A subcategory or option reads only its exact groups.
  */
 import subcategoryMap from '../../demo-seed/subcategory-map.json';
-import { CatalogBridge, areaFromAddress, type BridgeMapRow, type DemoMedia, type ItemRow, type MerchantRow } from '../../discovery-engine/src/adapters/supabase/catalogBridge';
+import { CatalogBridge, areaFromAddress, type BridgeMapRow, type DemoMedia, type ItemRow, type MerchantRow } from './catalogBridge';
 import { findCategory, findSubcategory } from '../data/taxonomy';
 import type { CollectionResult, DiscoveryProvider, DiscoveryQuery, Merchant, MerchantResult, OfferingResult } from './DiscoveryProvider';
 import { collectionDefinitions } from '../data/discoveryConfiguration';
@@ -28,6 +32,8 @@ const LIST_ITEMS = 30;
 const DETAIL_ITEMS = 200;
 /** L2 rails show at most 12 items per store. */
 const COLLECTION_ITEMS = 12;
+/** Stores on a category's last rail ("More stores"), as many as a type rail shows; View all lists the rest. */
+const REST_MERCHANTS = 6;
 /** Supabase's default cap on rows per PostgREST reply. */
 const PAGE_ROWS = 1000;
 /** Merchants per item read: 30 merchants × 30 items fit one reply, and the URL stays near 1 KB. */
@@ -176,7 +182,19 @@ const areaPattern = (area: string) => {
   return `^${TRIMMED}*${literal}${TRIMMED}*,${TRIMMED}*[Nn][Aa][Ii][Rr][Oo][Bb][Ii]${TRIMMED}*$`;
 };
 
-interface Scope { rows: readonly BridgeMapRow[]; search?: string; area?: string; labelRows?: readonly BridgeMapRow[] }
+/**
+ * What a read covers. A category or "all" names whole platform categories (`categories`); a subcategory or option
+ * names exact groups (`rows`) and no whole category. Search also matches labels: a category's name selects its
+ * whole platform category (`labelCategories`), a subcategory's name its groups (`labelRows`).
+ */
+interface Scope {
+  rows: readonly BridgeMapRow[];
+  categories: readonly string[];
+  search?: string;
+  area?: string;
+  labelRows?: readonly BridgeMapRow[];
+  labelCategories?: readonly string[];
+}
 
 /** and(category_key.eq.X,subcategory.in.(a,b)) groups for the rows' Supabase keys, in a stable order. */
 function keyGroups(rows: readonly BridgeMapRow[]): [string, string][] {
@@ -186,23 +204,33 @@ function keyGroups(rows: readonly BridgeMapRow[]): [string, string][] {
     .map(([category, subcategories]) => [category, [...subcategories].sort().join(',')]);
 }
 const groupTerm = ([category, list]: [string, string]) => `and(category_key.eq.${category},subcategory.in.(${list}))`;
+const sortedKeys = (keys: readonly string[]) => [...new Set(keys)].sort();
 
 /**
  * PostgREST filters for the scope's Supabase keys, search and area. Deterministic, so pages stay stable.
  * Search matches the merchant's name, or, as on the demo API, its category or subcategory name.
  */
 function merchantFilters(scope: Scope): Record<string, string> {
+  const whole = sortedKeys(scope.categories);
   const sorted = keyGroups(scope.rows);
   const [only] = sorted;
-  let params: Record<string, string> = sorted.length === 1 && only
-    ? { category_key: `eq.${only[0]}`, subcategory: `in.(${only[1]})` }
-    : { or: `(${sorted.map(groupTerm).join(',')})` };
-  if (scope.search && scope.labelRows?.length) {
+  const terms = whole.length ? [`category_key.in.(${whole.join(',')})`] : sorted.map(groupTerm);
+  let params: Record<string, string> = whole.length ? { category_key: `in.(${whole.join(',')})` }
+    : sorted.length === 1 && only ? { category_key: `eq.${only[0]}`, subcategory: `in.(${only[1]})` }
+    : { or: `(${terms.join(',')})` };
+  const labels = [...sortedKeys(scope.labelCategories ?? []).map((key) => `category_key.eq.${key}`), ...keyGroups(scope.labelRows ?? []).map(groupTerm)];
+  if (scope.search && labels.length) {
     const name = `trading_name.ilike.${quoted(`*${likePattern(scope.search)}*`)}`;
-    params = { and: `(or(${sorted.map(groupTerm).join(',')}),or(${[name, ...keyGroups(scope.labelRows).map(groupTerm)].join(',')}))` };
+    params = { and: `(or(${terms.join(',')}),or(${[name, ...labels].join(',')}))` };
   } else if (scope.search) params.trading_name = `ilike.*${likePattern(scope.search)}*`;
   if (scope.area) params.branch_address = `match.${areaPattern(scope.area)}`;
   return params;
+}
+
+/** The last rail on a category page: "All stores" when no type has a rail of its own, "More stores" after them. */
+function restTitle(categoryId: string, afterTypes: boolean): string {
+  const noun = categoryId === 'travel-tours' ? 'trips' : categoryId === 'experiences' ? 'experiences' : 'stores';
+  return `${afterTypes ? 'More' : 'All'} ${noun}`;
 }
 
 /** Old links and the owner's test sheet use demo codes such as M0384; they open the same demo row by its UUID. */
@@ -254,6 +282,8 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
   readonly #fetch: SupabaseFetch;
   readonly #now: () => number;
   readonly #rows: BridgeMapRow[];
+  /** Mapped rows whose Discovery category is on screen (hidden categories, such as Play, are left out). */
+  readonly #visible: BridgeMapRow[];
   readonly #mediaSource: (() => Promise<DemoMedia>) | undefined;
   readonly #timeoutMs: number;
   #media: Promise<DemoMedia> | undefined;
@@ -267,6 +297,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     this.#fetch = options.fetch ?? ((input, init) => globalThis.fetch(input, init));
     this.#now = options.now ?? Date.now;
     this.#rows = supabaseMapRows(options.map ?? subcategoryMap);
+    this.#visible = this.#rows.filter((row) => row.status === 'mapped' && !!row.discovery && !!findCategory(row.discovery.categoryId));
     this.#mediaSource = options.media;
     this.#timeoutMs = options.timeoutMs ?? 12_000;
   }
@@ -316,12 +347,18 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
       return [{ definition, shown }];
     });
     if (categoryId !== 'restaurants-food' && categoryId !== 'travel-tours') chosen.splice(4);
-    const unique = [...new Map(chosen.flatMap(({ shown }) => shown).map((row) => [row.id, row])).values()];
+    // Stores no rail above holds (no subcategory, one the map doesn't know, or a type too small for a rail of its own)
+    // get the last rail, so everyone listed in the category can be found from its page. Its View all is the category.
+    const covered = new Set(chosen.flatMap(({ definition }) => findSubcategory(categoryId, definition.subcategoryId)?.sourceIds ?? []));
+    const rest = rows.filter((row) => !covered.has(demoSubcategory(row) ?? '')).slice(0, REST_MERCHANTS);
+    const unique = [...new Map([...chosen.flatMap(({ shown }) => shown), ...rest].map((row) => [row.id, row])).values()];
     const merchants = new Map((await this.#hydrate(unique, COLLECTION_ITEMS, { categoryId }, signal)).map((merchant) => [merchant.id, merchant]));
-    return {
-      collections: chosen.map(({ definition, shown }) => ({ id: definition.id, title: definition.title, subcategoryId: definition.subcategoryId, merchants: shown.map((row) => merchants.get(row.id)!) })),
-      partial: false,
-    };
+    const collections: CollectionResult['collections'] = chosen.map(({ definition, shown }) => ({ id: definition.id, title: definition.title, subcategoryId: definition.subcategoryId, merchants: shown.map((row) => merchants.get(row.id)!) }));
+    if (rest.length) {
+      collections.push({ id: `${categoryId}:collection:rest`, title: restTitle(categoryId, chosen.length > 0),
+        viewAllQuery: { categoryId, ...(query.area ? { area: query.area } : {}) }, merchants: rest.map((row) => merchants.get(row.id)!) });
+    }
+    return { collections, partial: false };
   }
 
   async getMerchant(id: string, signal?: AbortSignal): Promise<Merchant> {
@@ -347,7 +384,12 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     return untilAborted(this.#areas.value, signal).then((areas) => [...areas]);
   }
 
-  /** The bridge's selection rules: a subcategory or option selects its demo groups; a category or all, its mapped groups only. */
+  /**
+   * A subcategory or option selects its demo groups. A category, or everything, selects the whole platform
+   * categories its mapped groups come from, so stores with no subcategory, or an unmapped one, are listed there.
+   * Platform categories with no Discovery category (Financial Services, Logistics & Shipping, Something else)
+   * stay off customer screens.
+   */
   #scope(query: DiscoveryQuery): Scope | 'unmapped' | 'empty' {
     const category = findCategory(query.categoryId);
     if (query.categoryId && !category) throw invalid();
@@ -362,17 +404,22 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     if (area !== undefined && (area !== area.trim() || area.includes(','))) return 'empty';
     const sourceIds = option?.sourceIds ?? subcategory?.sourceIds;
     if (sourceIds && !sourceIds.length) return 'unmapped';
-    const rows = this.#rows.filter((row) => row.status === 'mapped' && row.discovery
-      && (sourceIds ? sourceIds.includes(row.demoSubcategoryId) : !category || row.discovery.categoryId === category.id));
+    const rows = this.#visible.filter((row) => sourceIds ? sourceIds.includes(row.demoSubcategoryId) : !category || row.discovery!.categoryId === category.id);
     if (!rows.length) return 'unmapped';
-    // The demo API's search also matched category and subcategory names; these rows' merchants match by label.
+    const categories = sourceIds ? [] : sortedKeys(rows.map((row) => row.supabase.category));
+    // The demo API's search also matched category and subcategory names. A category's name matches its whole
+    // platform category (stores without a subcategory too); a subcategory's name matches that subcategory's groups.
     const term = search ? fold(search) : '';
-    const labelRows = term ? rows.filter((row) => {
-      const discoveryCategory = findCategory(row.discovery?.categoryId);
-      const labels = [row.demoLabel, row.demoCategoryLabel, discoveryCategory?.label, findSubcategory(row.discovery?.categoryId, row.discovery?.subcategoryId)?.label];
-      return labels.some((label) => label && fold(label).includes(term));
-    }) : [];
-    return { rows, ...(search ? { search } : {}), ...(area ? { area } : {}), ...(labelRows.length ? { labelRows } : {}) };
+    const matches = (labels: (string | undefined)[]) => labels.some((label) => label && fold(label).includes(term));
+    const labelCategories = new Set<string>();
+    const labelRows: BridgeMapRow[] = [];
+    if (term) for (const row of rows) {
+      const inCategory = matches([row.demoCategoryLabel, findCategory(row.discovery?.categoryId)?.label]);
+      if (inCategory && categories.includes(row.supabase.category)) labelCategories.add(row.supabase.category);
+      else if (inCategory || matches([row.demoLabel, findSubcategory(row.discovery?.categoryId, row.discovery?.subcategoryId)?.label])) labelRows.push(row);
+    }
+    return { rows, categories, ...(search ? { search } : {}), ...(area ? { area } : {}),
+      ...(labelRows.length ? { labelRows } : {}), ...(labelCategories.size ? { labelCategories: [...labelCategories] } : {}) };
   }
 
   /** Offerings need the complete scoped inventory, as on the platform: search covers item and host names. */
@@ -388,7 +435,8 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
   }
 
   async #readAreas(): Promise<string[]> {
-    const scope = { rows: this.#rows.filter((row) => row.status === 'mapped' && row.discovery) };
+    // Every listed store's area, the same stores the "all" listing shows.
+    const scope = { rows: [], categories: sortedKeys(this.#visible.map((row) => row.supabase.category)) };
     const rows = await this.#readAll('merchant_public', { select: 'id,branch_address', ...merchantFilters(scope), order: 'id.asc' });
     const areas = new Set<string>();
     for (const value of rows) {

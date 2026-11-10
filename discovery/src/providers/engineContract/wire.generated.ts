@@ -1,5 +1,24 @@
-// Generated from WORKFLOW_V1.openapi.json. Run npm run generate; do not edit.
+// Generated from ENGINE_V1.openapi.json. Run npm run generate; do not edit.
+// Copied with ENGINE_V1.openapi.json from discovery-engine/ (src/contracts, docs/contracts), which is not in this repository yet.
+// The opt-in engine provider reads them. Regenerate in the engine, then copy both here.
 export interface paths {
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** engineHealth */
+        get: operations["engineHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/capabilities": {
         parameters: {
             query?: never;
@@ -7,8 +26,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** readWorkflowCapabilities */
-        get: operations["readWorkflowCapabilities"];
+        /** readEngineCapabilities */
+        get: operations["readEngineCapabilities"];
         put?: never;
         post?: never;
         delete?: never;
@@ -17,15 +36,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/entitlement-plans/{planId}": {
+    "/results": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** readEntitlementPlan */
-        get: operations["readEntitlementPlan"];
+        get?: never;
+        put?: never;
+        /** discoverResults */
+        post: operations["discoverResults"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** composeCollections */
+        post: operations["composeCollections"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/merchants/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** readMerchantDetail */
+        get: operations["readMerchantDetail"];
         put?: never;
         post?: never;
         delete?: never;
@@ -34,15 +87,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/entitlements/{entitlementId}": {
+    "/merchants/{merchantId}/offerings/{offeringId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** readPrivateEntitlement */
-        get: operations["readPrivateEntitlement"];
+        /** readExactOfferingDetail */
+        get: operations["readExactOfferingDetail"];
         put?: never;
         post?: never;
         delete?: never;
@@ -51,49 +104,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/resources/availability": {
+    "/areas": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        /** queryResourceAvailability */
-        post: operations["queryResourceAvailability"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/owners/{ownerId}/series/preview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** previewFiniteSeries */
-        post: operations["previewFiniteSeries"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/owners/{ownerId}/telecom-products/{productId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** readTelecomProduct */
-        get: operations["readTelecomProduct"];
+        /** readCatalogAreas */
+        get: operations["readCatalogAreas"];
         put?: never;
         post?: never;
         delete?: never;
@@ -102,7 +121,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/recipients/validations": {
+    "/tasks": {
         parameters: {
             query?: never;
             header?: never;
@@ -111,15 +130,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** validatePrivateRecipientHandoff */
-        post: operations["validatePrivateRecipientHandoff"];
+        /** discoverTaskComponents */
+        post: operations["discoverTaskComponents"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/quotes": {
+    "/events": {
         parameters: {
             query?: never;
             header?: never;
@@ -128,15 +147,18 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** quoteWorkflowIntent */
-        post: operations["quoteWorkflowIntent"];
+        /**
+         * observeClientEvents
+         * @description First-party NexG interaction ingestion. Requires a live delivery token, recorded consent and approved sink configuration. Handoff events remain unavailable until an owner integration exists. Browser events never confirm owner outcomes.
+         */
+        post: operations["observeClientEvents"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/holds": {
+    "/workflow-assessments": {
         parameters: {
             query?: never;
             header?: never;
@@ -145,15 +167,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** holdQuotedScope */
-        post: operations["holdQuotedScope"];
+        /** assessWorkflowReadiness */
+        post: operations["assessWorkflowReadiness"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/holds/{holdId}/release": {
+    "/workflow-handoffs": {
         parameters: {
             query?: never;
             header?: never;
@@ -162,15 +184,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** releaseOwnerHold */
-        post: operations["releaseOwnerHold"];
+        /** prepareOwnerHandoff */
+        post: operations["prepareOwnerHandoff"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/operations": {
+    "/internal/owner-outcomes": {
         parameters: {
             query?: never;
             header?: never;
@@ -179,42 +201,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** commitReviewedWorkflowIntent */
-        post: operations["commitReviewedWorkflowIntent"];
+        /** observeVerifiedOwnerOutcome */
+        post: operations["observeVerifiedOwnerOutcome"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/owners/{ownerId}/operations/{operationId}": {
+    "/release": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** readOwnerOperation */
-        get: operations["readOwnerOperation"];
+        /** Read verified public release identity and collection labels */
+        get: operations["readPublishedReleaseContext"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/owners/{ownerId}/operation-lookups": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** recoverIntentWithoutOperationId */
-        post: operations["recoverIntentWithoutOperationId"];
         delete?: never;
         options?: never;
         head?: never;
@@ -900,6 +905,424 @@ export interface components {
             context: components["schemas"]["Context"];
             refs: components["schemas"]["ObservedRef"][];
         };
+        EngineRef: {
+            /** @enum {string} */
+            kind: "merchant" | "offering";
+            ownerId: string;
+            id: string;
+            merchantId: string;
+        };
+        Selection: {
+            categoryId?: string;
+            subcategoryId?: string;
+            optionId?: string;
+        };
+        AreaFilter: {
+            /** @constant */
+            kind: "catalog_area";
+            areaId: string;
+        };
+        OpenFilter: {
+            /** @constant */
+            kind: "merchant_open";
+            /** @constant */
+            value: true;
+        };
+        ListedPriceFilter: {
+            /** @constant */
+            kind: "listed_price";
+            min: components["schemas"]["Money"];
+            max?: components["schemas"]["Money"];
+            basisId: string;
+        } | {
+            /** @constant */
+            kind: "listed_price";
+            min?: components["schemas"]["Money"];
+            max: components["schemas"]["Money"];
+            basisId: string;
+        };
+        TotalFilter: {
+            /** @constant */
+            kind: "comparable_total";
+            max: components["schemas"]["Money"];
+            scopeId: string;
+        };
+        FulfillmentFilter: {
+            /** @constant */
+            kind: "fulfillment";
+            /** @enum {string} */
+            method: "delivery" | "pickup" | "on_site" | "remote";
+        };
+        CoverageFilter: {
+            /** @constant */
+            kind: "service_area";
+            contextToken: string;
+        };
+        AttributeFilter: {
+            /** @constant */
+            kind: "required_attributes";
+            values: {
+                key: string;
+                valueId: string;
+            }[];
+        };
+        AvailabilityFilter: {
+            /** @constant */
+            kind: "required_availability";
+            /** Format: date-time */
+            start: string;
+            /** Format: date-time */
+            end?: string;
+            timezone: string;
+        };
+        PartyFilter: {
+            /** @constant */
+            kind: "party";
+            adults: number;
+            children?: number;
+            infants?: number;
+        };
+        WorkflowFilter: {
+            /** @constant */
+            kind: "workflow_kind";
+            /** @enum {string} */
+            value: "PURCHASE" | "APPOINTMENT" | "RENTAL" | "TRANSFER" | "TICKET" | "TOUR" | "SERVICE" | "REQUEST" | "ENTITLEMENT" | "RESOURCE_RESERVATION" | "TELECOM_ACTIVATION";
+        };
+        SupportedFilter: components["schemas"]["AreaFilter"] | components["schemas"]["OpenFilter"] | components["schemas"]["ListedPriceFilter"] | components["schemas"]["TotalFilter"] | components["schemas"]["FulfillmentFilter"] | components["schemas"]["CoverageFilter"] | components["schemas"]["AttributeFilter"] | components["schemas"]["AvailabilityFilter"] | components["schemas"]["PartyFilter"] | components["schemas"]["WorkflowFilter"];
+        EngineRequest: {
+            /** @constant */
+            contractVersion: "1";
+            requestId: string;
+            discoveryReleaseId: string;
+            /** @enum {string} */
+            mode: "merchant" | "offering";
+            selection: components["schemas"]["Selection"];
+            sourceScope?: {
+                merchantId?: string;
+                anchorRef?: components["schemas"]["EngineRef"];
+            };
+            query?: string;
+            filters: components["schemas"]["SupportedFilter"][];
+            /** @enum {string} */
+            sort: "recommended" | "rating" | "delivery" | "price_low" | "price_high" | "listed_price_low" | "comparable_total_low";
+            /** @default 24 */
+            limit: number;
+            cursor?: string;
+            offset?: number;
+            contextToken?: string;
+        };
+        Versions: {
+            discoveryRelease: string;
+            layout: string;
+            taxonomy: string;
+            mapping: string;
+            policy: string;
+            ranker: string;
+            indexGeneration?: string;
+            modelRevision?: string;
+            sourceSnapshots: {
+                ownerId: string;
+                snapshot: components["schemas"]["StringFact"];
+            }[];
+            /** @description Server-owned runtime control revision. Changes invalidate paging and delivery tokens. */
+            profileRevision?: string;
+        };
+        RetrievalWindow: {
+            /** @enum {string} */
+            scope: "exact_matches" | "bounded_candidates";
+            windowId: string;
+            candidateCount: number;
+            /** @enum {string} */
+            completion: "more_in_window" | "window_exhausted" | "catalog_exhausted" | "unknown";
+        };
+        EnginePage: {
+            /** @constant */
+            contractVersion: "1";
+            requestId: string;
+            refs: components["schemas"]["EngineRef"][];
+            count: components["schemas"]["EngineCount"];
+            nextCursor?: string;
+            retrieval: components["schemas"]["RetrievalWindow"];
+            versions: components["schemas"]["Versions"];
+            applied: {
+                selection: components["schemas"]["Selection"];
+                filterHash: string;
+                constraints: components["schemas"]["AppliedConstraint"][];
+                /** @enum {string} */
+                sort: "recommended" | "rating" | "delivery" | "price_low" | "price_high" | "listed_price_low" | "comparable_total_low";
+                safeNormalizedQuery?: string;
+            };
+            /** @enum {string} */
+            status: "ok" | "underfilled" | "unmapped";
+            /** @enum {string} */
+            fallback?: "deterministic" | "lexical";
+            exposureToken?: string;
+            presentations: {
+                merchants: components["schemas"]["PublicMerchant"][];
+                offerings: components["schemas"]["PublicOffering"][];
+            };
+            /** @description Opaque cursor for revalidating this exact bounded session page. */
+            pageCursor?: string;
+            /** @description Opaque previous-page cursor in the same pinned session. */
+            previousCursor?: string;
+        } & unknown;
+        EngineCount: {
+            /** @constant */
+            kind: "exact";
+            value: number;
+            /** @enum {string} */
+            scope: "eligible" | "matched";
+        } | {
+            /** @constant */
+            kind: "lower_bound";
+            value: number;
+        } | {
+            /** @constant */
+            kind: "unknown";
+        };
+        AppliedConstraint: {
+            value: components["schemas"]["SupportedFilter"];
+            /** @enum {string} */
+            origin: "explicit_control" | "explicit_text" | "permitted_preference" | "inferred";
+            /** @enum {string} */
+            strength: "hard" | "soft";
+            /** @enum {string} */
+            state: "supported" | "unsupported" | "ambiguous" | "conflicting";
+            reasonCodes: string[];
+        };
+        CollectionRequest: {
+            request: components["schemas"]["EngineRequest"];
+            definitionIds: string[];
+        };
+        CollectionPage: {
+            sections: {
+                definitionId: string;
+                titleKey: string;
+                page: components["schemas"]["EnginePage"];
+                viewAllRequest: components["schemas"]["EngineRequest"];
+            }[];
+            partial: boolean;
+            reasonCodes: string[];
+        };
+        SharedConstraint: {
+            value: components["schemas"]["SupportedFilter"];
+            /** @enum {string} */
+            origin: "explicit_control" | "explicit_text" | "permitted_preference" | "inferred";
+            /** @enum {string} */
+            strength: "hard" | "soft";
+            evidence: string;
+        };
+        TaskRequest: {
+            /** @constant */
+            contractVersion: "1";
+            requestId: string;
+            discoveryReleaseId: string;
+            components: {
+                componentId: string;
+                required: boolean;
+                request: components["schemas"]["EngineRequest"];
+            }[];
+            sharedConstraints?: components["schemas"]["SharedConstraint"][];
+        };
+        TaskPage: {
+            /** @enum {string} */
+            status: "complete" | "partial" | "unavailable" | "needs_clarification";
+            components: {
+                componentId: string;
+                page?: components["schemas"]["EnginePage"];
+                reasonCodes: string[];
+                /** @enum {string} */
+                status: "ok" | "underfilled" | "unmapped" | "unsupported" | "needs_clarification" | "unavailable";
+            }[];
+        };
+        EngineCapabilities: {
+            /** @constant */
+            contractVersion: "1";
+            discoveryReleaseId: string;
+            versions: components["schemas"]["Versions"];
+            resultModes: ("merchant" | "offering")[];
+            filterKinds: string[];
+            sorts: string[];
+            countKinds: ("exact" | "lower_bound" | "unknown")[];
+            workflowKinds: string[];
+            /** @enum {string} */
+            readiness: "R0" | "R1" | "R2" | "R3" | "R4";
+            limits: {
+                /** @constant */
+                maxPageSize: 48;
+                /** @constant */
+                maxTaskComponents: 4;
+                /** @constant */
+                maxRequiredTaskComponents: 3;
+                /** @constant */
+                maxBodyBytes: 65536;
+                /** @constant */
+                sessionLifetimeSeconds: 300;
+            };
+            policyCoverage: {
+                nodeId: string;
+                /** @enum {string} */
+                state: "mapped" | "unmapped" | "partial" | "unsupported";
+                reasonCodes: string[];
+            }[];
+        };
+        PublicOffering: {
+            ref: components["schemas"]["EngineRef"];
+            name: string;
+            description?: string;
+            image?: string;
+            listedPrice: components["schemas"]["MoneyFact"];
+        };
+        PublicMerchant: {
+            ref: components["schemas"]["EngineRef"];
+            name: string;
+            area?: string;
+            image?: string;
+            /** @description Where the published release places this merchant in the Discovery taxonomy. Omitted when the source gives no mapped subcategory. */
+            taxonomyPaths?: components["schemas"]["TaxonomyPath"][];
+            location?: components["schemas"]["GeoPoint"];
+            items: components["schemas"]["PublicOffering"][];
+            itemsCount: components["schemas"]["Count"];
+            /** @enum {string} */
+            itemsCompletion: "complete_scope" | "bounded_window" | "unknown";
+        };
+        /** @description Where the published release places a merchant in the Discovery taxonomy. Resolved from the source's own subcategory through the release's source mappings; never inferred from names, text or the request. */
+        TaxonomyPath: {
+            categoryId: string;
+            subcategoryId: string;
+            optionId?: string;
+        };
+        /** @description WGS 84 coordinates of the merchant's branch, as the source records them. */
+        GeoPoint: {
+            latitude: number;
+            longitude: number;
+        };
+        Areas: {
+            areas: string[];
+        };
+        WorkflowAssessmentRequest: {
+            context: components["schemas"]["Context"];
+            ref: components["schemas"]["EngineRef"];
+            intent: components["schemas"]["WorkflowIntent"];
+        };
+        WorkflowAssessment: {
+            assessmentRef: components["schemas"]["ObservedRef"];
+            ref: components["schemas"]["EngineRef"];
+            workflowRef?: components["schemas"]["SourceRef"];
+            decisions: {
+                canBrowse: components["schemas"]["Decision"];
+                matchesHardRequest: components["schemas"]["Decision"];
+                canSubmitRequest: components["schemas"]["Decision"];
+                canTransact: components["schemas"]["Decision"];
+            };
+            versions: components["schemas"]["Versions"];
+            /** Format: date-time */
+            checkedAt: string;
+            /** Format: date-time */
+            validUntil?: string;
+            allowedHandoffKinds: string[];
+            reasonCodes: string[];
+        };
+        HandoffRequest: {
+            assessmentRef: components["schemas"]["ObservedRef"];
+            context: components["schemas"]["Context"];
+            ref: components["schemas"]["EngineRef"];
+            intent: components["schemas"]["WorkflowIntent"];
+            handoffKind: string;
+        };
+        Handoff: {
+            handoffRef: string;
+            destinationKey: string;
+            token: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** @constant */
+            businessEffect: "none";
+            /** @constant */
+            requiresOwnerRevalidation: true;
+        };
+        ClientEvent: {
+            eventId: string;
+            /** @enum {string} */
+            type: "result_exposed" | "detail_opened" | "handoff_opened";
+            ref: components["schemas"]["EngineRef"];
+            exposureToken: string;
+            /** Format: date-time */
+            occurredAt: string;
+            /** @description Zero-based position in the final delivered page, bound to exposureToken. */
+            position?: number;
+            exposure?: {
+                visibleRatio: number;
+                continuousVisibleMs: number;
+                /** @constant */
+                documentActive: true;
+            };
+        } & unknown;
+        ClientEvents: {
+            /** @constant */
+            contractVersion: "1";
+            events: components["schemas"]["ClientEvent"][];
+        };
+        OwnerOutcome: {
+            eventId: string;
+            ownerId: string;
+            operationRef: components["schemas"]["SourceRef"];
+            mappingRef: components["schemas"]["SourceRef"];
+            /** @enum {string} */
+            outcomeKind: "requested" | "confirmed" | "fulfilled" | "failed" | "cancelled" | "credit_posted" | "allowance_active" | "service_active" | "profile_provisioned";
+            /** Format: date-time */
+            occurredAt: string;
+        };
+        EventReceipt: {
+            accepted: number;
+            duplicates: number;
+            rejected: number;
+        };
+        EngineHealth: {
+            /** @enum {string} */
+            status: "ok" | "degraded" | "unavailable";
+            /** @constant */
+            contractVersion: "1";
+            /** @enum {string} */
+            readiness: "R0" | "R1" | "R2" | "R3" | "R4";
+        };
+        EngineError: {
+            /** @constant */
+            contractVersion: "1";
+            requestId: string;
+            /** @enum {string} */
+            code: "INVALID_REQUEST" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "RELEASE_INCOMPATIBLE" | "SOURCE_REVISION_CHANGED" | "IDEMPOTENCY_CONFLICT" | "UNSUPPORTED_CAPABILITY" | "REQUIRED_FACT_UNKNOWN" | "FACTS_TOO_STALE" | "CONSTRAINT_CONFLICT" | "QUOTE_EXPIRED" | "HOLD_EXPIRED" | "REVIEW_REQUIRED" | "LIMIT_EXCEEDED" | "RATE_LIMITED" | "OWNER_UNAVAILABLE" | "ACTION_OUTCOME_UNKNOWN" | "CLARIFICATION_REQUIRED" | "CURSOR_EXPIRED" | "CURSOR_RESTART_REQUIRED" | "CATALOG_UNAVAILABLE";
+            retryable: boolean;
+            /** @enum {string} */
+            recovery: "correct_request" | "authenticate" | "review" | "restart_preserving_constraints" | "retry_read" | "lookup_intent" | "wait" | "owner_support" | "none" | "clarify";
+            fieldPaths: string[];
+            clarification?: {
+                clarificationKey: string;
+                messageKey: string;
+                affectedPaths: string[];
+                options: {
+                    optionId: string;
+                    labelKey: string;
+                }[];
+            };
+        } & unknown;
+        ReleaseContext: {
+            /** @constant */
+            contractVersion: "1";
+            discoveryReleaseId: string;
+            versions: components["schemas"]["Versions"];
+            collections: ({
+                id: string;
+                categoryId: string;
+                titleKey: string;
+                title?: string;
+            } | {
+                id: string;
+                categoryId: string;
+                titleKey?: string;
+                title: string;
+            })[];
+        };
     };
     responses: never;
     parameters: never;
@@ -909,1316 +1332,1239 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    readWorkflowCapabilities: {
+    engineHealth: {
         parameters: {
-            query: {
-                ownerId: string;
-                merchantId: string;
-                offeringId: string;
-                releaseId: string;
-            };
-            header?: {
-                "X-Request-ID"?: string;
-            };
+            query?: never;
+            header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Capabilities"];
+                    "application/json": components["schemas"]["EngineHealth"];
                 };
             };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    readEntitlementPlan: {
+    readEngineCapabilities: {
+        parameters: {
+            query: {
+                releaseId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Typed read/decision result; no operational commitment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineCapabilities"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+        };
+    };
+    discoverResults: {
         parameters: {
             query?: never;
-            header?: {
-                "X-Request-ID"?: string;
+            header?: never;
+            path?: never;
+            cookie?: {
+                /** @description Server-issued signed anonymous paging scope. Initial requests receive it through Set-Cookie; cursor/offset continuation requires the same caller cookie. This is not authentication. */
+                nexg_discovery_page?: string;
             };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EngineRequest"];
+            };
+        };
+        responses: {
+            /** @description Typed read/decision result; no operational commitment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnginePage"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+        };
+    };
+    composeCollections: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                /** @description Server-issued signed anonymous paging scope. Initial requests receive it through Set-Cookie; cursor/offset continuation requires the same caller cookie. This is not authentication. */
+                nexg_discovery_page?: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Typed read/decision result; no operational commitment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionPage"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+            /** @description Typed failure preserving request constraints */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EngineError"];
+                };
+            };
+        };
+    };
+    readMerchantDetail: {
+        parameters: {
+            query?: never;
+            header?: never;
             path: {
-                ownerId: string;
-                planId: string;
+                id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EntitlementPlan"];
+                    "application/json": components["schemas"]["PublicMerchant"];
                 };
             };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    readPrivateEntitlement: {
+    readExactOfferingDetail: {
         parameters: {
             query?: never;
-            header?: {
-                "X-Request-ID"?: string;
-            };
+            header?: never;
             path: {
-                ownerId: string;
-                entitlementId: string;
+                merchantId: string;
+                offeringId: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Entitlement"];
+                    "application/json": components["schemas"]["PublicOffering"];
                 };
             };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    queryResourceAvailability: {
+    readCatalogAreas: {
         parameters: {
             query?: never;
-            header?: {
-                "X-Request-ID"?: string;
-            };
-            path: {
-                ownerId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AvailabilityRequest"];
-            };
-        };
-        responses: {
-            /** @description Authoritative response; status semantics remain separate */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Availability"];
-                };
-            };
-            /** @description Malformed request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Authentication required */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Scope denied */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Source entity not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Version or intent conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Recognized unsupported/unknown/invalid semantics */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Bounded overload */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-        };
-    };
-    previewFiniteSeries: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Request-ID"?: string;
-            };
-            path: {
-                ownerId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SeriesPreviewRequest"];
-            };
-        };
-        responses: {
-            /** @description Authoritative response; status semantics remain separate */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SeriesPreview"];
-                };
-            };
-            /** @description Malformed request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Authentication required */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Scope denied */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Source entity not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Version or intent conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Recognized unsupported/unknown/invalid semantics */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Bounded overload */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-        };
-    };
-    readTelecomProduct: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Request-ID"?: string;
-            };
-            path: {
-                ownerId: string;
-                productId: string;
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TelecomProduct"];
+                    "application/json": components["schemas"]["Areas"];
                 };
             };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    validatePrivateRecipientHandoff: {
+    discoverTaskComponents: {
         parameters: {
             query?: never;
-            header?: {
-                "X-Request-ID"?: string;
-            };
-            path: {
-                ownerId: string;
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RecipientValidationRequest"];
+                "application/json": components["schemas"]["TaskRequest"];
             };
         };
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["RecipientValidation"];
+                    "application/json": components["schemas"]["TaskPage"];
                 };
             };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    quoteWorkflowIntent: {
+    observeClientEvents: {
         parameters: {
             query?: never;
-            header: {
-                "X-Request-ID"?: string;
-                /** @description Owner-scoped single-intent key; changed payload is a 409. Never generate a new key to recover an uncertain outcome. */
-                "Idempotency-Key": string;
-            };
-            path: {
-                ownerId: string;
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["QuoteRequest"];
+                "application/json": components["schemas"]["ClientEvents"];
             };
         };
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Quote"];
+                    "application/json": components["schemas"]["EventReceipt"];
                 };
             };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    holdQuotedScope: {
+    assessWorkflowReadiness: {
         parameters: {
             query?: never;
-            header: {
-                "X-Request-ID"?: string;
-                /** @description Owner-scoped single-intent key; changed payload is a 409. Never generate a new key to recover an uncertain outcome. */
-                "Idempotency-Key": string;
-            };
-            path: {
-                ownerId: string;
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["HoldRequest"];
+                "application/json": components["schemas"]["WorkflowAssessmentRequest"];
             };
         };
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Hold"];
+                    "application/json": components["schemas"]["WorkflowAssessment"];
                 };
             };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    releaseOwnerHold: {
+    prepareOwnerHandoff: {
         parameters: {
             query?: never;
-            header: {
-                "X-Request-ID"?: string;
-                /** @description Owner-scoped single-intent key; changed payload is a 409. Never generate a new key to recover an uncertain outcome. */
-                "Idempotency-Key": string;
-            };
-            path: {
-                ownerId: string;
-                holdId: string;
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ReleaseHoldRequest"];
+                "application/json": components["schemas"]["HandoffRequest"];
             };
         };
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Operation"];
+                    "application/json": components["schemas"]["Handoff"];
                 };
             };
-            /** @description Owner accepted/pending or submission outcome unknown; recover this intent, never infer confirmation */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Operation"];
-                };
-            };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    commitReviewedWorkflowIntent: {
+    observeVerifiedOwnerOutcome: {
         parameters: {
             query?: never;
-            header: {
-                "X-Request-ID"?: string;
-                /** @description Owner-scoped single-intent key; changed payload is a 409. Never generate a new key to recover an uncertain outcome. */
-                "Idempotency-Key": string;
-            };
-            path: {
-                ownerId: string;
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CommitRequest"];
+                "application/json": components["schemas"]["OwnerOutcome"];
             };
         };
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Operation"];
+                    "application/json": components["schemas"]["EventReceipt"];
                 };
             };
-            /** @description Owner accepted/pending or submission outcome unknown; recover this intent, never infer confirmation */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Operation"];
-                };
-            };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };
     };
-    readOwnerOperation: {
+    readPublishedReleaseContext: {
         parameters: {
             query?: never;
-            header?: {
-                "X-Request-ID"?: string;
-            };
-            path: {
-                ownerId: string;
-                operationId: string;
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Authoritative response; status semantics remain separate */
+            /** @description Typed read/decision result; no operational commitment */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Operation"];
+                    "application/json": components["schemas"]["ReleaseContext"];
                 };
             };
-            /** @description Malformed request */
+            /** @description Typed failure preserving request constraints */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Authentication required */
+            /** @description Typed failure preserving request constraints */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Scope denied */
+            /** @description Typed failure preserving request constraints */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Source entity not found */
+            /** @description Typed failure preserving request constraints */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Version or intent conflict */
+            /** @description Typed failure preserving request constraints */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Recognized unsupported/unknown/invalid semantics */
+            /** @description Typed failure preserving request constraints */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Bounded overload */
+            /** @description Typed failure preserving request constraints */
             429: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
+            /** @description Typed failure preserving request constraints */
             503: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-        };
-    };
-    recoverIntentWithoutOperationId: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Request-ID"?: string;
-            };
-            path: {
-                ownerId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LookupRequest"];
-            };
-        };
-        responses: {
-            /** @description Authoritative response; status semantics remain separate */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Lookup"];
-                };
-            };
-            /** @description Malformed request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Authentication required */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Scope denied */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Source entity not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Version or intent conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Recognized unsupported/unknown/invalid semantics */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Bounded overload */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
-                };
-            };
-            /** @description Owner unavailable; not evidence that a submitted command failed */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiError"];
+                    "application/json": components["schemas"]["EngineError"];
                 };
             };
         };

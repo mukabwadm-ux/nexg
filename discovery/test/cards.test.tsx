@@ -26,8 +26,9 @@ test('every subcategory gets a card kind from its journey, and restaurant purcha
     if (source) assert.equal(offeringKind({ subcategoryId: subcategory.id }), kind, subcategory.id);
     counts[kind] = (counts[kind] ?? 0) + 1;
   }
-  // Play adds 13 activities; Flights adds 2 activities (scenic, safari) and 2 quoted charters (task).
-  assert.deepEqual(counts, { product: 46, dish: 6, service: 11, activity: 23, task: 23, vehicle: 6 });
+  // Play (13 activities) and Flights (2 activities, 2 quoted charters) are hidden until the platform has
+  // categories for them (HIDDEN_CATEGORY_IDS in src/data/taxonomy.ts), so they're not counted here.
+  assert.deepEqual(counts, { product: 46, dish: 6, service: 11, activity: 8, task: 21, vehicle: 6 });
   assert.equal(offeringKind({ subcategoryId: 'restaurants-food_restaurant' }), 'dish');
   assert.equal(offeringKind({ subcategoryId: 'restaurants-food_catering' }), 'task');
   assert.equal(offeringKind({ subcategoryId: 'beauty-wellness:massage' }), 'service');

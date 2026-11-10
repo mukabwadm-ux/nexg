@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import subcategoryMap from '../demo-seed/subcategory-map.json';
-import { areaFromAddress, demoMediaFromSnapshot, type BridgeMapRow } from '../discovery-engine/src/adapters/supabase/catalogBridge';
+import { areaFromAddress, demoMediaFromSnapshot, type BridgeMapRow } from '../src/providers/catalogBridge';
 import { SUBCATEGORY_KEY_ALIASES, SupabaseDiscoveryProvider, supabaseMapRows, type SupabaseFetch, type SupabaseProviderOptions } from '../src/providers/supabaseProvider';
 import { SUPABASE_PROVIDER_VERSION, supabaseCapabilities, supabaseKeyRole, supabaseSettings } from '../src/providers/supabaseSettings';
 import { packDemoMedia, unpackDemoMedia } from '../src/providers/demoMedia';
@@ -9,7 +9,7 @@ import { lazySupabaseProvider } from '../src/providers/lazySupabaseProvider';
 import { createDiscoveryProvider } from '../src/providers/providerFactory';
 import { platformMerchantProvider } from '../src/providers/platformMerchantProvider';
 import { failureFrom } from '../src/providers/readState';
-import { findSubcategory } from '../src/data/taxonomy';
+import { HIDDEN_CATEGORY_IDS, categories, findCategory, findSubcategory } from '../src/data/taxonomy';
 import type { DiscoveryProvider } from '../src/providers/DiscoveryProvider';
 
 // Isolated Supabase controls (plan step E2). These rows stand in for PostgREST replies and are never served as catalog data.
@@ -250,15 +250,65 @@ test('a subcategory page reads only its merchants and their items, with the publ
   assert.deepEqual([kahawa.id, kahawa.subcategoryId, kahawa.subcategory, kahawa.heroImage], [REAL, 'restaurants-food_café', 'Café', undefined]);
 });
 
-test('category browse spans several Supabase keys; "all" never shows unmapped or unknown groups', async () => {
+test('category browse reads whole platform categories; "all" never shows categories kept off customer screens', async () => {
   const { provider, calls } = setup();
   const beauty = await provider.getMerchants({ categoryId: 'beauty-wellness' });
   assert.deepEqual(names(beauty), ['Mwangaza Massage', 'Utulivu Spa']);
-  assert.match(calls[0]!.url.searchParams.get('or') ?? '', /^\(and\(category_key\.eq\.beauty,subcategory\.in\.\([a-z_,]+\)\),and\(category_key\.eq\.wellness,subcategory\.in\.\(gym,massage,personal_training,spa\)\)\)$/);
+  assert.equal(calls[0]!.url.searchParams.get('category_key'), 'in.(beauty,wellness)');
+  assert.equal(calls[0]!.url.searchParams.get('subcategory'), null);
   const all = await provider.getMerchants({ limit: 48 });
-  assert.deepEqual(names(all), ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café', 'Kahawa House', 'Mara Safaris', 'Mwangaza Massage', 'Picha Studio', 'Tamasha Concerts', 'Utulivu Spa']);
+  // Street Kitchen has no subcategory and is listed; Benki Banking's category (Financial Services) has no Discovery category.
+  assert.deepEqual(names(all), ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café', 'Kahawa House', 'Mara Safaris', 'Mwangaza Massage', 'Picha Studio', 'Street Kitchen', 'Tamasha Concerts', 'Utulivu Spa']);
   const massage = await provider.getMerchants({ categoryId: 'beauty-wellness', subcategoryId: 'beauty-wellness:massage' });
   assert.deepEqual(plain(massage.merchants[0]).subcategoryId, 'wellness_massage');
+});
+
+test('a store with no subcategory, or one the map does not know, is listed under its category but never under a type', async () => {
+  const pizza = merchant(id('c1', 11), 'Pizza Mtaani', 'restaurants_food', 'pizzeria', 'Westlands, Nairobi');
+  const { provider } = setup({ merchants: [...merchants, pizza] });
+  const food = await provider.getMerchants({ categoryId: 'restaurants-food' });
+  assert.deepEqual(names(food), ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café', 'Kahawa House', 'Pizza Mtaani', 'Street Kitchen']);
+  assert.deepEqual(names(await provider.getMerchants({ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:caf' })),
+    ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café', 'Kahawa House']);
+  // The card keeps the store's category and invents no subcategory.
+  const street = plain(food.merchants.find((row) => row.name === 'Street Kitchen'));
+  assert.deepEqual([street.categoryId, street.category, street.subcategoryId, street.subcategory], ['restaurants-food', 'Restaurants And Food', undefined, undefined]);
+  const all = plain((await provider.getMerchants({ limit: 48 })).merchants.find((row) => row.name === 'Pizza Mtaani'));
+  assert.deepEqual([all.categoryId, all.category, all.subcategory], ['restaurants-food', 'Restaurants And Food', undefined]);
+  // Search finds them by name, and by their category's name.
+  assert.deepEqual(names(await provider.getMerchants({ search: 'street' })), ['Street Kitchen']);
+  assert.deepEqual(names(await provider.getMerchants({ categoryId: 'restaurants-food', search: 'pizza' })), ['Pizza Mtaani']);
+  assert.deepEqual(names(await provider.getMerchants({ search: 'restaurants' })), names(food));
+  // A subcategory's name still matches only that subcategory's stores.
+  assert.deepEqual(names(await provider.getMerchants({ search: 'cafe' })), ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café', 'Kahawa House']);
+});
+
+test('with no subcategories at all, as in production today, every store is listed by its category', async () => {
+  const stores = [
+    merchant(REAL, 'Soko Grill', 'restaurants_food', null, 'Westlands, Nairobi'),
+    merchant(id('c1', 21), 'Maua Flowers', 'flowers_gifts', null, 'Karen, Nairobi'),
+    merchant(id('c1', 22), 'Afya Pharmacy', 'pharmacy', null, 'Kilimani, Nairobi'),
+    merchant(id('c1', 23), 'Benki Banking', 'financial_services', null, 'CBD, Nairobi'),
+  ];
+  const { provider } = setup({ merchants: stores, items: [item(REAL_ITEM, REAL, 'Nyama choma', 1450, 0)] });
+  assert.deepEqual(names(await provider.getMerchants({})), ['Afya Pharmacy', 'Maua Flowers', 'Soko Grill']);
+  const food = await provider.getCollections('restaurants-food');
+  assert.deepEqual(food.collections.map((collection) => [collection.title, collection.subcategoryId, collection.viewAllQuery, names(collection)]),
+    [['All stores', undefined, { categoryId: 'restaurants-food' }, ['Soko Grill']]]);
+  assert.deepEqual(food.collections[0]!.merchants[0]!.items.map((entry) => [entry.name, entry.price]), [['Nyama choma', 1450]]);
+  assert.deepEqual(names(await provider.getMerchants({ categoryId: 'health-pharmacy' })), ['Afya Pharmacy']);
+  assert.deepEqual(names(await provider.getMerchants({ categoryId: 'health-pharmacy', subcategoryId: 'health-pharmacy:pharmacy' })), []);
+  assert.deepEqual(await provider.getAreas(), ['Karen', 'Kilimani', 'Westlands']);
+});
+
+test('hidden categories (Play, Flights) are off every screen, and their mapped stores stay out of "all"', async () => {
+  assert.ok(!categories.some((category) => HIDDEN_CATEGORY_IDS.has(category.id)));
+  assert.deepEqual([...HIDDEN_CATEGORY_IDS].map((categoryId) => findCategory(categoryId)), [undefined, undefined]);
+  const bowling = merchant(id('c1', 31), 'Strike Bowling', 'activities_games_sports', 'bowling', 'Westlands, Nairobi');
+  const { provider, calls } = setup({ merchants: [...merchants, bowling] });
+  assert.ok(!names(await provider.getMerchants({ limit: 48 })).includes('Strike Bowling'));
+  await assert.rejects(provider.getMerchants({ categoryId: 'play' }), kind('invalid'));
+  assert.ok(!calls.some((call) => call.url.searchParams.get('category_key')?.includes('activities_games_sports')));
 });
 
 test('search escapes LIKE wildcards, and the area filter matches exactly what areaFromAddress names', async () => {
@@ -270,13 +320,14 @@ test('search escapes LIKE wildcards, and the area filter matches exactly what ar
   assert.deepEqual(names(await provider.getMerchants({ search: 'CAFE' })), ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café', 'Kahawa House']);
   assert.deepEqual(names(await provider.getMerchants({ search: 'kahawa' })), ['Kahawa House']);
   assert.deepEqual(names(await provider.getMerchants({ categoryId: 'travel-tours', search: 'safari' })), ['Mara Safaris']);
-  assert.match(calls.at(-2)!.url.searchParams.get('and') ?? '', /^\(or\(and\(category_key\.eq\.travel_tours,subcategory\.in\.\([a-z_,-]+\)\)\),or\(trading_name\.ilike\."\*safari\*",and\(category_key\.eq\.travel_tours,subcategory\.in\.\([a-z_,-]+\)\)\)\)$/);
+  // "safari" is in the category's own name (Safaris And Tours), so it matches the whole platform category.
+  assert.equal(calls.at(-2)!.url.searchParams.get('and'), '(or(category_key.in.(travel_tours)),or(trading_name.ilike."*safari*",category_key.eq.travel_tours))');
   const kilimani = await provider.getMerchants({ area: 'Kilimani', limit: 8, sort: 'recommended' });
-  assert.deepEqual(names(kilimani), ['Jua Café', 'Kahawa House', 'Utulivu Spa']);
+  assert.deepEqual(names(kilimani), ['Jua Café', 'Kahawa House', 'Street Kitchen', 'Utulivu Spa']);
   assert.ok(kilimani.merchants.every((row) => row.area === 'Kilimani'));
-  // The server-side pattern agrees with areaFromAddress on every mapped fixture address.
+  // The server-side pattern agrees with areaFromAddress on every listed fixture address (Financial Services is never listed).
   for (const area of ['Kilimani', 'Westlands', 'Karen', 'Lavington', "St. Austin's (Upper)", 'Mombasa']) {
-    const expected = merchants.filter((row) => !['banking'].includes(String(row.subcategory)) && row.subcategory !== null && areaFromAddress(row.branch_address as string | null) === area).map((row) => row.trading_name).sort();
+    const expected = merchants.filter((row) => row.category_key !== 'financial_services' && areaFromAddress(row.branch_address as string | null) === area).map((row) => row.trading_name).sort();
     assert.deepEqual(names(await provider.getMerchants({ area, limit: 48 })).sort(), expected, area);
   }
   const before = calls.length;
@@ -376,14 +427,14 @@ test('recommended puts featured merchants first, and a merchant that closed earl
   assert.equal((await provider.getMerchant(id('c1', 1))).isOpen, true, "yesterday's early close no longer applies");
 });
 
-test('areas come from mapped merchants with two-part Nairobi addresses, sorted, and two screens share one read', async () => {
+test('areas come from listed merchants with two-part Nairobi addresses, sorted, and two screens share one read', async () => {
   let now = clock;
   const { provider, calls } = setup({ maxRows: 4 }, { now: () => now });
   const [header, filter] = await Promise.all([provider.getAreas(), provider.getAreas()]);
   assert.deepEqual(header, ['Karen', 'Kilimani', "St. Austin's (Upper)", 'Westlands']);
   assert.deepEqual(filter, header);
   assert.notEqual(filter, header, 'each caller gets its own copy');
-  // The server caps replies at 4 rows, so the count drives paging: 9 mapped merchants, 3 reads.
+  // The server caps replies at 4 rows, so the count drives paging: 10 listed merchants (Street Kitchen too), 3 reads.
   assert.equal(calls.length, 3);
   assert.deepEqual(calls.map((call) => call.url.searchParams.get('offset')), ['0', '4', '8']);
   await provider.getAreas();
@@ -413,18 +464,23 @@ test('experience and tour offerings page over the complete scoped inventory, sea
   assert.ok(reads(calls, 'merchant_public').every((call) => !call.url.searchParams.has('trading_name')), 'offering search is applied to items and hosts, not sent as a merchant search');
 });
 
-test('collections keep the platform rules: configured groups with at least two merchants', async () => {
+test('collections keep the platform rules (types with at least two merchants), then one last rail for everyone else', async () => {
   const { provider, calls } = setup();
   const food = await provider.getCollections('restaurants-food');
-  assert.deepEqual(food.collections.map((collection) => [collection.subcategoryId, collection.merchants.length]), [['restaurants-food:caf', 4]]);
+  assert.deepEqual(food.collections.map((collection) => [collection.title, collection.subcategoryId, collection.merchants.length]),
+    [['Café', 'restaurants-food:caf', 4], ['More stores', undefined, 1]]);
   assert.equal(food.partial, false);
   // One read for the whole category and one for the shown stores' items, not two per subcategory.
   assert.deepEqual([reads(calls, 'merchant_public').length, reads(calls, 'catalogue_public').length], [1, 1]);
   assert.deepEqual(food.collections[0]!.merchants.map((merchant) => [merchant.name, merchant.items.length, merchant.subcategory]),
     [['Amani Café', 1, 'Café'], ['Hodari 50%_Off Café', 1, 'Café'], ['Jua Café', 12, 'Café'], ['Kahawa House', 1, 'Café']]);
+  // Street Kitchen has no subcategory: no type rail holds it, so it is on the last rail, whose View all is the category.
+  assert.deepEqual([food.collections[1]!.viewAllQuery, names(food.collections[1]!)], [{ categoryId: 'restaurants-food' }, ['Street Kitchen']]);
   const kilimani = await provider.getCollections('restaurants-food', { area: 'Kilimani' });
-  assert.deepEqual(kilimani.collections.map((collection) => collection.merchants.map((merchant) => merchant.name)), [['Jua Café', 'Kahawa House']]);
-  assert.deepEqual((await provider.getCollections('travel-tours')).collections, []);
+  assert.deepEqual(kilimani.collections.map((collection) => names(collection)), [['Jua Café', 'Kahawa House'], ['Street Kitchen']]);
+  assert.deepEqual(kilimani.collections[1]!.viewAllQuery, { categoryId: 'restaurants-food', area: 'Kilimani' });
+  // A type with one store gets no rail of its own; the store is still on the page, under "All trips".
+  assert.deepEqual((await provider.getCollections('travel-tours')).collections.map((collection) => [collection.title, names(collection)]), [['All trips', ['Mara Safaris']]]);
   assert.deepEqual(await provider.getCollections('retired-category'), { collections: [], partial: false });
 });
 

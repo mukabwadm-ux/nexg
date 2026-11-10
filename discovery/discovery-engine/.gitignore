@@ -1,8 +1,0 @@
-node_modules/
-dist/
-.test-dist/
-artifacts/
-.runtime/
-.env
-.env.local
-.env.*.local

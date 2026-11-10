@@ -1,5 +1,5 @@
 /** Screen-facing contract. Platform and future recommendation adapters keep this shape. */
-import type { components } from '../../discovery-engine/src/contracts/wire.generated';
+import type { components } from './engineContract/wire.generated';
 export type EngineSchemas = components['schemas'];
 export interface CatalogModifierOption {
   id: string;
@@ -166,7 +166,8 @@ export type OfferingResult = PageResult & {
 export interface DiscoveryCollection {
   id: string;
   title: string;
-  subcategoryId: string;
+  /** The type the rail shows. A category's last rail ("More stores") has none; its viewAllQuery opens the category. */
+  subcategoryId?: string;
   merchants: Merchant[];
   viewAllQuery?: DiscoveryQuery;
   observations?: ResultObservation[];

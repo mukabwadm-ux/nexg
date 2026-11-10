@@ -17,6 +17,10 @@
  * The originals are hash-pinned by the engine's baseline approval and NEXG APP's asset checks, so they are only
  * read here, and an original that no longer matches its approved hash stops the build.
  *
+ * In the NexG website repository this can't run yet: the original pack (ICONS/) and the engine's approval file
+ * (discovery-engine/config/baseline-approval.v1.json) come with the engine's own PR. The website builds from the
+ * committed copies in assets/icons-web, so nothing here is needed for a build.
+ *
  * sharp is not a dependency of this project. The script imports "sharp" when it resolves, then the copy named by
  * NEXG_SHARP_PATH, then the copy installed in Derrick NexG. It never downloads anything.
  */
