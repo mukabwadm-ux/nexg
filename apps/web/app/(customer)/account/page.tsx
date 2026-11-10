@@ -2,9 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { MyBookings } from '@/components/booking/my-bookings';
 import { ReceiptList } from '@/components/receipts/receipt-list';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import type { MyBooking } from '@/lib/booking/customer';
 import { RECEIPT_COLUMNS, receiptAmount, receiptDate, toReceipts } from '@/lib/receipts';
 import { createClient } from '@/lib/supabase/server';
 
@@ -17,6 +19,7 @@ export const dynamic = 'force-dynamic';
 const TABS = [
   { key: 'receipts', label: 'Receipts' },
   { key: 'orders', label: 'Orders' },
+  { key: 'bookings', label: 'Bookings' },
   { key: 'stays', label: 'Stays' },
 ] as const;
 type Tab = (typeof TABS)[number]['key'];
@@ -25,7 +28,7 @@ const label = (value: string | null) =>
   value ? value.charAt(0).toUpperCase() + value.slice(1).replaceAll('_', ' ') : '—';
 
 /**
- * A customer's own account: their receipts, orders and stays. Everything here
+ * A customer's own account: their receipts, orders, bookings and stays. Everything here
  * is read through row-level security, so it is theirs and nobody else's.
  */
 export default async function AccountPage({ searchParams }: { searchParams?: { tab?: string } }) {
@@ -39,7 +42,7 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
   if (!user || user.is_anonymous)
     redirect(`/sign-in?next=${encodeURIComponent(`/account?tab=${tab}`)}`);
 
-  const [receipts, orders, stays] = await Promise.all([
+  const [receipts, orders, stays, bookings] = await Promise.all([
     tab === 'receipts'
       ? supabase
           .from('receipt' as never)
@@ -63,6 +66,9 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
           .eq('guest_user_id', user.id)
           .order('check_in', { ascending: false })
           .limit(50)
+      : Promise.resolve({ data: [], error: null }),
+    tab === 'bookings'
+      ? supabase.rpc('rpc_my_bookings')
       : Promise.resolve({ data: [], error: null }),
   ]);
 
@@ -144,6 +150,12 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
                 ))}
               </ul>
             ))}
+
+          {tab === 'bookings' && (
+            <MyBookings
+              bookings={bookings.error ? null : ((bookings.data ?? []) as unknown as MyBooking[])}
+            />
+          )}
 
           {tab === 'stays' &&
             (stays.error ? (

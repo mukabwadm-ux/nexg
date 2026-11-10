@@ -49144,6 +49144,10 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_booking_open_at: {
+        Args: { p_at: string; p_is_end?: boolean; p_merchant_id: string };
+        Returns: boolean;
+      };
       fn_build_plan: { Args: { p_plan_id: string }; Returns: undefined };
       fn_capability: { Args: { p_key: string }; Returns: Json };
       fn_cash_guard: { Args: { p_rider_id: string }; Returns: undefined };
@@ -50536,6 +50540,13 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_booking_open_times: {
+        Args: { p_date: string; p_minutes?: number; p_resource_id: string };
+        Returns: {
+          ends_at: string;
+          starts_at: string;
+        }[];
       };
       rpc_booking_set_status: {
         Args: { p_booking_id: string; p_status: Database['public']['Enums']['reservation_status'] };
@@ -54766,6 +54777,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
+      rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_staff_avatar_set: { Args: { p_path: string }; Returns: string };
       rpc_my_staff_email_change: {
         Args: { p_current_password: string; p_new_email: string };
