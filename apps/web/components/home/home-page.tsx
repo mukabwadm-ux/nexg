@@ -11,7 +11,7 @@ import { Hero } from '@/components/home/hero';
 import { NotifyForm } from '@/components/home/notify-form';
 import { PopularCategories } from '@/components/home/popular-categories';
 import { SiteFooter } from '@/components/site-footer';
-import { BEST_SELLERS } from '@/lib/best-sellers';
+import { BEST_SELLERS, bestSellerFromCatalogue, type BestSeller } from '@/lib/best-sellers';
 import { categoryTiles } from '@/lib/categories';
 import { translator, type Locale, type Translate } from '@/lib/i18n/dictionaries';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -68,6 +68,77 @@ const getTileTaps = unstable_cache(
   { revalidate: 300 },
 );
 
+/*
+ * Best sellers: the products live merchants mark as popular, one per merchant
+ * before a second from the same shop, eight at most. Refreshed every five
+ * minutes. Nothing to show, or a read that fails: the sample row instead.
+ */
+const getBestSellers = unstable_cache(
+  async (): Promise<BestSeller[]> => {
+    const supabase = createPublicClient();
+    const { data: items, error } = await supabase
+      .from('catalogue_item')
+      .select('id, name, price_kes, photo_path, sort, merchant_id')
+      .eq('highlighted', true)
+      .eq('available', true)
+      .not('price_kes', 'is', null)
+      .order('sort', { ascending: true })
+      .limit(48);
+    if (error || !items?.length) return [];
+
+    const rows = items;
+    /* merchant_public only returns live businesses, so this also drops the
+       products of any shop that is not trading. */
+    const { data: merchants } = await supabase
+      .from('merchant_public')
+      .select('id, trading_name, category, branch_name, accepting_orders')
+      .in('id', [...new Set(rows.map((row) => row.merchant_id))]);
+    const byId = new Map(
+      (merchants ?? [])
+        .filter((m) => m.id && m.trading_name && m.accepting_orders !== false)
+        .map((m) => [m.id as string, m]),
+    );
+
+    /* Round-robin across merchants so one big menu cannot fill the row. */
+    const queues = new Map<string, typeof rows>();
+    for (const row of rows) {
+      if (!byId.has(row.merchant_id)) continue;
+      queues.set(row.merchant_id, [...(queues.get(row.merchant_id) ?? []), row]);
+    }
+    const picked: typeof rows = [];
+    while (picked.length < 8 && [...queues.values()].some((queue) => queue.length > 0)) {
+      for (const queue of queues.values()) {
+        const next = queue.shift();
+        if (next && picked.length < 8) picked.push(next);
+      }
+    }
+
+    const paths = picked.flatMap((row) => (row.photo_path ? [row.photo_path] : []));
+    const { data: signed } = paths.length
+      ? await supabase.storage.from('catalogue-images').createSignedUrls(paths, 2 * 60 * 60)
+      : { data: [] };
+    const photos = new Map(
+      (signed ?? []).flatMap((photo) => (photo.signedUrl ? [[photo.path, photo.signedUrl]] : [])),
+    );
+
+    return picked.map((row) => {
+      const merchant = byId.get(row.merchant_id)!;
+      return bestSellerFromCatalogue({
+        id: row.id,
+        name: row.name,
+        price_kes: row.price_kes as number,
+        photo_url: row.photo_path ? (photos.get(row.photo_path) ?? null) : null,
+        merchant_id: row.merchant_id,
+        trading_name: merchant.trading_name as string,
+        category: merchant.category,
+        branch_name: merchant.branch_name,
+      });
+    });
+  },
+  ['homepage-best-sellers'],
+  { revalidate: 300 },
+);
+
 export async function HomePageContent({
   locale,
   translate,
@@ -76,9 +147,10 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const [{ cities: allCities, zones, featured }, tileTaps] = await Promise.all([
+  const [{ cities: allCities, zones, featured }, tileTaps, liveBestSellers] = await Promise.all([
     getHomeData(),
     getTileTaps(),
+    getBestSellers().catch(() => [] as BestSeller[]),
   ]);
   const supabase = createPublicClient();
   const { data: categoryRows, error: categoryError } = await supabase
@@ -189,7 +261,7 @@ export async function HomePageContent({
               heading={t('home.bestSellers.heading')}
               seeAll={t('home.bestSellers.seeAll')}
               sponsored={t('merchant.sponsored')}
-              items={BEST_SELLERS}
+              items={liveBestSellers.length > 0 ? liveBestSellers : BEST_SELLERS}
             />
           </div>
         </section>

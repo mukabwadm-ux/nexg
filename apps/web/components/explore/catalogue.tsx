@@ -1,4 +1,7 @@
+import Link from 'next/link';
+
 import { AddToCart } from '@/components/cart/add-to-cart';
+import { productHref } from '@/lib/best-sellers';
 
 import { TodayMarker } from './today-marker';
 
@@ -104,7 +107,14 @@ export function Catalogue({
               >
                 <div className="flex min-w-0 flex-1 flex-col justify-between p-3.5">
                   <div>
-                    <p className="text-[0.9375rem] font-extrabold leading-snug">{item.name}</p>
+                    <p className="text-[0.9375rem] font-extrabold leading-snug">
+                      <Link
+                        href={productHref(merchantId, item.id)}
+                        className="hover:underline hover:underline-offset-4"
+                      >
+                        {item.name}
+                      </Link>
+                    </p>
                     {item.description && (
                       <p className="text-muted-light mt-1 line-clamp-2 text-xs font-semibold leading-snug">
                         {item.description}

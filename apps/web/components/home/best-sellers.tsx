@@ -1,20 +1,22 @@
 'use client';
 
 import { useLocation } from '@nexg/location';
-import { ArrowLeft, ArrowRight, Bike, Clock, Star } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bike, Clock, Star, Store } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 
+import { CATEGORY_ICON } from '@/components/explore/merchant-card';
 import type { BestSeller } from '@/lib/best-sellers';
 
 /**
  * Best sellers: a row of products from different merchants, scrolled with
  * the arrows (or a swipe).
  *
- * A paid placement, so every card carries Sponsored. A card opens Explore
- * for its category near the visitor — the products are placeholders today
- * and have no page of their own yet.
+ * A real product opens its own page, where it can be added to the cart and
+ * taken to checkout. A sample card (shown only while no live merchant has a
+ * popular product) opens Explore for its category near the visitor. Only a
+ * paid placement carries the Sponsored label.
  */
 export function BestSellers({
   heading,
@@ -34,6 +36,7 @@ export function BestSellers({
   const [atEnd, setAtEnd] = React.useState(false);
 
   const hrefFor = (item: BestSeller) => {
+    if (item.href) return item.href;
     if (item.category === 'airport') return '/ask?need=Airport%20Transfer';
     const params = new URLSearchParams();
     if (place?.city_slug) params.set('city', place.city_slug);
@@ -112,16 +115,12 @@ export function BestSellers({
               className="focus-visible:ring-gold border-border bg-surface shadow-card group flex h-full flex-col overflow-hidden rounded-2xl border transition-shadow hover:shadow-lg focus-visible:outline-none focus-visible:ring-2"
             >
               <span className="relative block aspect-[4/3] overflow-hidden">
-                <Image
-                  src={`/images/best-sellers/${item.image}.jpg`}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 24vw, 18rem"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <span className="bg-ink/80 absolute left-3 top-3 rounded-full px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wider text-white backdrop-blur">
-                  {sponsored}
-                </span>
+                <ProductPhoto item={item} />
+                {item.sponsored && (
+                  <span className="bg-ink/80 absolute left-3 top-3 rounded-full px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wider text-white backdrop-blur">
+                    {sponsored}
+                  </span>
+                )}
               </span>
 
               <span className="flex flex-1 items-start justify-between gap-3 p-4 pb-3">
@@ -137,15 +136,32 @@ export function BestSellers({
               </span>
 
               <span className="border-border text-muted flex items-center gap-2 border-t border-dashed px-4 py-2.5 text-xs font-semibold">
-                <Bike className="h-3.5 w-3.5" aria-hidden="true" />
-                {item.deliveryKes === 0 ? 'Free delivery' : `KES ${item.deliveryKes}`}
-                <span aria-hidden="true">·</span>
+                {item.deliveryKes !== null && (
+                  <>
+                    <Bike className="h-3.5 w-3.5" aria-hidden="true" />
+                    {item.deliveryKes === 0 ? 'Free delivery' : `KES ${item.deliveryKes}`}
+                    <span aria-hidden="true">·</span>
+                  </>
+                )}
                 <span className="text-ink font-extrabold">
                   KES {item.priceKes.toLocaleString('en-KE')}
                 </span>
-                <span aria-hidden="true">·</span>
-                <Star className="text-gold h-3.5 w-3.5" fill="currentColor" aria-hidden="true" />
-                {item.rating.toFixed(1)}
+                {item.rating !== null && (
+                  <>
+                    <span aria-hidden="true">·</span>
+                    <Star
+                      className="text-gold h-3.5 w-3.5"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    />
+                    {item.rating.toFixed(1)}
+                  </>
+                )}
+                {item.href && (
+                  <span className="text-ink ml-auto inline-flex items-center gap-1 font-extrabold">
+                    View <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                  </span>
+                )}
               </span>
             </Link>
           </li>
@@ -155,7 +171,42 @@ export function BestSellers({
   );
 }
 
+/*
+ * The merchant's photo, else the sample's photo, else the category's mark on a
+ * plain ground: never a stock photo of some other shop's product.
+ */
+function ProductPhoto({ item }: { item: BestSeller }) {
+  if (item.photoUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={item.photoUrl}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+    );
+  }
+  if (item.image) {
+    return (
+      <Image
+        src={`/images/best-sellers/${item.image}.jpg`}
+        alt=""
+        fill
+        sizes="(min-width: 1024px) 24vw, 18rem"
+        className="object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+    );
+  }
+  const Icon = CATEGORY_ICON[item.category] ?? Store;
+  return (
+    <span className="from-bg to-border/60 absolute inset-0 flex items-center justify-center bg-gradient-to-br">
+      <Icon aria-hidden="true" className="text-gold/60 h-12 w-12" />
+    </span>
+  );
+}
+
 function Eta({ item }: { item: BestSeller }) {
+  if (item.etaMin === null || item.etaMax === null) return null;
   const text =
     item.etaMax === 0
       ? 'On booking'
