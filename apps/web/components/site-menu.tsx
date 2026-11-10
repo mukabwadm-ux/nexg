@@ -35,8 +35,22 @@ import { Logo } from './logo';
 
 const SECTIONS = [
   { number: '01', key: 'nav.explore', href: '/explore', noteKey: null, note: null, live: false },
+  /*
+   * Discovery, next to Explore so the two can be compared. It is a separate app the
+   * website serves at /discover (discovery/, rewritten in next.config.mjs), not a
+   * Next.js page, so its row loads it in full rather than through the router.
+   */
   {
     number: '02',
+    key: 'nav.discovery',
+    href: '/discover',
+    noteKey: null,
+    note: null,
+    live: false,
+    fullLoad: true,
+  },
+  {
+    number: '03',
     key: 'nav.experience',
     href: '/experience',
     noteKey: 'nav.experience.note',
@@ -44,7 +58,7 @@ const SECTIONS = [
     live: false,
   },
   {
-    number: '03',
+    number: '04',
     key: 'nav.stays',
     href: '/stays',
     noteKey: 'nav.stays.note',
@@ -52,7 +66,7 @@ const SECTIONS = [
     live: false,
   },
   {
-    number: '04',
+    number: '05',
     key: 'nav.askConcierge',
     href: '/ask',
     noteKey: null,
@@ -82,6 +96,15 @@ const SOCIALS = [
     icon: Linkedin,
   },
 ] as const;
+
+/** A menu row's link: a plain link for a page outside the Next.js app (`fullLoad`), else the router's. */
+function MenuLink({
+  fullLoad = false,
+  children,
+  ...props
+}: React.ComponentProps<'a'> & { href: string; fullLoad?: boolean }) {
+  return fullLoad ? <a {...props}>{children}</a> : <Link {...props}>{children}</Link>;
+}
 
 export function SiteMenu({
   children,
@@ -195,8 +218,9 @@ export function SiteMenu({
                      * than beside it, where it squeezed the label into
                      * three lines.
                      */}
-                    <Link
+                    <MenuLink
                       href={section.href}
+                      fullLoad={'fullLoad' in section && section.fullLoad}
                       onClick={close}
                       className="focus-visible:ring-gold hover:text-gold-text flex min-h-[3rem] items-center gap-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 sm:min-h-[3.8rem] sm:gap-4"
                     >
@@ -219,7 +243,7 @@ export function SiteMenu({
                           </span>
                         )}
                       </span>
-                    </Link>
+                    </MenuLink>
                   </li>
                 ))}
               </ul>

@@ -21,7 +21,8 @@ export function DiscoveryHomepage({ area, provider, onCategory, onOpen, onViewAl
   const total = catalog.value && merchants.length ? `${countLabel(catalog.value)}${area ? ` in ${area}` : ''}` : undefined;
 
   return <div className="home-page">
-    <h1 className="sr-only">NexG Discovery</h1>
+    {/* The page is called Discovery on the website, where it sits next to Explore in the menu. */}
+    <header className="category-page-heading"><h1>Discovery</h1></header>
     <div className="home-categories"><CategoryRail items={homepageCategories} label="Main categories" onSelect={onCategory} /></div>
     <HomepageFeatureCarousel onCategory={onCategory} />
     <section className="discovery-section home-merchants" aria-labelledby="homepage-merchants-title">
