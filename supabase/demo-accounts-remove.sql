@@ -12,6 +12,20 @@ delete from public.document
    and owner_id in (select md5('demo-merchant-' || kind || '-' || cc.category::text)::uuid
                       from public.category_config cc cross join (values ('live'), ('new')) k(kind));
 
+-- Applications from demo-accounts-workspace.sql. Submission snapshots are
+-- immutable for real applicants; the guard is lifted only for this delete,
+-- inside this transaction, and only demo merchants' rows are touched.
+alter table public.merchant_application_submission
+  disable trigger merchant_application_submission_immutable;
+delete from public.merchant_application_submission
+ where merchant_id in (select md5('demo-merchant-' || kind || '-' || cc.category::text)::uuid
+                         from public.category_config cc cross join (values ('live'), ('new')) k(kind));
+alter table public.merchant_application_submission
+  enable trigger merchant_application_submission_immutable;
+delete from public.merchant_application
+ where merchant_id in (select md5('demo-merchant-' || kind || '-' || cc.category::text)::uuid
+                         from public.category_config cc cross join (values ('live'), ('new')) k(kind));
+
 delete from public.merchant
  where id in (select md5('demo-merchant-' || kind || '-' || cc.category::text)::uuid
                 from public.category_config cc cross join (values ('live'), ('new')) k(kind));
