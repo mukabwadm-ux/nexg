@@ -163,6 +163,8 @@ export async function requestFeatured(input: {
   weekStart: string;
   weeks: number;
   note: string;
+  /** The product a Best sellers slot promotes. */
+  itemId?: string;
 }): Promise<Outcome> {
   const { client } = await merchantActionClient({ merchantId: input.merchantId });
   const { data, error } = await client.rpc('rpc_merchant_request_featured', {
@@ -171,7 +173,8 @@ export async function requestFeatured(input: {
     p_week_start: input.weekStart,
     p_weeks: input.weeks,
     p_note: input.note || undefined,
-  });
+    ...(input.itemId ? { p_item_id: input.itemId } : {}),
+  } as never);
   return unwrap(data, error, ['/merchant', '/merchant/featured', '/merchant/promotions']);
 }
 

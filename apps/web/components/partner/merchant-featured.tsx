@@ -19,6 +19,13 @@ export interface Placement {
   priceUnavailable?: boolean;
 }
 
+/** A product the merchant can promote in a Best sellers slot. */
+export interface PromotableProduct {
+  id: string;
+  name: string;
+  price_kes: number;
+}
+
 export interface Booking {
   id: string;
   placement_kind: string;
@@ -34,7 +41,7 @@ export interface Booking {
 const KIND: Record<string, string> = {
   homepage: 'Top of the homepage',
   category_top: 'Top of your category',
-  popular_request: 'Popular requests',
+  popular_request: 'Best sellers on the homepage',
 };
 
 export function featuredPlacementLabel(kind: string) {
@@ -60,6 +67,7 @@ export function Featured({
   placements,
   bookings,
   nextMonday,
+  products = [],
   showHistory = true,
 }: {
   merchantId: string;
@@ -68,6 +76,8 @@ export function Featured({
   placements: Placement[];
   bookings: Booking[];
   nextMonday: string;
+  /** Available, priced products, for the Best sellers slot. */
+  products?: PromotableProduct[];
   showHistory?: boolean;
 }) {
   const router = useRouter();
@@ -77,6 +87,7 @@ export function Featured({
   const [week, setWeek] = React.useState(nextMonday);
   const [weeks, setWeeks] = React.useState(1);
   const [note, setNote] = React.useState('');
+  const [itemId, setItemId] = React.useState(products[0]?.id ?? '');
 
   const run = async (fn: () => Promise<Outcome>) => {
     setBusy(true);
@@ -250,6 +261,34 @@ export function Featured({
                           </>
                         )}
                       </p>
+                      {p.kind === 'popular_request' && (
+                        <label className="block">
+                          <span className="text-[0.6875rem] font-extrabold uppercase tracking-[0.06em]">
+                            Product to promote
+                          </span>
+                          {products.length === 0 ? (
+                            <span className="text-muted mt-1 block text-[0.75rem] font-semibold">
+                              Add a priced, available product to your catalogue first.
+                            </span>
+                          ) : (
+                            <select
+                              value={itemId}
+                              onChange={(e) => setItemId(e.target.value)}
+                              className="border-border-strong mt-1 block w-full rounded-lg border px-3 py-2 text-[0.8125rem] font-bold"
+                            >
+                              {products.map((product) => (
+                                <option key={product.id} value={product.id}>
+                                  {product.name} · {kesWhole(product.price_kes)}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                          <span className="text-muted-light mt-1 block text-[0.6875rem] font-semibold">
+                            It leads the Best sellers row on the homepage, marked Sponsored, and
+                            opens straight to the product so guests can add it and check out.
+                          </span>
+                        </label>
+                      )}
                       <input
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
@@ -258,7 +297,7 @@ export function Featured({
                       />
                       <button
                         type="button"
-                        disabled={busy}
+                        disabled={busy || (p.kind === 'popular_request' && !itemId)}
                         onClick={() =>
                           run(() =>
                             requestFeatured({
@@ -267,6 +306,7 @@ export function Featured({
                               weekStart: week,
                               weeks,
                               note,
+                              itemId: p.kind === 'popular_request' ? itemId : undefined,
                             }),
                           )
                         }

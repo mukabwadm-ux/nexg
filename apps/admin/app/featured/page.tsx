@@ -91,7 +91,7 @@ export default async function FeaturedPage({
     <ConsoleShell staff={staff} current="/featured">
       <ConsoleHeader
         title="Featured slots"
-        breadcrumb="Paid placement on the homepage, category top and Popular Requests · always labelled Sponsored · billed weekly"
+        breadcrumb="Paid placement on the homepage, category top and Best sellers · always labelled Sponsored · billed weekly"
       />
 
       <main className="px-4 py-6 sm:px-8">

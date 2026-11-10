@@ -1,10 +1,11 @@
 /**
  * Best sellers: individual products from different merchants.
  *
- * The row shows real products first: the items live merchants mark as
- * popular (`catalogue_item.highlighted`), read by bestSellersFromCatalogue in
- * components/home/home-page.tsx. Each opens its own product page, where it
- * can be added to the cart and taken to checkout.
+ * The row shows real products, ranked by rpc_best_sellers
+ * (supabase/migrations/20261126000100_best_sellers.sql): paid Best seller
+ * slots first (labelled Sponsored), then the most sold products of the last
+ * 30 days, then the ones merchants mark as popular. Each opens its own
+ * product page, where it can be added to the cart and taken to checkout.
  *
  * BEST_SELLERS below is SAMPLE DATA, one per category, shown only while no
  * live merchant has a popular product. Those cards open Explore for their
@@ -44,6 +45,8 @@ export interface CatalogueBestSeller {
   trading_name: string;
   category: string | null;
   branch_name: string | null;
+  /** A paid Best seller slot, live this week. */
+  sponsored: boolean;
 }
 
 export function bestSellerFromCatalogue(item: CatalogueBestSeller): BestSeller {
@@ -60,7 +63,7 @@ export function bestSellerFromCatalogue(item: CatalogueBestSeller): BestSeller {
     etaMin: null,
     etaMax: null,
     rating: null,
-    sponsored: false,
+    sponsored: item.sponsored,
   };
 }
 
