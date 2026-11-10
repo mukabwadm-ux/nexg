@@ -9450,6 +9450,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -9490,6 +9491,7 @@ export type Database = {
           ended_at?: string | null;
           hold_expires_at?: string | null;
           id?: string;
+          item_id?: string | null;
           merchant_id: string;
           notes?: string | null;
           pause_reason?: string | null;
@@ -9529,6 +9531,7 @@ export type Database = {
           ended_at?: string | null;
           hold_expires_at?: string | null;
           id?: string;
+          item_id?: string | null;
           merchant_id?: string;
           notes?: string | null;
           pause_reason?: string | null;
@@ -9669,6 +9672,27 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
           },
           {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
@@ -49641,6 +49665,22 @@ export type Database = {
         Returns: Json;
       };
       rpc_audit_verify_chain: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_best_sellers: {
+        Args: { p_city_slug?: string; p_limit?: number };
+        Returns: {
+          booking_id: string;
+          branch_name: string;
+          category: string;
+          item_id: string;
+          item_name: string;
+          merchant_id: string;
+          photo_path: string;
+          price_kes: number;
+          source: string;
+          trading_name: string;
+          units_sold: number;
+        }[];
+      };
       rpc_block_done: {
         Args: { p_block_id: string };
         Returns: {
@@ -51004,6 +51044,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -51052,6 +51093,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -51100,6 +51142,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -51199,6 +51242,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -51247,6 +51291,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -51329,6 +51374,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -51484,6 +51530,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -51532,6 +51579,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -53044,6 +53092,7 @@ export type Database = {
       };
       rpc_merchant_request_featured: {
         Args: {
+          p_item_id?: string;
           p_merchant_id: string;
           p_note?: string;
           p_placement_id: string;

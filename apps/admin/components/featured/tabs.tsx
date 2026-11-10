@@ -52,8 +52,8 @@ const GROUPS = [
   },
   {
     kind: 'popular_request',
-    title: 'Popular request',
-    note: 'Best-seller pinned in the Popular Requests strip',
+    title: 'Best seller',
+    note: 'A product pinned at the front of the homepage Best sellers row',
   },
 ] as const;
 

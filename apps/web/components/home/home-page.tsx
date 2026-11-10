@@ -69,51 +69,36 @@ const getTileTaps = unstable_cache(
 );
 
 /*
- * Best sellers: the products live merchants mark as popular, one per merchant
- * before a second from the same shop, eight at most. Refreshed every five
- * minutes. Nothing to show, or a read that fails: the sample row instead.
+ * Best sellers, ranked by the database (rpc_best_sellers): paid Best seller
+ * slots first, then the most sold products of the last 30 days, then
+ * products merchants mark as popular. Refreshed every five minutes, so a
+ * slot going live or a run of orders shows up on its own. Nothing to show,
+ * or a read that fails: the sample row instead.
  */
+interface BestSellerRow {
+  item_id: string;
+  item_name: string;
+  price_kes: number;
+  photo_path: string | null;
+  merchant_id: string;
+  trading_name: string;
+  category: string | null;
+  branch_name: string | null;
+  source: 'sponsored' | 'top_selling' | 'popular';
+}
+
 const getBestSellers = unstable_cache(
   async (): Promise<BestSeller[]> => {
     const supabase = createPublicClient();
-    const { data: items, error } = await supabase
-      .from('catalogue_item')
-      .select('id, name, price_kes, photo_path, sort, merchant_id')
-      .eq('highlighted', true)
-      .eq('available', true)
-      .not('price_kes', 'is', null)
-      .order('sort', { ascending: true })
-      .limit(48);
-    if (error || !items?.length) return [];
-
-    const rows = items;
-    /* merchant_public only returns live businesses, so this also drops the
-       products of any shop that is not trading. */
-    const { data: merchants } = await supabase
-      .from('merchant_public')
-      .select('id, trading_name, category, branch_name, accepting_orders')
-      .in('id', [...new Set(rows.map((row) => row.merchant_id))]);
-    const byId = new Map(
-      (merchants ?? [])
-        .filter((m) => m.id && m.trading_name && m.accepting_orders !== false)
-        .map((m) => [m.id as string, m]),
+    /* Not in the generated types until they are regenerated with this RPC. */
+    const { data, error } = await supabase.rpc(
+      'rpc_best_sellers' as never,
+      { p_limit: 8 } as never,
     );
+    const rows = (data ?? []) as unknown as BestSellerRow[];
+    if (error || rows.length === 0) return [];
 
-    /* Round-robin across merchants so one big menu cannot fill the row. */
-    const queues = new Map<string, typeof rows>();
-    for (const row of rows) {
-      if (!byId.has(row.merchant_id)) continue;
-      queues.set(row.merchant_id, [...(queues.get(row.merchant_id) ?? []), row]);
-    }
-    const picked: typeof rows = [];
-    while (picked.length < 8 && [...queues.values()].some((queue) => queue.length > 0)) {
-      for (const queue of queues.values()) {
-        const next = queue.shift();
-        if (next && picked.length < 8) picked.push(next);
-      }
-    }
-
-    const paths = picked.flatMap((row) => (row.photo_path ? [row.photo_path] : []));
+    const paths = rows.flatMap((row) => (row.photo_path ? [row.photo_path] : []));
     const { data: signed } = paths.length
       ? await supabase.storage.from('catalogue-images').createSignedUrls(paths, 2 * 60 * 60)
       : { data: [] };
@@ -121,19 +106,19 @@ const getBestSellers = unstable_cache(
       (signed ?? []).flatMap((photo) => (photo.signedUrl ? [[photo.path, photo.signedUrl]] : [])),
     );
 
-    return picked.map((row) => {
-      const merchant = byId.get(row.merchant_id)!;
-      return bestSellerFromCatalogue({
-        id: row.id,
-        name: row.name,
-        price_kes: row.price_kes as number,
+    return rows.map((row) =>
+      bestSellerFromCatalogue({
+        id: row.item_id,
+        name: row.item_name,
+        price_kes: row.price_kes,
         photo_url: row.photo_path ? (photos.get(row.photo_path) ?? null) : null,
         merchant_id: row.merchant_id,
-        trading_name: merchant.trading_name as string,
-        category: merchant.category,
-        branch_name: merchant.branch_name,
-      });
-    });
+        trading_name: row.trading_name,
+        category: row.category,
+        branch_name: row.branch_name,
+        sponsored: row.source === 'sponsored',
+      }),
+    );
   },
   ['homepage-best-sellers'],
   { revalidate: 300 },

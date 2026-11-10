@@ -770,7 +770,7 @@ export function PromotionsWorkspace({
                               {selected.campaign.placement?.surface === 'category'
                                 ? 'Top of category'
                                 : selected.campaign.placement?.surface === 'popular'
-                                  ? 'Popular requests'
+                                  ? 'Best sellers'
                                   : 'Homepage'}
                             </Pair>
                             <Pair label="Start">
@@ -1080,7 +1080,7 @@ export function PromotionsWorkspace({
                             >
                               <option value="homepage">Homepage</option>
                               <option value="category">Top of category</option>
-                              <option value="popular">Popular requests</option>
+                              <option value="popular">Best sellers</option>
                             </select>
                           </label>
                           <label>
@@ -1153,7 +1153,7 @@ export function PromotionsWorkspace({
                           {draft.placement?.surface === 'category'
                             ? 'Top of category'
                             : draft.placement?.surface === 'popular'
-                              ? 'Popular requests'
+                              ? 'Best sellers'
                               : 'Homepage'}
                         </Pair>
                         <Pair label="Start date">{draft.placement?.startsOn ?? 'Not set'}</Pair>

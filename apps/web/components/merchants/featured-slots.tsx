@@ -35,8 +35,8 @@ const SLOTS = [
   },
   {
     tag: 'Sponsored slot',
-    name: 'Popular request',
-    body: 'Your best-seller pinned in the Popular Requests strip.',
+    name: 'Best seller',
+    body: 'One of your products at the front of the homepage Best sellers row.',
     limit: 'Limited per city',
     highlight: false,
   },
