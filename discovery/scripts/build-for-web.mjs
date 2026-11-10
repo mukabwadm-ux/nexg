@@ -65,13 +65,16 @@ const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 // Reinstall when the lockfile changed since the last install: Vercel restores node_modules from its cache.
 // A deploy gets a clean `npm ci`. A developer's machine gets `npm install`, which never wipes node_modules first
 // (a running dev server keeps files there open, and Windows refuses to delete them).
+// --include=dev: Vercel builds with NODE_ENV=production, which otherwise skips vite, typescript and the type
+// packages (all devDependencies), so the type check failed (the same fix as scripts/build-host-workspace.mjs, #84).
+// A copy installed without them has no vite, so `missing` reinstalls it.
 const lockHash = createHash('sha256').update(readFileSync(path.join(root, 'package-lock.json'))).digest('hex');
 const stamp = path.join(root, 'node_modules', '.nexg-lock-sha256');
 const installed = existsSync(stamp) ? readFileSync(stamp, 'utf8').trim() : '';
 const missing = !existsSync(path.join(root, 'node_modules', 'vite'));
 if (args.includes('--install') || missing || installed !== lockHash) {
   const clean = missing || args.includes('--install') || process.env.VERCEL || process.env.CI;
-  run(npm, [clean ? 'ci' : 'install', '--no-audit', '--no-fund']);
+  run(npm, [clean ? 'ci' : 'install', '--include=dev', '--no-audit', '--no-fund']);
   writeFileSync(stamp, lockHash);
 }
 run(npm, ['run', 'typecheck'], env);
