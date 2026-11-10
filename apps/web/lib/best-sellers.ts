@@ -1,13 +1,16 @@
 /**
  * Best sellers: individual products from different merchants.
  *
- * DUMMY DATA. These products and merchants are placeholders, one per
- * category, so the row can be designed and seen before any merchant has
- * paid to appear in it. Best sellers is a paid placement (like Featured
- * merchants): when it is sold, this list is replaced by a read of the live
- * bookings, and every card keeps the Sponsored label.
+ * The row shows real products first: the items live merchants mark as
+ * popular (`catalogue_item.highlighted`), read by bestSellersFromCatalogue in
+ * components/home/home-page.tsx. Each opens its own product page, where it
+ * can be added to the cart and taken to checkout.
  *
- * Photos are CC0; provenance in public/images/best-sellers/CREDITS.md.
+ * BEST_SELLERS below is SAMPLE DATA, one per category, shown only while no
+ * live merchant has a popular product. Those cards open Explore for their
+ * category, because there is no product behind them.
+ *
+ * Sample photos are CC0; provenance in public/images/best-sellers/CREDITS.md.
  */
 export interface BestSeller {
   id: string;
@@ -15,12 +18,55 @@ export interface BestSeller {
   merchant: string;
   /** Merchant category, for "see more like this" on Explore. */
   category: string;
-  image: string;
+  /** A sample photo in public/images/best-sellers/, without the extension. */
+  image: string | null;
+  /** The merchant's own photo of a real product. */
+  photoUrl?: string | null;
+  /** The product page of a real product. Samples have none. */
+  href?: string;
   priceKes: number;
-  deliveryKes: number;
-  etaMin: number;
-  etaMax: number;
-  rating: number;
+  /** Unknown for real products until checkout prices delivery. */
+  deliveryKes: number | null;
+  etaMin: number | null;
+  etaMax: number | null;
+  rating: number | null;
+  /** Only a paid placement carries the Sponsored label. */
+  sponsored: boolean;
+}
+
+/** A merchant's popular product, as the home page reads it. */
+export interface CatalogueBestSeller {
+  id: string;
+  name: string;
+  price_kes: number;
+  photo_url: string | null;
+  merchant_id: string;
+  trading_name: string;
+  category: string | null;
+  branch_name: string | null;
+}
+
+export function bestSellerFromCatalogue(item: CatalogueBestSeller): BestSeller {
+  return {
+    id: item.id,
+    name: item.name,
+    merchant: [item.trading_name, item.branch_name].filter(Boolean).join(' · '),
+    category: item.category ?? 'other',
+    image: null,
+    photoUrl: item.photo_url,
+    href: productHref(item.merchant_id, item.id),
+    priceKes: item.price_kes,
+    deliveryKes: null,
+    etaMin: null,
+    etaMax: null,
+    rating: null,
+    sponsored: false,
+  };
+}
+
+/** Where one product of one merchant opens. */
+export function productHref(merchantId: string, itemId: string): string {
+  return `/explore/${merchantId}/item/${itemId}`;
 }
 
 export const BEST_SELLERS: BestSeller[] = [
@@ -35,6 +81,7 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 25,
     etaMax: 35,
     rating: 4.8,
+    sponsored: true,
   },
   {
     id: 'avocados',
@@ -47,6 +94,7 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 30,
     etaMax: 45,
     rating: 4.7,
+    sponsored: true,
   },
   {
     id: 'vitamin-c',
@@ -59,6 +107,7 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 20,
     etaMax: 30,
     rating: 4.9,
+    sponsored: true,
   },
   {
     id: 'lipstick',
@@ -71,6 +120,7 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 35,
     etaMax: 50,
     rating: 4.6,
+    sponsored: true,
   },
   {
     id: 'mojito',
@@ -83,6 +133,7 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 25,
     etaMax: 40,
     rating: 4.7,
+    sponsored: true,
   },
   {
     id: 'roses',
@@ -95,6 +146,7 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 45,
     etaMax: 60,
     rating: 4.9,
+    sponsored: true,
   },
   {
     id: 'shirts',
@@ -107,6 +159,7 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 24 * 60,
     etaMax: 24 * 60,
     rating: 4.8,
+    sponsored: true,
   },
   {
     id: 'gift-box',
@@ -119,6 +172,7 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 60,
     etaMax: 90,
     rating: 4.7,
+    sponsored: true,
   },
   {
     id: 'jkia-transfer',
@@ -131,5 +185,6 @@ export const BEST_SELLERS: BestSeller[] = [
     etaMin: 0,
     etaMax: 0,
     rating: 4.9,
+    sponsored: true,
   },
 ];
