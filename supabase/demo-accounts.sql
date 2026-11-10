@@ -148,13 +148,14 @@ begin
     v_merchant := md5('demo-merchant-live-' || c.category)::uuid;
 
     insert into public.merchant (
-      id, legal_name, trading_name, category, contact_name, contact_phone, contact_email,
+      id, legal_name, trading_name, category, category_other, contact_name, contact_phone, contact_email,
       city_id, status, onboarding_step, submitted_at, went_live_at, went_live_by,
       accepting_orders, explore_visible, pay_on_delivery,
       hours_pattern, prep_minutes, capacity_per_15min, price_band,
       payout_rail, payout_account, answers, health_band, health_score, onboarding_source)
     values (
       v_merchant, '[Demo] ' || c.name || ' Ltd', '[Demo] ' || c.name, c.category::public.merchant_category,
+      case when c.category = 'other' then 'Custom requests and errands' end,
       'Demo Owner', '+2547000' || lpad((abs(hashtext(c.category)) % 100000)::text, 5, '0'),
       'live.' || v_slug || '@nexgapp.com',
       v_city, 'live', 7, now() - interval '40 days', now() - interval '30 days', v_staff,
@@ -214,13 +215,14 @@ begin
     v_merchant := md5('demo-merchant-new-' || c.category)::uuid;
 
     insert into public.merchant (
-      id, legal_name, trading_name, category, contact_name, contact_phone, contact_email,
+      id, legal_name, trading_name, category, category_other, contact_name, contact_phone, contact_email,
       city_id, status, onboarding_step, submitted_at,
       hours_pattern, prep_minutes, price_band,
       payout_rail, payout_account, answers, onboarding_source)
     values (
       v_merchant, '[Demo] ' || c.name || ' (new) Ltd', '[Demo] ' || c.name || ' (new)',
       c.category::public.merchant_category,
+      case when c.category = 'other' then 'Custom requests and errands' end,
       'Demo Applicant', '+2547001' || lpad((abs(hashtext(c.category)) % 100000)::text, 5, '0'),
       'new.' || v_slug || '@nexgapp.com',
       v_city, 'documents_pending', 5, now() - interval '2 days',
