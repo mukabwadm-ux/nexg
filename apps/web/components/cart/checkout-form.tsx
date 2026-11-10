@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 
 import { kesFromCents, useCart } from './cart-provider';
 
-type Method = 'card' | 'mpesa_stk' | 'cash_on_delivery';
+type Method = 'card' | 'mpesa_stk' | 'bank_transfer' | 'cash_on_delivery';
 
 interface Quote {
   ok: boolean;
@@ -43,7 +43,7 @@ type LooseRpc = (
 const field =
   'border-border bg-surface focus:border-gold w-full rounded-xl border px-3.5 py-2.5 text-sm font-semibold outline-none';
 
-export function CheckoutForm() {
+export function CheckoutForm({ bankEnabled = false }: { bankEnabled?: boolean } = {}) {
   const cart = useCart();
   const router = useRouter();
   const { place, openSheet } = useLocation();
@@ -185,6 +185,29 @@ export function CheckoutForm() {
         return;
       }
 
+      if (method === 'bank_transfer') {
+        const started = await fetch('/api/payments/bank/start', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ orderId: result.order_id }),
+        });
+        const bank = (await started.json()) as {
+          ok: boolean;
+          message?: string;
+          reference?: string;
+          authorization_url?: string;
+        };
+        cart.clear();
+        if (bank.ok && bank.authorization_url) {
+          window.location.href = bank.authorization_url;
+          return;
+        }
+        /* The order and its payment are saved: the pay page says where it
+           stands and offers another way to pay. */
+        router.push(`/pay/${bank.reference ?? result.reference}`);
+        return;
+      }
+
       const res = await fetch('/api/payments/paystack/start', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -317,11 +340,12 @@ export function CheckoutForm() {
 
         <section className="border-border bg-surface rounded-2xl border p-5">
           <h2 className="text-lg font-extrabold">Payment</h2>
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <div className={`mt-3 grid gap-2 ${bankEnabled ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
             {(
               [
                 ['card', 'Card'],
                 ['mpesa_stk', 'M-Pesa'],
+                ...(bankEnabled ? ([['bank_transfer', 'Bank']] as const) : []),
                 ['cash_on_delivery', 'Pay on delivery'],
               ] as const
             ).map(([value, label]) => (
@@ -340,6 +364,12 @@ export function CheckoutForm() {
               </button>
             ))}
           </div>
+          {method === 'bank_transfer' && (
+            <p className="text-muted mt-3 text-[0.8125rem] font-semibold">
+              You approve the payment on your bank&apos;s page. Your order is confirmed once the
+              bank tells us it is paid.
+            </p>
+          )}
         </section>
       </div>
 

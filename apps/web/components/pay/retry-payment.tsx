@@ -15,16 +15,19 @@ export function RetryPayment({
   orderId,
   mode,
   defaultPhone,
+  bankEnabled = false,
 }: {
   orderId: string;
   /** "failed" offers to pay again; "waiting" offers to resend the prompt. */
   mode: 'failed' | 'waiting';
   defaultPhone?: string | null;
+  /** Offer paying from a bank account (when a bank is connected). */
+  bankEnabled?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(mode === 'failed');
   const [phone, setPhone] = React.useState(defaultPhone ?? '');
-  const [busy, setBusy] = React.useState<'mpesa' | 'card' | null>(null);
+  const [busy, setBusy] = React.useState<'mpesa' | 'card' | 'bank' | null>(null);
   const [message, setMessage] = React.useState<string | null>(null);
 
   async function mpesa(event: React.FormEvent) {
@@ -82,6 +85,39 @@ export function RetryPayment({
     }
   }
 
+  async function bank() {
+    setMessage(null);
+    setBusy('bank');
+    try {
+      const res = await fetch('/api/payments/bank/start', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      });
+      const body = (await res.json()) as {
+        ok: boolean;
+        message?: string;
+        reference?: string;
+        authorization_url?: string;
+        paid?: boolean;
+      };
+      if (body.ok && body.authorization_url) {
+        window.location.href = body.authorization_url;
+        return;
+      }
+      if (body.ok && body.reference) {
+        router.push(`/pay/${body.reference}`);
+        router.refresh();
+        return;
+      }
+      setMessage(body.message ?? 'Paying by bank could not start. Try M-Pesa instead.');
+    } catch {
+      setMessage('No connection. Check your internet and try again; nothing was charged.');
+    } finally {
+      setBusy(null);
+    }
+  }
+
   if (!open) {
     return (
       <button
@@ -132,6 +168,17 @@ export function RetryPayment({
         >
           {busy === 'card' && <Loader2 aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />}
           Pay by card instead
+        </button>
+      )}
+      {mode === 'failed' && bankEnabled && (
+        <button
+          type="button"
+          disabled={busy !== null}
+          onClick={() => void bank()}
+          className="text-ink ml-4 mt-3 inline-flex items-center gap-2 text-[0.8125rem] font-bold underline disabled:opacity-50"
+        >
+          {busy === 'bank' && <Loader2 aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />}
+          Pay from your bank instead
         </button>
       )}
       {message && (
