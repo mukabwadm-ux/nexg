@@ -94,21 +94,9 @@ const KIND_ICON: Record<SearchItem['kind'], LucideIcon> = {
   event: CalendarDays,
 };
 
-/**
- * NexG Discovery is its own page on this site: a static app built into public/discover from /discovery
- * (discovery/scripts/build-for-web.mjs) and served at /discover (next.config.mjs). Its links load it in full.
- */
-const DISCOVER_PATH = '/discover';
-// Discovery has no stays yet, so searches for a place to stay keep going to the Stays pages.
-const STAYS_PATH = '/stays';
-const STAY_WORDS =
-  /\b(stays?|hotels?|motels?|airbnbs?|b ?& ?bs?|bnbs?|guest ?houses?|lodges?|lodging|accommodation|villas?|cottages?|resorts?|hostels?)\b/i;
-function discoverUrl(q?: string): string {
-  return q ? `${DISCOVER_PATH}?q=${encodeURIComponent(q)}` : DISCOVER_PATH;
-}
-
 export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[]; locale: Locale }) {
   const { place, chip, openSheet, sheetOpen } = useLocation();
+  const router = useRouter();
   /* The city the search is scoped to: the one in the location pill. The
      pill (and the menu) is where it is changed, so the search bar has no
      picker of its own. */
@@ -132,12 +120,12 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
     {
       icon: Flower2,
       label: 'Massage & spa',
-      href: `${DISCOVER_PATH}?category=beauty-wellness`,
+      href: `/explore?city=${citySlug}&category=beauty_fashion`,
     },
     {
       icon: UtensilsCrossed,
       label: 'Restaurants near me',
-      href: `${DISCOVER_PATH}?category=restaurants-food`,
+      href: `/explore?city=${citySlug}&category=restaurant`,
     },
   ];
 
@@ -186,12 +174,12 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
         </h1>
         <p className="mt-3 max-w-md text-[0.9375rem] text-white/85 sm:text-base">{copy.lede}</p>
 
-        {/* The home search opens NexG Discovery: a tap goes straight there, typed words carry over. */}
         <HeroSearch
           copy={copy}
           citySlug={citySlug}
-          discovery
-          onSubmit={(q) => window.location.assign(STAY_WORDS.test(q) ? STAYS_PATH : discoverUrl(q))}
+          onSubmit={(q) =>
+            router.push(`/explore?city=${citySlug}${q ? `&q=${encodeURIComponent(q)}` : ''}`)
+          }
         />
 
         {/* Popular searches */}
@@ -199,29 +187,17 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
           <p className="text-[0.8125rem] font-semibold text-white/85">{copy.popular}</p>
           {/* One row: it scrolls sideways on a phone rather than taking two. */}
           <ul className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
-            {popular.map(({ icon: Icon, label, href }) => {
-              const className =
-                'hover:border-gold focus-visible:ring-gold flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-black/35 px-3.5 text-[0.8125rem] font-semibold backdrop-blur transition-colors focus-visible:outline-none focus-visible:ring-2';
-              const content = (
-                <>
+            {popular.map(({ icon: Icon, label, href }) => (
+              <li key={label}>
+                <Link
+                  href={href}
+                  className="hover:border-gold focus-visible:ring-gold flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-black/35 px-3.5 text-[0.8125rem] font-semibold backdrop-blur transition-colors focus-visible:outline-none focus-visible:ring-2"
+                >
                   <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   <span>{label}</span>
-                </>
-              );
-              return (
-                <li key={label}>
-                  {href.startsWith(DISCOVER_PATH) ? (
-                    <a href={href} className={className}>
-                      {content}
-                    </a>
-                  ) : (
-                    <Link href={href} className={className}>
-                      {content}
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -456,17 +432,11 @@ function HeroSearch({
   copy,
   citySlug,
   onSubmit,
-  discovery = false,
 }: {
   copy: HeroCopy;
   /** From the location pill; changed there, not here. */
   citySlug: string;
   onSubmit: (q: string) => void;
-  /**
-   * The bar opens NexG Discovery: a click or tap calls onSubmit at once, Enter carries the typed words, and the
-   * old typeahead (/api/search) stays off. The typeahead remains for removal with the rest of the old discovery.
-   */
-  discovery?: boolean;
 }) {
   const router = useRouter();
   const [q, setQ] = React.useState('');
@@ -483,7 +453,7 @@ function HeroSearch({
   /* Ask as they type, from the third letter. Debounced, and the previous
      request is abandoned so a slow answer cannot overwrite a newer one. */
   React.useEffect(() => {
-    if (discovery || term.length < MIN_CHARS) {
+    if (term.length < MIN_CHARS) {
       setGroups([]);
       setLoading(false);
       return;
@@ -509,7 +479,7 @@ function HeroSearch({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [term, citySlug, discovery]);
+  }, [term, citySlug]);
 
   /* Close when focus or a tap leaves the box. */
   React.useEffect(() => {
@@ -520,7 +490,7 @@ function HeroSearch({
     return () => document.removeEventListener('pointerdown', onDown);
   }, []);
 
-  const showPanel = !discovery && open && term.length >= MIN_CHARS;
+  const showPanel = open && term.length >= MIN_CHARS;
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'ArrowDown' && items.length) {
@@ -553,7 +523,7 @@ function HeroSearch({
         }}
         className="sm:focus-within:ring-gold flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:bg-white sm:p-1.5 sm:shadow-2xl sm:focus-within:ring-2"
       >
-        <label className="focus-within:ring-gold flex min-w-0 flex-1 items-center rounded-full bg-white shadow-2xl focus-within:ring-2 sm:shadow-none sm:focus-within:ring-0">
+        <div className="focus-within:ring-gold flex min-w-0 flex-1 items-center rounded-full bg-white shadow-2xl focus-within:ring-2 sm:shadow-none sm:focus-within:ring-0">
           <Search className="ml-4 h-5 w-5 shrink-0 text-[#141414]" aria-hidden="true" />
           <input
             type="search"
@@ -563,7 +533,6 @@ function HeroSearch({
               setOpen(true);
             }}
             onFocus={() => setOpen(true)}
-            onClick={discovery ? () => onSubmit(term) : undefined}
             onKeyDown={onKeyDown}
             placeholder={copy.searchPlaceholder}
             aria-label={copy.searchPlaceholder}
@@ -576,7 +545,7 @@ function HeroSearch({
             enterKeyHint="search"
             className="h-12 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 text-[0.9375rem] text-[#141414] shadow-none placeholder:text-[#6b6560] focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-auto [&::-webkit-search-cancel-button]:hidden"
           />
-        </label>
+        </div>
         <button
           type="submit"
           className="focus-visible:ring-gold flex h-12 items-center justify-center gap-2 rounded-full bg-[#FFC93C] px-6 text-base font-bold text-[#141414] transition-colors hover:bg-[#FFD35F] focus-visible:outline-none focus-visible:ring-2 sm:h-auto sm:min-w-[8.5rem] sm:py-3"
