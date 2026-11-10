@@ -56583,6 +56583,7 @@ export type Database = {
         Args: { p_display_name: string; p_email: string; p_roles?: string[] };
         Returns: Json;
       };
+      rpc_staff_reset_credentials: { Args: { p_staff_id: string }; Returns: Json };
       rpc_staff_set_roles: { Args: { p_roles: string[]; p_staff_id: string }; Returns: string[] };
       rpc_staff_set_scope: {
         Args: { p_city_id?: string; p_expires_at?: string; p_staff_id: string };
