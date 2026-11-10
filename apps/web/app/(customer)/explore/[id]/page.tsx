@@ -20,13 +20,15 @@ import {
   PUBLIC_RESOURCE_COLUMNS,
   type PublicResource,
 } from '@/lib/booking/customer';
+import { loadPromotedPrices } from '@/lib/promotions';
 import { createPublicClient } from '@/lib/supabase/public';
 
 /*
- * Cached for an hour. A merchant's public details do not change between
- * page views, and re-querying them per request cost a round trip each time.
+ * Cached for a minute. Long enough to spare a round trip per view, short
+ * enough that a promotion starting or ending shows within a minute (checkout
+ * always charges the current price either way).
  */
-export const revalidate = 3600;
+export const revalidate = 60;
 
 const SELECT =
   'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at';
@@ -62,7 +64,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
 
   if (!merchant?.id || !merchant.trading_name) notFound();
 
-  const [{ data: nearby }, { data: sections }, { data: hours }, { data: bookable }] =
+  const [{ data: nearby }, { data: sections }, { data: hours }, promotions, { data: bookable }] =
     await Promise.all([
       supabase
         .from('merchant_public')
@@ -85,6 +87,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
         .from('merchant_hours')
         .select('day_of_week, opens, closes, closed')
         .eq('merchant_id', params.id),
+      loadPromotedPrices(supabase, params.id),
       // Only active resources of a live business are readable without signing in.
       supabase
         .from('bookable_resource')
@@ -236,6 +239,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
                 merchantId={merchant.id}
                 merchantName={merchant.trading_name}
                 sections={menu}
+                promotions={promotions}
               />
             ) : resources.length > 0 ? null : (
               <div className="border-border bg-surface rounded-2xl border p-6 sm:p-8">

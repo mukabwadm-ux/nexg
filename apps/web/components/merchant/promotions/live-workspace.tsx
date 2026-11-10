@@ -11,6 +11,7 @@ import {
   type Booking,
 } from '@/components/partner/merchant-featured';
 
+import { PromotionManager, type PromotableItem, type PromotionRow } from './promotion-manager';
 import {
   PromotionsFrame,
   PromotionStatus,
@@ -49,9 +50,13 @@ export function LivePromotionsWorkspace({
   bookings,
   request,
   requestNotice,
+  promotions = [],
+  items = [],
 }: {
   businessName: string;
   bookings: Booking[] | null;
+  promotions?: PromotionRow[] | null;
+  items?: PromotableItem[];
   request: ComponentProps<typeof Featured> | null;
   requestNotice?: string;
 }) {
@@ -81,6 +86,11 @@ export function LivePromotionsWorkspace({
           setSelectedId('');
         }}
       />
+      {tab === 'Campaigns' && (
+        <div className="mb-4">
+          <PromotionManager promotions={promotions} items={items} />
+        </div>
+      )}
       <div
         className="pm-grid"
         role="tabpanel"
@@ -88,7 +98,7 @@ export function LivePromotionsWorkspace({
         aria-labelledby={'pm-tab-' + tab}
       >
         <section className="pm-panel">
-          <h2>{tab === 'Campaigns' ? 'Your campaigns' : 'Promotion history'}</h2>
+          <h2>{tab === 'Campaigns' ? 'Featured placements' : 'Placement history'}</h2>
           <p className="pm-lead">
             {tab === 'Campaigns'
               ? 'Request a featured placement or track one already in progress.'

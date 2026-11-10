@@ -41,7 +41,7 @@ function sources(bookings: unknown[], eligible: boolean) {
   from.mockImplementation((table: string) => {
     if (table === 'merchant_home_v')
       return query({ name: 'Example Merchant', status: 'live', city_id: 'city-1' });
-    if (table === 'catalogue_item') return query([]);
+    if (table === 'catalogue_item' || table === 'merchant_promotion') return query([]);
     return query(table === 'featured_booking' ? bookings : [placement]);
   });
   rpc.mockImplementation(async (name: string) => ({
