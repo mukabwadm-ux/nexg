@@ -3,6 +3,8 @@ import { LiveAvailability } from '@/components/merchant/availability/live';
 import type { DayHours } from '@/components/merchant/availability/model';
 import { weekFromSaved } from '@/components/merchant/availability/saved-hours';
 import { profiles } from '@/components/merchant/offerings/model';
+import { bookingEngineConfigured } from '@/lib/booking/bridge';
+import { loadBookingBoard } from '@/lib/booking/board-data';
 import { loadApplicationView } from '@/lib/merchant-application-load';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
@@ -22,7 +24,10 @@ export default async function MerchantAvailabilityPage({
   const client = createClient();
   const canEdit = merchant.access.state !== 'legacy' && merchant.access.setup;
   const now = new Date().toISOString();
-  const [saved, application, overrides, readOnlyWeek] = await Promise.all([
+  /* Until the separate booking engine is hosted, Resources and bookings uses
+     the bookings board built on the main database. */
+  const engine = bookingEngineConfigured(process.env);
+  const [saved, application, overrides, readOnlyWeek, board] = await Promise.all([
     canEdit ? loadSetupHours() : null,
     canEdit ? loadApplicationView(client, merchant.id, { includePayout: false }) : null,
     client
@@ -38,6 +43,7 @@ export default async function MerchantAvailabilityPage({
           .eq('merchant_id', merchant.id)
           .is('branch_id', null)
           .eq('service', 'All day'),
+    engine ? null : loadBookingBoard(client, merchant.id),
   ]);
   const taggedRows = readOnlyWeek?.data;
   const hasAmbiguousWeek = taggedRows?.some((row) => row.weekday_convention !== 'monday_zero');
@@ -82,6 +88,7 @@ export default async function MerchantAvailabilityPage({
         })) ?? []
       }
       canEdit={canEdit}
+      board={board ?? undefined}
       legacyHoursHref={merchant.access.state === 'legacy' ? '/merchant/hours' : undefined}
       hoursMessage={
         (saved?.ok && saved.value.ambiguous) || hasAmbiguousWeek
