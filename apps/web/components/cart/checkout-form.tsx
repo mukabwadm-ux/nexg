@@ -166,10 +166,16 @@ export function CheckoutForm() {
         });
         const sent = (await stk.json()) as { ok: boolean; message?: string; reference?: string };
         if (!sent.ok) {
+          cart.clear();
+          /* The order and its payment are saved: the pay page shows where it
+             stands and sends the prompt again, on the same payment. */
+          if (sent.reference) {
+            router.push(`/pay/${sent.reference}`);
+            return;
+          }
           setError(
             `Your order ${result.reference} is saved, but the M-Pesa prompt could not be sent. ${sent.message ?? ''}`,
           );
-          cart.clear();
           return;
         }
         cart.clear();
@@ -196,6 +202,13 @@ export function CheckoutForm() {
       }
       cart.clear();
       window.location.href = body.authorization_url;
+    } catch {
+      /* The connection dropped mid-way: the order may already be saved.
+         Nothing is charged without the guest confirming on their phone or
+         card page, so the safe advice is to look before ordering again. */
+      setError(
+        'The connection dropped. Your order may already be saved: check Your account → Orders before placing it again. Nothing is charged until you confirm the payment.',
+      );
     } finally {
       setBusy(false);
     }

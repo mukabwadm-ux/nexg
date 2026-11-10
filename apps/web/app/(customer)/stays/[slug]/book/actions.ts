@@ -1,6 +1,7 @@
 'use server';
 
 import { sendStayConfirmed } from '@/lib/email';
+import { reconcileMpesaPrompts } from '@/lib/mpesa-prompt';
 import { createClient } from '@/lib/supabase/server';
 
 export interface HoldInput {
@@ -104,9 +105,18 @@ export async function releaseStayHold(stayId: string): Promise<{ ok: boolean }> 
  */
 export async function stayCheckoutStatus(stayId: string): Promise<CheckoutStatus | null> {
   const supabase = createClient();
-  const { data, error } = await supabase.rpc('rpc_stay_checkout_status', { p_stay_id: stayId });
-  if (error || !data) return null;
-  const row = data as Record<string, unknown>;
+  const read = await supabase.rpc('rpc_stay_checkout_status', { p_stay_id: stayId });
+  if (read.error || !read.data) return null;
+  let row = read.data as Record<string, unknown>;
+
+  /* Waiting on M-Pesa: if a prompt has had no answer for a while, ask
+     M-Pesa directly, in case its callback never reached us. */
+  if (row.payment_state === 'authorised' && typeof row.payment_reference === 'string') {
+    if (await reconcileMpesaPrompts(supabase, row.payment_reference)) {
+      const again = await supabase.rpc('rpc_stay_checkout_status', { p_stay_id: stayId });
+      if (!again.error && again.data) row = again.data as Record<string, unknown>;
+    }
+  }
   const status: CheckoutStatus = {
     status: String(row.status),
     holdExpiresAt: (row.hold_expires_at as string | null) ?? null,

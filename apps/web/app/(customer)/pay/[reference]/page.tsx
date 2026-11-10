@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { AutoRefresh } from '@/components/pay/auto-refresh';
+import { RetryPayment } from '@/components/pay/retry-payment';
+import { reconcileMpesaPrompts } from '@/lib/mpesa-prompt';
 import { paystackConfigured, verify } from '@/lib/paystack';
 import { createClient } from '@/lib/supabase/server';
 
@@ -28,13 +31,40 @@ export const dynamic = 'force-dynamic';
 export default async function PaymentReturn({ params }: { params: { reference: string } }) {
   const supabase = createClient();
 
-  const { data } = await supabase
-    .from('payment')
-    .select('reference, state, amount_cents, currency, intent, order_id, paid_at, failure_reason')
-    .eq('reference', params.reference)
-    .maybeSingle();
+  const read = () =>
+    supabase
+      .from('payment')
+      .select(
+        'reference, state, amount_cents, currency, intent, order_id, paid_at, failure_reason, provider, payer_phone',
+      )
+      .eq('reference', params.reference)
+      .maybeSingle();
 
-  const payment = data as Payment | null;
+  let payment = (await read()).data as Payment | null;
+
+  /* Waiting on M-Pesa: a prompt with no answer after 45 seconds is asked
+     about directly, in case Safaricom's callback never reached us. */
+  if (payment?.state === 'authorised' && payment.provider === 'mpesa') {
+    if (await reconcileMpesaPrompts(supabase, params.reference)) {
+      payment = ((await read()).data as Payment | null) ?? payment;
+    }
+  }
+
+  /* The order may have been paid through a later attempt, or cancelled. */
+  const order = payment?.order_id
+    ? ((
+        await supabase
+          .from('order')
+          .select('payment_status, stage')
+          .eq('id', payment.order_id)
+          .maybeSingle()
+      ).data as { payment_status: string; stage: string } | null)
+    : null;
+  const orderOpen =
+    payment?.intent === 'order' &&
+    !!payment.order_id &&
+    !['paid', 'collected'].includes(order?.payment_status ?? '') &&
+    !['cancelled', 'refunded'].includes(order?.stage ?? '');
 
   /* Not ours, or not theirs to see. The same answer either way —
      a page that distinguished them would confirm which references
@@ -93,19 +123,44 @@ export default async function PaymentReturn({ params }: { params: { reference: s
   }
 
   if (payment.state === 'failed') {
+    if (
+      payment.intent === 'order' &&
+      order &&
+      ['paid', 'collected'].includes(order.payment_status)
+    ) {
+      return (
+        <Shell title="This order is paid.">
+          <p>This attempt did not go through, but a later one did. Nothing more to pay.</p>
+          <Link
+            href="/account?tab=orders"
+            className="bg-ink mt-5 inline-block rounded-lg px-4 py-2.5 text-[0.8125rem] font-extrabold text-white"
+          >
+            See your orders
+          </Link>
+        </Shell>
+      );
+    }
     return (
       <Shell title="That did not go through.">
         <p>{payment.failure_reason ?? 'The payment was not completed. Nothing was charged.'}</p>
         <p className="text-muted-light mt-3 text-[0.8125rem] font-semibold">
-          Nothing is lost — you can try again, and the amount owed has not changed.
+          Nothing was taken for this attempt. Your order is saved and the amount owed has not
+          changed.
         </p>
+        {orderOpen && (
+          <RetryPayment
+            orderId={payment.order_id!}
+            mode="failed"
+            defaultPhone={localPhone(payment.payer_phone)}
+          />
+        )}
       </Shell>
     );
   }
 
   return (
     <Shell title="Waiting for your payment.">
-      <meta httpEquiv="refresh" content="5" />
+      <AutoRefresh seconds={5} />
       <p>
         {amount} is being confirmed. If you were sent an M-Pesa prompt, enter your PIN on your phone
         — this page updates by itself.
@@ -114,6 +169,13 @@ export default async function PaymentReturn({ params }: { params: { reference: s
         Reference {payment.reference}. If money has left your account and this has not changed
         within a few minutes, send us that reference and we will find it.
       </p>
+      {orderOpen && (
+        <RetryPayment
+          orderId={payment.order_id!}
+          mode="waiting"
+          defaultPhone={localPhone(payment.payer_phone)}
+        />
+      )}
     </Shell>
   );
 }
@@ -131,6 +193,11 @@ function Shell({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
+/** 254712345678 → 0712345678, for the resend form. */
+function localPhone(phone: string | null): string | null {
+  return phone && /^254\d{9}$/.test(phone) ? `0${phone.slice(3)}` : phone;
+}
+
 interface Payment {
   reference: string;
   state: string;
@@ -140,4 +207,6 @@ interface Payment {
   order_id: string | null;
   paid_at: string | null;
   failure_reason: string | null;
+  provider: string | null;
+  payer_phone: string | null;
 }

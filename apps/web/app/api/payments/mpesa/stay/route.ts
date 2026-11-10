@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-import { darajaConfigured, normalisePhone, stkPush } from '@/lib/daraja';
+import { normalisePhone } from '@/lib/daraja';
+import { sendMpesaPrompt } from '@/lib/mpesa-prompt';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -40,48 +41,28 @@ export async function POST(request: Request) {
   }
   const payment = begun.data as { reference: string; amount_cents: number; expires_at: string };
 
-  const callbackSecret = process.env.DARAJA_CALLBACK_SECRET?.trim() ?? '';
-  const callbackReady =
-    darajaConfigured() &&
-    (await supabase.rpc('rpc_payment_mpesa_ready', { p_callback_secret: callbackSecret })).data;
-  if (!callbackReady) {
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ?? new URL(request.url).origin;
+  const sent = await sendMpesaPrompt({
+    supabase,
+    reference: payment.reference,
+    amountCents: payment.amount_cents,
+    phone,
+    origin,
+    description: 'NexG stay',
+    notReadyMessage:
+      'M-Pesa payments are not switched on yet. Your dates are held; send us an enquiry and we will finish the booking with you.',
+  });
+  if (!sent.ok) {
     return NextResponse.json(
       {
         ok: false,
-        pending: true,
         reference: payment.reference,
-        message:
-          'M-Pesa payments are not switched on yet. Your dates are held; send us an enquiry and we will finish the booking with you.',
+        pending: sent.pending,
+        waitSeconds: sent.waitSeconds,
+        message: sent.message,
       },
-      { status: 503 },
-    );
-  }
-
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ?? new URL(request.url).origin;
-
-  const sent = await stkPush({
-    phone,
-    amountCents: payment.amount_cents,
-    reference: payment.reference,
-    callbackUrl: `${origin}/api/payments/mpesa/callback?token=${encodeURIComponent(callbackSecret)}`,
-    description: 'NexG stay',
-  });
-  if (!sent.ok || !sent.checkoutRequestId) {
-    return NextResponse.json({ ok: false, message: sent.message }, { status: 502 });
-  }
-
-  const back = await supabase.rpc('rpc_payment_mpesa_sent', {
-    p_reference: payment.reference,
-    p_checkout_request_id: sent.checkoutRequestId,
-    p_merchant_request_id: sent.merchantRequestId ?? '',
-    p_phone: phone,
-    p_callback_secret: callbackSecret,
-  });
-  if (back.error) {
-    return NextResponse.json(
-      { ok: false, message: `Prompt sent but not recorded: ${back.error.message}` },
-      { status: 500 },
+      { status: sent.status },
     );
   }
 
