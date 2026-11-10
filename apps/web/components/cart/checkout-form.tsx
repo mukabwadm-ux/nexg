@@ -119,6 +119,13 @@ export function CheckoutForm({
   if (cart.lines.length === 0) {
     return (
       <div className="border-border bg-surface mt-6 rounded-2xl border p-8 text-center">
+        {/* A payment that could not start empties the cart after the order is
+            saved. Without this the guest saw only "empty" and lost the reference. */}
+        {error && (
+          <p role="alert" className="text-danger mb-4 text-sm font-bold">
+            {error}
+          </p>
+        )}
         <p className="text-lg font-extrabold">Your cart is empty</p>
         <p className="text-muted mt-1 text-sm">Pick something from a merchant to get started.</p>
         <Link
@@ -231,13 +238,20 @@ export function CheckoutForm({
       const body = (await res.json()) as {
         ok: boolean;
         message?: string;
+        reference?: string;
         authorization_url?: string;
       };
       if (!body.ok || !body.authorization_url) {
+        cart.clear();
+        /* The order and its payment are saved: the pay page says where it
+           stands, as it does when an M-Pesa prompt or a bank cannot start. */
+        if (body.reference) {
+          router.push(`/pay/${body.reference}`);
+          return;
+        }
         setError(
           `Your order ${result.reference} is saved, but payment could not start. ${body.message ?? ''}`,
         );
-        cart.clear();
         return;
       }
       cart.clear();

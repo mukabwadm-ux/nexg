@@ -139,7 +139,10 @@ cross join (values
   (0, null,    null,    true)
 ) as d(dow, opens, closes, closed)
 where m.contact_email like 'demo.%@nexg.invalid'
-on conflict (merchant_id, day_of_week) do nothing;
+-- No conflict target: the unique key is now merchant_hours_one_per_slot
+-- (merchant, branch, day, service). The old (merchant_id, day_of_week) target
+-- matches no key any more, and naming it failed the whole script.
+on conflict do nothing;
 
 commit;
 
