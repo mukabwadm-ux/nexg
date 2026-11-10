@@ -3330,6 +3330,265 @@ export type Database = {
         };
         Relationships: [];
       };
+      api_connection: {
+        Row: {
+          auth_header: string | null;
+          auth_type: string;
+          base_url: string | null;
+          contact_email: string | null;
+          contact_name: string | null;
+          created_at: string;
+          created_by: string | null;
+          enabled: boolean;
+          environment: string;
+          id: string;
+          key: string;
+          kind: string;
+          last_test_detail: string | null;
+          last_test_ms: number | null;
+          last_test_ok: boolean | null;
+          last_test_status: number | null;
+          last_tested_at: string | null;
+          merchant_id: string | null;
+          name: string;
+          notes: string | null;
+          secret_ref: string | null;
+          sort: number;
+          status: string;
+          test_path: string;
+          updated_at: string;
+          webhook_secret_ref: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          auth_header?: string | null;
+          auth_type?: string;
+          base_url?: string | null;
+          contact_email?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          enabled?: boolean;
+          environment: string;
+          id?: string;
+          key: string;
+          kind: string;
+          last_test_detail?: string | null;
+          last_test_ms?: number | null;
+          last_test_ok?: boolean | null;
+          last_test_status?: number | null;
+          last_tested_at?: string | null;
+          merchant_id?: string | null;
+          name: string;
+          notes?: string | null;
+          secret_ref?: string | null;
+          sort?: number;
+          status?: string;
+          test_path?: string;
+          updated_at?: string;
+          webhook_secret_ref?: string | null;
+        };
+        Update: {
+          auth_header?: string | null;
+          auth_type?: string;
+          base_url?: string | null;
+          contact_email?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          enabled?: boolean;
+          environment?: string;
+          id?: string;
+          key?: string;
+          kind?: string;
+          last_test_detail?: string | null;
+          last_test_ms?: number | null;
+          last_test_ok?: boolean | null;
+          last_test_status?: number | null;
+          last_tested_at?: string | null;
+          merchant_id?: string | null;
+          name?: string;
+          notes?: string | null;
+          secret_ref?: string | null;
+          sort?: number;
+          status?: string;
+          test_path?: string;
+          updated_at?: string;
+          webhook_secret_ref?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_connection_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      api_connection_test: {
+        Row: {
+          connection_id: string;
+          detail: string | null;
+          finished_at: string | null;
+          id: string;
+          latency_ms: number | null;
+          ok: boolean | null;
+          request_id: number | null;
+          started_at: string;
+          status_code: number | null;
+          tested_by: string | null;
+          url: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          connection_id: string;
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: string;
+          latency_ms?: number | null;
+          ok?: boolean | null;
+          request_id?: number | null;
+          started_at?: string;
+          status_code?: number | null;
+          tested_by?: string | null;
+          url: string;
+        };
+        Update: {
+          connection_id?: string;
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: string;
+          latency_ms?: number | null;
+          ok?: boolean | null;
+          request_id?: number | null;
+          started_at?: string;
+          status_code?: number | null;
+          tested_by?: string | null;
+          url?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_connection_test_connection_id_fkey';
+            columns: ['connection_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_connection';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_test_connection_id_fkey';
+            columns: ['connection_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_connection_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_test_tested_by_fkey';
+            columns: ['tested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       api_idempotency: {
         Row: {
           created_at: string;
@@ -33064,6 +33323,242 @@ export type Database = {
       };
     };
     Views: {
+      api_connection_test_v: {
+        Row: {
+          connection_id: string | null;
+          detail: string | null;
+          finished_at: string | null;
+          id: string | null;
+          latency_ms: number | null;
+          ok: boolean | null;
+          started_at: string | null;
+          status_code: number | null;
+          url: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          connection_id?: string | null;
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: string | null;
+          latency_ms?: number | null;
+          ok?: boolean | null;
+          started_at?: string | null;
+          status_code?: number | null;
+          url?: string | null;
+        };
+        Update: {
+          connection_id?: string | null;
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: string | null;
+          latency_ms?: number | null;
+          ok?: boolean | null;
+          started_at?: string | null;
+          status_code?: number | null;
+          url?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_connection_test_connection_id_fkey';
+            columns: ['connection_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_connection';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_test_connection_id_fkey';
+            columns: ['connection_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_connection_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      api_connection_v: {
+        Row: {
+          auth_header: string | null;
+          auth_type: string | null;
+          base_url: string | null;
+          contact_email: string | null;
+          contact_name: string | null;
+          created_at: string | null;
+          enabled: boolean | null;
+          environment: string | null;
+          has_credential: boolean | null;
+          has_webhook_secret: boolean | null;
+          id: string | null;
+          key: string | null;
+          kind: string | null;
+          last_test_detail: string | null;
+          last_test_ms: number | null;
+          last_test_ok: boolean | null;
+          last_test_status: number | null;
+          last_tested_at: string | null;
+          merchant_id: string | null;
+          name: string | null;
+          notes: string | null;
+          sort: number | null;
+          status: string | null;
+          test_path: string | null;
+          updated_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          auth_header?: string | null;
+          auth_type?: string | null;
+          base_url?: string | null;
+          contact_email?: string | null;
+          contact_name?: string | null;
+          created_at?: string | null;
+          enabled?: boolean | null;
+          environment?: string | null;
+          has_credential?: never;
+          has_webhook_secret?: never;
+          id?: string | null;
+          key?: string | null;
+          kind?: string | null;
+          last_test_detail?: string | null;
+          last_test_ms?: number | null;
+          last_test_ok?: boolean | null;
+          last_test_status?: number | null;
+          last_tested_at?: string | null;
+          merchant_id?: string | null;
+          name?: string | null;
+          notes?: string | null;
+          sort?: number | null;
+          status?: string | null;
+          test_path?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          auth_header?: string | null;
+          auth_type?: string | null;
+          base_url?: string | null;
+          contact_email?: string | null;
+          contact_name?: string | null;
+          created_at?: string | null;
+          enabled?: boolean | null;
+          environment?: string | null;
+          has_credential?: never;
+          has_webhook_secret?: never;
+          id?: string | null;
+          key?: string | null;
+          kind?: string | null;
+          last_test_detail?: string | null;
+          last_test_ms?: number | null;
+          last_test_ok?: boolean | null;
+          last_test_status?: number | null;
+          last_tested_at?: string | null;
+          merchant_id?: string | null;
+          name?: string | null;
+          notes?: string | null;
+          sort?: number | null;
+          status?: string | null;
+          test_path?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       audit_activity_v: {
         Row: {
           action: string | null;
@@ -49631,6 +50126,15 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_api_connection_clear_secret: { Args: { p_id: string; p_kind: string }; Returns: Json };
+      rpc_api_connection_save: { Args: { p: Json }; Returns: Json };
+      rpc_api_connection_set_enabled: { Args: { p_enabled: boolean; p_id: string }; Returns: Json };
+      rpc_api_connection_set_secret: {
+        Args: { p_id: string; p_kind: string; p_value: string };
+        Returns: Json;
+      };
+      rpc_api_connection_test: { Args: { p_id: string }; Returns: string };
+      rpc_api_connection_test_result: { Args: { p_test_id: string }; Returns: Json };
       rpc_api_key_revoke: { Args: { p_key_id: string; p_reason?: string }; Returns: boolean };
       rpc_approval_decide: {
         Args: { p_approve: boolean; p_note?: string; p_request_id: string };
