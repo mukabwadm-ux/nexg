@@ -16,6 +16,8 @@ interface Quote {
   ok: boolean;
   message?: string;
   subtotal_cents: number;
+  /** Before promotions; equal to subtotal_cents when none apply. */
+  list_subtotal_cents?: number;
   delivery_fee_cents: number;
   service_fee_cents: number;
   small_basket_fee_cents: number;
@@ -351,6 +353,12 @@ export function CheckoutForm() {
             />
             {quote?.ok && (
               <>
+                {(quote.list_subtotal_cents ?? 0) > quote.subtotal_cents && (
+                  <Row
+                    label="You saved (in subtotal)"
+                    value={kesFromCents((quote.list_subtotal_cents ?? 0) - quote.subtotal_cents)}
+                  />
+                )}
                 <Row label="Delivery" value={kesFromCents(quote.delivery_fee_cents)} />
                 <Row label="Service fee" value={kesFromCents(quote.service_fee_cents)} />
                 {quote.small_basket_fee_cents > 0 && (

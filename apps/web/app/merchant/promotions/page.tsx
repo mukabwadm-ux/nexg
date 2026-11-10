@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react';
 
 import { LivePromotionsWorkspace } from '@/components/merchant/promotions/live-workspace';
+import type { PromotionRow } from '@/components/merchant/promotions/promotion-manager';
 import type { Booking, Featured } from '@/components/partner/merchant-featured';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
@@ -109,7 +110,7 @@ async function featuredRequest(
 export default async function MerchantPromotions() {
   const merchant = await requireMerchant();
   const client = createClient();
-  const [home, history] = await Promise.all([
+  const [home, history, promotions, items] = await Promise.all([
     client
       .from('merchant_home_v')
       .select('name, status, city_id')
@@ -123,6 +124,21 @@ export default async function MerchantPromotions() {
       .eq('merchant_id', merchant.id)
       .order('requested_at', { ascending: false })
       .limit(30),
+    /* Not in the generated types until they are regenerated with this table. */
+    client
+      .from('merchant_promotion' as never)
+      .select('id, name, kind, value, catalogue_item_id, starts_at, ends_at, status')
+      .eq('merchant_id', merchant.id)
+      .order('created_at', { ascending: false })
+      .limit(100),
+    client
+      .from('catalogue_item')
+      .select('id, name, price_kes')
+      .eq('merchant_id', merchant.id)
+      .eq('available', true)
+      .not('price_kes', 'is', null)
+      .order('name')
+      .limit(500),
   ]);
   const bookings = history.error ? null : history.data;
   const controls = await featuredRequest(
@@ -136,6 +152,12 @@ export default async function MerchantPromotions() {
     <LivePromotionsWorkspace
       businessName={home.data?.name ?? 'Your business'}
       bookings={bookings}
+      promotions={promotions.error ? null : ((promotions.data ?? []) as unknown as PromotionRow[])}
+      items={(items.data ?? []).flatMap((item) =>
+        item.price_kes === null
+          ? []
+          : [{ id: item.id, name: item.name, price_kes: item.price_kes }],
+      )}
       {...controls}
     />
   );

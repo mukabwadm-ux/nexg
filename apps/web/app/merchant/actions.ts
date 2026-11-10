@@ -678,3 +678,50 @@ export async function openTicket(input: {
   });
   return unwrap(data, error, ALL, 'Opened. You will see it in Your tickets below.');
 }
+
+// ──────────────────────────────────────────────────── promotions
+
+export interface PromotionInput {
+  promotionId?: string | null;
+  name: string;
+  kind: 'percent' | 'amount';
+  value: number;
+  /** Empty: everything in the catalogue. */
+  itemId?: string | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+}
+
+const PROMOTION_PATHS = ['/merchant/promotions', '/merchant/menu', '/merchant/offerings'];
+
+/** Create or change a promotion. The database checks ownership, values and dates. */
+export async function savePromotion(input: PromotionInput): Promise<Outcome> {
+  const { client, merchantId } = await merchantActionClient();
+  const { data, error } = await client.rpc(
+    'rpc_merchant_promotion_save' as never,
+    {
+      p_merchant_id: merchantId,
+      p_promotion_id: input.promotionId || null,
+      p_name: input.name,
+      p_kind: input.kind,
+      p_value: Math.round(Number(input.value)),
+      p_item_id: input.itemId || null,
+      p_starts_at: input.startsAt || null,
+      p_ends_at: input.endsAt || null,
+    } as never,
+  );
+  return unwrap(data, error as { message: string } | null, PROMOTION_PATHS);
+}
+
+/** Pause, resume or end a promotion. */
+export async function setPromotionStatus(
+  promotionId: string,
+  status: 'active' | 'paused' | 'ended',
+): Promise<Outcome> {
+  const { client } = await merchantActionClient();
+  const { data, error } = await client.rpc(
+    'rpc_merchant_promotion_set_status' as never,
+    { p_promotion_id: promotionId, p_status: status } as never,
+  );
+  return unwrap(data, error as { message: string } | null, PROMOTION_PATHS);
+}

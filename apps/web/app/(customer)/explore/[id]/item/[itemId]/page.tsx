@@ -8,10 +8,11 @@ import { CATEGORY_ICON, CATEGORY_LABEL } from '@/components/explore/merchant-car
 import { ProductActions } from '@/components/explore/product-actions';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { loadPromotedPrices, promoBadge } from '@/lib/promotions';
 import { createPublicClient } from '@/lib/supabase/public';
 
-/* Prices and availability change during the day, so this is kept short. */
-export const revalidate = 300;
+/* Prices, promotions and availability change during the day, so this is kept short. */
+export const revalidate = 60;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -50,7 +51,8 @@ async function load(params: Params) {
       .createSignedUrl(item.photo_path, 2 * 60 * 60);
     photoUrl = data?.signedUrl ?? null;
   }
-  return { merchant, item, section, photoUrl };
+  const promotions = await loadPromotedPrices(supabase, merchant.id as string);
+  return { merchant, item, section, photoUrl, promo: promotions[item.id] ?? null };
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
@@ -67,7 +69,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function ProductPage({ params }: { params: Params }) {
   const found = await load(params);
   if (!found) notFound();
-  const { merchant, item, section, photoUrl } = found;
+  const { merchant, item, section, photoUrl, promo } = found;
 
   const category = merchant.category ?? 'other';
   const Icon = CATEGORY_ICON[category] ?? Store;
@@ -132,7 +134,17 @@ export default async function ProductPage({ params }: { params: Params }) {
               {section?.name ? ` · ${section.name}` : ''}
             </p>
 
-            <p className="mt-4 text-2xl font-extrabold">{price(item.price_kes)}</p>
+            {promo ? (
+              <p className="mt-4 flex flex-wrap items-baseline gap-2">
+                <span className="text-danger text-2xl font-extrabold">{price(promo.promo)}</span>
+                <s className="text-muted-light text-sm font-semibold">{price(item.price_kes)}</s>
+                <span className="bg-danger-bg text-danger rounded-full px-2 py-0.5 text-[0.625rem] font-extrabold uppercase tracking-wide">
+                  {promoBadge(promo)} · {promo.name}
+                </span>
+              </p>
+            ) : (
+              <p className="mt-4 text-2xl font-extrabold">{price(item.price_kes)}</p>
+            )}
             <div className="mt-2 flex flex-wrap gap-2">
               {item.age_restricted && (
                 <span className="border-border-strong text-muted rounded-full border px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide">
@@ -159,7 +171,7 @@ export default async function ProductPage({ params }: { params: Params }) {
               {item.available && open ? (
                 <ProductActions
                   merchant={{ id: merchant.id as string, name: merchantName }}
-                  item={{ id: item.id, name: item.name, price_kes: item.price_kes }}
+                  item={{ id: item.id, name: item.name, price_kes: promo?.promo ?? item.price_kes }}
                 />
               ) : (
                 <Link
