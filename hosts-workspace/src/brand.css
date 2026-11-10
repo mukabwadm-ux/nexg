@@ -1,13 +1,37 @@
 /* Palette and typography authority: Desktop/MERCHANT WORKSPACE.
    Shared tokens + merchant/workspace/workspace.module.css. */
-@font-face{font-family:'NexG Manrope';font-style:normal;font-weight:400 800;font-display:swap;src:url('/fonts/manrope-latin.woff2') format('woff2')}
-:root{
-  font-family:'NexG Manrope',system-ui,sans-serif;
-  --paper:#F6F3EC;--surface:#FFFFFF;--ink:#171B24;--muted:#626675;--line:#E7E3DA;
-  --gold:#D4A72C;--gold-text:#B8901F;--gold-soft:#FBF7EA;--accent:#141414;
-  --success:#1F7A3A;--success-soft:#E9F5EC;--danger:#B42318;--danger-soft:#FDECEA;
-  --info:#1F4E79;--info-soft:#EAF1F8;--warning:#8A6A10;--warning-soft:#FBF7EA;
-  --sidebar-bg:#141414;--sidebar-text:#C7C6C1;--sidebar-active-text:#17130B;
-  --border-strong:#DDD8CC;--shell-border:#2A2A28;--shell-muted:#8B8780;
-  color:var(--ink);background:var(--paper);
+@font-face {
+  font-family: 'NexG Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/manrope-latin.woff2') format('woff2');
+}
+:root {
+  font-family: 'NexG Manrope', system-ui, sans-serif;
+  --paper: #f6f3ec;
+  --surface: #ffffff;
+  --ink: #171b24;
+  --muted: #626675;
+  --line: #e7e3da;
+  --gold: #d4a72c;
+  --gold-text: #b8901f;
+  --gold-soft: #fbf7ea;
+  --accent: #141414;
+  --success: #1f7a3a;
+  --success-soft: #e9f5ec;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --info: #1f4e79;
+  --info-soft: #eaf1f8;
+  --warning: #8a6a10;
+  --warning-soft: #fbf7ea;
+  --sidebar-bg: #141414;
+  --sidebar-text: #c7c6c1;
+  --sidebar-active-text: #17130b;
+  --border-strong: #ddd8cc;
+  --shell-border: #2a2a28;
+  --shell-muted: #8b8780;
+  color: var(--ink);
+  background: var(--paper);
 }

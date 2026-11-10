@@ -4,7 +4,8 @@ import { errorMessage, workspaceRequest, WorkspaceConnectionError } from './clie
 import type { Collection, Command, DialogState, WorkspaceSnapshot } from './model';
 
 function locationFromHash() {
-  const view = window.location.hash.slice(1) || new URLSearchParams(window.location.search).get('open') || '';
+  const view =
+    window.location.hash.slice(1) || new URLSearchParams(window.location.search).get('open') || '';
   const [page = 'overview', id = '', section = ''] = view.split('/');
   const decode = (value: string) => {
     try {
@@ -31,9 +32,13 @@ function workspaceAction<T>(action: object) {
 function useWorkspaceState(initial: WorkspaceSnapshot) {
   const [snapshot, setSnapshot] = useState(initial);
   const [scope, setScope] = useState('all');
-  const [route, setRoute] = useState(() => !window.location.hash && !new URLSearchParams(window.location.search).has("open") && !initial.setup.live
-    ? { page:'setup', recordId:'', section:'' }
-    : locationFromHash());
+  const [route, setRoute] = useState(() =>
+    !window.location.hash &&
+    !new URLSearchParams(window.location.search).has('open') &&
+    !initial.setup.live
+      ? { page: 'setup', recordId: '', section: '' }
+      : locationFromHash(),
+  );
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [toast, notify] = useState('');
   const { data, actor, today, propertyWrites, setup } = snapshot;
@@ -70,15 +75,20 @@ function useWorkspaceState(initial: WorkspaceSnapshot) {
   }
 
   function canEdit(collection: Collection, id?: string) {
-    if (collection === 'articles') return !id || data.articles.some(article => article.id === id);
+    if (collection === 'articles') return !id || data.articles.some((article) => article.id === id);
     if (collection === 'properties') return propertyWrites;
-    if (collection === 'units') return id ? data.units.some(unit=>unit.id===id) : propertyWrites;
+    if (collection === 'units')
+      return id ? data.units.some((unit) => unit.id === id) : propertyWrites;
     if (collection === 'stays') {
       const stay = data.stays.find((row) => row.id === id);
       return !id || stay?.status === 'Confirmed';
     }
-    if (collection === 'tasks' && id) return data.tasks.some(task => task.id === id && task.workspaceTask);
-    if (collection === 'packages') return propertyWrites && (!id || data.packages.some(item=>item.id===id&&item.editable));
+    if (collection === 'tasks' && id)
+      return data.tasks.some((task) => task.id === id && task.workspaceTask);
+    if (collection === 'packages')
+      return (
+        propertyWrites && (!id || data.packages.some((item) => item.id === id && item.editable))
+      );
     return ['qrCards', 'tasks', 'payments', 'expenses', 'packageJobs'].includes(collection) && !id;
   }
 
@@ -89,16 +99,32 @@ function useWorkspaceState(initial: WorkspaceSnapshot) {
     data.properties.find((property) => property.id === id)?.name || 'All properties';
 
   return {
-    data, actor, today, setup, propertyWrites, scope, setScope, units, stays, ...route,
-    dialog, notify, propertyLabel, canEdit, refresh,
+    data,
+    actor,
+    today,
+    setup,
+    propertyWrites,
+    scope,
+    setScope,
+    units,
+    stays,
+    ...route,
+    dialog,
+    notify,
+    propertyLabel,
+    canEdit,
+    refresh,
     closeDialog: () => setDialog(null),
     unitLabel: (id: string) => {
       const unit = data.units.find((row) => row.id === id);
-      return unit ? (unit.propertyId ? propertyLabel(unit.propertyId) + ' · ' : '') + unit.name : 'Workspace';
+      return unit
+        ? (unit.propertyId ? propertyLabel(unit.propertyId) + ' · ' : '') + unit.name
+        : 'Workspace';
     },
     go: (page: string, id = '', section = '') => {
       window.location.hash =
-        page + (id || section ? '/' + encodeURIComponent(id) : '') +
+        page +
+        (id || section ? '/' + encodeURIComponent(id) : '') +
         (section ? '/' + encodeURIComponent(section) : '');
       setDialog(null);
     },
@@ -155,7 +181,9 @@ export function WorkspaceProvider({
       {workspace.toast && (
         <div className="toast" role="status">
           <span>{workspace.toast}</span>
-          <button aria-label="Dismiss notification" onClick={() => workspace.notify('')}>×</button>
+          <button aria-label="Dismiss notification" onClick={() => workspace.notify('')}>
+            ×
+          </button>
         </div>
       )}
     </Context.Provider>

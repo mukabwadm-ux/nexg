@@ -15,7 +15,9 @@ export function StartSupportForm({
   initialTopic?: string;
   onSent: (threadId: string) => void;
 }) {
-  const [topic, setTopic] = useState(topics.find(item => item.value === initialTopic)?.value ?? topics[0]?.value ?? '');
+  const [topic, setTopic] = useState(
+    topics.find((item) => item.value === initialTopic)?.value ?? topics[0]?.value ?? '',
+  );
   const [subject, setSubject] = useState(initialSubject.slice(0, 160));
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
