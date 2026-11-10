@@ -38,7 +38,9 @@ function slotLabel(s: OpenSlot): string {
       ? `Top of ${s.category.replace(/_/g, ' ')}`
       : s.kind === 'homepage'
         ? `Homepage · position ${s.position}`
-        : `${s.kind.replace(/_/g, ' ')} · ${s.position}`;
+        : s.kind === 'popular_request'
+          ? `Best seller · position ${s.position}`
+          : `${s.kind.replace(/_/g, ' ')} · ${s.position}`;
   return `${where} · ${s.city_name ?? DASH}`;
 }
 
@@ -296,7 +298,9 @@ export function FeaturedNow({
   const where =
     placement.placement_kind === 'category_top' && placement.placement_category
       ? `Top of ${placement.placement_category.replace(/_/g, ' ')}`
-      : placement.placement_kind.replace(/_/g, ' ');
+      : placement.placement_kind === 'popular_request'
+        ? 'Best seller'
+        : placement.placement_kind.replace(/_/g, ' ');
 
   return (
     <Card className="p-5">

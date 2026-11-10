@@ -40,7 +40,7 @@ async function featuredRequest(
     };
   }
 
-  const [placements, eligibility] = await Promise.all([
+  const [placements, eligibility, products] = await Promise.all([
     client
       .from('featured_placement')
       .select('id, kind, category, position, label, description, city_id')
@@ -52,6 +52,15 @@ async function featuredRequest(
       p_merchant_id: merchantId,
       p_placement_kind: 'homepage',
     }),
+    /* What a Best sellers slot can promote: available, priced products. */
+    client
+      .from('catalogue_item')
+      .select('id, name, price_kes')
+      .eq('merchant_id', merchantId)
+      .eq('available', true)
+      .not('price_kes', 'is', null)
+      .order('name')
+      .limit(200),
   ]);
   const check = eligibility.data;
   if (
@@ -88,6 +97,11 @@ async function featuredRequest(
       placements: priced,
       bookings,
       nextMonday: nextMonday(),
+      products: (products.data ?? []).flatMap((product) =>
+        product.price_kes === null
+          ? []
+          : [{ id: product.id, name: product.name, price_kes: product.price_kes }],
+      ),
     },
   };
 }
