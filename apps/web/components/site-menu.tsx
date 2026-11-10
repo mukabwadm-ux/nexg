@@ -10,8 +10,8 @@ import {
   Bike,
   Instagram,
   Facebook,
+  Linkedin,
   MapPin,
-  MessageCircle,
   Store,
   X,
 } from 'lucide-react';
@@ -68,20 +68,19 @@ const PARTNER_LINKS = [
   { key: 'nav.careers', noteKey: 'nav.careers.note', href: '/careers', icon: Briefcase },
 ] as const;
 
-/** The X mark; lucide's `X` is a close icon, not the wordmark. */
-function XLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
-      <path d="M18.9 2H22l-7.6 8.7L23.4 22h-6.8l-5.3-6.9L5.2 22H2l8.2-9.4L1.6 2h7l4.8 6.3L18.9 2Z" />
-    </svg>
-  );
-}
-
+/* NexG's own accounts only. Add a network here only when NexG has an account on it. */
 const SOCIALS = [
-  { label: 'Instagram', href: 'https://instagram.com', icon: Instagram },
-  { label: 'X', href: 'https://x.com', icon: XLogo },
-  { label: 'Facebook', href: 'https://facebook.com', icon: Facebook },
-  { label: 'WhatsApp', href: 'https://wa.me/254143819478', icon: MessageCircle },
+  { label: 'Facebook', href: 'https://web.facebook.com/share/1C8dtH1oGw/', icon: Facebook },
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/nexg_app?exln=NGs1eXBoZWxjZDg0',
+    icon: Instagram,
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/nexgenius-concierge-325066437?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
+    icon: Linkedin,
+  },
 ] as const;
 
 export function SiteMenu({
