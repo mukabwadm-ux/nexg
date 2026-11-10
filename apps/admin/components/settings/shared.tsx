@@ -9,7 +9,8 @@ export const DASH = '[—]';
 export const TABS = [
   { key: 'cities', label: 'Cities & coverage' },
   { key: 'fees', label: 'Fees & dispatch' },
-  { key: 'payments', label: 'Payments & integrations' },
+  { key: 'payments', label: 'Payments' },
+  { key: 'api', label: 'API & Webhooks' },
   { key: 'notifications', label: 'Notifications & templates' },
   { key: 'emails', label: 'Email routing' },
   { key: 'branding', label: 'Branding & legal' },
@@ -31,8 +32,13 @@ export const TAB_COPY: Record<string, { title: string; subtitle: string }> = {
       'Rate card and dispatch parameters per city · every number here is versioned, dated and two-person approved',
   },
   payments: {
-    title: 'Payments & integrations',
-    subtitle: 'How money comes in and goes out, and every external service NexG depends on',
+    title: 'Payments',
+    subtitle: 'How money comes in and goes out: checkout payment methods and payouts',
+  },
+  api: {
+    title: 'API & Webhooks',
+    subtitle:
+      'Every external service and API NexG depends on, the webhooks that report payments, and connections to banks and merchant systems in sandbox and live',
   },
   notifications: {
     title: 'Notifications & templates',
@@ -63,6 +69,7 @@ export const TAB_GROUP: Record<string, string> = {
   cities: 'cities',
   fees: 'fees',
   payments: 'payments',
+  api: 'payments',
   notifications: 'notifications',
   branding: 'branding',
   retention: 'retention',

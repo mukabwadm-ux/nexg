@@ -9,6 +9,12 @@ import {
 } from '@/app/settings/actions';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
+import {
+  type ApiConnectionRow,
+  type ApiOverview,
+  ApiTab,
+  type ApiTestRow,
+} from '@/components/settings/api';
 import { SaveBar, ScheduledBanner } from '@/components/settings/controls';
 import { EmailRoutingTab, type EmailRouteRow } from '@/components/settings/email-routing';
 import {
@@ -92,6 +98,35 @@ export default async function SettingsPage({
     ]);
     waitlistCities = (cityRes.data as WaitlistCityRow[] | null) ?? [];
     waitlistSignups = (signupRes.data as WaitlistSignupRow[] | null) ?? [];
+  }
+
+  let apiConnections: ApiConnectionRow[] = [];
+  let apiTests: ApiTestRow[] = [];
+  let apiCanEdit = false;
+  let apiOverview: ApiOverview | null = null;
+  if (tab === 'api') {
+    const [conn, runs, may, overview] = await Promise.all([
+      s
+        .from('api_connection_v' as never)
+        .select('*')
+        .order('sort')
+        .order('name'),
+      s
+        .from('api_connection_test_v' as never)
+        .select('*')
+        .order('started_at', { ascending: false })
+        .limit(25),
+      s.rpc('rpc_settings_may_edit', { p_group: 'payments' }),
+      /* Webhook and API-key status. Missing until its migration has run; the
+         tab then shows the webhooks without live status. */
+      s.rpc('rpc_api_overview' as never),
+    ]);
+    apiConnections = (conn.data as ApiConnectionRow[] | null) ?? [];
+    apiTests = (runs.data as ApiTestRow[] | null) ?? [];
+    apiCanEdit = may.data === true;
+    apiOverview = overview.error
+      ? null
+      : ((overview.data as unknown as ApiOverview | null) ?? null);
   }
 
   let emailRoutes: EmailRouteRow[] = [];
@@ -305,6 +340,25 @@ export default async function SettingsPage({
         {tab === 'payments' && <PaymentsTab {...props} />}
         {tab === 'notifications' && <NotificationsTab />}
         {tab === 'emails' && <EmailRoutingTab routes={emailRoutes} />}
+        {tab === 'api' && (
+          <ApiTab
+            connections={apiConnections}
+            tests={apiTests}
+            canEdit={apiCanEdit}
+            integrations={props.integrations}
+            overview={apiOverview}
+            origins={{
+              web: (process.env.NEXT_PUBLIC_WEB_ORIGIN ?? 'https://nexgapp.com').replace(
+                /\/+$/,
+                '',
+              ),
+              api: (process.env.NEXT_PUBLIC_API_ORIGIN ?? 'https://api.nexgapp.com').replace(
+                /\/+$/,
+                '',
+              ),
+            }}
+          />
+        )}
         {tab === 'branding' && <BrandingTab {...props} />}
         {tab === 'retention' && <RetentionTab {...props} />}
         {tab === 'waitlist' && <WaitlistTab cities={waitlistCities} signups={waitlistSignups} />}
