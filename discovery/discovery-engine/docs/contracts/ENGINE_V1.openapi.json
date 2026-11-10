@@ -1,0 +1,6662 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NexG Discovery Engine V1 target API",
+    "version": "1.0.0-draft",
+    "description": "Primary Discovery contract. Public read-only release, health, capability, results, collection, merchant, area and consent-gated interaction routes are implemented in the standalone service. Other routes retain their individual proposed status. Platform owners keep catalog and operational authority; Discovery never books, charges, mutates rights or provisions."
+  },
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "servers": [
+    {
+      "url": "/api/discovery",
+      "description": "Proposed same-origin engine namespace; contractVersion=1"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "engineHealth",
+        "summary": "engineHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineHealth"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "implemented_read_only",
+        "x-business-commands": false
+      }
+    },
+    "/capabilities": {
+      "get": {
+        "operationId": "readEngineCapabilities",
+        "summary": "readEngineCapabilities",
+        "parameters": [
+          {
+            "name": "releaseId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineCapabilities"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "implemented_read_only",
+        "x-business-commands": false
+      }
+    },
+    "/results": {
+      "post": {
+        "operationId": "discoverResults",
+        "summary": "discoverResults",
+        "parameters": [
+          {
+            "name": "nexg_discovery_page",
+            "in": "cookie",
+            "required": false,
+            "description": "Server-issued signed anonymous paging scope. Initial requests receive it through Set-Cookie; cursor/offset continuation requires the same caller cookie. This is not authentication.",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnginePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "implemented_read_only",
+        "x-business-commands": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EngineRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections": {
+      "post": {
+        "operationId": "composeCollections",
+        "summary": "composeCollections",
+        "parameters": [
+          {
+            "name": "nexg_discovery_page",
+            "in": "cookie",
+            "required": false,
+            "description": "Server-issued signed anonymous paging scope. Initial requests receive it through Set-Cookie; cursor/offset continuation requires the same caller cookie. This is not authentication.",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "implemented_read_only",
+        "x-business-commands": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CollectionRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/merchants/{id}": {
+      "get": {
+        "operationId": "readMerchantDetail",
+        "summary": "readMerchantDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicMerchant"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "implemented_read_only",
+        "x-business-commands": false
+      }
+    },
+    "/merchants/{merchantId}/offerings/{offeringId}": {
+      "get": {
+        "operationId": "readExactOfferingDetail",
+        "summary": "readExactOfferingDetail",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "offeringId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicOffering"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "proposed_not_implemented",
+        "x-business-commands": false
+      }
+    },
+    "/areas": {
+      "get": {
+        "operationId": "readCatalogAreas",
+        "summary": "readCatalogAreas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Areas"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "implemented_read_only",
+        "x-business-commands": false
+      }
+    },
+    "/tasks": {
+      "post": {
+        "operationId": "discoverTaskComponents",
+        "summary": "discoverTaskComponents",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "proposed_not_implemented",
+        "x-business-commands": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events": {
+      "post": {
+        "operationId": "observeClientEvents",
+        "summary": "observeClientEvents",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventReceipt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "implemented_consent_and_sink_gated",
+        "x-business-commands": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientEvents"
+              }
+            }
+          }
+        },
+        "description": "First-party NexG interaction ingestion. Requires a live delivery token, recorded consent and approved sink configuration. Handoff events remain unavailable until an owner integration exists. Browser events never confirm owner outcomes."
+      }
+    },
+    "/workflow-assessments": {
+      "post": {
+        "operationId": "assessWorkflowReadiness",
+        "summary": "assessWorkflowReadiness",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowAssessment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "proposed_not_implemented",
+        "x-business-commands": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowAssessmentRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "PrivateContext": []
+          }
+        ]
+      }
+    },
+    "/workflow-handoffs": {
+      "post": {
+        "operationId": "prepareOwnerHandoff",
+        "summary": "prepareOwnerHandoff",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Handoff"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "proposed_not_implemented",
+        "x-business-commands": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandoffRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "PrivateContext": []
+          }
+        ]
+      }
+    },
+    "/internal/owner-outcomes": {
+      "post": {
+        "operationId": "observeVerifiedOwnerOutcome",
+        "summary": "observeVerifiedOwnerOutcome",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventReceipt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "proposed_not_implemented",
+        "x-business-commands": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnerOutcome"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OwnerService": []
+          }
+        ]
+      }
+    },
+    "/release": {
+      "get": {
+        "operationId": "readPublishedReleaseContext",
+        "summary": "Read verified public release identity and collection labels",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Typed read/decision result; no operational commitment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseContext"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure preserving request constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineError"
+                }
+              }
+            }
+          }
+        },
+        "x-status": "implemented_read_only",
+        "x-business-commands": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SourceRef": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "ownerId",
+          "id",
+          "revision"
+        ],
+        "additionalProperties": false
+      },
+      "ObservedRef": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "ownerId",
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "Evidence": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/ObservedRef"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          }
+        },
+        "required": [
+          "source",
+          "observedAt"
+        ],
+        "additionalProperties": false
+      },
+      "Money": {
+        "type": "object",
+        "properties": {
+          "minor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          }
+        },
+        "required": [
+          "minor",
+          "currency"
+        ],
+        "additionalProperties": false
+      },
+      "Quantity": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "pattern": "^(0|[1-9]\\d*)(\\.\\d{1,6})?$"
+          },
+          "unitId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "value",
+          "unitId"
+        ],
+        "additionalProperties": false
+      },
+      "Interval": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "boundary": {
+            "const": "start_inclusive_end_exclusive"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "timezone",
+          "boundary"
+        ],
+        "additionalProperties": false
+      },
+      "OfferingBinding": {
+        "type": "object",
+        "properties": {
+          "merchantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "offeringId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "workflowRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "merchantId",
+          "offeringId",
+          "workflowRef"
+        ],
+        "additionalProperties": false
+      },
+      "Context": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "discoveryReleaseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "policyRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "contractVersion",
+          "discoveryReleaseId",
+          "policyRevision"
+        ],
+        "additionalProperties": false
+      },
+      "Decision": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "unknown",
+              "unsupported"
+            ]
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "minItems": 0,
+            "maxItems": 30
+          }
+        },
+        "required": [
+          "state",
+          "reasonCodes",
+          "evidence"
+        ],
+        "additionalProperties": false
+      },
+      "Pricing": {
+        "type": "object",
+        "properties": {
+          "amountKind": {
+            "type": "string",
+            "enum": [
+              "listed",
+              "estimate",
+              "quote",
+              "final"
+            ]
+          },
+          "basisId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "payableNow": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "totalObligation": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "refundableDeposit": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "mandatoryChargesIncluded": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "amountKind",
+          "basisId",
+          "mandatoryChargesIncluded"
+        ],
+        "additionalProperties": false
+      },
+      "MoneyFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Money"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "QuantityFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Quantity"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "BooleanFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "boolean"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "PricingFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Pricing"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Scope": {
+        "type": "object",
+        "properties": {
+          "serviceRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "siteRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "modeIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "serviceRefs",
+          "siteRefs",
+          "modeIds"
+        ],
+        "additionalProperties": false
+      },
+      "ScopeFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Scope"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Validity": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "fixed_window"
+              },
+              "interval": {
+                "$ref": "#/components/schemas/Interval"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "start_only",
+                  "whole_use"
+                ]
+              },
+              "redeemBy": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+              }
+            },
+            "required": [
+              "kind",
+              "interval",
+              "coverage"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "owner_event"
+              },
+              "trigger": {
+                "type": "string",
+                "enum": [
+                  "activation",
+                  "first_use",
+                  "issuance",
+                  "purchase"
+                ]
+              },
+              "ruleRef": {
+                "$ref": "#/components/schemas/SourceRef"
+              },
+              "timezone": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "kind",
+              "trigger",
+              "ruleRef",
+              "timezone"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ValidityFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Validity"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Allowance": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "finite_uses",
+              "fixed_term_access",
+              "period_allowance"
+            ]
+          },
+          "quantity": {
+            "$ref": "#/components/schemas/Quantity"
+          },
+          "consumptionEventId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "ruleRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "kind",
+          "consumptionEventId",
+          "ruleRef"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "finite_uses",
+                    "period_allowance"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "quantity"
+              ]
+            }
+          }
+        ]
+      },
+      "AllowanceFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Allowance"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Capability": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "read",
+              "quote",
+              "hold",
+              "release_hold",
+              "acquire_entitlement",
+              "redeem_entitlement",
+              "reserve_resource",
+              "commit_series",
+              "activate_telecom",
+              "cancel"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "unsupported",
+              "unknown",
+              "temporarily_unavailable"
+            ]
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "contractRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "operation",
+          "state",
+          "reasonCodes"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "const": "supported"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "contractRef"
+              ]
+            }
+          }
+        ]
+      },
+      "Capabilities": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "processKinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ENTITLEMENT",
+                "RESOURCE_RESERVATION",
+                "TELECOM_ACTIVATION",
+                "RECURRENCE"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 4
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Capability"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          },
+          "limits": {
+            "type": "object",
+            "properties": {
+              "maxSeriesOccurrences": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "maxSeriesHorizonDays": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 90
+              },
+              "maxBodyBytes": {
+                "const": 65536
+              }
+            },
+            "required": [
+              "maxSeriesOccurrences",
+              "maxSeriesHorizonDays",
+              "maxBodyBytes"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "context",
+          "offering",
+          "processKinds",
+          "operations",
+          "limits"
+        ],
+        "additionalProperties": false
+      },
+      "RenewalFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "manual",
+                  "automatic"
+                ]
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "EntitlementPlan": {
+        "type": "object",
+        "properties": {
+          "planRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeFact"
+          },
+          "validity": {
+            "$ref": "#/components/schemas/ValidityFact"
+          },
+          "allowance": {
+            "$ref": "#/components/schemas/AllowanceFact"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingFact"
+          },
+          "renewalMode": {
+            "$ref": "#/components/schemas/RenewalFact"
+          },
+          "termsRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Capability"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "planRef",
+          "offering",
+          "scope",
+          "validity",
+          "allowance",
+          "pricing",
+          "renewalMode",
+          "termsRef",
+          "operations"
+        ],
+        "additionalProperties": false
+      },
+      "Entitlement": {
+        "type": "object",
+        "properties": {
+          "entitlementRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "planRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "holderToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "sourceState": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "scheduled",
+              "active",
+              "frozen",
+              "suspended",
+              "exhausted",
+              "expired",
+              "cancelled",
+              "revoked",
+              "unknown"
+            ]
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeFact"
+          },
+          "validity": {
+            "$ref": "#/components/schemas/ValidityFact"
+          },
+          "usableBalance": {
+            "$ref": "#/components/schemas/QuantityFact"
+          },
+          "reservedBalance": {
+            "$ref": "#/components/schemas/QuantityFact"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          }
+        },
+        "required": [
+          "entitlementRef",
+          "planRef",
+          "holderToken",
+          "sourceState",
+          "status",
+          "scope",
+          "validity",
+          "usableBalance",
+          "reservedBalance",
+          "decision"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceChoice": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "named"
+              },
+              "resourceRef": {
+                "$ref": "#/components/schemas/SourceRef"
+              }
+            },
+            "required": [
+              "kind",
+              "resourceRef"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "class"
+              },
+              "classRef": {
+                "$ref": "#/components/schemas/SourceRef"
+              }
+            },
+            "required": [
+              "kind",
+              "classRef"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Party": {
+        "type": "object",
+        "properties": {
+          "adults": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "children": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "infants": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "adults"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceSelection": {
+        "type": "object",
+        "properties": {
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "siteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "resourceChoice": {
+            "$ref": "#/components/schemas/ResourceChoice"
+          },
+          "interval": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "units": {
+            "$ref": "#/components/schemas/Quantity"
+          },
+          "party": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "hardFeatureIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "softFeatureIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "offering",
+          "siteRef",
+          "resourceChoice",
+          "interval",
+          "units",
+          "hardFeatureIds",
+          "softFeatureIds"
+        ],
+        "additionalProperties": false
+      },
+      "AvailabilityRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/ResourceSelection"
+          }
+        },
+        "required": [
+          "context",
+          "selection"
+        ],
+        "additionalProperties": false
+      },
+      "Availability": {
+        "type": "object",
+        "properties": {
+          "availabilityRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "selectionHash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "allocationMode": {
+            "type": "string",
+            "enum": [
+              "named_exclusive",
+              "class_guarantee",
+              "shared_capacity"
+            ]
+          },
+          "guaranteedFeatureIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "capacity": {
+            "$ref": "#/components/schemas/QuantityFact"
+          }
+        },
+        "required": [
+          "availabilityRef",
+          "selectionHash",
+          "decision",
+          "observedAt",
+          "allocationMode",
+          "guaranteedFeatureIds",
+          "capacity"
+        ],
+        "additionalProperties": false
+      },
+      "OccurrenceDraft": {
+        "type": "object",
+        "properties": {
+          "clientOccurrenceKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "interval": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "units": {
+            "$ref": "#/components/schemas/Quantity"
+          },
+          "configurationRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "clientOccurrenceKey",
+          "interval",
+          "units",
+          "configurationRef"
+        ],
+        "additionalProperties": false
+      },
+      "SeriesSelection": {
+        "type": "object",
+        "properties": {
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "commitmentMode": {
+            "type": "string",
+            "enum": [
+              "all_or_nothing",
+              "per_occurrence"
+            ]
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceDraft"
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "requiredOccurrenceKeys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "partialAcceptance": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "offering",
+          "commitmentMode",
+          "occurrences",
+          "requiredOccurrenceKeys",
+          "partialAcceptance"
+        ],
+        "additionalProperties": false
+      },
+      "SeriesPreviewRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/SeriesSelection"
+          }
+        },
+        "required": [
+          "context",
+          "selection"
+        ],
+        "additionalProperties": false
+      },
+      "OccurrenceAssessment": {
+        "type": "object",
+        "properties": {
+          "clientOccurrenceKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "interval": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "sourceOccurrenceRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "clientOccurrenceKey",
+          "decision",
+          "interval"
+        ],
+        "additionalProperties": false
+      },
+      "SeriesPreview": {
+        "type": "object",
+        "properties": {
+          "previewRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "selectionHash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "commitmentMode": {
+            "type": "string",
+            "enum": [
+              "all_or_nothing",
+              "per_occurrence"
+            ]
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceAssessment"
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "wholeSeriesDecision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingFact"
+          }
+        },
+        "required": [
+          "previewRef",
+          "selectionHash",
+          "commitmentMode",
+          "occurrences",
+          "wholeSeriesDecision",
+          "pricing"
+        ],
+        "additionalProperties": false
+      },
+      "RecipientValidationRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "productRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "privateHandoffToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "context",
+          "offering",
+          "productRef",
+          "privateHandoffToken"
+        ],
+        "additionalProperties": false
+      },
+      "RecipientValidation": {
+        "type": "object",
+        "properties": {
+          "recipientRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "maskedDisplay": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "recipientType": {
+            "type": "string",
+            "enum": [
+              "phone_account",
+              "customer_account",
+              "sim_profile"
+            ]
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          }
+        },
+        "required": [
+          "recipientRef",
+          "maskedDisplay",
+          "recipientType",
+          "decision",
+          "validUntil"
+        ],
+        "additionalProperties": false
+      },
+      "TelecomProduct": {
+        "type": "object",
+        "properties": {
+          "productRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "promisedOutcome": {
+            "type": "string",
+            "enum": [
+              "credit_posted",
+              "profile_provisioned",
+              "allowance_active",
+              "service_active"
+            ]
+          },
+          "allowance": {
+            "$ref": "#/components/schemas/AllowanceFact"
+          },
+          "validity": {
+            "$ref": "#/components/schemas/ValidityFact"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingFact"
+          },
+          "termsRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Capability"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "productRef",
+          "offering",
+          "promisedOutcome",
+          "allowance",
+          "validity",
+          "pricing",
+          "termsRef",
+          "operations"
+        ],
+        "additionalProperties": false
+      },
+      "EntitlementAcquireIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "entitlement_acquire"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "planRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "holderToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "kind",
+          "offering",
+          "planRef",
+          "holderToken"
+        ],
+        "additionalProperties": false
+      },
+      "EntitlementRedeemIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "entitlement_redeem"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "entitlementRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "useRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "kind",
+          "offering",
+          "entitlementRef",
+          "useRef"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "resource_reservation"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/ResourceSelection"
+          },
+          "availabilityRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "kind",
+          "selection",
+          "availabilityRef"
+        ],
+        "additionalProperties": false
+      },
+      "SeriesIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "recurring_series"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/SeriesSelection"
+          },
+          "previewRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "kind",
+          "selection",
+          "previewRef"
+        ],
+        "additionalProperties": false
+      },
+      "TelecomIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "telecom_activation"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "productRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "recipientRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "promisedOutcome": {
+            "type": "string",
+            "enum": [
+              "credit_posted",
+              "profile_provisioned",
+              "allowance_active",
+              "service_active"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "offering",
+          "productRef",
+          "recipientRef",
+          "promisedOutcome"
+        ],
+        "additionalProperties": false
+      },
+      "CancellationIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "cancellation"
+          },
+          "targetKind": {
+            "type": "string",
+            "enum": [
+              "entitlement",
+              "reservation",
+              "series",
+              "occurrence",
+              "activation"
+            ]
+          },
+          "targetRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "occurrenceRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          },
+          "reasonCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "kind",
+          "targetKind",
+          "targetRef",
+          "occurrenceRefs",
+          "reasonCode"
+        ],
+        "additionalProperties": false
+      },
+      "WorkflowIntent": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/EntitlementAcquireIntent"
+          },
+          {
+            "$ref": "#/components/schemas/EntitlementRedeemIntent"
+          },
+          {
+            "$ref": "#/components/schemas/ResourceIntent"
+          },
+          {
+            "$ref": "#/components/schemas/SeriesIntent"
+          },
+          {
+            "$ref": "#/components/schemas/TelecomIntent"
+          },
+          {
+            "$ref": "#/components/schemas/CancellationIntent"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind"
+        }
+      },
+      "QuoteRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "intent": {
+            "$ref": "#/components/schemas/WorkflowIntent"
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "intent"
+        ],
+        "additionalProperties": false
+      },
+      "Quote": {
+        "type": "object",
+        "properties": {
+          "quoteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "intentKind": {
+            "type": "string",
+            "enum": [
+              "entitlement_acquire",
+              "entitlement_redeem",
+              "resource_reservation",
+              "recurring_series",
+              "telecom_activation",
+              "cancellation"
+            ]
+          },
+          "selectionHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "termsRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingFact"
+          },
+          "paymentRequired": {
+            "$ref": "#/components/schemas/BooleanFact"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "reviewToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "commitmentOwner": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "atomicity": {
+            "type": "string",
+            "enum": [
+              "single_owner",
+              "owner_coordinated",
+              "per_occurrence"
+            ]
+          },
+          "cancellationEffects": {
+            "$ref": "#/components/schemas/CancellationEffects"
+          }
+        },
+        "required": [
+          "quoteRef",
+          "clientIntentId",
+          "intentKind",
+          "selectionHash",
+          "expiresAt",
+          "termsRef",
+          "pricing",
+          "paymentRequired",
+          "decision",
+          "reviewToken",
+          "commitmentOwner",
+          "atomicity"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "intentKind": {
+                  "const": "cancellation"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "cancellationEffects"
+              ]
+            }
+          }
+        ]
+      },
+      "CancellationEffects": {
+        "type": "object",
+        "properties": {
+          "affectedRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 1,
+            "maxItems": 20
+          },
+          "effectiveAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "accessEffect": {
+            "type": "string",
+            "enum": [
+              "ends",
+              "continues_to_term",
+              "unchanged",
+              "owner_review"
+            ]
+          },
+          "refund": {
+            "$ref": "#/components/schemas/MoneyFact"
+          },
+          "fee": {
+            "$ref": "#/components/schemas/MoneyFact"
+          },
+          "forfeitedUnits": {
+            "$ref": "#/components/schemas/QuantityFact"
+          }
+        },
+        "required": [
+          "affectedRefs",
+          "effectiveAt",
+          "accessEffect",
+          "refund",
+          "fee",
+          "forfeitedUnits"
+        ],
+        "additionalProperties": false
+      },
+      "HoldRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "quoteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "reviewToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "quoteRef",
+          "reviewToken"
+        ],
+        "additionalProperties": false
+      },
+      "Hold": {
+        "type": "object",
+        "properties": {
+          "holdRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "quoteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "selectionHash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "sourceState": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "held",
+              "expired",
+              "released",
+              "consumed",
+              "unknown"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          }
+        },
+        "required": [
+          "holdRef",
+          "quoteRef",
+          "selectionHash",
+          "sourceState",
+          "state",
+          "expiresAt",
+          "components",
+          "decision"
+        ],
+        "additionalProperties": false
+      },
+      "CommitRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "expectedIntentKind": {
+            "type": "string",
+            "enum": [
+              "entitlement_acquire",
+              "entitlement_redeem",
+              "resource_reservation",
+              "recurring_series",
+              "telecom_activation",
+              "cancellation"
+            ]
+          },
+          "quoteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "reviewToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "holdRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "paymentAuthorizationRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "expectedIntentKind",
+          "quoteRef",
+          "reviewToken"
+        ],
+        "additionalProperties": false
+      },
+      "ReleaseHoldRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "expectedHoldRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "expectedHoldRevision"
+        ],
+        "additionalProperties": false
+      },
+      "LookupRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "quote",
+              "hold",
+              "commit",
+              "release_hold"
+            ]
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "idempotencyKey",
+          "stage"
+        ],
+        "additionalProperties": false
+      },
+      "OwnerState": {
+        "type": "object",
+        "properties": {
+          "sourceRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "sourceState": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "normalized": {
+            "type": "string",
+            "enum": [
+              "not_required",
+              "pending",
+              "held",
+              "active",
+              "confirmed",
+              "fulfilled",
+              "credit_posted",
+              "profile_provisioned",
+              "allowance_active",
+              "service_active",
+              "partial",
+              "declined",
+              "failed",
+              "expired",
+              "suspended",
+              "revoked",
+              "cancelled",
+              "refund_pending",
+              "refunded",
+              "released",
+              "unknown",
+              "partially_refunded",
+              "cancellation_pending",
+              "no_show",
+              "waitlisted"
+            ]
+          },
+          "reportedAmount": {
+            "$ref": "#/components/schemas/MoneyFact"
+          },
+          "refundedAmount": {
+            "$ref": "#/components/schemas/MoneyFact"
+          }
+        },
+        "required": [
+          "sourceRef",
+          "sourceState",
+          "normalized"
+        ],
+        "additionalProperties": false
+      },
+      "OwnerStateFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/OwnerState"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "OccurrenceOutcome": {
+        "type": "object",
+        "properties": {
+          "clientOccurrenceKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "state": {
+            "$ref": "#/components/schemas/OwnerStateFact"
+          },
+          "occurrenceRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "clientOccurrenceKey",
+          "state"
+        ],
+        "additionalProperties": false
+      },
+      "Operation": {
+        "type": "object",
+        "properties": {
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "operationRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "intentKind": {
+            "type": "string",
+            "enum": [
+              "entitlement_acquire",
+              "entitlement_redeem",
+              "resource_reservation",
+              "recurring_series",
+              "telecom_activation",
+              "cancellation",
+              "release_hold"
+            ]
+          },
+          "progress": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "pending",
+              "terminal",
+              "outcome_unknown"
+            ]
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "effects": {
+            "type": "object",
+            "properties": {
+              "allocation": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              },
+              "payment": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              },
+              "entitlement": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              },
+              "fulfillment": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              },
+              "compensation": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              }
+            },
+            "required": [
+              "allocation",
+              "payment",
+              "entitlement",
+              "fulfillment",
+              "compensation"
+            ],
+            "additionalProperties": false
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceOutcome"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          },
+          "nextAction": {
+            "type": "string",
+            "enum": [
+              "poll_operation",
+              "lookup_intent",
+              "review",
+              "owner_support",
+              "none"
+            ]
+          }
+        },
+        "required": [
+          "clientIntentId",
+          "intentKind",
+          "progress",
+          "decision",
+          "effects",
+          "nextAction"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "progress": {
+                  "enum": [
+                    "accepted",
+                    "pending",
+                    "terminal"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "operationRef"
+              ]
+            }
+          }
+        ]
+      },
+      "Lookup": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "found"
+              },
+              "operation": {
+                "$ref": "#/components/schemas/Operation"
+              }
+            },
+            "required": [
+              "state",
+              "operation"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "quote_found"
+              },
+              "quote": {
+                "$ref": "#/components/schemas/Quote"
+              }
+            },
+            "required": [
+              "state",
+              "quote"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "hold_found"
+              },
+              "hold": {
+                "$ref": "#/components/schemas/Hold"
+              }
+            },
+            "required": [
+              "state",
+              "hold"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "authoritatively_absent"
+              },
+              "recovery": {
+                "const": "retry_same_key"
+              },
+              "retryBefore": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "recovery",
+              "retryBefore",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "recovery": {
+                "type": "string",
+                "enum": [
+                  "wait",
+                  "owner_support"
+                ]
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "state",
+              "recovery",
+              "reasonCode"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_REQUEST",
+              "UNAUTHORIZED",
+              "FORBIDDEN",
+              "NOT_FOUND",
+              "RELEASE_INCOMPATIBLE",
+              "SOURCE_REVISION_CHANGED",
+              "IDEMPOTENCY_CONFLICT",
+              "UNSUPPORTED_CAPABILITY",
+              "REQUIRED_FACT_UNKNOWN",
+              "FACTS_TOO_STALE",
+              "CONSTRAINT_CONFLICT",
+              "QUOTE_EXPIRED",
+              "HOLD_EXPIRED",
+              "REVIEW_REQUIRED",
+              "LIMIT_EXCEEDED",
+              "RATE_LIMITED",
+              "OWNER_UNAVAILABLE",
+              "ACTION_OUTCOME_UNKNOWN"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "recovery": {
+            "type": "string",
+            "enum": [
+              "correct_request",
+              "authenticate",
+              "review",
+              "restart_preserving_constraints",
+              "retry_read",
+              "lookup_intent",
+              "wait",
+              "owner_support",
+              "none"
+            ]
+          },
+          "fieldPaths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "minItems": 0,
+            "maxItems": 30
+          }
+        },
+        "required": [
+          "contractVersion",
+          "requestId",
+          "code",
+          "retryable",
+          "recovery",
+          "fieldPaths"
+        ],
+        "additionalProperties": false
+      },
+      "StringFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "SourceClassification": {
+        "type": "object",
+        "properties": {
+          "sourceCategoryRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObservedRef"
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "sourceSubcategoryRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObservedRef"
+            },
+            "minItems": 0,
+            "maxItems": 30
+          },
+          "evidenceRef": {
+            "$ref": "#/components/schemas/ObservedRef"
+          }
+        },
+        "required": [
+          "sourceCategoryRefs",
+          "sourceSubcategoryRefs",
+          "evidenceRef"
+        ],
+        "additionalProperties": false
+      },
+      "ClassificationFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/SourceClassification"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ProvenanceFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "string",
+                "enum": [
+                  "confirmed",
+                  "demo",
+                  "unknown"
+                ]
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "WorkflowRefsFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SourceRef"
+                },
+                "minItems": 0,
+                "maxItems": 10
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "CatalogProjection": {
+        "type": "object",
+        "properties": {
+          "entityKind": {
+            "type": "string",
+            "enum": [
+              "merchant",
+              "offering"
+            ]
+          },
+          "ownerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "merchantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "sourceRevision": {
+            "$ref": "#/components/schemas/StringFact"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "classification": {
+            "$ref": "#/components/schemas/ClassificationFact"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/ProvenanceFact"
+          },
+          "listedPrice": {
+            "$ref": "#/components/schemas/MoneyFact"
+          },
+          "workflowPaths": {
+            "$ref": "#/components/schemas/WorkflowRefsFact"
+          },
+          "deleted": {
+            "$ref": "#/components/schemas/BooleanFact"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          }
+        },
+        "required": [
+          "entityKind",
+          "ownerId",
+          "id",
+          "merchantId",
+          "sourceRevision",
+          "label",
+          "classification",
+          "provenance",
+          "listedPrice",
+          "workflowPaths",
+          "deleted",
+          "observedAt"
+        ],
+        "additionalProperties": false
+      },
+      "Count": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "exact"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "lower_bound"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "unknown"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "CatalogProjectionPage": {
+        "type": "object",
+        "properties": {
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogProjection"
+            },
+            "minItems": 0,
+            "maxItems": 200
+          },
+          "count": {
+            "$ref": "#/components/schemas/Count"
+          },
+          "completion": {
+            "type": "string",
+            "enum": [
+              "complete_scope",
+              "more",
+              "bounded_window",
+              "unknown"
+            ]
+          },
+          "sourceSnapshot": {
+            "$ref": "#/components/schemas/StringFact"
+          },
+          "nextCursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "required": [
+          "records",
+          "count",
+          "completion",
+          "sourceSnapshot"
+        ],
+        "additionalProperties": false
+      },
+      "ReferenceValidationRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObservedRef"
+            },
+            "minItems": 1,
+            "maxItems": 50
+          }
+        },
+        "required": [
+          "context",
+          "refs"
+        ],
+        "additionalProperties": false
+      },
+      "EngineRef": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "merchant",
+              "offering"
+            ]
+          },
+          "ownerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "merchantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "kind",
+          "ownerId",
+          "id",
+          "merchantId"
+        ],
+        "additionalProperties": false
+      },
+      "Selection": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "subcategoryId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "optionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "AreaFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "catalog_area"
+          },
+          "areaId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "kind",
+          "areaId"
+        ],
+        "additionalProperties": false
+      },
+      "OpenFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "merchant_open"
+          },
+          "value": {
+            "const": true
+          }
+        },
+        "required": [
+          "kind",
+          "value"
+        ],
+        "additionalProperties": false
+      },
+      "ListedPriceFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "listed_price"
+          },
+          "min": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "max": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "basisId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "kind",
+          "basisId"
+        ],
+        "additionalProperties": false,
+        "anyOf": [
+          {
+            "required": [
+              "min"
+            ]
+          },
+          {
+            "required": [
+              "max"
+            ]
+          }
+        ]
+      },
+      "TotalFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "comparable_total"
+          },
+          "max": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "scopeId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "kind",
+          "max",
+          "scopeId"
+        ],
+        "additionalProperties": false
+      },
+      "FulfillmentFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "fulfillment"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "delivery",
+              "pickup",
+              "on_site",
+              "remote"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "method"
+        ],
+        "additionalProperties": false
+      },
+      "CoverageFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "service_area"
+          },
+          "contextToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "kind",
+          "contextToken"
+        ],
+        "additionalProperties": false
+      },
+      "AttributeFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "required_attributes"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "valueId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              },
+              "required": [
+                "key",
+                "valueId"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "kind",
+          "values"
+        ],
+        "additionalProperties": false
+      },
+      "AvailabilityFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "required_availability"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "kind",
+          "start",
+          "timezone"
+        ],
+        "additionalProperties": false
+      },
+      "PartyFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "party"
+          },
+          "adults": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "children": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "infants": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "kind",
+          "adults"
+        ],
+        "additionalProperties": false
+      },
+      "WorkflowFilter": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "workflow_kind"
+          },
+          "value": {
+            "type": "string",
+            "enum": [
+              "PURCHASE",
+              "APPOINTMENT",
+              "RENTAL",
+              "TRANSFER",
+              "TICKET",
+              "TOUR",
+              "SERVICE",
+              "REQUEST",
+              "ENTITLEMENT",
+              "RESOURCE_RESERVATION",
+              "TELECOM_ACTIVATION"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "value"
+        ],
+        "additionalProperties": false
+      },
+      "SupportedFilter": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AreaFilter"
+          },
+          {
+            "$ref": "#/components/schemas/OpenFilter"
+          },
+          {
+            "$ref": "#/components/schemas/ListedPriceFilter"
+          },
+          {
+            "$ref": "#/components/schemas/TotalFilter"
+          },
+          {
+            "$ref": "#/components/schemas/FulfillmentFilter"
+          },
+          {
+            "$ref": "#/components/schemas/CoverageFilter"
+          },
+          {
+            "$ref": "#/components/schemas/AttributeFilter"
+          },
+          {
+            "$ref": "#/components/schemas/AvailabilityFilter"
+          },
+          {
+            "$ref": "#/components/schemas/PartyFilter"
+          },
+          {
+            "$ref": "#/components/schemas/WorkflowFilter"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind"
+        }
+      },
+      "EngineRequest": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "discoveryReleaseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "merchant",
+              "offering"
+            ]
+          },
+          "selection": {
+            "$ref": "#/components/schemas/Selection"
+          },
+          "sourceScope": {
+            "type": "object",
+            "properties": {
+              "merchantId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "anchorRef": {
+                "$ref": "#/components/schemas/EngineRef"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupportedFilter"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          },
+          "sort": {
+            "type": "string",
+            "enum": [
+              "recommended",
+              "rating",
+              "delivery",
+              "price_low",
+              "price_high",
+              "listed_price_low",
+              "comparable_total_low"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 48,
+            "default": 24
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2000
+          },
+          "contextToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "contractVersion",
+          "requestId",
+          "discoveryReleaseId",
+          "mode",
+          "selection",
+          "filters",
+          "sort",
+          "limit"
+        ],
+        "additionalProperties": false,
+        "not": {
+          "required": [
+            "cursor",
+            "offset"
+          ]
+        }
+      },
+      "Versions": {
+        "type": "object",
+        "properties": {
+          "discoveryRelease": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "layout": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "taxonomy": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "mapping": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "policy": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "ranker": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "indexGeneration": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "modelRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "sourceSnapshots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ownerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "snapshot": {
+                  "$ref": "#/components/schemas/StringFact"
+                }
+              },
+              "required": [
+                "ownerId",
+                "snapshot"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "profileRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Server-owned runtime control revision. Changes invalidate paging and delivery tokens."
+          }
+        },
+        "required": [
+          "discoveryRelease",
+          "layout",
+          "taxonomy",
+          "mapping",
+          "policy",
+          "ranker",
+          "sourceSnapshots"
+        ],
+        "additionalProperties": false
+      },
+      "RetrievalWindow": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": [
+              "exact_matches",
+              "bounded_candidates"
+            ]
+          },
+          "windowId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "candidateCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "completion": {
+            "type": "string",
+            "enum": [
+              "more_in_window",
+              "window_exhausted",
+              "catalog_exhausted",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "scope",
+          "windowId",
+          "candidateCount",
+          "completion"
+        ],
+        "additionalProperties": false
+      },
+      "EnginePage": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EngineRef"
+            },
+            "minItems": 0,
+            "maxItems": 48
+          },
+          "count": {
+            "$ref": "#/components/schemas/EngineCount"
+          },
+          "nextCursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "retrieval": {
+            "$ref": "#/components/schemas/RetrievalWindow"
+          },
+          "versions": {
+            "$ref": "#/components/schemas/Versions"
+          },
+          "applied": {
+            "type": "object",
+            "properties": {
+              "selection": {
+                "$ref": "#/components/schemas/Selection"
+              },
+              "filterHash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "constraints": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AppliedConstraint"
+                },
+                "minItems": 0,
+                "maxItems": 24
+              },
+              "sort": {
+                "type": "string",
+                "enum": [
+                  "recommended",
+                  "rating",
+                  "delivery",
+                  "price_low",
+                  "price_high",
+                  "listed_price_low",
+                  "comparable_total_low"
+                ]
+              },
+              "safeNormalizedQuery": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              }
+            },
+            "required": [
+              "selection",
+              "filterHash",
+              "constraints",
+              "sort"
+            ],
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "underfilled",
+              "unmapped"
+            ]
+          },
+          "fallback": {
+            "type": "string",
+            "enum": [
+              "deterministic",
+              "lexical"
+            ]
+          },
+          "exposureToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "presentations": {
+            "type": "object",
+            "properties": {
+              "merchants": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PublicMerchant"
+                },
+                "minItems": 0,
+                "maxItems": 48
+              },
+              "offerings": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PublicOffering"
+                },
+                "minItems": 0,
+                "maxItems": 48
+              }
+            },
+            "required": [
+              "merchants",
+              "offerings"
+            ],
+            "additionalProperties": false
+          },
+          "pageCursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "description": "Opaque cursor for revalidating this exact bounded session page."
+          },
+          "previousCursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "description": "Opaque previous-page cursor in the same pinned session."
+          }
+        },
+        "required": [
+          "contractVersion",
+          "requestId",
+          "refs",
+          "count",
+          "retrieval",
+          "versions",
+          "applied",
+          "status",
+          "presentations"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "retrieval": {
+                  "properties": {
+                    "completion": {
+                      "const": "more_in_window"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "nextCursor"
+              ]
+            }
+          }
+        ]
+      },
+      "EngineCount": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "exact"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "eligible",
+                  "matched"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "value",
+              "scope"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "lower_bound"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "unknown"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "AppliedConstraint": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/SupportedFilter"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "explicit_control",
+              "explicit_text",
+              "permitted_preference",
+              "inferred"
+            ]
+          },
+          "strength": {
+            "type": "string",
+            "enum": [
+              "hard",
+              "soft"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "unsupported",
+              "ambiguous",
+              "conflicting"
+            ]
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "value",
+          "origin",
+          "strength",
+          "state",
+          "reasonCodes"
+        ],
+        "additionalProperties": false
+      },
+      "CollectionRequest": {
+        "type": "object",
+        "properties": {
+          "request": {
+            "$ref": "#/components/schemas/EngineRequest"
+          },
+          "definitionIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 1,
+            "maxItems": 8
+          }
+        },
+        "required": [
+          "request",
+          "definitionIds"
+        ],
+        "additionalProperties": false
+      },
+      "CollectionPage": {
+        "type": "object",
+        "properties": {
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "definitionId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "titleKey": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "page": {
+                  "$ref": "#/components/schemas/EnginePage"
+                },
+                "viewAllRequest": {
+                  "$ref": "#/components/schemas/EngineRequest"
+                }
+              },
+              "required": [
+                "definitionId",
+                "titleKey",
+                "page",
+                "viewAllRequest"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 8
+          },
+          "partial": {
+            "type": "boolean"
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "sections",
+          "partial",
+          "reasonCodes"
+        ],
+        "additionalProperties": false
+      },
+      "SharedConstraint": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/SupportedFilter"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "explicit_control",
+              "explicit_text",
+              "permitted_preference",
+              "inferred"
+            ]
+          },
+          "strength": {
+            "type": "string",
+            "enum": [
+              "hard",
+              "soft"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "value",
+          "origin",
+          "strength",
+          "evidence"
+        ],
+        "additionalProperties": false
+      },
+      "TaskRequest": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "discoveryReleaseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "componentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "request": {
+                  "$ref": "#/components/schemas/EngineRequest"
+                }
+              },
+              "required": [
+                "componentId",
+                "required",
+                "request"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 4
+          },
+          "sharedConstraints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SharedConstraint"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "contractVersion",
+          "requestId",
+          "discoveryReleaseId",
+          "components"
+        ],
+        "additionalProperties": false
+      },
+      "TaskPage": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial",
+              "unavailable",
+              "needs_clarification"
+            ]
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "componentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "page": {
+                  "$ref": "#/components/schemas/EnginePage"
+                },
+                "reasonCodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "minItems": 0,
+                  "maxItems": 20
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "ok",
+                    "underfilled",
+                    "unmapped",
+                    "unsupported",
+                    "needs_clarification",
+                    "unavailable"
+                  ]
+                }
+              },
+              "required": [
+                "componentId",
+                "reasonCodes",
+                "status"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 4
+          }
+        },
+        "required": [
+          "status",
+          "components"
+        ],
+        "additionalProperties": false
+      },
+      "EngineCapabilities": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "discoveryReleaseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "versions": {
+            "$ref": "#/components/schemas/Versions"
+          },
+          "resultModes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "merchant",
+                "offering"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 2
+          },
+          "filterKinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "sorts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "countKinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "exact",
+                "lower_bound",
+                "unknown"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 3
+          },
+          "workflowKinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "readiness": {
+            "type": "string",
+            "enum": [
+              "R0",
+              "R1",
+              "R2",
+              "R3",
+              "R4"
+            ]
+          },
+          "limits": {
+            "type": "object",
+            "properties": {
+              "maxPageSize": {
+                "const": 48
+              },
+              "maxTaskComponents": {
+                "const": 4
+              },
+              "maxRequiredTaskComponents": {
+                "const": 3
+              },
+              "maxBodyBytes": {
+                "const": 65536
+              },
+              "sessionLifetimeSeconds": {
+                "const": 300
+              }
+            },
+            "required": [
+              "maxPageSize",
+              "maxTaskComponents",
+              "maxRequiredTaskComponents",
+              "maxBodyBytes",
+              "sessionLifetimeSeconds"
+            ],
+            "additionalProperties": false
+          },
+          "policyCoverage": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "nodeId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "mapped",
+                    "unmapped",
+                    "partial",
+                    "unsupported"
+                  ]
+                },
+                "reasonCodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "minItems": 0,
+                  "maxItems": 10
+                }
+              },
+              "required": [
+                "nodeId",
+                "state",
+                "reasonCodes"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "contractVersion",
+          "discoveryReleaseId",
+          "versions",
+          "resultModes",
+          "filterKinds",
+          "sorts",
+          "countKinds",
+          "workflowKinds",
+          "readiness",
+          "limits",
+          "policyCoverage"
+        ],
+        "additionalProperties": false
+      },
+      "PublicOffering": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "$ref": "#/components/schemas/EngineRef"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000
+          },
+          "image": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "listedPrice": {
+            "$ref": "#/components/schemas/MoneyFact"
+          }
+        },
+        "required": [
+          "ref",
+          "name",
+          "listedPrice"
+        ],
+        "additionalProperties": false
+      },
+      "PublicMerchant": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "$ref": "#/components/schemas/EngineRef"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "area": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "image": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "taxonomyPaths": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxonomyPath"
+            },
+            "minItems": 1,
+            "maxItems": 8,
+            "description": "Where the published release places this merchant in the Discovery taxonomy. Omitted when the source gives no mapped subcategory."
+          },
+          "location": {
+            "$ref": "#/components/schemas/GeoPoint"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicOffering"
+            },
+            "minItems": 0,
+            "maxItems": 200
+          },
+          "itemsCount": {
+            "$ref": "#/components/schemas/Count"
+          },
+          "itemsCompletion": {
+            "type": "string",
+            "enum": [
+              "complete_scope",
+              "bounded_window",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "ref",
+          "name",
+          "items",
+          "itemsCount",
+          "itemsCompletion"
+        ],
+        "additionalProperties": false
+      },
+      "TaxonomyPath": {
+        "type": "object",
+        "description": "Where the published release places a merchant in the Discovery taxonomy. Resolved from the source's own subcategory through the release's source mappings; never inferred from names, text or the request.",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "subcategoryId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "optionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "categoryId",
+          "subcategoryId"
+        ],
+        "additionalProperties": false
+      },
+      "GeoPoint": {
+        "type": "object",
+        "description": "WGS 84 coordinates of the merchant's branch, as the source records them.",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "additionalProperties": false
+      },
+      "Areas": {
+        "type": "object",
+        "properties": {
+          "areas": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "areas"
+        ],
+        "additionalProperties": false
+      },
+      "WorkflowAssessmentRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "ref": {
+            "$ref": "#/components/schemas/EngineRef"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/WorkflowIntent"
+          }
+        },
+        "required": [
+          "context",
+          "ref",
+          "intent"
+        ],
+        "additionalProperties": false
+      },
+      "WorkflowAssessment": {
+        "type": "object",
+        "properties": {
+          "assessmentRef": {
+            "$ref": "#/components/schemas/ObservedRef"
+          },
+          "ref": {
+            "$ref": "#/components/schemas/EngineRef"
+          },
+          "workflowRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "decisions": {
+            "type": "object",
+            "properties": {
+              "canBrowse": {
+                "$ref": "#/components/schemas/Decision"
+              },
+              "matchesHardRequest": {
+                "$ref": "#/components/schemas/Decision"
+              },
+              "canSubmitRequest": {
+                "$ref": "#/components/schemas/Decision"
+              },
+              "canTransact": {
+                "$ref": "#/components/schemas/Decision"
+              }
+            },
+            "required": [
+              "canBrowse",
+              "matchesHardRequest",
+              "canSubmitRequest",
+              "canTransact"
+            ],
+            "additionalProperties": false
+          },
+          "versions": {
+            "$ref": "#/components/schemas/Versions"
+          },
+          "checkedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "allowedHandoffKinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 10
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "assessmentRef",
+          "ref",
+          "decisions",
+          "versions",
+          "checkedAt",
+          "allowedHandoffKinds",
+          "reasonCodes"
+        ],
+        "additionalProperties": false
+      },
+      "HandoffRequest": {
+        "type": "object",
+        "properties": {
+          "assessmentRef": {
+            "$ref": "#/components/schemas/ObservedRef"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "ref": {
+            "$ref": "#/components/schemas/EngineRef"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/WorkflowIntent"
+          },
+          "handoffKind": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "assessmentRef",
+          "context",
+          "ref",
+          "intent",
+          "handoffKind"
+        ],
+        "additionalProperties": false
+      },
+      "Handoff": {
+        "type": "object",
+        "properties": {
+          "handoffRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "destinationKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "businessEffect": {
+            "const": "none"
+          },
+          "requiresOwnerRevalidation": {
+            "const": true
+          }
+        },
+        "required": [
+          "handoffRef",
+          "destinationKey",
+          "token",
+          "expiresAt",
+          "businessEffect",
+          "requiresOwnerRevalidation"
+        ],
+        "additionalProperties": false
+      },
+      "ClientEvent": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "result_exposed",
+              "detail_opened",
+              "handoff_opened"
+            ]
+          },
+          "ref": {
+            "$ref": "#/components/schemas/EngineRef"
+          },
+          "exposureToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 47,
+            "description": "Zero-based position in the final delivered page, bound to exposureToken."
+          },
+          "exposure": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "visibleRatio",
+              "continuousVisibleMs",
+              "documentActive"
+            ],
+            "properties": {
+              "visibleRatio": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 1
+              },
+              "continuousVisibleMs": {
+                "type": "integer",
+                "minimum": 1000,
+                "maximum": 300000
+              },
+              "documentActive": {
+                "const": true
+              }
+            }
+          }
+        },
+        "required": [
+          "eventId",
+          "type",
+          "ref",
+          "exposureToken",
+          "occurredAt"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "result_exposed"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "position",
+                "exposure"
+              ]
+            }
+          }
+        ]
+      },
+      "ClientEvents": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientEvent"
+            },
+            "minItems": 1,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "contractVersion",
+          "events"
+        ],
+        "additionalProperties": false
+      },
+      "OwnerOutcome": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "ownerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "operationRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "mappingRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "outcomeKind": {
+            "type": "string",
+            "enum": [
+              "requested",
+              "confirmed",
+              "fulfilled",
+              "failed",
+              "cancelled",
+              "credit_posted",
+              "allowance_active",
+              "service_active",
+              "profile_provisioned"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "eventId",
+          "ownerId",
+          "operationRef",
+          "mappingRef",
+          "outcomeKind",
+          "occurredAt"
+        ],
+        "additionalProperties": false
+      },
+      "EventReceipt": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "duplicates": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "rejected": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "accepted",
+          "duplicates",
+          "rejected"
+        ],
+        "additionalProperties": false
+      },
+      "EngineHealth": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "degraded",
+              "unavailable"
+            ]
+          },
+          "contractVersion": {
+            "const": "1"
+          },
+          "readiness": {
+            "type": "string",
+            "enum": [
+              "R0",
+              "R1",
+              "R2",
+              "R3",
+              "R4"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "contractVersion",
+          "readiness"
+        ],
+        "additionalProperties": false
+      },
+      "EngineError": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_REQUEST",
+              "UNAUTHORIZED",
+              "FORBIDDEN",
+              "NOT_FOUND",
+              "RELEASE_INCOMPATIBLE",
+              "SOURCE_REVISION_CHANGED",
+              "IDEMPOTENCY_CONFLICT",
+              "UNSUPPORTED_CAPABILITY",
+              "REQUIRED_FACT_UNKNOWN",
+              "FACTS_TOO_STALE",
+              "CONSTRAINT_CONFLICT",
+              "QUOTE_EXPIRED",
+              "HOLD_EXPIRED",
+              "REVIEW_REQUIRED",
+              "LIMIT_EXCEEDED",
+              "RATE_LIMITED",
+              "OWNER_UNAVAILABLE",
+              "ACTION_OUTCOME_UNKNOWN",
+              "CLARIFICATION_REQUIRED",
+              "CURSOR_EXPIRED",
+              "CURSOR_RESTART_REQUIRED",
+              "CATALOG_UNAVAILABLE"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "recovery": {
+            "type": "string",
+            "enum": [
+              "correct_request",
+              "authenticate",
+              "review",
+              "restart_preserving_constraints",
+              "retry_read",
+              "lookup_intent",
+              "wait",
+              "owner_support",
+              "none",
+              "clarify"
+            ]
+          },
+          "fieldPaths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "minItems": 0,
+            "maxItems": 30
+          },
+          "clarification": {
+            "type": "object",
+            "properties": {
+              "clarificationKey": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "messageKey": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "affectedPaths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minItems": 0,
+                "maxItems": 20
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "optionId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "labelKey": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    }
+                  },
+                  "required": [
+                    "optionId",
+                    "labelKey"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 8
+              }
+            },
+            "required": [
+              "clarificationKey",
+              "messageKey",
+              "affectedPaths",
+              "options"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contractVersion",
+          "requestId",
+          "code",
+          "retryable",
+          "recovery",
+          "fieldPaths"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "code": {
+                  "const": "CLARIFICATION_REQUIRED"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "clarification"
+              ]
+            }
+          }
+        ]
+      },
+      "ReleaseContext": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "discoveryReleaseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "versions": {
+            "$ref": "#/components/schemas/Versions"
+          },
+          "collections": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "categoryId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "titleKey": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                }
+              },
+              "required": [
+                "id",
+                "categoryId"
+              ],
+              "anyOf": [
+                {
+                  "required": [
+                    "titleKey"
+                  ]
+                },
+                {
+                  "required": [
+                    "title"
+                  ]
+                }
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "contractVersion",
+          "discoveryReleaseId",
+          "versions",
+          "collections"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "PrivateContext": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Reviewed existing identity/delegation context. No new issuer. Required only for private workflow context/handoff."
+      },
+      "OwnerService": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Reviewed owner service identity/audience and permitted event mapping. Never a public browser credential."
+      }
+    }
+  },
+  "x-status": "design_only",
+  "x-profile": "Server-authorized low-cost/quality configuration; no caller token/budget privilege",
+  "x-body-limit-bytes": 65536
+}

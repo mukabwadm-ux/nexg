@@ -14,3 +14,5 @@ docs/
 # Written by the booking-config sync scripts; formatting them by hand would be
 # undone on the next sync.
 packages/booking-config/src/data/
+# NexG Discovery is its own project with its own code style.
+discovery/

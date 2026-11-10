@@ -1,0 +1,267 @@
+/* Airport transfers, trip first (TransferSearch.tsx; owner, 8 Nov 2026, and the "Airport transfers" design).
+   Phones first, as Wolt adapts: one column with 48px controls and 16px text in fields, results one card across (two
+   from 481px), a docked bar over the safe area; a laptop fits the trip on one row and the results in a grid.
+   Emil Kowalski and better-ui (Jakub Krehel) rules: rings instead of borders on surfaces (borders only on inputs),
+   concentric radii (panel 28 = control 12 + padding 16), press at .96, named transitions of 300ms or less on
+   --ease-out, hover only on mouse devices, at least 40px to hit, tabular numbers, an 8px rhythm. The cards are the
+   one card family (cards.css); this file only places them and marks the selected one. */
+
+.transfers{position:relative}
+.transfers__heading p{margin-top:8px;color:var(--muted);font-size:15px;line-height:1.5;text-wrap:pretty}
+.transfers__form{scroll-margin-top:96px}
+.transfers__hint{margin:24px 0 0;color:var(--muted);font-size:14px;line-height:1.5;text-align:center;text-wrap:balance}
+
+/* The trip panel ----------------------------------------------------------------------------------------------- */
+.transfer-form{display:flex;flex-direction:column;gap:16px;padding:16px;border-radius:28px;background:var(--surface);box-shadow:var(--shadow-ring)}
+
+/* Pickup | drop-off: a segmented control; the gold thumb slides under the chosen side. */
+.transfer-tabs{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));min-width:0;margin:0;padding:4px;border:0;border-radius:16px;background:#0b1316;box-shadow:var(--shadow-ring)}
+.transfer-tabs::before{content:'';position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:12px;background:var(--gold);transition-property:translate;transition-duration:220ms;transition-timing-function:var(--ease-out)}
+.transfer-tabs[data-direction=dropoff]::before{translate:100% 0}
+.transfer-tabs__tab{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:44px;padding:0 10px;border-radius:12px;color:#cfd3cf;font-size:15px;font-weight:700;white-space:nowrap;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition-property:color,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-tabs__tab svg{flex:none}
+.transfer-tabs__tab:has(input:checked){color:#16120a}
+.transfer-tabs__tab input{position:absolute;width:1px;height:1px;margin:0;opacity:0;pointer-events:none}
+.transfer-tabs__tab:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+.transfer-tabs__tab:active{scale:.96}
+
+/* Fields: a label over a 48px control. Inputs keep a border; the focused one gets the gold ring. */
+.transfer-form__fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px}
+.transfer-field{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0;grid-column:1/-1}
+.transfer-field--date,.transfer-field--time{grid-column:auto}
+/* On phones the open calendar takes the whole row; the time moves under it. */
+.transfer-field--date:has(.date-picker.is-open){grid-column:1/-1}
+.transfer-field__label,.transfer-form .date-picker__label{font-size:13px;font-weight:600;line-height:18px;color:#c9cec9;letter-spacing:.01em}
+.transfer-control{position:relative;display:flex;align-items:center;gap:10px;width:100%;min-width:0;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:#0b1316;color:#f3eee2;text-align:left;transition-property:border-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-control:focus-within{border-color:rgba(229,182,95,.7);box-shadow:0 0 0 3px rgba(229,182,95,.15)}
+.transfer-field.is-invalid .transfer-control,.transfer-field.is-invalid .date-picker__trigger{border-color:rgba(242,164,155,.75)}
+.transfer-control__icon{flex:none;color:var(--gold)}
+.transfer-control__chevron{flex:none;color:var(--muted)}
+.transfer-control__value{flex:1;min-width:0;overflow:hidden;font-size:16px;text-overflow:ellipsis;white-space:nowrap}
+.transfer-control input{flex:1;min-width:0;height:46px;margin:0;padding:0;border:0;border-radius:0;outline:none;background:none;color:inherit;font:inherit;font-size:16px;color-scheme:dark;-webkit-appearance:none;appearance:none}
+.transfer-control input:focus-visible,.transfer-control select:focus-visible{outline:none}
+.transfer-control input::placeholder{color:#828c8b;opacity:1}
+.transfer-control--plain{margin-top:2px}
+.transfer-field__error{margin:0;color:#f2a49b;font-size:13px;line-height:1.4}
+
+/* The airport: a styled box over the native select, which stays on top (invisible) for the platform's own picker. */
+.transfer-control--select{cursor:pointer}
+.transfer-control--select select{position:absolute;inset:0;width:100%;height:100%;min-height:0;margin:0;padding:0 14px;border:0;border-radius:inherit;background:transparent;color:transparent;font-size:16px;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none}
+
+/* The clear button: 32px to see, 44px to hit. */
+.transfer-control__clear{position:relative;display:grid;place-items:center;flex:none;width:32px;height:32px;min-height:32px;margin-right:-6px;padding:0;border-radius:50%;color:var(--muted);transition-property:scale,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-control__clear::after{content:'';position:absolute;inset:-6px;border-radius:50%}
+.transfer-control__clear:active{scale:.96}
+
+/* Area suggestions under the place field. Radius 16 = row 10 + padding 6. */
+.transfer-suggestions{position:absolute;top:calc(100% + 6px);left:-1px;right:-1px;z-index:30;margin:0;padding:6px;list-style:none;border-radius:16px;background:#162128;box-shadow:var(--shadow-ring),0 16px 40px rgba(0,0,0,.45)}
+.transfer-suggestions[hidden]{display:none}
+.transfer-suggestions li{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 10px;border-radius:10px;font-size:15px;cursor:pointer}
+.transfer-suggestions li svg{flex:none;color:var(--muted)}
+.transfer-suggestions li.is-active{background:rgba(255,255,255,.08)}
+.transfer-suggestions__name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.transfer-suggestions__city{flex:none;margin-left:auto;color:var(--muted);font-size:13px}
+
+/* Time: the browser's own control, with the field's icon and a placeholder while it's empty. */
+.transfer-control--time input{cursor:pointer;font-variant-numeric:tabular-nums}
+.transfer-control--time input::-webkit-calendar-picker-indicator{display:none}
+.transfer-control--time input::-webkit-date-and-time-value{min-height:1.2em;text-align:left}
+.transfer-control__placeholder{position:absolute;top:50%;left:42px;display:none;color:#828c8b;font-size:16px;translate:0 -50%;pointer-events:none}
+.transfer-control--time.is-empty .transfer-control__placeholder{display:block}
+.transfer-control--time.is-empty input:not(:focus){color:transparent}
+.transfer-control--time.is-empty input:not(:focus)::-webkit-datetime-edit{opacity:0}
+.transfer-control--time input:focus ~ .transfer-control__placeholder{display:none}
+
+/* The shared date picker (cards.css), sized like the other fields. */
+.transfer-form .date-picker{grid-column:auto;gap:6px}
+.transfer-form .date-picker__trigger{min-height:48px;padding:0 14px;border-radius:12px;background:#0b1316;font-size:16px;font-variant-numeric:tabular-nums}
+.transfer-form .date-picker__trigger span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Travellers and bags: on phones the steppers sit in the form, one per row. */
+.transfer-party>.transfer-field__label,.transfer-party__toggle,.transfer-party__done{display:none}
+.transfer-party__panel{display:flex;flex-direction:column;gap:8px}
+.transfer-party .offering-stepper{min-height:48px;color:#f3eee2;font-size:15px;font-weight:600}
+.transfer-party .offering-stepper button{width:40px;height:40px;min-height:40px}
+
+/* Meet & greet: a tick box, pickups only. The tick fades and scales in. */
+.transfer-check{position:relative;display:inline-flex;align-items:center;align-self:flex-start;gap:12px;min-height:44px;padding-right:8px;color:#f3eee2;font-size:15px;font-weight:600;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.transfer-check input{position:absolute;width:1px;height:1px;margin:0;opacity:0;pointer-events:none}
+.transfer-check__box{display:grid;place-items:center;flex:none;width:22px;height:22px;border:1.5px solid rgba(255,255,255,.38);border-radius:7px;background:#0b1316;color:#16120a;transition-property:background-color,border-color,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-check__box svg{opacity:0;scale:.25;filter:blur(4px);transition-property:opacity,scale,filter;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.transfer-check input:checked+.transfer-check__box{border-color:var(--gold);background:var(--gold)}
+.transfer-check input:checked+.transfer-check__box svg{opacity:1;scale:1;filter:blur(0)}
+.transfer-check input:focus-visible+.transfer-check__box{outline:2px solid var(--gold);outline-offset:3px}
+.transfer-check:active .transfer-check__box{scale:.96}
+
+/* Radius 14 + padding 16 meets the panel's 28 at its corner. */
+.transfer-form__submit{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:14px;background:var(--gold);color:#16120a;font-size:16px;font-weight:700;white-space:nowrap;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-form__submit:active{scale:.96}
+
+/* Tablets and laptops: the panel becomes a grid; the date and the travellers open as popovers over the page. */
+@media (min-width:768px){
+  .transfer-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-areas:"tabs tabs check check" "first first second second" "date time party submit";align-items:start;gap:16px 12px;padding:16px 16px 20px}
+  .transfer-tabs{grid-area:tabs;width:100%;max-width:400px}
+  .transfer-check{grid-area:check;justify-self:end}
+  .transfer-form__fields{display:contents}
+  .transfer-form__fields>.transfer-field:nth-child(1){grid-area:first}
+  .transfer-form__fields>.transfer-field:nth-child(2){grid-area:second}
+  .transfer-field--date{grid-area:date}
+  .transfer-field--time{grid-area:time}
+  .transfer-party{grid-area:party}
+  /* Level with the controls under their 18px labels and 6px gap, whatever error lines grow beneath them. */
+  .transfer-form__submit{grid-area:submit;min-height:48px;margin-top:24px;padding:0 20px;border-radius:12px}
+  .transfer-field--date:has(.date-picker.is-open){grid-column:auto}
+
+  .transfer-form .date-picker{position:relative}
+  .transfer-form .date-picker__panel,.transfer-party__panel{position:absolute;top:calc(100% + 8px);left:0;z-index:30;border-radius:18px;background:#162128;box-shadow:var(--shadow-ring),0 18px 44px rgba(0,0,0,.5);transform-origin:top left;transition-property:opacity,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+  /* Radius 22 = the day's 10 + the panel's 12 padding. */
+  .transfer-form .date-picker__panel{width:340px;max-width:none;border-radius:22px}
+  @starting-style{.transfer-form .date-picker__panel,.transfer-party.is-open .transfer-party__panel{opacity:0;scale:.97}}
+
+  .transfer-party>.transfer-field__label{display:block}
+  .transfer-party__toggle{display:flex;cursor:pointer;font:inherit}
+  /* Tablets: "2 [bag] 1" fits where "2 travellers · 1 bag" wouldn't; the words come back on the laptop's wider field. */
+  .transfer-party__words{display:none}
+  .transfer-party__counts{display:flex;flex:1;align-items:center;gap:10px;min-width:0;font-size:16px;font-variant-numeric:tabular-nums}
+  .transfer-party__counts svg{margin-left:6px}
+  .transfer-party__panel{display:none;width:300px;padding:12px 14px 14px}
+  .transfer-party.is-open .transfer-party__panel{display:flex}
+  .transfer-party .offering-stepper{min-height:48px}
+  .transfer-party__done{display:inline-flex;align-items:center;align-self:flex-end;min-height:40px;margin-top:4px;padding:0 18px;border-radius:999px;background:var(--gold);color:#16120a;font-size:14px;font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+  .transfer-party__done:active{scale:.96}
+}
+/* The owner's laptop (1536 x 760) and up: the trip on one row, as in the design. */
+@media (min-width:1280px){
+  .transfer-form{grid-template-columns:minmax(0,1.45fr) minmax(0,1.3fr) minmax(0,1fr) minmax(0,.85fr) minmax(0,1.3fr) auto;grid-template-areas:"tabs tabs tabs check check check" "first second date time party submit"}
+  .transfer-party__words{display:block}
+  .transfer-party__counts{display:none}
+}
+
+/* Results ------------------------------------------------------------------------------------------------------ */
+.transfer-results{display:flex;flex-direction:column;gap:32px;min-width:0;margin-top:32px;scroll-margin-top:88px}
+
+/* The ride in one line, the honest fare line, and a way back to the form. */
+.transfer-ride{display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:20px;background:#0f191d;box-shadow:var(--shadow-ring)}
+.transfer-ride__icon{flex:none;margin-top:1px;color:var(--gold)}
+.transfer-ride__text{flex:1;min-width:0}
+.transfer-ride__title{margin:0;font-size:16px;line-height:1.4;letter-spacing:0;text-wrap:pretty;font-variant-numeric:tabular-nums}
+.transfer-ride__text p{margin-top:4px;color:var(--muted);font-size:13.5px;line-height:1.5;text-wrap:pretty}
+.transfer-ride__edit{flex:none;min-height:40px;margin:-4px -4px -4px 0;padding:0 16px;border-radius:999px;background:#16232a;box-shadow:var(--shadow-ring);color:#f3eee2;font-size:13px;font-weight:700;white-space:nowrap;transition-property:scale,background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-ride__edit:active{scale:.96}
+
+/* Meet & greet, when ticked: who lists it, and that the operator confirms it. */
+.transfer-note{display:flex;align-items:flex-start;gap:12px;margin-top:-16px;padding:14px 16px;border-radius:20px;background:rgba(229,182,95,.07);box-shadow:0 0 0 1px rgba(229,182,95,.24)}
+.transfer-note__icon{flex:none;margin-top:1px;color:var(--gold)}
+.transfer-note__text{display:flex;flex-direction:column;gap:6px;min-width:0;color:#dfe3df;font-size:14px;line-height:1.55;text-wrap:pretty}
+.transfer-note__text strong{color:#f3eee2}
+.transfer-note__also{color:var(--muted)}
+.transfer-note__link{position:relative;min-height:0;padding:0;color:var(--gold);font-weight:700;text-align:left;text-decoration:underline;text-decoration-color:rgba(229,182,95,.4);text-underline-offset:3px;transition-property:text-decoration-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-note__link::after{content:'';position:absolute;inset:-10px -2px}
+
+.transfer-section{display:flex;flex-direction:column;gap:16px;min-width:0}
+.transfer-section__heading h2{font-size:22px;line-height:1.25;letter-spacing:-.015em;text-wrap:balance}
+.transfer-section__heading p{margin-top:4px;color:var(--muted);font-size:14px;line-height:1.5;text-wrap:pretty}
+.transfer-section__heading--row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}
+.transfer-section__heading--row p{margin:0;font-variant-numeric:tabular-nums}
+
+/* One card across on phones, two from 481px, three from 900px, four on a laptop (five lowest fares sit in one row). */
+.transfer-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.transfer-pick{display:flex;min-width:0}
+.transfer-pick>.offering-card{flex:1;min-width:0}
+/* The selected vehicle: a gold ring and a gold "Selected" pill, as in the design. */
+.transfer-pick.is-selected .offering-card{box-shadow:0 0 0 2px var(--gold);background-color:#13232a}
+.transfer-pick.is-selected .offering-card__action{padding:0 14px;color:#16120a}
+.transfer-pick.is-selected .offering-card__action::before{content:'';position:absolute;inset:4px 0;z-index:-1;border-radius:999px;background:var(--gold)}
+.transfer-pick.is-selected .offering-card__action svg{display:none}
+
+/* Class chips: one row that scrolls sideways on phones, never wrapping. */
+.transfer-chips{display:flex;gap:8px;margin:-6px -20px;padding:6px 20px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain}
+.transfer-chips::-webkit-scrollbar{display:none}
+.transfer-chips button{display:inline-flex;align-items:center;gap:8px;flex:none;min-height:40px;padding:0 16px;border-radius:999px;background:#131f24;box-shadow:var(--shadow-ring);color:#e3e6e2;font-size:14px;font-weight:700;white-space:nowrap;transition-property:scale,background-color,color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-chips button span{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.transfer-chips button[aria-pressed=true]{background:#f3eee2;box-shadow:none;color:#111315}
+.transfer-chips button[aria-pressed=true] span{color:#4d524f}
+.transfer-chips button:active{scale:.96}
+
+.transfer-more{display:inline-flex;align-items:center;justify-content:center;gap:10px;align-self:center;min-height:48px;margin-top:8px;padding:0 24px;border-radius:999px;background:#131f24;box-shadow:var(--shadow-ring);color:#f3eee2;font-size:15px;font-weight:700;transition-property:scale,background-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-more span{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.transfer-more:active{scale:.96}
+.transfer-empty svg{color:var(--gold)}
+
+/* The selected transfer: docked over the safe area on phones, as Wolt's basket bar is. */
+.transfer-bar{position:sticky;bottom:0;z-index:15;display:flex;align-items:center;gap:12px;margin:24px -20px 0;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:rgba(15,18,19,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -1px 0 var(--line),0 -12px 32px rgba(0,0,0,.4);transition-property:translate,opacity;transition-duration:220ms;transition-timing-function:var(--ease-out)}
+@starting-style{.transfer-bar{translate:0 16px;opacity:0}}
+.transfer-bar__text{display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.35}
+.transfer-bar__label{display:none}
+.transfer-bar__vehicle{overflow:hidden;font-size:15px;text-overflow:ellipsis;white-space:nowrap}
+.transfer-bar__meta{overflow:hidden;color:var(--muted);font-size:13px;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.transfer-bar__inline-fare{color:var(--gold);font-weight:700}
+.transfer-bar__fare{display:none}
+.transfer-bar__action{flex:none;min-height:48px;padding:0 22px;border-radius:999px;background:var(--gold);color:#16120a;font-size:15px;font-weight:700;white-space:nowrap;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.transfer-bar__action:active{scale:.96}
+.transfer-bar__wide{display:none}
+.transfers.has-bar .saved-notice{bottom:calc(92px + env(safe-area-inset-bottom))}
+
+@media (min-width:481px){
+  .transfer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+}
+/* 481 to 560px: two upright cards across, instead of the phone's row cards (cards.css). */
+@media (min-width:481px) and (max-width:560px){
+  .transfers .offering-card{flex-direction:column;min-height:0}
+  .transfers .offering-card .offering-card__media,.transfers .offering-card--vehicle .offering-card__media{width:auto;flex:none;aspect-ratio:16/11}
+  .transfers .offering-card .offering-card__tag{display:block}
+  .transfers .offering-card .offering-card__body{padding:10px 8px 6px}
+  .transfers .offering-card .offering-card__footer--action{flex-direction:row;align-items:center;gap:4px 10px}
+  .transfers .offering-card .offering-card__footer--action .offering-card__action{margin-left:auto}
+}
+/* Phones: the class sits on the photo's corner, small, since the row card hides the usual tag. */
+@media (max-width:480px){
+  .transfers .offering-card .offering-card__tag{display:block;top:auto;bottom:6px;left:6px;max-width:calc(100% - 12px);padding:3px 7px;font-size:10px}
+}
+/* Phones: the ride keeps the full width; "Edit trip" moves under it. */
+@media (max-width:560px){
+  .transfer-ride{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 12px;padding:14px 16px 16px}
+  .transfer-ride__title{font-size:15px}
+  .transfer-ride__edit{grid-column:2;justify-self:start;margin:12px 0 0}
+}
+@media (min-width:761px){
+  .transfer-chips{margin:-6px -4px;padding:6px 4px}
+  /* Laptops: the bar floats over the results as one pill (radius = the button's 24 + its 12 padding). */
+  .transfer-bar{bottom:16px;gap:24px;margin:32px 0 0;padding:12px 12px 12px 28px;border-radius:36px;background:rgba(20,32,38,.94);box-shadow:var(--shadow-ring),0 18px 44px rgba(0,0,0,.5)}
+  .transfer-bar__label{display:block;color:var(--muted);font-size:12.5px;font-weight:600}
+  .transfer-bar__vehicle{font-size:16px}
+  .transfer-bar__inline-fare{display:none}
+  .transfer-bar__fare{display:flex;flex-direction:column;align-items:flex-end;flex:none;margin:0;line-height:1.3}
+  .transfer-bar__fare span{color:var(--muted);font-size:12.5px;font-weight:600}
+  .transfer-bar__fare strong{font-size:20px;font-variant-numeric:tabular-nums}
+  .transfer-bar__action{padding:0 28px}
+  .transfer-bar__wide{display:inline}
+  .transfers.has-bar .saved-notice{bottom:112px}
+}
+@media (min-width:900px){
+  .transfer-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (min-width:1180px){
+  .transfer-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .transfer-grid--lead{grid-template-columns:repeat(var(--transfer-lead,4),minmax(0,1fr))}
+  .transfer-section__heading h2{font-size:24px}
+}
+
+@media (hover:hover) and (pointer:fine){
+  .transfer-tabs__tab:not(:has(input:checked)):hover{color:#f3eee2}
+  .transfer-control:hover:not(:focus-within){border-color:rgba(229,182,95,.4)}
+  .transfer-control__clear:hover{background:rgba(255,255,255,.08);color:#f3eee2}
+  .transfer-form__submit:hover,.transfer-bar__action:hover,.transfer-party__done:hover{background:#f0c979}
+  .transfer-chips button:not([aria-pressed=true]):hover,.transfer-more:hover,.transfer-ride__edit:hover{background:#18272d;box-shadow:var(--shadow-ring-hover)}
+  .transfer-note__link:hover{text-decoration-color:var(--gold)}
+  .transfer-pick.is-selected .offering-card:hover{box-shadow:0 0 0 2px #f0c979}
+  .transfer-pick.is-selected .offering-card__action:hover:not(:disabled){color:#16120a}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .transfer-tabs::before,.transfer-tabs__tab,.transfer-control,.transfer-control__clear,.transfer-check__box,.transfer-form__submit,.transfer-party__done,
+  .transfer-ride__edit,.transfer-note__link,.transfer-chips button,.transfer-more,.transfer-bar__action{transition:none}
+  /* Fades stay; nothing moves. */
+  .transfer-check__box svg{scale:1;filter:none;transition-property:opacity}
+  .transfer-bar,.transfer-form .date-picker__panel,.transfer-party__panel{transition-property:opacity}
+}

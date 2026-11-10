@@ -1,0 +1,60 @@
+/* Experience page (ExperienceDetail.tsx): the trip page's frame (tours/trip.css) with the host's identity, one
+   date and a ticket or guest count. Phones get a bottom bar while the booking card is off screen.
+   Rings instead of borders (dividers stay borders), press feedback at .96, named transitions, hover only on
+   mouse devices. Experience cards are the shared offering cards (cards.css). */
+
+.trip-page__header.event-page__header{gap:8px}
+.event-page__eyebrow{color:#f2c56d;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+/* The host: a 44px pill whose logo sits 4px inside it, so 22px outside = 18px inside + 4px. */
+.event-page__host{display:inline-flex;align-items:center;gap:10px;align-self:flex-start;max-width:100%;min-height:44px;margin-top:4px;padding:4px 14px 4px 4px;border-radius:999px;background:#151d21;box-shadow:var(--shadow-ring);color:#d2d6cf;font-size:14.5px;text-align:left;transition-property:scale,box-shadow,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.event-page__host>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.event-page__host strong{color:#f3eee2;font-weight:700}
+.event-page__host .merchant-logo{width:36px;height:36px;border-radius:50%}
+.event-page__host .merchant-logo--initial{font-size:15px}
+.event-page__host>svg{flex:none;color:var(--muted)}
+.event-page__host:active{scale:.96}
+
+/* Booking card extras: the count row matches the trip card's travellers row; the listed total sits under it. */
+.event-booking__count{padding-top:16px;border-top:1px solid var(--line)}
+.event-booking .offering-stepper{min-height:44px}
+.event-booking .offering-stepper>span{color:#d9ddd7;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.event-booking .offering-stepper>div{gap:14px;padding:0;background:none;box-shadow:none}
+.event-booking .offering-stepper button{width:44px;height:44px;min-height:44px;box-shadow:0 0 0 1px oklch(1 0 0 / .22);transition-property:scale,box-shadow}
+.event-booking .offering-stepper button:disabled{opacity:.35}
+.event-booking .offering-stepper output{min-width:24px;font-size:20px}
+.event-booking__total{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.event-booking__total>span{display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.event-booking__total-label{color:#d9ddd7;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.event-booking__total strong{flex:none;font-size:22px;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.event-booking__remove{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;min-height:40px;margin:-10px 0 -6px -10px;padding:0 10px;border-radius:999px;color:var(--muted);font-size:13px;font-weight:700;transition-property:scale,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.event-booking__remove:active{scale:.96}
+
+.event-page__more{margin-top:44px;padding-top:28px;border-top:1px solid var(--line)}
+
+/* The phone bar: off screen until the booking card is; it leaves a little faster than it arrives. */
+.event-bar{display:none}
+
+@media (hover:hover) and (pointer:fine){
+  .event-page__host:hover{background:#1a2428;box-shadow:var(--shadow-ring-hover)}
+  .event-page__host:hover>svg{color:#f3eee2}
+  .event-booking .offering-stepper button:hover:not(:disabled){background:none;box-shadow:0 0 0 1px oklch(1 0 0 / .4)}
+  .event-booking__remove:hover{background:rgba(255,255,255,.06);color:#f3eee2}
+}
+
+@media (max-width:900px){
+  .trip-page.event-page{padding-bottom:120px}
+  .event-bar{position:fixed;inset:auto 0 0;z-index:30;display:flex;align-items:center;gap:14px;margin:0;padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:rgba(15,18,19,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -1px 0 var(--line),0 -12px 32px rgba(0,0,0,.4);translate:0 110%;transition-property:translate;transition-duration:180ms;transition-timing-function:var(--ease-out)}
+  .event-bar.is-shown{translate:0 0;transition-duration:240ms}
+  .event-bar__text{display:flex;flex-direction:column;flex:1;min-width:0;margin:0;line-height:1.3}
+  .event-bar__text strong{overflow:hidden;font-size:16px;font-variant-numeric:tabular-nums;text-overflow:ellipsis;white-space:nowrap}
+  .event-bar__text span{overflow:hidden;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums;text-overflow:ellipsis;white-space:nowrap}
+  .event-bar__action{flex:none;min-height:48px;padding:0 22px;border-radius:999px;background:var(--gold);color:#1b150a;font-size:15px;font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+  .event-bar__action:active{scale:.96}
+}
+@media (max-width:900px) and (hover:hover) and (pointer:fine){
+  .event-bar__action:hover{background:#f0c979}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .event-page__host,.event-booking__remove,.event-bar,.event-bar__action{transition:none}
+}

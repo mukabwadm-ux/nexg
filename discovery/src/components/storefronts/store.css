@@ -1,0 +1,175 @@
+/* The storefront frame every store shares (owner, 8 Nov 2026): hero, sticky section bar, sections, basket.
+   Motion and surfaces follow the Emil Kowalski and better-ui (Jakub Krehel) rules: rings instead of borders,
+   press feedback at .96, named transitions of 300ms or less, hover only on mouse devices. Phones (767px and
+   narrower) follow Wolt and Uber Eats on an iPhone 14 Pro (owner, 9 Nov 2026): a cover with the logo centred
+   on its lower edge, and a store search that docks at the very top while the site header steps aside. */
+
+/* Hero: a full-bleed cover under the sticky site header, with the identity over its lower edge. */
+.store-hero{position:relative;isolation:isolate;display:flex;align-items:flex-end;height:clamp(250px,22vw,340px);margin:-24px calc(50% - 50vw) 0;overflow:hidden;background:#0d1417}
+.store-hero__image{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 45%}
+.store-hero__image.image-fallback{background:radial-gradient(120% 140% at 85% 0%,rgba(229,182,95,.16),transparent 55%),linear-gradient(135deg,#1b2a2f,#0d1417 70%)}
+.store-hero__image.image-fallback svg{display:none}
+.store-hero__shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(6,10,12,.95) 0%,rgba(6,10,12,.7) 30%,rgba(6,10,12,.1) 70%,rgba(6,10,12,.35) 100%)}
+.store-hero__back{position:absolute;top:20px;left:max(32px,calc((100vw - 1424px)/2 + 32px));z-index:1;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px 0 13px;border-radius:999px;background:rgba(8,13,15,.68);box-shadow:var(--shadow-ring);color:#f3eee2;font-size:13px;font-weight:700;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.store-hero__back:active{scale:.96}
+.store-hero__identity{display:flex;align-items:flex-end;gap:24px;width:100%;max-width:1424px;margin:0 auto;padding:0 32px 32px}
+.store-hero .store-hero__logo{flex:none;width:96px;height:96px;object-fit:cover;border-radius:22px;background:#0b1215;box-shadow:0 0 0 1px oklch(1 0 0 / .14),0 12px 32px rgba(0,0,0,.45);outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
+/* A store without a logo shows its first letter on phones, where the logo anchors the centred identity. */
+.store-hero .store-hero__logo.merchant-logo--initial{display:none;background:linear-gradient(145deg,#2c2517,#16130c);font-size:30px}
+.store-hero__text{min-width:0;flex:1;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.store-hero__eyebrow{margin:0 0 8px;color:#f2c56d;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.store-hero h1{margin:0;font-size:clamp(30px,3.4vw,48px);line-height:1.05;letter-spacing:-.025em;text-wrap:balance}
+.store-hero__facts{display:flex;flex-wrap:wrap;gap:6px 18px;margin:12px 0 0;padding:0;list-style:none;color:#e1e4df;font-size:14px;font-variant-numeric:tabular-nums}
+.store-hero__facts li{display:inline-flex;align-items:center;gap:6px}
+.store-hero__facts svg{flex:none;color:var(--gold)}
+/* The store type opens the facts line on phones only; wider screens show it above the name. */
+.store-hero__facts .store-hero__type,.store-hero__facts--type-only{display:none}
+.store-hero__actions{display:flex;gap:10px;flex:none}
+
+/* While a store loads: the hero's shape and a few card shapes, so nothing jumps when it arrives. */
+.store-hero--loading{background:linear-gradient(135deg,#172327,#0d1417 70%);animation:pulse 1.6s ease-in-out infinite}
+.store-loading .loading-grid{margin-top:28px}
+/* Only a store that failed to load shows this; every loaded store has the back pill in its hero. */
+.store-back{display:inline-flex;align-items:center;gap:8px;min-height:40px;margin:0 0 20px;padding:0 16px 0 13px;border-radius:999px;background:#151d21;box-shadow:var(--shadow-ring);color:#f3eee2;font-size:13px;font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.store-back:active{scale:.96}
+/* One calm line above the list, e.g. when a linked item is no longer listed. */
+.store-notice{display:flex;align-items:flex-start;gap:10px;max-width:72ch;margin:20px 0 0;padding:12px 16px;border-radius:14px;background:rgba(229,182,95,.07);box-shadow:0 0 0 1px rgba(229,182,95,.22);color:#e3dccb;font-size:14px;line-height:1.5;text-wrap:pretty}
+.store-notice svg{flex:none;margin-top:1px;color:var(--gold)}
+
+/* Sticky section bar (SectionNav): the store's search, then its section chips. The ::before paints the bar's
+   background edge to edge without widening the layout. The zero-height mark before it is where the bar would sit
+   unpinned, which is how the bar knows when to dock. */
+.section-nav-mark{display:flow-root;height:0}
+.section-nav{position:sticky;z-index:15;display:flex;align-items:center;gap:12px;min-height:64px;margin:0;padding:12px 0;isolation:isolate}
+.section-nav::before{content:'';position:absolute;inset:0 calc(50% - 50vw);z-index:-1;background:rgba(15,18,19,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--line);transition-property:box-shadow;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+/* Room to dock: the bar's container stays a screen taller than what sits above the bar in it (SectionNav sets the
+   offset), so a short list or a narrow search never pulls a pinned bar back down the page. */
+:has(> .section-nav){min-height:calc(var(--store-bar-offset,0px) + 100lvh)}
+
+/* "Search {store}": a field that says whose shelves it searches. */
+.section-nav__search{display:flex;align-items:center;flex:none;width:320px;min-height:40px;padding-right:4px;border-radius:999px;background:#151d21;box-shadow:var(--shadow-ring);color:var(--muted);transition-property:box-shadow,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.section-nav__search:focus-within{background:#172126;box-shadow:0 0 0 1px rgba(229,182,95,.65)}
+.section-nav__icon{display:grid;flex:none;place-items:center;width:40px;min-height:40px;padding-left:4px;cursor:text}
+.section-nav__search input{flex:1;min-width:0;min-height:40px;padding:0 4px 0 0;border:0;background:none;color:#f3eee2;font-size:14px;text-overflow:ellipsis;outline:none;-webkit-appearance:none;appearance:none}
+.section-nav__search input::placeholder{color:#97a09f;opacity:1}
+.section-nav__search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.section-nav__clear{position:relative;display:grid;flex:none;place-items:center;width:32px;height:32px;min-height:32px;padding:0;border-radius:50%;background:rgba(255,255,255,.08);color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.section-nav__clear::after{content:'';position:absolute;inset:-4px;border-radius:50%}
+.section-nav__clear:active{scale:.96}
+
+.section-nav__rail-wrap{position:relative;display:flex;flex:1;min-width:0}
+.section-nav__rail{--fade-start:0px;--fade-end:0px;position:relative;display:flex;gap:4px;flex:1;min-width:0;padding:2px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-inline:contain;-webkit-mask-image:linear-gradient(90deg,transparent,#000 var(--fade-start),#000 calc(100% - var(--fade-end)),transparent);mask-image:linear-gradient(90deg,transparent,#000 var(--fade-start),#000 calc(100% - var(--fade-end)),transparent)}
+.section-nav__rail::-webkit-scrollbar{display:none}
+.section-nav__rail-wrap[data-start=false] .section-nav__rail{--fade-start:36px}
+.section-nav__rail-wrap[data-end=false] .section-nav__rail{--fade-end:36px}
+.section-nav__rail a{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 15px;border-radius:999px;color:#cdd2cd;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap;transition-property:background-color,color,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.section-nav__rail a:active{scale:.96}
+.section-nav__rail a[aria-current=true]{background:rgba(229,182,95,.15);color:var(--gold)}
+.section-nav__rail a:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.section-nav__count{color:var(--muted);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.section-nav__rail a[aria-current=true] .section-nav__count{color:rgba(229,182,95,.8)}
+/* Arrows for mouse users only, and only toward chips that are out of view; touch scrolls the rail. */
+.section-nav__arrow{display:none}
+
+/* Sections: a heading with its count, then the cards. History sections ("Frequently ordered", "New") carry a gold mark. */
+.store-sections{display:flex;flex-direction:column;gap:40px;margin-top:24px}
+.store-section{scroll-margin-top:160px}
+.store-section:focus{outline:none}
+.store-section:focus-visible .store-section__heading h2{text-decoration:underline;text-decoration-color:var(--gold);text-underline-offset:6px}
+.store-section__heading{display:flex;align-items:baseline;gap:10px;margin:0 0 16px}
+.store-section__heading h2{margin:0;font-size:clamp(20px,1.8vw,26px);letter-spacing:-.015em;text-wrap:balance}
+.store-section__heading span{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.store-section--history .store-section__heading{align-items:center}
+.store-section--history .store-section__heading h2{display:inline-flex;align-items:center;gap:9px}
+.store-section--history .store-section__heading h2 svg{flex:none;color:var(--gold)}
+.store-intro{margin:16px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
+.store-intro--trip{display:flex;align-items:flex-start;gap:10px;max-width:90ch;padding:12px 16px;border-radius:14px;background:rgba(229,182,95,.07);box-shadow:0 0 0 1px rgba(229,182,95,.22);color:#e3dccb;text-wrap:pretty}
+.store-intro--trip svg{flex:none;margin-top:1px;color:var(--gold)}
+.store-empty{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:24px;padding:48px 24px;border-radius:20px;box-shadow:var(--shadow-ring);color:var(--muted);text-align:center}
+.store-empty svg{color:var(--gold)}
+.store-empty h2{margin:4px 0 0;color:#f3eee2;font-size:19px;text-wrap:balance}
+.store-empty p{max-width:46ch;margin:0;line-height:1.55;text-wrap:pretty}
+.store-empty button{min-height:40px;margin-top:6px;padding:0 18px;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(229,182,95,.45);color:var(--gold);font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.store-empty button:active{scale:.96}
+
+/* What the shopper has chosen so far, pinned to the bottom of the screen. */
+.store-basket{position:fixed;left:50%;bottom:20px;z-index:30;display:flex;align-items:center;gap:12px;width:max-content;max-width:calc(100vw - 32px);padding:8px 8px 8px 18px;border-radius:999px;background:#f0c56c;color:#16120a;box-shadow:0 14px 36px rgba(0,0,0,.5);translate:-50% 0;transition-property:translate,opacity;transition-duration:220ms;transition-timing-function:var(--ease-out)}
+@starting-style{.store-basket{translate:-50% 14px;opacity:0}}
+.store-basket>svg{flex:none}
+.store-basket strong{font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.store-basket span{font-size:12.5px;opacity:.78}
+.store-basket button{flex:none;min-height:40px;padding:0 18px;border-radius:999px;background:#16120a;color:#f3eee2;font-size:13px;font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.store-basket button:active{scale:.96}
+.store-basket__text{display:flex;flex-direction:column;min-width:0;line-height:1.3}
+.store-basket__text strong,.store-basket__text span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* The generic storefront (GenericStorefront.tsx): room under the list for the basket pill. */
+.generic-store.has-basket{padding-bottom:88px}
+
+@media (hover:hover) and (pointer:fine){
+  .store-hero__back:hover{background:rgba(8,13,15,.88)}
+  .store-back:hover{background:#1b252a}
+  .section-nav__search:hover:not(:focus-within){box-shadow:var(--shadow-ring-hover)}
+  .section-nav__clear:hover{background:rgba(255,255,255,.14)}
+  .section-nav__rail a:hover{background:rgba(255,255,255,.06);color:#f3eee2}
+  .section-nav__rail a[aria-current=true]:hover{background:rgba(229,182,95,.2);color:var(--gold)}
+  .section-nav__arrow:not([hidden]){position:absolute;top:50%;z-index:1;display:grid;place-items:center;width:32px;height:32px;min-height:32px;margin-top:-16px;padding:0;border-radius:50%;background:#1a2428;box-shadow:var(--shadow-ring),0 4px 14px rgba(0,0,0,.45);color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+  .section-nav__arrow::after{content:'';position:absolute;inset:-4px;border-radius:50%}
+  .section-nav__arrow--previous{left:0}
+  .section-nav__arrow--next{right:0}
+  .section-nav__arrow:hover{background:#243238}
+  .section-nav__arrow:active{scale:.96}
+  .store-empty button:hover{background:rgba(229,182,95,.1)}
+  .store-basket button:hover{background:#000}
+}
+
+/* The owner's laptop (1536 x 760): a slightly shorter cover brings the first row of the list above the fold. */
+@media (min-width:768px) and (max-height:820px){.store-hero{height:clamp(240px,19vw,296px)}}
+/* Tablets: the site header takes two rows, so sections land a little lower. */
+@media (min-width:768px) and (max-width:1050px){.store-section{scroll-margin-top:212px}}
+
+@media (max-width:767px){
+  /* Hero: the cover on its own, then the logo centred on its lower edge, the name and one quiet line of facts. */
+  .store-hero{display:block;height:auto;margin-top:-20px;overflow:visible;background:none}
+  .store-hero__image{position:relative;inset:auto;z-index:auto;display:block;height:clamp(190px,52vw,220px)}
+  .store-hero__image.image-fallback{display:block}
+  .store-hero__shade{inset:0 0 auto;height:clamp(190px,52vw,220px);background:linear-gradient(180deg,rgba(6,10,12,.5),rgba(6,10,12,0) 44%)}
+  .store-hero__back{top:12px;left:20px}
+  .store-hero__identity{position:relative;z-index:1;flex-direction:column;align-items:center;gap:12px;margin-top:-36px;padding:0 20px;text-align:center}
+  .store-hero .store-hero__logo{width:72px;height:72px;border-radius:18px;box-shadow:0 0 0 3px #111315,0 8px 20px rgba(0,0,0,.4)}
+  .store-hero .store-hero__logo.merchant-logo--initial{display:grid;font-size:26px}
+  .store-hero__text{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;text-shadow:none}
+  .store-hero__eyebrow{display:none}
+  .store-hero h1{font-size:clamp(22px,6.2vw,26px);line-height:1.2;letter-spacing:-.02em}
+  .store-hero__facts{justify-content:center;gap:2px 0;margin:0;color:var(--muted);font-size:13px;line-height:1.45;text-wrap:balance}
+  .store-hero__facts li{gap:0}
+  .store-hero__facts svg{display:none}
+  .store-hero__facts--type-only{display:flex}
+  .store-hero__facts .store-hero__type{display:inline-flex}
+  .store-hero__facts li+li::before{content:'·';margin:0 7px;color:#6f7a78}
+  .store-hero__actions{justify-content:center}
+  .store-hero--loading{height:calc(clamp(190px,52vw,220px) + 96px);background:linear-gradient(180deg,#172327 0 clamp(190px,52vw,220px),transparent 0)}
+
+  /* Section bar: a full-width search over the chips. Docked, it is the top of the screen (SectionNav). */
+  /* The gap above the bar sits on its mark, so the mark stays exactly where the bar's top edge would be. */
+  .section-nav-mark{margin-top:16px}
+  .section-nav{flex-direction:column;align-items:stretch;gap:8px;min-height:0;padding:8px 0}
+  .section-nav[data-docked]::before{box-shadow:0 1px 0 var(--line),0 10px 24px rgba(0,0,0,.32)}
+  .section-nav__search{width:auto;min-height:44px}
+  /* 16px keeps phones from zooming into the field on focus. */
+  .section-nav__search input{min-height:44px;font-size:16px}
+  .section-nav__icon{min-height:44px}
+  /* The chips run to the screen edges, so the next one visibly peeks in. */
+  .section-nav__rail-wrap{margin-inline:-20px}
+  .section-nav__rail{padding:2px 20px;scroll-padding-inline:20px}
+  .section-nav__rail a{padding:0 13px;font-size:13.5px}
+  .store-sections{gap:32px;margin-top:16px}
+  .store-section{scroll-margin-top:124px}
+  .store-section__heading{margin-bottom:12px}
+  .store-basket{bottom:14px;gap:10px;padding:6px 6px 6px 14px}
+  .generic-store.has-basket{padding-bottom:80px}
+}
+@media (prefers-reduced-motion:reduce){
+  .store-basket,.store-basket button,.store-hero__back,.store-back,.section-nav::before,.section-nav__search,.section-nav__clear,.section-nav__rail a,.section-nav__arrow,.store-empty button{transition:none}
+  .store-hero--loading{animation:none}
+}

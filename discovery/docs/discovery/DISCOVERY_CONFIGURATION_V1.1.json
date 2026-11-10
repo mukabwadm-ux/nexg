@@ -1,0 +1,2916 @@
+{
+  "version": "V1.1",
+  "status": "Standalone component specification/configuration; extraction first; complete UI and transactions are later implementation work",
+  "key_policy": "Discovery keys are presentation identifiers, never merchant/database IDs",
+  "taxonomy_source": "TAXONOMY_V1.1.json",
+  "homepage_category_order_basis": "Provisional priority based on broad everyday utility, repeat use and likely transaction value. Current revenue and usage analytics are not available in this project, so this order is a product judgment to refine with measured NexG data.",
+  "homepage_category_order": [
+    "restaurants-food",
+    "groceries-essentials",
+    "marketplace",
+    "health-pharmacy",
+    "beauty-wellness",
+    "fashion-apparel",
+    "tech-electronics",
+    "vehicle-rentals",
+    "flowers-gifts",
+    "airport-transfers",
+    "laundry-cleaning",
+    "experiences",
+    "play",
+    "travel-tours",
+    "flights",
+    "concierge-services",
+    "alcohol-beverages",
+    "adults-only"
+  ],
+  "collection_minimum_policy": "At least three meaningful sections when verified inventory supports them; report underfilled data instead of inventing content",
+  "categories": [
+    {
+      "category": "Adults Only",
+      "discovery_key": "adults-only",
+      "customer_task": "Find specific products discreetly; judge merchant information before purchase",
+      "result_intent": "merchant + product",
+      "availability_label": "Open now",
+      "context_controls": "Supported product attributes; fulfillment",
+      "source_category_ids": [
+        "adults-only"
+      ],
+      "collections": [
+        {
+          "key": "adults-only:collection-1",
+          "kind": "product",
+          "title": "Browse by product need",
+          "eligibility": "Mapped Erotic Products, Tobacco & Vapes and Adult Wellness items; use catalog labels only",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "adults-only:collection-2",
+          "kind": "merchant",
+          "title": "Stores serving your area",
+          "eligibility": "Mapped merchants with verified service areas and permitted customer access",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "adults-only:collection-3",
+          "kind": "convenience",
+          "title": "Available for pickup",
+          "eligibility": "Actual pickup capability and available matching items",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "adults-only:collection-4",
+          "kind": "comparison",
+          "title": "Compare product options",
+          "eligibility": "Same supported product grouping and currency; known size or variant and price",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Erotic Products",
+          "discovery_key": "adults-only:erotic-products",
+          "source_subcategory_ids": [
+            "adults-only_adult-products",
+            "adults-only_adult-accessories"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Proposed consolidation of two existing source groups",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Supported product variant; quantity; discreet fulfillment preference if actually offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/01_Adults_Only/01_01_Erotic_Products.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Tobacco & Vapes",
+          "discovery_key": "adults-only:tobacco-vapes",
+          "source_subcategory_ids": [
+            "adults-only_cigarettes",
+            "adults-only_cigars",
+            "adults-only_vapes"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "adults-only:tobacco-smoking:cigarettes",
+              "label": "Cigarettes",
+              "source_subcategory_ids": [
+                "adults-only_cigarettes"
+              ]
+            },
+            {
+              "id": "adults-only:tobacco-smoking:cigars",
+              "label": "Cigars",
+              "source_subcategory_ids": [
+                "adults-only_cigars"
+              ]
+            },
+            {
+              "id": "adults-only:tobacco-smoking:vapes",
+              "label": "Vapes",
+              "source_subcategory_ids": [
+                "adults-only_vapes"
+              ]
+            }
+          ],
+          "mapping_status": "Proposed label replacement preserving existing source IDs",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Verified tobacco/vape variant; quantity; applicable product access policy",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/01_Adults_Only/01_02_Tobacco_And_Vapes.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Adult Wellness",
+          "discovery_key": "adults-only:adult-wellness",
+          "source_subcategory_ids": [
+            "adults-only_adult-wellness"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Actual wellness product variant, or service duration/slot when offering is a service",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/01_Adults_Only/01_03_Adult_Wellness.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/01_adults_only.png",
+      "navigation_position": 1,
+      "subcategory_count": 3
+    },
+    {
+      "category": "Airport Transfers",
+      "discovery_key": "airport-transfers",
+      "customer_task": "Arrange the right journey with clear pickup, timing and capacity",
+      "result_intent": "provider + service",
+      "availability_label": "Available for your journey",
+      "context_controls": "Journey date; passenger capacity; vehicle capability",
+      "source_category_ids": [
+        "airport-transfers"
+      ],
+      "collections": [
+        {
+          "key": "airport-transfers:collection-1",
+          "kind": "convenience",
+          "title": "Plan a pickup or drop-off",
+          "eligibility": "Mapped transfer offerings; collect route and time before checking capacity",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "airport-transfers:collection-2",
+          "kind": "comparison",
+          "title": "Compare transfer options",
+          "eligibility": "Quoted or priced services for the same route, passenger count and date",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "airport-transfers:collection-3",
+          "kind": "merchant",
+          "title": "Meet & Greet providers",
+          "eligibility": "Providers mapped to Meet & Greet; do not infer from airport-pickup classification",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "airport-transfers:collection-4",
+          "kind": "product",
+          "title": "Executive transfer options",
+          "eligibility": "Mapped executive-transfer catalog offerings with stated vehicle capabilities",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Airport Pickup",
+          "discovery_key": "airport-transfers:airport-pickup",
+          "source_subcategory_ids": [
+            "airport-transfers_airport-pickup"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TRANSFER",
+          "configuration_candidates": "Arrival flight/time; pickup point; destination; party/luggage",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/02_Airport_Transfers/02_01_Airport_Pickup.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Airport Drop-off",
+          "discovery_key": "airport-transfers:airport-drop-off",
+          "source_subcategory_ids": [
+            "airport-transfers_airport-drop-off"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TRANSFER",
+          "configuration_candidates": "Pickup address/time; airport/flight if relevant; party/luggage",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/02_Airport_Transfers/02_02_Airport_Dropoff.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Meet & Greet",
+          "discovery_key": "airport-transfers:meet-greet",
+          "source_subcategory_ids": [
+            "airport-transfers_meet-greet"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TRANSFER",
+          "configuration_candidates": "Flight/arrival; meeting point; party; actual assistance scope",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/02_Airport_Transfers/02_03_Meet_And_Greet.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Executive Transfer",
+          "discovery_key": "airport-transfers:executive-transfer",
+          "source_subcategory_ids": [
+            "airport-transfers_executive-transfer"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TRANSFER",
+          "configuration_candidates": "Route/date/time; party/luggage; verified executive vehicle capability",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/02_Airport_Transfers/02_04_Executive_Transfer.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/02_airport_transfers.png",
+      "navigation_position": 2,
+      "subcategory_count": 4
+    },
+    {
+      "category": "Alcohol And Beverages",
+      "discovery_key": "alcohol-beverages",
+      "customer_task": "Choose a beverage, quantity and trustworthy fulfillment",
+      "result_intent": "merchant + product",
+      "availability_label": "Open now",
+      "context_controls": "Beverage attributes; pack size; fulfillment",
+      "source_category_ids": [
+        "alcohol-beverages"
+      ],
+      "collections": [
+        {
+          "key": "alcohol-beverages:collection-1",
+          "kind": "product",
+          "title": "Explore wine and spirits",
+          "eligibility": "Mapped Wine and Spirits items; distinct eligible product sets",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "alcohol-beverages:collection-2",
+          "kind": "occasion",
+          "title": "Build a drinks selection",
+          "eligibility": "Actual beverage and mixer inventory selected by curated catalog tags",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "alcohol-beverages:collection-3",
+          "kind": "merchant",
+          "title": "Browse liquor stores",
+          "eligibility": "Mapped Liquor Stores merchants with matching available offerings",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "alcohol-beverages:collection-4",
+          "kind": "convenience",
+          "title": "Pickup options",
+          "eligibility": "Verified pickup capability; restricted products still follow checkout policy",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Wine",
+          "discovery_key": "alcohol-beverages:wine",
+          "source_subcategory_ids": [
+            "alcohol-beverages_wine"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Wine variant/vintage and bottle or pack quantity if catalogued",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_01_Wine.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Spirits",
+          "discovery_key": "alcohol-beverages:spirits",
+          "source_subcategory_ids": [
+            "alcohol-beverages_spirits"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Spirit variant and bottle or pack quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_02_Spirits.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Beer",
+          "discovery_key": "alcohol-beverages:beer",
+          "source_subcategory_ids": [
+            "alcohol-beverages_beer"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Beer variant, container/pack and quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_03_Beer.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Champagne",
+          "discovery_key": "alcohol-beverages:champagne",
+          "source_subcategory_ids": [
+            "alcohol-beverages_champagne"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Champagne variant, bottle or pack and quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_04_Champagne.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Cocktail Mixers",
+          "discovery_key": "alcohol-beverages:cocktail-mixers",
+          "source_subcategory_ids": [
+            "alcohol-beverages_cocktail-mixers"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Mixer variant, volume/pack and quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_05_Cocktail_Mixers.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Liquor Stores",
+          "discovery_key": "alcohol-beverages:liquor-stores",
+          "source_subcategory_ids": [
+            "alcohol-beverages_liquor-stores"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Merchant storefront → actual selected beverage and product-specific access policy",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_06_Liquor_Stores.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Non-Alcoholic Drinks",
+          "discovery_key": "alcohol-beverages:non-alcoholic-drinks",
+          "source_subcategory_ids": [
+            "alcohol-beverages_non-alcoholic-drinks"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual non-alcoholic beverage variant, volume/pack and quantity; no alcohol restriction by category association",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/03_Alcohol_And_Beverages/03_07_NonAlcoholic_Drinks.png",
+          "icon_asset_status": "authoritative",
+          "previous_navigation_label": "Soft Drinks & Water",
+          "previous_discovery_key": "alcohol-beverages:soft-drinks-water"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/03_alcohol_beverages.png",
+      "navigation_position": 3,
+      "subcategory_count": 7
+    },
+    {
+      "category": "Apparel",
+      "discovery_key": "fashion-apparel",
+      "customer_task": "Find the right style, size and variant with clear returns",
+      "result_intent": "product + merchant",
+      "availability_label": "In stock",
+      "context_controls": "Catalog size; brand; material; fulfillment",
+      "source_category_ids": [
+        "fashion-apparel"
+      ],
+      "collections": [
+        {
+          "key": "fashion-apparel:collection-1",
+          "kind": "product",
+          "title": "Find your size",
+          "eligibility": "Explicit available variants; no inferred size availability",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "fashion-apparel:collection-2",
+          "kind": "product",
+          "title": "Shoes and bags",
+          "eligibility": "Mapped item groups, distinct from clothing results",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "fashion-apparel:collection-3",
+          "kind": "comparison",
+          "title": "Compare watches",
+          "eligibility": "Comparable catalog specification and known price/currency",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "fashion-apparel:collection-4",
+          "kind": "occasion",
+          "title": "Shop an outfit",
+          "eligibility": "Curated existing item tags; no invented bundles or bundle price",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Men's Fashion",
+          "discovery_key": "fashion-apparel:men-s-fashion",
+          "source_subcategory_ids": [
+            "fashion-apparel_mens-fashion"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual garment size/color variant; quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_01_Mens_Fashion.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Women's Fashion",
+          "discovery_key": "fashion-apparel:women-s-fashion",
+          "source_subcategory_ids": [
+            "fashion-apparel_womens-fashion"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual garment size/color variant; quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_02_Womens_Fashion.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Kids Fashion",
+          "discovery_key": "fashion-apparel:kids-fashion",
+          "source_subcategory_ids": [
+            "fashion-apparel_kids-fashion"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Catalog size/age label and color variant; quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_03_Kids_Fashion.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Shoes",
+          "discovery_key": "fashion-apparel:shoes",
+          "source_subcategory_ids": [
+            "fashion-apparel_shoes"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Shoe size/color variant and quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_04_Shoes.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Bags",
+          "discovery_key": "fashion-apparel:bags",
+          "source_subcategory_ids": [
+            "fashion-apparel_bags"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Bag size/color/material variant where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_05_Bags.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Watches",
+          "discovery_key": "fashion-apparel:watches",
+          "source_subcategory_ids": [
+            "fashion-apparel_watches"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Watch model/variant and stated warranty information",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_06_Watches.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Fashion Accessories",
+          "discovery_key": "fashion-apparel:fashion-accessories",
+          "source_subcategory_ids": [
+            "fashion-apparel_accessories"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Accessory model/color/variant and quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/04_Apparel/04_07_Fashion_Accessories.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/04_apparel.png",
+      "navigation_position": 4,
+      "subcategory_count": 7
+    },
+    {
+      "category": "Beauty And Wellness",
+      "discovery_key": "beauty-wellness",
+      "customer_task": "Separate buying beauty products from scheduling a service",
+      "result_intent": "merchant + product + service",
+      "availability_label": "Available appointments / In stock",
+      "context_controls": "Treatment attributes; date; service location",
+      "source_category_ids": [
+        "beauty",
+        "wellness"
+      ],
+      "collections": [
+        {
+          "key": "beauty-wellness:collection-1",
+          "kind": "product",
+          "title": "Beauty products",
+          "eligibility": "Mapped Beauty Products items and actual product attributes",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "beauty-wellness:collection-2",
+          "kind": "convenience",
+          "title": "Find an appointment",
+          "eligibility": "Service slot provider confirms time; hide if no slot source",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "beauty-wellness:collection-3",
+          "kind": "merchant",
+          "title": "Spa and massage providers",
+          "eligibility": "Mapped providers with matching actual services",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "beauty-wellness:collection-4",
+          "kind": "comparison",
+          "title": "Compare fitness options",
+          "eligibility": "Gym and training offerings; display catalog duration and package terms",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Beauty Products",
+          "discovery_key": "beauty-wellness:beauty-products",
+          "source_subcategory_ids": [
+            "beauty_makeup",
+            "beauty_skincare",
+            "beauty_haircare",
+            "beauty_fragrances",
+            "beauty_cosmetics-stores"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "beauty-wellness:beauty-products:makeup",
+              "label": "Makeup",
+              "source_subcategory_ids": [
+                "beauty_makeup"
+              ]
+            },
+            {
+              "id": "beauty-wellness:beauty-products:skincare",
+              "label": "Skincare",
+              "source_subcategory_ids": [
+                "beauty_skincare"
+              ]
+            },
+            {
+              "id": "beauty-wellness:beauty-products:haircare",
+              "label": "Haircare",
+              "source_subcategory_ids": [
+                "beauty_haircare"
+              ]
+            },
+            {
+              "id": "beauty-wellness:beauty-products:fragrances",
+              "label": "Fragrances",
+              "source_subcategory_ids": [
+                "beauty_fragrances"
+              ]
+            },
+            {
+              "id": "beauty-wellness:beauty-products:cosmetics-stores",
+              "label": "Cosmetics Stores",
+              "source_subcategory_ids": [
+                "beauty_cosmetics-stores"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Product-specific shade/size/volume or other catalog variant",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_01_Beauty_Products.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Spa",
+          "discovery_key": "beauty-wellness:spa",
+          "source_subcategory_ids": [
+            "wellness_spa"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "APPOINTMENT",
+          "configuration_candidates": "Actual spa treatment/package, duration and available slot",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_02_Spa.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Massage",
+          "discovery_key": "beauty-wellness:massage",
+          "source_subcategory_ids": [
+            "wellness_massage"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "APPOINTMENT",
+          "configuration_candidates": "Actual massage treatment/duration and available slot; Deep Tissue only if verified",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_03_Massage.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Gym",
+          "discovery_key": "beauty-wellness:gym",
+          "source_subcategory_ids": [
+            "wellness_gym"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "APPOINTMENT",
+          "configuration_candidates": "Actual visit/membership/package; start date/session if supported",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_04_Gym.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Personal Training",
+          "discovery_key": "beauty-wellness:personal-training",
+          "source_subcategory_ids": [
+            "wellness_personal-training"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "APPOINTMENT",
+          "configuration_candidates": "Actual training session/package; provider; supported slot/location",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_05_Personal_Training.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Salon & Barber",
+          "discovery_key": "beauty-wellness:salon-barber",
+          "source_subcategory_ids": [
+            "beauty_salon-barber"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "APPOINTMENT",
+          "configuration_candidates": "Supported salon/barber service, duration/provider and available slot",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Nails & Beauty Services",
+          "discovery_key": "beauty-wellness:nails-beauty-services",
+          "source_subcategory_ids": [
+            "beauty_nails-beauty-services"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "APPOINTMENT",
+          "configuration_candidates": "Actual nails/beauty service, supported style/variant and slot",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/05_Beauty_And_Wellness/05_07_Nails_And_Beauty_Services.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/05_beauty_wellness.png",
+      "navigation_position": 5,
+      "subcategory_count": 7
+    },
+    {
+      "category": "Vehicle Rentals",
+      "discovery_key": "vehicle-rentals",
+      "customer_task": "Rent transport or arrange vehicle care without mixing commitments",
+      "result_intent": "provider + service",
+      "availability_label": "Available for selected dates",
+      "context_controls": "Rental interval; vehicle class; service location",
+      "source_category_ids": [
+        "vehicle-rentals",
+        "vehicle-services"
+      ],
+      "collections": [
+        {
+          "key": "vehicle-rentals:collection-1",
+          "kind": "comparison",
+          "title": "Compare rentals",
+          "eligibility": "Car and bike offerings for the same date interval; known inclusive costs",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "vehicle-rentals:collection-2",
+          "kind": "convenience",
+          "title": "Vehicle care",
+          "eligibility": "Mapped Vehicle Repair and Car Wash services with actual supported capabilities",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "vehicle-rentals:collection-3",
+          "kind": "product",
+          "title": "Longer rental options",
+          "eligibility": "Catalog long-term or corporate rental classification and genuine terms",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "vehicle-rentals:collection-4",
+          "kind": "merchant",
+          "title": "Browse rental providers",
+          "eligibility": "Mapped rental merchants; never show repair merchants as rental operators",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Car Rental",
+          "discovery_key": "vehicle-rentals:car-rental",
+          "source_subcategory_ids": [
+            "vehicle-rentals_car-rental",
+            "vehicle-rentals_self-drive",
+            "vehicle-rentals_corporate-rental",
+            "vehicle-rentals_long-term-rental"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "vehicle-rentals:car-rental:car-rental",
+              "label": "Car Rental",
+              "source_subcategory_ids": [
+                "vehicle-rentals_car-rental"
+              ]
+            },
+            {
+              "id": "vehicle-rentals:car-rental:self-drive",
+              "label": "Self Drive",
+              "source_subcategory_ids": [
+                "vehicle-rentals_self-drive"
+              ]
+            },
+            {
+              "id": "vehicle-rentals:car-rental:corporate-rental",
+              "label": "Corporate Rental",
+              "source_subcategory_ids": [
+                "vehicle-rentals_corporate-rental"
+              ]
+            },
+            {
+              "id": "vehicle-rentals:car-rental:long-term-rental",
+              "label": "Long-Term Rental",
+              "source_subcategory_ids": [
+                "vehicle-rentals_long-term-rental"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RENTAL",
+          "configuration_candidates": "Vehicle offering; rental start/end; pickup/return; declared rental requirements",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/06_Vehicle_Rentals/06_01_Car_Rental.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Bike Rental",
+          "discovery_key": "vehicle-rentals:bike-rental",
+          "source_subcategory_ids": [
+            "vehicle-rentals_bike-rental"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RENTAL",
+          "configuration_candidates": "Bike offering; rental start/end; pickup/return; declared rental requirements",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/06_Vehicle_Rentals/06_02_Bike_Rental.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Vehicle Repair",
+          "discovery_key": "vehicle-rentals:vehicle-repair",
+          "source_subcategory_ids": [
+            "vehicle-services_tire-service",
+            "vehicle-services_battery-service",
+            "vehicle-services_vehicle-assistance",
+            "vehicle-services_vehicle-inspection"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "vehicle-rentals:vehicle-repair:tire-service",
+              "label": "Tyre Service",
+              "source_subcategory_ids": [
+                "vehicle-services_tire-service"
+              ]
+            },
+            {
+              "id": "vehicle-rentals:vehicle-repair:battery-service",
+              "label": "Battery Service",
+              "source_subcategory_ids": [
+                "vehicle-services_battery-service"
+              ]
+            },
+            {
+              "id": "vehicle-rentals:vehicle-repair:vehicle-assistance",
+              "label": "Vehicle Assistance",
+              "source_subcategory_ids": [
+                "vehicle-services_vehicle-assistance"
+              ]
+            },
+            {
+              "id": "vehicle-rentals:vehicle-repair:vehicle-inspection",
+              "label": "Vehicle Inspection",
+              "source_subcategory_ids": [
+                "vehicle-services_vehicle-inspection"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Vehicle/device details; actual repair task; service location; preferred schedule",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/06_Vehicle_Rentals/06_03_Vehicle_Repair.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Car Wash",
+          "discovery_key": "vehicle-rentals:car-wash",
+          "source_subcategory_ids": [
+            "vehicle-services_car-wash"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Vehicle type; actual wash package; location and supported slot",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/06_Vehicle_Rentals/06_04_Car_Wash.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/06_vehicle_rentals.png",
+      "navigation_position": 6,
+      "subcategory_count": 4
+    },
+    {
+      "category": "Experiences",
+      "discovery_key": "experiences",
+      "customer_task": "Choose a dated activity, ticket or commissioned service",
+      "result_intent": "offering + provider",
+      "availability_label": "Available on selected date",
+      "context_controls": "Date; venue; participants; supported event options",
+      "source_category_ids": [
+        "experiences"
+      ],
+      "collections": [
+        {
+          "key": "experiences:collection-1",
+          "kind": "occasion",
+          "title": "Events by date",
+          "eligibility": "Mapped Events offerings with real dated inventory",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "experiences:collection-2",
+          "kind": "product",
+          "title": "Workshops and classes",
+          "eligibility": "Actual workshop/class schedules and capacity",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "experiences:collection-3",
+          "kind": "convenience",
+          "title": "Sports and recreation",
+          "eligibility": "Mapped activity offerings with bookable sessions",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "experiences:collection-4",
+          "kind": "merchant",
+          "title": "Photography providers",
+          "eligibility": "Mapped services; quote or book according to provider contract",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Events",
+          "discovery_key": "experiences:events",
+          "source_subcategory_ids": [
+            "experiences_concerts",
+            "experiences_festivals",
+            "experiences_conferences",
+            "experiences_private-events"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "experiences:concerts",
+              "label": "Concerts",
+              "source_subcategory_ids": [
+                "experiences_concerts"
+              ]
+            },
+            {
+              "id": "experiences:festivals",
+              "label": "Festivals",
+              "source_subcategory_ids": [
+                "experiences_festivals"
+              ]
+            },
+            {
+              "id": "experiences:conferences",
+              "label": "Conferences",
+              "source_subcategory_ids": [
+                "experiences_conferences"
+              ]
+            },
+            {
+              "id": "experiences:private-events",
+              "label": "Private Events",
+              "source_subcategory_ids": [
+                "experiences_private-events"
+              ]
+            }
+          ],
+          "mapping_status": "Proposed consolidation; event options stay nested",
+          "journey": "TICKET",
+          "configuration_candidates": "Dated event and actual tier/attendees; private events use scope/date/venue quote",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/07_Experiences/07_01_Events.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Photography",
+          "discovery_key": "experiences:photography",
+          "source_subcategory_ids": [
+            "experiences_photography"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Photography brief; occasion/date/location; actual package or quote scope",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/07_Experiences/07_02_Photography.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Workshops & Classes",
+          "discovery_key": "experiences:workshops-classes",
+          "source_subcategory_ids": [
+            "experiences_workshops",
+            "experiences_classes"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "experiences:workshops-classes:workshops",
+              "label": "Workshops",
+              "source_subcategory_ids": [
+                "experiences_workshops"
+              ]
+            },
+            {
+              "id": "experiences:workshops-classes:classes",
+              "label": "Classes",
+              "source_subcategory_ids": [
+                "experiences_classes"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TICKET",
+          "configuration_candidates": "Actual class/workshop session; participant count and supported level",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/07_Experiences/07_03_Workshops_And_Classes.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Sports & Recreation",
+          "discovery_key": "experiences:sports-recreation",
+          "source_subcategory_ids": [
+            "experiences_sports-activities",
+            "experiences_recreation"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "experiences:sports-recreation:sports-activities",
+              "label": "Sports Activities",
+              "source_subcategory_ids": [
+                "experiences_sports-activities"
+              ]
+            },
+            {
+              "id": "experiences:sports-recreation:recreation",
+              "label": "Recreation",
+              "source_subcategory_ids": [
+                "experiences_recreation"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TICKET",
+          "configuration_candidates": "Actual activity/session; participants; supported equipment/venue options",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/07_Experiences/07_04_Sports_And_Recreation.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/07_experiences.png",
+      "navigation_position": 7,
+      "subcategory_count": 4
+    },
+    {
+      "category": "Flowers And Gifts",
+      "discovery_key": "flowers-gifts",
+      "customer_task": "Send the right gift with recipient, date and personalization",
+      "result_intent": "product + merchant",
+      "availability_label": "Available for selected delivery date",
+      "context_controls": "Occasion tags; delivery date; supported customization",
+      "source_category_ids": [
+        "flowers-gifts"
+      ],
+      "collections": [
+        {
+          "key": "flowers-gifts:collection-1",
+          "kind": "occasion",
+          "title": "Gifts by occasion",
+          "eligibility": "Existing occasion tags; do not infer occasions from merchant names",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "flowers-gifts:collection-2",
+          "kind": "product",
+          "title": "Flowers and hampers",
+          "eligibility": "Mapped available products; genuine customization details",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "flowers-gifts:collection-3",
+          "kind": "convenience",
+          "title": "Gifts for your date",
+          "eligibility": "Verified delivery area, capacity and lead time",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "flowers-gifts:collection-4",
+          "kind": "product",
+          "title": "Personalized gifts",
+          "eligibility": "Catalog customization capability; retain values in order payload",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Flowers",
+          "discovery_key": "flowers-gifts:flowers",
+          "source_subcategory_ids": [
+            "flowers-gifts_flowers"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual arrangement/size; recipient; supported delivery date and note",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_01_Flowers.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Gift Hampers",
+          "discovery_key": "flowers-gifts:gift-hampers",
+          "source_subcategory_ids": [
+            "flowers-gifts_gift-hampers"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual hamper/contents variants; recipient/date; supported substitutions",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_02_Gift_Hampers.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Cakes",
+          "discovery_key": "flowers-gifts:cakes",
+          "source_subcategory_ids": [
+            "flowers-gifts_cakes"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual cake size/flavor/customization; recipient/date; catalog lead time",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_03_Cakes.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Chocolates",
+          "discovery_key": "flowers-gifts:chocolates",
+          "source_subcategory_ids": [
+            "flowers-gifts_chocolates"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual box/pack variant; recipient/date; supported gift note",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_04_Chocolates.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Personalized Gifts",
+          "discovery_key": "flowers-gifts:personalized-gifts",
+          "source_subcategory_ids": [
+            "flowers-gifts_personalized-gifts"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual product/customization text or asset through supported secure input; lead time",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_05_Personalized_Gifts.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Occasion Gifts",
+          "discovery_key": "flowers-gifts:occasion-gifts",
+          "source_subcategory_ids": [
+            "flowers-gifts_occasion-gifts"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual gift tagged for occasion; recipient/date; supported gift message",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/08_Flowers_And_Gifts/08_06_Occasion_Gifts.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/08_flowers_gifts.png",
+      "navigation_position": 8,
+      "subcategory_count": 6
+    },
+    {
+      "category": "Marketplace",
+      "discovery_key": "marketplace",
+      "customer_task": "Find practical goods through known specifications and stock",
+      "result_intent": "product + merchant",
+      "availability_label": "In stock",
+      "context_controls": "Verified product attributes; brand; fulfillment",
+      "source_category_ids": [
+        "marketplace"
+      ],
+      "collections": [
+        {
+          "key": "marketplace:collection-1",
+          "kind": "product",
+          "title": "Home and living",
+          "eligibility": "Mapped catalog items; preserve furniture/appliance/decor nested options",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "marketplace:collection-2",
+          "kind": "occasion",
+          "title": "Study and office essentials",
+          "eligibility": "Books and stationery inventory with explicit relevant catalog tags",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "marketplace:collection-3",
+          "kind": "comparison",
+          "title": "Compare home products",
+          "eligibility": "Comparable specifications and same currency; known prices",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "marketplace:collection-4",
+          "kind": "merchant",
+          "title": "Explore local retail",
+          "eligibility": "Mapped General Retail merchants; new hardware/pet groups need evidenced mappings",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Home & Living",
+          "discovery_key": "marketplace:home-living",
+          "source_subcategory_ids": [
+            "marketplace_home-living",
+            "marketplace_furniture",
+            "marketplace_appliances",
+            "marketplace_decor",
+            "marketplace_kitchenware"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "marketplace:home-living:home-living",
+              "label": "Home & Living",
+              "source_subcategory_ids": [
+                "marketplace_home-living"
+              ]
+            },
+            {
+              "id": "marketplace:home-living:furniture",
+              "label": "Furniture",
+              "source_subcategory_ids": [
+                "marketplace_furniture"
+              ]
+            },
+            {
+              "id": "marketplace:home-living:appliances",
+              "label": "Appliances",
+              "source_subcategory_ids": [
+                "marketplace_appliances"
+              ]
+            },
+            {
+              "id": "marketplace:home-living:decor",
+              "label": "Decor",
+              "source_subcategory_ids": [
+                "marketplace_decor"
+              ]
+            },
+            {
+              "id": "marketplace:home-living:kitchenware",
+              "label": "Kitchenware",
+              "source_subcategory_ids": [
+                "marketplace_kitchenware"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual product dimensions/material/finish variant; fulfillment",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_01_Home_And_Living.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Books & Stationery",
+          "discovery_key": "marketplace:books-stationery",
+          "source_subcategory_ids": [
+            "marketplace_books",
+            "marketplace_stationery",
+            "marketplace_office-supplies"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "marketplace:books-stationery:books",
+              "label": "Books",
+              "source_subcategory_ids": [
+                "marketplace_books"
+              ]
+            },
+            {
+              "id": "marketplace:books-stationery:stationery",
+              "label": "Stationery",
+              "source_subcategory_ids": [
+                "marketplace_stationery"
+              ]
+            },
+            {
+              "id": "marketplace:books-stationery:office-supplies",
+              "label": "Office Supplies",
+              "source_subcategory_ids": [
+                "marketplace_office-supplies"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual title/product/pack; quantity; supported fulfillment",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_02_Books_And_Stationery.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "General Retail",
+          "discovery_key": "marketplace:general-retail",
+          "source_subcategory_ids": [
+            "marketplace_general-retail"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual item/variant/quantity; product-specific configuration",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_03_General_Retail.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Hardware & DIY",
+          "discovery_key": "marketplace:hardware-diy",
+          "source_subcategory_ids": [
+            "marketplace_hardware-diy"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual hardware/tool specifications and variant; fulfillment",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_04_Hardware_And_DIY.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Pet Supplies",
+          "discovery_key": "marketplace:pet-supplies",
+          "source_subcategory_ids": [
+            "marketplace_pet-supplies"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual pet product type/size/pack; supported fulfillment",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_05_Pet_Supplies.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/09_marketplace.png",
+      "navigation_position": 9,
+      "subcategory_count": 5
+    },
+    {
+      "category": "Restaurants And Food",
+      "discovery_key": "restaurants-food",
+      "customer_task": "Choose food by taste, fulfillment and genuine timing",
+      "result_intent": "merchant + product",
+      "availability_label": "Open now",
+      "context_controls": "Dietary attributes; cuisine; fulfillment",
+      "source_category_ids": [
+        "restaurants-food"
+      ],
+      "collections": [
+        {
+          "key": "restaurants-food:collection-1",
+          "kind": "merchant",
+          "title": "Browse restaurants",
+          "eligibility": "Mapped Restaurant and Fast Food merchants with matching menus",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "restaurants-food:collection-2",
+          "kind": "product",
+          "title": "Find a meal",
+          "eligibility": "Actual available food items and explicit cuisine/dietary attributes",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "restaurants-food:collection-3",
+          "kind": "occasion",
+          "title": "Coffee and something sweet",
+          "eligibility": "Mapped Café, Bakery and Desserts items; avoid repeating the same items",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "restaurants-food:collection-4",
+          "kind": "convenience",
+          "title": "Pickup choices",
+          "eligibility": "Verified pickup capability and current menu availability",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "restaurants-food:collection-5",
+          "kind": "product",
+          "title": "Plan catering",
+          "eligibility": "Mapped Catering offerings; event details and quote contract required",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Restaurant",
+          "discovery_key": "restaurants-food:restaurant",
+          "source_subcategory_ids": [
+            "restaurants-food_restaurant",
+            "restaurants-food_cloud-kitchen"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "restaurants-food:restaurant:restaurant",
+              "label": "Restaurant",
+              "source_subcategory_ids": [
+                "restaurants-food_restaurant"
+              ]
+            },
+            {
+              "id": "restaurants-food:restaurant:cloud-kitchen",
+              "label": "Cloud Kitchen",
+              "source_subcategory_ids": [
+                "restaurants-food_cloud-kitchen"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual menu item/portion and supported modifiers; dietary facts; fulfillment",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_01_Restaurant.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Fast Food",
+          "discovery_key": "restaurants-food:fast-food",
+          "source_subcategory_ids": [
+            "restaurants-food_fast-food"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual meal/portion and supported extras; quantity; fulfillment",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_02_Fast_Food.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Café",
+          "discovery_key": "restaurants-food:caf",
+          "source_subcategory_ids": [
+            "restaurants-food_café"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual drink/food size and supported milk or other modifiers",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_03_Cafe.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Bakery",
+          "discovery_key": "restaurants-food:bakery",
+          "source_subcategory_ids": [
+            "restaurants-food_bakery"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual bakery item/quantity and supported customization",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_04_Bakery.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Desserts",
+          "discovery_key": "restaurants-food:desserts",
+          "source_subcategory_ids": [
+            "restaurants-food_desserts"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual dessert/size and supported extras; quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_05_Desserts.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Juice Bar",
+          "discovery_key": "restaurants-food:juice-bar",
+          "source_subcategory_ids": [
+            "restaurants-food_juice-bar"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual juice/size and supported catalog modifiers",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_06_Juice_Bar.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Catering",
+          "discovery_key": "restaurants-food:catering",
+          "source_subcategory_ids": [
+            "restaurants-food_catering"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Event date/location/party; actual catering menu/package and scope; quote or supported booking",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/10_Restaurants_And_Food/10_07_Catering.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/10_restaurants_food.png",
+      "navigation_position": 10,
+      "subcategory_count": 7
+    },
+    {
+      "category": "Groceries And Essentials",
+      "discovery_key": "groceries-essentials",
+      "customer_task": "Fill a basket by store, essentials and fresh stock",
+      "result_intent": "merchant + product",
+      "availability_label": "Open now / In stock",
+      "context_controls": "Fulfillment; dietary attributes; pack size",
+      "source_category_ids": [
+        "groceries-essentials"
+      ],
+      "collections": [
+        {
+          "key": "groceries-essentials:collection-1",
+          "kind": "product",
+          "title": "Daily essentials",
+          "eligibility": "Verified essential-product tags; new Household Essentials needs explicit mapping",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "groceries-essentials:collection-2",
+          "kind": "product",
+          "title": "Fresh produce and proteins",
+          "eligibility": "Mapped Fresh Produce, Butchery and Seafood items; actual stock and unit price",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "groceries-essentials:collection-3",
+          "kind": "occasion",
+          "title": "Ingredients for a meal",
+          "eligibility": "Curated real catalog ingredients; no made-up recipe inventory",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "groceries-essentials:collection-4",
+          "kind": "merchant",
+          "title": "Choose a grocery store",
+          "eligibility": "Mapped Supermarket, Convenience Store and Organic Store merchants",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Supermarket",
+          "discovery_key": "groceries-essentials:supermarket",
+          "source_subcategory_ids": [
+            "groceries-essentials_supermarket"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Storefront aisle → actual item variants, pack/unit quantities; fulfillment",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_01_Supermarket.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Convenience Store",
+          "discovery_key": "groceries-essentials:convenience-store",
+          "source_subcategory_ids": [
+            "groceries-essentials_convenience-store"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Storefront → actual available essentials; pack/unit quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_02_Convenience_Store.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Fresh Produce",
+          "discovery_key": "groceries-essentials:fresh-produce",
+          "source_subcategory_ids": [
+            "groceries-essentials_fresh-produce"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual produce unit/weight; supported quantity and substitutions",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_03_Fresh_Produce.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Butchery",
+          "discovery_key": "groceries-essentials:butchery",
+          "source_subcategory_ids": [
+            "groceries-essentials_butchery"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual meat/cut/unit/weight; supported preparation and quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_04_Butchery.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Seafood",
+          "discovery_key": "groceries-essentials:seafood",
+          "source_subcategory_ids": [
+            "groceries-essentials_seafood"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual seafood unit/weight; supported preparation and quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_05_Seafood.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Organic Store",
+          "discovery_key": "groceries-essentials:organic-store",
+          "source_subcategory_ids": [
+            "groceries-essentials_organic-store"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual product/pack; explicit organic classification rather than inferred label",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_06_Organic_Store.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Household Essentials",
+          "discovery_key": "groceries-essentials:household-essentials",
+          "source_subcategory_ids": [
+            "groceries-essentials_household-essentials"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual household product/pack; explicit catalog grouping; quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/11_Groceries_And_Essentials/11_07_Household_Essentials.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/11_groceries_essentials.png",
+      "navigation_position": 11,
+      "subcategory_count": 7
+    },
+    {
+      "category": "Laundry And Cleaning",
+      "discovery_key": "laundry-cleaning",
+      "customer_task": "Choose a task, scope and collection or visit schedule",
+      "result_intent": "provider + service",
+      "availability_label": "Available service times",
+      "context_controls": "Service location; collection; task units; date",
+      "source_category_ids": [
+        "laundry-cleaning"
+      ],
+      "collections": [
+        {
+          "key": "laundry-cleaning:collection-1",
+          "kind": "product",
+          "title": "Laundry services",
+          "eligibility": "Mapped Laundry, Dry Cleaning and Ironing catalog services with units",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "laundry-cleaning:collection-2",
+          "kind": "convenience",
+          "title": "Collection and return",
+          "eligibility": "Verified collection capability and actual service-area support",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "laundry-cleaning:collection-3",
+          "kind": "product",
+          "title": "Home and office cleaning",
+          "eligibility": "Mapped services with declared scope and duration",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "laundry-cleaning:collection-4",
+          "kind": "comparison",
+          "title": "Compare service packages",
+          "eligibility": "Same task unit and scope; known fixed or quoted pricing",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Laundry",
+          "discovery_key": "laundry-cleaning:laundry",
+          "source_subcategory_ids": [
+            "laundry-cleaning_laundry"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Garment/task unit or declared weight; pickup/return if supported",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_01_Laundry.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Dry Cleaning",
+          "discovery_key": "laundry-cleaning:dry-cleaning",
+          "source_subcategory_ids": [
+            "laundry-cleaning_dry-cleaning"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Garment type/quantity; actual cleaning task; pickup/return",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_02_Dry_Cleaning.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Ironing",
+          "discovery_key": "laundry-cleaning:ironing",
+          "source_subcategory_ids": [
+            "laundry-cleaning_ironing"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Garment count/type and declared ironing scope; schedule",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_03_Ironing.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Home Cleaning",
+          "discovery_key": "laundry-cleaning:home-cleaning",
+          "source_subcategory_ids": [
+            "laundry-cleaning_home-cleaning"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Address/service area; actual task scope/room units; supported schedule",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_04_Home_Cleaning.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Office Cleaning",
+          "discovery_key": "laundry-cleaning:office-cleaning",
+          "source_subcategory_ids": [
+            "laundry-cleaning_office-cleaning"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Service address; actual office scope/units; supported schedule",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/12_Laundry_And_Cleaning/12_05_Office_Cleaning.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/12_laundry_cleaning.png",
+      "navigation_position": 12,
+      "subcategory_count": 5
+    },
+    {
+      "category": "Health And Pharmacy",
+      "discovery_key": "health-pharmacy",
+      "customer_task": "Buy health goods or access care through the appropriate private flow",
+      "result_intent": "product + care provider",
+      "availability_label": "In stock / Available appointments",
+      "context_controls": "Care mode; date; product attributes; fulfillment",
+      "source_category_ids": [
+        "health",
+        "pharmacy"
+      ],
+      "collections": [
+        {
+          "key": "health-pharmacy:collection-1",
+          "kind": "product",
+          "title": "Pharmacy and supplies",
+          "eligibility": "Mapped Pharmacy and Medical Supplies items; product-level prescription rules",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "health-pharmacy:collection-2",
+          "kind": "product",
+          "title": "Baby and wellness essentials",
+          "eligibility": "Mapped Baby Products and Supplements inventory; no inferred health claims",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "health-pharmacy:collection-3",
+          "kind": "convenience",
+          "title": "Find care appointments",
+          "eligibility": "Hospitals & Clinics, Telemedicine and Mobile Diagnostic Services with verified provider classification, service/collection area and booking capability",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "health-pharmacy:collection-4",
+          "kind": "merchant",
+          "title": "Mental health and therapy",
+          "eligibility": "Reviewed Mental Health/Therapy provider and item predicates; no inherited Coaching mapping; sensitive context excluded from cross-category profiling",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Pharmacy",
+          "discovery_key": "health-pharmacy:pharmacy",
+          "source_subcategory_ids": [
+            "pharmacy_pharmacy"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "RESTRICTED_PURCHASE",
+          "configuration_candidates": "Actual medicine/product/quantity; secure prescription input only when product policy requires",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_01_Pharmacy.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Medical Supplies",
+          "discovery_key": "health-pharmacy:medical-supplies",
+          "source_subcategory_ids": [
+            "pharmacy_medical-supplies"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual medical item/specification/size/quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_02_Medical_Supplies.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Baby Products",
+          "discovery_key": "health-pharmacy:baby-products",
+          "source_subcategory_ids": [
+            "pharmacy_baby-products"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual baby product size/pack/quantity",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_03_Baby_Products.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Supplements",
+          "discovery_key": "health-pharmacy:supplements",
+          "source_subcategory_ids": [
+            "pharmacy_supplements"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual supplement variant/pack/quantity; no inferred efficacy claims",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_04_Supplements.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Hospitals & Clinics",
+          "discovery_key": "health-pharmacy:hospitals-clinics",
+          "source_subcategory_ids": [
+            "health_clinics"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Source-backed clinic subset only (health_clinics); hospital classification unverified; validate actual providers and live catalog",
+          "journey": "CARE",
+          "configuration_candidates": "Actual hospital or clinic provider and care service; supported modality/slot; minimal private intake",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_05_Hospitals_And_Clinics.png",
+          "icon_asset_status": "authoritative",
+          "previous_navigation_label": "Clinics",
+          "previous_discovery_key": "health-pharmacy:clinics"
+        },
+        {
+          "name": "Telemedicine",
+          "discovery_key": "health-pharmacy:telemedicine",
+          "source_subcategory_ids": [
+            "health_telemedicine"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "CARE",
+          "configuration_candidates": "Actual remote consultation/provider; supported slot/contact mode",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_06_Telemedicine.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Mobile Diagnostic Services",
+          "discovery_key": "health-pharmacy:mobile-diagnostic-services",
+          "source_subcategory_ids": [
+            "health_labs"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: demo group health_labs shown here for the demo; mobile diagnostic capability and classification still unverified before live",
+          "journey": "CARE",
+          "configuration_candidates": "Actual mobile diagnostic service/test; verified collection/service area and location; supported slot and stated preparation",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_07_Mobile_Diagnostic_Services.png",
+          "icon_asset_status": "authoritative",
+          "previous_navigation_label": "Labs",
+          "previous_discovery_key": "health-pharmacy:labs",
+          "source_mapping_candidates": [
+            {
+              "id": "health_labs",
+              "condition": "Only offerings with verified mobile diagnostic or at-location collection capability; a Labs label alone is insufficient"
+            }
+          ]
+        },
+        {
+          "name": "Mental Health",
+          "discovery_key": "health-pharmacy:mental-health",
+          "source_subcategory_ids": [
+            "health_mental-health-therapy"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: demo group health_mental-health-therapy shown here for the demo; reviewed provider and item predicate still required before live",
+          "journey": "CARE",
+          "configuration_candidates": "Actual mental health service/provider and supported modality/slot; private intake boundary",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_08_Mental_Health.png",
+          "icon_asset_status": "authoritative",
+          "previous_navigation_label": "Mental Health (Therapy)",
+          "previous_discovery_key": "health-pharmacy:mental-health-therapy",
+          "source_mapping_candidates": [
+            {
+              "id": "health_mental-health-therapy",
+              "condition": "Review actual provider/service classification and boundary against separate Therapy navigation before assigning"
+            }
+          ]
+        },
+        {
+          "name": "Therapy",
+          "discovery_key": "health-pharmacy:therapy",
+          "source_subcategory_ids": [
+            "health_therapy"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "CARE",
+          "configuration_candidates": "Actual therapy service/provider, modality and supported slot; offering capability decides care/appointment workflow and private intake",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/13_Health_And_Pharmacy/13_09_Therapy.png",
+          "icon_asset_status": "authoritative",
+          "previous_navigation_label": "Coaching",
+          "previous_discovery_key": "health-pharmacy:coaching",
+          "source_mapping_candidates": [
+            {
+              "id": "health_mental-health-therapy",
+              "condition": "Actual therapy offering/provider predicate and reviewed overlap with Mental Health required"
+            }
+          ]
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/13_health_pharmacy.png",
+      "navigation_position": 13,
+      "subcategory_count": 9
+    },
+    {
+      "category": "Tech And Electronics",
+      "discovery_key": "tech-electronics",
+      "customer_task": "Compare specifications and supported variants or request a repair",
+      "result_intent": "product + merchant",
+      "availability_label": "In stock",
+      "context_controls": "Brand; supported specification; repair device; fulfillment",
+      "source_category_ids": [
+        "tech-electronics"
+      ],
+      "collections": [
+        {
+          "key": "tech-electronics:collection-1",
+          "kind": "comparison",
+          "title": "Compare devices",
+          "eligibility": "Same supported product grouping and known comparable specs/prices",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "tech-electronics:collection-2",
+          "kind": "product",
+          "title": "Accessories for your device",
+          "eligibility": "Explicit compatibility attributes; never inferred from image",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "tech-electronics:collection-3",
+          "kind": "product",
+          "title": "Computing and gaming",
+          "eligibility": "Mapped Computers and Gaming inventory; distinct item sets",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "tech-electronics:collection-4",
+          "kind": "merchant",
+          "title": "Device support providers",
+          "eligibility": "Telecom and Device Repairs capabilities; repairs mapping requires evidence",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Smartphones",
+          "discovery_key": "tech-electronics:smartphones",
+          "source_subcategory_ids": [
+            "tech-electronics_smartphones"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual phone model/storage/color/network variant; warranty/returns facts",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_01_Smartphones.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Tech Accessories",
+          "discovery_key": "tech-electronics:tech-accessories",
+          "source_subcategory_ids": [
+            "tech-electronics_accessories"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual accessory; explicit compatible-device variant/specification",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_02_Tech_Accessories.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Computers",
+          "discovery_key": "tech-electronics:computers",
+          "source_subcategory_ids": [
+            "tech-electronics_computers"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual computer configuration/storage/memory variant and warranty facts",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_03_Computers.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Gaming",
+          "discovery_key": "tech-electronics:gaming",
+          "source_subcategory_ids": [
+            "tech-electronics_gaming"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual console/game/accessory model/platform variant",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_04_Gaming.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Audio",
+          "discovery_key": "tech-electronics:audio",
+          "source_subcategory_ids": [
+            "tech-electronics_audio"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual audio model/connectivity/color variant",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_05_Audio.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Telecom Services",
+          "discovery_key": "tech-electronics:telecom-services",
+          "source_subcategory_ids": [
+            "tech-electronics_telecom-services"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "SERVICE",
+          "configuration_candidates": "Actual telecom plan/service; supported activation/identity requirements; contract terms",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_06_Telecom_Services.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Smart Devices",
+          "discovery_key": "tech-electronics:smart-devices",
+          "source_subcategory_ids": [
+            "tech-electronics_smart-devices"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "PURCHASE",
+          "configuration_candidates": "Actual smart-device model/protocol/compatibility variant",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_07_Smart_Devices.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Device Repairs",
+          "discovery_key": "tech-electronics:device-repairs",
+          "source_subcategory_ids": [
+            "tech-electronics_device-repairs"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "SERVICE",
+          "configuration_candidates": "Device model; declared fault; actual repair scope; estimate/diagnostic terms",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/14_Tech_And_Electronics/14_08_Device_Repairs.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/14_tech_electronics.png",
+      "navigation_position": 14,
+      "subcategory_count": 8
+    },
+    {
+      "category": "Safaris And Tours",
+      "discovery_key": "travel-tours",
+      "customer_task": "Choose an itinerary and verify dates, participants and terms",
+      "result_intent": "offering + operator",
+      "availability_label": "Available departures",
+      "context_controls": "Date range; duration; participants; verified inclusions",
+      "source_category_ids": [
+        "travel-tours"
+      ],
+      "collections": [
+        {
+          "key": "travel-tours:collection-1",
+          "kind": "product",
+          "title": "Explore safari itineraries",
+          "eligibility": "Mapped Safaris offerings with actual itinerary data",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "travel-tours:collection-2",
+          "kind": "occasion",
+          "title": "Tours for your dates",
+          "eligibility": "City, Cultural and Adventure Tours with real departure capacity",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "travel-tours:collection-3",
+          "kind": "comparison",
+          "title": "Compare travel packages",
+          "eligibility": "Same party/date scope; verified inclusions, price and cancellation terms",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "travel-tours:collection-4",
+          "kind": "merchant",
+          "title": "Browse tour operators",
+          "eligibility": "Mapped providers; ratings and verification only from authoritative facts",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Safaris",
+          "discovery_key": "travel-tours:safaris",
+          "source_subcategory_ids": [
+            "travel-tours_game-drives",
+            "travel-tours_luxury-safaris",
+            "travel-tours_safaris"
+          ],
+          "nested_option_candidates": [
+            {
+              "id": "travel-tours:safaris:game-drives",
+              "label": "Game Drives",
+              "source_subcategory_ids": [
+                "travel-tours_game-drives"
+              ]
+            },
+            {
+              "id": "travel-tours:safaris:luxury-safaris",
+              "label": "Luxury Safaris",
+              "source_subcategory_ids": [
+                "travel-tours_luxury-safaris"
+              ]
+            },
+            {
+              "id": "travel-tours:safaris:safaris",
+              "label": "Other Safari Packages",
+              "source_subcategory_ids": [
+                "travel-tours_safaris"
+              ]
+            }
+          ],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TOUR",
+          "configuration_candidates": "Actual safari itinerary/departure; party; supported accommodation/inclusions",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_01_Safaris.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "City Tours",
+          "discovery_key": "travel-tours:city-tours",
+          "source_subcategory_ids": [
+            "travel-tours_city-tours"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TOUR",
+          "configuration_candidates": "Actual city-tour itinerary/session; party; meeting point",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_02_City_Tours.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Cultural Tours",
+          "discovery_key": "travel-tours:cultural-tours",
+          "source_subcategory_ids": [
+            "travel-tours_cultural-tours"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TOUR",
+          "configuration_candidates": "Actual cultural-tour itinerary/session; party; verified inclusions",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_03_Cultural_Tours.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Adventure Tours",
+          "discovery_key": "travel-tours:adventure-tours",
+          "source_subcategory_ids": [
+            "travel-tours_adventure-tours"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TOUR",
+          "configuration_candidates": "Actual adventure offering/date; participants; provider-declared requirements",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_04_Adventure_Tours.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Travel Packages",
+          "discovery_key": "travel-tours:travel-packages",
+          "source_subcategory_ids": [
+            "travel-tours_travel-packages"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "TOUR",
+          "configuration_candidates": "Actual package/date/party; supported inclusions and booking or quote contract",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/15_Safaris_And_Tours/15_05_Travel_Packages.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/15_safaris_tours.png",
+      "navigation_position": 15,
+      "subcategory_count": 5
+    },
+    {
+      "category": "Concierge Services",
+      "discovery_key": "concierge-services",
+      "customer_task": "Describe a task and receive a clear request, quote or confirmation",
+      "result_intent": "provider + service",
+      "availability_label": "Accepting requests",
+      "context_controls": "Task date; location; supported budget or urgency",
+      "source_category_ids": [
+        "concierge-services"
+      ],
+      "collections": [
+        {
+          "key": "concierge-services:collection-1",
+          "kind": "occasion",
+          "title": "Plan a reservation or trip",
+          "eligibility": "Mapped Reservations and Travel Planning services; request precedes confirmation",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "concierge-services:collection-2",
+          "kind": "product",
+          "title": "Shopping and gift assistance",
+          "eligibility": "Mapped Shopping Assistance and Gift Sourcing offerings with actual scope",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "concierge-services:collection-3",
+          "kind": "convenience",
+          "title": "Property and moving help",
+          "eligibility": "Mapped Property Coordination, Moving Assistance and Cleaning Coordination",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "concierge-services:collection-4",
+          "kind": "merchant",
+          "title": "Personal and VIP assistance",
+          "eligibility": "Mapped Personal Assistance and VIP Assistance providers; courier group needs mapping",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Reservations",
+          "discovery_key": "concierge-services:reservations",
+          "source_subcategory_ids": [
+            "concierge-services_reservations"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Desired venue/date/time/party and reservation preferences; request until confirmed",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_01_Reservations.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Personal Assistance",
+          "discovery_key": "concierge-services:personal-assistance",
+          "source_subcategory_ids": [
+            "concierge-services_personal-assistance"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Actual assistance task/scope; date/location; supported preferences",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_02_Personal_Assistance.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Shopping Assistance",
+          "discovery_key": "concierge-services:shopping-assistance",
+          "source_subcategory_ids": [
+            "concierge-services_shopping-assistance"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Shopping brief/items; date/location; budget only if provider supports it",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_03_Shopping_Assistance.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Gift Sourcing",
+          "discovery_key": "concierge-services:gift-sourcing",
+          "source_subcategory_ids": [
+            "concierge-services_gift-sourcing"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Gift brief/recipient/occasion/deadline; supported sourcing budget",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_04_Gift_Sourcing.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Travel Planning",
+          "discovery_key": "concierge-services:travel-planning",
+          "source_subcategory_ids": [
+            "concierge-services_travel-planning"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Travel brief/dates/party; actual planning scope; supported preferences",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_05_Travel_Planning.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Property Coordination",
+          "discovery_key": "concierge-services:property-coordination",
+          "source_subcategory_ids": [
+            "concierge-services_property-coordination"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Property task/scope/location/date; no unauthorized access credentials",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_06_Property_Coordination.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Moving Assistance",
+          "discovery_key": "concierge-services:moving-assistance",
+          "source_subcategory_ids": [
+            "concierge-services_moving-assistance"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Move origin/destination/date; inventory/scope and provider-supported requirements",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_07_Moving_Assistance.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Cleaning Coordination",
+          "discovery_key": "concierge-services:cleaning-coordination",
+          "source_subcategory_ids": [
+            "concierge-services_cleaning-coordination"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Cleaning task/location/date/scope; coordination request distinct from direct cleaning",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_08_Cleaning_Coordination.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "VIP Assistance",
+          "discovery_key": "concierge-services:vip-assistance",
+          "source_subcategory_ids": [
+            "concierge-services_vip-assistance"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Existing registry mapping; validate live data",
+          "journey": "REQUEST",
+          "configuration_candidates": "Actual VIP task/scope/date/location; supported needs without invented privileges",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_09_VIP_Assistance.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Courier & Errands",
+          "discovery_key": "concierge-services:courier-errands",
+          "source_subcategory_ids": [
+            "concierge-services_courier-errands"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner decision 8 Nov 2026: curated demo merchants in the local Supabase seed (demo-seed/gap-fill.json); verified classification still required before live",
+          "journey": "REQUEST",
+          "configuration_candidates": "Collection/destination/date; actual parcel/task scope and provider-supported restrictions",
+          "result_mode_candidate": "merchant/provider with relevant offerings",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/16_Concierge_Services/16_10_Courier_And_Errands.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/16_concierge_services.png",
+      "navigation_position": 16,
+      "subcategory_count": 10
+    },
+    {
+      "category": "Play",
+      "discovery_key": "play",
+      "customer_task": "Book a lane, court, pitch, session or game",
+      "result_intent": "offering + provider",
+      "availability_label": "Available on selected date",
+      "context_controls": "Date; time; players; supported venue options",
+      "source_category_ids": [
+        "activities-games-sports"
+      ],
+      "collections": [
+        {
+          "key": "play:collection-1",
+          "kind": "occasion",
+          "title": "Games and thrills",
+          "eligibility": "Mapped bowling, arcade, escape room, karting, paintball and zipline offerings with bookable sessions",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "play:collection-2",
+          "kind": "convenience",
+          "title": "Courts and pitches",
+          "eligibility": "Mapped court and pitch offerings with real time slots",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "play:collection-3",
+          "kind": "product",
+          "title": "Swimming",
+          "eligibility": "Mapped swim sessions, lessons and lane hire with real schedules",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Bowling",
+          "discovery_key": "play:bowling",
+          "source_subcategory_ids": [
+            "activities-games-sports_bowling"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/bowling",
+          "journey": "TICKET",
+          "configuration_candidates": "Lane and game length; players; shoe hire where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_01_Bowling.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Arcade & Timed Play",
+          "discovery_key": "play:arcade-timed-play",
+          "source_subcategory_ids": [
+            "activities-games-sports_arcade-games"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/arcade_games",
+          "journey": "TICKET",
+          "configuration_candidates": "Play time or credits; players; supported party packages",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_02_Arcade_And_Timed_Play.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Escape Rooms",
+          "discovery_key": "play:escape-rooms",
+          "source_subcategory_ids": [
+            "activities-games-sports_escape-rooms"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/escape_rooms",
+          "journey": "TICKET",
+          "configuration_candidates": "Room and session time; team size within the room limits",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_03_Escape_Rooms.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Indoor Sports Courts",
+          "discovery_key": "play:indoor-sports-courts",
+          "source_subcategory_ids": [
+            "activities-games-sports_indoor-courts"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/indoor_courts",
+          "journey": "TICKET",
+          "configuration_candidates": "Sport, court and time slot; players; equipment hire where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_04_Indoor_Sports_Courts.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Outdoor Sports Courts",
+          "discovery_key": "play:outdoor-sports-courts",
+          "source_subcategory_ids": [
+            "activities-games-sports_outdoor-courts"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/outdoor_courts",
+          "journey": "TICKET",
+          "configuration_candidates": "Sport, court and time slot; floodlights; equipment hire where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_05_Outdoor_Sports_Courts.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Football Pitches",
+          "discovery_key": "play:football-pitches",
+          "source_subcategory_ids": [
+            "activities-games-sports_football-pitches"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/football_pitches",
+          "journey": "TICKET",
+          "configuration_candidates": "Pitch size and time slot; floodlights; bibs and balls where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_06_Football_Pitches.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Outdoor Team Games",
+          "discovery_key": "play:outdoor-team-games",
+          "source_subcategory_ids": [
+            "activities-games-sports_outdoor-team-games"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/outdoor_team_games",
+          "journey": "TICKET",
+          "configuration_candidates": "Game or package; group size; date and venue",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_07_Outdoor_Team_Games.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Go-Karting",
+          "discovery_key": "play:go-karting",
+          "source_subcategory_ids": [
+            "activities-games-sports_go-karting"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/go_karting",
+          "journey": "TICKET",
+          "configuration_candidates": "Laps or race format; drivers; age and height limits from the track",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_08_Go_Karting.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Paintball",
+          "discovery_key": "play:paintball",
+          "source_subcategory_ids": [
+            "activities-games-sports_paintball"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/paintball",
+          "journey": "TICKET",
+          "configuration_candidates": "Paintball package; players; age limits from the venue",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_09_Paintball.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Ziplining & High Ropes",
+          "discovery_key": "play:ziplining-high-ropes",
+          "source_subcategory_ids": [
+            "activities-games-sports_ziplining"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/ziplining",
+          "journey": "TICKET",
+          "configuration_candidates": "Ride or course; riders; weight and age limits from the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_10_Ziplining_And_High_Ropes.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Public Swim Sessions",
+          "discovery_key": "play:public-swim-sessions",
+          "source_subcategory_ids": [
+            "activities-games-sports_swimming-sessions"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/swimming_sessions",
+          "journey": "TICKET",
+          "configuration_candidates": "Session time; adults and children; passes where offered",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_11_Public_Swim_Sessions.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Swimming Lessons",
+          "discovery_key": "play:swimming-lessons",
+          "source_subcategory_ids": [
+            "activities-games-sports_swimming-lessons"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/swimming_lessons",
+          "journey": "TICKET",
+          "configuration_candidates": "Lesson or course; learner age and level; group or private",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_12_Swimming_Lessons.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Pool Lane Hire",
+          "discovery_key": "play:pool-lane-hire",
+          "source_subcategory_ids": [
+            "activities-games-sports_pool-lane-hire"
+          ],
+          "nested_option_candidates": [],
+          "mapping_status": "Owner addition 9 Nov 2026; Derrick NexG activities_games_sports/pool_lane_hire",
+          "journey": "TICKET",
+          "configuration_candidates": "Lanes and time slot; club or private use",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/17_Play/17_13_Pool_Lane_Hire.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/17_play.png",
+      "navigation_position": 17,
+      "subcategory_count": 13
+    },
+    {
+      "category": "Flights",
+      "discovery_key": "flights",
+      "customer_task": "Charter an aircraft or book a seat on a scenic or safari flight",
+      "result_intent": "offering + provider",
+      "availability_label": "Available on selected date",
+      "context_controls": "Route; date; passengers; supported aircraft options",
+      "source_category_ids": [],
+      "collections": [
+        {
+          "key": "flights:collection-1",
+          "kind": "convenience",
+          "title": "Charter a helicopter or jet",
+          "eligibility": "Mapped charter operators that quote routes and aircraft",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        },
+        {
+          "key": "flights:collection-2",
+          "kind": "occasion",
+          "title": "Scenic and safari flights",
+          "eligibility": "Mapped flights with real departures and seats",
+          "status": "Proposed configuration; requires verified catalog facts",
+          "minimum_distinct_entities": 2,
+          "destination": "Filtered L3 or existing L4 for the selected entity"
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Helicopter Charters",
+          "discovery_key": "flights:helicopter-charters",
+          "source_subcategory_ids": [],
+          "nested_option_candidates": [],
+          "mapping_status": "Unmapped until Derrick NexG publishes a flights category (flights_aviation is a merchant-portal meeting demo on 9 Nov 2026)",
+          "journey": "SERVICE",
+          "configuration_candidates": "Route, date and departure time; passengers and bags; aircraft quoted by the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_01_Helicopter_Charters.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Scenic Flights",
+          "discovery_key": "flights:scenic-flights",
+          "source_subcategory_ids": [],
+          "nested_option_candidates": [],
+          "mapping_status": "Unmapped until Derrick NexG publishes a flights category (flights_aviation is a merchant-portal meeting demo on 9 Nov 2026)",
+          "journey": "TICKET",
+          "configuration_candidates": "Flight and departure slot; passengers; weight limits from the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_02_Scenic_Flights.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Safari Flights",
+          "discovery_key": "flights:safari-flights",
+          "source_subcategory_ids": [],
+          "nested_option_candidates": [],
+          "mapping_status": "Unmapped until Derrick NexG publishes a flights category (flights_aviation is a merchant-portal meeting demo on 9 Nov 2026)",
+          "journey": "TICKET",
+          "configuration_candidates": "Route, date and seats; luggage allowance from the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_03_Safari_Flights.png",
+          "icon_asset_status": "authoritative"
+        },
+        {
+          "name": "Private Charters",
+          "discovery_key": "flights:private-charters",
+          "source_subcategory_ids": [],
+          "nested_option_candidates": [],
+          "mapping_status": "Unmapped until Derrick NexG publishes a flights category (flights_aviation is a merchant-portal meeting demo on 9 Nov 2026)",
+          "journey": "SERVICE",
+          "configuration_candidates": "Route, dates and passengers; aircraft class quoted by the operator",
+          "result_mode_candidate": "offering",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/18_Flights/18_04_Private_Charters.png",
+          "icon_asset_status": "authoritative"
+        }
+      ],
+      "main_icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/18_flights.png",
+      "navigation_position": 18,
+      "subcategory_count": 4
+    }
+  ],
+  "taxonomy_authority": "Current icon pack manifest and individual images, per latest owner directive; no inherited source IDs based solely on position",
+  "main_category_count": 18,
+  "subcategory_count": 115,
+  "authority_revision": "icon-pack-2026-10-12"
+}
