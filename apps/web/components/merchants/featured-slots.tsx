@@ -2,6 +2,8 @@ import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
 
+import { SectionLabel } from './landing';
+
 /**
  * The "Get featured" block from the `Merchants` artboard — an inset ink card
  * (content width, 728px tall) rather than a full-bleed band.
@@ -44,15 +46,13 @@ const SLOTS = [
 
 export function FeaturedSlots() {
   return (
-    <section id="featured" className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
-      <div className="bg-ink rounded-2xl px-6 py-10 text-white sm:px-10 sm:py-[4.6875rem]">
-        <div className="grid gap-8 lg:grid-cols-[1fr_31rem] lg:items-start">
+    <section id="featured" className="bg-ink text-white">
+      <div className="mx-auto max-w-[96rem] px-4 py-16 sm:px-8 sm:py-24 lg:px-16">
+        <div className="grid gap-10 lg:grid-cols-[1fr_31rem] lg:items-start">
           <div>
-            <span className="bg-gold text-ink inline-block rounded-full px-3 py-1.5 text-[0.6875rem] font-extrabold uppercase tracking-[0.12em]">
-              Get featured
-            </span>
+            <SectionLabel onDark>Get featured</SectionLabel>
 
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
+            <h2 className="mt-3 text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]">
               Put your store on the <span className="text-gold">homepage.</span>
             </h2>
 
@@ -79,7 +79,10 @@ export function FeaturedSlots() {
 
           {/* How a featured slot looks on the homepage. Decorative: the copy
               beside it says the same thing. */}
-          <div aria-hidden="true" className="bg-bg text-ink rounded-2xl p-4">
+          <div
+            aria-hidden="true"
+            className="bg-bg text-ink rounded-3xl p-5 shadow-[0_24px_50px_-24px_rgb(0_0_0/0.6)]"
+          >
             <div className="flex items-center justify-between">
               <p className="text-micro text-muted font-bold uppercase tracking-[0.12em]">
                 Featured merchants · Homepage
@@ -126,14 +129,14 @@ export function FeaturedSlots() {
           </div>
         </div>
 
-        <ul className="mt-8 grid gap-4 lg:grid-cols-3">
+        <ul className="mt-10 grid gap-4 lg:grid-cols-3">
           {SLOTS.map((slot) => (
             <li
               key={slot.name}
               className={
                 slot.highlight
-                  ? 'bg-gold text-ink rounded-2xl p-5'
-                  : 'rounded-2xl border border-white/10 bg-white/[0.03] p-5'
+                  ? 'bg-gold text-ink rounded-3xl p-6'
+                  : 'rounded-3xl border border-white/10 bg-white/[0.03] p-6'
               }
             >
               <span
@@ -171,7 +174,7 @@ export function FeaturedSlots() {
         </ul>
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          <Button variant="gold" size="lg" asChild className="rounded-xl">
+          <Button variant="gold" size="lg" asChild className="rounded-full">
             <Link href="/help">Ask about featured placement</Link>
           </Button>
           <p className="text-[0.8125rem] font-semibold text-white/45">
