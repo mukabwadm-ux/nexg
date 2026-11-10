@@ -62,8 +62,10 @@ select is(
   public.rpc_payment_mpesa_callback('resend-a', 1037, 'DS timeout user cannot be reached',
     'ci-only-daraja-prompt-token', '{}') ->> 'superseded',
   'true', 'An early failure does not fail a payment another prompt can still settle.');
+reset role;
 select is((select state::text from public.payment where reference = 'PROMPT-PAY-RESEND'),
   'authorised', 'The payment is still waiting on the second prompt.');
+set local role anon;
 -- The guest answers the second prompt.
 select is(
   public.rpc_payment_mpesa_callback('resend-b', 0, 'paid', 'ci-only-daraja-prompt-token', '{}', 500,
