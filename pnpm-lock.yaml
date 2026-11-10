@@ -182,6 +182,19 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(@types/node@20.17.10)(jsdom@25.0.1)
 
+  apps/bank-sandbox:
+    dependencies:
+      tsx:
+        specifier: 4.20.6
+        version: 4.20.6
+    devDependencies:
+      '@types/node':
+        specifier: 22.19.9
+        version: 22.19.9
+      typescript:
+        specifier: 5.7.2
+        version: 5.7.2
+
   apps/booking-engine:
     dependencies:
       '@nexg/booking-config':

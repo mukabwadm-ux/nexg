@@ -68,7 +68,7 @@ export default function DocsPage() {
     <div className="space-y-8">
       <section className="mb-8">
         <h2 className="text-2xl font-bold mb-2">Endpoints</h2>
-        <p className="text-ink/70">Use the NexG API to connect a merchant website or back-office system to public catalogue data and, with a merchant-bound key, read that merchant&apos;s orders. Bank collections, payouts, and write operations are not available yet.</p>
+        <p className="text-ink/70">Use the NexG API to connect a merchant website or back-office system to public catalogue data and, with a merchant-bound key, read that merchant&apos;s orders. Guests can pay by bank at checkout (sandbox bank today; see the bank guide). Payouts and write operations are not available yet.</p>
       </section>
 
       <section className="grid gap-8 border-y py-6 md:grid-cols-2" aria-label="Integration guides">
@@ -79,7 +79,7 @@ export default function DocsPage() {
         </div>
         <div className="space-y-2">
           <h3 className="text-lg font-bold">For banks and payment providers</h3>
-          <p className="text-sm text-ink/70">Review the intended collection and settlement flows and the controls required before a provider integration can go live.</p>
+          <p className="text-sm text-ink/70">Bank collections at checkout: the API a bank provides, the signed webhooks NexG receives, and the NexG Sandbox Bank for testing.</p>
           <Link href="/docs/bank-transfers" className="text-sm font-semibold underline underline-offset-4">Bank and payment partner guide</Link>
         </div>
       </section>

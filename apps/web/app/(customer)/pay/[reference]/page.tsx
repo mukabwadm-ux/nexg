@@ -3,6 +3,8 @@ import Link from 'next/link';
 
 import { AutoRefresh } from '@/components/pay/auto-refresh';
 import { RetryPayment } from '@/components/pay/retry-payment';
+import { bankCheckoutEnabled } from '@/lib/bank';
+import { reconcileBankPayment } from '@/lib/bank/payments';
 import { reconcileMpesaPrompts } from '@/lib/mpesa-prompt';
 import { paystackConfigured, verify } from '@/lib/paystack';
 import { createClient } from '@/lib/supabase/server';
@@ -35,7 +37,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     supabase
       .from('payment')
       .select(
-        'reference, state, amount_cents, currency, intent, order_id, paid_at, failure_reason, provider, payer_phone',
+        'reference, state, amount_cents, currency, intent, order_id, paid_at, failure_reason, provider, provider_ref, authorization_url, payer_phone',
       )
       .eq('reference', params.reference)
       .maybeSingle();
@@ -46,6 +48,14 @@ export default async function PaymentReturn({ params }: { params: { reference: s
      about directly, in case Safaricom's callback never reached us. */
   if (payment?.state === 'authorised' && payment.provider === 'mpesa') {
     if (await reconcileMpesaPrompts(supabase, params.reference)) {
+      payment = ((await read()).data as Payment | null) ?? payment;
+    }
+  }
+
+  /* Waiting on a bank: ask it for its latest signed answer, in case the
+     webhook is late. */
+  if (payment?.state === 'authorised' && payment.provider?.startsWith('bank_')) {
+    if (await reconcileBankPayment(payment)) {
       payment = ((await read()).data as Payment | null) ?? payment;
     }
   }
@@ -83,7 +93,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
   /* Still pending and a provider is connected: ask it rather than
      leaving somebody staring at "checking". */
   let settledNow = false;
-  if (payment.state !== 'paid' && paystackConfigured()) {
+  if (payment.state !== 'paid' && payment.provider === 'paystack' && paystackConfigured()) {
     const asked = await verify(params.reference);
     settledNow = asked.ok && asked.data?.status === 'success';
   }
@@ -152,8 +162,33 @@ export default async function PaymentReturn({ params }: { params: { reference: s
             orderId={payment.order_id!}
             mode="failed"
             defaultPhone={localPhone(payment.payer_phone)}
+            bankEnabled={bankCheckoutEnabled()}
           />
         )}
+      </Shell>
+    );
+  }
+
+  if (payment.provider?.startsWith('bank_')) {
+    return (
+      <Shell title="Waiting for your bank.">
+        <AutoRefresh seconds={5} />
+        <p>
+          {amount} is waiting for approval at your bank. Approve it there and this page updates by
+          itself.
+        </p>
+        {payment.authorization_url && payment.state === 'authorised' && (
+          <a
+            href={payment.authorization_url}
+            className="bg-ink mt-5 inline-block rounded-lg px-4 py-2.5 text-[0.8125rem] font-extrabold text-white"
+          >
+            Continue at your bank
+          </a>
+        )}
+        <p className="text-muted-light mt-3 text-[0.8125rem] font-semibold">
+          Reference {payment.reference}. If money has left your account and this has not changed
+          within a few minutes, send us that reference and we will find it.
+        </p>
       </Shell>
     );
   }
@@ -208,5 +243,7 @@ interface Payment {
   paid_at: string | null;
   failure_reason: string | null;
   provider: string | null;
+  provider_ref: string | null;
+  authorization_url: string | null;
   payer_phone: string | null;
 }
