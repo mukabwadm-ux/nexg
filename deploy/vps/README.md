@@ -1,0 +1,173 @@
+# NexG on the VPS
+
+Written for: whoever runs the NexG VPS.
+
+This folder runs NexG's back-end services on one Linux server with Docker:
+
+| Service          | What it is                                           | Reachable at                             |
+| ---------------- | ---------------------------------------------------- | ---------------------------------------- |
+| `booking-engine` | The Payload booking runtime (`apps/booking-engine`)  | `https://<BOOKING_DOMAIN>` through Caddy |
+| `booking-db`     | PostgreSQL 16, used only by the booking engine       | nowhere outside the server               |
+| `caddy`          | HTTPS in front, with certificates from Let's Encrypt | ports 80 and 443                         |
+
+The website stays on Vercel and the main database stays on Supabase. The VPS runs alongside them; nothing moves.
+
+**Nothing in this folder holds a secret.** The secrets live in `.env` on the server, which git ignores. The repository is public: never commit `.env`, and never paste its values into chat, issues or pull requests.
+
+## 1. Check the server
+
+On the VPS:
+
+```sh
+cat /etc/os-release; nproc; free -h; df -h /
+```
+
+- **OS:** these steps are for Ubuntu 22.04 or 24.04, or Debian 12. For another Linux, install Docker the way [Docker's documentation](https://docs.docker.com/engine/install/) says for it, then continue from step 4.
+- **Memory:** 2 GB is enough for the booking engine, its database and Caddy. The image is built by CI, not on the server, so the server never needs memory for a build. With less than 2 GB, add swap:
+
+  ```sh
+  sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+  echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+  ```
+
+- **Disk:** keep 10 GB free for images, the database and backups.
+
+## 2. Point the domain at the server
+
+Create a DNS **A record** for the booking engine's name, for example `booking.nexgapp.com`, with the VPS's public IP as its value. Check that it has taken effect before the first start:
+
+```sh
+getent hosts booking.nexgapp.com
+```
+
+It should print the VPS's IP. Caddy cannot get a certificate until it does.
+
+## 3. Install Docker and open the firewall
+
+```sh
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker "$USER"    # then log out and back in
+docker compose version             # should print v2.x
+```
+
+Allow SSH and HTTPS, and nothing else:
+
+```sh
+sudo ufw allow OpenSSH
+sudo ufw allow 80/tcp
+sudo ufw allow 443
+sudo ufw enable
+```
+
+## 4. Get this folder onto the server
+
+```sh
+sudo git clone --depth 1 https://github.com/mukabwadm-ux/nexg.git /opt/nexg
+sudo chown -R "$USER" /opt/nexg
+cd /opt/nexg/deploy/vps
+```
+
+## 5. Fill in `.env`
+
+```sh
+cp .env.example .env
+chmod 600 .env
+openssl rand -hex 32    # run three times: BOOKING_DB_PASSWORD, PAYLOAD_SECRET, BOOKING_BRIDGE_SECRET
+nano .env
+```
+
+Set `BOOKING_DOMAIN` to the name from step 2, and `ACME_EMAIL` to an address that should hear about certificates.
+
+## 6. Let the server pull the image
+
+CI publishes the engine to GitHub Container Registry as `ghcr.io/mukabwadm-ux/nexg-booking-engine`. Choose one of these:
+
+- **Make the package public, once.** On GitHub, open the package's settings and change its visibility to public. It contains no secrets: the image is built from this public repository, and every secret comes from `.env` at runtime.
+- **Or sign the server in.** Create a GitHub personal access token with only `read:packages`, then:
+
+  ```sh
+  docker login ghcr.io -u <your GitHub username>
+  ```
+
+  Paste the token when Docker asks for a password. It is stored on the server only.
+
+## 7. Start
+
+```sh
+docker compose up -d
+docker compose ps
+```
+
+The engine applies any pending database migrations, then starts. Give it a minute, then check:
+
+```sh
+curl -s https://booking.nexgapp.com/health
+```
+
+It should return `{"ready":true,"engine":"Payload Reserve",...}`. Every other path refuses a request that is not signed with the bridge secret.
+
+## 8. Connecting the website (wait)
+
+The website takes customer bookings in Supabase today. The engine keeps its own database. If both take bookings, they end up in two places. So:
+
+1. Run the engine here and test it with no website traffic.
+2. Decide which system holds bookings. If it becomes the engine, plan moving the existing bookings before switching.
+3. Then, in Vercel's web project, set `BOOKING_ENGINE_URL` = `https://<BOOKING_DOMAIN>` and `BOOKING_BRIDGE_SECRET` = the same value as in `.env`. Both are server-only, never `NEXT_PUBLIC_`. Redeploy.
+
+Until both are set, the website keeps using Supabase for bookings.
+
+## Day to day
+
+**Logs**
+
+```sh
+docker compose logs -f booking-engine
+```
+
+**Update to the newest image**
+
+```sh
+git pull && docker compose pull && docker compose up -d
+```
+
+**Hold or roll back a version:** set `BOOKING_ENGINE_TAG` in `.env` to a commit SHA that CI published, then run `docker compose up -d`.
+
+**Back up the database**
+
+```sh
+./backup.sh
+```
+
+This writes to `/var/backups/nexg-booking` and keeps 14 days of dumps. For a nightly backup, add this with `crontab -e`:
+
+```
+0 2 * * * /opt/nexg/deploy/vps/backup.sh >> /var/log/nexg-booking-backup.log 2>&1
+```
+
+Copy backups off the server from time to time: a backup that lives only on the server is lost with it.
+
+**Restore a backup:** this replaces the current data.
+
+```sh
+docker compose stop booking-engine
+gunzip -c /var/backups/nexg-booking/booking-<date>.sql.gz | docker compose exec -T booking-db psql -U booking -d booking
+docker compose start booking-engine
+```
+
+## If something is wrong
+
+| You see                                                                                | Likely cause                                                                              |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| The browser warns about the certificate, or Caddy's log says the ACME challenge failed | DNS does not point at this server yet (step 2), or port 80 is closed                      |
+| `502` from the domain                                                                  | The engine is still starting or applying migrations: `docker compose logs booking-engine` |
+| `docker compose up` stops at "Set … in .env"                                           | That line in `.env` is empty                                                              |
+| `pull access denied` for the engine image                                              | Step 6 is not done                                                                        |
+
+## Next: the discovery engine
+
+The discovery engine (`discovery/discovery-engine` on the `discovery` branch, PR #89) will join this setup as another service with its own domain. It needs no database of its own: it reads Supabase with the public key. Before it can run:
+
+- **Missing files:** its release check needs 134 icon files that #89 did not include. Without them it refuses to start.
+- **Missing image:** it needs a Dockerfile and an image built by CI, like the booking engine.
+- **Website proxy:** it does not accept calls from other sites, so the website will reach it through a server-side proxy route on nexgapp.com.
+- **Optional search:** Typesense needs about 2 GB more memory.

@@ -1,0 +1,18 @@
+# HTTPS for the NexG services on the VPS. Caddy gets and renews the
+# certificate itself once the domain's DNS points at this server.
+{
+	email {$ACME_EMAIL}
+}
+
+{$BOOKING_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	reverse_proxy booking-engine:3003
+}

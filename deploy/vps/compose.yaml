@@ -1,0 +1,84 @@
+# NexG services on the VPS: the booking engine, its own PostgreSQL, and Caddy
+# in front for HTTPS. The website stays on Vercel and the main database stays
+# on Supabase; nothing here replaces them.
+#
+#   cp .env.example .env     # then fill it in on the server (see README.md)
+#   docker compose up -d
+#
+# Only Caddy is reachable from outside (ports 80 and 443). The database has no
+# published port and sits on a network with no route out.
+name: nexg
+
+services:
+  booking-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: booking
+      POSTGRES_DB: booking
+      POSTGRES_PASSWORD: ${BOOKING_DB_PASSWORD:?Set BOOKING_DB_PASSWORD in .env}
+    volumes:
+      - booking-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U booking -d booking']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  booking-engine:
+    # Built and published by .github/workflows/booking-engine-image.yml.
+    image: ${BOOKING_ENGINE_IMAGE:-ghcr.io/mukabwadm-ux/nexg-booking-engine}:${BOOKING_ENGINE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      booking-db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      BOOKING_HOST: 0.0.0.0
+      BOOKING_PORT: '3003'
+      BOOKING_DATABASE_URL: postgres://booking:${BOOKING_DB_PASSWORD}@booking-db:5432/booking
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?Set PAYLOAD_SECRET in .env}
+      BOOKING_BRIDGE_SECRET: ${BOOKING_BRIDGE_SECRET:?Set BOOKING_BRIDGE_SECRET in .env}
+    # The container applies pending reviewed migrations, then serves.
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3003/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    networks: [internal, edge]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [booking-engine]
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      BOOKING_DOMAIN: ${BOOKING_DOMAIN:?Set BOOKING_DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [edge]
+
+volumes:
+  booking-db:
+  caddy-data:
+  caddy-config:
+
+networks:
+  # No route out: only the engine can reach the database.
+  internal:
+    internal: true
+  edge:

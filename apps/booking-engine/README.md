@@ -33,6 +33,8 @@ Runtime settings:
 
 The web app needs `BOOKING_ENGINE_URL` (this service's HTTPS address) and the same `BOOKING_BRIDGE_SECRET`. Build the image from the repository root with `docker build -f apps/booking-engine/Dockerfile .`. `GET /health` answers without a signature; every other route requires the signed bridge headers.
 
+CI publishes the image from `main` to `ghcr.io/mukabwadm-ux/nexg-booking-engine` (`.github/workflows/booking-engine-image.yml`). To run it on a server with its own PostgreSQL and HTTPS, follow [`deploy/vps`](../../deploy/vps/README.md).
+
 ## Contracts
 
 The bridge supplies a base64url JSON `x-nexg-booking-context` containing business ID, user ID, role and expiry, signed with HMAC SHA-256 in the hex `x-nexg-booking-signature` header. Sessions expire within five minutes. Branch scopes are applied server-side. Neither body tenant IDs nor client readiness flags are accepted.
