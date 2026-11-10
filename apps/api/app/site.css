@@ -1,0 +1,55 @@
+/*
+ * The parts of the page the browser draws, in NexG's colours: selected
+ * text, the scrollbars inside code and tables, and the offset that keeps an
+ * anchored heading clear of the sticky masthead.
+ */
+
+/*
+ * Syntax colours for the ink code panels. Strings use the brand gold and
+ * keys the cream ground; these two are the success and info hues from
+ * tokens.css, lifted so they read on #141414 (both above 9:1).
+ */
+:root {
+  --code-literal-rgb: 155 211 174; /* --success, lifted: numbers, true/false, $VARIABLES */
+  --code-keyword-rgb: 157 191 224; /* --info, lifted: keywords, flags, methods */
+}
+
+html {
+  scroll-padding-top: 5.5rem;
+}
+
+::selection {
+  background: rgb(var(--gold-rgb) / 0.3);
+  color: inherit;
+}
+
+.bg-ink ::selection {
+  background: rgb(var(--gold-rgb) / 0.35);
+}
+
+.code-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.22) transparent;
+}
+
+.bg-surface .code-scroll,
+.code-scroll.bg-surface {
+  scrollbar-color: rgb(var(--border-strong-rgb)) transparent;
+}
+
+.code-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.code-scroll::-webkit-scrollbar-track,
+.code-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.code-scroll::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.22);
+  background-clip: padding-box;
+}

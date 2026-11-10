@@ -1,103 +1,118 @@
-import Link from 'next/link';
+import { CodeBlock, CodeTabs } from '@/components/docs/code';
+import { DocPage } from '@/components/docs/doc-page';
+import { A, C, Callout, H2, List, P, Step, Steps } from '@/components/docs/prose';
+import { endpointBySlug } from '@/lib/reference/endpoints';
+import { pageMetadata } from '@/lib/reference/navigation';
+import { requestSamples } from '@/lib/reference/samples';
+
+export const metadata = pageMetadata('/docs/merchants');
+
+const ORDER = `{
+  "order_id": "0f1e2d3c-4b5a-4697-8a8b-9c0d1e2f3a4b",
+  "reference": "NX-261110-0003",
+  "service": "",
+  "quantity": 3,
+  "stage": "preparing",
+  "payment_method": "mpesa_stk",
+  "payment_status": "paid",
+  "currency": "KES",
+  "total_cents": 161625,
+  "scheduled_for": null,
+  "pickup_label": null,
+  "dropoff_label": "Rhapta Road, Westlands, Nairobi",
+  "created_at": "2026-11-10T09:42:17.204+00:00"
+}`;
 
 export default function MerchantIntegrationPage() {
+  const orders = endpointBySlug('list-orders');
   return (
-    <article className="max-w-3xl space-y-8 text-ink/80">
-      <header className="space-y-3">
-        <h2 className="text-3xl font-extrabold text-ink">Connect your system to NexG</h2>
+    <DocPage
+      href="/docs/merchants"
+      toc={[
+        { id: 'today', label: 'What you can integrate today' },
+        { id: 'set-up', label: 'Set up an integration' },
+        { id: 'orders', label: 'Read your orders' },
+        { id: 'practices', label: 'Good practice' },
+      ]}
+    >
+      <H2 id="today">What you can integrate today</H2>
+      <P>
+        This guide is for NexG merchants and the developers who build their websites, point of
+        sale, booking systems and back offices.
+      </P>
+      <List>
+        <li>Read your own orders into your system, with a key bound to your merchant.</li>
+        <li>Show your NexG listing and catalogue on your own website.</li>
+        <li>Use NexG&apos;s delivery zones and bookable services.</li>
+        <li>Keep your catalogue in your own system and import it to NexG as CSV.</li>
+      </List>
+      <Callout tone="soon" title="Not through the API yet">
         <p>
-          This guide is for NexG merchants and the developers who build their
-          websites, point-of-sale tools, booking systems, and back offices.
-          Start with the data the API supports today; ordering and payment
-          actions are not available through the API yet.
+          Creating, changing or cancelling orders, accepting bookings, starting a payment and
+          requesting a payout. Booking a service by API is designed and listed in the{' '}
+          <A href="/docs/reference/create-order">reference</A> as coming soon. The service list is
+          informational until then.
         </p>
-      </header>
+      </Callout>
 
-      <section className="space-y-3">
-        <h3 className="text-xl font-bold text-ink">What you can integrate today</h3>
-        <ul className="list-disc space-y-2 pl-6">
-          <li>Read public NexG listings and catalogue details for use in your own digital channels.</li>
-          <li>Read your own merchant orders using a key bound to your merchant account.</li>
-          <li>Browse active service types, delivery zones, and published experiences.</li>
-        </ul>
-        <p className="text-sm">
-          The API currently provides read access only. It cannot create or
-          update orders, accept or cancel bookings, initiate a customer payment,
-          or request a payout. The active service list is informational; it
-          does not mean service booking is enabled.
-        </p>
-      </section>
+      <H2 id="set-up">Set up an integration</H2>
+      <Steps>
+        <Step title="Sign in to the developer console">
+          <P>
+            Open the <A href="/developers">developer console</A> with the NexG account that owns
+            your merchant. Your merchants are listed by name.
+          </P>
+        </Step>
+        <Step title="Issue a key for your merchant">
+          <P>
+            Choose your merchant and only the scopes you need: <C>merchant_read</C> for your
+            orders, <C>public_read</C> for public data. Merchant keys need your merchant to be
+            approved and operating.
+          </P>
+        </Step>
+        <Step title="Store it as a secret on your server">
+          <P>
+            The key is shown once. Put it in your server&apos;s secret store, never in a website,
+            an app or a repository. See <A href="/docs/auth#safety">Keeping keys safe</A>.
+          </P>
+        </Step>
+        <Step title="Call the API from your server">
+          <P>
+            Map NexG&apos;s ids and stages into your system. The{' '}
+            <A href="/docs/connecting-systems#orders">order sync recipe</A> shows one way.
+          </P>
+        </Step>
+      </Steps>
 
-      <section className="space-y-3">
-        <h3 className="text-xl font-bold text-ink">Set up an integration</h3>
-        <ol className="list-decimal space-y-2 pl-6">
-          <li>Sign in to the <Link href="/developers" className="underline underline-offset-4">developer console</Link> with a NexG account that belongs to your merchant.</li>
-          <li>Create a key for your merchant and select only the scopes your integration needs. Use <code className="font-mono text-sm">merchant_read</code> to read that merchant&apos;s orders; use <code className="font-mono text-sm">public_read</code> for public data.</li>
-          <li>Copy the key when it is issued. NexG shows it only once; store it as a secret in your server environment.</li>
-          <li>Call the API from your server, then map NexG IDs and statuses into your own system.</li>
-        </ol>
-        <p className="text-sm">
-          Merchant keys are tied to one merchant. The API determines which
-          merchant&apos;s orders to return from the key; your request cannot
-          select a different merchant by sending its ID.
-        </p>
-      </section>
+      <H2 id="orders">Read your orders</H2>
+      <P>
+        Request <C>GET /v1/orders</C> with your merchant key. Orders come newest first, 25 to a
+        page; follow <C>next_cursor</C> for more. The key decides the merchant: you never send a
+        merchant id, and no request can read another merchant&apos;s orders.
+      </P>
+      {orders ? <CodeTabs className="mt-6" samples={requestSamples(orders)} title="Request" /> : null}
+      <CodeBlock className="mt-4" code={ORDER} language="json" title="One order in data.items" />
+      <P>
+        Amounts are integer cents: <C>161625</C> is KES 1,616.25. Keep both <C>order_id</C> and{' '}
+        <C>reference</C> so you can match your record with NexG&apos;s. Every field is described
+        in the <A href="/docs/reference/list-orders">reference</A>.
+      </P>
 
-      <section className="space-y-3">
-        <h3 className="text-xl font-bold text-ink">Read your orders</h3>
-        <p>
-          Request <code className="font-mono text-sm">GET /v1/orders</code> with
-          a merchant-bound key that has <code className="font-mono text-sm">merchant_read</code>.
-          Results are newest first and paginated. Follow <code className="font-mono text-sm">next_cursor</code> to
-          load the next page; treat the cursor as opaque.
-        </p>
-        <pre className="overflow-x-auto rounded bg-surface p-3 text-xs">
-{`curl "https://api.nexgapp.com/v1/orders?limit=25" \\
-  -H "X-Api-Key: YOUR_MERCHANT_KEY"`}
-        </pre>
-        <pre className="overflow-x-auto rounded bg-surface p-3 text-xs">
-{`{
-  "ok": true,
-  "data": {
-    "items": [{
-      "order_id": "…",
-      "reference": "…",
-      "service": "…",
-      "stage": "…",
-      "payment_status": "…",
-      "currency": "KES",
-      "total_cents": 12500
-    }],
-    "next_cursor": null
-  },
-  "meta": { "api_version": "v1", "limit": 25 }
-}`}
-        </pre>
-        <p className="text-sm">
-          Amounts are integer cents, not decimal shillings. Keep the NexG
-          <code className="font-mono"> order_id</code> and <code className="font-mono"> reference</code> so
-          you can match your local record with NexG. The actual response also
-          includes quantity, payment method, schedule, pickup/drop-off labels,
-          and creation time.
-        </p>
-      </section>
-
-      <section className="space-y-3">
-        <h3 className="text-xl font-bold text-ink">Integration practices</h3>
-        <ul className="list-disc space-y-2 pl-6">
-          <li>Keep API keys on your server. Never put them in browser JavaScript, mobile app bundles, public repositories, or URLs.</li>
-          <li>Use HTTPS and request only the fields and scopes your workflow needs.</li>
-          <li>Handle HTTP errors by status and stable error code. A 401 means check or replace the key; a 403 means the key lacks the required scope; a 429 means slow down and retry later.</li>
-          <li>Use pagination rather than assuming one response contains every record. Respect response cache headers for public catalogue data.</li>
-          <li>The API does not currently provide webhooks or order-write operations. Do not rely on instant push notifications or attempt to create, change, or cancel NexG orders through undocumented routes.</li>
-        </ul>
-      </section>
-
-      <p className="border-t border-ink/10 pt-5 text-sm">
-        For endpoint details, see the <Link href="/docs" className="underline underline-offset-4">API reference</Link>.
-        For bank collections at checkout, see the{' '}
-        <Link href="/docs/bank-transfers" className="underline underline-offset-4">bank and payment partner guide</Link>.
-      </p>
-    </article>
+      <H2 id="practices">Good practice</H2>
+      <List>
+        <li>Call NexG from your server only, over HTTPS.</li>
+        <li>
+          Handle errors by HTTP status and <C>error.code</C>: <C>401</C> means replace the key,{' '}
+          <C>403</C> means the key lacks the scope, <C>429</C> means wait for{' '}
+          <C>Retry-After</C>.
+        </li>
+        <li>Page with <C>next_cursor</C> rather than assuming one response holds everything.</li>
+        <li>
+          Poll your orders about once a minute. NexG does not push order changes yet; see{' '}
+          <A href="/docs/webhooks#coming-soon">Webhooks</A>.
+        </li>
+        <li>Do not call routes that are not in the reference. They are not part of the API.</li>
+      </List>
+    </DocPage>
   );
 }

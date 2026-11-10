@@ -4,7 +4,7 @@ Every derived brand asset, from one source file.
     python scripts/build-brand-assets.py
 
 The source is packages/ui/brand/nexg-mark.png. Everything this
-writes is generated and committed — favicons for both apps, the
+writes is generated and committed — favicons for every app, the
 Apple touch icons, and the base64 centre mark the QR encoder stamps
 into each card. Regenerate rather than editing any of them by hand,
 or they drift and the card stops matching the tab.
@@ -58,7 +58,7 @@ def main():
     mark = squared(Image.open(SOURCE))
     print(f"source {SOURCE.name} -> square {mark.size[0]}px")
 
-    for app in ("web", "admin"):
+    for app in ("web", "admin", "api"):
         app_dir = ROOT / "apps" / app / "app"
         if not app_dir.exists():
             print(f"  skipping {app}: no app directory")

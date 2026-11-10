@@ -1,153 +1,199 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@nexg/ui';
-import Link from 'next/link';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 
-/**
- * Interactive docs explorer for api.nexgapp.com
- *
- * Lists every public endpoint with description, parameters, and response
- * shape. Uses @nexg/ui design tokens (Manrope, bg-bg, ink) for consistency
- * with the marketing site and staff console.
- *
- * Lists implemented endpoints only. Planned writes and bank transfers
- * are documented separately until their routes and financial controls ship.
- */
+import { DocPage } from '@/components/docs/doc-page';
+import { A, C, Callout, H2, List, P, Strong } from '@/components/docs/prose';
+import { pageMetadata } from '@/lib/reference/navigation';
 
-const endpoints = [
+export const metadata = pageMetadata('/docs');
+
+const AUDIENCES = [
   {
-    method: 'GET',
-    path: '/v1/catalog/merchants',
-    title: 'List merchants',
-    desc: 'Cursor-paginated list of live merchants. Filter by city slug, taxonomy category, or free-text query.',
-    params: ['cursor', 'limit (1-100, default 25)', 'city', 'category', 'q'],
-    response: '{ ok: true, data: { items: PublicMerchant[], next_cursor: string|null }, meta: { api_version: "v1", limit: number } }',
+    name: 'Merchants',
+    today:
+      'Read your own orders into your back office with a key bound to your merchant, and show your NexG listing and catalogue on your own website.',
+    soon: 'Book transfers and couriers for your guests through the API, and receive order events instead of polling.',
+    href: '/docs/merchants',
+    link: 'Merchant integration guide',
   },
   {
-    method: 'GET',
-    path: '/v1/catalog/merchants/{id}',
-    title: 'Get merchant',
-    desc: 'Single merchant with its catalogue items. Returns 404 if the merchant is not live.',
-    params: ['id (UUID)'],
-    response: '{ ok: true, data: { merchant: PublicMerchant, catalogue: CatalogueItem[] }, meta: { api_version: "v1" } }',
+    name: 'Partners and developers',
+    today:
+      'Build on NexG’s public data: live merchants and catalogues, delivery zones and bookable services. Public reads work without a key.',
+    soon: 'Sandbox keys with test data, for building writes without touching real orders.',
+    href: '/docs/quickstart',
+    link: 'Quickstart',
   },
   {
-    method: 'GET',
-    path: '/v1/zones',
-    title: 'List zones',
-    desc: 'Active delivery zones with bounding boxes. No pagination needed: small, stable set.',
-    params: [],
-    response: '{ ok: true, data: { items: PublicZone[], next_cursor: null }, meta: { api_version: "v1", limit: number } }',
+    name: 'Banks and payment providers',
+    today:
+      'Collect payments at checkout through the bank collection contract, with signed webhooks, tested end to end against the NexG Sandbox Bank.',
+    soon: 'The first live bank connection, once finance has approved limits and reconciliation.',
+    href: '/docs/bank-transfers',
+    link: 'Bank collections',
   },
   {
-    method: 'GET',
-    path: '/v1/experiences',
-    title: 'List experiences',
-    desc: 'Upcoming events. Sorted by starts_at ascending. Cursor-paginated.',
-    params: ['cursor', 'limit', 'city', 'q'],
-    response: '{ ok: true, data: { items: PublicEvent[], next_cursor: string|null }, meta: { api_version: "v1", limit: number } }',
-  },
-  {
-    method: 'GET',
-    path: '/v1/services',
-    title: 'List available service types',
-    desc: 'Browse active service types and their labels. This endpoint is informational; creating a booking is not currently supported.',
-    params: [],
-    response: '{ ok: true, data: { items: ApiService[] }, meta: { api_version: "v1" } }',
-  },
-  {
-    method: 'GET',
-    path: '/v1/orders',
-    title: 'Read your merchant orders',
-    desc: 'Read a cursor-paginated list of orders for the merchant bound to your API key. Requires the merchant_read scope.',
-    params: ['X-Api-Key (merchant-bound key)', 'cursor (optional)', 'limit (1-100, default 25)'],
-    response: '{ ok: true, data: { items: MerchantOrder[], next_cursor: string|null }, meta: { api_version: "v1", limit: number } }',
+    name: 'Hotels and stays',
+    today:
+      'Show guests what NexG offers in your city: live merchants and their menus, and the zones NexG delivers to.',
+    soon: 'Airport transfers and couriers booked for guests from your own system.',
+    href: '/docs/connecting-systems',
+    link: 'Connecting your systems',
   },
 ];
 
-export default function DocsPage() {
+function FlowNode({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="space-y-8">
-      <section className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">Endpoints</h2>
-        <p className="text-ink/70">Use the NexG API to connect a merchant website or back-office system to public catalogue data and, with a merchant-bound key, read that merchant&apos;s orders. Guests can pay by bank at checkout (sandbox bank today; see the bank guide). Payouts and write operations are not available yet.</p>
-      </section>
+    <div className="border-border bg-surface rounded-lg border px-4 py-3 shadow-card">
+      <p className="text-ink text-sm font-bold">{title}</p>
+      <p className="text-muted mt-0.5 text-xs leading-5">{detail}</p>
+    </div>
+  );
+}
 
-      <section className="grid gap-8 border-y py-6 md:grid-cols-2" aria-label="Integration guides">
-        <div className="space-y-2">
-          <h3 className="text-lg font-bold">For merchants and developers</h3>
-          <p className="text-sm text-ink/70">Connect a website, point-of-sale system, or back office to NexG&apos;s published data and your merchant&apos;s order feed.</p>
-          <Link href="/docs/merchants" className="text-sm font-semibold underline underline-offset-4">Merchant integration guide</Link>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-bold">For banks and payment providers</h3>
-          <p className="text-sm text-ink/70">Bank collections at checkout: the API a bank provides, the signed webhooks NexG receives, and the NexG Sandbox Bank for testing.</p>
-          <Link href="/docs/bank-transfers" className="text-sm font-semibold underline underline-offset-4">Bank and payment partner guide</Link>
-        </div>
-      </section>
+/** An arrow between two nodes. Monospace only when the label is a request. */
+function FlowArrow({ label, code = false }: { label: string; code?: boolean }) {
+  return (
+    <div className="text-muted flex items-center justify-center gap-1.5 py-1 md:flex-col md:px-1 md:py-0">
+      <ArrowDown className="h-4 w-4 md:hidden" aria-hidden="true" />
+      <ArrowRight className="hidden h-4 w-4 md:block" aria-hidden="true" />
+      <span
+        className={
+          code
+            ? 'text-center font-mono text-xs font-semibold leading-4'
+            : 'text-center text-xs font-semibold leading-4'
+        }
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {endpoints.map((ep) => (
-          <Card key={ep.path} className="border shadow-sm">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-xs font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-surface border text-ink/60">{ep.method}</span>
-                <CardTitle className="text-base font-mono text-sm">{ep.path}</CardTitle>
-              </div>
-              <h3 className="font-extrabold text-lg">{ep.title}</h3>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-ink/80">{ep.desc}</p>
-              <div className="text-xs">
-                <strong className="block mb-1">Parameters</strong>
-                <div className="flex flex-wrap gap-2">
-                  {ep.params.length > 0 ? (
-                    ep.params.map((p) => (
-                      <span key={p} className="px-2 py-0.5 rounded bg-surface text-ink/70 text-xs font-mono">{p}</span>
-                    ))
-                  ) : (
-                    <span className="text-ink/40 text-xs">None</span>
-                  )}
-                </div>
-              </div>
-              <div className="text-xs">
-                <strong className="block mb-1">Response</strong>
-                <code className="block bg-surface p-2 rounded text-[11px] font-mono text-ink/80 overflow-x-auto whitespace-pre-wrap">{ep.response}</code>
-              </div>
-            </CardContent>
-          </Card>
+export default function IntroductionPage() {
+  return (
+    <DocPage
+      href="/docs"
+      toc={[
+        { id: 'what-it-does', label: 'What the API does' },
+        { id: 'how-it-fits', label: 'How it fits together' },
+        { id: 'who-its-for', label: 'Who it is for' },
+        { id: 'getting-started', label: 'Getting started' },
+        { id: 'not-yet', label: 'Not available yet' },
+      ]}
+    >
+      <H2 id="what-it-does">What the API does</H2>
+      <P>
+        NexG is a concierge delivery and booking platform for Kenya. What a guest sees on
+        nexgapp.com, from verified merchants and their catalogues to the zones NexG delivers to,
+        is also available to your systems as JSON over HTTPS, from{' '}
+        <C>https://api.nexgapp.com/v1</C>.
+      </P>
+      <List>
+        <li>
+          <Strong>Read</Strong> NexG&apos;s public data: merchants, catalogues, zones and bookable
+          services, and upcoming experiences once a{' '}
+          <A href="/docs/reference/list-experiences">known issue</A> is fixed. No key is needed to
+          start.
+        </li>
+        <li>
+          <Strong>Read your own orders</Strong> with a key bound to your merchant, newest first,
+          with the same stage the merchant console shows.
+        </li>
+        <li>
+          <Strong>Call back to NexG</Strong> with signed events. Banks do this today for payments
+          at checkout.
+        </li>
+      </List>
+
+      <H2 id="how-it-fits">How it fits together</H2>
+      <P>
+        NexG keeps one record of every merchant, item and order in its database. The website,
+        the merchant console and this API all read that same record, so what your system reads is
+        what a guest sees.
+      </P>
+      <figure className="mt-6">
+        <div className="grid items-center gap-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]">
+          <FlowNode title="Your system" detail="Website, POS, ERP, booking or bank" />
+          <FlowArrow label="GET /v1/…" code />
+          <FlowNode title="NexG API" detail="api.nexgapp.com · keys, scopes, limits" />
+          <FlowArrow label="one record" />
+          <FlowNode title="nexgapp.com" detail="Storefronts in NexG’s own design" />
+        </div>
+        <div className="mt-1 grid items-center gap-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]">
+          <FlowNode title="Your bank" detail="Signs every event it sends" />
+          <FlowArrow label="signed POST" />
+          <FlowNode title="NexG webhook" detail="Checks the signature twice" />
+          <FlowArrow label="once per event" />
+          <FlowNode title="The order" detail="Marked paid only by a verified event" />
+        </div>
+        <figcaption className="text-muted-light mt-3 text-xs">
+          Reads go to the API. Events come back to the website&apos;s webhook. Both end in the same
+          database.
+        </figcaption>
+      </figure>
+
+      <H2 id="who-its-for">Who it is for</H2>
+      <div className="divide-border border-border mt-6 divide-y border-y">
+        {AUDIENCES.map((audience) => (
+          <div key={audience.name} className="grid gap-x-8 gap-y-2 py-5 md:grid-cols-[11rem_minmax(0,1fr)]">
+            <h3 className="text-ink text-base font-extrabold">{audience.name}</h3>
+            <div className="min-w-0">
+              <p className="text-muted text-sm leading-6">
+                <span className="text-ink font-bold">Today. </span>
+                {audience.today}
+              </p>
+              <p className="text-muted mt-1.5 text-sm leading-6">
+                <span className="text-ink font-bold">Coming soon. </span>
+                {audience.soon}
+              </p>
+              <p className="mt-2 text-sm">
+                <A href={audience.href}>{audience.link}</A>
+              </p>
+            </div>
+          </div>
         ))}
       </div>
 
-      <section className="border-t pt-8 mt-8">
-        <h2 className="text-2xl font-bold mb-4">Authentication</h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>API Keys</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-ink/80 space-y-2">
-              <p>Send the key in the <code className="font-mono bg-surface px-1 rounded text-xs">X-Api-Key</code> header. The server validates the SHA-256 hash (never the raw key) and checks scopes, rate limits, and expiry.</p>
-              <p>For integrations, use <code className="font-mono text-xs">public_read</code> for public data or <code className="font-mono text-xs">merchant_read</code> for the bound merchant&apos;s orders. Other scopes are defined, but no write endpoints are currently available.</p>
-              <p>Keys share a PostgreSQL token bucket per merchant or developer. Public reads cost one token; merchant order reads cost three. A 429 response includes Retry-After in seconds. Manage keys at <Link href="/developers" className="underline">/developers</Link>.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>OAuth 2.0</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-ink/80 space-y-2">
-              <p>OAuth client storage is present, but authorization and token endpoints are not implemented. Use an API key for the implemented routes.</p>
-              <p>Do not build an integration against the planned OAuth flow until its endpoints are published here.</p>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="mt-6 flex flex-wrap gap-4 text-sm">
-          <Link href="/docs/auth" className="underline text-ink/80 hover:text-ink">Authentication guide →</Link>
-          <Link href="/docs/quickstart" className="underline text-ink/80 hover:text-ink">Quick start →</Link>
-          <Link href="/docs/merchants" className="underline text-ink/80 hover:text-ink">Merchant integration →</Link>
-          <Link href="/docs/bank-transfers" className="underline text-ink/80 hover:text-ink">Bank &amp; payment partners →</Link>
-          <Link href="/developers" className="underline text-ink/80 hover:text-ink">Issue a key →</Link>
-        </div>
-      </section>
-    </div>
+      <H2 id="getting-started">Getting started</H2>
+      <List ordered>
+        <li>
+          Make a request without a key: <C>curl https://api.nexgapp.com/v1/zones</C>. The{' '}
+          <A href="/docs/quickstart">quickstart</A> walks through it.
+        </li>
+        <li>
+          Sign in to the <A href="/developers">developer console</A> with your NexG account and
+          issue a key. It is shown once.
+        </li>
+        <li>
+          Read <A href="/docs/auth">Authentication</A>, <A href="/docs/errors">Errors</A> and{' '}
+          <A href="/docs/rate-limits">Rate limits</A> before you go live, then build against the{' '}
+          <A href="/docs/reference">API reference</A>.
+        </li>
+      </List>
+
+      <H2 id="not-yet">Not available yet</H2>
+      <P>
+        These are designed or planned, and each is marked coming soon wherever it appears in
+        these docs. Do not build against them until the <A href="/docs/changelog">changelog</A>{' '}
+        says they are live.
+      </P>
+      <List>
+        <li>
+          Writes: booking a service with <C>POST /v1/orders</C>, and any <C>PATCH</C> endpoint.
+        </li>
+        <li>Reading one order by id, <C>GET /v1/orders/{'{id}'}</C>.</li>
+        <li>Events NexG sends to you, such as an order changing stage. Poll your orders for now.</li>
+        <li>Sandbox API keys with test data.</li>
+        <li>Two-way sync with a POS, ERP, booking or inventory system.</li>
+        <li>OAuth sign-in for third-party apps. Use API keys.</li>
+      </List>
+      <Callout tone="note" title="Everything live today is read-only">
+        <p>
+          No endpoint on api.nexgapp.com changes anything at NexG, so you can explore against the live
+          API safely. The first write, booking a service, is designed around an idempotency key,
+          so a retried booking is never made twice.
+        </p>
+      </Callout>
+    </DocPage>
   );
 }
