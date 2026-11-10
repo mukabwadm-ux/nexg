@@ -278,9 +278,11 @@ export function StayingAtField() {
               </button>
             </div>
           ) : (
-            results.map((r) => (
+            results.map((r, i) => (
               <button
-                key={`${r.lat},${r.lng}`}
+                /* Two places can share a pin (shops in one mall), so the
+                   position in the list keeps every key unique. */
+                key={`${i}:${r.lat},${r.lng}`}
                 type="button"
                 onClick={() => void choose(r)}
                 className="border-border hover:bg-bg flex w-full items-center gap-3 border-b px-4 py-2.5 text-left transition-colors last:border-0"

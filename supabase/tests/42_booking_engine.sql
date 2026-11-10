@@ -33,6 +33,11 @@ insert into public.merchant_user (merchant_id, user_id, role) values
   ('cccccccc-0000-0000-0000-000000000001', '55555555-5555-5555-5555-555555555555', 'owner'),
   ('cccccccc-0000-0000-0000-000000000002', '77777777-7777-7777-7777-777777777777', 'owner');
 
+-- Open around the clock, so these checks are about overlaps, not opening hours.
+insert into public.merchant_hours (merchant_id, day_of_week, opens, closes, weekday_convention)
+select 'cccccccc-0000-0000-0000-000000000001', d, time '00:00', time '00:00', 'monday_zero'
+from generate_series(0, 6) d;
+
 insert into public.bookable_resource (id, merchant_id, model, kind, name, price_cents, price_unit, buffer_minutes, min_notice_minutes, cancel_cutoff_minutes)
 values
   ('dddddddd-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000001', 'exclusive', 'vehicle', 'Toyota Axio', 500000, 'day', 60, 120, 240);
