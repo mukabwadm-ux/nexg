@@ -34,7 +34,6 @@ import {
   Th,
   Tile,
   TIER_TONE,
-  when,
   type ZoneRow,
   day,
   hoursLabel,
@@ -745,37 +744,29 @@ export function FeesTab({
   );
 }
 
-// ═══════════════════════════════════ H3 · Payments & integrations
+// ═══════════════════════════════════ H3 · Payments
 
-export function PaymentsTab({ payments, integrations, rails, canEdit }: TabProps) {
-  const healthy = integrations.filter((i) => i.status === 'connected').length;
-  const pending = integrations.filter((i) => i.status === 'pending');
-  const todo = integrations.filter((i) => i.status === 'to_do');
-  const dueRotation = integrations.filter((i) => i.rotation_due).length;
+export function PaymentsTab({ payments, rails, canEdit }: TabProps) {
+  const on = payments.filter((m) => m.enabled).length;
 
   return (
     <>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Tile label="Payment success · 24 h" value={`${DASH}%`} hint="M-Pesa + card" />
-        <Tile label="Failed callbacks" value={DASH} hint="auto-retried · 0 stuck" />
         <Tile
-          label="Integrations healthy"
-          value={`${healthy} / ${integrations.length}`}
-          hint={[
-            pending.length > 0 ? `${pending.map((i) => i.label).join(', ')} pending` : null,
-            todo.length > 0 ? `${todo.map((i) => i.label).join(', ')} to do` : null,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-          tone={todo.length > 0 ? 'warning' : undefined}
-        />
-        <Tile
-          label="Keys due rotation"
-          value={num(dueRotation)}
-          hint="90-day rule"
-          tone={dueRotation > 0 ? 'warning' : 'success'}
+          label="Checkout methods on"
+          value={`${on} / ${payments.length}`}
+          tone={on === 0 ? 'warning' : undefined}
         />
       </div>
+
+      <p className="text-muted-light mt-3 text-[0.75rem] font-semibold">
+        External services, API keys, webhooks and bank connections are under{' '}
+        <Link href="/settings?tab=api" className="text-ink underline underline-offset-2">
+          API &amp; Webhooks
+        </Link>
+        .
+      </p>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2 lg:items-start">
         <div>
@@ -818,7 +809,8 @@ export function PaymentsTab({ payments, integrations, rails, canEdit }: TabProps
               — a guest who picks a route with nothing behind it finds out after they have chosen.
             </p>
           </Section>
-
+        </div>
+        <div>
           <Section title="Payouts · settlements" sub="">
             <div className="space-y-2">
               {rails.map((r) => (
@@ -844,54 +836,6 @@ export function PaymentsTab({ payments, integrations, rails, canEdit }: TabProps
                 <span className="font-extrabold">{kes(rails[0]?.float_alert_amount)}</span>
               </Card>
             </div>
-          </Section>
-        </div>
-
-        <div>
-          <Section title="Integrations" sub="">
-            <div className="space-y-2">
-              {integrations.map((i) => (
-                <Card key={i.key} className="p-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[0.875rem] font-extrabold">{i.label}</span>
-                    <Pill tone={STATUS_TONE[i.status]}>
-                      {i.status === 'pending' && (i.config.templates_total as number)
-                        ? `PENDING ${
-                            Number(i.config.templates_total) - Number(i.config.templates_approved)
-                          }`
-                        : (STATUS_LABEL[i.status] ?? i.status)}
-                    </Pill>
-                    {i.rotation_due && <Pill tone="bg-warning-bg text-warning">ROTATE KEY</Pill>}
-                  </div>
-                  <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.7]">
-                    {[i.provider ? `[${i.provider}]` : null, i.notes].filter(Boolean).join(' · ')}
-                  </p>
-                  {i.blocks.length > 0 && i.status !== 'connected' && (
-                    <p className="text-danger mt-1.5 text-[0.75rem] font-extrabold">
-                      Blocks: {i.blocks.join(', ').replace(/_/g, ' ')}
-                    </p>
-                  )}
-                  <p className="text-muted-light mt-1.5 text-[0.6875rem] font-semibold">
-                    {i.secrets > 0
-                      ? `${i.secrets} secret${i.secrets === 1 ? '' : 's'} in the vault · last rotated ${
-                          i.key_rotated_at ? when(i.key_rotated_at) : 'never'
-                        }`
-                      : 'No secrets stored here.'}
-                  </p>
-                </Card>
-              ))}
-            </div>
-            <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.7]">
-              Secrets live in the vault and this console holds only their names. There is no control
-              here that could show you a key, which is the point.
-            </p>
-          </Section>
-
-          <Section title="API keys & webhooks" sub="">
-            <Empty>
-              Keys are issued by the API build and are not editable from here yet. When they are,
-              they will be shown once and never again — rotation and revocation are already logged.
-            </Empty>
           </Section>
         </div>
       </div>

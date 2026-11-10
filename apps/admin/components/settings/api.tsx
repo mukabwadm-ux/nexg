@@ -1,5 +1,6 @@
 'use client';
 
+import { Card } from '@nexg/ui';
 import * as React from 'react';
 
 import {
@@ -12,6 +13,8 @@ import {
   setApiSecret,
   startApiTest,
 } from '@/app/settings/api-actions';
+
+import { type IntegrationRow, Pill, STATUS_LABEL, STATUS_TONE, Tile } from './shared';
 
 export interface ApiConnectionRow {
   id: string;
@@ -52,6 +55,21 @@ export interface ApiTestRow {
 export interface ApiOrigins {
   web: string;
   api: string;
+}
+
+export interface WebhookStatus {
+  key: 'paystack' | 'mpesa' | 'bank';
+  secret_set: boolean;
+  last_event_at: string | null;
+  events_30d: number;
+  unhandled_30d: number;
+  prompts_30d?: number;
+  answered_30d?: number;
+}
+
+export interface ApiOverview {
+  webhooks: WebhookStatus[];
+  api_keys: { active: number; merchant: number; platform: number };
 }
 
 const KIND_LABEL: Record<ApiConnectionRow['kind'], string> = {
@@ -121,11 +139,16 @@ export function ApiTab({
   tests,
   canEdit,
   origins,
+  integrations,
+  overview,
 }: {
   connections: ApiConnectionRow[];
   tests: ApiTestRow[];
   canEdit: boolean;
   origins: ApiOrigins;
+  integrations: IntegrationRow[];
+  /** Null until the database update for this tab is in place, or when it cannot be read. */
+  overview: ApiOverview | null;
 }) {
   const [adding, setAdding] = React.useState<'sandbox' | 'live' | null>(null);
   const byId = new Map(connections.map((c) => [c.id, c]));
@@ -133,14 +156,21 @@ export function ApiTab({
   return (
     <div className="mt-5 space-y-8">
       <p className="text-muted max-w-3xl text-[0.8125rem] font-semibold">
-        Every outside system NexG talks to (banks, merchants&apos; own systems, payment providers)
-        and NexG&apos;s own API, in a <strong>Sandbox</strong> for testing and a{' '}
-        <strong>Live</strong> environment for real partners. Credentials are kept in Supabase Vault:
-        you can set or replace one, but nobody can read it back. Tests are run by the database
-        itself, so a credential never reaches this page.
-        {!canEdit &&
-          ' You can view and test; changes need someone who edits Payments & integrations.'}
+        Everything NexG connects to: the external services it depends on, the webhooks that report
+        payments to it, and connections to banks, merchants&apos; own systems and NexG&apos;s own
+        API, each in a <strong>Sandbox</strong> for testing and a <strong>Live</strong> environment
+        for real partners. Credentials are kept in Supabase Vault: you can set or replace one, but
+        nobody can read it back. Connection tests are run by the database itself, so a credential
+        never reaches this page.
+        {!canEdit && ' You can view and test; changes need Finance or Tech.'}
       </p>
+
+      <ApiTiles integrations={integrations} connections={connections} overview={overview} />
+
+      <div className="grid gap-6 xl:grid-cols-2 xl:items-start">
+        <IntegrationsSection integrations={integrations} />
+        <WebhooksSection origins={origins} overview={overview} />
+      </div>
 
       {/* ───────────────────────────────────────────── environments */}
       <div className="grid gap-6 xl:grid-cols-2">
@@ -232,6 +262,230 @@ export function ApiTab({
 
       <ApiDocs origins={origins} />
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────── overview
+
+function ApiTiles({
+  integrations,
+  connections,
+  overview,
+}: {
+  integrations: IntegrationRow[];
+  connections: ApiConnectionRow[];
+  overview: ApiOverview | null;
+}) {
+  const healthy = integrations.filter((i) => i.status === 'connected').length;
+  const pending = integrations.filter((i) => i.status === 'pending');
+  const todo = integrations.filter((i) => i.status === 'to_do');
+  const dueRotation = integrations.filter((i) => i.rotation_due).length;
+  const switchedOn = connections.filter((c) => c.enabled);
+  const passing = switchedOn.filter((c) => c.status === 'connected').length;
+  const events = overview?.webhooks.reduce((n, w) => n + Number(w.events_30d), 0) ?? 0;
+  const unhandled = overview?.webhooks.reduce((n, w) => n + Number(w.unhandled_30d), 0) ?? 0;
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <Tile
+        label="Integrations healthy"
+        value={`${healthy} / ${integrations.length}`}
+        hint={[
+          pending.length > 0 ? `${pending.map((i) => i.label).join(', ')} pending` : null,
+          todo.length > 0 ? `${todo.map((i) => i.label).join(', ')} to do` : null,
+        ]
+          .filter(Boolean)
+          .join(' · ')}
+        tone={todo.length > 0 ? 'warning' : undefined}
+      />
+      <Tile
+        label="Keys due rotation"
+        value={String(dueRotation)}
+        hint="90-day rule"
+        tone={dueRotation > 0 ? 'warning' : 'success'}
+      />
+      <Tile
+        label="Connections passing"
+        value={`${passing} / ${switchedOn.length}`}
+        hint="last test of each switched-on connection"
+        tone={passing < switchedOn.length ? 'warning' : 'success'}
+      />
+      <Tile
+        label="Webhook events · 30 d"
+        value={overview ? String(events) : '—'}
+        hint={
+          overview
+            ? unhandled > 0
+              ? `${unhandled} not handled`
+              : 'none refused or unmatched'
+            : 'status not available yet'
+        }
+        tone={unhandled > 0 ? 'warning' : undefined}
+      />
+    </div>
+  );
+}
+
+function IntegrationsSection({ integrations }: { integrations: IntegrationRow[] }) {
+  return (
+    <section className={card} aria-labelledby="api-integrations">
+      <h3 id="api-integrations" className="text-lg font-extrabold tracking-tight">
+        Integrations
+      </h3>
+      <p className="text-muted text-[0.75rem] font-semibold">
+        The external services NexG depends on.
+      </p>
+      <div className="mt-3 space-y-2">
+        {integrations.length === 0 && (
+          <p className="text-muted-light text-sm font-semibold">No integrations recorded.</p>
+        )}
+        {integrations.map((i) => (
+          <Card key={i.key} className="p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[0.875rem] font-extrabold">{i.label}</span>
+              <Pill tone={STATUS_TONE[i.status]}>
+                {i.status === 'pending' && (i.config.templates_total as number)
+                  ? `PENDING ${
+                      Number(i.config.templates_total) - Number(i.config.templates_approved)
+                    }`
+                  : (STATUS_LABEL[i.status] ?? i.status)}
+              </Pill>
+              {i.rotation_due && <Pill tone="bg-warning-bg text-warning">ROTATE KEY</Pill>}
+            </div>
+            <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.7]">
+              {[i.provider ? `[${i.provider}]` : null, i.notes].filter(Boolean).join(' · ')}
+            </p>
+            {i.blocks.length > 0 && i.status !== 'connected' && (
+              <p className="text-danger mt-1.5 text-[0.75rem] font-extrabold">
+                Blocks: {i.blocks.join(', ').replace(/_/g, ' ')}
+              </p>
+            )}
+            <p className="text-muted-light mt-1.5 text-[0.6875rem] font-semibold">
+              {i.secrets > 0
+                ? `${i.secrets} secret${i.secrets === 1 ? '' : 's'} in the vault · last rotated ${when(
+                    i.key_rotated_at,
+                  )}`
+                : 'No secrets stored here.'}
+            </p>
+          </Card>
+        ))}
+      </div>
+      <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.7]">
+        Secrets live in the vault and this console holds only their names. There is no control here
+        that could show you a key, which is the point.
+      </p>
+    </section>
+  );
+}
+
+const WEBHOOKS: {
+  key: WebhookStatus['key'];
+  name: string;
+  path: string;
+  check: string;
+  secret: string;
+}[] = [
+  {
+    key: 'paystack',
+    name: 'Paystack (cards)',
+    path: '/api/payments/paystack/webhook',
+    check: 'HMAC-SHA512 of the raw body (x-paystack-signature), checked again in the database',
+    secret: 'paystack_secret_key',
+  },
+  {
+    key: 'mpesa',
+    name: 'M-Pesa (Safaricom Daraja)',
+    path: '/api/payments/mpesa/callback?token=…',
+    check: 'A secret token in the callback address, checked again in the database',
+    secret: 'daraja_callback_secret',
+  },
+  {
+    key: 'bank',
+    name: 'Banks',
+    path: '/api/payments/bank/webhook',
+    check: 'X-Bank-Signature: HMAC-SHA256 of "timestamp.body", refused after five minutes',
+    secret: 'bank_webhook_secret',
+  },
+];
+
+function WebhooksSection({
+  origins,
+  overview,
+}: {
+  origins: ApiOrigins;
+  overview: ApiOverview | null;
+}) {
+  return (
+    <section className={card} aria-labelledby="api-webhooks">
+      <h3 id="api-webhooks" className="text-lg font-extrabold tracking-tight">
+        Webhooks
+      </h3>
+      <p className="text-muted text-[0.75rem] font-semibold">
+        Where payment providers and banks tell NexG what happened. Only a verified event changes a
+        payment.
+      </p>
+      <div className="mt-3 space-y-2">
+        {WEBHOOKS.map((w) => {
+          const s = overview?.webhooks.find((x) => x.key === w.key);
+          const prompts = Number(s?.prompts_30d ?? 0);
+          const silent = w.key === 'mpesa' && prompts > 0 && Number(s?.events_30d ?? 0) === 0;
+          return (
+            <Card key={w.key} className="p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[0.875rem] font-extrabold">{w.name}</span>
+                {s && (
+                  <Pill
+                    tone={
+                      s.secret_set ? 'bg-success-bg text-success' : 'bg-warning-bg text-warning'
+                    }
+                  >
+                    {s.secret_set ? 'SECRET SET' : 'NO SECRET'}
+                  </Pill>
+                )}
+              </div>
+              <p className="text-muted mt-1 break-all font-mono text-[0.6875rem]">
+                POST {origins.web}
+                {w.path}
+              </p>
+              <p className="text-muted mt-1 text-[0.75rem] font-semibold">{w.check}.</p>
+              <p className="text-muted-light mt-1 text-[0.6875rem] font-semibold">
+                Vault secret <code className="font-mono">{w.secret}</code>
+                {s
+                  ? ` · last event ${when(s.last_event_at)} · ${s.events_30d} in 30 days${
+                      Number(s.unhandled_30d) > 0 ? ` · ${s.unhandled_30d} not handled` : ''
+                    }`
+                  : ''}
+                {s && w.key === 'mpesa'
+                  ? ` · ${prompts} prompt${prompts === 1 ? '' : 's'} sent, ${s.answered_30d ?? 0} answered`
+                  : ''}
+              </p>
+              {silent && (
+                <p className="text-danger mt-1.5 text-[0.75rem] font-bold">
+                  Prompts went out but no answer from Safaricom was recorded. Check that Safaricom
+                  can reach this address and that DARAJA_CALLBACK_SECRET on the website matches{' '}
+                  <code className="font-mono">daraja_callback_secret</code> in Vault.
+                </p>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+      <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.7]">
+        {overview
+          ? `API keys: ${overview.api_keys.active} active (${overview.api_keys.merchant} for merchants, ${overview.api_keys.platform} platform). `
+          : 'Live webhook status appears once the database update for this tab has been run. '}
+        Keys are created in the{' '}
+        <a
+          className="underline"
+          href={`${origins.api}/developers`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          developer console
+        </a>{' '}
+        and shown once.
+      </p>
+    </section>
   );
 }
 

@@ -50136,6 +50136,7 @@ export type Database = {
       rpc_api_connection_test: { Args: { p_id: string }; Returns: string };
       rpc_api_connection_test_result: { Args: { p_test_id: string }; Returns: Json };
       rpc_api_key_revoke: { Args: { p_key_id: string; p_reason?: string }; Returns: boolean };
+      rpc_api_overview: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_approval_decide: {
         Args: { p_approve: boolean; p_note?: string; p_request_id: string };
         Returns: {

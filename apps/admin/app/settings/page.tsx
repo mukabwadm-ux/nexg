@@ -9,7 +9,12 @@ import {
 } from '@/app/settings/actions';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
-import { type ApiConnectionRow, ApiTab, type ApiTestRow } from '@/components/settings/api';
+import {
+  type ApiConnectionRow,
+  type ApiOverview,
+  ApiTab,
+  type ApiTestRow,
+} from '@/components/settings/api';
 import { SaveBar, ScheduledBanner } from '@/components/settings/controls';
 import { EmailRoutingTab, type EmailRouteRow } from '@/components/settings/email-routing';
 import {
@@ -98,8 +103,9 @@ export default async function SettingsPage({
   let apiConnections: ApiConnectionRow[] = [];
   let apiTests: ApiTestRow[] = [];
   let apiCanEdit = false;
+  let apiOverview: ApiOverview | null = null;
   if (tab === 'api') {
-    const [conn, runs, may] = await Promise.all([
+    const [conn, runs, may, overview] = await Promise.all([
       s
         .from('api_connection_v' as never)
         .select('*')
@@ -111,10 +117,16 @@ export default async function SettingsPage({
         .order('started_at', { ascending: false })
         .limit(25),
       s.rpc('rpc_settings_may_edit', { p_group: 'payments' }),
+      /* Webhook and API-key status. Missing until its migration has run; the
+         tab then shows the webhooks without live status. */
+      s.rpc('rpc_api_overview' as never),
     ]);
     apiConnections = (conn.data as ApiConnectionRow[] | null) ?? [];
     apiTests = (runs.data as ApiTestRow[] | null) ?? [];
     apiCanEdit = may.data === true;
+    apiOverview = overview.error
+      ? null
+      : ((overview.data as unknown as ApiOverview | null) ?? null);
   }
 
   let emailRoutes: EmailRouteRow[] = [];
@@ -333,6 +345,8 @@ export default async function SettingsPage({
             connections={apiConnections}
             tests={apiTests}
             canEdit={apiCanEdit}
+            integrations={props.integrations}
+            overview={apiOverview}
             origins={{
               web: (process.env.NEXT_PUBLIC_WEB_ORIGIN ?? 'https://nexgapp.com').replace(
                 /\/+$/,
