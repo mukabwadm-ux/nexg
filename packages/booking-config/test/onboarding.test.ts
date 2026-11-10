@@ -1,3 +1,4 @@
+import { SUBCATEGORY_VARIANTS } from '../src/variants';
 import { describe, expect, it } from 'vitest';
 import {
   assessOnboardingAnswers,
@@ -10,10 +11,12 @@ const signedIn = { otpVerified: true, signedIn: true };
 const capturing = { otpVerified: false, signedIn: false };
 
 describe('compiled onboarding inventory', () => {
-  it('exposes all 128 registered input configurations under their existing categories', () => {
+  it('exposes all registered input configurations under their existing categories', () => {
     const categories = listOnboardingCategories();
     expect(categories).toHaveLength(21);
-    expect(categories.flatMap((category) => category.subcategories)).toHaveLength(128);
+    expect(categories.flatMap((category) => category.subcategories)).toHaveLength(
+      128 + SUBCATEGORY_VARIANTS.length,
+    );
     expect(
       categories.flatMap((category) =>
         category.subcategories.map((subcategory) => ({

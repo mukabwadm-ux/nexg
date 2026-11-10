@@ -13,6 +13,8 @@ concurrency:
 env:
   TURBO_TELEMETRY_DISABLED: 1
   NEXT_TELEMETRY_DISABLED: 1
+  # NexG Discovery (apps/web build) refuses a local Supabase unless asked; CI builds against one.
+  DISCOVERY_ALLOW_LOCAL_SUPABASE: '1'
 
 jobs:
   database:
@@ -178,6 +180,13 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      # NexG Discovery (discovery/) is its own npm project outside the pnpm workspace. `pnpm build` installs it
+      # when it builds /discover; install here too in case that build came from the Turbo cache.
+      - name: Test NexG Discovery
+        run: |
+          test -d discovery/node_modules/vite || npm ci --prefix discovery --include=dev --no-audit --no-fund
+          npm --prefix discovery test
 
       - name: Check formatting
         run: pnpm format:check

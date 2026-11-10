@@ -1,3 +1,4 @@
+import { SUBCATEGORY_VARIANTS } from '../src/variants';
 import { describe, expect, it } from 'vitest';
 import {
   evaluatePredicate,
@@ -148,9 +149,11 @@ function readyAppointment(): ResolveBookingInput {
 describe('reconciled source inventory', () => {
   it('preserves every category and subtype with registered question and model bindings', () => {
     const profiles = listBookingProfiles();
-    expect(profiles).toHaveLength(128);
+    // The audited 128 plus the subcategory variants (src/data/subcategory-variants.json).
+    const total = 128 + SUBCATEGORY_VARIANTS.length;
+    expect(profiles).toHaveLength(total);
     expect(new Set(profiles.map((profile) => profile.categoryId)).size).toBe(21);
-    expect(new Set(profiles.map((profile) => profile.subcategoryId)).size).toBe(128);
+    expect(new Set(profiles.map((profile) => profile.subcategoryId)).size).toBe(total);
     const models = new Set(listBookingModels().map((model) => model.id));
     for (const profile of profiles) {
       expect(models.has(profile.defaultModelId)).toBe(true);

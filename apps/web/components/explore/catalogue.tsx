@@ -1,4 +1,8 @@
+import Link from 'next/link';
+
 import { AddToCart } from '@/components/cart/add-to-cart';
+import { productHref } from '@/lib/best-sellers';
+import { promoBadge, type PromoPrice, type PromoPrices } from '@/lib/promotions';
 
 import { TodayMarker } from './today-marker';
 
@@ -49,10 +53,13 @@ export function Catalogue({
   merchantId,
   merchantName,
   sections,
+  promotions = {},
 }: {
   merchantId: string;
   merchantName: string;
   sections: CatalogueSection[];
+  /** Running promotions by item: the price shown is the price charged. */
+  promotions?: PromoPrices;
 }) {
   const popular = sections.flatMap((s) => s.items).filter((i) => i.highlighted && i.available);
   const groups: CatalogueSection[] =
@@ -104,7 +111,14 @@ export function Catalogue({
               >
                 <div className="flex min-w-0 flex-1 flex-col justify-between p-3.5">
                   <div>
-                    <p className="text-[0.9375rem] font-extrabold leading-snug">{item.name}</p>
+                    <p className="text-[0.9375rem] font-extrabold leading-snug">
+                      <Link
+                        href={productHref(merchantId, item.id)}
+                        className="hover:underline hover:underline-offset-4"
+                      >
+                        {item.name}
+                      </Link>
+                    </p>
                     {item.description && (
                       <p className="text-muted-light mt-1 line-clamp-2 text-xs font-semibold leading-snug">
                         {item.description}
@@ -171,7 +185,7 @@ export function Catalogue({
                     )}
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="text-[0.9375rem] font-extrabold">{price(item.price_kes)}</span>
+                    <ItemPrice listKes={item.price_kes} promo={promotions[item.id]} />
                     {item.highlighted && item.available && (
                       <span className="bg-gold-soft text-gold-text rounded-full px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide">
                         Popular
@@ -199,7 +213,10 @@ export function Catalogue({
                   ) : null}
                   {item.available ? (
                     <div className="absolute bottom-2 right-2 z-10">
-                      <AddToCart merchant={{ id: merchantId, name: merchantName }} item={item} />
+                      <AddToCart
+                        merchant={{ id: merchantId, name: merchantName }}
+                        item={{ ...item, price_kes: promotions[item.id]?.promo ?? item.price_kes }}
+                      />
                     </div>
                   ) : (
                     <span className="text-muted-light text-[0.625rem] font-bold uppercase">
@@ -218,6 +235,20 @@ export function Catalogue({
         pay.
       </p>
     </div>
+  );
+}
+
+/** The item's price, or its promotional price with the list price struck through. */
+function ItemPrice({ listKes, promo }: { listKes: number | null; promo?: PromoPrice }) {
+  if (!promo) return <span className="text-[0.9375rem] font-extrabold">{price(listKes)}</span>;
+  return (
+    <>
+      <span className="text-danger text-[0.9375rem] font-extrabold">{price(promo.promo)}</span>
+      <s className="text-muted-light text-xs font-semibold">{price(listKes)}</s>
+      <span className="bg-danger-bg text-danger rounded-full px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-wide">
+        {promoBadge(promo)}
+      </span>
+    </>
   );
 }
 

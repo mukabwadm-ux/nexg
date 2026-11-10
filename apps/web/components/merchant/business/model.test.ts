@@ -1,3 +1,8 @@
+import { SUBCATEGORY_VARIANTS } from '@nexg/booking-config/variants';
+
+/** The audited 128 specialties plus the subcategory variants. */
+const PROFILE_COUNT = 128 + SUBCATEGORY_VARIANTS.length;
+
 import { describe, expect, it } from 'vitest';
 import {
   activityIssues,
@@ -24,8 +29,8 @@ const memory = () => {
   };
 };
 describe('Business frontend configuration', () => {
-  it('validates representative configured samples and every source question for all 128 specialties', () => {
-    expect(profiles).toHaveLength(128);
+  it('validates representative configured samples and every source question for every specialty', () => {
+    expect(profiles).toHaveLength(PROFILE_COUNT);
     expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(21);
     for (const profile of profiles) {
       expect(validateBusiness(seedBusiness(profile.id)), profile.id).toEqual([]);
@@ -60,7 +65,7 @@ describe('Business frontend configuration', () => {
   });
   it('requires registered question IDs and models for future definitions', () => {
     const p = { ...profiles[0]!, id: 'future-specialty', name: 'Future specialty' };
-    expect(extendBusinessProfiles([p])).toHaveLength(129);
+    expect(extendBusinessProfiles([p])).toHaveLength(PROFILE_COUNT + 1);
     expect(() => extendBusinessProfiles([{ ...p, questions: ['UNKNOWN'] }])).toThrow();
     expect(() => extendBusinessProfiles([profiles[0]!])).toThrow();
   });

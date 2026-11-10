@@ -8,6 +8,7 @@ import { LEGAL_DOCUMENTS, findDocument } from '@/content/legal';
 import { PrintButton } from '@/components/legal/print-button';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
 
 export function generateStaticParams() {
   return LEGAL_DOCUMENTS.map((document) => ({ slug: document.slug }));
@@ -216,7 +217,15 @@ export default function LegalPage({ params }: { params: { slug: string } }) {
                 Registered office: Nairobi, Kenya
               </p>
               <p className="text-muted-light mt-1 text-xs font-semibold">
-                Data Protection Officer and support contacts are published with the Privacy Policy.
+                Read the full{' '}
+                <a
+                  href={DATA_PROTECTION_POLICY_URL}
+                  {...NEW_TAB}
+                  className="text-ink font-bold underline underline-offset-2"
+                >
+                  NexG Data Protection Policy
+                </a>
+                .
               </p>
             </footer>
           </div>

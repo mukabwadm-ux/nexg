@@ -1,14 +1,36 @@
 'use client';
 
-import { Button, Card, Input, useToast } from '@nexg/ui';
+import { Button, Card, Input, useToast, withCaptcha } from '@nexg/ui';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { requestPasswordRecovery, updateRecoveredPassword } from '@/app/(customer)/sign-in/actions';
+import { PORTALS, type Portal } from '@/lib/auth-portals';
 
-export function ForgotPasswordForm({ invalidLink = false }: { invalidLink?: boolean }) {
+/** A full page load for the host workspace, which is served as its own HTML. */
+export function goTo(router: ReturnType<typeof useRouter>, destination: string) {
+  if (
+    destination === '/host' ||
+    destination.startsWith('/host?') ||
+    destination.startsWith('/host/')
+  ) {
+    window.location.assign(destination);
+    return;
+  }
+  router.push(destination);
+  router.refresh();
+}
+
+export function ForgotPasswordForm({
+  invalidLink = false,
+  portal = 'customer',
+}: {
+  invalidLink?: boolean;
+  /** The sign-in page to return to. After the reset, the account goes to its own home. */
+  portal?: Portal;
+}) {
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [sent, setSent] = React.useState(false);
@@ -18,7 +40,9 @@ export function ForgotPasswordForm({ invalidLink = false }: { invalidLink?: bool
     setPending(true);
     setError(null);
 
-    const result = await requestPasswordRecovery(new FormData(event.currentTarget));
+    const result = await requestPasswordRecovery(
+      await withCaptcha(new FormData(event.currentTarget)),
+    );
     setPending(false);
     if (!result.ok) {
       setError(result.message);
@@ -71,10 +95,10 @@ export function ForgotPasswordForm({ invalidLink = false }: { invalidLink?: bool
       )}
 
       <Link
-        href="/sign-in"
+        href={PORTALS[portal].signIn}
         className="text-ink mt-6 block text-center text-sm font-bold underline underline-offset-4"
       >
-        Back to sign in
+        Back to {portal === 'customer' ? '' : `${PORTALS[portal].label.toLowerCase()} `}sign in
       </Link>
     </Card>
   );
@@ -99,8 +123,8 @@ export function ResetPasswordForm({ redirectTo = '/' }: { redirectTo?: string })
     }
 
     toast({ title: 'Password updated', description: result.message, tone: 'success' });
-    router.push(redirectTo);
-    router.refresh();
+    // The server knows where this account belongs (its workspace, if any).
+    goTo(router, result.redirectTo ?? redirectTo);
   };
 
   return (

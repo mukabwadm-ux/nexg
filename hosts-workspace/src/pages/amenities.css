@@ -1,0 +1,225 @@
+.unit-page .amenity-instructions-panel {
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
+}
+.amenity-instructions-panel > h2 {
+  flex: none;
+  margin: 0;
+}
+.amenity-instructions-panel .amenity-accordion {
+  flex: none;
+  min-width: 0;
+}
+.amenity-accordion .nexg-accordion-trigger {
+  min-height: 35px;
+  padding: 7px 9px;
+  gap: 10px;
+}
+.amenity-accordion .nexg-accordion-title {
+  font-size: 12px;
+  line-height: 20px;
+}
+.amenity-accordion .nexg-accordion-content {
+  padding: 8px 9px 11px;
+}
+.amenity-instruction-content {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+.amenity-instructions-panel .amenity-instruction-content > p {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+}
+.amenity-instruction-content > ol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.amenity-instruction-content > ol > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.amenity-step-number {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+.amenity-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.amenity-edit-actions > .btn {
+  min-height: 29px;
+  font-size: 10px;
+  padding: 6px 8px;
+  gap: 5px;
+}
+.amenity-edit-actions > .btn > svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+}
+.amenity-media-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 16px;
+  overflow-wrap: anywhere;
+}
+.amenity-steps-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--muted);
+}
+.amenity-steps-controls > div {
+  display: flex;
+  gap: 4px;
+}
+.amenity-steps-controls .btn {
+  min-height: 24px;
+  padding: 4px 6px;
+}
+.amenity-pagination {
+  flex: none;
+  margin-top: 1px;
+}
+.amenity-pagination .pager {
+  min-height: 25px;
+  font-size: 10px;
+}
+.amenity-pagination .pager > div {
+  gap: 7px;
+}
+.amenity-pagination .pager .btn {
+  min-height: 25px;
+  padding: 4px 6px;
+}
+.amenity-instructions-panel > .guide-status {
+  gap: 6px;
+  min-height: 35px;
+  padding-top: 8px;
+}
+.amenity-instructions-panel > .guide-status > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.amenity-instructions-panel > .guide-status .badge {
+  font-size: 9px;
+  padding: 3px 5px;
+}
+.amenity-instructions-panel > .guide-status > .btn {
+  min-height: 28px;
+  font-size: 10px;
+  padding: 5px 6px;
+  gap: 5px;
+}
+.amenity-instructions-panel > .guide-status svg {
+  display: block;
+  flex: none;
+  width: 17px;
+  height: 17px;
+}
+.amenity-instructions-panel[data-density='compact'] {
+  padding: 10px;
+  gap: 7px;
+}
+.amenity-instructions-panel[data-density='compact'] > h2 {
+  font-size: 18px;
+  line-height: 24px;
+}
+.amenity-instructions-panel[data-density='compact'] .nexg-accordion-trigger {
+  min-height: 29px;
+  padding: 4px 7px;
+  gap: 8px;
+}
+.amenity-instructions-panel[data-density='compact'] .nexg-accordion-title {
+  font-size: 11px;
+  line-height: 19px;
+}
+.amenity-instructions-panel[data-density='compact'] .nexg-accordion-content {
+  padding: 6px 7px 8px;
+}
+.amenity-instructions-panel[data-density='compact'] .amenity-instruction-content {
+  gap: 6px;
+}
+.amenity-instructions-panel[data-density='compact'] .amenity-instruction-content > p {
+  font-size: 10px;
+  line-height: 1.4;
+}
+.amenity-instructions-panel[data-density='compact'] .amenity-instruction-content > ol {
+  gap: 5px;
+}
+.amenity-instructions-panel[data-density='compact'] .amenity-instruction-content > ol > li {
+  font-size: 10px;
+  line-height: 1.4;
+  gap: 7px;
+}
+.amenity-instructions-panel[data-density='compact'] .amenity-step-number {
+  width: 19px;
+  height: 19px;
+  font-size: 10px;
+}
+.amenity-instructions-panel[data-density='compact'] .amenity-edit-actions > .btn {
+  min-height: 25px;
+  padding: 4px 6px;
+  font-size: 9px;
+}
+@media (max-width: 800px) {
+  .unit-page .amenity-instructions-panel {
+    padding: 9px;
+    gap: 6px;
+  }
+  .amenity-instructions-panel > .guide-status {
+    min-height: 29px;
+    padding-top: 5px;
+  }
+  .amenity-instructions-panel > .guide-status > span {
+    font-size: 8px;
+    gap: 3px;
+  }
+  .amenity-instructions-panel > .guide-status .badge {
+    font-size: 8px;
+    padding: 2px 4px;
+  }
+  .amenity-instructions-panel > .guide-status > .btn {
+    font-size: 8px;
+    min-height: 24px;
+    padding: 4px;
+    gap: 3px;
+  }
+  .amenity-instructions-panel > .guide-status svg {
+    width: 14px;
+    height: 14px;
+  }
+}

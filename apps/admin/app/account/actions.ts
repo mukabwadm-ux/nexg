@@ -87,7 +87,12 @@ export async function changePassword(formData: FormData): Promise<ActionResult> 
   } = await supabase.auth.getUser();
   if (!user?.email) return { ok: false, message: 'Sign in again first.' };
 
-  const check = await supabase.auth.signInWithPassword({ email: user.email, password: current });
+  const captcha = formData.get('captchaToken');
+  const check = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: current,
+    options: { captchaToken: typeof captcha === 'string' && captcha ? captcha : undefined },
+  });
   if (check.error) return { ok: false, message: 'Your current password is not right.' };
 
   const { error } = await supabase.auth.updateUser({ password: next });

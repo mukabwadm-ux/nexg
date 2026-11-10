@@ -1,0 +1,5474 @@
+{
+  "version": "1.2",
+  "date": "2026-11-09",
+  "status": "draft from owner direction: every store's list is sectioned one consistent, Wolt-like way (\"Frequently ordered\", \"Desserts\"...), named in each store type's own words; the engine later learns and contributes to it",
+  "purpose": "Section vocabularies for storefront menus, one scheme per Discovery category. A section ID is `<scheme>:<section>` and never changes once published. Studio may later rename titles, add sections and retire them.",
+  "precedence": [
+    "catalogue: the merchant's own section on the item (`section`) wins",
+    "engine: a section ID the engine assigned (`sectionId`) comes next",
+    "rules: otherwise the item's name is matched against the keywords below"
+  ],
+  "matching": "Names and keywords are lower-cased and accents removed. A keyword matches whole words; a trailing * matches any ending. Sections with a priority are tried first, lowest number first; then the rest in display order; then the shared sections; anything left goes to the fallback. Sections show in display order, items keep catalogue order.",
+  "departments": "Every product store uses the retail storefront (owner, 9 Nov 2026): groceries, electronics, pharmacy, drinks, fashion, beauty products, flowers and gifts, marketplace and adults. Their schemes group sections (aisles) into departments, each listing its aisles in display order; an aisle sits in one department at most. A merchant's own section joins the department its name matches, by the aisle words and then the department's own words; whatever no department claims goes to the fallback, last. A store with fewer than two departments shows its aisles straight away. Beauty's departments cover products only: its service sections stay out.",
+  "schemes": [
+    {
+      "id": "menu",
+      "categories": [
+        "restaurants-food"
+      ],
+      "allTitle": "Menu",
+      "sections": [
+        {
+          "id": "breakfast",
+          "title": "Breakfast",
+          "priority": 6,
+          "keywords": [
+            "breakfast",
+            "toast",
+            "granola",
+            "pancake*",
+            "omelette*",
+            "eggs"
+          ]
+        },
+        {
+          "id": "platters-combos",
+          "title": "Platters & combos",
+          "keywords": [
+            "platter*",
+            "combo*",
+            "bucket*",
+            "lunch box*",
+            "sharing",
+            "meal deal*"
+          ]
+        },
+        {
+          "id": "burgers-wraps",
+          "title": "Burgers & wraps",
+          "keywords": [
+            "burger*",
+            "wrap*",
+            "sandwich*",
+            "shawarma*"
+          ]
+        },
+        {
+          "id": "pizza",
+          "title": "Pizza",
+          "keywords": [
+            "pizza*"
+          ]
+        },
+        {
+          "id": "bowls-curries",
+          "title": "Bowls & curries",
+          "keywords": [
+            "bowl*",
+            "curry",
+            "curries",
+            "butter chicken",
+            "pasta*",
+            "biryani",
+            "pilau",
+            "rice"
+          ]
+        },
+        {
+          "id": "grills-mains",
+          "title": "Grills & mains",
+          "keywords": [
+            "grilled",
+            "grill*",
+            "steak*",
+            "fillet*",
+            "fish",
+            "peri-peri",
+            "chicken",
+            "beef",
+            "special*",
+            "plate*",
+            "nyama",
+            "ribs"
+          ]
+        },
+        {
+          "id": "starters-sides",
+          "title": "Starters & sides",
+          "priority": 8,
+          "keywords": [
+            "fries",
+            "chips",
+            "wings",
+            "salad*",
+            "soup*",
+            "samosa*"
+          ]
+        },
+        {
+          "id": "bread-pastries",
+          "title": "Bread & pastries",
+          "keywords": [
+            "sourdough",
+            "loaf",
+            "croissant*",
+            "cinnamon roll*",
+            "bread",
+            "muffin*",
+            "focaccia",
+            "bagel*",
+            "scone*"
+          ]
+        },
+        {
+          "id": "savoury-bakes",
+          "title": "Savoury bakes",
+          "priority": 7,
+          "keywords": [
+            "pie",
+            "pies",
+            "quiche*"
+          ]
+        },
+        {
+          "id": "desserts",
+          "title": "Desserts",
+          "keywords": [
+            "cheesecake*",
+            "brownie*",
+            "tiramisu",
+            "gelato*",
+            "ice cream*",
+            "waffle*",
+            "crepe*",
+            "churros",
+            "cake*",
+            "panna cotta",
+            "cookie*",
+            "tart*",
+            "dessert*"
+          ]
+        },
+        {
+          "id": "coffee",
+          "title": "Coffee",
+          "keywords": [
+            "espresso*",
+            "cappuccino*",
+            "flat white*",
+            "latte*",
+            "cold brew*",
+            "americano*",
+            "mocha*",
+            "macchiato*",
+            "coffee"
+          ]
+        },
+        {
+          "id": "tea",
+          "title": "Tea",
+          "priority": 3,
+          "keywords": [
+            "matcha",
+            "chai",
+            "tea",
+            "teas"
+          ]
+        },
+        {
+          "id": "juices",
+          "title": "Fresh juices",
+          "keywords": [
+            "juice*",
+            "mango passion",
+            "pineapple mint",
+            "lemonade*"
+          ]
+        },
+        {
+          "id": "smoothies-bowls",
+          "title": "Smoothies & bowls",
+          "priority": 4,
+          "keywords": [
+            "smoothie*",
+            "acai"
+          ]
+        },
+        {
+          "id": "shots-water",
+          "title": "Shots & water",
+          "priority": 5,
+          "keywords": [
+            "shot",
+            "shots",
+            "coconut water",
+            "water"
+          ]
+        },
+        {
+          "id": "buffets",
+          "title": "Buffets",
+          "priority": 2,
+          "keywords": [
+            "buffet*"
+          ]
+        },
+        {
+          "id": "packages-events",
+          "title": "Packages & events",
+          "priority": 1,
+          "keywords": [
+            "catering",
+            "package*",
+            "corporate",
+            "canape*",
+            "wedding*",
+            "cocktail*",
+            "private dinner*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "groceries",
+      "categories": [
+        "groceries-essentials"
+      ],
+      "allTitle": "All products",
+      "departmentsNote": "Two levels for stores with thousands of products (owner, 9 Nov 2026): departments in the sidebar, aisles inside them. Each department lists its aisles in display order. Every aisle has a priority, so the most specific product words win (\"Coconut milk\" is a tin, \"Vegetable oil\" an oil, \"Tuna steak\" fish). A merchant's own section becomes an aisle in the department its name matches, by the aisle words and then the department's own words, else \"More\".",
+      "departments": [
+        {
+          "id": "fruit-veg",
+          "title": "Fruit & veg",
+          "icon": "Apple",
+          "keywords": [
+            "fruit*",
+            "veg",
+            "vegetable*",
+            "produce",
+            "fresh produce",
+            "greengrocer*",
+            "fresh",
+            "salad*",
+            "herb*"
+          ],
+          "sections": [
+            "fruit",
+            "vegetables",
+            "produce-boxes"
+          ]
+        },
+        {
+          "id": "meat-fish",
+          "title": "Meat & fish",
+          "icon": "Beef",
+          "keywords": [
+            "meat*",
+            "butcher*",
+            "butchery",
+            "poultry",
+            "fish*",
+            "seafood*",
+            "fishmonger*",
+            "nyama"
+          ],
+          "sections": [
+            "beef",
+            "poultry",
+            "goat-lamb",
+            "pork",
+            "sausages",
+            "meat-boxes",
+            "fish",
+            "seafood"
+          ]
+        },
+        {
+          "id": "dairy-eggs",
+          "title": "Dairy & eggs",
+          "icon": "Milk",
+          "keywords": [
+            "dairy",
+            "egg",
+            "eggs",
+            "milk*",
+            "cheese*",
+            "yoghurt*",
+            "yogurt*",
+            "chilled",
+            "fridge"
+          ],
+          "sections": [
+            "milk",
+            "yoghurt",
+            "cheese-butter",
+            "eggs"
+          ]
+        },
+        {
+          "id": "bakery",
+          "title": "Bakery",
+          "icon": "Croissant",
+          "keywords": [
+            "bakery",
+            "bakeries",
+            "baker*",
+            "bread*",
+            "pastr*",
+            "patisserie*",
+            "cakes"
+          ],
+          "sections": [
+            "bread",
+            "cakes-pastries"
+          ]
+        },
+        {
+          "id": "deli",
+          "title": "Deli & ready meals",
+          "icon": "Sandwich",
+          "keywords": [
+            "deli",
+            "delicatessen",
+            "hot food*",
+            "prepared food*",
+            "ready meal*",
+            "ready-to-eat",
+            "takeaway*",
+            "food to go",
+            "meals"
+          ],
+          "sections": [
+            "cold-cuts",
+            "ready-meals"
+          ]
+        },
+        {
+          "id": "pantry",
+          "title": "Pantry",
+          "icon": "Wheat",
+          "keywords": [
+            "pantry",
+            "food cupboard*",
+            "cupboard*",
+            "dry goods",
+            "staples",
+            "condiment*",
+            "sauce*",
+            "spice*",
+            "baking",
+            "breakfast",
+            "cereal*",
+            "cooking*",
+            "tins",
+            "tinned*",
+            "canned*",
+            "groceries",
+            "grocery",
+            "grains"
+          ],
+          "sections": [
+            "grains",
+            "flour-baking",
+            "oils-sauces",
+            "breakfast",
+            "tins-jars"
+          ]
+        },
+        {
+          "id": "drinks",
+          "title": "Drinks",
+          "icon": "CupSoda",
+          "keywords": [
+            "drink*",
+            "beverage*",
+            "soda*",
+            "soft drink*",
+            "juice*",
+            "water*",
+            "coffee*",
+            "tea",
+            "teas",
+            "hot drink*"
+          ],
+          "sections": [
+            "water",
+            "soft-drinks",
+            "tea-coffee"
+          ]
+        },
+        {
+          "id": "snacks-sweets",
+          "title": "Snacks & sweets",
+          "icon": "Cookie",
+          "keywords": [
+            "snack*",
+            "confectionery",
+            "sweets",
+            "candy",
+            "chocolate*",
+            "biscuit*",
+            "crisps",
+            "treats",
+            "nibbles"
+          ],
+          "sections": [
+            "crisps-nuts",
+            "biscuits",
+            "chocolate-sweets",
+            "snacks"
+          ]
+        },
+        {
+          "id": "frozen",
+          "title": "Frozen",
+          "icon": "Snowflake",
+          "keywords": [
+            "frozen*",
+            "freezer*",
+            "ice cream*"
+          ],
+          "sections": [
+            "frozen-food",
+            "ice-cream"
+          ]
+        },
+        {
+          "id": "household",
+          "title": "Household & cleaning",
+          "icon": "SprayCan",
+          "keywords": [
+            "household",
+            "cleaning",
+            "laundry",
+            "home care",
+            "homecare",
+            "home",
+            "kitchen",
+            "paper"
+          ],
+          "sections": [
+            "cleaning",
+            "laundry",
+            "paper",
+            "home-essentials"
+          ]
+        },
+        {
+          "id": "personal-care",
+          "title": "Personal care",
+          "icon": "Bath",
+          "keywords": [
+            "personal care",
+            "toiletries",
+            "toiletry",
+            "beauty",
+            "hygiene",
+            "bath",
+            "body care",
+            "cosmetic*",
+            "grooming",
+            "health & beauty",
+            "skincare"
+          ],
+          "sections": [
+            "bath-body",
+            "oral-care",
+            "hair-care",
+            "feminine-care",
+            "toiletries"
+          ]
+        },
+        {
+          "id": "baby",
+          "title": "Baby & kids",
+          "icon": "Baby",
+          "keywords": [
+            "baby*",
+            "babies",
+            "kids",
+            "children",
+            "toddler*",
+            "infant*",
+            "mother & baby",
+            "mum & baby"
+          ],
+          "sections": [
+            "nappies",
+            "baby-food",
+            "baby-care"
+          ]
+        },
+        {
+          "id": "pets",
+          "title": "Pets",
+          "icon": "PawPrint",
+          "keywords": [
+            "pet*",
+            "animal*",
+            "dog*",
+            "cat",
+            "cats"
+          ],
+          "sections": [
+            "pet-supplies"
+          ]
+        },
+        {
+          "id": "boxes",
+          "title": "Boxes & baskets",
+          "icon": "Package",
+          "keywords": [
+            "hamper*",
+            "bundle*",
+            "box",
+            "boxes",
+            "basket*",
+            "gift*",
+            "kit*",
+            "pack*",
+            "combo*",
+            "essentials"
+          ],
+          "sections": [
+            "boxes",
+            "bundles",
+            "plans"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "fruit",
+          "title": "Fruit",
+          "priority": 131,
+          "keywords": [
+            "fruit*",
+            "banana*",
+            "avocado*",
+            "berry",
+            "berries",
+            "strawberr*",
+            "blueberr*",
+            "raspberr*",
+            "apple*",
+            "mango*",
+            "orange*",
+            "pineapple*",
+            "citrus",
+            "grape",
+            "grapes",
+            "grapefruit*",
+            "melon*",
+            "watermelon*",
+            "pawpaw*",
+            "papaya*",
+            "passion fruit*",
+            "lemon*",
+            "lime",
+            "limes",
+            "pear",
+            "pears",
+            "plum",
+            "plums",
+            "peach*",
+            "kiwi*",
+            "guava*",
+            "tangerine*",
+            "pomegranate*",
+            "tree tomato*",
+            "coconut",
+            "coconuts",
+            "matunda"
+          ]
+        },
+        {
+          "id": "vegetables",
+          "title": "Vegetables & herbs",
+          "priority": 132,
+          "keywords": [
+            "vegetable*",
+            "veg",
+            "veggie*",
+            "greens",
+            "leafy",
+            "salad*",
+            "lettuce",
+            "tomato*",
+            "onion*",
+            "potato*",
+            "carrot*",
+            "cabbage*",
+            "kale",
+            "sukuma*",
+            "spinach",
+            "managu",
+            "terere",
+            "kunde",
+            "broccoli",
+            "cauliflower*",
+            "cucumber*",
+            "courgette*",
+            "zucchini*",
+            "eggplant*",
+            "aubergine*",
+            "brinjal*",
+            "pepper*",
+            "capsicum*",
+            "chilli",
+            "chillies",
+            "chili",
+            "chilies",
+            "garlic",
+            "ginger",
+            "mushroom*",
+            "pea",
+            "peas",
+            "french bean*",
+            "green bean*",
+            "beetroot*",
+            "butternut*",
+            "pumpkin*",
+            "squash",
+            "celery",
+            "leek*",
+            "spring onion*",
+            "herb",
+            "herbs",
+            "coriander",
+            "dhania",
+            "parsley",
+            "basil",
+            "mint",
+            "rosemary",
+            "thyme",
+            "dill",
+            "arrowroot*",
+            "nduma",
+            "cassava*",
+            "yam",
+            "yams",
+            "okra"
+          ]
+        },
+        {
+          "id": "produce-boxes",
+          "title": "Fruit & veg boxes",
+          "priority": 130,
+          "keywords": [
+            "farm basket*",
+            "farm box*",
+            "veg box*",
+            "veggie box*",
+            "produce box*",
+            "fruit and veg*",
+            "fruit & veg*",
+            "harvest box*",
+            "market basket*"
+          ]
+        },
+        {
+          "id": "beef",
+          "title": "Beef",
+          "priority": 126,
+          "keywords": [
+            "beef",
+            "steak*",
+            "ribeye*",
+            "rib-eye*",
+            "sirloin*",
+            "t-bone*",
+            "rump",
+            "brisket*",
+            "topside",
+            "silverside",
+            "oxtail*",
+            "veal",
+            "mince",
+            "minced",
+            "short rib*"
+          ]
+        },
+        {
+          "id": "poultry",
+          "title": "Chicken & poultry",
+          "priority": 125,
+          "keywords": [
+            "chicken*",
+            "poultry",
+            "kienyeji",
+            "broiler*",
+            "turkey*",
+            "duck*",
+            "quail*",
+            "drumstick*",
+            "wings"
+          ]
+        },
+        {
+          "id": "goat-lamb",
+          "title": "Goat & lamb",
+          "priority": 124,
+          "keywords": [
+            "goat*",
+            "lamb*",
+            "mutton",
+            "mbuzi"
+          ]
+        },
+        {
+          "id": "pork",
+          "title": "Pork & bacon",
+          "priority": 123,
+          "keywords": [
+            "pork*",
+            "bacon",
+            "gammon",
+            "spare rib*"
+          ]
+        },
+        {
+          "id": "sausages",
+          "title": "Sausages & burgers",
+          "priority": 122,
+          "keywords": [
+            "sausage*",
+            "smokie*",
+            "frankfurter*",
+            "hot dog*",
+            "hotdog*",
+            "chipolata*",
+            "bratwurst*",
+            "burger*",
+            "patty",
+            "patties",
+            "kebab*",
+            "meatball*"
+          ]
+        },
+        {
+          "id": "meat-boxes",
+          "title": "BBQ & mixed meat",
+          "priority": 127,
+          "keywords": [
+            "bbq",
+            "barbecue*",
+            "braai*",
+            "nyama choma",
+            "meat*",
+            "nyama",
+            "chops",
+            "offal",
+            "liver",
+            "matumbo",
+            "tripe",
+            "kidney*",
+            "bones",
+            "ribs",
+            "mixed grill*"
+          ]
+        },
+        {
+          "id": "fish",
+          "title": "Fish",
+          "priority": 121,
+          "keywords": [
+            "fish",
+            "fishes",
+            "fish fillet*",
+            "salmon*",
+            "tilapia*",
+            "tuna*",
+            "omena",
+            "dagaa",
+            "mackerel*",
+            "cod",
+            "hake",
+            "trout*",
+            "catfish*",
+            "nile perch",
+            "perch",
+            "kingfish*",
+            "snapper*",
+            "sea bass",
+            "seabass"
+          ]
+        },
+        {
+          "id": "seafood",
+          "title": "Prawns & seafood",
+          "priority": 120,
+          "keywords": [
+            "seafood*",
+            "prawn*",
+            "shrimp*",
+            "calamari",
+            "squid*",
+            "octopus*",
+            "crab*",
+            "lobster*",
+            "mussel*",
+            "oyster*",
+            "clam*",
+            "scallop*"
+          ]
+        },
+        {
+          "id": "milk",
+          "title": "Milk & cream",
+          "priority": 102,
+          "keywords": [
+            "milk",
+            "maziwa",
+            "mala",
+            "lala",
+            "cream",
+            "creams",
+            "long life milk",
+            "uht",
+            "milk powder",
+            "powdered milk",
+            "oat milk",
+            "almond milk",
+            "soy milk",
+            "plant milk"
+          ]
+        },
+        {
+          "id": "yoghurt",
+          "title": "Yoghurt",
+          "priority": 100,
+          "keywords": [
+            "yoghurt*",
+            "yogurt*",
+            "yoghourt*",
+            "kefir",
+            "lassi"
+          ]
+        },
+        {
+          "id": "cheese-butter",
+          "title": "Cheese & butter",
+          "priority": 101,
+          "keywords": [
+            "cheese*",
+            "cheddar",
+            "mozzarella",
+            "parmesan",
+            "gouda",
+            "feta",
+            "halloumi",
+            "paneer",
+            "butter",
+            "margarine",
+            "ghee",
+            "spread"
+          ]
+        },
+        {
+          "id": "eggs",
+          "title": "Eggs",
+          "priority": 103,
+          "keywords": [
+            "egg",
+            "eggs"
+          ]
+        },
+        {
+          "id": "bread",
+          "title": "Bread",
+          "priority": 80,
+          "keywords": [
+            "bread*",
+            "loaf",
+            "loaves",
+            "bun",
+            "buns",
+            "baguette*",
+            "sourdough*",
+            "chapati*",
+            "chapatti*",
+            "tortillas",
+            "tortilla wrap*",
+            "pita*",
+            "naan*",
+            "bagel*",
+            "rusk*",
+            "mandazi*",
+            "mandaazi*",
+            "bread roll*",
+            "dinner roll*",
+            "hot dog roll*",
+            "brioche*",
+            "ciabatta*",
+            "focaccia*"
+          ]
+        },
+        {
+          "id": "cakes-pastries",
+          "title": "Cakes & pastries",
+          "priority": 81,
+          "keywords": [
+            "cake*",
+            "cupcake*",
+            "cheesecake*",
+            "muffin*",
+            "croissant*",
+            "pastry",
+            "pastries",
+            "doughnut*",
+            "donut*",
+            "scone*",
+            "danish*",
+            "brownie*",
+            "swiss roll*",
+            "cinnamon roll*",
+            "eclair*",
+            "tart",
+            "tarts",
+            "baklava"
+          ]
+        },
+        {
+          "id": "cold-cuts",
+          "title": "Deli & cold cuts",
+          "priority": 111,
+          "keywords": [
+            "deli",
+            "delicatessen",
+            "ham",
+            "salami*",
+            "pastrami",
+            "pepperoni",
+            "chorizo",
+            "cold cut*",
+            "cold meat*",
+            "luncheon*",
+            "polony",
+            "hummus",
+            "houmous",
+            "dip",
+            "dips",
+            "pate",
+            "antipast*"
+          ]
+        },
+        {
+          "id": "ready-meals",
+          "title": "Ready meals",
+          "priority": 110,
+          "keywords": [
+            "ready meal*",
+            "ready-to-eat",
+            "ready to eat",
+            "meals",
+            "meal kit*",
+            "samosa*",
+            "pizza*",
+            "lasagne*",
+            "lasagna*",
+            "sandwich*",
+            "wrap",
+            "wraps",
+            "soup*",
+            "pie",
+            "pies",
+            "quiche*",
+            "spring roll*",
+            "sushi",
+            "curry",
+            "curries",
+            "stew*",
+            "pilau",
+            "biryani"
+          ]
+        },
+        {
+          "id": "grains",
+          "title": "Rice, pasta & grains",
+          "priority": 75,
+          "keywords": [
+            "rice",
+            "basmati",
+            "pishori",
+            "pasta*",
+            "spaghetti*",
+            "macaroni*",
+            "penne",
+            "fusilli",
+            "noodle*",
+            "grain*",
+            "quinoa",
+            "couscous",
+            "barley",
+            "millet",
+            "sorghum",
+            "lentil*",
+            "ndengu",
+            "dengu",
+            "green gram*",
+            "chickpea*",
+            "kidney bean*",
+            "dried bean*",
+            "rosecoco",
+            "mbaazi",
+            "pigeon pea*",
+            "maize",
+            "githeri",
+            "pulses",
+            "legume*"
+          ]
+        },
+        {
+          "id": "flour-baking",
+          "title": "Flour, sugar & baking",
+          "priority": 74,
+          "keywords": [
+            "flour",
+            "unga",
+            "maize meal",
+            "atta",
+            "cornflour",
+            "corn flour",
+            "self-raising",
+            "sugar",
+            "baking*",
+            "yeast",
+            "icing",
+            "cake mix*",
+            "custard*",
+            "vanilla*",
+            "essence*",
+            "food colour*",
+            "sprinkles",
+            "gelatine"
+          ]
+        },
+        {
+          "id": "oils-sauces",
+          "title": "Oils, spices & sauces",
+          "priority": 73,
+          "keywords": [
+            "oil",
+            "oils",
+            "cooking oil*",
+            "olive oil*",
+            "salt",
+            "spice*",
+            "masala*",
+            "curry powder*",
+            "seasoning*",
+            "stock cube*",
+            "stock",
+            "sauce*",
+            "ketchup",
+            "tomato paste",
+            "tomato puree",
+            "mayonnaise",
+            "mayo",
+            "mustard",
+            "vinegar*",
+            "dressing*",
+            "salad cream",
+            "chilli flake*",
+            "chilli powder*",
+            "black pepper*",
+            "peppercorn*",
+            "garlic paste",
+            "ginger paste",
+            "paprika",
+            "turmeric",
+            "cumin",
+            "ground cinnamon",
+            "bay leaves",
+            "chutney*",
+            "relish*",
+            "condiment*"
+          ]
+        },
+        {
+          "id": "breakfast",
+          "title": "Breakfast & spreads",
+          "priority": 71,
+          "keywords": [
+            "cereal*",
+            "cornflake*",
+            "corn flake*",
+            "muesli",
+            "granola*",
+            "oats",
+            "oatmeal",
+            "porridge*",
+            "uji",
+            "weetabix",
+            "honey",
+            "jam",
+            "jams",
+            "marmalade*",
+            "peanut butter*",
+            "nut butter*",
+            "almond butter*",
+            "chocolate spread*",
+            "hazelnut spread*",
+            "syrup*",
+            "maple*"
+          ]
+        },
+        {
+          "id": "tins-jars",
+          "title": "Tins & jars",
+          "priority": 70,
+          "keywords": [
+            "tin",
+            "tins",
+            "tinned",
+            "can",
+            "cans",
+            "canned",
+            "in brine",
+            "in oil",
+            "in water",
+            "in tomato sauce",
+            "baked beans",
+            "corned beef",
+            "sardine*",
+            "sweetcorn",
+            "sweet corn",
+            "coconut milk",
+            "coconut cream",
+            "chopped tomato*",
+            "olives",
+            "pickle*",
+            "gherkin*"
+          ]
+        },
+        {
+          "id": "water",
+          "title": "Water",
+          "priority": 62,
+          "keywords": [
+            "water",
+            "waters",
+            "mineral water*",
+            "spring water*",
+            "sparkling water*",
+            "still water*"
+          ]
+        },
+        {
+          "id": "soft-drinks",
+          "title": "Soft drinks & juice",
+          "priority": 60,
+          "keywords": [
+            "soda*",
+            "soft drink*",
+            "drink",
+            "drinks",
+            "cola",
+            "colas",
+            "juice*",
+            "nectar*",
+            "cordial*",
+            "lemonade*",
+            "energy drink*",
+            "sports drink*",
+            "iced tea*",
+            "ice tea*",
+            "kombucha",
+            "tonic*",
+            "ginger ale*",
+            "ginger beer*",
+            "coconut water",
+            "milkshake*",
+            "chocolate milk",
+            "flavoured milk*",
+            "flavored milk*",
+            "smoothie*",
+            "fizzy",
+            "malt drink*"
+          ]
+        },
+        {
+          "id": "tea-coffee",
+          "title": "Tea & coffee",
+          "priority": 61,
+          "keywords": [
+            "tea",
+            "teas",
+            "tea bag*",
+            "teabag*",
+            "chai",
+            "herbal tea*",
+            "green tea*",
+            "rooibos",
+            "coffee*",
+            "espresso*",
+            "cocoa",
+            "hot chocolate*",
+            "drinking chocolate*",
+            "chamomile",
+            "camomile",
+            "matcha",
+            "creamer*"
+          ]
+        },
+        {
+          "id": "crisps-nuts",
+          "title": "Crisps, nuts & popcorn",
+          "priority": 72,
+          "keywords": [
+            "crisps",
+            "crisp",
+            "potato chips",
+            "tortilla chips",
+            "corn chips",
+            "banana chips",
+            "plantain chips",
+            "popcorn",
+            "nut",
+            "nuts",
+            "peanut*",
+            "groundnut*",
+            "cashew*",
+            "almonds",
+            "macadamia*",
+            "pistachio*",
+            "hazelnuts",
+            "walnut*",
+            "trail mix*",
+            "pretzel*",
+            "chevda",
+            "bhujia"
+          ]
+        },
+        {
+          "id": "biscuits",
+          "title": "Biscuits & cookies",
+          "priority": 90,
+          "keywords": [
+            "biscuit*",
+            "cookie*",
+            "cracker*",
+            "wafer*",
+            "digestive*",
+            "shortbread*",
+            "rich tea"
+          ]
+        },
+        {
+          "id": "chocolate-sweets",
+          "title": "Chocolate & sweets",
+          "priority": 91,
+          "keywords": [
+            "chocolate*",
+            "choc",
+            "sweets",
+            "candy",
+            "candies",
+            "lollipop*",
+            "lolly",
+            "toffee*",
+            "gum",
+            "chewing gum",
+            "bubble gum",
+            "mints",
+            "marshmallow*",
+            "jelly bean*",
+            "gummy*",
+            "gummies",
+            "fudge",
+            "confectionery",
+            "caramel*",
+            "truffle*",
+            "easter egg*",
+            "nougat"
+          ]
+        },
+        {
+          "id": "snacks",
+          "title": "Snacks & bars",
+          "priority": 93,
+          "keywords": [
+            "snack*",
+            "bar",
+            "bars",
+            "energy bar*",
+            "protein bar*",
+            "biltong",
+            "jerky",
+            "rice cake*"
+          ]
+        },
+        {
+          "id": "frozen-food",
+          "title": "Frozen food",
+          "priority": 31,
+          "keywords": [
+            "frozen*",
+            "fish finger*",
+            "nugget*",
+            "frozen chips",
+            "frozen veg*",
+            "frozen pea*"
+          ]
+        },
+        {
+          "id": "ice-cream",
+          "title": "Ice cream & ice",
+          "priority": 30,
+          "keywords": [
+            "ice cream*",
+            "ice-cream*",
+            "icecream*",
+            "ice lolly",
+            "ice lollies",
+            "ice pop*",
+            "ice cube*",
+            "sorbet*",
+            "gelato*",
+            "frozen yoghurt*",
+            "frozen yogurt*"
+          ]
+        },
+        {
+          "id": "cleaning",
+          "title": "Cleaning",
+          "priority": 40,
+          "keywords": [
+            "cleaner*",
+            "cleaning",
+            "bleach",
+            "disinfectant*",
+            "dishwashing",
+            "dishwasher*",
+            "dish soap*",
+            "dish wash*",
+            "washing-up",
+            "washing up",
+            "scourer*",
+            "scouring",
+            "sponge*",
+            "steel wool",
+            "mop",
+            "mops",
+            "broom*",
+            "rubber glove*",
+            "polish",
+            "surface spray*",
+            "toilet brush*",
+            "dustpan*",
+            "bucket*",
+            "squeegee*",
+            "descaler*"
+          ]
+        },
+        {
+          "id": "laundry",
+          "title": "Laundry",
+          "priority": 41,
+          "keywords": [
+            "laundry",
+            "detergent*",
+            "washing powder*",
+            "washing liquid*",
+            "fabric softener*",
+            "fabric conditioner*",
+            "softener*",
+            "stain remover*",
+            "starch",
+            "clothes peg*",
+            "pegs"
+          ]
+        },
+        {
+          "id": "paper",
+          "title": "Paper, foil & bags",
+          "priority": 42,
+          "keywords": [
+            "toilet paper*",
+            "toilet roll*",
+            "toilet tissue*",
+            "tissue*",
+            "serviette*",
+            "napkin*",
+            "kitchen towel*",
+            "paper towel*",
+            "kitchen roll*",
+            "foil",
+            "aluminium foil*",
+            "cling film*",
+            "cling wrap*",
+            "baking paper*",
+            "bin liner*",
+            "bin bag*",
+            "garbage bag*",
+            "trash bag*",
+            "refuse bag*",
+            "freezer bag*",
+            "zip bag*",
+            "ziplock*",
+            "paper plate*",
+            "paper cup*",
+            "disposable*"
+          ]
+        },
+        {
+          "id": "home-essentials",
+          "title": "Household essentials",
+          "priority": 43,
+          "keywords": [
+            "household",
+            "home essentials",
+            "air freshener*",
+            "freshener*",
+            "insect*",
+            "mosquito*",
+            "repellent*",
+            "cockroach*",
+            "match",
+            "matches",
+            "matchbox*",
+            "candle*",
+            "battery",
+            "batteries",
+            "light bulb*",
+            "led bulb*",
+            "lighter*",
+            "charcoal",
+            "cooking gas",
+            "gas refill*",
+            "gas cylinder*",
+            "zero-waste",
+            "reusable*",
+            "beeswax*",
+            "tea towel*",
+            "storage box*",
+            "storage container*",
+            "torch*"
+          ]
+        },
+        {
+          "id": "bath-body",
+          "title": "Bath & body",
+          "priority": 53,
+          "keywords": [
+            "soap*",
+            "shower*",
+            "body wash*",
+            "bath*",
+            "lotion*",
+            "body cream*",
+            "body butter*",
+            "body oil*",
+            "massage oil*",
+            "petroleum jelly",
+            "moisturi*",
+            "deodorant*",
+            "roll-on*",
+            "antiperspirant*",
+            "perfume*",
+            "cologne*",
+            "body spray*",
+            "body mist*",
+            "fragrance*",
+            "talc*",
+            "hand wash*",
+            "handwash*",
+            "sanitiser*",
+            "sanitizer*",
+            "razor*",
+            "shav*",
+            "aftershave*",
+            "cotton wool",
+            "cotton bud*",
+            "skincare",
+            "skin care",
+            "face wash*",
+            "facial*",
+            "sunscreen*",
+            "lip balm*",
+            "cleanser*",
+            "toner*"
+          ]
+        },
+        {
+          "id": "oral-care",
+          "title": "Oral care",
+          "priority": 51,
+          "keywords": [
+            "toothpaste*",
+            "toothbrush*",
+            "mouthwash*",
+            "floss*",
+            "dental*",
+            "oral"
+          ]
+        },
+        {
+          "id": "hair-care",
+          "title": "Hair care",
+          "priority": 52,
+          "keywords": [
+            "shampoo*",
+            "conditioner*",
+            "hair*",
+            "relaxer*",
+            "braid*",
+            "weave*",
+            "wig",
+            "wigs",
+            "comb",
+            "combs",
+            "afro"
+          ]
+        },
+        {
+          "id": "feminine-care",
+          "title": "Feminine care",
+          "priority": 50,
+          "keywords": [
+            "sanitary*",
+            "maxi pad*",
+            "panty liner*",
+            "pantyliner*",
+            "tampon*",
+            "menstrual*",
+            "feminine*",
+            "period pad*"
+          ]
+        },
+        {
+          "id": "toiletries",
+          "title": "Toiletries & kits",
+          "priority": 54,
+          "keywords": [
+            "toiletries",
+            "toiletry",
+            "personal care",
+            "care kit*",
+            "grooming*",
+            "travel size*",
+            "wash bag*"
+          ]
+        },
+        {
+          "id": "nappies",
+          "title": "Nappies & wipes",
+          "priority": 21,
+          "keywords": [
+            "diaper*",
+            "nappy",
+            "nappies",
+            "baby wipes",
+            "wet wipes",
+            "pull-up*",
+            "pull ups"
+          ]
+        },
+        {
+          "id": "baby-food",
+          "title": "Baby food & formula",
+          "priority": 20,
+          "keywords": [
+            "baby food*",
+            "baby cereal*",
+            "baby porridge*",
+            "baby puree*",
+            "infant formula*",
+            "baby formula*",
+            "formula",
+            "follow-on milk*",
+            "weaning*"
+          ]
+        },
+        {
+          "id": "baby-care",
+          "title": "Baby care",
+          "priority": 22,
+          "keywords": [
+            "baby*",
+            "babies",
+            "infant*",
+            "newborn*",
+            "toddler*",
+            "teether*",
+            "teething*",
+            "sippy*",
+            "feeding bottle*",
+            "pacifier*",
+            "dummy",
+            "dummies"
+          ]
+        },
+        {
+          "id": "pet-supplies",
+          "title": "Pet food & care",
+          "priority": 10,
+          "keywords": [
+            "pet",
+            "pets",
+            "pet food*",
+            "pet treat*",
+            "dog food*",
+            "dog treat*",
+            "dog chew*",
+            "dog biscuit*",
+            "dog bowl*",
+            "dog toy*",
+            "dog shampoo*",
+            "dog collar*",
+            "dog lead*",
+            "dry dog*",
+            "wet dog*",
+            "puppy*",
+            "puppies",
+            "cat",
+            "cats",
+            "cat food*",
+            "cat litter*",
+            "kitten*",
+            "litter*",
+            "bird seed*",
+            "birdseed*",
+            "bird food*",
+            "fish food*",
+            "aquarium*",
+            "flea*",
+            "leash*",
+            "collar*"
+          ]
+        },
+        {
+          "id": "boxes",
+          "title": "Boxes & baskets",
+          "priority": 140,
+          "keywords": [
+            "box",
+            "boxes",
+            "basket",
+            "baskets",
+            "hamper*",
+            "bundle*",
+            "pack",
+            "packs",
+            "kit",
+            "kits",
+            "essentials",
+            "combo*",
+            "starter*",
+            "selection*",
+            "assortment*",
+            "variety pack*",
+            "multipack*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drinks",
+      "categories": [
+        "alcohol-beverages"
+      ],
+      "allTitle": "All drinks",
+      "departments": [
+        {
+          "id": "wine",
+          "title": "Wine & champagne",
+          "icon": "Wine",
+          "keywords": [
+            "wine*",
+            "champagne*",
+            "sparkling",
+            "prosecco",
+            "vino",
+            "cellar*"
+          ],
+          "sections": [
+            "champagne",
+            "red-wine",
+            "white-wine",
+            "wine"
+          ]
+        },
+        {
+          "id": "spirits",
+          "title": "Spirits",
+          "icon": "Martini",
+          "keywords": [
+            "spirit*",
+            "liquor*",
+            "liqueur*",
+            "whisk*",
+            "gin",
+            "vodka",
+            "rum",
+            "tequila",
+            "brandy",
+            "cognac"
+          ],
+          "sections": [
+            "whisky",
+            "gin",
+            "vodka",
+            "rum",
+            "tequila",
+            "brandy",
+            "spirits"
+          ]
+        },
+        {
+          "id": "beer",
+          "title": "Beer & cider",
+          "icon": "Beer",
+          "keywords": [
+            "beer*",
+            "lager*",
+            "ale",
+            "ales",
+            "cider*",
+            "brew*"
+          ],
+          "sections": [
+            "lager",
+            "craft-beer",
+            "beer-cider"
+          ]
+        },
+        {
+          "id": "soft",
+          "title": "Soft drinks & mixers",
+          "icon": "CupSoda",
+          "keywords": [
+            "mixer*",
+            "soft drink*",
+            "soda*",
+            "water*",
+            "juice*",
+            "non-alcoholic",
+            "alcohol-free",
+            "zero",
+            "refreshment*"
+          ],
+          "sections": [
+            "water",
+            "juice",
+            "soft-drinks",
+            "mixers"
+          ]
+        },
+        {
+          "id": "gifts",
+          "title": "Gifts & sets",
+          "icon": "Gift",
+          "keywords": [
+            "gift*",
+            "hamper*",
+            "celebration*",
+            "set",
+            "sets",
+            "collection*",
+            "box*",
+            "bundle*"
+          ],
+          "sections": [
+            "gifts",
+            "bundles"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "champagne",
+          "title": "Champagne & sparkling",
+          "priority": 1,
+          "keywords": [
+            "champagne*",
+            "brut",
+            "cuvee",
+            "prosecco",
+            "sparkling wine*",
+            "cava",
+            "cremant"
+          ]
+        },
+        {
+          "id": "red-wine",
+          "title": "Red wine",
+          "keywords": [
+            "red",
+            "reds",
+            "merlot",
+            "cabernet*",
+            "pinot noir",
+            "shiraz",
+            "syrah",
+            "malbec",
+            "pinotage"
+          ]
+        },
+        {
+          "id": "white-wine",
+          "title": "White wine",
+          "keywords": [
+            "white",
+            "whites",
+            "chardonnay",
+            "sauvignon blanc",
+            "pinot grigio",
+            "riesling",
+            "chenin*"
+          ]
+        },
+        {
+          "id": "wine",
+          "title": "Wine",
+          "keywords": [
+            "wine*",
+            "rose",
+            "pinot*",
+            "sauvignon*"
+          ]
+        },
+        {
+          "id": "lager",
+          "title": "Lager & pilsner",
+          "keywords": [
+            "lager*",
+            "pilsner*",
+            "pils"
+          ]
+        },
+        {
+          "id": "craft-beer",
+          "title": "Craft beer & ale",
+          "keywords": [
+            "craft*",
+            "ale",
+            "ales",
+            "ipa",
+            "pale ale*",
+            "wheat beer*"
+          ]
+        },
+        {
+          "id": "beer-cider",
+          "title": "Beer & cider",
+          "keywords": [
+            "beer*",
+            "stout*",
+            "cider*",
+            "radler*",
+            "shandy"
+          ]
+        },
+        {
+          "id": "whisky",
+          "title": "Whisky",
+          "priority": 3,
+          "keywords": [
+            "whisky",
+            "whiskey",
+            "whiskies",
+            "bourbon",
+            "single malt",
+            "scotch"
+          ]
+        },
+        {
+          "id": "gin",
+          "title": "Gin",
+          "priority": 3,
+          "keywords": [
+            "gin",
+            "gins"
+          ]
+        },
+        {
+          "id": "vodka",
+          "title": "Vodka",
+          "priority": 3,
+          "keywords": [
+            "vodka*"
+          ]
+        },
+        {
+          "id": "rum",
+          "title": "Rum",
+          "priority": 3,
+          "keywords": [
+            "rum",
+            "rums"
+          ]
+        },
+        {
+          "id": "tequila",
+          "title": "Tequila & mezcal",
+          "priority": 3,
+          "keywords": [
+            "tequila*",
+            "mezcal*"
+          ]
+        },
+        {
+          "id": "brandy",
+          "title": "Brandy & cognac",
+          "priority": 3,
+          "keywords": [
+            "brandy",
+            "brandies",
+            "cognac*",
+            "armagnac"
+          ]
+        },
+        {
+          "id": "spirits",
+          "title": "Spirits",
+          "priority": 3,
+          "keywords": [
+            "spirit*",
+            "liqueur*",
+            "aperitif*",
+            "bitters"
+          ]
+        },
+        {
+          "id": "water",
+          "title": "Water",
+          "keywords": [
+            "water",
+            "waters"
+          ]
+        },
+        {
+          "id": "juice",
+          "title": "Juice",
+          "keywords": [
+            "juice*",
+            "nectar*"
+          ]
+        },
+        {
+          "id": "soft-drinks",
+          "title": "Soft drinks",
+          "keywords": [
+            "cola",
+            "colas",
+            "soda",
+            "sodas",
+            "iced tea",
+            "energy drink*",
+            "sports drink*",
+            "kombucha",
+            "non-alcoholic",
+            "soft drink*",
+            "lemonade*"
+          ]
+        },
+        {
+          "id": "mixers",
+          "title": "Mixers",
+          "priority": 2,
+          "keywords": [
+            "mixer*",
+            "tonic*",
+            "ginger ale",
+            "ginger beer",
+            "syrup*",
+            "soda water",
+            "club soda"
+          ]
+        },
+        {
+          "id": "gifts",
+          "title": "Gift sets & boxes",
+          "keywords": [
+            "gift*",
+            "celebration*",
+            "box",
+            "pair",
+            "selection*",
+            "collection*",
+            "wedding*",
+            "bottle*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fashion",
+      "categories": [
+        "fashion-apparel"
+      ],
+      "allTitle": "All items",
+      "departments": [
+        {
+          "id": "clothing",
+          "title": "Clothing",
+          "icon": "Shirt",
+          "keywords": [
+            "clothing",
+            "clothes",
+            "apparel",
+            "wear",
+            "menswear",
+            "womenswear",
+            "kidswear",
+            "outfit*",
+            "knitwear",
+            "tops",
+            "dresses"
+          ],
+          "sections": [
+            "outerwear",
+            "tops",
+            "bottoms",
+            "dresses"
+          ]
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes",
+          "icon": "Footprints",
+          "keywords": [
+            "shoe*",
+            "footwear",
+            "sneaker*",
+            "boot*",
+            "sandal*",
+            "trainer*"
+          ],
+          "sections": [
+            "sneakers",
+            "sandals",
+            "shoes"
+          ]
+        },
+        {
+          "id": "bags",
+          "title": "Bags",
+          "icon": "Handbag",
+          "keywords": [
+            "bag*",
+            "luggage",
+            "travel",
+            "leather goods"
+          ],
+          "sections": [
+            "bags",
+            "work-bags",
+            "travel-bags"
+          ]
+        },
+        {
+          "id": "watches",
+          "title": "Watches",
+          "icon": "Watch",
+          "keywords": [
+            "watch*",
+            "timepiece*"
+          ],
+          "sections": [
+            "watches"
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Accessories",
+          "icon": "Glasses",
+          "keywords": [
+            "accessor*",
+            "jewel*",
+            "sunglasses",
+            "eyewear",
+            "belt*",
+            "hat",
+            "hats",
+            "scarf*",
+            "scarves",
+            "tech"
+          ],
+          "sections": [
+            "accessories",
+            "tech-accessories"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "outerwear",
+          "title": "Jackets & blazers",
+          "priority": 1,
+          "keywords": [
+            "jacket*",
+            "blazer*",
+            "coat*",
+            "bomber*"
+          ]
+        },
+        {
+          "id": "tops",
+          "title": "Tops & shirts",
+          "keywords": [
+            "shirt*",
+            "tee",
+            "tees",
+            "t-shirt*",
+            "polo*",
+            "blouse*",
+            "top",
+            "tops",
+            "hoodie*",
+            "sweater*",
+            "sweatshirt*",
+            "knit"
+          ]
+        },
+        {
+          "id": "bottoms",
+          "title": "Trousers & jeans",
+          "keywords": [
+            "trouser*",
+            "chino*",
+            "pants",
+            "jeans",
+            "denim",
+            "jogger*",
+            "shorts",
+            "skirt*"
+          ]
+        },
+        {
+          "id": "dresses",
+          "title": "Dresses & sets",
+          "keywords": [
+            "dress",
+            "dresses",
+            "co-ord*",
+            "jumpsuit*",
+            "set"
+          ]
+        },
+        {
+          "id": "sneakers",
+          "title": "Sneakers & trainers",
+          "priority": 3,
+          "keywords": [
+            "sneaker*",
+            "trainer*",
+            "running shoe*",
+            "trail shoe*",
+            "canvas shoe*"
+          ]
+        },
+        {
+          "id": "sandals",
+          "title": "Sandals & slides",
+          "priority": 3,
+          "keywords": [
+            "sandal*",
+            "slides",
+            "flip flop*",
+            "flip-flop*",
+            "slipper*"
+          ]
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes",
+          "keywords": [
+            "shoe*",
+            "boot*",
+            "loafer*",
+            "heels",
+            "flats",
+            "mule*",
+            "brogue*"
+          ]
+        },
+        {
+          "id": "bags",
+          "title": "Handbags",
+          "keywords": [
+            "bag",
+            "bags",
+            "handbag*",
+            "tote*",
+            "clutch*",
+            "crossbody*",
+            "purse*"
+          ]
+        },
+        {
+          "id": "work-bags",
+          "title": "Backpacks & work bags",
+          "priority": 3,
+          "keywords": [
+            "backpack*",
+            "rucksack*",
+            "laptop bag*",
+            "briefcase*",
+            "messenger bag*"
+          ]
+        },
+        {
+          "id": "travel-bags",
+          "title": "Travel bags",
+          "priority": 3,
+          "keywords": [
+            "weekender*",
+            "duffel*",
+            "duffle*",
+            "suitcase*",
+            "luggage",
+            "travel bag*",
+            "holdall*"
+          ]
+        },
+        {
+          "id": "watches",
+          "title": "Watches",
+          "priority": 2,
+          "keywords": [
+            "watch*",
+            "chronograph*",
+            "automatic",
+            "quartz",
+            "smartwatch*",
+            "smart watch*",
+            "hybrid*"
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Accessories",
+          "keywords": [
+            "belt*",
+            "scarf*",
+            "scarves",
+            "hat",
+            "hats",
+            "cap",
+            "caps",
+            "sunglasses",
+            "wallet*",
+            "jewellery",
+            "necklace*",
+            "earring*",
+            "tie",
+            "ties"
+          ]
+        },
+        {
+          "id": "tech-accessories",
+          "title": "Phone & tech accessories",
+          "keywords": [
+            "phone case*",
+            "phone stand*",
+            "screen protector*",
+            "charger*",
+            "cable*",
+            "power bank*",
+            "adapter*",
+            "adaptor*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beauty",
+      "categories": [
+        "beauty-wellness"
+      ],
+      "allTitle": "All services and products",
+      "departments": [
+        {
+          "id": "skincare",
+          "title": "Skincare",
+          "icon": "Droplet",
+          "keywords": [
+            "skin*",
+            "face care",
+            "facial care",
+            "sun care",
+            "suncare"
+          ],
+          "sections": [
+            "cleansers",
+            "serums",
+            "skincare",
+            "suncare"
+          ]
+        },
+        {
+          "id": "makeup",
+          "title": "Makeup",
+          "icon": "Palette",
+          "keywords": [
+            "makeup",
+            "make-up",
+            "cosmetic*",
+            "beauty",
+            "face",
+            "eyes",
+            "lips"
+          ],
+          "sections": [
+            "face",
+            "eyes",
+            "lips",
+            "makeup"
+          ]
+        },
+        {
+          "id": "haircare",
+          "title": "Haircare",
+          "icon": "Scissors",
+          "keywords": [
+            "hair*"
+          ],
+          "sections": [
+            "haircare"
+          ]
+        },
+        {
+          "id": "fragrance",
+          "title": "Fragrance",
+          "icon": "Flower2",
+          "keywords": [
+            "fragrance*",
+            "perfume*",
+            "parfum*",
+            "scent*",
+            "cologne*"
+          ],
+          "sections": [
+            "fragrance"
+          ]
+        },
+        {
+          "id": "bath-body",
+          "title": "Bath & body",
+          "icon": "Bath",
+          "keywords": [
+            "bath*",
+            "body*",
+            "shower*"
+          ],
+          "sections": [
+            "body-care"
+          ]
+        },
+        {
+          "id": "kits",
+          "title": "Gift sets & kits",
+          "icon": "Gift",
+          "keywords": [
+            "gift*",
+            "kit*",
+            "set",
+            "sets",
+            "box*",
+            "bundle*"
+          ],
+          "sections": [
+            "kits",
+            "bundles"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "hair-services",
+          "title": "Hair & barber",
+          "priority": 1,
+          "keywords": [
+            "haircut*",
+            "beard*",
+            "shave*",
+            "braid*",
+            "cornrow*",
+            "locs",
+            "retwist*",
+            "wig*",
+            "relaxer*",
+            "blow-dry*",
+            "hair colour*",
+            "deep condition*",
+            "barber*"
+          ]
+        },
+        {
+          "id": "nails-lashes",
+          "title": "Nails, lashes & brows",
+          "priority": 1,
+          "keywords": [
+            "manicure*",
+            "pedicure*",
+            "nail*",
+            "acrylic*",
+            "lash lift*",
+            "eyelash*",
+            "eyebrow*"
+          ]
+        },
+        {
+          "id": "haircare",
+          "title": "Haircare",
+          "priority": 2,
+          "keywords": [
+            "shampoo*",
+            "conditioner*",
+            "curl*",
+            "hair oil*",
+            "hair mask*",
+            "scalp*",
+            "leave-in*",
+            "edge control*",
+            "heat protectant*",
+            "deep mask*",
+            "haircare"
+          ]
+        },
+        {
+          "id": "face",
+          "title": "Face",
+          "keywords": [
+            "foundation*",
+            "concealer*",
+            "skin tint*",
+            "bronzer*",
+            "highlighter*",
+            "blush*",
+            "setting spray*",
+            "primer*",
+            "powder*"
+          ]
+        },
+        {
+          "id": "eyes",
+          "title": "Eyes",
+          "keywords": [
+            "mascara*",
+            "eyeliner*",
+            "eyeshadow*",
+            "brow*",
+            "lash*"
+          ]
+        },
+        {
+          "id": "lips",
+          "title": "Lips",
+          "keywords": [
+            "lipstick*",
+            "lip gloss*",
+            "lip*",
+            "gloss*"
+          ]
+        },
+        {
+          "id": "cleansers",
+          "title": "Cleansers & toners",
+          "keywords": [
+            "cleanser*",
+            "toner*",
+            "micellar*",
+            "face wash*",
+            "exfoliat*",
+            "cleansing*"
+          ]
+        },
+        {
+          "id": "serums",
+          "title": "Serums",
+          "keywords": [
+            "serum*",
+            "retinol*",
+            "niacinamide",
+            "hyaluronic*"
+          ]
+        },
+        {
+          "id": "suncare",
+          "title": "Sun care",
+          "keywords": [
+            "spf",
+            "sunscreen*",
+            "sun cream*",
+            "sunblock*",
+            "after sun*",
+            "after-sun*"
+          ]
+        },
+        {
+          "id": "body-care",
+          "title": "Bath & body",
+          "keywords": [
+            "body lotion*",
+            "body wash*",
+            "body butter*",
+            "body cream*",
+            "shower gel*",
+            "hand cream*",
+            "deodorant*"
+          ]
+        },
+        {
+          "id": "skincare",
+          "title": "Skincare",
+          "keywords": [
+            "moisturi*",
+            "cream*",
+            "mask*",
+            "eye gel*",
+            "eye cream*",
+            "lotion*",
+            "skincare",
+            "skin care",
+            "face oil*"
+          ]
+        },
+        {
+          "id": "fragrance",
+          "title": "Fragrance",
+          "keywords": [
+            "parfum*",
+            "eau de*",
+            "cologne*",
+            "musk",
+            "oud",
+            "fragrance*",
+            "atomi*",
+            "perfume*"
+          ]
+        },
+        {
+          "id": "makeup",
+          "title": "Makeup",
+          "keywords": [
+            "makeup",
+            "make-up"
+          ]
+        },
+        {
+          "id": "kits",
+          "title": "Kits & gift boxes",
+          "keywords": [
+            "kit*",
+            "box*",
+            "starter*",
+            "essentials",
+            "set",
+            "sets",
+            "gift*"
+          ]
+        },
+        {
+          "id": "massages",
+          "title": "Massages",
+          "keywords": [
+            "massage*"
+          ]
+        },
+        {
+          "id": "facials",
+          "title": "Facials",
+          "keywords": [
+            "facial*"
+          ]
+        },
+        {
+          "id": "body",
+          "title": "Body & spa rituals",
+          "keywords": [
+            "scrub*",
+            "wrap",
+            "wraps",
+            "steam*",
+            "ritual*",
+            "body"
+          ]
+        },
+        {
+          "id": "spa-days",
+          "title": "Spa days & packages",
+          "keywords": [
+            "spa",
+            "spa day*",
+            "package*",
+            "retreat*"
+          ]
+        },
+        {
+          "id": "memberships",
+          "title": "Memberships & passes",
+          "keywords": [
+            "membership*",
+            "pass",
+            "passes"
+          ]
+        },
+        {
+          "id": "training",
+          "title": "Training & classes",
+          "keywords": [
+            "training",
+            "trainer*",
+            "program*",
+            "programme*",
+            "session*",
+            "coaching",
+            "fitness",
+            "mobility",
+            "strength",
+            "weight-loss",
+            "athlete*",
+            "class*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vehicles",
+      "categories": [
+        "vehicle-rentals"
+      ],
+      "allTitle": "All vehicles and services",
+      "sections": [
+        {
+          "id": "washes",
+          "title": "Washes",
+          "priority": 1,
+          "keywords": [
+            "wash*"
+          ]
+        },
+        {
+          "id": "long-term",
+          "title": "Monthly & long-term",
+          "priority": 2,
+          "keywords": [
+            "30-day",
+            "90-day",
+            "monthly",
+            "quarterly",
+            "six-month",
+            "annual",
+            "long-term",
+            "contract*"
+          ]
+        },
+        {
+          "id": "executive",
+          "title": "Executive & chauffeur",
+          "priority": 3,
+          "keywords": [
+            "executive",
+            "luxury",
+            "chauffeur*",
+            "boardroom",
+            "vip",
+            "corporate",
+            "fleet package*"
+          ]
+        },
+        {
+          "id": "suvs",
+          "title": "SUVs & 4x4s",
+          "priority": 4,
+          "keywords": [
+            "suv*",
+            "4x4",
+            "7-seater",
+            "long-range"
+          ]
+        },
+        {
+          "id": "economy",
+          "title": "Economy & compact",
+          "keywords": [
+            "economy",
+            "compact",
+            "city sedan",
+            "hybrid"
+          ]
+        },
+        {
+          "id": "sedans",
+          "title": "Sedans",
+          "keywords": [
+            "sedan*"
+          ]
+        },
+        {
+          "id": "vans",
+          "title": "Vans & pickups",
+          "keywords": [
+            "van",
+            "vans",
+            "pickup*",
+            "shuttle*",
+            "minibus*"
+          ]
+        },
+        {
+          "id": "bikes",
+          "title": "Bikes & scooters",
+          "keywords": [
+            "bike*",
+            "scooter*",
+            "cruiser*"
+          ]
+        },
+        {
+          "id": "tyres",
+          "title": "Tyres & wheels",
+          "keywords": [
+            "tire*",
+            "tyre*",
+            "wheel*",
+            "puncture*"
+          ]
+        },
+        {
+          "id": "battery",
+          "title": "Battery",
+          "keywords": [
+            "battery",
+            "batteries"
+          ]
+        },
+        {
+          "id": "recovery",
+          "title": "Recovery & rescue",
+          "keywords": [
+            "recovery",
+            "towing",
+            "tow",
+            "rescue",
+            "fuel delivery",
+            "lockout*",
+            "winch*",
+            "breakdown*"
+          ]
+        },
+        {
+          "id": "inspections",
+          "title": "Inspections",
+          "keywords": [
+            "inspection*",
+            "check*",
+            "diagnostic*"
+          ]
+        },
+        {
+          "id": "detailing",
+          "title": "Detailing & care",
+          "keywords": [
+            "detail*",
+            "polish*",
+            "wax*",
+            "interior*",
+            "leather*",
+            "engine bay*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "transfers",
+      "categories": [
+        "airport-transfers"
+      ],
+      "allTitle": "All transfers",
+      "sections": [
+        {
+          "id": "meet-greet",
+          "title": "Meet & greet",
+          "priority": 1,
+          "keywords": [
+            "meet",
+            "greet",
+            "assist*",
+            "arrival*",
+            "escort*",
+            "terminal*"
+          ]
+        },
+        {
+          "id": "chauffeur",
+          "title": "Chauffeur & day hire",
+          "priority": 2,
+          "keywords": [
+            "chauffeur*",
+            "full-day",
+            "half-day",
+            "intercity",
+            "boardroom",
+            "corporate airport run"
+          ]
+        },
+        {
+          "id": "sedans",
+          "title": "Sedans",
+          "keywords": [
+            "sedan*"
+          ]
+        },
+        {
+          "id": "suvs",
+          "title": "SUVs & 4x4s",
+          "keywords": [
+            "suv*",
+            "4x4"
+          ]
+        },
+        {
+          "id": "vans",
+          "title": "Vans & minibuses",
+          "keywords": [
+            "van",
+            "vans",
+            "minibus*",
+            "group",
+            "shuttle*"
+          ]
+        },
+        {
+          "id": "early-late",
+          "title": "Early & late",
+          "keywords": [
+            "early-morning",
+            "early",
+            "late",
+            "late-night",
+            "night"
+          ]
+        },
+        {
+          "id": "business",
+          "title": "Business & VIP",
+          "keywords": [
+            "business",
+            "executive",
+            "vip",
+            "corporate"
+          ]
+        },
+        {
+          "id": "standard",
+          "title": "Standard transfers",
+          "keywords": [
+            "pickup*",
+            "drop-off*",
+            "transfer*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "experiences",
+      "categories": [
+        "experiences"
+      ],
+      "allTitle": "All experiences",
+      "sections": [
+        {
+          "id": "delegate",
+          "title": "Delegate passes",
+          "priority": 1,
+          "keywords": [
+            "delegate*",
+            "exhibition*",
+            "networking*",
+            "student pass*",
+            "virtual pass*",
+            "workshop add-on*",
+            "conference*"
+          ]
+        },
+        {
+          "id": "vip",
+          "title": "VIP & premium",
+          "priority": 2,
+          "keywords": [
+            "vip",
+            "backstage*",
+            "lounge*",
+            "golden circle*",
+            "all-access*",
+            "front row*"
+          ]
+        },
+        {
+          "id": "tickets",
+          "title": "Tickets & entry",
+          "keywords": [
+            "ticket*",
+            "general admission*",
+            "admission*",
+            "entry",
+            "early bird*"
+          ]
+        },
+        {
+          "id": "passes",
+          "title": "Passes",
+          "keywords": [
+            "pass",
+            "passes"
+          ]
+        },
+        {
+          "id": "classes",
+          "title": "Classes & workshops",
+          "keywords": [
+            "class*",
+            "series",
+            "course*",
+            "drop-in*",
+            "masterclass*",
+            "workshop*",
+            "lab",
+            "labs",
+            "hands-on*",
+            "intensive*"
+          ]
+        },
+        {
+          "id": "sports",
+          "title": "Sports & activities",
+          "keywords": [
+            "archery*",
+            "climbing*",
+            "football*",
+            "padel*",
+            "basketball*",
+            "tennis*",
+            "cycling*",
+            "running*",
+            "swimming*",
+            "sport*"
+          ]
+        },
+        {
+          "id": "outings",
+          "title": "Outings & leisure",
+          "keywords": [
+            "game night*",
+            "game room*",
+            "cinema*",
+            "nature walk*",
+            "picnic*",
+            "sunset*",
+            "leisure*",
+            "recreation*",
+            "board game*"
+          ]
+        },
+        {
+          "id": "shoots",
+          "title": "Photo shoots",
+          "keywords": [
+            "session*",
+            "shoot*",
+            "headshot*",
+            "editorial*",
+            "portrait*",
+            "maternity*",
+            "proposal*",
+            "coverage*"
+          ]
+        },
+        {
+          "id": "event-packages",
+          "title": "Event packages",
+          "keywords": [
+            "package*",
+            "planning*",
+            "coordination*",
+            "sourcing*",
+            "decor*",
+            "entertainment*",
+            "full-service*",
+            "dinner*",
+            "wedding*",
+            "engagement*",
+            "birthday*",
+            "private event*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "play",
+      "categories": [
+        "play"
+      ],
+      "allTitle": "All activities",
+      "sections": [
+        {
+          "id": "sessions",
+          "title": "Games & sessions",
+          "keywords": [
+            "game*",
+            "lane*",
+            "court*",
+            "pitch*",
+            "session*",
+            "lap*",
+            "laps",
+            "ride*",
+            "room*",
+            "play*",
+            "kart*",
+            "paintball*",
+            "vr",
+            "table*",
+            "tag",
+            "ropes*",
+            "zipline*",
+            "adventure*"
+          ]
+        },
+        {
+          "id": "lessons",
+          "title": "Lessons",
+          "priority": 2,
+          "keywords": [
+            "lesson*",
+            "learn*",
+            "coaching*",
+            "stroke*"
+          ]
+        },
+        {
+          "id": "passes",
+          "title": "Passes & memberships",
+          "priority": 3,
+          "keywords": [
+            "pass",
+            "passes",
+            "monthly*",
+            "membership*"
+          ]
+        },
+        {
+          "id": "groups",
+          "title": "Parties & groups",
+          "priority": 1,
+          "keywords": [
+            "party*",
+            "parties",
+            "birthday*",
+            "group*",
+            "team*",
+            "corporate*",
+            "battle*",
+            "grand prix*",
+            "treasure hunt*",
+            "tug of war*",
+            "whole pool*"
+          ]
+        },
+        {
+          "id": "extras",
+          "title": "Hire & extras",
+          "priority": 4,
+          "keywords": [
+            "hire",
+            "extra*",
+            "add-on*",
+            "bibs*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gifts",
+      "categories": [
+        "flowers-gifts"
+      ],
+      "allTitle": "All gifts",
+      "departments": [
+        {
+          "id": "flowers",
+          "title": "Flowers",
+          "icon": "Flower2",
+          "keywords": [
+            "flower*",
+            "floral",
+            "florist*",
+            "bouquet*",
+            "rose*",
+            "plant*",
+            "arrangement*"
+          ],
+          "sections": [
+            "roses",
+            "bouquets"
+          ]
+        },
+        {
+          "id": "cakes",
+          "title": "Cakes",
+          "icon": "Cake",
+          "keywords": [
+            "cake*",
+            "cupcake*",
+            "bakery",
+            "baker*"
+          ],
+          "sections": [
+            "cakes"
+          ]
+        },
+        {
+          "id": "chocolates",
+          "title": "Chocolates",
+          "icon": "Candy",
+          "keywords": [
+            "chocolate*",
+            "sweet*",
+            "confection*",
+            "cacao",
+            "truffle*"
+          ],
+          "sections": [
+            "chocolates"
+          ]
+        },
+        {
+          "id": "hampers",
+          "title": "Hampers",
+          "icon": "ShoppingBasket",
+          "keywords": [
+            "hamper*",
+            "basket*"
+          ],
+          "sections": [
+            "hampers"
+          ]
+        },
+        {
+          "id": "personalised",
+          "title": "Personalised gifts",
+          "icon": "PenLine",
+          "keywords": [
+            "personali*",
+            "custom*",
+            "engrav*",
+            "monogram*"
+          ],
+          "sections": [
+            "personalised"
+          ]
+        },
+        {
+          "id": "occasions",
+          "title": "Occasion gifts",
+          "icon": "Gift",
+          "keywords": [
+            "occasion*",
+            "gift*",
+            "celebration*",
+            "birthday*",
+            "anniversary*",
+            "corporate*",
+            "box*",
+            "bundle*"
+          ],
+          "sections": [
+            "occasions",
+            "bundles",
+            "plans"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "hampers",
+          "title": "Hampers",
+          "priority": 1,
+          "keywords": [
+            "hamper*"
+          ]
+        },
+        {
+          "id": "personalised",
+          "title": "Personalised",
+          "priority": 2,
+          "keywords": [
+            "personali*",
+            "custom*",
+            "engraved*",
+            "monogram*",
+            "name",
+            "photo*"
+          ]
+        },
+        {
+          "id": "roses",
+          "title": "Roses",
+          "keywords": [
+            "rose",
+            "roses",
+            "rose box*",
+            "rose bouquet*"
+          ]
+        },
+        {
+          "id": "bouquets",
+          "title": "Bouquets & arrangements",
+          "keywords": [
+            "bouquet*",
+            "arrangement*",
+            "rose*",
+            "lily",
+            "lilies",
+            "sunflower*",
+            "wildflower*",
+            "flower*",
+            "tulip*",
+            "orchid*"
+          ]
+        },
+        {
+          "id": "cakes",
+          "title": "Cakes",
+          "keywords": [
+            "cake*",
+            "cheesecake*",
+            "cupcake*"
+          ]
+        },
+        {
+          "id": "chocolates",
+          "title": "Chocolates",
+          "keywords": [
+            "chocolate*",
+            "cacao",
+            "bonbon*",
+            "truffle*",
+            "hazelnut*",
+            "caramel*",
+            "sea salt*",
+            "praline*",
+            "gift bar*",
+            "tasting box*"
+          ]
+        },
+        {
+          "id": "occasions",
+          "title": "Occasion boxes",
+          "keywords": [
+            "birthday*",
+            "anniversary*",
+            "graduation*",
+            "get well*",
+            "congratulations*",
+            "new baby*",
+            "housewarming*",
+            "romantic*",
+            "thank you*",
+            "corporate gift*",
+            "box",
+            "boxes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "home",
+      "categories": [
+        "marketplace"
+      ],
+      "allTitle": "All products",
+      "departments": [
+        {
+          "id": "furniture",
+          "title": "Furniture",
+          "icon": "Sofa",
+          "keywords": [
+            "furniture",
+            "sofa*",
+            "seating",
+            "tables",
+            "chairs",
+            "bedroom furniture",
+            "living room furniture"
+          ],
+          "sections": [
+            "furniture"
+          ]
+        },
+        {
+          "id": "decor",
+          "title": "Decor & lighting",
+          "icon": "Lamp",
+          "keywords": [
+            "decor*",
+            "home decor",
+            "lighting",
+            "light*",
+            "lamp*",
+            "soft furnishing*",
+            "textile*",
+            "room*",
+            "living"
+          ],
+          "sections": [
+            "decor",
+            "lighting",
+            "rooms"
+          ]
+        },
+        {
+          "id": "kitchen",
+          "title": "Kitchen & dining",
+          "icon": "UtensilsCrossed",
+          "keywords": [
+            "kitchen*",
+            "dining",
+            "cookware",
+            "tableware",
+            "homeware*",
+            "bar"
+          ],
+          "sections": [
+            "kitchen"
+          ]
+        },
+        {
+          "id": "appliances",
+          "title": "Appliances",
+          "icon": "Refrigerator",
+          "keywords": [
+            "appliance*",
+            "electronics",
+            "home electronics"
+          ],
+          "sections": [
+            "appliances"
+          ]
+        },
+        {
+          "id": "essentials",
+          "title": "Storage & essentials",
+          "icon": "Package",
+          "keywords": [
+            "storage",
+            "essentials",
+            "household",
+            "home essentials",
+            "everyday*",
+            "basics",
+            "cleaning",
+            "value"
+          ],
+          "sections": [
+            "storage",
+            "essentials",
+            "bundles",
+            "plans"
+          ]
+        },
+        {
+          "id": "office",
+          "title": "Stationery & office",
+          "icon": "NotebookPen",
+          "keywords": [
+            "stationery",
+            "office",
+            "school",
+            "writing",
+            "paper*",
+            "back to school"
+          ],
+          "sections": [
+            "notebooks",
+            "pens",
+            "office-supplies",
+            "stationery"
+          ]
+        },
+        {
+          "id": "books",
+          "title": "Books",
+          "icon": "BookOpen",
+          "keywords": [
+            "book*",
+            "reading",
+            "literature",
+            "fiction",
+            "non-fiction"
+          ],
+          "sections": [
+            "books"
+          ]
+        },
+        {
+          "id": "diy",
+          "title": "Tools & DIY",
+          "icon": "Hammer",
+          "keywords": [
+            "tool*",
+            "hardware",
+            "diy",
+            "building",
+            "paint*",
+            "garden*",
+            "plumbing",
+            "electrical*"
+          ],
+          "sections": [
+            "tools"
+          ]
+        },
+        {
+          "id": "pets",
+          "title": "Pet supplies",
+          "icon": "PawPrint",
+          "keywords": [
+            "pet*",
+            "dog*",
+            "cat",
+            "cats",
+            "animal*",
+            "puppy",
+            "kitten*",
+            "aquarium*"
+          ],
+          "sections": [
+            "pet-food",
+            "pets"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "tools",
+          "title": "Tools & hardware",
+          "priority": 0,
+          "keywords": [
+            "drill*",
+            "hammer*",
+            "screwdriver*",
+            "measuring tape*",
+            "paint*",
+            "roller*",
+            "pipe*",
+            "extension cable*",
+            "bulb*",
+            "padlock*",
+            "wood*",
+            "nail*",
+            "screw*",
+            "tool*",
+            "masking tape*",
+            "duct tape*"
+          ]
+        },
+        {
+          "id": "pet-food",
+          "title": "Pet food & treats",
+          "priority": 1,
+          "keywords": [
+            "dog food*",
+            "cat food*",
+            "pet food*",
+            "puppy food*",
+            "kitten food*",
+            "dental chew*",
+            "treat*",
+            "bird seed*",
+            "fish food*",
+            "kibble"
+          ]
+        },
+        {
+          "id": "pets",
+          "title": "Pet supplies",
+          "priority": 1,
+          "keywords": [
+            "dog*",
+            "cat",
+            "cats",
+            "pet*",
+            "litter*",
+            "leash*",
+            "collar*",
+            "chew*",
+            "flea*",
+            "food bowl*",
+            "bird*",
+            "aquarium*"
+          ]
+        },
+        {
+          "id": "notebooks",
+          "title": "Notebooks & journals",
+          "priority": 2,
+          "keywords": [
+            "notebook*",
+            "journal*",
+            "sketchbook*",
+            "planner*",
+            "diary",
+            "diaries"
+          ]
+        },
+        {
+          "id": "pens",
+          "title": "Pens & writing",
+          "priority": 2,
+          "keywords": [
+            "pen",
+            "pens",
+            "pen set*",
+            "pen box*",
+            "pencil*",
+            "marker*",
+            "highlighter*"
+          ]
+        },
+        {
+          "id": "office-supplies",
+          "title": "Office supplies",
+          "priority": 2,
+          "keywords": [
+            "printer*",
+            "paper",
+            "ink",
+            "tape",
+            "folder*",
+            "file*",
+            "archive*",
+            "whiteboard*",
+            "organizer*",
+            "organiser*",
+            "meeting kit*",
+            "stapler*",
+            "envelope*",
+            "packaging*"
+          ]
+        },
+        {
+          "id": "stationery",
+          "title": "Stationery",
+          "priority": 2,
+          "keywords": [
+            "stationery",
+            "sticky notes",
+            "greeting card*"
+          ]
+        },
+        {
+          "id": "books",
+          "title": "Books",
+          "priority": 3,
+          "keywords": [
+            "book",
+            "books",
+            "novel*",
+            "travel guide*",
+            "fiction",
+            "history",
+            "biography",
+            "poetry*",
+            "cookbook*"
+          ]
+        },
+        {
+          "id": "appliances",
+          "title": "Appliances",
+          "priority": 4,
+          "keywords": [
+            "washing machine*",
+            "dishwasher*",
+            "fridge*",
+            "microwave*",
+            "air fryer*",
+            "coffee machine*",
+            "vacuum*",
+            "purifier*",
+            "kettle*",
+            "blender*",
+            "appliance*"
+          ]
+        },
+        {
+          "id": "lighting",
+          "title": "Lighting",
+          "priority": 5,
+          "keywords": [
+            "lamp*",
+            "lampshade*",
+            "lighting",
+            "light set*",
+            "pendant light*",
+            "floor lamp*",
+            "table lamp*",
+            "string light*",
+            "fairy light*",
+            "lantern*",
+            "chandelier*"
+          ]
+        },
+        {
+          "id": "furniture",
+          "title": "Furniture",
+          "keywords": [
+            "sofa*",
+            "armchair*",
+            "table*",
+            "chair*",
+            "desk*",
+            "wardrobe*",
+            "bed frame*",
+            "bedside*",
+            "console*",
+            "shelf",
+            "shelves",
+            "bookcase*"
+          ]
+        },
+        {
+          "id": "decor",
+          "title": "Decor",
+          "keywords": [
+            "wall art*",
+            "vase*",
+            "rug*",
+            "tray*",
+            "plant pot*",
+            "candle*",
+            "cushion*",
+            "lamp*",
+            "mirror*",
+            "sculpture*",
+            "decor*"
+          ]
+        },
+        {
+          "id": "kitchen",
+          "title": "Kitchen & dining",
+          "keywords": [
+            "cookware*",
+            "glassware*",
+            "dinner*",
+            "knife*",
+            "knives",
+            "baking",
+            "serving*",
+            "platter*",
+            "barware*",
+            "coffee*",
+            "tea",
+            "mug*",
+            "kitchen*"
+          ]
+        },
+        {
+          "id": "rooms",
+          "title": "Room sets",
+          "keywords": [
+            "living room*",
+            "bedroom*",
+            "bathroom*",
+            "home office*",
+            "entryway*",
+            "balcony*",
+            "lighting",
+            "textile*",
+            "starter home*"
+          ]
+        },
+        {
+          "id": "storage",
+          "title": "Storage",
+          "keywords": [
+            "storage*"
+          ]
+        },
+        {
+          "id": "essentials",
+          "title": "Everyday essentials",
+          "keywords": [
+            "essentials",
+            "kit*",
+            "bundle*",
+            "basics",
+            "value box*",
+            "cleaning",
+            "personal care",
+            "gift*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cleaning",
+      "categories": [
+        "laundry-cleaning"
+      ],
+      "allTitle": "All services",
+      "sections": [
+        {
+          "id": "ironing",
+          "title": "Ironing",
+          "priority": 1,
+          "keywords": [
+            "iron*"
+          ]
+        },
+        {
+          "id": "dry-cleaning",
+          "title": "Dry cleaning",
+          "priority": 2,
+          "keywords": [
+            "dry clean*",
+            "garment*",
+            "leather care*",
+            "wedding dress*",
+            "delicate*"
+          ]
+        },
+        {
+          "id": "office",
+          "title": "Office cleaning",
+          "priority": 3,
+          "keywords": [
+            "office*",
+            "washroom*",
+            "carpet*",
+            "glass*",
+            "kitchenette*",
+            "post-event*",
+            "commercial*"
+          ]
+        },
+        {
+          "id": "bags-plans",
+          "title": "Bags & plans",
+          "priority": 4,
+          "keywords": [
+            "bag",
+            "bags",
+            "subscription*",
+            "weekly",
+            "monthly",
+            "family",
+            "plan",
+            "plans"
+          ]
+        },
+        {
+          "id": "wash-fold",
+          "title": "Wash & fold",
+          "keywords": [
+            "laundry",
+            "wash*",
+            "fold*",
+            "towel*",
+            "bedding",
+            "duvet*",
+            "linen*"
+          ]
+        },
+        {
+          "id": "home",
+          "title": "Home cleaning",
+          "keywords": [
+            "bedroom*",
+            "studio*",
+            "home clean*",
+            "kitchen*",
+            "bathroom*",
+            "move-in*",
+            "move-out*",
+            "deep clean*",
+            "house*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "health",
+      "categories": [
+        "health-pharmacy"
+      ],
+      "allTitle": "All products and services",
+      "departments": [
+        {
+          "id": "medicines",
+          "title": "Medicines",
+          "icon": "Pill",
+          "keywords": [
+            "medicine*",
+            "medication*",
+            "pharmacy",
+            "over the counter",
+            "otc",
+            "remed*",
+            "treatment*"
+          ],
+          "sections": [
+            "pain-cold",
+            "digestive",
+            "medicines"
+          ]
+        },
+        {
+          "id": "vitamins",
+          "title": "Vitamins & supplements",
+          "icon": "PillBottle",
+          "keywords": [
+            "vitamin*",
+            "supplement*",
+            "nutrition",
+            "wellness",
+            "fitness"
+          ],
+          "sections": [
+            "vitamins",
+            "sports-nutrition"
+          ]
+        },
+        {
+          "id": "care",
+          "title": "First aid & everyday care",
+          "icon": "Bandage",
+          "keywords": [
+            "first aid*",
+            "everyday*",
+            "personal care",
+            "hygiene",
+            "toiletr*",
+            "skin*",
+            "oral*",
+            "dental"
+          ],
+          "sections": [
+            "first-aid",
+            "skin",
+            "oral-care",
+            "everyday-care"
+          ]
+        },
+        {
+          "id": "baby",
+          "title": "Baby & mother",
+          "icon": "Baby",
+          "keywords": [
+            "baby*",
+            "babies",
+            "mother*",
+            "mum*",
+            "maternity",
+            "newborn*",
+            "infant*",
+            "kids",
+            "children"
+          ],
+          "sections": [
+            "nappies",
+            "baby-feeding",
+            "baby"
+          ]
+        },
+        {
+          "id": "medical",
+          "title": "Medical supplies",
+          "icon": "Stethoscope",
+          "keywords": [
+            "medical*",
+            "clinic*",
+            "device*",
+            "equipment",
+            "supplies",
+            "mobility*",
+            "monitor*"
+          ],
+          "sections": [
+            "medical-devices",
+            "medical",
+            "mobility"
+          ]
+        },
+        {
+          "id": "services",
+          "title": "Health services",
+          "icon": "BriefcaseMedical",
+          "keywords": [
+            "service*",
+            "consult*",
+            "test*",
+            "lab*",
+            "laborator*",
+            "therapy",
+            "therapies",
+            "appointment*",
+            "telehealth",
+            "telemedicine"
+          ],
+          "sections": [
+            "consultations",
+            "lab-tests",
+            "therapy"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "lab-tests",
+          "title": "Lab tests",
+          "priority": 1,
+          "keywords": [
+            "test",
+            "tests",
+            "panel*",
+            "profile*",
+            "blood count*",
+            "urinalysis",
+            "function test*",
+            "screening*"
+          ]
+        },
+        {
+          "id": "therapy",
+          "title": "Therapy & counselling",
+          "priority": 3,
+          "keywords": [
+            "therapy",
+            "therapist*",
+            "counsel*",
+            "support",
+            "grief*",
+            "burnout*",
+            "anxiety*",
+            "stress*",
+            "physiotherapy*",
+            "relationship*"
+          ]
+        },
+        {
+          "id": "consultations",
+          "title": "Consultations & visits",
+          "keywords": [
+            "consult*",
+            "visit*",
+            "check*",
+            "review*",
+            "opinion*",
+            "follow-up*",
+            "call",
+            "calls",
+            "prescription*",
+            "appointment*"
+          ]
+        },
+        {
+          "id": "pain-cold",
+          "title": "Pain, cold & allergy",
+          "keywords": [
+            "pain*",
+            "cold",
+            "colds",
+            "flu",
+            "allerg*",
+            "fever*",
+            "cough*",
+            "sinus*",
+            "hay fever"
+          ]
+        },
+        {
+          "id": "digestive",
+          "title": "Digestive health",
+          "keywords": [
+            "digestive*",
+            "digestion",
+            "antacid*",
+            "indigestion",
+            "heartburn",
+            "laxative*",
+            "constipation",
+            "diarrh*",
+            "rehydration*",
+            "ors"
+          ]
+        },
+        {
+          "id": "medicines",
+          "title": "Medicines",
+          "keywords": [
+            "medicine*",
+            "tablets",
+            "capsule*",
+            "syrup*",
+            "antibiotic*"
+          ]
+        },
+        {
+          "id": "vitamins",
+          "title": "Vitamins & supplements",
+          "priority": 2,
+          "keywords": [
+            "vitamin*",
+            "multivitamin*",
+            "omega*",
+            "iron",
+            "magnesium",
+            "probiotic*",
+            "supplement*",
+            "zinc",
+            "calcium",
+            "collagen*",
+            "wellness pack*",
+            "wellness starter*"
+          ]
+        },
+        {
+          "id": "sports-nutrition",
+          "title": "Sports nutrition",
+          "priority": 2,
+          "keywords": [
+            "protein*",
+            "electrolyte*",
+            "whey",
+            "creatine*",
+            "energy gel*",
+            "pre-workout*"
+          ]
+        },
+        {
+          "id": "first-aid",
+          "title": "First aid",
+          "keywords": [
+            "first aid*",
+            "wound*",
+            "plaster*",
+            "bandage*",
+            "antiseptic*",
+            "dressing*",
+            "gauze",
+            "burn*",
+            "health kit*"
+          ]
+        },
+        {
+          "id": "skin",
+          "title": "Skin care",
+          "keywords": [
+            "skin care*",
+            "skincare",
+            "skin cream*",
+            "eczema",
+            "acne",
+            "sunscreen*",
+            "sun cream*",
+            "spf",
+            "ointment*",
+            "antifungal*"
+          ]
+        },
+        {
+          "id": "oral-care",
+          "title": "Oral care",
+          "keywords": [
+            "oral care*",
+            "toothpaste*",
+            "toothbrush*",
+            "mouthwash*",
+            "dental*",
+            "floss*"
+          ]
+        },
+        {
+          "id": "everyday-care",
+          "title": "Everyday care",
+          "keywords": [
+            "home care*",
+            "hygiene*",
+            "sanitiser*",
+            "sanitizer*",
+            "hand wash*",
+            "care"
+          ]
+        },
+        {
+          "id": "nappies",
+          "title": "Nappies & wipes",
+          "priority": 4,
+          "keywords": [
+            "diaper*",
+            "nappy",
+            "nappies",
+            "wipes"
+          ]
+        },
+        {
+          "id": "baby-feeding",
+          "title": "Baby food & feeding",
+          "priority": 4,
+          "keywords": [
+            "baby food*",
+            "feeding*",
+            "formula",
+            "infant formula*",
+            "baby cereal*",
+            "sippy*",
+            "feeding bottle*"
+          ]
+        },
+        {
+          "id": "baby",
+          "title": "Baby & mother",
+          "keywords": [
+            "baby*",
+            "newborn*",
+            "nursery*",
+            "maternity*",
+            "mother*",
+            "mum",
+            "mums"
+          ]
+        },
+        {
+          "id": "medical-devices",
+          "title": "Health monitors",
+          "keywords": [
+            "thermometer*",
+            "blood pressure monitor*",
+            "bp monitor*",
+            "monitor*",
+            "oximeter*",
+            "glucometer*",
+            "glucose meter*",
+            "nebuli*"
+          ]
+        },
+        {
+          "id": "medical",
+          "title": "Medical supplies",
+          "keywords": [
+            "mask*",
+            "syringe*",
+            "gloves*",
+            "tape",
+            "clinic starter*",
+            "cotton wool",
+            "surgical*"
+          ]
+        },
+        {
+          "id": "mobility",
+          "title": "Mobility aids",
+          "keywords": [
+            "mobility*",
+            "wheelchair*",
+            "crutch*",
+            "walking stick*",
+            "walking frame*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tech",
+      "categories": [
+        "tech-electronics"
+      ],
+      "allTitle": "All products and services",
+      "departments": [
+        {
+          "id": "phones",
+          "title": "Phones & smart tech",
+          "icon": "Smartphone",
+          "keywords": [
+            "phone*",
+            "smartphone*",
+            "mobile*",
+            "tablet*",
+            "wearable*",
+            "smartwatch*",
+            "smart home",
+            "smart tech",
+            "gadget*",
+            "sim",
+            "sims",
+            "sim card*"
+          ],
+          "sections": [
+            "flagship-phones",
+            "budget-phones",
+            "phones",
+            "tablets",
+            "wearables",
+            "smart-home",
+            "accessories",
+            "connectivity"
+          ]
+        },
+        {
+          "id": "computers",
+          "title": "Computers & office",
+          "icon": "Laptop",
+          "keywords": [
+            "computer*",
+            "computing",
+            "laptop*",
+            "desktop*",
+            "pc",
+            "pcs",
+            "office",
+            "printer*",
+            "printing"
+          ],
+          "sections": [
+            "laptops",
+            "desktops",
+            "computer-accessories",
+            "storage",
+            "printers"
+          ]
+        },
+        {
+          "id": "audio",
+          "title": "Audio",
+          "icon": "Headphones",
+          "keywords": [
+            "audio",
+            "sound",
+            "music",
+            "hi-fi",
+            "hifi",
+            "headphone*",
+            "speaker*",
+            "earbud*"
+          ],
+          "sections": [
+            "headphones",
+            "speakers"
+          ]
+        },
+        {
+          "id": "tv",
+          "title": "TV & entertainment",
+          "icon": "Tv",
+          "keywords": [
+            "tv",
+            "tvs",
+            "television*",
+            "entertainment",
+            "home cinema",
+            "home theatre",
+            "home theater",
+            "projector*",
+            "streaming"
+          ],
+          "sections": [
+            "tvs"
+          ]
+        },
+        {
+          "id": "cables-chargers",
+          "title": "Cables & chargers",
+          "icon": "Cable",
+          "keywords": [
+            "cable*",
+            "charger*",
+            "charging",
+            "power",
+            "adapter*",
+            "adaptor*"
+          ],
+          "sections": [
+            "chargers",
+            "cables"
+          ]
+        },
+        {
+          "id": "gaming",
+          "title": "Gaming",
+          "icon": "Gamepad2",
+          "keywords": [
+            "gaming",
+            "game",
+            "games",
+            "console*",
+            "esports"
+          ],
+          "sections": [
+            "consoles",
+            "games",
+            "gaming-gear"
+          ]
+        },
+        {
+          "id": "cameras",
+          "title": "Cameras",
+          "icon": "Camera",
+          "keywords": [
+            "camera*",
+            "photo*",
+            "photography",
+            "drone*",
+            "video"
+          ],
+          "sections": [
+            "cameras"
+          ]
+        },
+        {
+          "id": "appliances",
+          "title": "Kitchen & home appliances",
+          "icon": "Refrigerator",
+          "keywords": [
+            "appliance*",
+            "kitchen",
+            "home appliance*",
+            "white goods",
+            "household",
+            "cleaning"
+          ],
+          "sections": [
+            "kitchen-appliances",
+            "home-appliances"
+          ]
+        },
+        {
+          "id": "personal-care",
+          "title": "Personal care & health tech",
+          "icon": "HeartPulse",
+          "keywords": [
+            "personal care",
+            "grooming",
+            "beauty",
+            "health",
+            "wellness",
+            "fitness"
+          ],
+          "sections": [
+            "personal-care",
+            "health-tech"
+          ]
+        },
+        {
+          "id": "repairs",
+          "title": "Repairs & services",
+          "icon": "Wrench",
+          "keywords": [
+            "repair*",
+            "service*",
+            "servicing",
+            "support",
+            "installation*"
+          ],
+          "sections": [
+            "repairs"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "flagship-phones",
+          "title": "Flagship & foldable phones",
+          "priority": 6,
+          "keywords": [
+            "flagship*",
+            "foldable*",
+            "premium smartphone*",
+            "gaming smartphone*"
+          ]
+        },
+        {
+          "id": "budget-phones",
+          "title": "Entry & refurbished phones",
+          "priority": 6,
+          "keywords": [
+            "entry smartphone*",
+            "refurbished smartphone*",
+            "budget smartphone*",
+            "feature phone*"
+          ]
+        },
+        {
+          "id": "phones",
+          "title": "Smartphones",
+          "keywords": [
+            "smartphone*",
+            "phone*"
+          ]
+        },
+        {
+          "id": "tablets",
+          "title": "Tablets & e-readers",
+          "keywords": [
+            "tablet*",
+            "ipad*",
+            "e-reader*",
+            "ereader*",
+            "kindle*"
+          ]
+        },
+        {
+          "id": "wearables",
+          "title": "Smartwatches & wearables",
+          "keywords": [
+            "smartwatch*",
+            "smart watch*",
+            "fitness tracker*",
+            "fitness band*",
+            "activity tracker*",
+            "smart ring*",
+            "wearable*"
+          ]
+        },
+        {
+          "id": "smart-home",
+          "title": "Smart home",
+          "priority": 3,
+          "keywords": [
+            "smart speaker*",
+            "smart lock*",
+            "smart doorbell*",
+            "smart thermostat*",
+            "smart plug*",
+            "smart bulb*",
+            "smart light*",
+            "smart home*",
+            "smart display*",
+            "home hub*",
+            "security camera*",
+            "cctv",
+            "doorbell*",
+            "thermostat*",
+            "motion sensor*"
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Accessories",
+          "priority": 5,
+          "keywords": [
+            "case",
+            "cases",
+            "stand",
+            "stands",
+            "screen protector*",
+            "tempered glass",
+            "organizer*",
+            "organiser*",
+            "phone holder*",
+            "phone mount*",
+            "car mount*",
+            "phone grip*",
+            "selfie stick*"
+          ]
+        },
+        {
+          "id": "connectivity",
+          "title": "Internet & connectivity",
+          "priority": 0,
+          "keywords": [
+            "internet",
+            "fiber*",
+            "fibre*",
+            "wi-fi",
+            "wifi",
+            "sim",
+            "sim card*",
+            "esim*",
+            "router*",
+            "mobile data*",
+            "data bundle*",
+            "data plan*",
+            "mifi",
+            "hotspot*",
+            "connectivity"
+          ]
+        },
+        {
+          "id": "laptops",
+          "title": "Laptops",
+          "keywords": [
+            "laptop*",
+            "ultrabook*",
+            "chromebook*",
+            "macbook*"
+          ]
+        },
+        {
+          "id": "desktops",
+          "title": "Desktops & monitors",
+          "keywords": [
+            "desktop*",
+            "pc",
+            "pcs",
+            "workstation*",
+            "mini pc",
+            "monitor*",
+            "computer*",
+            "all-in-one*"
+          ]
+        },
+        {
+          "id": "computer-accessories",
+          "title": "Keyboards, mice & webcams",
+          "priority": 4,
+          "keywords": [
+            "keyboard*",
+            "mouse",
+            "mice",
+            "mouse pad*",
+            "webcam*",
+            "docking station*",
+            "laptop stand*",
+            "laptop bag*",
+            "laptop sleeve*",
+            "laptop case*",
+            "monitor arm*",
+            "monitor stand*"
+          ]
+        },
+        {
+          "id": "storage",
+          "title": "Storage & memory",
+          "keywords": [
+            "hard drive*",
+            "hard disk*",
+            "ssd",
+            "ssds",
+            "external drive*",
+            "flash drive*",
+            "flash disk*",
+            "usb drive*",
+            "usb stick*",
+            "memory card*",
+            "sd card*",
+            "micro sd*",
+            "microsd*"
+          ]
+        },
+        {
+          "id": "printers",
+          "title": "Printers & ink",
+          "keywords": [
+            "printer*",
+            "scanner*",
+            "ink",
+            "inks",
+            "toner*",
+            "ink cartridge*",
+            "toner cartridge*"
+          ]
+        },
+        {
+          "id": "headphones",
+          "title": "Headphones & earbuds",
+          "keywords": [
+            "earbud*",
+            "headphone*",
+            "headset*",
+            "earphone*",
+            "in-ear*"
+          ]
+        },
+        {
+          "id": "speakers",
+          "title": "Speakers & home audio",
+          "keywords": [
+            "speaker*",
+            "soundbar*",
+            "turntable*",
+            "microphone*",
+            "audio",
+            "hi-fi",
+            "hifi",
+            "radio*",
+            "amplifier*",
+            "subwoofer*"
+          ]
+        },
+        {
+          "id": "tvs",
+          "title": "TVs & projectors",
+          "priority": 3,
+          "keywords": [
+            "tv",
+            "tvs",
+            "smart tv*",
+            "television*",
+            "projector*",
+            "tv box*",
+            "streaming stick*",
+            "streaming device*",
+            "media player*",
+            "tv mount*",
+            "tv bracket*",
+            "tv stand*",
+            "decoder*",
+            "set-top box*"
+          ]
+        },
+        {
+          "id": "chargers",
+          "title": "Chargers & power banks",
+          "priority": 4,
+          "keywords": [
+            "charger*",
+            "charging*",
+            "power bank*",
+            "powerbank*",
+            "battery pack*",
+            "batteries"
+          ]
+        },
+        {
+          "id": "cables",
+          "title": "Cables & adapters",
+          "priority": 4,
+          "keywords": [
+            "cable*",
+            "adapter*",
+            "adaptor*",
+            "hdmi*",
+            "usb hub*",
+            "usb-c hub*",
+            "dongle*",
+            "extension lead*",
+            "extension cable*",
+            "surge protector*",
+            "power strip*",
+            "splitter*"
+          ]
+        },
+        {
+          "id": "consoles",
+          "title": "Consoles",
+          "keywords": [
+            "console*"
+          ]
+        },
+        {
+          "id": "games",
+          "title": "Games",
+          "keywords": [
+            "game",
+            "games",
+            "game bundle*",
+            "video game*"
+          ]
+        },
+        {
+          "id": "gaming-gear",
+          "title": "Gaming gear",
+          "priority": 2,
+          "keywords": [
+            "gaming headset*",
+            "gaming chair*",
+            "gaming monitor*",
+            "gaming mouse",
+            "gaming mice",
+            "gaming keyboard*",
+            "gaming desk*",
+            "controller*",
+            "racing wheel*",
+            "streaming kit*",
+            "gamepad*",
+            "joystick*",
+            "vr headset*",
+            "capture card*"
+          ]
+        },
+        {
+          "id": "cameras",
+          "title": "Cameras & drones",
+          "keywords": [
+            "camera",
+            "cameras",
+            "dslr*",
+            "mirrorless*",
+            "action cam*",
+            "gopro*",
+            "instant camera*",
+            "camcorder*",
+            "dash cam*",
+            "drone*",
+            "lens",
+            "lenses",
+            "tripod*",
+            "gimbal*"
+          ]
+        },
+        {
+          "id": "kitchen-appliances",
+          "title": "Kitchen appliances",
+          "keywords": [
+            "kettle*",
+            "blender*",
+            "toaster*",
+            "microwave*",
+            "air fryer*",
+            "coffee machine*",
+            "coffee maker*",
+            "espresso machine*",
+            "juicer*",
+            "stand mixer*",
+            "hand mixer*",
+            "food processor*",
+            "fridge*",
+            "refrigerator*",
+            "freezer*",
+            "cooker*",
+            "oven*",
+            "hob",
+            "hobs",
+            "dishwasher*",
+            "water dispenser*"
+          ]
+        },
+        {
+          "id": "home-appliances",
+          "title": "Home appliances",
+          "keywords": [
+            "vacuum*",
+            "washing machine*",
+            "tumble dryer*",
+            "steam iron*",
+            "iron box*",
+            "clothes iron*",
+            "standing fan*",
+            "desk fan*",
+            "ceiling fan*",
+            "tower fan*",
+            "pedestal fan*",
+            "fan heater*",
+            "heater*",
+            "air purifier*",
+            "purifier*",
+            "air conditioner*",
+            "humidifier*",
+            "dehumidifier*",
+            "sewing machine*"
+          ]
+        },
+        {
+          "id": "personal-care",
+          "title": "Shavers & hair tools",
+          "keywords": [
+            "shaver*",
+            "trimmer*",
+            "clipper*",
+            "epilator*",
+            "hair dryer*",
+            "hairdryer*",
+            "straightener*",
+            "curling*",
+            "hair styler*",
+            "flat iron*",
+            "electric toothbrush*"
+          ]
+        },
+        {
+          "id": "health-tech",
+          "title": "Health & fitness tech",
+          "keywords": [
+            "smart scale*",
+            "bathroom scale*",
+            "body scale*",
+            "blood pressure*",
+            "thermometer*",
+            "massager*",
+            "massage gun*",
+            "pulse oximeter*",
+            "heart rate*"
+          ]
+        },
+        {
+          "id": "repairs",
+          "title": "Repairs",
+          "priority": 1,
+          "keywords": [
+            "repair*",
+            "replacement*",
+            "fix*",
+            "water damage*",
+            "reinstall*",
+            "data recovery",
+            "diagnostic*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trips",
+      "categories": [
+        "travel-tours"
+      ],
+      "allTitle": "All trips",
+      "sections": [
+        {
+          "id": "game-drives",
+          "title": "Game drives",
+          "priority": 1,
+          "keywords": [
+            "game drive*",
+            "birding*",
+            "conservation*"
+          ]
+        },
+        {
+          "id": "culture",
+          "title": "Culture & food",
+          "priority": 2,
+          "keywords": [
+            "cultur*",
+            "heritage*",
+            "village*",
+            "artisan*",
+            "craft*",
+            "music*",
+            "dance*",
+            "food*",
+            "community*",
+            "local home*"
+          ]
+        },
+        {
+          "id": "packages",
+          "title": "Packages & getaways",
+          "priority": 3,
+          "keywords": [
+            "package*",
+            "getaway*",
+            "escape*",
+            "extension*",
+            "holiday*",
+            "city break*",
+            "beach*",
+            "multi-city*",
+            "honeymoon*"
+          ]
+        },
+        {
+          "id": "safaris",
+          "title": "Safaris",
+          "keywords": [
+            "safari*",
+            "mara",
+            "amboseli",
+            "samburu",
+            "tsavo",
+            "nakuru",
+            "naivasha",
+            "conservancy*",
+            "fly-in*"
+          ]
+        },
+        {
+          "id": "adventure",
+          "title": "Adventure",
+          "keywords": [
+            "adventure*",
+            "zipline*",
+            "horse*",
+            "off-road*",
+            "hiking*",
+            "hike*",
+            "climbing*",
+            "kayak*",
+            "camping*",
+            "cycling*",
+            "outdoor*",
+            "forest*"
+          ]
+        },
+        {
+          "id": "city",
+          "title": "City & day tours",
+          "keywords": [
+            "city*",
+            "tour*",
+            "walk*",
+            "highlights*",
+            "half-day*",
+            "day trip*",
+            "nairobi",
+            "karen",
+            "cbd",
+            "night*",
+            "coffee*",
+            "art*",
+            "architecture*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flights",
+      "categories": [
+        "flights"
+      ],
+      "allTitle": "All flights",
+      "sections": [
+        {
+          "id": "charters",
+          "title": "Charters",
+          "keywords": [
+            "charter*",
+            "private*",
+            "helicopter hire*",
+            "jet*",
+            "hourly*"
+          ]
+        },
+        {
+          "id": "scenic",
+          "title": "Scenic flights",
+          "keywords": [
+            "scenic*",
+            "sightseeing*",
+            "sunset*",
+            "aerial*",
+            "tour*",
+            "flyover*"
+          ]
+        },
+        {
+          "id": "safari",
+          "title": "Safari flights",
+          "keywords": [
+            "safari*",
+            "mara*",
+            "amboseli*",
+            "samburu*",
+            "tsavo*",
+            "lodge*",
+            "airstrip*"
+          ]
+        },
+        {
+          "id": "extras",
+          "title": "Extras",
+          "priority": 1,
+          "keywords": [
+            "extra*",
+            "add-on*",
+            "waiting*",
+            "luggage*",
+            "landing fee*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "concierge",
+      "categories": [
+        "concierge-services"
+      ],
+      "allTitle": "All requests",
+      "sections": [
+        {
+          "id": "retainers",
+          "title": "Retainers & plans",
+          "priority": 1,
+          "keywords": [
+            "retainer*",
+            "recurring*",
+            "subscription*"
+          ]
+        },
+        {
+          "id": "reservations",
+          "title": "Reservations",
+          "keywords": [
+            "reservation*"
+          ]
+        },
+        {
+          "id": "errands",
+          "title": "Errands & deliveries",
+          "keywords": [
+            "errand*",
+            "run",
+            "runs",
+            "delivery*",
+            "deliveries",
+            "document*",
+            "parcel*",
+            "courier*",
+            "pickup*",
+            "drop-off*",
+            "queue*",
+            "bill payment*"
+          ]
+        },
+        {
+          "id": "shopping",
+          "title": "Shopping help",
+          "keywords": [
+            "shopping*",
+            "shopper*"
+          ]
+        },
+        {
+          "id": "gifts",
+          "title": "Gift sourcing",
+          "keywords": [
+            "gift*"
+          ]
+        },
+        {
+          "id": "travel",
+          "title": "Travel planning",
+          "keywords": [
+            "travel*",
+            "trip*",
+            "itinerary*",
+            "holiday*",
+            "visa*",
+            "safari*",
+            "weekend plan*"
+          ]
+        },
+        {
+          "id": "moving",
+          "title": "Moving",
+          "keywords": [
+            "move*",
+            "moving*",
+            "packing*",
+            "unpacking*",
+            "furniture*"
+          ]
+        },
+        {
+          "id": "property",
+          "title": "Property & cleaning",
+          "keywords": [
+            "property*",
+            "key*",
+            "inspection*",
+            "maintenance*",
+            "vendor*",
+            "utility*",
+            "check-in*",
+            "turnover*",
+            "clean*",
+            "laundry*"
+          ]
+        },
+        {
+          "id": "vip",
+          "title": "VIP & lifestyle",
+          "keywords": [
+            "vip",
+            "executive*",
+            "luxury*",
+            "bespoke*",
+            "security*",
+            "priority*",
+            "private event*",
+            "lifestyle*",
+            "driver*"
+          ]
+        },
+        {
+          "id": "assistance",
+          "title": "Assistance",
+          "keywords": [
+            "assist*",
+            "assistant*",
+            "appointment*",
+            "guest*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "adults",
+      "categories": [
+        "adults-only"
+      ],
+      "allTitle": "All products",
+      "departments": [
+        {
+          "id": "tobacco",
+          "title": "Tobacco & vapes",
+          "icon": "Cigarette",
+          "keywords": [
+            "tobacco",
+            "smok*",
+            "cigar*",
+            "cigarette*",
+            "vape*",
+            "vaping",
+            "pod",
+            "pods",
+            "shisha*",
+            "hookah*",
+            "e-liquid*"
+          ],
+          "sections": [
+            "cigars",
+            "cigarettes",
+            "vapes"
+          ]
+        },
+        {
+          "id": "intimacy",
+          "title": "Intimacy",
+          "icon": "Heart",
+          "keywords": [
+            "intima*",
+            "adult*",
+            "pleasure*",
+            "lingerie",
+            "couples*",
+            "care",
+            "sexual wellness"
+          ],
+          "sections": [
+            "care",
+            "accessories"
+          ]
+        },
+        {
+          "id": "gift-sets",
+          "title": "Gift sets",
+          "icon": "Gift",
+          "keywords": [
+            "gift*",
+            "kit*",
+            "set",
+            "sets",
+            "collection*",
+            "box*",
+            "bundle*"
+          ],
+          "sections": [
+            "gift-sets",
+            "bundles"
+          ]
+        },
+        {
+          "id": "wellness",
+          "title": "Wellness sessions",
+          "icon": "HandHeart",
+          "keywords": [
+            "wellness*",
+            "session*",
+            "ritual*",
+            "spa",
+            "massage*",
+            "therap*"
+          ],
+          "sections": [
+            "sessions"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "cigars",
+          "title": "Cigars",
+          "keywords": [
+            "cigar*",
+            "robusto*",
+            "toro*",
+            "corona*",
+            "churchill*",
+            "maduro*",
+            "connecticut*"
+          ]
+        },
+        {
+          "id": "vapes",
+          "title": "Vapes & pods",
+          "keywords": [
+            "pod",
+            "pods",
+            "vape*"
+          ]
+        },
+        {
+          "id": "cigarettes",
+          "title": "Cigarettes",
+          "keywords": [
+            "cigarette*",
+            "menthol*",
+            "compact*",
+            "smooth*",
+            "blue",
+            "gold",
+            "silver",
+            "pack",
+            "packs",
+            "carton*"
+          ]
+        },
+        {
+          "id": "sessions",
+          "title": "Wellness sessions",
+          "keywords": [
+            "session*",
+            "ritual*",
+            "package*",
+            "consultation*",
+            "visit*"
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Accessories",
+          "keywords": [
+            "accessor*"
+          ]
+        },
+        {
+          "id": "gift-sets",
+          "title": "Gift sets & kits",
+          "keywords": [
+            "gift*",
+            "kit*",
+            "box*",
+            "set",
+            "sets",
+            "collection*",
+            "pair",
+            "pairs"
+          ]
+        },
+        {
+          "id": "care",
+          "title": "Intimacy & care",
+          "keywords": [
+            "intimacy*",
+            "care",
+            "comfort*",
+            "couples*",
+            "night-in*",
+            "wellness*"
+          ]
+        }
+      ]
+    }
+  ],
+  "shared": [
+    {
+      "id": "bundles",
+      "title": "Bundles & sets",
+      "keywords": [
+        "bundle*",
+        "set",
+        "sets",
+        "kit*",
+        "pack",
+        "packs",
+        "box*",
+        "combo*",
+        "hamper*"
+      ]
+    },
+    {
+      "id": "plans",
+      "title": "Plans & memberships",
+      "keywords": [
+        "plan",
+        "plans",
+        "membership*",
+        "subscription*",
+        "retainer*",
+        "monthly",
+        "weekly",
+        "annual*",
+        "quarterly"
+      ]
+    }
+  ],
+  "fallback": {
+    "id": "more",
+    "title": "More"
+  },
+  "naming": {
+    "note": "What a store calls its list, its items and its demand section. The most specific match wins: subcategory, then category, then the kind (from the subcategory's journey), then the default.",
+    "default": {
+      "list": "Shop",
+      "item": "item",
+      "items": "items",
+      "demand": "Frequently ordered"
+    },
+    "byKind": {
+      "dish": {
+        "list": "Menu",
+        "item": "dish",
+        "items": "dishes",
+        "demand": "Frequently ordered"
+      },
+      "product": {
+        "list": "Shop",
+        "item": "product",
+        "items": "products",
+        "demand": "Frequently ordered"
+      },
+      "service": {
+        "list": "Services",
+        "item": "service",
+        "items": "services",
+        "demand": "Most booked"
+      },
+      "activity": {
+        "list": "Experiences",
+        "item": "experience",
+        "items": "experiences",
+        "demand": "Most booked"
+      },
+      "task": {
+        "list": "Services",
+        "item": "service",
+        "items": "services",
+        "demand": "Most requested"
+      },
+      "vehicle": {
+        "list": "Fleet",
+        "item": "vehicle",
+        "items": "vehicles",
+        "demand": "Most hired"
+      }
+    },
+    "byCategory": {
+      "groceries-essentials": {
+        "list": "Aisles"
+      },
+      "alcohol-beverages": {
+        "list": "Drinks",
+        "item": "drink",
+        "items": "drinks"
+      },
+      "flowers-gifts": {
+        "list": "Gifts",
+        "item": "gift",
+        "items": "gifts"
+      },
+      "travel-tours": {
+        "list": "Trips",
+        "item": "trip",
+        "items": "trips",
+        "demand": "Most booked trips"
+      },
+      "experiences": {
+        "list": "Tickets & sessions",
+        "item": "option",
+        "items": "options"
+      },
+      "airport-transfers": {
+        "list": "Vehicles",
+        "item": "vehicle",
+        "items": "vehicles",
+        "demand": "Most booked"
+      },
+      "concierge-services": {
+        "list": "Requests",
+        "item": "request",
+        "items": "requests"
+      },
+      "laundry-cleaning": {
+        "list": "Services"
+      },
+      "play": {
+        "list": "Activities",
+        "item": "activity",
+        "items": "activities",
+        "demand": "Most booked"
+      },
+      "flights": {
+        "list": "Flights",
+        "item": "flight",
+        "items": "flights",
+        "demand": "Most booked"
+      }
+    },
+    "bySubcategory": {
+      "beauty-wellness:spa": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "beauty-wellness:massage": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "beauty-wellness:gym": {
+        "list": "Memberships & classes",
+        "item": "option",
+        "items": "options",
+        "demand": "Most chosen"
+      },
+      "beauty-wellness:personal-training": {
+        "list": "Training",
+        "item": "programme",
+        "items": "programmes",
+        "demand": "Most chosen"
+      },
+      "restaurants-food:catering": {
+        "list": "Catering menu",
+        "item": "package",
+        "items": "packages",
+        "demand": "Most requested"
+      },
+      "vehicle-rentals:vehicle-repair": {
+        "list": "Services",
+        "item": "service",
+        "items": "services",
+        "demand": "Most booked"
+      },
+      "vehicle-rentals:car-wash": {
+        "list": "Services",
+        "item": "service",
+        "items": "services",
+        "demand": "Most booked"
+      },
+      "tech-electronics:device-repairs": {
+        "list": "Repairs",
+        "item": "repair",
+        "items": "repairs",
+        "demand": "Most booked"
+      },
+      "tech-electronics:telecom-services": {
+        "list": "Plans & services",
+        "item": "plan",
+        "items": "plans",
+        "demand": "Most chosen"
+      },
+      "health-pharmacy:mobile-diagnostic-services": {
+        "list": "Tests",
+        "item": "test",
+        "items": "tests",
+        "demand": "Most booked"
+      },
+      "experiences:photography": {
+        "list": "Shoots",
+        "item": "shoot",
+        "items": "shoots",
+        "demand": "Most booked"
+      }
+    }
+  },
+  "signals": {
+    "note": "Sections filled only from real history, shown above the named sections and repeating their items there, as Wolt does. Until an item carries the signal, the section does not show. Never estimated or seeded.",
+    "demand": {
+      "id": "demand",
+      "field": "orders",
+      "limit": 8
+    },
+    "new": {
+      "id": "new",
+      "title": "New",
+      "field": "isNew",
+      "limit": 8
+    }
+  }
+}

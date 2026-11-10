@@ -11,7 +11,7 @@ import { Hero } from '@/components/home/hero';
 import { NotifyForm } from '@/components/home/notify-form';
 import { PopularCategories } from '@/components/home/popular-categories';
 import { SiteFooter } from '@/components/site-footer';
-import { BEST_SELLERS } from '@/lib/best-sellers';
+import { BEST_SELLERS, bestSellerFromCatalogue, type BestSeller } from '@/lib/best-sellers';
 import { categoryTiles } from '@/lib/categories';
 import { translator, type Locale, type Translate } from '@/lib/i18n/dictionaries';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -52,6 +52,78 @@ const getHomeData = unstable_cache(
   { revalidate: 300 },
 );
 
+/* Taps per category tile over the last 30 days. Refreshed every five minutes;
+   if it cannot be read, the tiles keep their usual order. */
+const getTileTaps = unstable_cache(
+  async (): Promise<Record<string, number>> => {
+    const { data, error } = await createPublicClient().rpc('rpc_category_tile_popularity', {
+      p_days: 30,
+    });
+    if (error || !data) return {};
+    return Object.fromEntries(
+      (data as { tile: string; clicks: number }[]).map((row) => [row.tile, Number(row.clicks)]),
+    );
+  },
+  ['homepage-tile-taps'],
+  { revalidate: 300 },
+);
+
+/*
+ * Best sellers, ranked by the database (rpc_best_sellers): paid Best seller
+ * slots first, then the most sold products of the last 30 days, then
+ * products merchants mark as popular. Refreshed every five minutes, so a
+ * slot going live or a run of orders shows up on its own. Nothing to show,
+ * or a read that fails: the sample row instead.
+ */
+interface BestSellerRow {
+  item_id: string;
+  item_name: string;
+  price_kes: number;
+  photo_path: string | null;
+  merchant_id: string;
+  trading_name: string;
+  category: string | null;
+  branch_name: string | null;
+  source: 'sponsored' | 'top_selling' | 'popular';
+}
+
+const getBestSellers = unstable_cache(
+  async (): Promise<BestSeller[]> => {
+    const supabase = createPublicClient();
+    /* Not in the generated types until they are regenerated with this RPC. */
+    const { data, error } = await supabase.rpc(
+      'rpc_best_sellers' as never,
+      { p_limit: 8 } as never,
+    );
+    const rows = (data ?? []) as unknown as BestSellerRow[];
+    if (error || rows.length === 0) return [];
+
+    const paths = rows.flatMap((row) => (row.photo_path ? [row.photo_path] : []));
+    const { data: signed } = paths.length
+      ? await supabase.storage.from('catalogue-images').createSignedUrls(paths, 2 * 60 * 60)
+      : { data: [] };
+    const photos = new Map(
+      (signed ?? []).flatMap((photo) => (photo.signedUrl ? [[photo.path, photo.signedUrl]] : [])),
+    );
+
+    return rows.map((row) =>
+      bestSellerFromCatalogue({
+        id: row.item_id,
+        name: row.item_name,
+        price_kes: row.price_kes,
+        photo_url: row.photo_path ? (photos.get(row.photo_path) ?? null) : null,
+        merchant_id: row.merchant_id,
+        trading_name: row.trading_name,
+        category: row.category,
+        branch_name: row.branch_name,
+        sponsored: row.source === 'sponsored',
+      }),
+    );
+  },
+  ['homepage-best-sellers'],
+  { revalidate: 300 },
+);
+
 export async function HomePageContent({
   locale,
   translate,
@@ -60,7 +132,11 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const { cities: allCities, zones, featured } = await getHomeData();
+  const [{ cities: allCities, zones, featured }, tileTaps, liveBestSellers] = await Promise.all([
+    getHomeData(),
+    getTileTaps(),
+    getBestSellers().catch(() => [] as BestSeller[]),
+  ]);
   const supabase = createPublicClient();
   const { data: categoryRows, error: categoryError } = await supabase
     .from('category_config')
@@ -117,7 +193,7 @@ export async function HomePageContent({
             heading={t('home.popular.heading')}
             sub={t('home.popular.sub')}
             allLabel={t('home.popular.all')}
-            items={categoryTiles(t, categories)}
+            items={categoryTiles(t, categories, tileTaps)}
           />
         </section>
 
@@ -170,7 +246,7 @@ export async function HomePageContent({
               heading={t('home.bestSellers.heading')}
               seeAll={t('home.bestSellers.seeAll')}
               sponsored={t('merchant.sponsored')}
-              items={BEST_SELLERS}
+              items={liveBestSellers.length > 0 ? liveBestSellers : BEST_SELLERS}
             />
           </div>
         </section>

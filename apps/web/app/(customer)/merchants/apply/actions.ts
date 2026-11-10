@@ -3,6 +3,8 @@
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 
+import { safeGetHtml } from '@/lib/safe-fetch';
+
 /**
  * Reading a merchant's existing listing so they do not have to retype it.
  *
@@ -272,15 +274,15 @@ function isPrivateAddress(address: string): boolean {
 }
 
 async function fromOpenGraph(url: URL, signal: AbortSignal): Promise<PrefillResult | null> {
-  const response = await fetch(url.toString(), {
-    signal,
-    redirect: 'follow',
-    headers: { 'User-Agent': 'NexG-Onboarding/1.0 (+https://nexgapp.com)' },
-  });
-  if (!response.ok) return null;
-
-  /* Only the head is needed, and a shop's homepage can be megabytes. */
-  const html = (await response.text()).slice(0, 200_000);
+  if (signal.aborted) return null;
+  /* Every redirect hop is checked against private addresses (it used to
+     follow redirects blindly), and only the head of the page is read. */
+  let html: string;
+  try {
+    ({ html } = await safeGetHtml(url, { maxBytes: 200_000, timeoutMs: TIMEOUT_MS }));
+  } catch {
+    return null;
+  }
 
   const meta = (property: string): string | null => {
     const pattern = new RegExp(

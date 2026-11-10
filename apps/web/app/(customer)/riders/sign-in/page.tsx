@@ -1,12 +1,13 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 
-/**
- * There is one sign-in page for everybody.
- *
- * This route exists because the header links to it and people bookmark it,
- * but a separate rider login would be a second place to keep correct for no
- * benefit — the role buttons on /sign-in already decide where you land.
- */
-export default function RiderSignInRedirect() {
-  redirect('/sign-in');
+import { PortalSignInPage, type SignInSearchParams } from '@/components/auth/portal-sign-in-page';
+
+export const metadata: Metadata = {
+  title: 'Rider sign in',
+  description: 'Sign in to your NexG rider dashboard.',
+};
+
+/** Riders sign in here; customers use /sign-in. */
+export default function RiderSignInPage({ searchParams }: { searchParams?: SignInSearchParams }) {
+  return <PortalSignInPage portal="rider" searchParams={searchParams} />;
 }

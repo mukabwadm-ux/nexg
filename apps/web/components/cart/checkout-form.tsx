@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocation } from '@nexg/location';
-import { Loader2, MapPin, Minus, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Lock, MapPin, Minus, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -9,13 +9,14 @@ import * as React from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 import { kesFromCents, useCart } from './cart-provider';
-
-type Method = 'card' | 'mpesa_stk' | 'cash_on_delivery';
+import { type Method, methodOptions, PaymentMethods } from './payment-methods';
 
 interface Quote {
   ok: boolean;
   message?: string;
   subtotal_cents: number;
+  /** Before promotions; equal to subtotal_cents when none apply. */
+  list_subtotal_cents?: number;
   delivery_fee_cents: number;
   service_fee_cents: number;
   small_basket_fee_cents: number;
@@ -41,12 +42,28 @@ type LooseRpc = (
 const field =
   'border-border bg-surface focus:border-gold w-full rounded-xl border px-3.5 py-2.5 text-sm font-semibold outline-none';
 
-export function CheckoutForm() {
+export function CheckoutForm({
+  bankEnabled = false,
+  cardReady = true,
+  mpesaReady = true,
+}: {
+  bankEnabled?: boolean;
+  /** Whether a card provider is connected; when not, Card is shown as coming soon. */
+  cardReady?: boolean;
+  /** Whether M-Pesa prompts can be sent. */
+  mpesaReady?: boolean;
+} = {}) {
   const cart = useCart();
   const router = useRouter();
   const { place, openSheet } = useLocation();
 
-  const [method, setMethod] = React.useState<Method>('card');
+  const options = React.useMemo(
+    () => methodOptions({ cardReady, mpesaReady, bankEnabled }),
+    [cardReady, mpesaReady, bankEnabled],
+  );
+  const [method, setMethod] = React.useState<Method>(
+    () => options.find((o) => o.ready)?.value ?? 'cash_on_delivery',
+  );
   const [phone, setPhone] = React.useState('');
   const [name, setName] = React.useState('');
   const [note, setNote] = React.useState('');
@@ -102,6 +119,13 @@ export function CheckoutForm() {
   if (cart.lines.length === 0) {
     return (
       <div className="border-border bg-surface mt-6 rounded-2xl border p-8 text-center">
+        {/* A payment that could not start empties the cart after the order is
+            saved. Without this the guest saw only "empty" and lost the reference. */}
+        {error && (
+          <p role="alert" className="text-danger mb-4 text-sm font-bold">
+            {error}
+          </p>
+        )}
         <p className="text-lg font-extrabold">Your cart is empty</p>
         <p className="text-muted mt-1 text-sm">Pick something from a merchant to get started.</p>
         <Link
@@ -166,14 +190,43 @@ export function CheckoutForm() {
         });
         const sent = (await stk.json()) as { ok: boolean; message?: string; reference?: string };
         if (!sent.ok) {
+          cart.clear();
+          /* The order and its payment are saved: the pay page shows where it
+             stands and sends the prompt again, on the same payment. */
+          if (sent.reference) {
+            router.push(`/pay/${sent.reference}`);
+            return;
+          }
           setError(
             `Your order ${result.reference} is saved, but the M-Pesa prompt could not be sent. ${sent.message ?? ''}`,
           );
-          cart.clear();
           return;
         }
         cart.clear();
         router.push(`/pay/${sent.reference ?? result.reference}`);
+        return;
+      }
+
+      if (method === 'bank_transfer') {
+        const started = await fetch('/api/payments/bank/start', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ orderId: result.order_id }),
+        });
+        const bank = (await started.json()) as {
+          ok: boolean;
+          message?: string;
+          reference?: string;
+          authorization_url?: string;
+        };
+        cart.clear();
+        if (bank.ok && bank.authorization_url) {
+          window.location.href = bank.authorization_url;
+          return;
+        }
+        /* The order and its payment are saved: the pay page says where it
+           stands and offers another way to pay. */
+        router.push(`/pay/${bank.reference ?? result.reference}`);
         return;
       }
 
@@ -185,25 +238,50 @@ export function CheckoutForm() {
       const body = (await res.json()) as {
         ok: boolean;
         message?: string;
+        reference?: string;
         authorization_url?: string;
       };
       if (!body.ok || !body.authorization_url) {
+        cart.clear();
+        /* The order and its payment are saved: the pay page says where it
+           stands, as it does when an M-Pesa prompt or a bank cannot start. */
+        if (body.reference) {
+          router.push(`/pay/${body.reference}`);
+          return;
+        }
         setError(
           `Your order ${result.reference} is saved, but payment could not start. ${body.message ?? ''}`,
         );
-        cart.clear();
         return;
       }
       cart.clear();
       window.location.href = body.authorization_url;
+    } catch {
+      /* The connection dropped mid-way: the order may already be saved.
+         Nothing is charged without the guest confirming on their phone or
+         card page, so the safe advice is to look before ordering again. */
+      setError(
+        'The connection dropped. Your order may already be saved: check Your account → Orders before placing it again. Nothing is charged until you confirm the payment.',
+      );
     } finally {
       setBusy(false);
     }
   };
 
+  const itemCount = cart.lines.reduce((n, l) => n + l.quantity, 0);
+  const totalLabel = quote?.ok ? kesFromCents(quote.total_cents) : null;
+  const payLabel =
+    method === 'cash_on_delivery'
+      ? totalLabel
+        ? `Place order · pay ${totalLabel} on delivery`
+        : 'Place order'
+      : totalLabel
+        ? `Pay ${totalLabel}`
+        : 'Pay and place order';
+
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-6">
         <section className="border-border bg-surface rounded-2xl border p-5">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-lg font-extrabold">{cart.merchantName}</h2>
@@ -216,8 +294,8 @@ export function CheckoutForm() {
           </div>
           <ul className="divide-border mt-3 divide-y">
             {cart.lines.map((line) => (
-              <li key={line.id} className="flex items-center gap-3 py-3">
-                <div className="min-w-0 flex-1">
+              <li key={line.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
+                <div className="min-w-0 flex-1 basis-40">
                   <p className="truncate text-sm font-extrabold">{line.name}</p>
                   <p className="text-muted text-xs font-semibold">
                     KES {line.price_kes.toLocaleString('en-KE')} each
@@ -244,7 +322,7 @@ export function CheckoutForm() {
                     <Plus className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <span className="w-24 text-right text-sm font-extrabold">
+                <span className="ml-auto w-24 text-right text-sm font-extrabold">
                   KES {(line.price_kes * line.quantity).toLocaleString('en-KE')}
                 </span>
                 <button
@@ -300,37 +378,28 @@ export function CheckoutForm() {
           />
         </section>
 
-        <section className="border-border bg-surface rounded-2xl border p-5">
-          <h2 className="text-lg font-extrabold">Payment</h2>
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
-            {(
-              [
-                ['card', 'Card'],
-                ['mpesa_stk', 'M-Pesa'],
-                ['cash_on_delivery', 'Pay on delivery'],
-              ] as const
-            ).map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setMethod(value)}
-                aria-pressed={method === value}
-                className={`rounded-xl border px-3 py-2.5 text-sm font-extrabold transition-colors ${
-                  method === value
-                    ? 'border-gold bg-gold-soft text-ink'
-                    : 'border-border text-muted hover:border-ink'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </section>
+        <PaymentMethods
+          options={options}
+          value={method}
+          onChange={setMethod}
+          phone={phone}
+          total={quote?.ok ? kesFromCents(quote.total_cents) : null}
+          cashFee={
+            quote?.ok && quote.cash_handling_cents > 0
+              ? kesFromCents(quote.cash_handling_cents)
+              : null
+          }
+        />
       </div>
 
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <div className="border-border bg-surface rounded-2xl border p-5">
-          <h2 className="text-lg font-extrabold">Summary</h2>
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-lg font-extrabold">Summary</h2>
+            <span className="text-muted text-xs font-bold">
+              {itemCount} {itemCount === 1 ? 'item' : 'items'}
+            </span>
+          </div>
           <dl className="mt-3 space-y-2 text-sm font-semibold">
             <Row
               label="Subtotal"
@@ -338,6 +407,12 @@ export function CheckoutForm() {
             />
             {quote?.ok && (
               <>
+                {(quote.list_subtotal_cents ?? 0) > quote.subtotal_cents && (
+                  <Row
+                    label="You saved (in subtotal)"
+                    value={kesFromCents((quote.list_subtotal_cents ?? 0) - quote.subtotal_cents)}
+                  />
+                )}
                 <Row label="Delivery" value={kesFromCents(quote.delivery_fee_cents)} />
                 <Row label="Service fee" value={kesFromCents(quote.service_fee_cents)} />
                 {quote.small_basket_fee_cents > 0 && (
@@ -375,9 +450,25 @@ export function CheckoutForm() {
             onClick={() => void place_order()}
             className="bg-gold text-ink hover:bg-gold/90 mt-4 flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-extrabold disabled:opacity-50"
           >
-            {(busy || quoting) && <Loader2 className="h-4 w-4 animate-spin" />}
-            {method === 'cash_on_delivery' ? 'Place order' : 'Pay and place order'}
+            {busy || quoting ? (
+              <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+            ) : method !== 'cash_on_delivery' ? (
+              <Lock aria-hidden="true" className="h-4 w-4" />
+            ) : null}
+            {payLabel}
           </button>
+          <p className="text-muted mt-3 flex flex-wrap items-center justify-center gap-x-1.5 text-[0.6875rem] font-semibold">
+            <Lock aria-hidden="true" className="h-3 w-3" />
+            Secure payments
+            <span aria-hidden="true"> · </span>
+            <Link href="/legal/terms" className="hover:text-ink underline underline-offset-2">
+              Terms
+            </Link>
+            <span aria-hidden="true"> · </span>
+            <Link href="/legal/privacy" className="hover:text-ink underline underline-offset-2">
+              Privacy
+            </Link>
+          </p>
         </div>
       </aside>
     </div>

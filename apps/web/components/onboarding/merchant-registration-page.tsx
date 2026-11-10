@@ -16,10 +16,7 @@ export function MerchantRegistrationPage({ children }: { children: React.ReactNo
           <Link href="#merchant-benefits" className={styles.navLink}>
             How NexG works
           </Link>
-          <Link
-            href="/sign-in?role=merchant&next=%2Fmerchants%2Fregister"
-            className={styles.signIn}
-          >
+          <Link href="/merchants/sign-in?next=%2Fmerchants%2Fregister" className={styles.signIn}>
             Already on NexG? <span>Sign in</span>
           </Link>
         </nav>

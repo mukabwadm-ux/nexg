@@ -1,3 +1,4 @@
+import { SUBCATEGORY_VARIANTS } from '../src/variants';
 import { describe, expect, it } from 'vitest';
 import { projectOnboardingHome } from '@nexg/booking-config/onboarding-home';
 import type { OnboardingHomeCapture } from '@nexg/booking-config/onboarding-home';
@@ -299,8 +300,8 @@ describe('onboarding Home readiness projection', () => {
     ]);
   });
 
-  it('projects all 128 registry profiles with valid registered IDs and no active workflow or completed launch', () => {
-    expect(registry.profiles).toHaveLength(128);
+  it('projects all registry profiles with valid registered IDs and no active workflow or completed launch', () => {
+    expect(registry.profiles).toHaveLength(128 + SUBCATEGORY_VARIANTS.length);
     for (const profile of registry.profiles) {
       const home = projectOnboardingHome({
         business,

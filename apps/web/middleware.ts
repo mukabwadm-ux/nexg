@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { localHostBookmark, hostWorkspaceEnabled } from '@/lib/host-workspace/routes';
 
 /**
  * The scan happens here, not in the page.
@@ -55,6 +56,7 @@ export const config = {
    */
   matcher: [
     '/',
+    '/host/:path*',
     '/q/:code*',
     '/merchant/:path*',
     '/merchants/register/:path*',
@@ -65,6 +67,8 @@ export const config = {
     '/auth/:path*',
     '/merchants/sign-in/:path*',
     '/riders/sign-in/:path*',
+    '/hosts/sign-in/:path*',
+    '/sign-up/:path*',
     '/forgot-password/:path*',
     '/reset-password/:path*',
   ],
@@ -72,6 +76,20 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  if (pathname === '/host' || pathname.startsWith('/host/')) {
+    const location =
+      (request.method === 'GET' || request.method === 'HEAD') && hostWorkspaceEnabled()
+        ? localHostBookmark(pathname, request.nextUrl.searchParams)
+        : null;
+    if (!location) return NextResponse.next();
+    // Redirect here rather than rewriting to the route handler, which saw the
+    // original /host/... URL and dropped `open`. The Host header keeps the
+    // origin the browser used (127.0.0.1 in dev, the public host in production).
+    const origin = `${request.nextUrl.protocol}//${request.headers.get('host') ?? request.nextUrl.host}`;
+    const redirect = NextResponse.redirect(new URL(location, origin), 307);
+    redirect.headers.set('Cache-Control', 'private, no-store');
+    return redirect;
+  }
   if (
     pathname === '/merchant' ||
     pathname.startsWith('/merchant/') ||
@@ -89,6 +107,10 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/merchants/sign-in/') ||
     pathname === '/riders/sign-in' ||
     pathname.startsWith('/riders/sign-in/') ||
+    pathname === '/hosts/sign-in' ||
+    pathname.startsWith('/hosts/sign-in/') ||
+    pathname === '/sign-up' ||
+    pathname.startsWith('/sign-up/') ||
     pathname === '/forgot-password' ||
     pathname.startsWith('/forgot-password/') ||
     pathname === '/reset-password' ||

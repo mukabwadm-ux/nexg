@@ -66,6 +66,8 @@ nexgcr.txt
 *secret*
 *.pem
 *.key
+# A migration, not a credential: the name matches *credential* above.
+!supabase/migrations/20260101021800_staff_reset_credentials.sql
 
 # Dev-server output, kept separate from the production build.
 .next-dev/
@@ -99,3 +101,8 @@ apps/web/.next-merchant-layout-preview/
 
 # Isolated local merchant preview
 apps/web/.next-dev-3141/
+
+# Generated host workspace preview assets
+/apps/web/public/nexg-hosts-workspace/
+# NexG Discovery, built from /discovery by `pnpm --filter web discover` (and by `build`).
+/apps/web/public/discover/

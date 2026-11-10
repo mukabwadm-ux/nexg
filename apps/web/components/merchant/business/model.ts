@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { withSubcategoryVariants } from '@nexg/booking-config/variants';
 import config from './config.json';
 
 export type Model =
@@ -36,7 +37,17 @@ export type BusinessCategory = {
   questions: string[];
   vocabulary: Record<string, string>;
 };
-export const profiles = config.profiles as unknown as BusinessCategory[];
+/* The audited profiles plus the subcategory variants, which reuse their base's setup. */
+export const profiles = withSubcategoryVariants(
+  config.profiles as unknown as BusinessCategory[],
+  (profile) => profile.id,
+  (base, variant) => ({
+    ...base,
+    id: variant.subcategoryId,
+    name: variant.name,
+    needs: variant.specialtyNeeds,
+  }),
+);
 export const fields = config.fields as Record<string, FieldDefinition>;
 export const sections: { id: Section; label: string }[] = [
   { id: 'profile', label: 'Profile' },

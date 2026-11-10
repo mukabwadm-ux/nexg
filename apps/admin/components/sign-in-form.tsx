@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input } from '@nexg/ui';
+import { Button, Card, Input, withCaptcha } from '@nexg/ui';
 import { Lock } from 'lucide-react';
 import * as React from 'react';
 
@@ -31,7 +31,7 @@ export function SignInForm({
     setPending(true);
     setError(null);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = await withCaptcha(new FormData(event.currentTarget));
     /*
      * A successful sign-in redirects. Next resolves the call with nothing in
      * that case rather than rejecting, so the result is only read when it is

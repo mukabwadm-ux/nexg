@@ -31,6 +31,14 @@ const nextConfig = {
     // `pnpm lint` runs ESLint as its own CI step; do not run it twice.
     ignoreDuringBuilds: true,
   },
+  /*
+   * NexG Discovery: a static app built into public/discover by `discovery/scripts/build-for-web.mjs` (the
+   * `build` and `discover` scripts). Its pages are query strings on one HTML file, so /discover serves it.
+   * Same origin as the rest of the site, so its cart is this site's cart (localStorage "nexg.cart.v1").
+   */
+  async rewrites() {
+    return [{ source: '/discover', destination: '/discover/index.html' }];
+  },
   experimental: {
     // Without @nexg/ui here, importing a Button from the barrel pulls in
     // PhoneInput and therefore libphonenumber-js on every page.

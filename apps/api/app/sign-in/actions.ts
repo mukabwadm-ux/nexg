@@ -40,9 +40,11 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
   }
 
   const supabase = createClient();
+  const captcha = formData.get('captchaToken');
   const { error } = await supabase.auth.signInWithPassword({
     email: parsed.data.email.toLowerCase(),
     password: parsed.data.password,
+    options: { captchaToken: typeof captcha === 'string' && captcha ? captcha : undefined },
   });
 
   if (error) {

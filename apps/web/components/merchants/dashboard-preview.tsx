@@ -1,6 +1,7 @@
 import { VALUE_PLACEHOLDER } from '@nexg/ui';
 
 import { Logo } from '../logo';
+import { SectionLabel } from './landing';
 
 /**
  * The merchant dashboard band from the `Merchants` artboard.
@@ -48,15 +49,13 @@ const STATE_STYLES: Record<string, string> = {
 
 export function DashboardPreview() {
   return (
-    <section className="bg-ink py-14 text-white sm:pb-[6.9375rem] sm:pt-24">
+    <section className="bg-ink py-16 text-white sm:pb-[6.9375rem] sm:pt-24">
       <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
-        <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
-          Merchant dashboard
-        </span>
+        <SectionLabel onDark>Merchant dashboard</SectionLabel>
 
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="max-w-lg text-3xl/[1.06] font-extrabold tracking-tight sm:text-[3.125rem]/[1.06]">
-            Every order, rider and shilling in one place.
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+          <h2 className="max-w-xl text-3xl/[1.06] font-extrabold tracking-tight sm:text-[3.125rem]/[1.06]">
+            Every order, rider and shilling in <span className="text-gold">one place.</span>
           </h2>
           <p className="max-w-xs text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
             Accept with one tap, watch the rider arrive, and see what you&apos;ve sold today without

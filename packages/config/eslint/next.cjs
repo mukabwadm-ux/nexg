@@ -18,6 +18,25 @@ module.exports = {
     '@next/next/no-html-link-for-pages': 'error',
 
     /*
+     * next/font/google downloads fonts from fonts.googleapis.com during
+     * `next build`. When Google rate-limits or the network blips, the
+     * response cannot be parsed and the build fails inside next/font.
+     * Fonts are bundled in the repo instead.
+     */
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'next/font/google',
+            message:
+              'Fonts are bundled in the repo: import Manrope from @nexg/ui/fonts/manrope (next/font/local).',
+          },
+        ],
+      },
+    ],
+
+    /*
      * The rule's default `depth` is 2, which is shallower than
      * any of our two-line rows: `<label><span><span>Name</span>
      * <span>what it does</span></span><input/></label>` puts the

@@ -11,6 +11,8 @@ type Feedback = { kind: 'error' | 'notice'; message: string } | null;
 type EmailVerificationCardProps = {
   email: string;
   preview?: boolean;
+  /** The small label above the heading. */
+  eyebrow?: string;
   submitLabel?: string;
   descriptionPrefix?: string;
   resendNotice?: string;
@@ -27,6 +29,7 @@ type EmailVerificationCardProps = {
 export function EmailVerificationCard({
   email,
   preview = false,
+  eyebrow = 'Merchant onboarding',
   submitLabel = 'Verify email',
   descriptionPrefix,
   resendNotice = 'A new code has been sent to your email.',
@@ -130,7 +133,7 @@ export function EmailVerificationCard({
       <div className="bg-gold h-1" aria-hidden="true" />
       <CardHeader className="mb-0 block px-6 pb-0 pt-7 sm:px-8 sm:pt-8">
         <p className="text-gold-text w-full text-center text-[13px] font-extrabold uppercase tracking-[0.16em] sm:text-sm">
-          Merchant onboarding
+          {eyebrow}
         </p>
         <h1 className="text-ink mt-1 text-center text-[24px] font-extrabold leading-tight tracking-tight sm:text-[26px]">
           Verify your email

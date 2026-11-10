@@ -10,8 +10,8 @@ import {
   Bike,
   Instagram,
   Facebook,
+  Linkedin,
   MapPin,
-  MessageCircle,
   Store,
   X,
 } from 'lucide-react';
@@ -35,8 +35,22 @@ import { Logo } from './logo';
 
 const SECTIONS = [
   { number: '01', key: 'nav.explore', href: '/explore', noteKey: null, note: null, live: false },
+  /*
+   * Discovery, next to Explore so the two can be compared. It is a separate app the
+   * website serves at /discover (discovery/, rewritten in next.config.mjs), not a
+   * Next.js page, so its row loads it in full rather than through the router.
+   */
   {
     number: '02',
+    key: 'nav.discovery',
+    href: '/discover',
+    noteKey: null,
+    note: null,
+    live: false,
+    fullLoad: true,
+  },
+  {
+    number: '03',
     key: 'nav.experience',
     href: '/experience',
     noteKey: 'nav.experience.note',
@@ -44,7 +58,7 @@ const SECTIONS = [
     live: false,
   },
   {
-    number: '03',
+    number: '04',
     key: 'nav.stays',
     href: '/stays',
     noteKey: 'nav.stays.note',
@@ -52,7 +66,7 @@ const SECTIONS = [
     live: false,
   },
   {
-    number: '04',
+    number: '05',
     key: 'nav.askConcierge',
     href: '/ask',
     noteKey: null,
@@ -68,21 +82,29 @@ const PARTNER_LINKS = [
   { key: 'nav.careers', noteKey: 'nav.careers.note', href: '/careers', icon: Briefcase },
 ] as const;
 
-/** The X mark; lucide's `X` is a close icon, not the wordmark. */
-function XLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
-      <path d="M18.9 2H22l-7.6 8.7L23.4 22h-6.8l-5.3-6.9L5.2 22H2l8.2-9.4L1.6 2h7l4.8 6.3L18.9 2Z" />
-    </svg>
-  );
-}
-
+/* NexG's own accounts only. Add a network here only when NexG has an account on it. */
 const SOCIALS = [
-  { label: 'Instagram', href: 'https://instagram.com', icon: Instagram },
-  { label: 'X', href: 'https://x.com', icon: XLogo },
-  { label: 'Facebook', href: 'https://facebook.com', icon: Facebook },
-  { label: 'WhatsApp', href: 'https://wa.me/254143819478', icon: MessageCircle },
+  { label: 'Facebook', href: 'https://web.facebook.com/share/1C8dtH1oGw/', icon: Facebook },
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/nexg_app?exln=NGs1eXBoZWxjZDg0',
+    icon: Instagram,
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/nexgenius-concierge-325066437?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
+    icon: Linkedin,
+  },
 ] as const;
+
+/** A menu row's link: a plain link for a page outside the Next.js app (`fullLoad`), else the router's. */
+function MenuLink({
+  fullLoad = false,
+  children,
+  ...props
+}: React.ComponentProps<'a'> & { href: string; fullLoad?: boolean }) {
+  return fullLoad ? <a {...props}>{children}</a> : <Link {...props}>{children}</Link>;
+}
 
 export function SiteMenu({
   children,
@@ -196,8 +218,9 @@ export function SiteMenu({
                      * than beside it, where it squeezed the label into
                      * three lines.
                      */}
-                    <Link
+                    <MenuLink
                       href={section.href}
+                      fullLoad={'fullLoad' in section && section.fullLoad}
                       onClick={close}
                       className="focus-visible:ring-gold hover:text-gold-text flex min-h-[3rem] items-center gap-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 sm:min-h-[3.8rem] sm:gap-4"
                     >
@@ -220,7 +243,7 @@ export function SiteMenu({
                           </span>
                         )}
                       </span>
-                    </Link>
+                    </MenuLink>
                   </li>
                 ))}
               </ul>

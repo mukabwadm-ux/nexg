@@ -13,20 +13,20 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(12);
+select plan(13);
 
 /* Carries the reference between statements. */
 create temp table t (k text primary key, v text);
 
 do $grant$
 begin
-  execute format('grant usage on schema %I to anon',
+  execute format('grant usage on schema %I to anon, authenticated',
                  (select nspname from pg_namespace n
                    join pg_class c on c.relnamespace = n.oid
                   where c.relname = 't' and n.nspname like 'pg_temp%'));
 end
 $grant$;
-grant all on t to anon;
+grant all on t to anon, authenticated;
 
 set local session_replication_role = replica;
 delete from public.role_grant;
@@ -41,6 +41,17 @@ values
   ('00000000-0000-0000-0000-000000000000','c1111111-1111-1111-1111-111111111111',
    'authenticated','authenticated','ht.desk@nexgapp.com','',now(),now(),now());
 
+/* Applicants. The form verifies the email before submitting, so each one is
+   a login with a confirmed email; one login applies for one host. */
+insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
+values
+  ('00000000-0000-0000-0000-000000000000','c2000000-0000-4000-8000-000000000001',
+   'authenticated','authenticated','host@example.test',now(),false,now(),now()),
+  ('00000000-0000-0000-0000-000000000000','c2000000-0000-4000-8000-000000000002',
+   'authenticated','authenticated','two@example.test',now(),false,now(),now()),
+  ('00000000-0000-0000-0000-000000000000','c2000000-0000-4000-8000-000000000003',
+   'authenticated','authenticated','three@example.test',now(),false,now(),now());
+
 insert into public.staff_user (id, user_id, email, display_name)
 values ('cccccccc-0000-0000-0000-00000000000a','c1111111-1111-1111-1111-111111111111',
         'ht.desk@nexgapp.com','Host desk');
@@ -51,6 +62,9 @@ select s.id, (select id from public.role where key='ops_manager'),
 from public.staff_user s where s.email = 'ht.desk@nexgapp.com';
 
 -- the form
+
+select set_config('request.jwt.claims',
+  '{"sub":"c2000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 
 select lives_ok(
   $$ select public.rpc_host_apply(jsonb_build_object(
@@ -108,9 +122,13 @@ select is(
  * snapshot, so a row written by the first half of a comparison is
  * invisible to the second half of it.
  */
+select set_config('request.jwt.claims',
+  '{"sub":"c2000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
+
 insert into t (k, v)
 select 'reference', public.rpc_host_apply(jsonb_build_object(
          'phone', '+254700009002', 'contact_name', '[Host Two]',
+         'email', 'two@example.test', 'handoff', 'call_guest_first',
          'address', '[Address], Westlands', 'city', 'nairobi')) ->> 'ticket_reference';
 
 select is(
@@ -122,11 +140,27 @@ select is(
 -- the form is the public one
 
 /*
- * The form on the page runs on the anonymous key, so that is the path
- * that has to work. It is also the path where a mistake would leak:
- * the ticket holds a name, a phone number and an address.
+ * The bare anonymous key is refused: an application with no session
+ * created a host nobody could ever sign in to.
  */
+select set_config('request.jwt.claims', '', true);
 set local role anon;
+
+select throws_ok(
+  $$ select public.rpc_host_apply(jsonb_build_object(
+       'phone', '+254700009004', 'contact_name', '[Nobody]', 'email', 'n@example.test',
+       'handoff', 'lockbox', 'address', '[Address], Karen')) $$,
+  '42501', null,
+  'the anonymous key alone cannot apply; the form verifies an email login first');
+
+/*
+ * The form's verified login is the path that has to work. It is also
+ * the path where a mistake would leak: the ticket holds a name, a phone
+ * number and an address.
+ */
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"c2000000-0000-4000-8000-000000000003","role":"authenticated"}', true);
 
 insert into t (k, v)
 select 'anon_reference', public.rpc_host_apply(jsonb_build_object(
@@ -150,7 +184,7 @@ reset role;
 select is(
   (select v from t where k = 'anon_reference'),
   (select reference from public.support_ticket where phone = '+254700009003'),
-  'a visitor with no account can apply, and the desk still gets it'
+  'a verified applicant can apply, and the desk still gets it'
 );
 
 select is(

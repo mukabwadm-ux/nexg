@@ -231,3 +231,10 @@ select r.id, u.id, 1,
        u.nightly_rate_kes
 from public.stay_request r, public.unit u
 where r.reference = 'ST-W3Q8NR' and u.name = 'Apartment 2A';
+
+-- Demonstration only. Since guest checkout, a priced unit could be held and
+-- paid for, so every property of the two placeholder hosts is a sample
+-- listing: shown and labelled, never bookable (migration 20261122000100).
+update public.property set is_sample = true
+ where host_id in ('11000000-0000-4000-8000-000000000001',
+                   '11000000-0000-4000-8000-000000000002');

@@ -1,0 +1,1929 @@
+.management-page {
+  --mg-ink: var(--ink);
+  --mg-muted: var(--muted);
+  --mg-paper: var(--paper);
+  --mg-line: var(--line);
+  --mg-gold: var(--gold);
+  --mg-soft: var(--gold-soft);
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  color: var(--mg-ink);
+}
+.management-page .page-header {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+.management-page .page-actions {
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.management-page h2 {
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 650;
+  letter-spacing: -0.25px;
+}
+.mg-context {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--mg-muted);
+}
+.mg-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  color: var(--accent);
+  background: var(--gold-soft);
+  border: 1px solid var(--line);
+  padding: 4px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.mg-preview > span {
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background: var(--mg-gold);
+}
+.mg-period {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--mg-line);
+  padding: 0 11px;
+  border-radius: 8px;
+  min-height: 38px;
+}
+.mg-period select {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: var(--mg-ink);
+  padding: 7px 12px 7px 0;
+  outline-offset: 3px;
+}
+.mg-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  flex-shrink: 0;
+}
+.mg-stat {
+  min-width: 0;
+  padding: 17px 19px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+.mg-stat-label {
+  font-size: 12px;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--mg-muted);
+}
+.mg-stat > strong {
+  font-size: clamp(22px, 2.35vw, 34px);
+  font-weight: 650;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.mg-stat > small {
+  font-size: 10px;
+  color: var(--mg-muted);
+  line-height: 1.4;
+}
+.mg-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 17px 19px 13px;
+  flex-shrink: 0;
+}
+.mg-panel-heading p {
+  font-size: 11px;
+  color: var(--mg-muted);
+  margin: 5px 0 0;
+  max-width: 67ch;
+}
+.mg-panel-heading > span {
+  font-size: 11px;
+  color: var(--mg-muted);
+}
+.mg-finance-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.mg-overview-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: 14px;
+  flex: 1.15;
+  min-height: 175px;
+  max-height: 285px;
+}
+.mg-chart-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.mg-chart {
+  padding: 0 17px 10px;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.mg-chart > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+}
+.mg-chart svg text {
+  font:
+    11px 'Segoe UI',
+    Arial,
+    sans-serif;
+  fill: var(--mg-muted);
+}
+.mg-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--mg-muted);
+  margin-top: 4px;
+}
+.mg-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mg-legend i {
+  width: 11px;
+  height: 11px;
+  background: var(--gold);
+  border-radius: 2px;
+}
+.mg-legend i.expense {
+  background: var(--gold-soft);
+}
+.mg-expense-chart {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 19px 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.mg-expense-chart > svg {
+  width: 40%;
+  height: 100%;
+  max-height: 190px;
+  flex-shrink: 0;
+  min-height: 0;
+}
+.mg-expense-chart svg text {
+  font:
+    9px 'Segoe UI',
+    Arial,
+    sans-serif;
+  fill: var(--mg-muted);
+}
+.mg-expense-chart .mg-ring-value {
+  font-size: 11px;
+  font-weight: 650;
+  fill: var(--mg-ink);
+}
+.mg-expense-legend {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+}
+.mg-expense-legend > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--mg-line);
+}
+.mg-expense-legend > div:last-child {
+  border-bottom: 0;
+}
+.mg-expense-legend span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mg-expense-legend i {
+  height: 9px;
+  width: 9px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.mg-expense-legend strong {
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 11px;
+}
+.mg-expense-legend p {
+  font-size: 10px;
+  color: var(--mg-muted);
+}
+.mg-chart-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 15px;
+  color: var(--mg-muted);
+  font-size: 12px;
+}
+.mg-transactions-panel,
+.mg-fill-panel,
+.mg-performance-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.mg-transactions-panel {
+  flex: 1;
+  min-height: 160px;
+}
+.mg-records {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+.management-page .table-scroll {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.management-page table {
+  font-variant-numeric: tabular-nums;
+}
+.management-page th {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--mg-muted);
+  white-space: nowrap;
+}
+.management-page td {
+  font-size: 11px;
+  vertical-align: middle;
+}
+.management-page td strong {
+  font-weight: 600;
+}
+.management-page td small {
+  display: block;
+  font-size: 10px;
+  color: var(--mg-muted);
+  margin-top: 3px;
+  max-width: 260px;
+  white-space: normal;
+  line-height: 1.4;
+}
+.management-page td .btn {
+  font-size: 10px;
+  min-height: 31px;
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+.management-page .pager {
+  flex-shrink: 0;
+  padding: 9px 17px;
+  border-top: 1px solid var(--mg-line);
+  font-size: 10px;
+}
+.management-page .pager .btn {
+  min-height: 27px;
+  height: 27px;
+  min-width: 27px;
+  padding: 4px;
+}
+.mg-table-empty {
+  padding: 25px 15px;
+  color: var(--mg-muted);
+  font-size: 12px;
+  text-align: center;
+}
+.mg-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mg-positive {
+  color: var(--success, var(--ink));
+  font-weight: 600;
+}
+.mg-negative {
+  color: var(--danger, var(--ink));
+  font-weight: 600;
+}
+.mg-separate-balances {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 3px 0;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--mg-muted);
+  border-top: 1px solid var(--mg-line);
+}
+.mg-separate-balances span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mg-separate-balances strong {
+  font-size: 11px;
+  color: var(--mg-ink);
+  font-weight: 600;
+}
+.mg-panel-footer {
+  padding: 10px 17px;
+  border-top: 1px solid var(--mg-line);
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+  font-size: 10px;
+  color: var(--mg-muted);
+  flex-shrink: 0;
+}
+.mg-panel-footer .btn {
+  font-size: 10px;
+  min-height: 30px;
+}
+.mg-inline-note {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: var(--paper);
+  margin: 9px 17px 13px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--mg-muted);
+  line-height: 1.6;
+}
+.mg-inline-note strong {
+  font-weight: 600;
+  color: var(--mg-ink);
+}
+.mg-reports-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+.mg-report-chart-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(240px, 1fr);
+  gap: 14px;
+  flex: 1;
+  min-height: 175px;
+  max-height: 285px;
+}
+.mg-report-aside {
+  padding-bottom: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+.mg-key-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 18px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--mg-line);
+  font-size: 11px;
+}
+.mg-key-row strong {
+  font-weight: 600;
+}
+.mg-small-note {
+  color: var(--mg-muted);
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 13px 19px;
+  max-width: 70ch;
+}
+.mg-distribution {
+  display: grid;
+  gap: 15px;
+  padding: 3px 20px 20px;
+  flex: 1;
+  align-content: center;
+  min-height: 0;
+}
+.mg-distribution > div > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+.mg-distribution strong {
+  font-weight: 600;
+}
+.mg-progress {
+  background: var(--paper);
+  height: 8px;
+  overflow: hidden;
+  border-radius: 5px;
+}
+.mg-progress i {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  border-radius: 5px;
+}
+.mg-property-cell {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.mg-property-cell img {
+  width: 47px;
+  height: 33px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.mg-experience-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 7px 20px 19px;
+  border-bottom: 1px solid var(--mg-line);
+}
+.mg-experience-summary > span {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--mg-muted);
+}
+.mg-experience-summary strong {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--mg-ink);
+  margin-inline-start: 2px;
+}
+.mg-mobile-switch,
+.mg-mobile-tabs {
+  display: none;
+}
+.mg-settings-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.mg-form-step {
+  padding: 0 19px 13px;
+  flex-shrink: 0;
+}
+.mg-settings-form {
+  padding: 10px 23px 17px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.mg-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 21px 25px;
+  max-width: 950px;
+}
+.mg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.mg-field.wide {
+  grid-column: 1/-1;
+}
+.mg-field input,
+.mg-field select,
+.mg-field textarea {
+  font:
+    400 13px/1.45 'Segoe UI',
+    Arial,
+    sans-serif;
+  color: var(--mg-ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 10px 12px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  outline-offset: 4px;
+}
+.mg-field input:focus,
+.mg-field select:focus,
+.mg-field textarea:focus {
+  outline: 2px solid var(--gold);
+  border-color: var(--gold);
+}
+.mg-field textarea {
+  resize: none;
+  min-height: 70px;
+}
+.mg-field input[type='color'] {
+  max-width: 150px;
+  height: 43px;
+  padding: 5px;
+}
+.mg-field input[type='file'] {
+  font-size: 11px;
+  padding: 9px;
+}
+.mg-field input:disabled,
+.mg-field select:disabled,
+.mg-field textarea:disabled {
+  background: var(--paper);
+  color: var(--muted);
+}
+.mg-settings-form > .mg-small-note {
+  margin-inline: 0;
+}
+.mg-settings-footer {
+  padding: 16px 22px;
+  border-top: 1px solid var(--mg-line);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: auto;
+  background: var(--surface);
+}
+.mg-settings-footer > span {
+  font-size: 11px;
+  color: var(--mg-muted);
+}
+.mg-settings-footer .btn {
+  min-height: 37px;
+  font-size: 12px;
+}
+.mg-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--mg-line);
+  font-size: 12px;
+}
+.mg-toggle-row strong {
+  font-weight: 550;
+}
+.mg-toggle-row small {
+  display: block;
+  color: var(--mg-muted);
+  font-size: 11px;
+  margin-top: 5px;
+  font-weight: 400;
+}
+.mg-toggle-row input {
+  appearance: none;
+  width: 39px;
+  height: 23px;
+  border-radius: 20px;
+  background: var(--line);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  outline-offset: 4px;
+}
+.mg-toggle-row input:before {
+  content: '';
+  position: absolute;
+  inset-block-start: 3px;
+  inset-inline-start: 3px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 1px 3px #0002;
+  transition: transform 0.12s ease;
+}
+.mg-toggle-row input:checked {
+  background: var(--gold);
+}
+.mg-toggle-row input:checked:before {
+  transform: translateX(16px);
+}
+.mg-toggle-row input:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+.mg-notification-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin: 0 22px 13px;
+  flex-shrink: 0;
+}
+.mg-notification-controls .mg-toggle-row {
+  padding: 11px 0;
+}
+.mg-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mg-person > span:last-child {
+  min-width: 0;
+}
+.mg-person .avatar {
+  flex-shrink: 0;
+}
+.mg-brand-preview {
+  min-height: 100px;
+  padding: 14px;
+  border: 1px dashed var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.mg-brand-preview img {
+  max-width: 120px;
+  max-height: 70px;
+  object-fit: contain;
+}
+.mg-brand-preview strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.mg-local-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 17px;
+  padding: 3px 19px 15px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--mg-muted);
+}
+.mg-local-toolbar .btn {
+  min-height: 33px;
+  font-size: 11px;
+}
+.mg-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-height: 850px) and (min-width: 761px) {
+  .management-page {
+    gap: 10px;
+  }
+  .mg-stats {
+    gap: 11px;
+  }
+  .mg-stat {
+    padding: 12px 16px !important;
+    gap: 6px;
+  }
+  .mg-stat > strong {
+    font-size: 27px;
+  }
+  .mg-overview-charts,
+  .mg-report-chart-row {
+    min-height: 140px;
+    max-height: 220px;
+  }
+  .mg-panel-heading {
+    padding-top: 13px;
+    padding-bottom: 10px;
+  }
+  .mg-settings-form {
+    padding-top: 5px;
+  }
+  .mg-form-grid {
+    gap: 16px 23px;
+  }
+  .mg-settings-footer {
+    padding-block: 12px;
+  }
+  .mg-expense-legend > div {
+    padding-block: 5px;
+  }
+  .mg-key-row {
+    padding-block: 8px;
+  }
+}
+@media (max-width: 1100px) {
+  .mg-stat {
+    padding: 14px !important;
+  }
+  .mg-stat-label {
+    font-size: 11px;
+    gap: 7px;
+  }
+  .mg-stat > strong {
+    font-size: 25px;
+  }
+  .mg-overview-charts {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+  .mg-expense-chart {
+    gap: 6px;
+    padding-inline: 13px;
+  }
+  .mg-expense-legend {
+    font-size: 10px;
+  }
+  .mg-expense-legend strong {
+    font-size: 10px;
+  }
+  .mg-separate-balances {
+    font-size: 9px;
+    gap: 9px;
+  }
+  .mg-separate-balances span {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+  .mg-separate-balances strong {
+    font-size: 10px;
+  }
+  .mg-form-grid {
+    gap: 18px;
+  }
+  .mg-reports-content .mg-key-row {
+    font-size: 10px;
+  }
+}
+@media (max-width: 760px) {
+  .management-page {
+    gap: 10px;
+  }
+  .management-page .page-header {
+    gap: 10px;
+  }
+  .management-page .page-actions {
+    gap: 7px;
+  }
+  .management-page .page-actions .btn {
+    font-size: 10px;
+    min-height: 33px;
+    padding: 7px 9px;
+  }
+  .management-page .page-header h1 {
+    font-size: 25px;
+  }
+  .management-page .page-header p {
+    font-size: 11px;
+  }
+  .mg-context {
+    font-size: 9px;
+    gap: 10px;
+  }
+  .mg-preview {
+    font-size: 9px;
+    padding: 3px 7px;
+  }
+  .mg-period {
+    min-height: 33px;
+    gap: 5px;
+    padding-inline: 8px;
+  }
+  .mg-period select {
+    font-size: 10px;
+    padding: 6px 4px 6px 0;
+    max-width: 120px;
+  }
+  .mg-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .mg-stat {
+    padding: 10px 12px !important;
+    gap: 5px;
+  }
+  .mg-stat-label {
+    font-size: 10px;
+    gap: 7px;
+  }
+  .mg-stat-label svg {
+    width: 16px;
+    height: 16px;
+  }
+  .mg-stat > strong {
+    font-size: 23px;
+    letter-spacing: -0.65px;
+  }
+  .mg-stat > small {
+    font-size: 9px;
+  }
+  .mg-desktop-tabs {
+    display: none;
+  }
+  .mg-mobile-tabs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    font-size: 10px;
+    color: var(--mg-muted);
+    flex-shrink: 0;
+  }
+  .mg-mobile-tabs select {
+    min-width: 0;
+    flex: 1;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--mg-ink);
+    max-width: 100%;
+  }
+  .mg-finance-overview {
+    gap: 10px;
+  }
+  .mg-mobile-switch {
+    display: block;
+    flex-shrink: 0;
+  }
+  .mg-mobile-switch .tabs {
+    display: flex;
+    gap: 3px;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .mg-mobile-switch .tabs button {
+    font-size: 10px;
+    padding: 7px 9px;
+    min-width: 0;
+    white-space: normal;
+  }
+  .mg-overview-charts {
+    display: contents;
+    min-height: 0;
+    max-height: none;
+  }
+  .mg-overview-charts > .mg-chart-panel,
+  .mg-finance-overview > .mg-transactions-panel {
+    display: none;
+    min-height: 0;
+    max-height: none;
+    flex: 1;
+  }
+  .mg-overview-charts > .mobile-active,
+  .mg-finance-overview > .mobile-active {
+    display: flex;
+  }
+  .mg-separate-balances {
+    display: none;
+  }
+  .mg-panel-heading {
+    padding: 13px 14px 10px;
+    gap: 10px;
+  }
+  .mg-panel-heading h2 {
+    font-size: 14px;
+  }
+  .mg-panel-heading p {
+    font-size: 10px;
+    line-height: 1.45;
+  }
+  .mg-panel-heading > .mg-row-actions {
+    justify-content: flex-end;
+  }
+  .mg-panel-heading .btn {
+    font-size: 10px;
+    min-height: 31px;
+    padding: 6px 9px;
+  }
+  .mg-chart {
+    padding-inline: 8px;
+  }
+  .mg-chart svg text {
+    font-size: 11px;
+  }
+  .mg-legend {
+    font-size: 9px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .mg-expense-chart {
+    padding: 0 15px 13px;
+    gap: 12px;
+  }
+  .mg-expense-chart > svg {
+    width: 43%;
+    max-height: 220px;
+  }
+  .mg-expense-legend {
+    font-size: 10px;
+  }
+  .mg-expense-legend > div {
+    padding-block: 8px;
+  }
+  .mg-report-chart-row {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    grid-template-columns: 1fr;
+  }
+  .mg-report-chart-row.mobile-active {
+    display: flex;
+  }
+  .mg-report-chart-row .mg-chart-panel {
+    flex: 1;
+  }
+  .mg-report-aside {
+    display: none;
+  }
+  .mg-performance-panel {
+    display: none;
+    min-height: 0;
+  }
+  .mg-performance-panel.mobile-active {
+    display: flex;
+  }
+  .mg-reports-content {
+    gap: 10px;
+  }
+  .mg-panel-footer {
+    padding: 8px 12px;
+    font-size: 9px;
+    gap: 8px;
+  }
+  .mg-panel-footer > span {
+    max-width: 24ch;
+  }
+  .mg-panel-footer .btn {
+    font-size: 9px;
+    padding-inline: 6px;
+  }
+  .management-page .table-scroll {
+    min-width: 0;
+  }
+  .management-page th,
+  .management-page td {
+    font-size: 10px;
+    padding: 12px 10px;
+    white-space: nowrap;
+  }
+  .management-page td small {
+    font-size: 9px;
+    max-width: 170px;
+  }
+  .management-page .pager {
+    padding: 8px 12px;
+    font-size: 9px;
+  }
+  .mg-inline-note {
+    font-size: 10px;
+    line-height: 1.45;
+    margin: 8px 12px;
+    padding: 10px;
+  }
+  .mg-inline-note svg {
+    flex-shrink: 0;
+  }
+  .mg-experience-summary {
+    padding: 5px 13px 13px;
+    gap: 9px;
+  }
+  .mg-experience-summary > span {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 9px;
+  }
+  .mg-experience-summary strong {
+    font-size: 22px;
+    margin: 0;
+  }
+  .mg-experience-summary svg {
+    display: none;
+  }
+  .mg-property-cell img {
+    width: 35px;
+    height: 27px;
+  }
+  .mg-settings-panel {
+    min-height: 0;
+  }
+  .mg-form-step {
+    padding: 0 14px 12px;
+  }
+  .mg-settings-form {
+    padding: 4px 15px 14px;
+  }
+  .mg-form-grid {
+    gap: 16px 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mg-field {
+    font-size: 10px;
+    gap: 6px;
+  }
+  .mg-field input,
+  .mg-field select,
+  .mg-field textarea {
+    font-size: 16px;
+    padding: 9px 10px;
+    min-height: 41px;
+  }
+  .mg-field textarea {
+    font-size: 14px;
+    min-height: 71px;
+  }
+  .mg-field input[type='file'] {
+    font-size: 10px;
+  }
+  .mg-settings-footer {
+    padding: 11px 14px;
+    gap: 9px;
+  }
+  .mg-settings-footer > span {
+    font-size: 9px;
+    max-width: 20ch;
+  }
+  .mg-settings-footer .btn {
+    font-size: 10px;
+    min-height: 34px;
+    padding: 7px 10px;
+  }
+  .mg-notification-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0 15px 10px;
+  }
+  .mg-toggle-row {
+    font-size: 11px;
+    padding-block: 13px;
+    gap: 15px;
+  }
+  .mg-toggle-row small {
+    font-size: 10px;
+  }
+  .mg-toggle-row input {
+    width: 37px;
+    height: 23px;
+  }
+  .mg-person {
+    gap: 8px;
+  }
+  .mg-person .avatar {
+    width: 29px !important;
+    height: 29px !important;
+    font-size: 10px !important;
+  }
+  .mg-local-toolbar {
+    padding: 0 14px 12px;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 10px;
+  }
+  .mg-local-toolbar > span {
+    max-width: 35ch;
+  }
+  .mg-local-toolbar .btn {
+    font-size: 10px;
+    flex-shrink: 0;
+    min-height: 31px;
+    padding-inline: 9px;
+  }
+  .mg-brand-preview {
+    padding: 10px;
+    min-height: 100px;
+    gap: 8px;
+  }
+  .mg-brand-preview img {
+    max-width: 80px;
+    max-height: 50px;
+  }
+  .mg-brand-preview strong {
+    font-size: 11px;
+  }
+  .mg-small-note {
+    font-size: 10px;
+    margin: 10px 14px;
+  }
+  .mg-row-actions {
+    gap: 6px;
+  }
+  .mg-row-actions .btn {
+    font-size: 10px;
+  }
+}
+@media (max-width: 420px) {
+  .mg-form-grid {
+    gap: 14px 10px;
+  }
+  .mg-settings-form .mg-field > span {
+    min-height: 24px;
+  }
+  .mg-stat > strong {
+    font-size: 21px;
+  }
+  .mg-stat-label {
+    font-size: 9px;
+  }
+  .mg-context > span:last-child {
+    font-size: 8px;
+    text-align: right;
+    max-width: 23ch;
+  }
+  .mg-settings-page .mg-context > span:last-child {
+    max-width: 25ch;
+  }
+  .mg-panel-heading .mg-row-actions {
+    gap: 5px;
+  }
+  .mg-panel-heading .btn {
+    font-size: 9px;
+    padding-inline: 7px;
+  }
+  .mg-local-toolbar > span {
+    max-width: 25ch;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .management-page * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.mg-property-thumb {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 47px;
+  height: 33px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  color: var(--accent);
+}
+.mg-property-thumb > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (max-width: 760px) {
+  .mg-property-thumb {
+    width: 35px;
+    height: 27px;
+  }
+}
+
+@media (max-width: 360px) {
+  .management-page .page-header > div:first-child {
+    min-width: 0;
+    flex: 1;
+  }
+  .management-page .page-header > .page-actions:not(:empty) {
+    width: 126px;
+    min-width: 126px;
+    max-width: 126px;
+    flex: 0 0 126px;
+  }
+}
+
+/* Bound the working areas to the viewport; only record tables scroll. */
+.mg-settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  gap: 16px;
+  overflow: hidden;
+}
+.mg-settings-layout.has-summary {
+  grid-template-columns: minmax(0, 1.9fr) minmax(250px, 1fr);
+}
+.mg-settings-summary {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 0.85fr) minmax(0, 1.3fr);
+  gap: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+.mg-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-height: 0;
+  padding: 20px;
+  overflow: hidden;
+}
+.mg-summary-card h2 {
+  font-size: 22px;
+  line-height: 1.15;
+}
+.mg-summary-card > .btn {
+  width: 100%;
+  margin-top: auto;
+  color: var(--accent);
+  border-color: var(--gold);
+}
+.mg-summary-team {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+}
+.mg-summary-team > span {
+  min-width: 0;
+}
+.mg-summary-team strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+.mg-summary-team small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+.mg-avatar-stack {
+  display: flex;
+  padding-left: 4px;
+  flex-shrink: 0;
+}
+.mg-avatar-stack > .avatar {
+  margin-left: -4px;
+  border: 2px solid var(--surface);
+}
+.mg-summary-guide {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+}
+.mg-summary-guide > span {
+  display: grid;
+  place-items: center;
+  width: 49px;
+  height: 49px;
+  background: var(--gold-soft);
+  border-radius: 8px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.mg-summary-guide p {
+  font-size: 14px;
+  line-height: 1.4;
+}
+.mg-summary-tools {
+  gap: 10px;
+}
+.mg-summary-tools > div {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+.mg-summary-tools button {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  text-align: left;
+  width: 100%;
+}
+.mg-summary-tools button > svg:last-child {
+  margin-left: auto;
+}
+.mg-summary-tools > small {
+  font-size: 11px;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+.mg-general-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: space-between;
+}
+.mg-general-form .mg-form-grid {
+  max-width: none;
+}
+.mg-general-section {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.mg-general-section h3 {
+  font-size: 21px;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+  margin-bottom: 13px;
+}
+.mg-general-notifications .mg-toggle-row {
+  padding-block: 13px;
+}
+.mg-general-notifications .mg-toggle-row:last-child {
+  border-bottom: 0;
+}
+@media (min-width: 761px) {
+  .management-page {
+    gap: 12px;
+  }
+  .management-page > .mg-context {
+    display: none;
+  }
+  .management-page .page-header {
+    min-height: 66px;
+  }
+  .management-page .mg-desktop-tabs .tabs {
+    flex-wrap: nowrap;
+  }
+  .management-page .mg-panel-heading h2 {
+    font-size: 21px;
+  }
+  .mg-finance-overview {
+    display: grid;
+    grid-template-rows: minmax(0, 1.15fr) minmax(170px, 1fr) auto;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+  }
+  .mg-overview-charts {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    flex: none;
+  }
+  .mg-transactions-panel {
+    min-height: 0;
+    flex: none;
+  }
+  .mg-chart {
+    height: 100%;
+    flex: 1;
+    min-height: 0;
+  }
+  .mg-chart > svg {
+    width: 100%;
+    height: 0;
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+  }
+  .mg-reports-content {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) minmax(185px, 1.05fr);
+    gap: 14px;
+  }
+  .mg-report-chart-row {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    flex: none;
+  }
+  .mg-performance-panel {
+    min-height: 0;
+    flex: none;
+  }
+  .management-page th {
+    font-size: 12px;
+    padding: 9px 13px;
+  }
+  .management-page td {
+    font-size: 13px;
+    padding: 9px 13px;
+  }
+  .management-page td small {
+    font-size: 11px;
+  }
+  .management-page td .btn {
+    font-size: 11px;
+    min-height: 29px;
+  }
+  .management-page .pager {
+    padding: 7px 15px;
+    font-size: 11px;
+    min-height: 38px;
+  }
+  .mg-panel-heading {
+    padding: 14px 17px 10px;
+  }
+  .mg-legend {
+    font-size: 11px;
+  }
+  .mg-field {
+    font-size: 13px;
+  }
+  .mg-field input,
+  .mg-field select,
+  .mg-field textarea {
+    font-size: 14px;
+  }
+  .mg-form-grid {
+    gap: 18px 22px;
+  }
+  .mg-form-step .tabs {
+    min-height: 35px;
+  }
+  .mg-form-step .tabs > button {
+    min-height: 35px;
+  }
+  .mg-settings-footer {
+    padding: 13px 19px;
+  }
+}
+@media (min-width: 761px) and (max-height: 740px) {
+  .management-page {
+    gap: 8px;
+  }
+  .management-page .page-header {
+    min-height: 48px;
+    gap: 14px;
+  }
+  .management-page .page-header h1 {
+    font-size: 28px;
+  }
+  .management-page .page-header p {
+    font-size: 12px;
+    margin-top: 3px;
+  }
+  .management-page .page-actions > .btn {
+    font-size: 11px;
+    min-height: 33px;
+    padding: 6px 11px;
+  }
+  .management-page .mg-period {
+    min-height: 33px;
+    padding-inline: 9px;
+  }
+  .management-page .mg-period select {
+    font-size: 11px;
+    min-height: 31px;
+    padding: 5px 8px 5px 0;
+  }
+  .management-page .mg-desktop-tabs .tabs {
+    min-height: 31px;
+    gap: 8px;
+  }
+  .management-page .mg-desktop-tabs .tabs > button {
+    min-height: 31px;
+    padding: 6px 11px;
+    font-size: 12px;
+  }
+  .mg-stats {
+    gap: 10px;
+  }
+  .mg-stat {
+    padding: 10px 14px !important;
+    gap: 5px;
+  }
+  .mg-stat-label {
+    font-size: 11px;
+  }
+  .mg-stat-label svg {
+    width: 18px;
+    height: 18px;
+  }
+  .mg-stat > strong {
+    font-size: 26px;
+    line-height: 1.05;
+  }
+  .mg-stat > small {
+    font-size: 9px;
+    line-height: 1.3;
+  }
+  .mg-finance-overview {
+    grid-template-rows: minmax(0, 1fr) minmax(157px, 1fr) auto;
+    gap: 9px;
+  }
+  .mg-reports-content {
+    grid-template-rows: minmax(0, 0.95fr) minmax(170px, 1.05fr);
+    gap: 9px;
+  }
+  .mg-panel-heading {
+    padding: 8px 13px 7px;
+    gap: 10px;
+  }
+  .management-page .mg-panel-heading h2 {
+    font-size: 16px;
+  }
+  .mg-panel-heading p {
+    font-size: 10px;
+    margin-top: 3px;
+  }
+  .mg-panel-heading .btn {
+    font-size: 10px;
+    min-height: 25px;
+    padding: 4px 8px;
+  }
+  .mg-chart {
+    padding: 0 10px 6px;
+  }
+  .mg-legend {
+    font-size: 9px;
+    gap: 15px;
+    margin-top: 4px;
+  }
+  .mg-legend i {
+    height: 9px;
+    width: 9px;
+  }
+  .mg-expense-chart {
+    padding: 0 13px 8px;
+    gap: 10px;
+  }
+  .mg-expense-chart > svg {
+    max-height: none;
+    width: 39%;
+  }
+  .mg-expense-legend {
+    font-size: 10px;
+  }
+  .mg-expense-legend > div {
+    padding-block: 5px;
+  }
+  .mg-expense-legend strong {
+    font-size: 10px;
+  }
+  .mg-separate-balances {
+    font-size: 9px;
+    padding-top: 6px;
+    gap: 10px;
+  }
+  .mg-separate-balances strong {
+    font-size: 10px;
+  }
+  .mg-separate-balances span {
+    gap: 6px;
+  }
+  .management-page th {
+    font-size: 10px;
+    padding: 6px 10px;
+  }
+  .management-page td {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  .management-page td small {
+    font-size: 9px;
+    margin-top: 2px;
+  }
+  .management-page td .btn {
+    min-height: 23px;
+    padding: 4px 7px;
+    font-size: 10px;
+  }
+  .management-page td .badge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  .management-page .pager {
+    min-height: 29px;
+    padding: 4px 12px;
+    font-size: 9px;
+  }
+  .management-page .pager .btn {
+    height: 23px;
+    min-height: 23px;
+    min-width: 23px;
+    padding: 3px;
+  }
+  .mg-table-empty {
+    padding: 15px;
+  }
+  .mg-key-row {
+    padding-block: 6px;
+    font-size: 10px;
+  }
+  .mg-report-aside .mg-small-note {
+    font-size: 9px;
+    line-height: 1.4;
+    margin-top: 8px;
+  }
+  .mg-panel-footer {
+    padding: 6px 12px;
+  }
+  .mg-inline-note {
+    font-size: 10px;
+    padding: 8px 11px;
+    margin: 7px 12px;
+  }
+  .mg-settings-layout,
+  .mg-settings-summary {
+    gap: 10px;
+  }
+  .mg-settings-layout.has-summary {
+    grid-template-columns: minmax(0, 1.95fr) minmax(250px, 1fr);
+  }
+  .mg-summary-card {
+    padding: 12px;
+    gap: 10px;
+  }
+  .mg-summary-card h2 {
+    font-size: 18px;
+  }
+  .mg-summary-team {
+    gap: 10px;
+  }
+  .mg-summary-team strong {
+    font-size: 13px;
+  }
+  .mg-summary-team small {
+    font-size: 10px;
+    margin-top: 3px;
+  }
+  .mg-avatar-stack > .avatar {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 10px !important;
+  }
+  .mg-summary-card > .btn {
+    min-height: 29px;
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  .mg-summary-guide {
+    gap: 10px;
+  }
+  .mg-summary-guide > span {
+    height: 36px;
+    width: 36px;
+  }
+  .mg-summary-guide svg {
+    width: 24px;
+    height: 24px;
+  }
+  .mg-summary-guide p {
+    font-size: 11px;
+  }
+  .mg-summary-tools button {
+    padding: 7px 0;
+    gap: 10px;
+    font-size: 11px;
+  }
+  .mg-summary-tools button > svg {
+    width: 17px;
+    height: 17px;
+  }
+  .mg-summary-tools > small {
+    font-size: 9px;
+    line-height: 1.35;
+  }
+  .mg-settings-form {
+    padding: 5px 15px 10px;
+  }
+  .mg-form-grid {
+    gap: 11px 17px;
+  }
+  .mg-field {
+    font-size: 11px;
+    gap: 5px;
+  }
+  .mg-field input,
+  .mg-field select,
+  .mg-field textarea {
+    font-size: 12px;
+    min-height: 32px;
+    padding: 6px 9px;
+  }
+  .mg-field textarea {
+    min-height: 48px;
+    max-height: 48px;
+  }
+  .mg-general-form {
+    gap: 12px;
+    justify-content: flex-start;
+  }
+  .mg-general-section {
+    padding-top: 11px;
+  }
+  .mg-general-section h3 {
+    font-size: 16px;
+    margin-bottom: 9px;
+  }
+  .mg-settings-footer {
+    padding: 9px 15px;
+    gap: 10px;
+  }
+  .mg-settings-footer > span {
+    font-size: 10px;
+  }
+  .mg-settings-footer .btn {
+    min-height: 30px;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  .mg-form-step {
+    padding: 0 15px 8px;
+  }
+  .mg-form-step .tabs {
+    min-height: 30px;
+  }
+  .mg-form-step .tabs > button {
+    font-size: 11px;
+    min-height: 30px;
+    padding: 5px 10px;
+  }
+  .mg-toggle-row {
+    padding-block: 10px;
+    font-size: 11px;
+  }
+  .mg-toggle-row small {
+    font-size: 10px;
+  }
+  .mg-notification-controls {
+    margin: 0 15px 8px;
+    gap: 16px;
+  }
+  .mg-notification-controls .mg-toggle-row {
+    padding-block: 8px;
+  }
+}
+@media (max-width: 999px) {
+  .mg-settings-layout.has-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mg-settings-summary {
+    display: none;
+  }
+}
+
+@media (min-width: 761px) and (max-height: 740px) {
+  .management-page {
+    gap: 6px;
+  }
+  .management-page .page-header {
+    min-height: 44px;
+  }
+  .management-page .page-header h1 {
+    font-size: 26px;
+  }
+  .management-page .page-header p {
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  .mg-stat > small {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+  .mg-stat {
+    position: relative;
+  }
+  .mg-finance-overview {
+    grid-template-rows: minmax(0, 0.95fr) minmax(164px, 1.05fr) auto;
+    gap: 8px;
+  }
+  .mg-reports-content {
+    gap: 8px;
+  }
+  .mg-summary-guide > span {
+    height: 32px;
+    width: 32px;
+  }
+  .mg-summary-card {
+    gap: 8px;
+  }
+}
+
+@media (min-width: 761px) and (max-height: 740px) {
+  .mg-summary-tools {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+  .mg-summary-tools > div {
+    flex: none;
+  }
+  .mg-summary-tools button {
+    padding: 5px 0;
+  }
+  .mg-summary-tools > small {
+    line-height: 1.35;
+  }
+  .mg-chart svg text {
+    font-size: 10px;
+  }
+}
+
+.mg-settings-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.mg-settings-panel .mg-local-toolbar > input {
+  flex: 1;
+  min-width: 0;
+}
+.mg-settings-panel .mg-settings-form input[type='color'] {
+  min-height: 38px;
+}
+
+.mg-settings-tabs button.active {
+  background: var(--gold-soft);
+  border-radius: 9px 9px 0 0;
+}
+.mg-settings-page .mg-settings-footer .btn-primary {
+  background: #875a1d;
+  color: #fff;
+}
+.mg-settings-page .mg-summary-card > .btn {
+  font-weight: 700;
+  color: var(--gold-text);
+}
+.mg-settings-page .mg-toggle-row {
+  justify-content: flex-start;
+  gap: 13px;
+}
+.mg-settings-page .mg-toggle-row > input {
+  margin-left: auto;
+}
+.mg-settings-page .mg-toggle-icon {
+  flex: 0 0 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  background: var(--gold-soft);
+  color: var(--gold-text);
+  border-radius: 8px;
+}
+.mg-settings-page .mg-summary-card h2 {
+  font-weight: 750;
+}

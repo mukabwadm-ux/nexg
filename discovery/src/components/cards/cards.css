@@ -1,0 +1,210 @@
+/* One item card family (owner decision, 8 Nov 2026): six kinds, small and expanded, desktop to phone.
+   Emil Kowalski and better-ui (Jakub Krehel) rules: rings instead of borders on surfaces (borders only on
+   inputs and dividers), concentric radii, press feedback at .96, named transitions of 300ms or less,
+   hover only on mouse devices, at least 40px to hit. */
+
+:root{--ease-out:cubic-bezier(.23,1,.32,1);--shadow-ring:0 0 0 1px oklch(1 0 0 / .08);--shadow-ring-hover:0 0 0 1px oklch(1 0 0 / .17)}
+
+/* Products need only a price and a +, so they sit five across on a laptop; requests carry a worded action and get more room. */
+.offering-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:20px 16px}
+.offering-grid--roomy{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+
+/* Small card: one anatomy for every kind. Framed photo: card radius 18 = photo radius 12 + 6 padding. */
+.offering-card{position:relative;display:flex;flex-direction:column;min-width:0;padding:6px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow-ring);transition-property:box-shadow,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card.is-chosen{box-shadow:0 0 0 1px rgba(229,182,95,.42)}
+.offering-card__media{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#0c1418}
+.offering-card--activity .offering-card__media,.offering-card--vehicle .offering-card__media{aspect-ratio:16/11}
+.offering-card__image{display:block;width:100%;height:100%;min-height:0;padding:0}
+.offering-card__image img,.offering-card__image .image-fallback{display:block;width:100%;height:100%;object-fit:cover;border-radius:12px}
+.offering-card__image img{outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px;transition-property:scale;transition-duration:300ms;transition-timing-function:var(--ease-out)}
+.offering-card__tag{position:absolute;top:8px;left:8px;z-index:1;max-width:calc(100% - 60px);padding:5px 10px;border-radius:999px;background:rgba(8,13,15,.72);color:#f2c56d;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.offering-card__save{position:absolute;top:8px;right:8px;z-index:1;display:grid;place-items:center;width:34px;height:34px;min-height:34px;padding:0;border-radius:50%;background:rgba(8,13,15,.66);color:#f3eee2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition-property:scale,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card__save::after{content:'';position:absolute;inset:-3px;border-radius:50%}
+.offering-card__save[aria-pressed=true]{color:var(--gold)}
+.offering-card__body{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;padding:10px 8px 6px}
+.offering-card__title{margin:0;font-size:15px;line-height:1.3;font-weight:700;letter-spacing:-.005em}
+.offering-card__title button{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:0;padding:0;text-align:left;font:inherit;color:inherit;text-wrap:pretty}
+/* The name's button stretches over the whole card, so a tap anywhere opens it; the card's own buttons sit above. */
+.offering-card__title button::after{content:'';position:absolute;inset:0;border-radius:18px}
+.offering-card__title button:focus-visible{outline:none}
+.offering-card:has(.offering-card__title button:focus-visible){box-shadow:0 0 0 2px var(--gold)}
+.offering-card__byline{margin:0;color:#c4c9c4;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.offering-card__description{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* The price never splits over two lines; a long action moves under it as a whole instead. */
+.offering-card__footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;margin-top:auto;padding-top:8px}
+.offering-card__price{font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap;font-variant-numeric:tabular-nums}
+.offering-card__price.is-unavailable{color:var(--muted);font-weight:500}
+.offering-card__action{position:relative;z-index:1;display:inline-flex;align-items:center;gap:5px;min-height:40px;margin-left:auto;padding:0 2px;font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap;transition-property:scale,color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card__action svg{flex:none;transition-property:translate;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+/* Products and dishes (owner, 9 Nov 2026, as on Wolt and Uber Eats): a tap on the round gold + adds one and the
+   + grows in place into a − n + pill; after a quiet spell it folds back into one round button showing the
+   count. The gold is the control's ::before, so the buttons' enlarged hit areas aren't clipped. Width and
+   the stepper's opacity animate, under 250ms. */
+.offering-card__quantity{position:relative;z-index:1;display:flex;align-items:center;justify-content:flex-end;flex:none;width:36px;height:36px;margin-left:auto;border-radius:999px;color:#111315;transition-property:width;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+.offering-card__quantity::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--gold)}
+.offering-card__quantity.is-open{width:104px}
+.offering-card__quantity.is-disabled{opacity:.4}
+.offering-card__quantity.is-disabled .offering-card__add:disabled{opacity:1}
+.offering-card__stepper{display:flex;align-items:center;flex:none;opacity:0;pointer-events:none;transition-property:opacity;transition-duration:100ms;transition-timing-function:var(--ease-out)}
+.offering-card__quantity.is-open .offering-card__stepper{opacity:1;pointer-events:auto;transition-duration:150ms;transition-delay:50ms}
+.offering-card__less,.offering-card__add{position:relative;display:grid;place-items:center;flex:none;width:36px;height:36px;min-height:36px;padding:0;border-radius:50%;color:#111315;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-card__less::after,.offering-card__add::after{content:'';position:absolute;inset:-4px;border-radius:50%}
+.offering-card__count{min-width:32px;text-align:center;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.offering-card__total{font-size:14px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.offering-card__badge{position:absolute;top:-6px;right:-6px;z-index:1;display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#f3eee2;color:#111315;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;pointer-events:none}
+.offering-card__save:active,.offering-card__add:active,.offering-card__less:active,.offering-card__action:active{scale:.96}
+.offering-card__add:disabled,.offering-card__action:disabled{opacity:.4}
+
+/* Compact product card (owner, 9 Nov 2026), the grocery industry standard: a square photo tile (radius 12,
+   image outline) with the + on its bottom-right corner, then the price, bold, and a two-line name. No frame,
+   description, heart or tag. Five across in a laptop's main column, two on phones, three from 481px. */
+.offering-grid.offering-grid--compact{grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:24px 16px}
+.offering-card.offering-card--compact{flex-direction:column;min-height:0;padding:0;border-radius:14px;background:none;box-shadow:none}
+.offering-card--compact .offering-card__media{width:auto;aspect-ratio:1;border-radius:12px;background:#16222a}
+.offering-card--compact .offering-card__quantity{position:absolute;right:8px;bottom:8px;margin:0}
+.offering-card--compact .offering-card__quantity::before{box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.offering-card--compact .offering-card__body{gap:2px;padding:8px 2px 0}
+.offering-card--compact .offering-card__price{order:-1;color:#f3eee2;font-size:15px;line-height:1.35}
+.offering-card--compact .offering-card__price.is-unavailable{color:var(--muted);font-weight:600}
+.offering-card--compact .offering-card__title{color:#d3d8d2;font-size:13.5px;font-weight:600;line-height:1.35;letter-spacing:0}
+.offering-card--compact .offering-card__title button::after{border-radius:14px}
+.offering-card.offering-card--compact:has(.offering-card__title button:focus-visible){box-shadow:none;outline:2px solid var(--gold);outline-offset:4px}
+.offering-card--compact.is-unavailable .offering-card__image img{filter:grayscale(.65);opacity:.7}
+
+.offering-card__image .image-fallback{display:flex}
+/* Form controls the item sheet and the trip panels share, and their gold primary button. */
+.offering-field{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:13px;color:var(--muted)}
+.offering-field--wide,.offering-chips,.offering-check{grid-column:1/-1}
+.offering-field input,.offering-field textarea{width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#0d1518;color:#f3eee2;font:inherit;font-size:14px;color-scheme:dark;transition-property:border-color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-field input:focus,.offering-field textarea:focus{outline:none;border-color:rgba(229,182,95,.7);box-shadow:0 0 0 3px rgba(229,182,95,.15)}
+.offering-field input::placeholder,.offering-field textarea::placeholder{color:#7f8988}
+.offering-field textarea{min-height:84px;resize:vertical}
+.offering-chips{margin:0;padding:0;border:0;min-width:0}
+.offering-chips legend{padding:0;margin-bottom:6px;font-size:13px;color:var(--muted)}
+.offering-chips>div{display:flex;flex-wrap:wrap;gap:8px}
+.offering-chip{position:relative}
+.offering-chip input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
+.offering-chip span{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;transition-property:border-color,color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-chip input:checked+span{border-color:var(--gold);color:var(--gold);background:rgba(229,182,95,.08)}
+.offering-chip input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+.offering-check input{accent-color:var(--gold)}
+.offering-check{display:flex;align-items:center;gap:10px;min-height:40px;font-size:14px;cursor:pointer}
+.offering-check input{width:18px;height:18px;margin:0;flex:none}
+.offering-check--inline{grid-column:auto;align-self:end;min-height:42px}
+.offering-stepper{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:42px;font-size:13px;color:var(--muted)}
+.offering-stepper>div{display:flex;align-items:center;gap:4px;padding:3px;border-radius:999px;background:#0d1518;box-shadow:var(--shadow-ring)}
+.offering-stepper button{position:relative;display:grid;place-items:center;width:34px;height:34px;min-height:34px;padding:0;border-radius:50%;color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-stepper button::after{content:'';position:absolute;inset:-3px;border-radius:50%}
+.offering-stepper output{min-width:26px;text-align:center;color:#f3eee2;font-weight:700;font-variant-numeric:tabular-nums}
+.offering-sheet__primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:999px;background:var(--gold);color:#111315;font-weight:700;white-space:nowrap;transition-property:scale,opacity,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.offering-sheet__primary:disabled{opacity:.45}
+.offering-sheet__primary:active:not(:disabled),.offering-stepper button:active:not(:disabled){scale:.96}
+
+
+/* Date picker (one date or a range), opened inline so a sheet never clips it. */
+.date-picker{display:flex;flex-direction:column;gap:6px;min-width:0;grid-column:1/-1}
+.date-picker__label{font-size:13px;color:var(--muted)}
+.date-picker__trigger{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#0d1518;color:#f3eee2;text-align:left;font-size:14px;transition-property:border-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__trigger svg{color:var(--gold);flex:none}
+.date-picker__trigger .is-placeholder{color:var(--muted)}
+.date-picker.is-open .date-picker__trigger{border-color:rgba(229,182,95,.6)}
+.date-picker__panel{padding:12px;border-radius:14px;background:#0d1518;box-shadow:var(--shadow-ring)}
+.date-picker__header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.date-picker__header strong{font-size:15px}
+.date-picker__header button{display:grid;place-items:center;width:40px;height:40px;min-height:40px;padding:0;border-radius:50%;color:#f3eee2;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__header button:disabled{opacity:.3}
+.date-picker__grid{display:flex;flex-direction:column;gap:2px}
+.date-picker__row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.date-picker__weekday{padding:4px 0;text-align:center;font-size:11px;color:var(--muted)}
+.date-picker__row>span[role=gridcell]{display:flex;justify-content:center}
+.date-picker__day{width:100%;max-width:44px;height:40px;min-height:40px;padding:0;border-radius:10px;color:#f3eee2;font-size:13px;font-variant-numeric:tabular-nums;transition-property:background-color,color,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__day.is-outside{color:rgba(243,238,226,.35)}
+.date-picker__day.is-today{box-shadow:inset 0 0 0 1px rgba(229,182,95,.6)}
+.date-picker__day.is-between{background:rgba(229,182,95,.14);border-radius:0}
+.date-picker__day.is-selected{background:var(--gold);color:#111315;font-weight:700}
+.date-picker__day:disabled{opacity:.25;cursor:not-allowed}
+.date-picker__day:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.date-picker__day:active:not(:disabled),.date-picker__header button:active:not(:disabled),.date-picker__done:active,.date-picker__clear:active:not(:disabled){scale:.96}
+.date-picker__footer{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.date-picker__footer>span{flex:1;min-width:0}
+.date-picker__clear{min-height:40px;padding:0 10px;border-radius:999px;color:var(--muted);transition-property:scale,color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__done{min-height:40px;padding:0 16px;border-radius:999px;background:var(--gold);color:#111315;font-weight:700;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.date-picker__clear:disabled{opacity:.35}
+
+/* Trip first for car and bike hire, and for transfers: where and when, then the vehicles. */
+.trip-panel{margin:24px 0 8px;padding:20px 22px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(229,182,95,.09),rgba(16,27,32,.92) 42%);box-shadow:0 0 0 1px rgba(229,182,95,.28)}
+.trip-panel__heading h2{margin:0;font-size:21px;text-wrap:balance}
+.trip-panel__heading p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.trip-panel__fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;gap:12px 14px;margin-top:16px}
+.trip-panel__fields .trip-panel__wide,.trip-panel__fields .date-picker{grid-column:span 2}
+.trip-panel__options{display:flex;flex-wrap:wrap;align-items:center;align-self:end;gap:0 20px;grid-column:span 2;min-height:42px}
+.trip-panel--transfer .trip-panel__options{grid-column:span 1}
+.trip-panel .date-picker__panel{max-width:400px}
+.trip-panel__footer{display:flex;align-items:center;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.trip-panel__footer p{flex:1;margin:0;font-size:13px;color:var(--muted);text-wrap:pretty}
+
+@media (hover:hover) and (pointer:fine){
+  .offering-card:hover{box-shadow:var(--shadow-ring-hover);background-color:#12212a}
+  .offering-card.is-chosen:hover{box-shadow:0 0 0 1px rgba(229,182,95,.6)}
+  .offering-card:hover .offering-card__image img{scale:1.03}
+  .offering-card__save:hover{background:rgba(8,13,15,.86)}
+  .offering-card__add:hover:not(:disabled),.offering-card__less:hover{background:rgba(255,255,255,.22)}
+  .offering-card.offering-card--compact:hover{box-shadow:none;background:none}
+  .offering-card__action:hover:not(:disabled){color:#f0c979}
+  .offering-card__action:hover:not(:disabled) svg{translate:2px 0}
+  .offering-sheet__primary:hover:not(:disabled){background:#f0c979}
+  .offering-stepper button:hover:not(:disabled){background:rgba(255,255,255,.08)}
+  .offering-chip:hover span{border-color:rgba(229,182,95,.45)}
+  .date-picker__trigger:hover{border-color:rgba(229,182,95,.4)}
+  .date-picker__day:hover:not(:disabled):not(.is-selected),.date-picker__header button:hover:not(:disabled){background:rgba(255,255,255,.07)}
+  .date-picker__done:hover{background:#f0c979}
+  .date-picker__clear:hover:not(:disabled){color:#f3eee2}
+}
+
+@media (max-width:900px){
+  .trip-panel__fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .trip-panel--transfer .trip-panel__options{grid-column:span 1}
+}
+
+@media (max-width:720px){
+  /* 16px keeps phones from zooming into a field on focus. */
+  .offering-field input,.offering-field textarea{font-size:16px}
+}
+
+/* Phones: a row card (photo left, text right) keeps long lists scannable. */
+@media (max-width:560px){
+  .offering-grid,.offering-grid--roomy{grid-template-columns:1fr;gap:10px}
+  .offering-card{flex-direction:row;min-height:124px}
+  .offering-card__media,.offering-card--activity .offering-card__media,.offering-card--vehicle .offering-card__media{width:112px;flex:none;aspect-ratio:auto}
+  .offering-card__save{top:6px;right:6px;width:30px;height:30px;min-height:30px}
+  .offering-card__save::after{inset:-5px}
+  .offering-card__tag{display:none}
+  .offering-card__body{padding:6px 6px 2px 12px}
+  .offering-card__footer{padding-top:4px}
+  .offering-card__footer--action{flex-direction:column;align-items:flex-start;gap:0}
+  .offering-card__footer--action .offering-card__action{margin-left:0}
+  .trip-panel{margin:20px 0 4px;padding:16px}
+  .trip-panel__heading h2{font-size:19px}
+  .trip-panel__fields{gap:12px 10px}
+  .trip-panel__fields .offering-stepper{grid-column:1/-1}
+  .trip-panel__footer{flex-direction:column;align-items:stretch}
+}
+
+/* Compact grids: auto-fill on tablets, three across from 481px, two on phones. */
+@media (max-width:899px){
+  .offering-grid.offering-grid--compact{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:20px 12px}
+}
+@media (max-width:767px){
+  .offering-grid.offering-grid--compact{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:480px){
+  .offering-grid.offering-grid--compact{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .offering-card--compact .offering-card__title{font-size:13px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .offering-card,.offering-card__image img,.offering-card__save,.offering-card__add,.offering-card__less,.offering-card__action,.offering-card__action svg,.offering-card__quantity,.offering-card__stepper,
+  .offering-sheet__primary,.offering-stepper button,
+  .offering-chip span,.offering-field input,.offering-field textarea,.date-picker__trigger,.date-picker__day,.date-picker__header button,.date-picker__done,.date-picker__clear{transition:none}
+  .offering-card:hover .offering-card__image img{scale:1}
+}

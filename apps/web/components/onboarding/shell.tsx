@@ -43,6 +43,7 @@ export function OnboardingShell({
   return (
     <ShellFrame
       label="Merchant onboarding"
+      signInHref="/merchants/sign-in"
       step={step}
       totalSteps={6}
       steps={MERCHANT_STEP_NAMES.map((label, i) => ({

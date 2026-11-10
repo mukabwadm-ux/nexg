@@ -1,0 +1,13 @@
+/* Appointment storefronts: massage, spa, gym, personal training, salon & barber, nails & beauty (owner, 8 Nov 2026).
+   The frame comes from store.css (hero, sticky section bar, sections, requests pill), the cards from cards.css and
+   the request sheet from item-sheet.css; this file adds only what appointments need. It loads with the app and
+   before the shared styles, so every rule stays inside .appointment-store with enough weight to sit on top. */
+
+/* Room under the list for the requests pill, and a pill as wide as its words (up to the screen's width) so
+   phones read "Not sent to … yet" in full. */
+.appointment-store.has-basket{padding-bottom:88px}
+.appointment-store .store-basket{width:max-content}
+
+@media (max-width:640px){
+  .appointment-store.has-basket{padding-bottom:80px}
+}

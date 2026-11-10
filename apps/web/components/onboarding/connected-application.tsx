@@ -5,13 +5,16 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
+import { getCaptchaToken } from '@nexg/ui';
 import SharedRegistration from '../../../../merchant-onboarding/src/MerchantOnboarding';
 import {
   applicationCapture,
   payoutDeclaration,
   payoutForm,
 } from '@/lib/merchant-application-client';
+import { agreementForCategory } from '@nexg/contracts/merchant-agreements';
 import { sendMerchantPasswordSetupLink } from '@/app/(customer)/sign-in/actions';
+import { AgreementConsent } from '@/components/merchant/agreement-consent';
 import { createClient } from '@/lib/supabase/client';
 import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 import type { MerchantSavedHomeSource } from '@/lib/merchant-home-source';
@@ -84,6 +87,9 @@ export function ConnectedApplication({
   const payout = useRef(initialPayout);
   const [status, setStatus] = useState(initialRecord?.review.state ?? 'draft');
   const [setupEditor, setSetupEditor] = useState<SetupEditor | null>(null);
+  /* The category whose merchant agreement the applicant has ticked. */
+  const [agreementAcceptedFor, setAgreementAcceptedFor] = useState<string | null>(null);
+  const [agreementError, setAgreementError] = useState<string | null>(null);
   const closeSetupEditor = () => setSetupEditor(null);
   const refreshSetup = () => router.refresh();
   const openLegacySetup = useCallback(
@@ -410,7 +416,7 @@ export function ConnectedApplication({
   async function completeSubmission(email: string) {
     if (anonymousSession && emailOtpEnabled) {
       if (!setupLinkSent.current) {
-        const result = await sendMerchantPasswordSetupLink();
+        const result = await sendMerchantPasswordSetupLink(await getCaptchaToken());
         if (!result.ok) throw new Error(result.message);
         setupLinkSent.current = true;
       }
@@ -419,13 +425,8 @@ export function ConnectedApplication({
         throw new Error(
           'Your password setup link was sent, but we could not sign out. Please try again.',
         );
-      const params = new URLSearchParams({
-        role: 'merchant',
-        next: '/merchant',
-        setup: 'sent',
-        email,
-      });
-      router.push(`/sign-in?${params.toString()}`);
+      const params = new URLSearchParams({ next: '/merchant', setup: 'sent', email });
+      router.push(`/merchants/sign-in?${params.toString()}`);
     } else {
       router.push('/merchant');
     }
@@ -458,6 +459,33 @@ export function ConnectedApplication({
       window.history.replaceState(null, '', `/merchants/register?merchantId=${saved.merchant_id}`);
     return saved;
   }
+  /*
+   * The merchant agreement for the application's category. Ticking the box
+   * is remembered per category, so changing category asks again; the
+   * acceptance itself is recorded (agreement, version, who, when) just
+   * before submitting, and the database refuses a submission without it.
+   */
+  async function acceptAgreement(merchantId: string, categoryId: string) {
+    const agreement = agreementForCategory(categoryId);
+    if (!agreement) throw new Error('Choose your business category before submitting.');
+    if (agreementAcceptedFor !== categoryId) {
+      setAgreementError('Tick "I have read and agree" to accept the NexG Merchant Agreement.');
+      throw new Error(
+        'Read and accept the NexG Merchant Agreement for your category (Registration and policies) before submitting.',
+      );
+    }
+    const { error } = await createClient().rpc('rpc_merchant_agreement_accept', {
+      p_merchant_id: merchantId,
+      p_agreement_id: agreement.id,
+      p_version: agreement.version,
+    });
+    if (error)
+      throw new Error(
+        error.message ||
+          'Your acceptance of the merchant agreement could not be saved. Please retry.',
+      );
+  }
+
   async function submit(input: Record<string, unknown>) {
     if (emailOtpEnabled) {
       const email = String((input.business as { email?: unknown } | undefined)?.email ?? '')
@@ -488,6 +516,7 @@ export function ConnectedApplication({
         );
         return { applicationId: saved.merchant_id, status: saved.review.state, redirecting: true };
       }
+      await acceptAgreement(saved.merchant_id, String(input.categoryId ?? ''));
       const submitted = MerchantApplicationRecord.parse(
         await post({
           command: 'submit',
@@ -589,7 +618,7 @@ export function ConnectedApplication({
             href={
               emailOtpEnabled
                 ? '/merchants/verify-email'
-                : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'
+                : '/merchants/sign-in?tab=create&next=%2Fmerchant'
             }
             prefetch={false}
             className="bg-gold text-ink mt-3 inline-flex rounded-lg px-4 py-2.5 font-bold"
@@ -613,6 +642,17 @@ export function ConnectedApplication({
         authenticatedSession={undefined}
         onSaveDraft={(input: Record<string, unknown>) => serialize(() => save(input))}
         onSubmit={submit}
+        renderAgreement={(categoryId: string) => (
+          <AgreementConsent
+            categoryId={categoryId}
+            checked={agreementAcceptedFor === categoryId && Boolean(categoryId)}
+            error={agreementError}
+            onChange={(checked) => {
+              setAgreementAcceptedFor(checked ? categoryId : null);
+              setAgreementError(null);
+            }}
+          />
+        )}
         canSubmit={!emailOtpEnabled || emailIsVerified}
         emailFieldDisabled={
           emailOtpEnabled && (verificationStatus === 'sending' || verifyingEmail || resendingCode)

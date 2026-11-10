@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" stroke="#172f35" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Food and drinks">
+  <path d="M76 270h187c-5 57-37 92-94 92s-88-35-93-92Z"/>
+  <path d="M64 256c0-8 7-14 15-14h181c8 0 15 6 15 14s-7 14-15 14H79c-8 0-15-6-15-14Z"/>
+  <path d="M137 211c-15-18 17-26 2-45M183 211c-15-18 17-26 2-45M229 211c-15-18 17-26 2-45"/>
+  <path d="M321 208h112l-15 153c-2 20-16 34-36 34h-10c-20 0-34-14-36-34l-15-153Z"/>
+  <path d="M321 208h112M345 258c26 10 52 10 78 0M371 208l16-49h37"/>
+  <path d="M350 425h70"/>
+</svg>

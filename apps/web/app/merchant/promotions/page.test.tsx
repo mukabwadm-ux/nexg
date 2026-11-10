@@ -20,6 +20,7 @@ function query(data: unknown) {
   return Object.assign(result, {
     select: () => result,
     eq: () => result,
+    not: () => result,
     order: () => result,
     limit: () => result,
     maybeSingle: () => result,
@@ -40,6 +41,7 @@ function sources(bookings: unknown[], eligible: boolean) {
   from.mockImplementation((table: string) => {
     if (table === 'merchant_home_v')
       return query({ name: 'Example Merchant', status: 'live', city_id: 'city-1' });
+    if (table === 'catalogue_item' || table === 'merchant_promotion') return query([]);
     return query(table === 'featured_booking' ? bookings : [placement]);
   });
   rpc.mockImplementation(async (name: string) => ({

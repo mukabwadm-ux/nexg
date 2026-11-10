@@ -1,0 +1,18 @@
+/* The restaurant storefront (RestaurantStorefront.tsx) for every restaurants-food store that sells dishes.
+   The frame is store.css (hero, section bar, sections, basket pill), the dish cards are the card family
+   (cards.css), the dish sheet is the one item sheet (item-sheet.css) and the cart is the shared cart pieces
+   (cart/cart.css); this file adds only what a menu needs on top. It loads before those files, so every rule
+   that adjusts them is scoped under a restaurant class. */
+
+/* Room under the menu for the "View cart" pill. */
+.restaurant-menu.has-basket{padding-bottom:88px}
+.restaurant-menu__catalog:focus{outline:none}
+
+/* Dishes: four across on a laptop, three on a small one, two on a tablet; phones get the family's row cards. */
+@media (min-width:561px){.restaurant-menu .offering-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px){.restaurant-menu .offering-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1200px){.restaurant-menu .offering-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+@media (max-width:640px){
+  .restaurant-menu.has-basket{padding-bottom:80px}
+}

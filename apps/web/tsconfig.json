@@ -19,7 +19,8 @@
     ".next-insights-preview/types/**/*.ts",
     ".next-merchant-layout-preview/types/**/*.ts",
     ".next-dev-3141/types/**/*.ts",
-    ".next-dev-3002/types/**/*.ts"
+    ".next-dev-3002/types/**/*.ts",
+    ".next-hosts-preview/types/**/*.ts"
   ],
   "exclude": ["node_modules", ".next", ".turbo"]
 }

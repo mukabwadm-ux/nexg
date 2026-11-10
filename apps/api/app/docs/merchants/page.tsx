@@ -95,7 +95,7 @@ export default function MerchantIntegrationPage() {
 
       <p className="border-t border-ink/10 pt-5 text-sm">
         For endpoint details, see the <Link href="/docs" className="underline underline-offset-4">API reference</Link>.
-        For future bank collections and settlement integration, see the{' '}
+        For bank collections at checkout, see the{' '}
         <Link href="/docs/bank-transfers" className="underline underline-offset-4">bank and payment partner guide</Link>.
       </p>
     </article>

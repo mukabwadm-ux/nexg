@@ -17,12 +17,38 @@ import Link from 'next/link';
 
 export interface PopularCategory {
   key: string;
+  /** The id the tap counter records, so the most tapped tiles come first. */
+  tile?: string;
   label: string;
   image: string;
   imageUrl?: string | null;
   /** A merchant category for Explore, or a fixed destination. */
   category?: string;
   href?: string;
+}
+
+/**
+ * Count a tap, at most once per tile per browser per day, without holding up
+ * the navigation. Nothing about the visitor is sent: only which tile.
+ */
+function recordTap(tile: string | undefined) {
+  if (!tile || typeof navigator === 'undefined') return;
+  const today = new Date().toISOString().slice(0, 10);
+  const key = `nexg.tile-tap.${tile}`;
+  try {
+    if (window.localStorage.getItem(key) === today) return;
+    window.localStorage.setItem(key, today);
+  } catch {
+    /* Private mode or storage blocked: count it anyway. */
+  }
+  const body = JSON.stringify({ tile });
+  if (
+    !navigator.sendBeacon?.('/api/category-tap', new Blob([body], { type: 'application/json' }))
+  ) {
+    void fetch('/api/category-tap', { method: 'POST', body, keepalive: true }).catch(
+      () => undefined,
+    );
+  }
 }
 
 export function PopularCategories({
@@ -88,6 +114,7 @@ export function PopularCategories({
           >
             <Link
               href={hrefFor(item)}
+              onClick={() => recordTap(item.tile)}
               className="focus-visible:ring-gold group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               <span className="shadow-card bg-surface relative block aspect-square overflow-hidden rounded-2xl">

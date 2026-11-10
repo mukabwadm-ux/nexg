@@ -1,12 +1,17 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 
-/**
- * There is one sign-in page for everybody.
- *
- * This route exists because the header links to it and people bookmark it,
- * but a separate merchant login would be a second place to keep correct for no
- * benefit — the role buttons on /sign-in already decide where you land.
- */
-export default function MerchantSignInRedirect() {
-  redirect('/sign-in');
+import { PortalSignInPage, type SignInSearchParams } from '@/components/auth/portal-sign-in-page';
+
+export const metadata: Metadata = {
+  title: 'Merchant sign in',
+  description: 'Sign in to your NexG merchant workspace.',
+};
+
+/** Merchants sign in here; customers use /sign-in. */
+export default function MerchantSignInPage({
+  searchParams,
+}: {
+  searchParams?: SignInSearchParams;
+}) {
+  return <PortalSignInPage portal="merchant" searchParams={searchParams} />;
 }

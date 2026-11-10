@@ -85,7 +85,7 @@ describe('merchant application decision recovery', () => {
     async (user) => {
       state.user = user;
       await expect(MerchantDecisionPage()).rejects.toThrow(
-        'redirect:/sign-in?reason=workspace-session',
+        'redirect:/merchants/sign-in?reason=workspace-session',
       );
       expect(state.requests).toEqual([]);
     },
@@ -94,7 +94,7 @@ describe('merchant application decision recovery', () => {
   it('does not trust a user returned with an Auth error', async () => {
     state.authError = new Error('private auth failure');
     await expect(MerchantDecisionPage()).rejects.toThrow(
-      'redirect:/sign-in?reason=workspace-session',
+      'redirect:/merchants/sign-in?reason=workspace-session',
     );
     expect(state.requests).toEqual([]);
   });

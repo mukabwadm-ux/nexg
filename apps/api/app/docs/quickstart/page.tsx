@@ -46,7 +46,7 @@ print(res.json()['data']['items'])`,
           </CardContent>
         </Card>
       ))}
-      <p className="text-sm text-ink/70">The merchant orders example requires a merchant-bound key with the <code className="font-mono text-xs">merchant_read</code> scope. Read the <a href="/docs/merchants" className="underline">merchant integration guide</a> for setup and server-side key handling. Write operations, including service bookings and bank transfers, are not available; use only endpoints listed in the <a href="/docs" className="underline">API reference</a>. HTTP 429 includes Retry-After in seconds.</p>
+      <p className="text-sm text-ink/70">The merchant orders example requires a merchant-bound key with the <code className="font-mono text-xs">merchant_read</code> scope. Read the <a href="/docs/merchants" className="underline">merchant integration guide</a> for setup and server-side key handling. Write operations, including service bookings, are not available through API keys (bank collections use their own signed contract, described in the <a href="/docs/bank-transfers" className="underline">bank guide</a>); use only endpoints listed in the <a href="/docs" className="underline">API reference</a>. HTTP 429 includes Retry-After in seconds.</p>
     </div>
   );
 }

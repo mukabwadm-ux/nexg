@@ -482,6 +482,10 @@ export default function MerchantOnboarding({
   emailVerificationAction = /** @type {import('react').ReactNode} */ (null),
   emailVerificationContent = /** @type {import('react').ReactNode} */ (null),
   onBusinessEmailChange = /** @type {(email: string) => void} */ (() => {}),
+  /** The merchant agreement for the chosen category, rendered under the terms. */
+  renderAgreement = /** @type {null | ((categoryId: string) => import('react').ReactNode)} */ (
+    null
+  ),
   className = '',
 }) {
   const [form, setForm] = useState(() =>
@@ -1085,6 +1089,7 @@ export default function MerchantOnboarding({
               <span className="mo-error">{fieldError('policies.terms')}</span>
             )}
           </div>
+          {renderAgreement ? renderAgreement(form.categoryId) : null}
           <label className="mo-check">
             <input
               type="checkbox"

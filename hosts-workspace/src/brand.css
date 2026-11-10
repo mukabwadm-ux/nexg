@@ -1,0 +1,37 @@
+/* Palette and typography authority: Desktop/MERCHANT WORKSPACE.
+   Shared tokens + merchant/workspace/workspace.module.css. */
+@font-face {
+  font-family: 'NexG Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/manrope-latin.woff2') format('woff2');
+}
+:root {
+  font-family: 'NexG Manrope', system-ui, sans-serif;
+  --paper: #f6f3ec;
+  --surface: #ffffff;
+  --ink: #171b24;
+  --muted: #626675;
+  --line: #e7e3da;
+  --gold: #d4a72c;
+  --gold-text: #b8901f;
+  --gold-soft: #fbf7ea;
+  --accent: #141414;
+  --success: #1f7a3a;
+  --success-soft: #e9f5ec;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --info: #1f4e79;
+  --info-soft: #eaf1f8;
+  --warning: #8a6a10;
+  --warning-soft: #fbf7ea;
+  --sidebar-bg: #141414;
+  --sidebar-text: #c7c6c1;
+  --sidebar-active-text: #17130b;
+  --border-strong: #ddd8cc;
+  --shell-border: #2a2a28;
+  --shell-muted: #8b8780;
+  color: var(--ink);
+  background: var(--paper);
+}

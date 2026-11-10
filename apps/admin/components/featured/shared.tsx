@@ -61,7 +61,7 @@ export function weekNumber(iso: string): number {
 export const KIND_LABEL: Record<string, string> = {
   homepage: 'Homepage spot',
   category_top: 'Category top',
-  popular_request: 'Popular request',
+  popular_request: 'Best seller',
 };
 
 export const CATEGORY_LABEL: Record<string, string> = {

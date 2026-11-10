@@ -1,0 +1,221 @@
+a.btn,
+.nxops-thread,
+.nxops-guide-row {
+  text-decoration: none;
+}
+.property-photo {
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+}
+.property-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.connected-entry {
+  display: grid;
+  height: 100%;
+  place-items: center;
+}
+.platform-back-to-inbox {
+  display: none;
+}
+.platform-support-form {
+  display: grid;
+  gap: 10px;
+}
+.platform-support-form .field input,
+.platform-support-form .field textarea,
+.platform-support-form .field select {
+  width: 100%;
+  max-width: 100%;
+}
+.platform-reply .field {
+  width: 100%;
+}
+.platform-message-feed {
+  justify-content: flex-start;
+}
+.platform-message-feed p,
+.platform-dialog p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.platform-inbox-aside {
+  font-size: 13px;
+  gap: 12px;
+}
+.platform-inbox-aside dd {
+  margin-bottom: 9px;
+}
+.platform-error {
+  font-size: 12px;
+  color: var(--danger);
+}
+.platform-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgb(18 20 23 / 55%);
+}
+.platform-dialog {
+  position: fixed;
+  z-index: 101;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(450px, calc(100% - 32px));
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+}
+.platform-dialog h2 {
+  margin-top: 0;
+}
+.platform-dialog p {
+  line-height: 1.45;
+}
+@media (max-width: 760px) {
+  .platform-back-to-inbox {
+    display: inline-flex;
+    align-self: flex-start;
+  }
+  .platform-inbox .nxops-inbox-layout:not(.nxops-mobile-conversation) .nxops-conversation {
+    display: none;
+  }
+  .platform-inbox .nxops-mobile-conversation .nxops-thread-list {
+    display: none;
+  }
+  .platform-page {
+    gap: 8px;
+  }
+  .platform-table-panel th,
+  .platform-table-panel td {
+    padding: 6px;
+  }
+  .platform-property-grid .platform-photo {
+    min-height: 105px;
+  }
+  .platform-detail {
+    padding: 12px;
+    gap: 10px;
+  }
+  .platform-detail dl {
+    gap: 12px;
+  }
+  .platform-calendar th:first-child {
+    min-width: 110px;
+  }
+  .platform-dialog {
+    font-size: 13px;
+  }
+}
+
+:root[data-host-theme='light'] {
+  --paper: #f8f8f7;
+  --surface: #fff;
+  --line: #dededc;
+}
+:root[data-host-theme='dark'] {
+  --paper: #17181d;
+  --surface: #23252c;
+  --line: #44474f;
+  --ink: #faf8f1;
+  --muted: #c4c5cc;
+  --gold-soft: #39311a;
+  --gold-text: #f1ca67;
+}
+:root[data-host-theme='contrast'] {
+  --paper: #fff;
+  --surface: #fff;
+  --line: #252525;
+  --ink: #111;
+  --muted: #343434;
+  --gold-soft: #fff3c2;
+  --gold-text: #674700;
+}
+:root[data-host-theme='custom'] {
+  --accent: var(--host-personal-accent, #141414);
+}
+:root[data-host-sidebar='light'] .sidebar {
+  --sidebar-bg: #fff;
+  --sidebar-text: #3a3630;
+  --shell-border: #dedbd4;
+}
+:root[data-host-sidebar='light'] .sidebar .brand,
+:root[data-host-sidebar='light'] .sidebar .owner-profile,
+:root[data-host-sidebar='light'] .sidebar .portfolio-switch {
+  color: #171b24;
+}
+:root[data-host-density='compact'] .table-scroll td,
+:root[data-host-density='compact'] .table-scroll th {
+  padding-block: 5px;
+}
+:root[data-host-font='large'] {
+  font-size: 16px;
+}
+.notification-menu > p {
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sidebar-bottom > .btn {
+  color: var(--sidebar-text);
+}
+
+.host-gallery {
+  padding: 14px;
+  gap: 10px;
+}
+.host-gallery-photo {
+  flex: 1;
+  min-height: 65px;
+  max-height: 300px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+.host-gallery-photo img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+.host-gallery-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: 8px;
+  align-items: end;
+}
+.host-gallery-form input {
+  width: 100%;
+  min-width: 0;
+}
+.host-gallery-removal {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+@media (max-width: 620px) {
+  .host-gallery-form {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .host-gallery-form .field:first-child {
+    grid-column: 1/-1;
+  }
+}
+
+.host-workflow-form {
+  padding: 12px;
+}
+.host-workflow-form form {
+  align-items: end;
+}
+.host-workflow-form .mg-form-grid {
+  max-width: none;
+}

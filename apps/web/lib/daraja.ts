@@ -130,3 +130,58 @@ export async function stkPush(input: {
     return { ok: false, message: e instanceof Error ? e.message : 'Could not reach M-Pesa.' };
   }
 }
+
+export type StkQueryResult =
+  | { status: 'paid' | 'failed'; resultCode: number; resultDesc: string }
+  | { status: 'pending' | 'error'; message: string };
+
+/**
+ * Asks M-Pesa what became of one prompt (STK Push Query), for when its
+ * callback never reached us. "Still being processed" comes back as an error
+ * from Safaricom, so it is reported as pending, not as a failure.
+ */
+export async function stkQuery(checkoutRequestId: string): Promise<StkQueryResult> {
+  const c = env();
+  if (!darajaConfigured()) return { status: 'error', message: 'M-Pesa is not configured.' };
+
+  try {
+    const ts = timestamp();
+    const password = Buffer.from(`${c.shortcode}${c.passkey}${ts}`).toString('base64');
+    const res = await fetch(`${HOSTS[c.mode]}/mpesa/stkpushquery/v1/query`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${await token()}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        BusinessShortCode: c.shortcode,
+        Password: password,
+        Timestamp: ts,
+        CheckoutRequestID: checkoutRequestId,
+      }),
+      cache: 'no-store',
+    });
+    const body = (await res.json()) as {
+      ResponseCode?: string;
+      ResultCode?: string | number;
+      ResultDesc?: string;
+      errorCode?: string;
+      errorMessage?: string;
+    };
+    if (body.ResultCode !== undefined && body.ResultCode !== null && body.ResultCode !== '') {
+      const code = Number(body.ResultCode);
+      if (!Number.isInteger(code)) return { status: 'error', message: 'Unreadable M-Pesa answer.' };
+      return {
+        status: code === 0 ? 'paid' : 'failed',
+        resultCode: code,
+        resultDesc: body.ResultDesc ?? '',
+      };
+    }
+    return {
+      status: body.errorCode === '500.001.1001' ? 'pending' : 'error',
+      message: body.errorMessage ?? 'M-Pesa did not say.',
+    };
+  } catch (e) {
+    return { status: 'error', message: e instanceof Error ? e.message : 'Could not reach M-Pesa.' };
+  }
+}

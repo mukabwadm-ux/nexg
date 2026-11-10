@@ -1,0 +1,140 @@
+.connected-auth {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+.connected-auth-card {
+  width: min(100%, 420px);
+  padding: 28px;
+  display: grid;
+  gap: 16px;
+}
+.connected-auth-card h1 {
+  margin: 0;
+  font-size: clamp(22px, 5vw, 30px);
+}
+.connected-auth-form {
+  display: grid;
+  gap: 12px;
+}
+.connected-auth-error {
+  color: #962e24;
+  margin: 0;
+}
+.connected-guest,
+.model-preview-page,
+.connected-qr {
+  box-sizing: border-box;
+  max-height: 100dvh;
+  overflow: auto;
+  background: #f1f4f7;
+}
+.connected-guest {
+  width: min(100%, 780px);
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: 24px;
+}
+.connected-guest-heading {
+  margin: 20px 0;
+}
+.connected-guest-heading h1,
+.connected-guide-panel h2 {
+  margin: 0;
+}
+.connected-guide-panel {
+  padding: 16px;
+  margin-bottom: 16px;
+  display: grid;
+  gap: 12px;
+}
+.connected-model {
+  min-width: 0;
+}
+.connected-model-stage {
+  position: relative;
+  min-height: 220px;
+  height: clamp(230px, 56vh, 510px);
+  overflow: hidden;
+  background: #edf3f4;
+}
+.connected-model-canvas {
+  position: absolute;
+  inset: 0;
+}
+.connected-model-canvas canvas {
+  display: block;
+}
+.connected-model-message {
+  position: absolute;
+  inset: auto 12px 12px;
+  padding: 12px;
+  background: #fff;
+  color: #102329;
+}
+.connected-model-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-block: 8px;
+}
+.connected-model-controls .btn {
+  min-height: 44px;
+}
+.connected-guide-plan {
+  position: relative;
+  width: min(100%, 650px);
+}
+.connected-guide-plan img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.guide-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #063f45;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+.guide-marker[aria-pressed='true'] {
+  background: #ff9500;
+  color: #102329;
+}
+.model-preview-page {
+  padding: 8px;
+}
+.model-preview-page .connected-model-stage {
+  height: max(185px, calc(100dvh - 76px));
+}
+.connected-qr {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+}
+.connected-qr img {
+  width: min(90vw, 300px);
+  height: auto;
+}
+.empty-property-photo {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #063f45;
+  background: #e5efef;
+}
+.connected-message-image {
+  display: block;
+  max-width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+}

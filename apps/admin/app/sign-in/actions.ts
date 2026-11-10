@@ -42,7 +42,12 @@ export async function signIn(
   }
 
   const supabase = createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const captcha = formData.get('captchaToken');
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+    options: { captchaToken: typeof captcha === 'string' && captcha ? captcha : undefined },
+  });
 
   await record(supabase, email, error ? 'bad_password' : 'success');
 

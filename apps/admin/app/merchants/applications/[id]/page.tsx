@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
+import { ApplicationAgreement } from '@/components/merchants/application-agreement';
 import { ApplicationReviewActor } from '@/components/merchants/application-review-actor';
 import {
   ApplicationReviewDetail,
@@ -61,6 +62,7 @@ export default async function ManagedMerchantApplicationPage({
           >
             Back to applications
           </Link>
+          <ApplicationAgreement merchantId={params.id} />
           <ApplicationReviewDetail {...source} />
         </main>
       </ConsoleShell>

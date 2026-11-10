@@ -136,10 +136,10 @@ describe('parse shapes the error for a response', () => {
 });
 
 describe('merchant taxonomy', () => {
-  it('has 21 categories and 128 subcategories', async () => {
+  it('has 21 categories and 140 subcategories (128 audited plus 12 laundry additions)', async () => {
     const { ALL_CATEGORIES, ALL_SUBCATEGORIES } = await import('./taxonomy');
     expect(ALL_CATEGORIES.length).toBe(21);
-    expect(ALL_SUBCATEGORIES.length).toBe(128);
+    expect(ALL_SUBCATEGORIES.length).toBe(140);
   });
 
   it('gives each Adults Only specialty a distinct, staged workflow', async () => {

@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { ForgotPasswordForm } from '@/components/auth/password-recovery';
 import { Logo } from '@/components/logo';
+import { isPortal } from '@/lib/auth-portals';
 
 export const metadata: Metadata = {
   title: 'Reset your password',
@@ -12,14 +13,17 @@ export const metadata: Metadata = {
 export default function ForgotPasswordPage({
   searchParams,
 }: {
-  searchParams?: { error?: string };
+  searchParams?: { error?: string; portal?: string };
 }) {
   return (
     <main className="bg-surface flex min-h-dvh flex-col items-center justify-center px-4 py-10">
       <Link href="/" aria-label="NexG Concierge home" className="mb-8">
         <Logo className="h-20 w-auto" />
       </Link>
-      <ForgotPasswordForm invalidLink={searchParams?.error === 'invalid-link'} />
+      <ForgotPasswordForm
+        invalidLink={searchParams?.error === 'invalid-link'}
+        portal={isPortal(searchParams?.portal) ? searchParams.portal : 'customer'}
+      />
     </main>
   );
 }

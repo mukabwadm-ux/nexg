@@ -1,6 +1,7 @@
 'use server';
 
 import { createPublicClient } from '@/lib/supabase/public';
+import { CAPTCHA_FAILED_MESSAGE, verifyTurnstile } from '@/lib/turnstile';
 
 export interface StayRequestResult {
   ok: boolean;
@@ -24,6 +25,8 @@ export interface StayRequestInput {
   notes: string | null;
   consent_marketing: boolean;
   source?: string;
+  /** Cloudflare Turnstile token, checked before anything is written. */
+  captchaToken?: string;
 }
 
 /**
@@ -36,6 +39,8 @@ export interface StayRequestInput {
  * answer is not a request.
  */
 export async function requestStay(input: StayRequestInput): Promise<StayRequestResult> {
+  if (!(await verifyTurnstile(input.captchaToken)))
+    return { ok: false, message: CAPTCHA_FAILED_MESSAGE };
   if (!input.phone?.trim() && !input.email?.trim()) {
     return {
       ok: false,
@@ -67,10 +72,12 @@ export async function requestStay(input: StayRequestInput): Promise<StayRequestR
 
   if (error) return { ok: false, message: error.message };
 
-  const result = data as { ok: boolean; reference: string } | null;
+  /* The request is also a support ticket now; its reference is the one the
+     desk works from, so that is the one the guest is given to quote. */
+  const result = data as { ok: boolean; reference: string; ticket_reference?: string } | null;
   return {
     ok: true,
     message: 'We will come back with a shortlist.',
-    reference: result?.reference,
+    reference: result?.ticket_reference ?? result?.reference,
   };
 }

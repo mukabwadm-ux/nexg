@@ -32,6 +32,7 @@ export function RiderShell({
   return (
     <ShellFrame
       label="Rider application"
+      signInHref="/riders/sign-in"
       step={step}
       totalSteps={5}
       minutesLeft={RIDER_STEPS.find((s) => s.step === step)?.minutes ?? 0}

@@ -185,6 +185,7 @@ const en: Dictionary = {
 
   // ── chrome
   'nav.explore': 'Explore',
+  'nav.discovery': 'Discovery',
   'nav.experience': 'Experience',
   'nav.experience.note': 'Build a day to your budget',
   'nav.stays': 'Stays',
@@ -206,6 +207,7 @@ const en: Dictionary = {
   'footer.terms': 'Terms',
   'footer.privacy': 'Privacy',
   'footer.cookies': 'Cookies',
+  'footer.dataProtection': 'Data Protection Policy',
   'footer.contact': 'Contact',
   'footer.language': 'Language',
 
@@ -356,6 +358,8 @@ const sw: Dictionary = {
 
   // ── menyu
   'nav.explore': 'Gundua',
+  // The page's name, kept as it is so it reads the same next to Explore.
+  'nav.discovery': 'Discovery',
   'nav.experience': 'Panga siku yako',
   'nav.experience.note': 'Jenga siku kulingana na bajeti yako',
   'nav.stays': 'Malazi',
@@ -377,6 +381,7 @@ const sw: Dictionary = {
   'footer.terms': 'Masharti',
   'footer.privacy': 'Faragha',
   'footer.cookies': 'Vidakuzi',
+  'footer.dataProtection': 'Sera ya Ulinzi wa Data',
   'footer.contact': 'Wasiliana nasi',
   'footer.language': 'Lugha',
 

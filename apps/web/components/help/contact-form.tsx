@@ -1,10 +1,11 @@
 'use client';
 
-import { Button, Card, Input, Select } from '@nexg/ui';
+import { Button, Card, Input, Select, getCaptchaToken } from '@nexg/ui';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import * as React from 'react';
 
 import { submitTicket } from '@/app/(customer)/help/actions';
+import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
 
 type Role = 'guest' | 'rider' | 'merchant' | 'hotel';
 
@@ -80,6 +81,7 @@ export function ContactForm() {
      * sent with a provider key that must never reach the browser.
      */
     const result = await submitTicket({
+      captchaToken: await getCaptchaToken(),
       body: String(form.get('body') ?? ''),
       fromRole: role,
       topic,
@@ -208,6 +210,14 @@ export function ContactForm() {
           We use these details only to answer you. See our{' '}
           <a href="/legal/privacy" className="text-ink font-bold underline underline-offset-2">
             Privacy Policy
+          </a>{' '}
+          and{' '}
+          <a
+            href={DATA_PROTECTION_POLICY_URL}
+            {...NEW_TAB}
+            className="text-ink font-bold underline underline-offset-2"
+          >
+            Data Protection Policy
           </a>
           .
         </p>

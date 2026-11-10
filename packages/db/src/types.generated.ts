@@ -3330,6 +3330,265 @@ export type Database = {
         };
         Relationships: [];
       };
+      api_connection: {
+        Row: {
+          auth_header: string | null;
+          auth_type: string;
+          base_url: string | null;
+          contact_email: string | null;
+          contact_name: string | null;
+          created_at: string;
+          created_by: string | null;
+          enabled: boolean;
+          environment: string;
+          id: string;
+          key: string;
+          kind: string;
+          last_test_detail: string | null;
+          last_test_ms: number | null;
+          last_test_ok: boolean | null;
+          last_test_status: number | null;
+          last_tested_at: string | null;
+          merchant_id: string | null;
+          name: string;
+          notes: string | null;
+          secret_ref: string | null;
+          sort: number;
+          status: string;
+          test_path: string;
+          updated_at: string;
+          webhook_secret_ref: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          auth_header?: string | null;
+          auth_type?: string;
+          base_url?: string | null;
+          contact_email?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          enabled?: boolean;
+          environment: string;
+          id?: string;
+          key: string;
+          kind: string;
+          last_test_detail?: string | null;
+          last_test_ms?: number | null;
+          last_test_ok?: boolean | null;
+          last_test_status?: number | null;
+          last_tested_at?: string | null;
+          merchant_id?: string | null;
+          name: string;
+          notes?: string | null;
+          secret_ref?: string | null;
+          sort?: number;
+          status?: string;
+          test_path?: string;
+          updated_at?: string;
+          webhook_secret_ref?: string | null;
+        };
+        Update: {
+          auth_header?: string | null;
+          auth_type?: string;
+          base_url?: string | null;
+          contact_email?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          enabled?: boolean;
+          environment?: string;
+          id?: string;
+          key?: string;
+          kind?: string;
+          last_test_detail?: string | null;
+          last_test_ms?: number | null;
+          last_test_ok?: boolean | null;
+          last_test_status?: number | null;
+          last_tested_at?: string | null;
+          merchant_id?: string | null;
+          name?: string;
+          notes?: string | null;
+          secret_ref?: string | null;
+          sort?: number;
+          status?: string;
+          test_path?: string;
+          updated_at?: string;
+          webhook_secret_ref?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_connection_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      api_connection_test: {
+        Row: {
+          connection_id: string;
+          detail: string | null;
+          finished_at: string | null;
+          id: string;
+          latency_ms: number | null;
+          ok: boolean | null;
+          request_id: number | null;
+          started_at: string;
+          status_code: number | null;
+          tested_by: string | null;
+          url: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          connection_id: string;
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: string;
+          latency_ms?: number | null;
+          ok?: boolean | null;
+          request_id?: number | null;
+          started_at?: string;
+          status_code?: number | null;
+          tested_by?: string | null;
+          url: string;
+        };
+        Update: {
+          connection_id?: string;
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: string;
+          latency_ms?: number | null;
+          ok?: boolean | null;
+          request_id?: number | null;
+          started_at?: string;
+          status_code?: number | null;
+          tested_by?: string | null;
+          url?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_connection_test_connection_id_fkey';
+            columns: ['connection_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_connection';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_test_connection_id_fkey';
+            columns: ['connection_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_connection_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_test_tested_by_fkey';
+            columns: ['tested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       api_idempotency: {
         Row: {
           created_at: string;
@@ -6584,6 +6843,25 @@ export type Database = {
         };
         Relationships: [];
       };
+      category_tile_click: {
+        Row: {
+          clicks: number;
+          day: string;
+          tile: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          clicks?: number;
+          day?: string;
+          tile: string;
+        };
+        Update: {
+          clicks?: number;
+          day?: string;
+          tile?: string;
+        };
+        Relationships: [];
+      };
       city: {
         Row: {
           centre: unknown;
@@ -9431,6 +9709,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -9471,6 +9750,7 @@ export type Database = {
           ended_at?: string | null;
           hold_expires_at?: string | null;
           id?: string;
+          item_id?: string | null;
           merchant_id: string;
           notes?: string | null;
           pause_reason?: string | null;
@@ -9510,6 +9790,7 @@ export type Database = {
           ended_at?: string | null;
           hold_expires_at?: string | null;
           id?: string;
+          item_id?: string | null;
           merchant_id?: string;
           notes?: string | null;
           pause_reason?: string | null;
@@ -9650,6 +9931,27 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
           },
           {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
@@ -12864,6 +13166,7 @@ export type Database = {
           verified_at: string | null;
           verified_by: string | null;
           went_live_at: string | null;
+          workspace_profile: NonNullable<Json>;
         };
         ComputedFields: never;
         Insert: {
@@ -12911,6 +13214,7 @@ export type Database = {
           verified_at?: string | null;
           verified_by?: string | null;
           went_live_at?: string | null;
+          workspace_profile?: NonNullable<Json>;
         };
         Update: {
           areas?: string[];
@@ -12957,6 +13261,7 @@ export type Database = {
           verified_at?: string | null;
           verified_by?: string | null;
           went_live_at?: string | null;
+          workspace_profile?: NonNullable<Json>;
         };
         Relationships: [
           {
@@ -13157,6 +13462,122 @@ export type Database = {
           },
         ];
       };
+      host_document: {
+        Row: {
+          file_name: string;
+          host_id: string;
+          id: string;
+          kind: string;
+          mime: string;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          size_bytes: number;
+          status: string;
+          storage_path: string;
+          superseded_at: string | null;
+          uploaded_at: string;
+          uploaded_by: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          file_name: string;
+          host_id: string;
+          id?: string;
+          kind: string;
+          mime: string;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          size_bytes: number;
+          status?: string;
+          storage_path: string;
+          superseded_at?: string | null;
+          uploaded_at?: string;
+          uploaded_by: string;
+        };
+        Update: {
+          file_name?: string;
+          host_id?: string;
+          id?: string;
+          kind?: string;
+          mime?: string;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          size_bytes?: number;
+          status?: string;
+          storage_path?: string;
+          superseded_at?: string | null;
+          uploaded_at?: string;
+          uploaded_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_document_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+        ];
+      };
       host_invoice: {
         Row: {
           created_at: string;
@@ -13264,6 +13685,189 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'host_today_v';
             referencedColumns: ['host_id'];
+          },
+        ];
+      };
+      host_manual_finance: {
+        Row: {
+          amount_minor: number;
+          category: string;
+          created_at: string;
+          created_by: string;
+          description: string;
+          host_id: string;
+          id: string;
+          kind: string;
+          recorded_on: string;
+          reference: string;
+          status: string;
+          stay_id: string | null;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_minor: number;
+          category?: string;
+          created_at?: string;
+          created_by: string;
+          description?: string;
+          host_id: string;
+          id: string;
+          kind: string;
+          recorded_on: string;
+          reference?: string;
+          status?: string;
+          stay_id?: string | null;
+          unit_id: string;
+        };
+        Update: {
+          amount_minor?: number;
+          category?: string;
+          created_at?: string;
+          created_by?: string;
+          description?: string;
+          host_id?: string;
+          id?: string;
+          kind?: string;
+          recorded_on?: string;
+          reference?: string;
+          status?: string;
+          stay_id?: string | null;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_handoff_rule_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_manual_finance_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_readiness_v';
+            referencedColumns: ['unit_id'];
           },
         ];
       };
@@ -13977,6 +14581,154 @@ export type Database = {
           },
         ];
       };
+      host_unit_guide: {
+        Row: {
+          document: NonNullable<Json>;
+          published_id: string | null;
+          revision: number;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          document?: NonNullable<Json>;
+          published_id?: string | null;
+          revision?: number;
+          unit_id: string;
+        };
+        Update: {
+          document?: NonNullable<Json>;
+          published_id?: string | null;
+          revision?: number;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_handoff_rule_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_unit_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_unit_guide_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: true;
+            referencedRelation: 'unit_readiness_v';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
+      host_unit_guide_asset: {
+        Row: {
+          body: string;
+          digest: string;
+          id: string;
+          kind: string;
+          mime: string;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          body: string;
+          digest: string;
+          id?: string;
+          kind: string;
+          mime: string;
+          unit_id: string;
+        };
+        Update: {
+          body?: string;
+          digest?: string;
+          id?: string;
+          kind?: string;
+          mime?: string;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_unit_guide_asset_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_guide';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
+      host_unit_guide_version: {
+        Row: {
+          article_count: number | null;
+          document: NonNullable<Json>;
+          id: string;
+          published_at: string;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          article_count?: never;
+          document: NonNullable<Json>;
+          id?: string;
+          published_at?: string;
+          unit_id: string;
+        };
+        Update: {
+          article_count?: never;
+          document?: NonNullable<Json>;
+          id?: string;
+          published_at?: string;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_unit_guide_version_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_guide';
+            referencedColumns: ['unit_id'];
+          },
+        ];
+      };
       host_user: {
         Row: {
           accepted_at: string | null;
@@ -14069,6 +14821,255 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'host_today_v';
             referencedColumns: ['host_id'];
+          },
+        ];
+      };
+      host_workspace_data_share: {
+        Row: {
+          host_id: string;
+          request_id: string;
+          shared_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          host_id: string;
+          request_id: string;
+          shared_at?: string;
+        };
+        Update: {
+          host_id?: string;
+          request_id?: string;
+          shared_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_data_request_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'data_request';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_data_share_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_data_request_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      host_workspace_task: {
+        Row: {
+          assignee_id: string | null;
+          cadence: string;
+          checklist: string[];
+          comments: string;
+          completed_checks: string[];
+          created_by: string | null;
+          due_at: string;
+          evidence: string;
+          id: string;
+          inspection: boolean;
+          kind: string;
+          priority: string;
+          repeat_of: string | null;
+          status: string;
+          stay_id: string | null;
+          title: string;
+          unit_id: string;
+          updated_at: string;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          assignee_id?: string | null;
+          cadence?: string;
+          checklist?: string[];
+          comments?: string;
+          completed_checks?: string[];
+          created_by?: string | null;
+          due_at: string;
+          evidence?: string;
+          id: string;
+          inspection?: boolean;
+          kind: string;
+          priority?: string;
+          repeat_of?: string | null;
+          status?: string;
+          stay_id?: string | null;
+          title: string;
+          unit_id: string;
+          updated_at?: string;
+          version?: number;
+        };
+        Update: {
+          assignee_id?: string | null;
+          cadence?: string;
+          checklist?: string[];
+          comments?: string;
+          completed_checks?: string[];
+          created_by?: string | null;
+          due_at?: string;
+          evidence?: string;
+          id?: string;
+          inspection?: boolean;
+          kind?: string;
+          priority?: string;
+          repeat_of?: string | null;
+          status?: string;
+          stay_id?: string | null;
+          title?: string;
+          unit_id?: string;
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_workspace_task_repeat_of_fkey';
+            columns: ['repeat_of'];
+            isOneToOne: true;
+            referencedRelation: 'host_workspace_task';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_handoff_rule_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_unit_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_view_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_unit_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_handoff_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_context_v';
+            referencedColumns: ['unit_id'];
+          },
+          {
+            foreignKeyName: 'host_workspace_task_unit_id_fkey';
+            columns: ['unit_id'];
+            isOneToOne: false;
+            referencedRelation: 'unit_readiness_v';
+            referencedColumns: ['unit_id'];
           },
         ];
       };
@@ -16254,6 +17255,193 @@ export type Database = {
           },
         ];
       };
+      merchant_agreement: {
+        Row: {
+          created_at: string;
+          id: string;
+          path: string;
+          published_on: string;
+          sha256: string;
+          title: string;
+          version: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id: string;
+          path: string;
+          published_on: string;
+          sha256: string;
+          title: string;
+          version: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          path?: string;
+          published_on?: string;
+          sha256?: string;
+          title?: string;
+          version?: string;
+        };
+        Relationships: [];
+      };
+      merchant_agreement_acceptance: {
+        Row: {
+          accepted_at: string;
+          accepted_by: string | null;
+          agreement_id: string;
+          category: string;
+          id: string;
+          merchant_id: string;
+          version: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          accepted_at?: string;
+          accepted_by?: string | null;
+          agreement_id: string;
+          category: string;
+          id?: string;
+          merchant_id: string;
+          version: string;
+        };
+        Update: {
+          accepted_at?: string;
+          accepted_by?: string | null;
+          agreement_id?: string;
+          category?: string;
+          id?: string;
+          merchant_id?: string;
+          version?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_agreement_id_version_fkey';
+            columns: ['agreement_id', 'version'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_agreement';
+            referencedColumns: ['id', 'version'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_agreement_category: {
+        Row: {
+          agreement_id: string;
+          category: string;
+          interim: boolean;
+        };
+        ComputedFields: never;
+        Insert: {
+          agreement_id: string;
+          category: string;
+          interim?: boolean;
+        };
+        Update: {
+          agreement_id?: string;
+          category?: string;
+          interim?: boolean;
+        };
+        Relationships: [];
+      };
       merchant_application: {
         Row: {
           approved_revision: number | null;
@@ -18342,6 +19530,172 @@ export type Database = {
           },
           {
             foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_promotion: {
+        Row: {
+          catalogue_item_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          ends_at: string | null;
+          id: string;
+          kind: string;
+          merchant_id: string;
+          name: string;
+          starts_at: string;
+          status: string;
+          updated_at: string;
+          value: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          kind: string;
+          merchant_id: string;
+          name: string;
+          starts_at?: string;
+          status?: string;
+          updated_at?: string;
+          value: number;
+        };
+        Update: {
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          kind?: string;
+          merchant_id?: string;
+          name?: string;
+          starts_at?: string;
+          status?: string;
+          updated_at?: string;
+          value?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
@@ -22864,6 +24218,7 @@ export type Database = {
           provider_ref: string | null;
           reference: string;
           state: Database['public']['Enums']['payment_state'];
+          stay_id: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -22892,6 +24247,7 @@ export type Database = {
           provider_ref?: string | null;
           reference: string;
           state?: Database['public']['Enums']['payment_state'];
+          stay_id?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -22919,6 +24275,7 @@ export type Database = {
           provider_ref?: string | null;
           reference?: string;
           state?: Database['public']['Enums']['payment_state'];
+          stay_id?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -23216,6 +24573,20 @@ export type Database = {
             referencedRelation: 'rider_jobs_v';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'payment_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'payment_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
         ];
       };
       payment_event: {
@@ -23325,6 +24696,63 @@ export type Database = {
             columns: ['disabled_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      payment_prompt: {
+        Row: {
+          checkout_request_id: string;
+          id: string;
+          last_queried_at: string | null;
+          merchant_request_id: string | null;
+          outcome: string | null;
+          payment_id: string;
+          phone: string | null;
+          receipt: string | null;
+          resolved_at: string | null;
+          resolved_via: string | null;
+          result_code: number | null;
+          result_desc: string | null;
+          sent_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          checkout_request_id: string;
+          id?: string;
+          last_queried_at?: string | null;
+          merchant_request_id?: string | null;
+          outcome?: string | null;
+          payment_id: string;
+          phone?: string | null;
+          receipt?: string | null;
+          resolved_at?: string | null;
+          resolved_via?: string | null;
+          result_code?: number | null;
+          result_desc?: string | null;
+          sent_at?: string;
+        };
+        Update: {
+          checkout_request_id?: string;
+          id?: string;
+          last_queried_at?: string | null;
+          merchant_request_id?: string | null;
+          outcome?: string | null;
+          payment_id?: string;
+          phone?: string | null;
+          receipt?: string | null;
+          resolved_at?: string | null;
+          resolved_via?: string | null;
+          result_code?: number | null;
+          result_desc?: string | null;
+          sent_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payment_prompt_payment_id_fkey';
+            columns: ['payment_id'];
+            isOneToOne: false;
+            referencedRelation: 'payment';
             referencedColumns: ['id'];
           },
         ];
@@ -23993,6 +25421,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -24003,6 +25432,7 @@ export type Database = {
           point: unknown;
           slug: string;
           summary: string | null;
+          unlisted_by_staff_at: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -24019,6 +25449,7 @@ export type Database = {
           floors?: number | null;
           host_id: string;
           id?: string;
+          is_sample?: boolean;
           kind?: Database['public']['Enums']['property_kind'];
           listed?: boolean;
           listed_at?: string | null;
@@ -24029,6 +25460,7 @@ export type Database = {
           point?: unknown;
           slug: string;
           summary?: string | null;
+          unlisted_by_staff_at?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -24044,6 +25476,7 @@ export type Database = {
           floors?: number | null;
           host_id?: string;
           id?: string;
+          is_sample?: boolean;
           kind?: Database['public']['Enums']['property_kind'];
           listed?: boolean;
           listed_at?: string | null;
@@ -24054,6 +25487,7 @@ export type Database = {
           point?: unknown;
           slug?: string;
           summary?: string | null;
+          unlisted_by_staff_at?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -25654,6 +27088,80 @@ export type Database = {
           scanned_at?: string;
           session_id?: string | null;
           zone_id?: string | null;
+        };
+        Relationships: [];
+      };
+      receipt: {
+        Row: {
+          currency: string;
+          emailed_at: string | null;
+          id: string;
+          issued_at: string;
+          kind: string;
+          lines: NonNullable<Json>;
+          method: string | null;
+          method_ref: string | null;
+          number: string;
+          party_id: string;
+          party_type: string;
+          source_id: string;
+          source_type: string;
+          title: string;
+          total_cents: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          currency?: string;
+          emailed_at?: string | null;
+          id?: string;
+          issued_at?: string;
+          kind: string;
+          lines?: NonNullable<Json>;
+          method?: string | null;
+          method_ref?: string | null;
+          number: string;
+          party_id: string;
+          party_type: string;
+          source_id: string;
+          source_type: string;
+          title: string;
+          total_cents: number;
+        };
+        Update: {
+          currency?: string;
+          emailed_at?: string | null;
+          id?: string;
+          issued_at?: string;
+          kind?: string;
+          lines?: NonNullable<Json>;
+          method?: string | null;
+          method_ref?: string | null;
+          number?: string;
+          party_id?: string;
+          party_type?: string;
+          source_id?: string;
+          source_type?: string;
+          title?: string;
+          total_cents?: number;
+        };
+        Relationships: [];
+      };
+      receipt_counter: {
+        Row: {
+          last_value: number;
+          prefix: string;
+          year: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          last_value?: number;
+          prefix: string;
+          year: number;
+        };
+        Update: {
+          last_value?: number;
+          prefix?: string;
+          year?: number;
         };
         Relationships: [];
       };
@@ -29582,19 +31090,33 @@ export type Database = {
         Row: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
           external_ref_hash: string | null;
           guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -29604,19 +31126,33 @@ export type Database = {
         Insert: {
           check_in: string;
           check_out: string;
+          commission_kes?: number | null;
+          confirmation_sent_at?: string | null;
+          confirmed_at?: string | null;
           conflict_flagged?: boolean;
           created_at?: string;
           external_ref_hash?: string | null;
           guest_first_name?: string | null;
+          guest_user_id?: string | null;
+          hold_expires_at?: string | null;
           host_id: string;
+          host_share_kes?: number | null;
           id?: string;
           notes?: string | null;
+          paid_kes?: number | null;
           party_adults?: number;
           party_children?: number;
+          payment_reference?: string | null;
           phone?: string | null;
           property_id?: string | null;
           qr_link_sent_at?: string | null;
+          quote_total_kes?: number | null;
           rate_kes?: number | null;
+          refund_due_at?: string | null;
+          refund_note?: string | null;
+          refund_reference?: string | null;
+          refunded_at?: string | null;
+          refunded_by?: string | null;
           source?: string;
           status?: string;
           unit_id?: string | null;
@@ -29625,19 +31161,33 @@ export type Database = {
         Update: {
           check_in?: string;
           check_out?: string;
+          commission_kes?: number | null;
+          confirmation_sent_at?: string | null;
+          confirmed_at?: string | null;
           conflict_flagged?: boolean;
           created_at?: string;
           external_ref_hash?: string | null;
           guest_first_name?: string | null;
+          guest_user_id?: string | null;
+          hold_expires_at?: string | null;
           host_id?: string;
+          host_share_kes?: number | null;
           id?: string;
           notes?: string | null;
+          paid_kes?: number | null;
           party_adults?: number;
           party_children?: number;
+          payment_reference?: string | null;
           phone?: string | null;
           property_id?: string | null;
           qr_link_sent_at?: string | null;
+          quote_total_kes?: number | null;
           rate_kes?: number | null;
+          refund_due_at?: string | null;
+          refund_note?: string | null;
+          refund_reference?: string | null;
+          refunded_at?: string | null;
+          refunded_by?: string | null;
           source?: string;
           status?: string;
           unit_id?: string | null;
@@ -29743,6 +31293,13 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'stay_refunded_by_fkey';
+            columns: ['refunded_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
             foreignKeyName: 'stay_unit_id_fkey';
             columns: ['unit_id'];
             isOneToOne: false;
@@ -29825,6 +31382,7 @@ export type Database = {
           sent_at: string | null;
           source: string;
           status: Database['public']['Enums']['stay_request_status'];
+          ticket_id: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -29852,6 +31410,7 @@ export type Database = {
           sent_at?: string | null;
           source?: string;
           status?: Database['public']['Enums']['stay_request_status'];
+          ticket_id?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -29878,6 +31437,7 @@ export type Database = {
           sent_at?: string | null;
           source?: string;
           status?: Database['public']['Enums']['stay_request_status'];
+          ticket_id?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -29957,6 +31517,34 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'waitlist_city_v';
             referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_ticket_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_ticket_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_ticket_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'stay_request_ticket_id_fkey';
+            columns: ['ticket_id'];
+            isOneToOne: false;
+            referencedRelation: 'support_ticket';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -31735,6 +33323,242 @@ export type Database = {
       };
     };
     Views: {
+      api_connection_test_v: {
+        Row: {
+          connection_id: string | null;
+          detail: string | null;
+          finished_at: string | null;
+          id: string | null;
+          latency_ms: number | null;
+          ok: boolean | null;
+          started_at: string | null;
+          status_code: number | null;
+          url: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          connection_id?: string | null;
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: string | null;
+          latency_ms?: number | null;
+          ok?: boolean | null;
+          started_at?: string | null;
+          status_code?: number | null;
+          url?: string | null;
+        };
+        Update: {
+          connection_id?: string | null;
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: string | null;
+          latency_ms?: number | null;
+          ok?: boolean | null;
+          started_at?: string | null;
+          status_code?: number | null;
+          url?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_connection_test_connection_id_fkey';
+            columns: ['connection_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_connection';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_test_connection_id_fkey';
+            columns: ['connection_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_connection_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      api_connection_v: {
+        Row: {
+          auth_header: string | null;
+          auth_type: string | null;
+          base_url: string | null;
+          contact_email: string | null;
+          contact_name: string | null;
+          created_at: string | null;
+          enabled: boolean | null;
+          environment: string | null;
+          has_credential: boolean | null;
+          has_webhook_secret: boolean | null;
+          id: string | null;
+          key: string | null;
+          kind: string | null;
+          last_test_detail: string | null;
+          last_test_ms: number | null;
+          last_test_ok: boolean | null;
+          last_test_status: number | null;
+          last_tested_at: string | null;
+          merchant_id: string | null;
+          name: string | null;
+          notes: string | null;
+          sort: number | null;
+          status: string | null;
+          test_path: string | null;
+          updated_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          auth_header?: string | null;
+          auth_type?: string | null;
+          base_url?: string | null;
+          contact_email?: string | null;
+          contact_name?: string | null;
+          created_at?: string | null;
+          enabled?: boolean | null;
+          environment?: string | null;
+          has_credential?: never;
+          has_webhook_secret?: never;
+          id?: string | null;
+          key?: string | null;
+          kind?: string | null;
+          last_test_detail?: string | null;
+          last_test_ms?: number | null;
+          last_test_ok?: boolean | null;
+          last_test_status?: number | null;
+          last_tested_at?: string | null;
+          merchant_id?: string | null;
+          name?: string | null;
+          notes?: string | null;
+          sort?: number | null;
+          status?: string | null;
+          test_path?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          auth_header?: string | null;
+          auth_type?: string | null;
+          base_url?: string | null;
+          contact_email?: string | null;
+          contact_name?: string | null;
+          created_at?: string | null;
+          enabled?: boolean | null;
+          environment?: string | null;
+          has_credential?: never;
+          has_webhook_secret?: never;
+          id?: string | null;
+          key?: string | null;
+          kind?: string | null;
+          last_test_detail?: string | null;
+          last_test_ms?: number | null;
+          last_test_ok?: boolean | null;
+          last_test_status?: number | null;
+          last_tested_at?: string | null;
+          merchant_id?: string | null;
+          name?: string | null;
+          notes?: string | null;
+          sort?: number | null;
+          status?: string | null;
+          test_path?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       audit_activity_v: {
         Row: {
           action: string | null;
@@ -40217,17 +42041,24 @@ export type Database = {
         Row: {
           check_in: string | null;
           check_out: string | null;
+          commission_kes: number | null;
           conflict_flagged: boolean | null;
           guest_first_name: string | null;
+          hold_expired: boolean | null;
+          hold_expires_at: string | null;
           host_id: string | null;
+          host_share_kes: number | null;
           id: string | null;
           in_stay: boolean | null;
+          notes: string | null;
           orders: number | null;
+          paid_kes: number | null;
           party_adults: number | null;
           party_children: number | null;
           phone_masked: string | null;
           property_name: string | null;
           qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
           rate_kes: number | null;
           reviewed_at: string | null;
           scans: number | null;
@@ -43747,6 +45578,7 @@ export type Database = {
           description: string | null;
           from_rate_kes: number | null;
           id: string | null;
+          is_sample: boolean | null;
           kind: Database['public']['Enums']['property_kind'] | null;
           name: string | null;
           neighbourhood_note: string | null;
@@ -43840,6 +45672,7 @@ export type Database = {
           floor: string | null;
           handoff_arranged: boolean | null;
           id: string | null;
+          is_sample: boolean | null;
           label_public: string | null;
           max_guests: number | null;
           min_nights: number | null;
@@ -47311,6 +49144,10 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_booking_open_at: {
+        Args: { p_at: string; p_is_end?: boolean; p_merchant_id: string };
+        Returns: boolean;
+      };
       fn_build_plan: { Args: { p_plan_id: string }; Returns: undefined };
       fn_capability: { Args: { p_key: string }; Returns: Json };
       fn_cash_guard: { Args: { p_rider_id: string }; Returns: undefined };
@@ -47454,6 +49291,7 @@ export type Database = {
       };
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
+      fn_host_documents_missing: { Args: { p_host_id: string }; Returns: string[] };
       fn_integration_rotation_due: {
         Args: {
           i: Omit<
@@ -47463,7 +49301,17 @@ export type Database = {
         };
         Returns: boolean;
       };
+      fn_item_promo_price: {
+        Args: { p_at?: string; p_item_id: string; p_merchant_id: string; p_price_kes: number };
+        Returns: {
+          ends_at: string;
+          price_kes: number;
+          promotion_id: string;
+          promotion_name: string;
+        }[];
+      };
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
+      fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
       fn_match_deposit: {
@@ -47484,6 +49332,25 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'cash_deposit';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      fn_merchant_agreement_category: { Args: { p_merchant_id: string }; Returns: string };
+      fn_merchant_agreement_for_category: {
+        Args: { p_category: string };
+        Returns: {
+          created_at: string;
+          id: string;
+          path: string;
+          published_on: string;
+          sha256: string;
+          title: string;
+          version: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant_agreement';
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -47817,6 +49684,62 @@ export type Database = {
       };
       fn_qr_new_code: { Args: Record<PropertyKey, never>; Returns: string };
       fn_qr_scan_partition: { Args: { p_month: string }; Returns: string };
+      fn_receipt_email: { Args: { p_party_id: string; p_party_type: string }; Returns: string };
+      fn_receipt_for_deposit: { Args: { p_email?: boolean; p_id: string }; Returns: undefined };
+      fn_receipt_for_host_invoice: {
+        Args: { p_email?: boolean; p_id: string };
+        Returns: undefined;
+      };
+      fn_receipt_for_payment: {
+        Args: { p_email?: boolean; p_payment_id: string };
+        Returns: undefined;
+      };
+      fn_receipt_for_rider_payout: {
+        Args: { p_email?: boolean; p_id: string };
+        Returns: undefined;
+      };
+      fn_receipt_for_statement: { Args: { p_email?: boolean; p_id: string }; Returns: undefined };
+      fn_receipt_for_stay: { Args: { p_email?: boolean; p_stay_id: string }; Returns: undefined };
+      fn_receipt_issue: {
+        Args: {
+          p_email?: boolean;
+          p_issued_at?: string;
+          p_kind: string;
+          p_lines: Json;
+          p_method?: string;
+          p_method_ref?: string;
+          p_party_id: string;
+          p_party_type: string;
+          p_source_id: string;
+          p_source_type: string;
+          p_title: string;
+          p_total_cents: number;
+        };
+        Returns: {
+          currency: string;
+          emailed_at: string | null;
+          id: string;
+          issued_at: string;
+          kind: string;
+          lines: NonNullable<Json>;
+          method: string | null;
+          method_ref: string | null;
+          number: string;
+          party_id: string;
+          party_type: string;
+          source_id: string;
+          source_type: string;
+          title: string;
+          total_cents: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'receipt';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      fn_receipt_next_number: { Args: { p_prefix: string }; Returns: string };
       fn_refund_routes: { Args: { p_order_id: string }; Returns: Json };
       fn_render_featured_pitch: { Args: { p_payload: Json }; Returns: Json };
       fn_review_checks: { Args: { p_body: string; p_plan_id: string }; Returns: Json };
@@ -48002,6 +49925,17 @@ export type Database = {
           user_id: string;
         }[];
       };
+      fn_stay_commission_rate: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_stay_dates_check: {
+        Args: { p_check_in: string; p_check_out: string };
+        Returns: undefined;
+      };
+      fn_stay_occupies: { Args: { p_hold_expires_at: string; p_status: string }; Returns: boolean };
+      fn_stay_release_expired_holds: { Args: { p_unit_id?: string }; Returns: number };
+      fn_stay_window: {
+        Args: { p_check_in: string; p_check_out: string; p_unit_id: string };
+        Returns: unknown;
+      };
       fn_swap_options: {
         Args: { p_block_id: string };
         Returns: {
@@ -48018,6 +49952,7 @@ export type Database = {
       fn_tax_issue_order_compliant: { Args: { p_order_id: string }; Returns: number };
       fn_tax_next_number: { Args: { p_at?: string }; Returns: string };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
+      fn_unit_listing_ready: { Args: { p_unit_id: string }; Returns: boolean };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
       fn_wa_window: { Args: { p_conversation: string }; Returns: Json };
       fn_web_order_quote: { Args: { p_payload: Json }; Returns: Json };
@@ -48195,7 +50130,17 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_api_connection_clear_secret: { Args: { p_id: string; p_kind: string }; Returns: Json };
+      rpc_api_connection_save: { Args: { p: Json }; Returns: Json };
+      rpc_api_connection_set_enabled: { Args: { p_enabled: boolean; p_id: string }; Returns: Json };
+      rpc_api_connection_set_secret: {
+        Args: { p_id: string; p_kind: string; p_value: string };
+        Returns: Json;
+      };
+      rpc_api_connection_test: { Args: { p_id: string }; Returns: string };
+      rpc_api_connection_test_result: { Args: { p_test_id: string }; Returns: Json };
       rpc_api_key_revoke: { Args: { p_key_id: string; p_reason?: string }; Returns: boolean };
+      rpc_api_overview: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_approval_decide: {
         Args: { p_approve: boolean; p_note?: string; p_request_id: string };
         Returns: {
@@ -48461,6 +50406,22 @@ export type Database = {
         Returns: Json;
       };
       rpc_audit_verify_chain: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_best_sellers: {
+        Args: { p_city_slug?: string; p_limit?: number };
+        Returns: {
+          booking_id: string;
+          branch_name: string;
+          category: string;
+          item_id: string;
+          item_name: string;
+          merchant_id: string;
+          photo_path: string;
+          price_kes: number;
+          source: string;
+          trading_name: string;
+          units_sold: number;
+        }[];
+      };
       rpc_block_done: {
         Args: { p_block_id: string };
         Returns: {
@@ -48579,6 +50540,13 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_booking_open_times: {
+        Args: { p_date: string; p_minutes?: number; p_resource_id: string };
+        Returns: {
+          ends_at: string;
+          starts_at: string;
+        }[];
       };
       rpc_booking_set_status: {
         Args: { p_booking_id: string; p_status: Database['public']['Enums']['reservation_status'] };
@@ -48901,6 +50869,14 @@ export type Database = {
         };
       };
       rpc_category_config_save: { Args: { p_category: string; p_config: Json }; Returns: Json };
+      rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
+      rpc_category_tile_popularity: {
+        Args: { p_days?: number };
+        Returns: {
+          clicks: number;
+          tile: string;
+        }[];
+      };
       rpc_change_block: {
         Args: { p_block_id: string; p_note: string; p_patch: Json };
         Returns: {
@@ -49816,6 +51792,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -49864,6 +51841,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -49912,6 +51890,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -50011,6 +51990,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -50059,6 +52039,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -50141,6 +52122,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -50296,6 +52278,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -50344,6 +52327,7 @@ export type Database = {
           ended_at: string | null;
           hold_expires_at: string | null;
           id: string;
+          item_id: string | null;
           merchant_id: string;
           notes: string | null;
           pause_reason: string | null;
@@ -50547,6 +52531,54 @@ export type Database = {
       };
       rpc_hospitality_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_apply: { Args: { p_payload: Json }; Returns: Json };
+      rpc_host_document_add: {
+        Args: {
+          p_file_name: string;
+          p_host_id: string;
+          p_kind: string;
+          p_mime: string;
+          p_size_bytes: number;
+          p_storage_path: string;
+        };
+        Returns: string;
+      };
+      rpc_host_document_review: {
+        Args: { p_approve: boolean; p_document_id: string; p_reason?: string };
+        Returns: {
+          file_name: string;
+          host_id: string;
+          id: string;
+          kind: string;
+          mime: string;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          size_bytes: number;
+          status: string;
+          storage_path: string;
+          superseded_at: string | null;
+          uploaded_at: string;
+          uploaded_by: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'host_document';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_host_documents_submit: {
+        Args: { p_host_id: string };
+        Returns: Database['public']['Enums']['host_status'];
+      };
+      rpc_host_listing_photo_set: {
+        Args: { p_alt?: string; p_host_id: string; p_path: string; p_unit_id: string };
+        Returns: undefined;
+      };
+      rpc_host_manual_finance_record: {
+        Args: { p_entry: Json; p_host_id: string };
+        Returns: string;
+      };
       rpc_host_message_read: { Args: { p_conversation: string }; Returns: Json };
       rpc_host_message_reply: {
         Args: { p_body: string; p_conversation: string; p_idempotency_key?: string };
@@ -50775,6 +52807,7 @@ export type Database = {
           verified_at: string | null;
           verified_by: string | null;
           went_live_at: string | null;
+          workspace_profile: NonNullable<Json>;
         };
         SetofOptions: {
           from: '*';
@@ -50830,6 +52863,7 @@ export type Database = {
           verified_at: string | null;
           verified_by: string | null;
           went_live_at: string | null;
+          workspace_profile: NonNullable<Json>;
         };
         SetofOptions: {
           from: '*';
@@ -50837,6 +52871,77 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_host_workspace_data_share_options: {
+        Args: { p_request_id: string };
+        Returns: {
+          host_id: string;
+          host_name: string;
+          shared: boolean;
+        }[];
+      };
+      rpc_host_workspace_data_share_set: {
+        Args: { p_host_id: string; p_request_id: string; p_shared: boolean };
+        Returns: undefined;
+      };
+      rpc_host_workspace_guide_asset: { Args: { p_code?: string; p_id: string }; Returns: Json };
+      rpc_host_workspace_guide_asset_put: {
+        Args: {
+          p_base64: string;
+          p_kind: string;
+          p_mime: string;
+          p_revision: number;
+          p_unit_id: string;
+        };
+        Returns: number;
+      };
+      rpc_host_workspace_guide_commit: {
+        Args: {
+          p_action: string;
+          p_document: Json;
+          p_restore_id: string;
+          p_revision: number;
+          p_unit_id: string;
+        };
+        Returns: number;
+      };
+      rpc_host_workspace_package_cancel: {
+        Args: { p_host_id: string; p_order_id: string };
+        Returns: undefined;
+      };
+      rpc_host_workspace_photos_set: {
+        Args: { p_expected: Json; p_id: string; p_kind: string; p_photos: Json };
+        Returns: undefined;
+      };
+      rpc_host_workspace_profile_save: {
+        Args: { p_host_id: string; p_host_patch: Json; p_profile_patch: Json };
+        Returns: undefined;
+      };
+      rpc_host_workspace_published_guide: { Args: { p_code: string }; Returns: Json };
+      rpc_host_workspace_settings_activity: {
+        Args: { p_host_id: string };
+        Returns: {
+          action: string;
+          at: string;
+          id: number;
+          own: boolean;
+        }[];
+      };
+      rpc_host_workspace_shared_data_requests: {
+        Args: { p_host_id: string };
+        Returns: {
+          due_at: string;
+          fulfilled_at: string;
+          id: string;
+          kind: string;
+          received_at: string;
+          status: string;
+          verified: boolean;
+        }[];
+      };
+      rpc_host_workspace_task_save: {
+        Args: { p_id: string; p_patch?: Json; p_unit_id: string; p_version?: number };
+        Returns: undefined;
       };
       rpc_hotel_access_rule_publish: {
         Args: {
@@ -51344,6 +53449,11 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_merchant_agreement_accept: {
+        Args: { p_agreement_id: string; p_merchant_id: string; p_version: string };
+        Returns: Json;
+      };
+      rpc_merchant_agreement_status: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_application_operation_read: { Args: { p_operation_id: string }; Returns: Json };
       rpc_merchant_application_payout_read: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_application_payout_save: {
@@ -51724,12 +53834,30 @@ export type Database = {
         };
       };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_promotion_save: {
+        Args: {
+          p_ends_at: string;
+          p_item_id: string;
+          p_kind: string;
+          p_merchant_id: string;
+          p_name: string;
+          p_promotion_id: string;
+          p_starts_at: string;
+          p_value: number;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_promotion_set_status: {
+        Args: { p_promotion_id: string; p_status: string };
+        Returns: Json;
+      };
       rpc_merchant_rename_store: {
         Args: { p_address?: string; p_branch_id: string; p_name: string };
         Returns: Json;
       };
       rpc_merchant_request_featured: {
         Args: {
+          p_item_id?: string;
           p_merchant_id: string;
           p_note?: string;
           p_placement_id: string;
@@ -52649,6 +54777,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
+      rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_staff_avatar_set: { Args: { p_path: string }; Returns: string };
       rpc_my_staff_email_change: {
         Args: { p_current_password: string; p_new_email: string };
@@ -52816,8 +54945,23 @@ export type Database = {
         Args: { p_provider_ref: string; p_reference: string; p_url: string };
         Returns: Json;
       };
+      rpc_payment_bank_started: {
+        Args: {
+          p_checkout_url: string;
+          p_collection_id: string;
+          p_proof: string;
+          p_provider: string;
+          p_reference: string;
+        };
+        Returns: Json;
+      };
+      rpc_payment_bank_webhook: {
+        Args: { p_provider: string; p_raw_body: string; p_signature_header: string };
+        Returns: Json;
+      };
       rpc_payment_begin_featured: { Args: { p_booking_id: string }; Returns: Json };
       rpc_payment_begin_order: { Args: { p_order_id: string }; Returns: Json };
+      rpc_payment_begin_stay: { Args: { p_stay_id: string }; Returns: Json };
       rpc_payment_method_toggle: {
         Args: { p_enabled: boolean; p_key: string; p_reason: string };
         Returns: Json;
@@ -52835,6 +54979,14 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_payment_mpesa_open_prompts: {
+        Args: { p_reference: string };
+        Returns: {
+          amount_cents: number;
+          checkout_request_id: string;
+        }[];
+      };
+      rpc_payment_mpesa_prompt_wait: { Args: { p_reference: string }; Returns: Json };
       rpc_payment_mpesa_ready: { Args: { p_callback_secret: string }; Returns: boolean };
       rpc_payment_mpesa_sent: {
         Args: {
@@ -52908,6 +55060,17 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_promoted_prices: {
+        Args: { p_merchant_id: string };
+        Returns: {
+          catalogue_item_id: string;
+          ends_at: string;
+          price_kes: number;
+          promo_price_kes: number;
+          promotion_id: string;
+          promotion_name: string;
+        }[];
+      };
       rpc_property_delete: {
         Args: { p_confirm_name: string; p_property_id: string };
         Returns: Json;
@@ -52927,6 +55090,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -52937,6 +55101,7 @@ export type Database = {
           point: unknown;
           slug: string;
           summary: string | null;
+          unlisted_by_staff_at: string | null;
           updated_at: string;
         };
         SetofOptions: {
@@ -52961,6 +55126,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -52971,6 +55137,7 @@ export type Database = {
           point: unknown;
           slug: string;
           summary: string | null;
+          unlisted_by_staff_at: string | null;
           updated_at: string;
         };
         SetofOptions: {
@@ -52995,6 +55162,7 @@ export type Database = {
           floors: number | null;
           host_id: string;
           id: string;
+          is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
           listed: boolean;
           listed_at: string | null;
@@ -53005,6 +55173,7 @@ export type Database = {
           point: unknown;
           slug: string;
           summary: string | null;
+          unlisted_by_staff_at: string | null;
           updated_at: string;
         };
         SetofOptions: {
@@ -54414,6 +56583,7 @@ export type Database = {
         Args: { p_display_name: string; p_email: string; p_roles?: string[] };
         Returns: Json;
       };
+      rpc_staff_reset_credentials: { Args: { p_staff_id: string }; Returns: Json };
       rpc_staff_set_roles: { Args: { p_roles: string[]; p_staff_id: string }; Returns: string[] };
       rpc_staff_set_scope: {
         Args: { p_city_id?: string; p_expires_at?: string; p_staff_id: string };
@@ -54428,24 +56598,44 @@ export type Database = {
         Returns: Database['public']['Enums']['staff_status'];
       };
       rpc_staff_sign_out_everywhere: { Args: { p_staff_id: string }; Returns: number };
-      rpc_stay_cancel: {
-        Args: { p_reason?: string; p_stay_id: string };
+      rpc_stay_block: {
+        Args: {
+          p_from: string;
+          p_host_id: string;
+          p_note?: string;
+          p_to: string;
+          p_unit_id: string;
+        };
         Returns: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
           external_ref_hash: string | null;
           guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -54457,6 +56647,255 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_stay_cancel: {
+        Args: { p_reason?: string; p_stay_id: string };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_checkout_status: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_stay_confirm: {
+        Args: { p_reference?: string; p_stay_id: string };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_confirmation_sent: { Args: { p_stay_id: string }; Returns: boolean };
+      rpc_stay_hold: {
+        Args: { p_check_in: string; p_check_out: string; p_guest?: Json; p_unit_id: string };
+        Returns: Json;
+      };
+      rpc_stay_hold_release: {
+        Args: { p_stay_id: string };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_host_hold: {
+        Args: { p_host_id: string; p_hours: number; p_stay: Json };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_refund_record: {
+        Args: { p_note?: string; p_reference: string; p_stay_id: string };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_stay_refunds: {
+        Args: { p_show?: string };
+        Returns: {
+          check_in: string;
+          check_out: string;
+          guest_email: string;
+          guest_name: string;
+          host: string;
+          mpesa_receipt: string;
+          paid_kes: number;
+          payer_phone: string;
+          payment_reference: string;
+          property: string;
+          reason: string;
+          refund_due_at: string;
+          refund_note: string;
+          refund_reference: string;
+          refunded_at: string;
+          refunded_by: string;
+          stay_id: string;
+          unit: string;
+        }[];
       };
       rpc_stay_request_create: { Args: { p_payload: Json }; Returns: Json };
       rpc_stay_request_match: {
@@ -54516,6 +56955,7 @@ export type Database = {
           sent_at: string | null;
           source: string;
           status: Database['public']['Enums']['stay_request_status'];
+          ticket_id: string | null;
           updated_at: string;
         };
         SetofOptions: {
@@ -54525,24 +56965,53 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_search: {
+        Args: {
+          p_check_in: string;
+          p_check_out: string;
+          p_guests?: number;
+          p_property_id?: string;
+        };
+        Returns: {
+          nightly_rate_kes: number;
+          nights: number;
+          property_id: string;
+          total_kes: number;
+          unit_id: string;
+        }[];
+      };
       rpc_stay_upsert: {
         Args: { p_host_id: string; p_stay: Json; p_stay_id?: string };
         Returns: {
           check_in: string;
           check_out: string;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
           conflict_flagged: boolean;
           created_at: string;
           external_ref_hash: string | null;
           guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
           host_id: string;
+          host_share_kes: number | null;
           id: string;
           notes: string | null;
+          paid_kes: number | null;
           party_adults: number;
           party_children: number;
+          payment_reference: string | null;
           phone: string | null;
           property_id: string | null;
           qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
           source: string;
           status: string;
           unit_id: string | null;
@@ -54674,6 +57143,13 @@ export type Database = {
         Returns: Json;
       };
       rpc_translations_put: { Args: { p_locale: string; p_rows: Json }; Returns: number };
+      rpc_unit_busy: {
+        Args: { p_from: string; p_to: string; p_unit_id: string };
+        Returns: {
+          ends_on: string;
+          starts_on: string;
+        }[];
+      };
       rpc_unit_caretaker_confirm: { Args: { p_token?: string; p_unit_id: string }; Returns: Json };
       rpc_unit_caretaker_invite: { Args: { p_unit_id: string }; Returns: Json };
       rpc_unit_photos_set: {
@@ -55308,7 +57784,8 @@ export type Database = {
         | 'card'
         | 'charge_to_room'
         | 'cash_on_delivery'
-        | 'on_account';
+        | 'on_account'
+        | 'bank_transfer';
       order_payment_status:
         | 'pending'
         | 'authorised'
@@ -55337,7 +57814,7 @@ export type Database = {
         | 'paused'
         | 'suspended'
         | 'delisted';
-      payment_intent: 'order' | 'featured_slot' | 'rider_float';
+      payment_intent: 'order' | 'featured_slot' | 'rider_float' | 'stay';
       payment_state: 'pending' | 'authorised' | 'paid' | 'failed' | 'abandoned' | 'reversed';
       placement_kind: 'homepage' | 'category_top' | 'popular_request';
       plan_block_status: 'proposed' | 'confirmed' | 'changed' | 'unavailable' | 'removed' | 'done';
@@ -57115,6 +59592,7 @@ export const Constants = {
         'charge_to_room',
         'cash_on_delivery',
         'on_account',
+        'bank_transfer',
       ],
       order_payment_status: [
         'pending',
@@ -57147,7 +59625,7 @@ export const Constants = {
         'suspended',
         'delisted',
       ],
-      payment_intent: ['order', 'featured_slot', 'rider_float'],
+      payment_intent: ['order', 'featured_slot', 'rider_float', 'stay'],
       payment_state: ['pending', 'authorised', 'paid', 'failed', 'abandoned', 'reversed'],
       placement_kind: ['homepage', 'category_top', 'popular_request'],
       plan_block_status: ['proposed', 'confirmed', 'changed', 'unavailable', 'removed', 'done'],

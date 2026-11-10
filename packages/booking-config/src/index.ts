@@ -17,6 +17,14 @@ import {
   type SpecialistSetup,
 } from './specialists';
 import { listBookingProfiles as baseProfiles, getBookingProfile as baseProfile } from './profiles';
+export {
+  baseSubcategoryId,
+  subcategoryVariant,
+  SUBCATEGORY_VARIANTS,
+  VARIANT_REGISTRY_REVISION,
+  type SubcategoryVariant,
+} from './variants';
+import { VARIANT_BASE_REVISION } from './variants';
 import type {
   AuthorityBinding,
   BookingModel,
@@ -43,6 +51,15 @@ export {
 export const BOOKING_TIMEZONE = 'Africa/Nairobi' as const;
 export const BOOKING_CURRENCY = 'KES' as const;
 export const BOOKING_REGISTRY_REVISION = registry.revision;
+/**
+ * Every registry revision an application may have been captured under.
+ * Each one is a subset of the current registry, so a capture from any of
+ * them validates against it. New captures always use the current revision.
+ */
+export const BOOKING_REGISTRY_REVISIONS: readonly string[] = [
+  VARIANT_BASE_REVISION,
+  registry.revision,
+];
 
 const profileMap = new Map(registry.profiles.map((profile) => [profile.subcategoryId, profile]));
 const customProfiles = new Map<string, ProfileDefinition>();

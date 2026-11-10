@@ -1,3 +1,16 @@
+import offeringsConfig from '@/components/merchant/offerings/config.json';
+import { SUBCATEGORY_VARIANTS } from '@nexg/booking-config/variants';
+
+/** The audited 128 specialties plus the subcategory variants. */
+const PROFILE_COUNT = 128 + SUBCATEGORY_VARIANTS.length;
+/** The audited 193 profile/model bindings plus each variant's copy of its base's models. */
+const BINDING_COUNT =
+  193 +
+  SUBCATEGORY_VARIANTS.reduce(
+    (n, v) => n + offeringsConfig.profiles.find((p) => p.id === v.baseSubcategoryId)!.models.length,
+    0,
+  );
+
 import { describe, expect, it } from 'vitest';
 import { calendarItems, timeGridSegments, type CalendarItem } from './calendar';
 import { availableSchemas, extendOfferingProfiles, seedCatalogue } from '../offerings/model';
@@ -74,8 +87,8 @@ describe('Availability merchant decisions', () => {
         expect(p.models.includes(view.model)).toBe(true);
         rendered.push(p.id + ':' + view.model);
       }
-    expect(new Set(rendered.map((x) => x.split(':')[0])).size).toBe(128);
-    expect(new Set(rendered).size).toBe(193);
+    expect(new Set(rendered.map((x) => x.split(':')[0])).size).toBe(PROFILE_COUNT);
+    expect(new Set(rendered).size).toBe(BINDING_COUNT);
     const c = context('restaurant', 'SPACE_RESERVATION_V1');
     expect(() => resolveView(c.profile, c.offering, ['PRODUCT_CATALOG_V1'])).toThrow(
       'Availability setup unresolved',

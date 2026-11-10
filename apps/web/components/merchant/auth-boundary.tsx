@@ -45,7 +45,7 @@ export function MerchantAuthBoundary({
         if (expiryTimer) clearTimeout(expiryTimer);
         stopProtectedBrowserRequests();
         setEnded(true);
-        window.location.replace('/sign-in');
+        window.location.replace('/merchants/sign-in?reason=workspace-session');
       }
     };
     const armExpiry = (value: string) => {

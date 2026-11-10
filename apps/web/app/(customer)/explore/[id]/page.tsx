@@ -1,5 +1,5 @@
 import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
-import { Clock, Info, MapPin, MessageSquare, Store } from 'lucide-react';
+import { CalendarDays, Clock, Info, MapPin, MessageSquare, Store } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,13 +14,21 @@ import {
 import { CATEGORY_ICON, CATEGORY_LABEL, MerchantCard } from '@/components/explore/merchant-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import {
+  durationLabel,
+  priceLabel,
+  PUBLIC_RESOURCE_COLUMNS,
+  type PublicResource,
+} from '@/lib/booking/customer';
+import { loadPromotedPrices } from '@/lib/promotions';
 import { createPublicClient } from '@/lib/supabase/public';
 
 /*
- * Cached for an hour. A merchant's public details do not change between
- * page views, and re-querying them per request cost a round trip each time.
+ * Cached for a minute. Long enough to spare a round trip per view, short
+ * enough that a promotion starting or ending shows within a minute (checkout
+ * always charges the current price either way).
  */
-export const revalidate = 3600;
+export const revalidate = 60;
 
 const SELECT =
   'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at';
@@ -56,29 +64,39 @@ export default async function MerchantPage({ params }: { params: { id: string } 
 
   if (!merchant?.id || !merchant.trading_name) notFound();
 
-  const [{ data: nearby }, { data: sections }, { data: hours }] = await Promise.all([
-    supabase
-      .from('merchant_public')
-      .select(SELECT)
-      .eq('city_slug', merchant.city_slug ?? '')
-      .neq('id', merchant.id)
-      .limit(4),
-    /*
-     * The policy on these tables only returns rows for a live business, so
-     * nothing here has to re-check the status the page already relied on.
-     */
-    supabase
-      .from('catalogue_section')
-      .select(
-        'id, name, blurb, sort, catalogue_item(id, name, description, price_kes, available, age_restricted, highlighted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes)',
-      )
-      .eq('merchant_id', params.id)
-      .order('sort', { ascending: true }),
-    supabase
-      .from('merchant_hours')
-      .select('day_of_week, opens, closes, closed')
-      .eq('merchant_id', params.id),
-  ]);
+  const [{ data: nearby }, { data: sections }, { data: hours }, promotions, { data: bookable }] =
+    await Promise.all([
+      supabase
+        .from('merchant_public')
+        .select(SELECT)
+        .eq('city_slug', merchant.city_slug ?? '')
+        .neq('id', merchant.id)
+        .limit(4),
+      /*
+       * The policy on these tables only returns rows for a live business, so
+       * nothing here has to re-check the status the page already relied on.
+       */
+      supabase
+        .from('catalogue_section')
+        .select(
+          'id, name, blurb, sort, catalogue_item(id, name, description, price_kes, available, age_restricted, highlighted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes)',
+        )
+        .eq('merchant_id', params.id)
+        .order('sort', { ascending: true }),
+      supabase
+        .from('merchant_hours')
+        .select('day_of_week, opens, closes, closed')
+        .eq('merchant_id', params.id),
+      loadPromotedPrices(supabase, params.id),
+      // Only active resources of a live business are readable without signing in.
+      supabase
+        .from('bookable_resource')
+        .select(PUBLIC_RESOURCE_COLUMNS)
+        .eq('merchant_id', params.id)
+        .eq('active', true)
+        .order('created_at'),
+    ]);
+  const resources = (bookable ?? []) as unknown as PublicResource[];
 
   const catalogueItems = (sections ?? []).flatMap((section) => section.catalogue_item ?? []);
   const photoPaths = catalogueItems.flatMap((item) => (item.photo_path ? [item.photo_path] : []));
@@ -214,14 +232,16 @@ export default async function MerchantPage({ params }: { params: { id: string } 
 
         {/* --------------------------------------------------------- catalogue */}
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
-          <section aria-label="Catalogue">
+          <section aria-label="Catalogue" className="space-y-6">
+            {resources.length > 0 && <BookSection merchantId={merchant.id} resources={resources} />}
             {menu.length > 0 ? (
               <Catalogue
                 merchantId={merchant.id}
                 merchantName={merchant.trading_name}
                 sections={menu}
+                promotions={promotions}
               />
-            ) : (
+            ) : resources.length > 0 ? null : (
               <div className="border-border bg-surface rounded-2xl border p-6 sm:p-8">
                 <span
                   aria-hidden="true"
@@ -307,5 +327,57 @@ export default async function MerchantPage({ params }: { params: { id: string } 
 
       <SiteFooter />
     </>
+  );
+}
+
+function BookSection({
+  merchantId,
+  resources,
+}: {
+  merchantId: string;
+  resources: PublicResource[];
+}) {
+  return (
+    <div id="book" className="border-border bg-surface rounded-2xl border p-5 sm:p-6">
+      <div className="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className="bg-gold/15 text-ink flex h-10 w-10 items-center justify-center rounded-xl"
+        >
+          <CalendarDays className="h-5 w-5" />
+        </span>
+        <div>
+          <h2 className="text-xl font-extrabold tracking-tight">Book a time</h2>
+          <p className="text-muted text-[0.8125rem] font-semibold">
+            Pick a time that suits you. You pay at the venue.
+          </p>
+        </div>
+      </div>
+      <ul className="divide-border mt-4 divide-y">
+        {resources.map((r) => {
+          const length = durationLabel(r.duration_minutes);
+          return (
+            <li key={r.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+              <span className="min-w-0">
+                <span className="block text-[0.9375rem] font-extrabold">{r.name}</span>
+                {r.description && (
+                  <span className="text-muted block text-[0.8125rem] leading-[1.6]">
+                    {r.description}
+                  </span>
+                )}
+                <span className="text-muted block text-[0.75rem] font-bold">
+                  {priceLabel(r)}
+                  {length && ` · ${length}`}
+                  {r.model === 'capacity' && ' · Set sessions'}
+                </span>
+              </span>
+              <Button asChild size="sm" className="shrink-0">
+                <Link href={`/book/${merchantId}?resource=${r.id}`}>Book</Link>
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }

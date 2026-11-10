@@ -1,0 +1,20 @@
+{
+  "name": "@nexg/bank-sandbox",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NexG Sandbox Bank: a stand-in bank for testing pay-by-bank at checkout. No real money moves.",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "tsx": "4.20.6"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.9",
+    "typescript": "5.7.2"
+  }
+}
