@@ -10,6 +10,7 @@ export const TABS = [
   { key: 'cities', label: 'Cities & coverage' },
   { key: 'fees', label: 'Fees & dispatch' },
   { key: 'payments', label: 'Payments & integrations' },
+  { key: 'api', label: 'API' },
   { key: 'notifications', label: 'Notifications & templates' },
   { key: 'emails', label: 'Email routing' },
   { key: 'branding', label: 'Branding & legal' },
@@ -33,6 +34,11 @@ export const TAB_COPY: Record<string, { title: string; subtitle: string }> = {
   payments: {
     title: 'Payments & integrations',
     subtitle: 'How money comes in and goes out, and every external service NexG depends on',
+  },
+  api: {
+    title: 'API',
+    subtitle:
+      'Banks, merchant systems and other APIs NexG connects to, in sandbox and live · test each connection · how the NexG API works',
   },
   notifications: {
     title: 'Notifications & templates',
