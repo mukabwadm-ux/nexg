@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Smartphone } from 'lucide-react';
+import { CreditCard, Landmark, Loader2, RotateCw, Smartphone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -10,25 +10,42 @@ import * as React from 'react';
  * Retrying never charges twice by accident: the server reuses the open
  * payment, refuses a new prompt within a minute of the last one, and keeps
  * every prompt, so whichever one the guest answers is the one that counts.
+ *
+ * Modes:
+ *   waiting  a prompt is out; offer to send it again (quietly).
+ *   expired  a prompt went unanswered long enough that Safaricom has dropped
+ *            it (cancelled, timed out, or never arrived); offer a new prompt
+ *            up front, and the bank when one is connected.
+ *   failed   the attempt failed or was cancelled; every way to pay again.
+ *   start    nothing has been sent to a provider yet; every way to pay.
+ *
+ * Card is offered only after a failed attempt and only when Paystack is
+ * connected: starting a card payment while an M-Pesa prompt is still open
+ * would reuse that open payment.
  */
 export function RetryPayment({
   orderId,
   mode,
   defaultPhone,
   bankEnabled = false,
+  cardReady = false,
 }: {
   orderId: string;
-  /** "failed" offers to pay again; "waiting" offers to resend the prompt. */
-  mode: 'failed' | 'waiting';
+  mode: 'waiting' | 'expired' | 'failed' | 'start';
   defaultPhone?: string | null;
   /** Offer paying from a bank account (when a bank is connected). */
   bankEnabled?: boolean;
+  /** Offer card (when Paystack is connected). */
+  cardReady?: boolean;
 }) {
   const router = useRouter();
-  const [open, setOpen] = React.useState(mode === 'failed');
+  const [open, setOpen] = React.useState(mode !== 'waiting');
   const [phone, setPhone] = React.useState(defaultPhone ?? '');
   const [busy, setBusy] = React.useState<'mpesa' | 'card' | 'bank' | null>(null);
   const [message, setMessage] = React.useState<string | null>(null);
+
+  const offerCard = (mode === 'failed' || mode === 'start') && cardReady;
+  const offerBank = mode !== 'waiting' && bankEnabled;
 
   async function mpesa(event: React.FormEvent) {
     event.preventDefault();
@@ -59,47 +76,23 @@ export function RetryPayment({
     }
   }
 
-  async function card() {
+  async function redirectTo(kind: 'card' | 'bank') {
     setMessage(null);
-    setBusy('card');
+    setBusy(kind);
     try {
-      const res = await fetch('/api/payments/paystack/start', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderId }),
-      });
-      const body = (await res.json()) as {
-        ok: boolean;
-        message?: string;
-        authorization_url?: string;
-      };
-      if (!body.ok || !body.authorization_url) {
-        setMessage(body.message ?? 'Card payment could not start. Try M-Pesa instead.');
-        return;
-      }
-      window.location.href = body.authorization_url;
-    } catch {
-      setMessage('No connection. Check your internet and try again; nothing was charged.');
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  async function bank() {
-    setMessage(null);
-    setBusy('bank');
-    try {
-      const res = await fetch('/api/payments/bank/start', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderId }),
-      });
+      const res = await fetch(
+        kind === 'card' ? '/api/payments/paystack/start' : '/api/payments/bank/start',
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ orderId }),
+        },
+      );
       const body = (await res.json()) as {
         ok: boolean;
         message?: string;
         reference?: string;
         authorization_url?: string;
-        paid?: boolean;
       };
       if (body.ok && body.authorization_url) {
         window.location.href = body.authorization_url;
@@ -110,7 +103,12 @@ export function RetryPayment({
         router.refresh();
         return;
       }
-      setMessage(body.message ?? 'Paying by bank could not start. Try M-Pesa instead.');
+      setMessage(
+        body.message ??
+          (kind === 'card'
+            ? 'Card payment could not start. Try M-Pesa instead.'
+            : 'Paying by bank could not start. Try M-Pesa instead.'),
+      );
     } catch {
       setMessage('No connection. Check your internet and try again; nothing was charged.');
     } finally {
@@ -118,23 +116,31 @@ export function RetryPayment({
     }
   }
 
+  const outline =
+    'border-border text-ink enabled:hover:border-ink focus-visible:ring-gold inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-[0.8125rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50';
+
   if (!open) {
     return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="text-muted hover:text-ink mt-4 text-[0.8125rem] font-bold underline"
-      >
-        No prompt on your phone? Send it again
-      </button>
+      <div className="mt-6">
+        <button type="button" onClick={() => setOpen(true)} className={outline}>
+          <RotateCw aria-hidden="true" className="h-4 w-4" />
+          No prompt on your phone? Send it again
+        </button>
+      </div>
     );
   }
 
   return (
-    <div className="border-border mt-5 rounded-xl border p-4">
-      <p className="text-ink flex items-center gap-2 text-[0.9375rem] font-extrabold">
-        <Smartphone aria-hidden="true" className="h-4 w-4" />
-        {mode === 'failed' ? 'Pay again with M-Pesa' : 'Send the M-Pesa prompt again'}
+    <div className="border-border mt-7 border-t pt-6">
+      <h2 className="text-base font-extrabold">
+        {mode === 'waiting'
+          ? 'Send the prompt again'
+          : mode === 'start'
+            ? 'Pay with M-Pesa'
+            : 'Try again with M-Pesa'}
+      </h2>
+      <p className="text-muted mt-1 text-[0.8125rem] font-semibold">
+        We send a new prompt to this number. Check it is right, then enter your PIN on your phone.
       </p>
       <form onSubmit={(event) => void mpesa(event)} className="mt-3 flex flex-wrap gap-2">
         <label className="sr-only" htmlFor="retry-phone">
@@ -148,41 +154,62 @@ export function RetryPayment({
           placeholder="0712 345 678"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="border-border bg-surface focus:border-gold min-w-0 flex-1 rounded-xl border px-3.5 py-2.5 text-sm font-semibold outline-none"
+          className="border-border bg-surface focus:border-gold min-w-0 flex-1 basis-48 rounded-full border px-4 py-2.5 text-sm font-semibold outline-none"
         />
         <button
           type="submit"
           disabled={busy !== null}
-          className="bg-gold text-ink hover:bg-gold/90 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold disabled:opacity-50"
+          className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
         >
-          {busy === 'mpesa' && <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />}
-          {mode === 'failed' ? 'Pay with M-Pesa' : 'Send prompt'}
+          {busy === 'mpesa' ? (
+            <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+          ) : (
+            <Smartphone aria-hidden="true" className="h-4 w-4" />
+          )}
+          Send new prompt
         </button>
       </form>
-      {mode === 'failed' && (
-        <button
-          type="button"
-          disabled={busy !== null}
-          onClick={() => void card()}
-          className="text-ink mt-3 inline-flex items-center gap-2 text-[0.8125rem] font-bold underline disabled:opacity-50"
-        >
-          {busy === 'card' && <Loader2 aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />}
-          Pay by card instead
-        </button>
+
+      {(offerCard || offerBank) && (
+        <div className="mt-5">
+          <p className="text-[0.8125rem] font-extrabold">Or pay another way</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {offerCard && (
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => void redirectTo('card')}
+                className={outline}
+              >
+                {busy === 'card' ? (
+                  <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CreditCard aria-hidden="true" className="h-4 w-4" />
+                )}
+                Pay by card
+              </button>
+            )}
+            {offerBank && (
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => void redirectTo('bank')}
+                className={outline}
+              >
+                {busy === 'bank' ? (
+                  <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Landmark aria-hidden="true" className="h-4 w-4" />
+                )}
+                Pay from your bank
+              </button>
+            )}
+          </div>
+        </div>
       )}
-      {mode === 'failed' && bankEnabled && (
-        <button
-          type="button"
-          disabled={busy !== null}
-          onClick={() => void bank()}
-          className="text-ink ml-4 mt-3 inline-flex items-center gap-2 text-[0.8125rem] font-bold underline disabled:opacity-50"
-        >
-          {busy === 'bank' && <Loader2 aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />}
-          Pay from your bank instead
-        </button>
-      )}
+
       {message && (
-        <p role="alert" className="text-danger mt-3 text-[0.8125rem] font-semibold">
+        <p role="alert" className="text-danger mt-3 text-[0.8125rem] font-bold">
           {message}
         </p>
       )}
