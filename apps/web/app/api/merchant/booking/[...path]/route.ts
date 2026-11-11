@@ -1,3 +1,4 @@
+import { legacyBookingState } from '../../../../../lib/booking/board-data';
 import {
   bookingEngineConfigured,
   bookingEngineEnabledForMerchant,
@@ -12,6 +13,7 @@ import {
 } from '../../../../../lib/booking/identity';
 import { merchantBookingBootstrapIdentity } from '../../../../../lib/booking/onboarding-bootstrap';
 import { MerchantAccessError } from '../../../../../lib/merchant-access';
+import { createClient } from '../../../../../lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -42,7 +44,26 @@ async function route(request: Request, context: { params: { path: string[] } }) 
       'Activate this business before accepting or changing booking work.',
       'activation_required',
     );
-  if (request.method === 'POST' && context.params.path.join('/') === 'bootstrap') {
+  const path = context.params.path.join('/');
+  if (
+    process.env.NODE_ENV === 'production' &&
+    bookingEngineEnabledForMerchant(identity.businessId, process.env) &&
+    ((request.method === 'PUT' && path === 'configuration') ||
+      (request.method === 'POST' && path === 'bookings'))
+  ) {
+    if (!sameOriginMutation(request))
+      return problem(403, 'Open this action from your NEXG portal.', 'origin_mismatch');
+    const legacy = await legacyBookingState(createClient(), identity.businessId);
+    if (legacy === 'unavailable')
+      return problem(503, 'Existing bookings could not be checked.', 'legacy_booking_unavailable');
+    if (legacy === 'legacy')
+      return problem(
+        409,
+        'Manage existing resources and bookings in the Bookings board before opening new engine intake.',
+        'legacy_booking_in_use',
+      );
+  }
+  if (request.method === 'POST' && path === 'bootstrap') {
     if (!sameOriginMutation(request))
       return problem(403, 'Use this site to initialize booking setup.', 'invalid_origin');
     try {

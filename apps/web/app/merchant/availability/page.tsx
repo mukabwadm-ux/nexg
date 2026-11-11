@@ -4,7 +4,7 @@ import type { DayHours } from '@/components/merchant/availability/model';
 import { weekFromSaved } from '@/components/merchant/availability/saved-hours';
 import { profiles } from '@/components/merchant/offerings/model';
 import { bookingEngineEnabledForMerchant } from '@/lib/booking/bridge';
-import { loadBookingBoard } from '@/lib/booking/board-data';
+import { legacyBookingState, loadBookingBoard } from '@/lib/booking/board-data';
 import { loadApplicationView } from '@/lib/merchant-application-load';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
@@ -24,7 +24,10 @@ export default async function MerchantAvailabilityPage({
   const client = createClient();
   const canEdit = merchant.access.state !== 'legacy' && merchant.access.setup;
   const now = new Date().toISOString();
-  const engine = bookingEngineEnabledForMerchant(merchant.id, process.env);
+  const engine =
+    bookingEngineEnabledForMerchant(merchant.id, process.env) &&
+    (process.env.NODE_ENV !== 'production' ||
+      (await legacyBookingState(client, merchant.id)) === 'clear');
   const [saved, application, overrides, readOnlyWeek, board] = await Promise.all([
     canEdit ? loadSetupHours() : null,
     canEdit ? loadApplicationView(client, merchant.id, { includePayout: false }) : null,

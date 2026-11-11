@@ -11,6 +11,35 @@ export interface BookingBoardData {
   slots: Slot[];
 }
 
+export async function legacyBookingState(
+  client: unknown,
+  merchantId: string,
+): Promise<'clear' | 'legacy' | 'unavailable'> {
+  const db = client as SupabaseClient;
+  try {
+    const [resources, bookings] = await Promise.all([
+      db
+        .from('bookable_resource')
+        .select('id')
+        .eq('merchant_id', merchantId)
+        .eq('active', true)
+        .limit(1),
+      db
+        .from('booking')
+        .select('id')
+        .eq('merchant_id', merchantId)
+        .in('status', ['pending', 'confirmed', 'blocked'])
+        .gt('ends_at', new Date().toISOString())
+        .limit(1),
+    ]);
+    if (resources.error || bookings.error || !resources.data || !bookings.data)
+      return 'unavailable';
+    return resources.data.length || bookings.data.length ? 'legacy' : 'clear';
+  } catch {
+    return 'unavailable';
+  }
+}
+
 /**
  * What the bookings board shows: the merchant's bookable resources, bookings
  * from the last week on, and upcoming slots. Read from the main database, so

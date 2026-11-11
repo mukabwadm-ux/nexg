@@ -111,20 +111,17 @@ It should return `{"ready":true,"engine":"Payload Reserve",...}`. Every other pa
 
 In the production Vercel web project, set `BOOKING_ENGINE_URL` to `https://<BOOKING_DOMAIN>` and
 `BOOKING_BRIDGE_SECRET` to the booking service's matching secret. Keep both in server-only
-environment variables. With the connection configured, `BOOKING_ENGINE_MERCHANT_IDS` controls the
-production rollout as a comma-separated list of Supabase merchant IDs.
+environment variables. The bridge uses each merchant's existing Supabase UUID as its business ID.
 
-1. Check the engine's HTTPS health and verify a signed read before adding a merchant.
-2. For each merchant, account for future Supabase reservations and transfer or retire the corresponding
-   legacy resources before opening engine intake. The public engine catalog refuses new intake while
-   active Supabase resources remain. Existing Supabase bookings are managed in `/merchant/bookings`.
-3. Add the merchant ID, redeploy, and have an authorized merchant owner import setup in
-   `/merchant/calendar` and publish the offerings. Verify the calendar and the public catalog for that
-   merchant. Other merchants continue using the Supabase booking flow.
+1. Check the engine's HTTPS health and verify a signed read.
+2. Redeploy the website. The portal uses the existing Bookings board while a merchant has active
+   Supabase resources or outstanding reservations. Past Supabase bookings remain in
+   `/merchant/bookings`.
+3. Have an eligible merchant owner import setup in `/merchant/calendar` and publish the offerings.
+   Verify the calendar and the public catalog for that merchant. Customer engine intake requires a
+   live merchant and no active Supabase booking resources.
 4. Check `/explore/<merchant-id>` and the consumer app merchant page. They link to
    `/book/<merchant-id>` once the shared public catalog has a published offering.
-
-Keep enrolled merchants in the rollout while they have bookings that customers still need to manage.
 
 ## Day to day
 

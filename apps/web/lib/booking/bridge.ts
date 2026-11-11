@@ -12,6 +12,8 @@ export interface BookingIdentity {
 }
 
 export const MAX_BOOKING_BODY_BYTES = 64 * 1024;
+export const MERCHANT_BOOKING_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Anonymous actors have separate signed sessions; booking tokens still control records. */
 export function bookingCustomerSession(
@@ -170,12 +172,7 @@ export function bookingEngineEnabledForMerchant(
   env: Record<string, string | undefined>,
 ) {
   if (!bookingEngineConfigured(env)) return false;
-  if (env.NODE_ENV !== 'production') return true;
-  return (
-    env.BOOKING_ENGINE_MERCHANT_IDS?.split(',').some(
-      (id) => id.trim().toLowerCase() === merchantId.toLowerCase(),
-    ) ?? false
-  );
+  return env.NODE_ENV !== 'production' || MERCHANT_BOOKING_ID.test(merchantId);
 }
 
 export function localBookingSandboxEnabled(

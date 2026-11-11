@@ -40,6 +40,7 @@ describe('public booking proxy publication', () => {
     },
   );
   it('forwards a published merchant catalog through the existing customer identity', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
     mock.access.mockResolvedValue('available');
     mock.forward.mockResolvedValue(Response.json({ business: { id: businessId }, offerings: [] }));
     const response = await GET(
@@ -49,16 +50,5 @@ describe('public booking proxy publication', () => {
     expect(await response.json()).toEqual({ business: { id: businessId }, offerings: [] });
     expect(response.headers.get('set-cookie')).toContain('nexg_booking_session=');
     expect(mock.forward.mock.calls[0]?.[2]).toMatchObject({ businessId, role: 'customer' });
-  });
-  it('keeps the public engine API closed to merchants outside the production rollout', async () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('BOOKING_ENGINE_MERCHANT_IDS', '12345678-1234-4234-8234-123456789abd');
-    const response = await GET(
-      new Request(`https://merchant.test/api/public/booking/${businessId}/catalog`),
-      { params: { businessId, path: ['catalog'] } },
-    );
-    expect(response.status).toBe(404);
-    expect(mock.forward).not.toHaveBeenCalled();
-    expect(response.headers.get('set-cookie')).toBeNull();
   });
 });

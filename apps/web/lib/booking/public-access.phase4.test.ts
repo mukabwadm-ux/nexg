@@ -12,7 +12,6 @@ beforeEach(() => {
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'public-test-key');
   vi.stubEnv('NODE_ENV', 'production');
   vi.stubEnv('NEXG_BOOKING_SANDBOX', '');
-  vi.stubEnv('BOOKING_ENGINE_MERCHANT_IDS', '');
   result = { data: { id: merchantId, status: 'live' }, error: null };
   legacyResult = { data: [], error: null };
   mock.createClient.mockReset();
@@ -61,7 +60,6 @@ describe('public booking publication', () => {
   it('blocks new engine intake while a production merchant still offers Supabase resources', async () => {
     vi.stubEnv('BOOKING_ENGINE_URL', 'https://booking.example.test');
     vi.stubEnv('BOOKING_BRIDGE_SECRET', 's'.repeat(40));
-    vi.stubEnv('BOOKING_ENGINE_MERCHANT_IDS', merchantId);
     await expect(publicMerchantBookingAccess(request(), merchantId)).resolves.toBe('available');
     legacyResult.data = [{ id: 'old-resource' }];
     await expect(publicMerchantBookingAccess(request(), merchantId)).resolves.toBe('not_found');
