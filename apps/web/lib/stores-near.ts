@@ -85,11 +85,19 @@ export function rankStores(
     near.sort((a, b) => Number(isOpen(b)) - Number(isOpen(a)) || a.km! - b.km!);
   }
 
+  /* The rest still carry their distance when there is a spot and a pin, so
+     a card can say how far away it is even when it is not near. */
   const taken = new Set(near.map((s) => s.id));
   const rest: RankedStore[] = stores
     .filter((s) => !taken.has(s.id))
     .sort(cityOrder)
-    .map((s) => ({ ...s, km: null }));
+    .map((s) => ({
+      ...s,
+      km:
+        spot && s.branch_latitude != null && s.branch_longitude != null
+          ? kmBetween(spot, { lat: s.branch_latitude, lng: s.branch_longitude })
+          : null,
+    }));
 
   const shown = near.slice(0, STORES_MAX);
   const topUp = Math.max(0, STORES_MIN - shown.length);
