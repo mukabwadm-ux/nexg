@@ -117,7 +117,7 @@ export function PopularCategories({
               onClick={() => recordTap(item.tile)}
               className="focus-visible:ring-gold group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
-              <span className="shadow-card bg-surface relative block aspect-square overflow-hidden rounded-2xl">
+              <span className="shadow-card bg-surface relative block aspect-square overflow-hidden rounded-full">
                 <Image
                   src={item.imageUrl || `/images/categories/${item.image}.jpg`}
                   alt=""
