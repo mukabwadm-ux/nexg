@@ -1,5 +1,5 @@
 import { Button, EmptyState } from '@nexg/ui';
-import { MapPin, Store } from 'lucide-react';
+import { Store } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,6 +14,7 @@ import {
 import { CategoryScroller } from '@/components/explore/category-scroller';
 import { FilterRail, type FilterState } from '@/components/explore/filter-rail';
 import { SiteFooter } from '@/components/site-footer';
+import { BrowsingBar } from '@/components/location/browsing-bar';
 import { ExploreFollowsLocation } from '@/components/location/explore-sync';
 import { SiteHeader } from '@/components/site-header';
 import { unstable_cache } from 'next/cache';
@@ -294,29 +295,7 @@ export default async function ExplorePage({
          * the prices belong to. The chip owns the delivery
          * address everywhere; this switches the listing.
          */}
-        <div className="border-border bg-surface flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border px-4 py-3">
-          <MapPin aria-hidden="true" className="text-gold h-4 w-4 shrink-0" />
-          <span className="text-muted-light text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
-            Browsing
-          </span>
-          <span className="text-[0.875rem] font-extrabold">{cityName}</span>
-          <span className="ml-auto flex flex-wrap gap-1.5">
-            {(cities ?? []).map((city) => (
-              <Link
-                key={city.slug}
-                href={hrefFor({ city: city.slug, area: null, zone: null })}
-                aria-current={city.slug === citySlug ? 'true' : undefined}
-                className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${
-                  city.slug === citySlug
-                    ? 'bg-ink text-white'
-                    : 'text-muted hover:bg-bg hover:text-ink'
-                }`}
-              >
-                {city.name}
-              </Link>
-            ))}
-          </span>
-        </div>
+        <BrowsingBar citySlug={citySlug} />
 
         <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
           <div>
