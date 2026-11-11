@@ -300,259 +300,270 @@ export default async function ExplorePage({
     <>
       <SiteHeader />
 
-      <main className="mx-auto max-w-[120rem] px-4 pb-16 pt-6 sm:px-[30px]">
-        {/* Keeps ?city= in step with the chip, so changing the
+      {/* Dark page, cream panels, gold accents; a warm glow in the top-right. */}
+      <div className="relative overflow-hidden bg-[#0b0907] text-white">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#E5B32A]/15 blur-3xl"
+        />
+        <main className="relative mx-auto max-w-[120rem] px-4 pb-20 pt-8 sm:px-[30px]">
+          {/* Keeps ?city= in step with the chip, so changing the
             delivery address re-queries this listing without a
             reload. */}
-        <ExploreFollowsLocation />
+          <ExploreFollowsLocation />
 
-        {/*
-         * Which city is being browsed — not where the order is
-         * going. Those are different questions and this used to
-         * answer both, under the same words the header chip
-         * uses.
-         *
-         * Two controls labelled "Deliver to", each with its own
-         * state, is how a guest ends up browsing Mombasa with a
-         * Nairobi pin in the header and no way to tell which one
-         * the prices belong to. The chip owns the delivery
-         * address everywhere; this switches the listing.
-         */}
-        <BrowsingBar citySlug={citySlug} />
+          {/*
+           * Which city is being browsed — not where the order is
+           * going. Those are different questions and this used to
+           * answer both, under the same words the header chip
+           * uses.
+           *
+           * Two controls labelled "Deliver to", each with its own
+           * state, is how a guest ends up browsing Mombasa with a
+           * Nairobi pin in the header and no way to tell which one
+           * the prices belong to. The chip owns the delivery
+           * address everywhere; this switches the listing.
+           */}
+          <BrowsingBar citySlug={citySlug} />
 
-        <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-              What can we bring you{' '}
-              <span className="text-gold">
-                <TimeOfDayPhrase initial={timeOfDay(nairobiHour())} />?
-              </span>
-            </h1>
-            <p className="text-muted mt-3 max-w-xl text-[0.9375rem] font-semibold leading-[1.7]">
+          <h1 className="mt-12 text-4xl font-extrabold tracking-tight sm:text-5xl lg:mt-14 lg:text-[4rem]/[1.1]">
+            What can we bring you{' '}
+            <span className="text-gold">
+              <TimeOfDayPhrase initial={timeOfDay(nairobiHour())} />?
+            </span>
+          </h1>
+          {/* The lede on the left and the search on the right, on one row. */}
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-6">
+            <p className="max-w-xl text-base leading-[1.75] text-white/60 sm:text-lg">
               Merchants that deliver to {cityName} right now. Pick one, or ask a concierge and we’ll
               find it.
             </p>
+
+            {/* A GET form, so the result is a shareable URL and it works with
+              JavaScript off. */}
+            <form action="/explore" className="flex w-full max-w-xl gap-3">
+              <input type="hidden" name="city" value={citySlug} />
+              {state.category && <input type="hidden" name="category" value={state.category} />}
+              {state.zone && <input type="hidden" name="zone" value={state.zone} />}
+              <input
+                type="search"
+                name="q"
+                defaultValue={searchParams?.q ?? ''}
+                aria-label="Search merchants"
+                placeholder="Search merchants"
+                className="text-ink placeholder:text-muted-light focus-visible:ring-gold h-12 min-w-0 flex-1 rounded-xl border-0 bg-[#FAF7F0] px-5 text-base focus-visible:outline-none focus-visible:ring-2"
+              />
+              <button
+                type="submit"
+                className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold h-12 shrink-0 rounded-xl px-7 text-base font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0907]"
+              >
+                Search
+              </button>
+            </form>
           </div>
 
-          {/* A GET form, so the result is a shareable URL and it works with
-              JavaScript off. */}
-          <form action="/explore" className="flex w-full max-w-sm gap-2">
-            <input type="hidden" name="city" value={citySlug} />
-            {state.category && <input type="hidden" name="category" value={state.category} />}
-            {state.zone && <input type="hidden" name="zone" value={state.zone} />}
-            <input
-              type="search"
-              name="q"
-              defaultValue={searchParams?.q ?? ''}
-              aria-label="Search merchants"
-              placeholder="Search merchants"
-              className="border-border bg-surface focus-visible:ring-gold min-w-0 flex-1 rounded-xl border px-4 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2"
-            />
-            <Button type="submit" size="sm">
-              Search
-            </Button>
-          </form>
-        </div>
-
-        {/* Categories */}
-        <h2 className="mt-8 text-lg font-extrabold tracking-tight">Browse by category</h2>
-        <CategoryScroller className="mt-3" itemClass="[&>li]:w-[5.5rem]">
-          {[{ key: null as string | null, label: 'All', Icon: Store }]
-            .concat(
-              usedCategories.map((category) => ({
-                key: category,
-                label: categoriesById.get(category)?.label ?? CATEGORY_LABEL[category] ?? category,
-                Icon:
-                  CATEGORY_ICON[category] ??
-                  CATEGORY_ICON_BY_NAME[categoriesById.get(category)?.icon ?? ''] ??
-                  Store,
-              })),
-            )
-            .map(({ key, label, Icon }) => {
-              const on = state.category === key;
-              return (
-                <li key={key ?? 'all'}>
-                  <Link
-                    href={hrefFor({ category: on ? null : key })}
-                    aria-current={on ? 'true' : undefined}
-                    className="group flex flex-col items-center gap-2 text-center"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={`flex h-16 w-16 items-center justify-center rounded-full border-2 transition-colors ${
-                        on
-                          ? 'border-gold bg-ink text-gold'
-                          : 'border-border bg-surface text-muted group-hover:border-gold'
-                      }`}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </span>
-                    <span
-                      className={`text-[0.6875rem] leading-tight ${on ? 'text-ink font-extrabold' : 'text-muted font-bold'}`}
-                    >
-                      {label}
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-        </CategoryScroller>
-
-        {/* Concierge picks */}
-        {picks.length > 0 && !state.category && !state.area && !query && (
-          <section className="mt-10">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="flex items-center gap-2.5 text-2xl font-extrabold tracking-tight">
-                <span
-                  aria-hidden="true"
-                  className="bg-gold text-ink flex h-8 w-8 items-center justify-center rounded-full text-sm"
-                >
-                  ★
-                </span>
-                Concierge picks for {cityName}
-              </h2>
-              <Link
-                href={hrefFor({ picksOnly: true })}
-                className="text-ink text-sm font-bold underline underline-offset-4"
-              >
-                See all picks
-              </Link>
-            </div>
-
-            <ul className="mt-5 grid gap-4 md:grid-cols-3">
-              {picks.map((pick) => {
-                const pickCategory = pick.category_key ?? pick.category ?? 'other';
-                const Icon =
-                  CATEGORY_ICON[pickCategory] ??
-                  CATEGORY_ICON_BY_NAME[pick.category_icon_name ?? ''] ??
-                  Store;
+          {/* Categories */}
+          <h2 className="mt-12 text-xl font-extrabold tracking-tight">Browse by category</h2>
+          <CategoryScroller className="mt-5" itemClass="[&>li]:w-[6.5rem]">
+            {[{ key: null as string | null, label: 'All', Icon: Store }]
+              .concat(
+                usedCategories.map((category) => ({
+                  key: category,
+                  label:
+                    categoriesById.get(category)?.label ?? CATEGORY_LABEL[category] ?? category,
+                  Icon:
+                    CATEGORY_ICON[category] ??
+                    CATEGORY_ICON_BY_NAME[categoriesById.get(category)?.icon ?? ''] ??
+                    Store,
+                })),
+              )
+              .map(({ key, label, Icon }) => {
+                const on = state.category === key;
                 return (
-                  <li key={pick.id}>
+                  <li key={key ?? 'all'}>
                     <Link
-                      href={`/explore/${pick.id}`}
-                      className="bg-ink relative flex h-56 flex-col justify-end overflow-hidden rounded-2xl p-5 text-white"
+                      href={hrefFor({ category: on ? null : key })}
+                      aria-current={on ? 'true' : undefined}
+                      className="group flex flex-col items-center gap-2 text-center"
                     >
-                      {pick.cover_photo_path ? (
-                        <Image
-                          src={pick.cover_photo_path}
-                          alt=""
-                          fill
-                          sizes="(min-width: 768px) 33vw, 100vw"
-                          className="object-cover opacity-55"
-                        />
-                      ) : (
-                        <Icon
-                          aria-hidden="true"
-                          className="text-gold/15 absolute right-4 top-4 h-24 w-24"
-                        />
-                      )}
-                      <span className="bg-gold text-ink absolute left-4 top-4 rounded-full px-2.5 py-1 text-[0.5625rem] font-extrabold uppercase tracking-[0.12em]">
-                        Concierge pick
+                      <span
+                        aria-hidden="true"
+                        className={`flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full transition-all ${
+                          on
+                            ? 'bg-gold text-ink ring-4 ring-[#E5B32A]/25'
+                            : 'text-ink bg-[#FAF7F0] group-hover:ring-2 group-hover:ring-[#E5B32A]/60'
+                        }`}
+                      >
+                        <Icon className="h-6 w-6" />
                       </span>
-                      <span className="relative">
-                        <span className="block text-[1.375rem] font-extrabold tracking-tight">
-                          {pick.trading_name}
-                        </span>
-                        <span className="mt-1 block text-xs font-semibold text-white/60">
-                          {pick.category_label ?? CATEGORY_LABEL[pickCategory] ?? pickCategory}
-                          {pick.branch_name && ` · ${pick.branch_name}`}
-                        </span>
+                      <span
+                        className={`text-xs leading-tight ${on ? 'font-extrabold text-white' : 'font-semibold text-white/60 group-hover:text-white'}`}
+                      >
+                        {label}
                       </span>
                     </Link>
                   </li>
                 );
               })}
-            </ul>
-          </section>
-        )}
+          </CategoryScroller>
 
-        {/* Listing */}
-        <div className="mt-10 grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start">
-          <FilterRail state={state} areas={areas} hrefFor={hrefFor} />
+          {/* Concierge picks */}
+          {picks.length > 0 && !state.category && !state.area && !query && (
+            <section className="mt-10">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="flex items-center gap-2.5 text-2xl font-extrabold tracking-tight">
+                  <span
+                    aria-hidden="true"
+                    className="bg-gold text-ink flex h-8 w-8 items-center justify-center rounded-full text-sm"
+                  >
+                    ★
+                  </span>
+                  Concierge picks for {cityName}
+                </h2>
+                <Link
+                  href={hrefFor({ picksOnly: true })}
+                  className="text-gold text-sm font-bold underline underline-offset-4"
+                >
+                  See all picks
+                </Link>
+              </div>
 
-          <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-[0.9375rem] font-bold">
-                {visible.length} {visible.length === 1 ? 'merchant delivers' : 'merchants deliver'}{' '}
-                {near
-                  ? 'to your spot'
-                  : selectedZone
-                    ? `in ${selectedZone.name}`
-                    : `to ${cityName}`}{' '}
-                right now
-              </p>
-              {near && (
-                <Link
-                  href={hrefFor({ near: null })}
-                  className="text-muted-light hover:text-ink text-xs font-bold transition-colors"
-                >
-                  Show all in {cityName}
-                </Link>
-              )}
-              {query && (
-                <Link
-                  href={hrefFor({ q: null })}
-                  className="text-muted-light hover:text-ink text-xs font-bold transition-colors"
-                >
-                  Clear “{searchParams?.q}”
-                </Link>
+              <ul className="mt-5 grid gap-4 md:grid-cols-3">
+                {picks.map((pick) => {
+                  const pickCategory = pick.category_key ?? pick.category ?? 'other';
+                  const Icon =
+                    CATEGORY_ICON[pickCategory] ??
+                    CATEGORY_ICON_BY_NAME[pick.category_icon_name ?? ''] ??
+                    Store;
+                  return (
+                    <li key={pick.id}>
+                      <Link
+                        href={`/explore/${pick.id}`}
+                        className="bg-ink relative flex h-56 flex-col justify-end overflow-hidden rounded-2xl p-5 text-white"
+                      >
+                        {pick.cover_photo_path ? (
+                          <Image
+                            src={pick.cover_photo_path}
+                            alt=""
+                            fill
+                            sizes="(min-width: 768px) 33vw, 100vw"
+                            className="object-cover opacity-55"
+                          />
+                        ) : (
+                          <Icon
+                            aria-hidden="true"
+                            className="text-gold/15 absolute right-4 top-4 h-24 w-24"
+                          />
+                        )}
+                        <span className="bg-gold text-ink absolute left-4 top-4 rounded-full px-2.5 py-1 text-[0.5625rem] font-extrabold uppercase tracking-[0.12em]">
+                          Concierge pick
+                        </span>
+                        <span className="relative">
+                          <span className="block text-[1.375rem] font-extrabold tracking-tight">
+                            {pick.trading_name}
+                          </span>
+                          <span className="mt-1 block text-xs font-semibold text-white/60">
+                            {pick.category_label ?? CATEGORY_LABEL[pickCategory] ?? pickCategory}
+                            {pick.branch_name && ` · ${pick.branch_name}`}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+
+          {/* Listing */}
+          <div className="mt-12 grid gap-7 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start">
+            <FilterRail state={state} areas={areas} hrefFor={hrefFor} />
+
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-base font-bold text-white">
+                  {visible.length}{' '}
+                  {visible.length === 1 ? 'merchant delivers' : 'merchants deliver'}{' '}
+                  {near
+                    ? 'to your spot'
+                    : selectedZone
+                      ? `in ${selectedZone.name}`
+                      : `to ${cityName}`}{' '}
+                  right now
+                </p>
+                {near && (
+                  <Link
+                    href={hrefFor({ near: null })}
+                    className="text-xs font-bold text-white/60 transition-colors hover:text-white"
+                  >
+                    Show all in {cityName}
+                  </Link>
+                )}
+                {query && (
+                  <Link
+                    href={hrefFor({ q: null })}
+                    className="text-xs font-bold text-white/60 transition-colors hover:text-white"
+                  >
+                    Clear “{searchParams?.q}”
+                  </Link>
+                )}
+              </div>
+
+              {visible.length === 0 ? (
+                <div className="mt-6">
+                  <EmptyState
+                    icon={<Store className="h-5 w-5" />}
+                    title={near ? 'Nobody near you yet' : 'Nothing matches that yet'}
+                    description={
+                      near
+                        ? `No business within ${NEAR_KM} km of your spot fits that yet. See everything in ${cityName}, or ask the concierge — plenty of what guests want never comes from a listing.`
+                        : selectedZone
+                          ? `No merchants are listed in ${selectedZone.name} just yet. Try another zone or ask the concierge — plenty of what guests want never comes from a listing.`
+                          : 'No business here fits those filters. Try another area or category — or ask the concierge, since plenty of what guests want never comes from a listing.'
+                    }
+                    action={{
+                      label: near || selectedZone ? `See all in ${cityName}` : 'Clear filters',
+                      href: hrefFor({
+                        category: near ? state.category : null,
+                        area: null,
+                        zone: null,
+                        openNow: false,
+                        picksOnly: false,
+                        q: null,
+                        near: null,
+                      }),
+                    }}
+                  />
+                </div>
+              ) : (
+                <ul className="mt-5 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {visible.map((merchant) => (
+                    <MerchantCard
+                      key={merchant.id}
+                      merchant={merchant as ExploreMerchant}
+                      deliveryRate={deliveryRate}
+                    />
+                  ))}
+                </ul>
               )}
             </div>
-
-            {visible.length === 0 ? (
-              <div className="mt-6">
-                <EmptyState
-                  icon={<Store className="h-5 w-5" />}
-                  title={near ? 'Nobody near you yet' : 'Nothing matches that yet'}
-                  description={
-                    near
-                      ? `No business within ${NEAR_KM} km of your spot fits that yet. See everything in ${cityName}, or ask the concierge — plenty of what guests want never comes from a listing.`
-                      : selectedZone
-                        ? `No merchants are listed in ${selectedZone.name} just yet. Try another zone or ask the concierge — plenty of what guests want never comes from a listing.`
-                        : 'No business here fits those filters. Try another area or category — or ask the concierge, since plenty of what guests want never comes from a listing.'
-                  }
-                  action={{
-                    label: near || selectedZone ? `See all in ${cityName}` : 'Clear filters',
-                    href: hrefFor({
-                      category: near ? state.category : null,
-                      area: null,
-                      zone: null,
-                      openNow: false,
-                      picksOnly: false,
-                      q: null,
-                      near: null,
-                    }),
-                  }}
-                />
-              </div>
-            ) : (
-              <ul className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {visible.map((merchant) => (
-                  <MerchantCard
-                    key={merchant.id}
-                    merchant={merchant as ExploreMerchant}
-                    deliveryRate={deliveryRate}
-                  />
-                ))}
-              </ul>
-            )}
           </div>
-        </div>
 
-        <section className="bg-gold text-ink mt-12 flex flex-wrap items-center justify-between gap-6 rounded-2xl p-8 sm:p-10">
-          <div className="max-w-xl">
-            <h2 className="text-[1.75rem] font-extrabold leading-tight tracking-tight">
-              Own a business guests would love?
-            </h2>
-            <p className="text-ink/80 mt-2 text-[0.9375rem] font-semibold">
-              Join the merchants on this page. No listing fee, our riders, weekly payouts.
-            </p>
-          </div>
-          <Button variant="black" size="lg" asChild className="h-14 shrink-0 rounded-xl">
-            <Link href="/merchants/apply">Register Your Business</Link>
-          </Button>
-        </section>
-      </main>
+          <section className="bg-gold text-ink mt-12 flex flex-wrap items-center justify-between gap-6 rounded-2xl p-8 sm:p-10">
+            <div className="max-w-xl">
+              <h2 className="text-[1.75rem] font-extrabold leading-tight tracking-tight">
+                Own a business guests would love?
+              </h2>
+              <p className="text-ink/80 mt-2 text-[0.9375rem] font-semibold">
+                Join the merchants on this page. No listing fee, our riders, weekly payouts.
+              </p>
+            </div>
+            <Button variant="black" size="lg" asChild className="h-14 shrink-0 rounded-xl">
+              <Link href="/merchants/apply">Register Your Business</Link>
+            </Button>
+          </section>
+        </main>
+      </div>
 
       <SiteFooter />
     </>
