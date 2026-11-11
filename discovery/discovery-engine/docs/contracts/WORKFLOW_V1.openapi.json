@@ -1,0 +1,5004 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NexG V1 required workflow owner-port contract annex",
+    "version": "1.0.0-draft",
+    "description": "Platform integration requirements, not Discovery Engine endpoints or a new service mandate. Proposed normalized HTTP binding only; owners may adapt existing reviewed routes. Real owners retain identities, ledgers, allocation, charges and provisioning. Schema examples use placeholders only."
+  },
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "servers": [
+    {
+      "url": "/api/workflows/v1",
+      "description": "Illustrative normalized owner binding only; engine never mounts command routes"
+    }
+  ],
+  "security": [
+    {
+      "OwnerSession": []
+    }
+  ],
+  "paths": {
+    "/capabilities": {
+      "get": {
+        "operationId": "readWorkflowCapabilities",
+        "summary": "readWorkflowCapabilities",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "merchantId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "offeringId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "security": [],
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/entitlement-plans/{planId}": {
+      "get": {
+        "operationId": "readEntitlementPlan",
+        "summary": "readEntitlementPlan",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "planId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitlementPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/entitlements/{entitlementId}": {
+      "get": {
+        "operationId": "readPrivateEntitlement",
+        "summary": "readPrivateEntitlement",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "entitlementId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entitlement"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/resources/availability": {
+      "post": {
+        "operationId": "queryResourceAvailability",
+        "summary": "queryResourceAvailability",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Availability"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvailabilityRequest"
+              }
+            }
+          }
+        },
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/series/preview": {
+      "post": {
+        "operationId": "previewFiniteSeries",
+        "summary": "previewFiniteSeries",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesPreview"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesPreviewRequest"
+              }
+            }
+          }
+        },
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/telecom-products/{productId}": {
+      "get": {
+        "operationId": "readTelecomProduct",
+        "summary": "readTelecomProduct",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelecomProduct"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/recipients/validations": {
+      "post": {
+        "operationId": "validatePrivateRecipientHandoff",
+        "summary": "validatePrivateRecipientHandoff",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipientValidation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipientValidationRequest"
+              }
+            }
+          }
+        },
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/quotes": {
+      "post": {
+        "operationId": "quoteWorkflowIntent",
+        "summary": "quoteWorkflowIntent",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "description": "Owner-scoped single-intent key; changed payload is a 409. Never generate a new key to recover an uncertain outcome."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quote"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteRequest"
+              }
+            }
+          }
+        },
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/holds": {
+      "post": {
+        "operationId": "holdQuotedScope",
+        "summary": "holdQuotedScope",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "description": "Owner-scoped single-intent key; changed payload is a 409. Never generate a new key to recover an uncertain outcome."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Hold"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HoldRequest"
+              }
+            }
+          }
+        },
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/holds/{holdId}/release": {
+      "post": {
+        "operationId": "releaseOwnerHold",
+        "summary": "releaseOwnerHold",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "holdId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "description": "Owner-scoped single-intent key; changed payload is a 409. Never generate a new key to recover an uncertain outcome."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Owner accepted/pending or submission outcome unknown; recover this intent, never infer confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReleaseHoldRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/owners/{ownerId}/operations": {
+      "post": {
+        "operationId": "commitReviewedWorkflowIntent",
+        "summary": "commitReviewedWorkflowIntent",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "description": "Owner-scoped single-intent key; changed payload is a 409. Never generate a new key to recover an uncertain outcome."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Owner accepted/pending or submission outcome unknown; recover this intent, never infer confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/owners/{ownerId}/operations/{operationId}": {
+      "get": {
+        "operationId": "readOwnerOperation",
+        "summary": "readOwnerOperation",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "operationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "x-operational-command": false
+      }
+    },
+    "/owners/{ownerId}/operation-lookups": {
+      "post": {
+        "operationId": "recoverIntentWithoutOperationId",
+        "summary": "recoverIntentWithoutOperationId",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative response; status semantics remain separate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lookup"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source entity not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version or intent conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recognized unsupported/unknown/invalid semantics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded overload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner unavailable; not evidence that a submitted command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "x-implementation-status": "proposed_not_deployed",
+        "x-owner-boundary": "Approved registry adapter only; no caller URL or direct database access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupRequest"
+              }
+            }
+          }
+        },
+        "x-operational-command": false
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "OwnerSession": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Opaque approved session/delegation token; issuer, exchange, audience and scope mapping must reuse reviewed owner identity. This spec does not create a token issuer. Existing public catalog reads remain unchanged."
+      }
+    },
+    "schemas": {
+      "SourceRef": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "ownerId",
+          "id",
+          "revision"
+        ],
+        "additionalProperties": false
+      },
+      "ObservedRef": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "ownerId",
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "Evidence": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/ObservedRef"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          }
+        },
+        "required": [
+          "source",
+          "observedAt"
+        ],
+        "additionalProperties": false
+      },
+      "Money": {
+        "type": "object",
+        "properties": {
+          "minor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          }
+        },
+        "required": [
+          "minor",
+          "currency"
+        ],
+        "additionalProperties": false
+      },
+      "Quantity": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "pattern": "^(0|[1-9]\\d*)(\\.\\d{1,6})?$"
+          },
+          "unitId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "value",
+          "unitId"
+        ],
+        "additionalProperties": false
+      },
+      "Interval": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "boundary": {
+            "const": "start_inclusive_end_exclusive"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "timezone",
+          "boundary"
+        ],
+        "additionalProperties": false
+      },
+      "OfferingBinding": {
+        "type": "object",
+        "properties": {
+          "merchantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "offeringId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "workflowRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "merchantId",
+          "offeringId",
+          "workflowRef"
+        ],
+        "additionalProperties": false
+      },
+      "Context": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "discoveryReleaseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "policyRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "contractVersion",
+          "discoveryReleaseId",
+          "policyRevision"
+        ],
+        "additionalProperties": false
+      },
+      "Decision": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "unknown",
+              "unsupported"
+            ]
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "minItems": 0,
+            "maxItems": 30
+          }
+        },
+        "required": [
+          "state",
+          "reasonCodes",
+          "evidence"
+        ],
+        "additionalProperties": false
+      },
+      "Pricing": {
+        "type": "object",
+        "properties": {
+          "amountKind": {
+            "type": "string",
+            "enum": [
+              "listed",
+              "estimate",
+              "quote",
+              "final"
+            ]
+          },
+          "basisId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "payableNow": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "totalObligation": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "refundableDeposit": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "mandatoryChargesIncluded": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "amountKind",
+          "basisId",
+          "mandatoryChargesIncluded"
+        ],
+        "additionalProperties": false
+      },
+      "MoneyFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Money"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "QuantityFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Quantity"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "BooleanFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "boolean"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "PricingFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Pricing"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Scope": {
+        "type": "object",
+        "properties": {
+          "serviceRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "siteRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "modeIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "serviceRefs",
+          "siteRefs",
+          "modeIds"
+        ],
+        "additionalProperties": false
+      },
+      "ScopeFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Scope"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Validity": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "fixed_window"
+              },
+              "interval": {
+                "$ref": "#/components/schemas/Interval"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "start_only",
+                  "whole_use"
+                ]
+              },
+              "redeemBy": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+              }
+            },
+            "required": [
+              "kind",
+              "interval",
+              "coverage"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "owner_event"
+              },
+              "trigger": {
+                "type": "string",
+                "enum": [
+                  "activation",
+                  "first_use",
+                  "issuance",
+                  "purchase"
+                ]
+              },
+              "ruleRef": {
+                "$ref": "#/components/schemas/SourceRef"
+              },
+              "timezone": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "kind",
+              "trigger",
+              "ruleRef",
+              "timezone"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ValidityFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Validity"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Allowance": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "finite_uses",
+              "fixed_term_access",
+              "period_allowance"
+            ]
+          },
+          "quantity": {
+            "$ref": "#/components/schemas/Quantity"
+          },
+          "consumptionEventId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "ruleRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "kind",
+          "consumptionEventId",
+          "ruleRef"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "finite_uses",
+                    "period_allowance"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "quantity"
+              ]
+            }
+          }
+        ]
+      },
+      "AllowanceFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/Allowance"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Capability": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "read",
+              "quote",
+              "hold",
+              "release_hold",
+              "acquire_entitlement",
+              "redeem_entitlement",
+              "reserve_resource",
+              "commit_series",
+              "activate_telecom",
+              "cancel"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "unsupported",
+              "unknown",
+              "temporarily_unavailable"
+            ]
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "contractRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "operation",
+          "state",
+          "reasonCodes"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "const": "supported"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "contractRef"
+              ]
+            }
+          }
+        ]
+      },
+      "Capabilities": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "processKinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ENTITLEMENT",
+                "RESOURCE_RESERVATION",
+                "TELECOM_ACTIVATION",
+                "RECURRENCE"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 4
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Capability"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          },
+          "limits": {
+            "type": "object",
+            "properties": {
+              "maxSeriesOccurrences": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "maxSeriesHorizonDays": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 90
+              },
+              "maxBodyBytes": {
+                "const": 65536
+              }
+            },
+            "required": [
+              "maxSeriesOccurrences",
+              "maxSeriesHorizonDays",
+              "maxBodyBytes"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "context",
+          "offering",
+          "processKinds",
+          "operations",
+          "limits"
+        ],
+        "additionalProperties": false
+      },
+      "RenewalFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "manual",
+                  "automatic"
+                ]
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "EntitlementPlan": {
+        "type": "object",
+        "properties": {
+          "planRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeFact"
+          },
+          "validity": {
+            "$ref": "#/components/schemas/ValidityFact"
+          },
+          "allowance": {
+            "$ref": "#/components/schemas/AllowanceFact"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingFact"
+          },
+          "renewalMode": {
+            "$ref": "#/components/schemas/RenewalFact"
+          },
+          "termsRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Capability"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "planRef",
+          "offering",
+          "scope",
+          "validity",
+          "allowance",
+          "pricing",
+          "renewalMode",
+          "termsRef",
+          "operations"
+        ],
+        "additionalProperties": false
+      },
+      "Entitlement": {
+        "type": "object",
+        "properties": {
+          "entitlementRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "planRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "holderToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "sourceState": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "scheduled",
+              "active",
+              "frozen",
+              "suspended",
+              "exhausted",
+              "expired",
+              "cancelled",
+              "revoked",
+              "unknown"
+            ]
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ScopeFact"
+          },
+          "validity": {
+            "$ref": "#/components/schemas/ValidityFact"
+          },
+          "usableBalance": {
+            "$ref": "#/components/schemas/QuantityFact"
+          },
+          "reservedBalance": {
+            "$ref": "#/components/schemas/QuantityFact"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          }
+        },
+        "required": [
+          "entitlementRef",
+          "planRef",
+          "holderToken",
+          "sourceState",
+          "status",
+          "scope",
+          "validity",
+          "usableBalance",
+          "reservedBalance",
+          "decision"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceChoice": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "named"
+              },
+              "resourceRef": {
+                "$ref": "#/components/schemas/SourceRef"
+              }
+            },
+            "required": [
+              "kind",
+              "resourceRef"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "class"
+              },
+              "classRef": {
+                "$ref": "#/components/schemas/SourceRef"
+              }
+            },
+            "required": [
+              "kind",
+              "classRef"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Party": {
+        "type": "object",
+        "properties": {
+          "adults": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "children": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "infants": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "adults"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceSelection": {
+        "type": "object",
+        "properties": {
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "siteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "resourceChoice": {
+            "$ref": "#/components/schemas/ResourceChoice"
+          },
+          "interval": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "units": {
+            "$ref": "#/components/schemas/Quantity"
+          },
+          "party": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "hardFeatureIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "softFeatureIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "offering",
+          "siteRef",
+          "resourceChoice",
+          "interval",
+          "units",
+          "hardFeatureIds",
+          "softFeatureIds"
+        ],
+        "additionalProperties": false
+      },
+      "AvailabilityRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/ResourceSelection"
+          }
+        },
+        "required": [
+          "context",
+          "selection"
+        ],
+        "additionalProperties": false
+      },
+      "Availability": {
+        "type": "object",
+        "properties": {
+          "availabilityRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "selectionHash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "allocationMode": {
+            "type": "string",
+            "enum": [
+              "named_exclusive",
+              "class_guarantee",
+              "shared_capacity"
+            ]
+          },
+          "guaranteedFeatureIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "capacity": {
+            "$ref": "#/components/schemas/QuantityFact"
+          }
+        },
+        "required": [
+          "availabilityRef",
+          "selectionHash",
+          "decision",
+          "observedAt",
+          "allocationMode",
+          "guaranteedFeatureIds",
+          "capacity"
+        ],
+        "additionalProperties": false
+      },
+      "OccurrenceDraft": {
+        "type": "object",
+        "properties": {
+          "clientOccurrenceKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "interval": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "units": {
+            "$ref": "#/components/schemas/Quantity"
+          },
+          "configurationRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "clientOccurrenceKey",
+          "interval",
+          "units",
+          "configurationRef"
+        ],
+        "additionalProperties": false
+      },
+      "SeriesSelection": {
+        "type": "object",
+        "properties": {
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "commitmentMode": {
+            "type": "string",
+            "enum": [
+              "all_or_nothing",
+              "per_occurrence"
+            ]
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceDraft"
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "requiredOccurrenceKeys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "partialAcceptance": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "offering",
+          "commitmentMode",
+          "occurrences",
+          "requiredOccurrenceKeys",
+          "partialAcceptance"
+        ],
+        "additionalProperties": false
+      },
+      "SeriesPreviewRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/SeriesSelection"
+          }
+        },
+        "required": [
+          "context",
+          "selection"
+        ],
+        "additionalProperties": false
+      },
+      "OccurrenceAssessment": {
+        "type": "object",
+        "properties": {
+          "clientOccurrenceKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "interval": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "sourceOccurrenceRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "clientOccurrenceKey",
+          "decision",
+          "interval"
+        ],
+        "additionalProperties": false
+      },
+      "SeriesPreview": {
+        "type": "object",
+        "properties": {
+          "previewRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "selectionHash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "commitmentMode": {
+            "type": "string",
+            "enum": [
+              "all_or_nothing",
+              "per_occurrence"
+            ]
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceAssessment"
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "wholeSeriesDecision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingFact"
+          }
+        },
+        "required": [
+          "previewRef",
+          "selectionHash",
+          "commitmentMode",
+          "occurrences",
+          "wholeSeriesDecision",
+          "pricing"
+        ],
+        "additionalProperties": false
+      },
+      "RecipientValidationRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "productRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "privateHandoffToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "context",
+          "offering",
+          "productRef",
+          "privateHandoffToken"
+        ],
+        "additionalProperties": false
+      },
+      "RecipientValidation": {
+        "type": "object",
+        "properties": {
+          "recipientRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "maskedDisplay": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "recipientType": {
+            "type": "string",
+            "enum": [
+              "phone_account",
+              "customer_account",
+              "sim_profile"
+            ]
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          }
+        },
+        "required": [
+          "recipientRef",
+          "maskedDisplay",
+          "recipientType",
+          "decision",
+          "validUntil"
+        ],
+        "additionalProperties": false
+      },
+      "TelecomProduct": {
+        "type": "object",
+        "properties": {
+          "productRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "promisedOutcome": {
+            "type": "string",
+            "enum": [
+              "credit_posted",
+              "profile_provisioned",
+              "allowance_active",
+              "service_active"
+            ]
+          },
+          "allowance": {
+            "$ref": "#/components/schemas/AllowanceFact"
+          },
+          "validity": {
+            "$ref": "#/components/schemas/ValidityFact"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingFact"
+          },
+          "termsRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Capability"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "productRef",
+          "offering",
+          "promisedOutcome",
+          "allowance",
+          "validity",
+          "pricing",
+          "termsRef",
+          "operations"
+        ],
+        "additionalProperties": false
+      },
+      "EntitlementAcquireIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "entitlement_acquire"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "planRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "holderToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "kind",
+          "offering",
+          "planRef",
+          "holderToken"
+        ],
+        "additionalProperties": false
+      },
+      "EntitlementRedeemIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "entitlement_redeem"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "entitlementRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "useRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "kind",
+          "offering",
+          "entitlementRef",
+          "useRef"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "resource_reservation"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/ResourceSelection"
+          },
+          "availabilityRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "kind",
+          "selection",
+          "availabilityRef"
+        ],
+        "additionalProperties": false
+      },
+      "SeriesIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "recurring_series"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/SeriesSelection"
+          },
+          "previewRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "kind",
+          "selection",
+          "previewRef"
+        ],
+        "additionalProperties": false
+      },
+      "TelecomIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "telecom_activation"
+          },
+          "offering": {
+            "$ref": "#/components/schemas/OfferingBinding"
+          },
+          "productRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "recipientRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "promisedOutcome": {
+            "type": "string",
+            "enum": [
+              "credit_posted",
+              "profile_provisioned",
+              "allowance_active",
+              "service_active"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "offering",
+          "productRef",
+          "recipientRef",
+          "promisedOutcome"
+        ],
+        "additionalProperties": false
+      },
+      "CancellationIntent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "cancellation"
+          },
+          "targetKind": {
+            "type": "string",
+            "enum": [
+              "entitlement",
+              "reservation",
+              "series",
+              "occurrence",
+              "activation"
+            ]
+          },
+          "targetRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "occurrenceRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          },
+          "reasonCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "kind",
+          "targetKind",
+          "targetRef",
+          "occurrenceRefs",
+          "reasonCode"
+        ],
+        "additionalProperties": false
+      },
+      "WorkflowIntent": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/EntitlementAcquireIntent"
+          },
+          {
+            "$ref": "#/components/schemas/EntitlementRedeemIntent"
+          },
+          {
+            "$ref": "#/components/schemas/ResourceIntent"
+          },
+          {
+            "$ref": "#/components/schemas/SeriesIntent"
+          },
+          {
+            "$ref": "#/components/schemas/TelecomIntent"
+          },
+          {
+            "$ref": "#/components/schemas/CancellationIntent"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind"
+        }
+      },
+      "QuoteRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "intent": {
+            "$ref": "#/components/schemas/WorkflowIntent"
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "intent"
+        ],
+        "additionalProperties": false
+      },
+      "Quote": {
+        "type": "object",
+        "properties": {
+          "quoteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "intentKind": {
+            "type": "string",
+            "enum": [
+              "entitlement_acquire",
+              "entitlement_redeem",
+              "resource_reservation",
+              "recurring_series",
+              "telecom_activation",
+              "cancellation"
+            ]
+          },
+          "selectionHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "termsRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingFact"
+          },
+          "paymentRequired": {
+            "$ref": "#/components/schemas/BooleanFact"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "reviewToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "commitmentOwner": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "atomicity": {
+            "type": "string",
+            "enum": [
+              "single_owner",
+              "owner_coordinated",
+              "per_occurrence"
+            ]
+          },
+          "cancellationEffects": {
+            "$ref": "#/components/schemas/CancellationEffects"
+          }
+        },
+        "required": [
+          "quoteRef",
+          "clientIntentId",
+          "intentKind",
+          "selectionHash",
+          "expiresAt",
+          "termsRef",
+          "pricing",
+          "paymentRequired",
+          "decision",
+          "reviewToken",
+          "commitmentOwner",
+          "atomicity"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "intentKind": {
+                  "const": "cancellation"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "cancellationEffects"
+              ]
+            }
+          }
+        ]
+      },
+      "CancellationEffects": {
+        "type": "object",
+        "properties": {
+          "affectedRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 1,
+            "maxItems": 20
+          },
+          "effectiveAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "accessEffect": {
+            "type": "string",
+            "enum": [
+              "ends",
+              "continues_to_term",
+              "unchanged",
+              "owner_review"
+            ]
+          },
+          "refund": {
+            "$ref": "#/components/schemas/MoneyFact"
+          },
+          "fee": {
+            "$ref": "#/components/schemas/MoneyFact"
+          },
+          "forfeitedUnits": {
+            "$ref": "#/components/schemas/QuantityFact"
+          }
+        },
+        "required": [
+          "affectedRefs",
+          "effectiveAt",
+          "accessEffect",
+          "refund",
+          "fee",
+          "forfeitedUnits"
+        ],
+        "additionalProperties": false
+      },
+      "HoldRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "quoteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "reviewToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "quoteRef",
+          "reviewToken"
+        ],
+        "additionalProperties": false
+      },
+      "Hold": {
+        "type": "object",
+        "properties": {
+          "holdRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "quoteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "selectionHash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "sourceState": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "held",
+              "expired",
+              "released",
+              "consumed",
+              "unknown"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          }
+        },
+        "required": [
+          "holdRef",
+          "quoteRef",
+          "selectionHash",
+          "sourceState",
+          "state",
+          "expiresAt",
+          "components",
+          "decision"
+        ],
+        "additionalProperties": false
+      },
+      "CommitRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "expectedIntentKind": {
+            "type": "string",
+            "enum": [
+              "entitlement_acquire",
+              "entitlement_redeem",
+              "resource_reservation",
+              "recurring_series",
+              "telecom_activation",
+              "cancellation"
+            ]
+          },
+          "quoteRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "reviewToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "holdRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "paymentAuthorizationRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "expectedIntentKind",
+          "quoteRef",
+          "reviewToken"
+        ],
+        "additionalProperties": false
+      },
+      "ReleaseHoldRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "expectedHoldRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "expectedHoldRevision"
+        ],
+        "additionalProperties": false
+      },
+      "LookupRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "quote",
+              "hold",
+              "commit",
+              "release_hold"
+            ]
+          }
+        },
+        "required": [
+          "context",
+          "clientIntentId",
+          "idempotencyKey",
+          "stage"
+        ],
+        "additionalProperties": false
+      },
+      "OwnerState": {
+        "type": "object",
+        "properties": {
+          "sourceRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "sourceState": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "normalized": {
+            "type": "string",
+            "enum": [
+              "not_required",
+              "pending",
+              "held",
+              "active",
+              "confirmed",
+              "fulfilled",
+              "credit_posted",
+              "profile_provisioned",
+              "allowance_active",
+              "service_active",
+              "partial",
+              "declined",
+              "failed",
+              "expired",
+              "suspended",
+              "revoked",
+              "cancelled",
+              "refund_pending",
+              "refunded",
+              "released",
+              "unknown",
+              "partially_refunded",
+              "cancellation_pending",
+              "no_show",
+              "waitlisted"
+            ]
+          },
+          "reportedAmount": {
+            "$ref": "#/components/schemas/MoneyFact"
+          },
+          "refundedAmount": {
+            "$ref": "#/components/schemas/MoneyFact"
+          }
+        },
+        "required": [
+          "sourceRef",
+          "sourceState",
+          "normalized"
+        ],
+        "additionalProperties": false
+      },
+      "OwnerStateFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/OwnerState"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "OccurrenceOutcome": {
+        "type": "object",
+        "properties": {
+          "clientOccurrenceKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "state": {
+            "$ref": "#/components/schemas/OwnerStateFact"
+          },
+          "occurrenceRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          }
+        },
+        "required": [
+          "clientOccurrenceKey",
+          "state"
+        ],
+        "additionalProperties": false
+      },
+      "Operation": {
+        "type": "object",
+        "properties": {
+          "clientIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "operationRef": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "intentKind": {
+            "type": "string",
+            "enum": [
+              "entitlement_acquire",
+              "entitlement_redeem",
+              "resource_reservation",
+              "recurring_series",
+              "telecom_activation",
+              "cancellation",
+              "release_hold"
+            ]
+          },
+          "progress": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "pending",
+              "terminal",
+              "outcome_unknown"
+            ]
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "effects": {
+            "type": "object",
+            "properties": {
+              "allocation": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              },
+              "payment": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              },
+              "entitlement": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              },
+              "fulfillment": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              },
+              "compensation": {
+                "$ref": "#/components/schemas/OwnerStateFact"
+              }
+            },
+            "required": [
+              "allocation",
+              "payment",
+              "entitlement",
+              "fulfillment",
+              "compensation"
+            ],
+            "additionalProperties": false
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceOutcome"
+            },
+            "minItems": 0,
+            "maxItems": 12
+          },
+          "nextAction": {
+            "type": "string",
+            "enum": [
+              "poll_operation",
+              "lookup_intent",
+              "review",
+              "owner_support",
+              "none"
+            ]
+          }
+        },
+        "required": [
+          "clientIntentId",
+          "intentKind",
+          "progress",
+          "decision",
+          "effects",
+          "nextAction"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "progress": {
+                  "enum": [
+                    "accepted",
+                    "pending",
+                    "terminal"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "operationRef"
+              ]
+            }
+          }
+        ]
+      },
+      "Lookup": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "found"
+              },
+              "operation": {
+                "$ref": "#/components/schemas/Operation"
+              }
+            },
+            "required": [
+              "state",
+              "operation"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "quote_found"
+              },
+              "quote": {
+                "$ref": "#/components/schemas/Quote"
+              }
+            },
+            "required": [
+              "state",
+              "quote"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "hold_found"
+              },
+              "hold": {
+                "$ref": "#/components/schemas/Hold"
+              }
+            },
+            "required": [
+              "state",
+              "hold"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "authoritatively_absent"
+              },
+              "recovery": {
+                "const": "retry_same_key"
+              },
+              "retryBefore": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "recovery",
+              "retryBefore",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "recovery": {
+                "type": "string",
+                "enum": [
+                  "wait",
+                  "owner_support"
+                ]
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "state",
+              "recovery",
+              "reasonCode"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "const": "1"
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_REQUEST",
+              "UNAUTHORIZED",
+              "FORBIDDEN",
+              "NOT_FOUND",
+              "RELEASE_INCOMPATIBLE",
+              "SOURCE_REVISION_CHANGED",
+              "IDEMPOTENCY_CONFLICT",
+              "UNSUPPORTED_CAPABILITY",
+              "REQUIRED_FACT_UNKNOWN",
+              "FACTS_TOO_STALE",
+              "CONSTRAINT_CONFLICT",
+              "QUOTE_EXPIRED",
+              "HOLD_EXPIRED",
+              "REVIEW_REQUIRED",
+              "LIMIT_EXCEEDED",
+              "RATE_LIMITED",
+              "OWNER_UNAVAILABLE",
+              "ACTION_OUTCOME_UNKNOWN"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "recovery": {
+            "type": "string",
+            "enum": [
+              "correct_request",
+              "authenticate",
+              "review",
+              "restart_preserving_constraints",
+              "retry_read",
+              "lookup_intent",
+              "wait",
+              "owner_support",
+              "none"
+            ]
+          },
+          "fieldPaths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "minItems": 0,
+            "maxItems": 30
+          }
+        },
+        "required": [
+          "contractVersion",
+          "requestId",
+          "code",
+          "retryable",
+          "recovery",
+          "fieldPaths"
+        ],
+        "additionalProperties": false
+      },
+      "StringFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "SourceClassification": {
+        "type": "object",
+        "properties": {
+          "sourceCategoryRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObservedRef"
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "sourceSubcategoryRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObservedRef"
+            },
+            "minItems": 0,
+            "maxItems": 30
+          },
+          "evidenceRef": {
+            "$ref": "#/components/schemas/ObservedRef"
+          }
+        },
+        "required": [
+          "sourceCategoryRefs",
+          "sourceSubcategoryRefs",
+          "evidenceRef"
+        ],
+        "additionalProperties": false
+      },
+      "ClassificationFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "$ref": "#/components/schemas/SourceClassification"
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ProvenanceFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "string",
+                "enum": [
+                  "confirmed",
+                  "demo",
+                  "unknown"
+                ]
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "WorkflowRefsFact": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "known"
+              },
+              "value": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SourceRef"
+                },
+                "minItems": 0,
+                "maxItems": 10
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "value",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "not_exposed",
+                  "not_verified",
+                  "stale",
+                  "owner_unavailable",
+                  "unsupported_contract"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              },
+              "reasonCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "evidence": {
+                "$ref": "#/components/schemas/Evidence"
+              }
+            },
+            "required": [
+              "state",
+              "reasonCode",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "CatalogProjection": {
+        "type": "object",
+        "properties": {
+          "entityKind": {
+            "type": "string",
+            "enum": [
+              "merchant",
+              "offering"
+            ]
+          },
+          "ownerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "merchantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "sourceRevision": {
+            "$ref": "#/components/schemas/StringFact"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "classification": {
+            "$ref": "#/components/schemas/ClassificationFact"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/ProvenanceFact"
+          },
+          "listedPrice": {
+            "$ref": "#/components/schemas/MoneyFact"
+          },
+          "workflowPaths": {
+            "$ref": "#/components/schemas/WorkflowRefsFact"
+          },
+          "deleted": {
+            "$ref": "#/components/schemas/BooleanFact"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "(Z|[+-]\\d{2}:\\d{2})$"
+          }
+        },
+        "required": [
+          "entityKind",
+          "ownerId",
+          "id",
+          "merchantId",
+          "sourceRevision",
+          "label",
+          "classification",
+          "provenance",
+          "listedPrice",
+          "workflowPaths",
+          "deleted",
+          "observedAt"
+        ],
+        "additionalProperties": false
+      },
+      "Count": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "exact"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "lower_bound"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "unknown"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "CatalogProjectionPage": {
+        "type": "object",
+        "properties": {
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogProjection"
+            },
+            "minItems": 0,
+            "maxItems": 200
+          },
+          "count": {
+            "$ref": "#/components/schemas/Count"
+          },
+          "completion": {
+            "type": "string",
+            "enum": [
+              "complete_scope",
+              "more",
+              "bounded_window",
+              "unknown"
+            ]
+          },
+          "sourceSnapshot": {
+            "$ref": "#/components/schemas/StringFact"
+          },
+          "nextCursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "required": [
+          "records",
+          "count",
+          "completion",
+          "sourceSnapshot"
+        ],
+        "additionalProperties": false
+      },
+      "ReferenceValidationRequest": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObservedRef"
+            },
+            "minItems": 1,
+            "maxItems": 50
+          }
+        },
+        "required": [
+          "context",
+          "refs"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "x-status": "owner_requirements_only_current_shell_read_only",
+  "x-body-limit-bytes": 65536,
+  "x-idempotency-policy": "Keys bind owner, actor, stage/operation and immutable payload. Distinct stage keys for quote/hold/commit. Owner declares retention/status recovery; unknown outcomes never use blind fresh-key resubmission."
+}

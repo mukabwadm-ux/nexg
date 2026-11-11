@@ -1,0 +1,1084 @@
+{
+  "schemaVersion": "1",
+  "authority": "Derived pins for the owner-approved baseline: the taxonomy, its configuration, and the 256 px WebP copy of each approved icon (assets/icons-web/manifest.json records the SHA-256 of the original each copy was made from). Re-pinned to the copies with the owner’s approval on 10 November 2026; regenerate with scripts/pin-web-icons.mjs. No mutable taxonomy or publisher signature.",
+  "assetBindings": [
+    {
+      "manifestPath": "00_Main_Category_Icons/01_adults_only.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/01_adults_only.webp"
+    },
+    {
+      "manifestPath": "01_Adults_Only/01_01_Erotic_Products.webp",
+      "assetPath": "assets/icons-web/01_Adults_Only/01_01_Erotic_Products.webp"
+    },
+    {
+      "manifestPath": "01_Adults_Only/01_02_Tobacco_And_Vapes.webp",
+      "assetPath": "assets/icons-web/01_Adults_Only/01_02_Tobacco_And_Vapes.webp"
+    },
+    {
+      "manifestPath": "01_Adults_Only/01_03_Adult_Wellness.webp",
+      "assetPath": "assets/icons-web/01_Adults_Only/01_03_Adult_Wellness.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/02_airport_transfers.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/02_airport_transfers.webp"
+    },
+    {
+      "manifestPath": "02_Airport_Transfers/02_01_Airport_Pickup.webp",
+      "assetPath": "assets/icons-web/02_Airport_Transfers/02_01_Airport_Pickup.webp"
+    },
+    {
+      "manifestPath": "02_Airport_Transfers/02_02_Airport_Dropoff.webp",
+      "assetPath": "assets/icons-web/02_Airport_Transfers/02_02_Airport_Dropoff.webp"
+    },
+    {
+      "manifestPath": "02_Airport_Transfers/02_03_Meet_And_Greet.webp",
+      "assetPath": "assets/icons-web/02_Airport_Transfers/02_03_Meet_And_Greet.webp"
+    },
+    {
+      "manifestPath": "02_Airport_Transfers/02_04_Executive_Transfer.webp",
+      "assetPath": "assets/icons-web/02_Airport_Transfers/02_04_Executive_Transfer.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/03_alcohol_beverages.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/03_alcohol_beverages.webp"
+    },
+    {
+      "manifestPath": "03_Alcohol_And_Beverages/03_01_Wine.webp",
+      "assetPath": "assets/icons-web/03_Alcohol_And_Beverages/03_01_Wine.webp"
+    },
+    {
+      "manifestPath": "03_Alcohol_And_Beverages/03_02_Spirits.webp",
+      "assetPath": "assets/icons-web/03_Alcohol_And_Beverages/03_02_Spirits.webp"
+    },
+    {
+      "manifestPath": "03_Alcohol_And_Beverages/03_03_Beer.webp",
+      "assetPath": "assets/icons-web/03_Alcohol_And_Beverages/03_03_Beer.webp"
+    },
+    {
+      "manifestPath": "03_Alcohol_And_Beverages/03_04_Champagne.webp",
+      "assetPath": "assets/icons-web/03_Alcohol_And_Beverages/03_04_Champagne.webp"
+    },
+    {
+      "manifestPath": "03_Alcohol_And_Beverages/03_05_Cocktail_Mixers.webp",
+      "assetPath": "assets/icons-web/03_Alcohol_And_Beverages/03_05_Cocktail_Mixers.webp"
+    },
+    {
+      "manifestPath": "03_Alcohol_And_Beverages/03_06_Liquor_Stores.webp",
+      "assetPath": "assets/icons-web/03_Alcohol_And_Beverages/03_06_Liquor_Stores.webp"
+    },
+    {
+      "manifestPath": "03_Alcohol_And_Beverages/03_07_NonAlcoholic_Drinks.webp",
+      "assetPath": "assets/icons-web/03_Alcohol_And_Beverages/03_07_NonAlcoholic_Drinks.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/04_apparel.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/04_apparel.webp"
+    },
+    {
+      "manifestPath": "04_Apparel/04_01_Mens_Fashion.webp",
+      "assetPath": "assets/icons-web/04_Apparel/04_01_Mens_Fashion.webp"
+    },
+    {
+      "manifestPath": "04_Apparel/04_02_Womens_Fashion.webp",
+      "assetPath": "assets/icons-web/04_Apparel/04_02_Womens_Fashion.webp"
+    },
+    {
+      "manifestPath": "04_Apparel/04_03_Kids_Fashion.webp",
+      "assetPath": "assets/icons-web/04_Apparel/04_03_Kids_Fashion.webp"
+    },
+    {
+      "manifestPath": "04_Apparel/04_04_Shoes.webp",
+      "assetPath": "assets/icons-web/04_Apparel/04_04_Shoes.webp"
+    },
+    {
+      "manifestPath": "04_Apparel/04_05_Bags.webp",
+      "assetPath": "assets/icons-web/04_Apparel/04_05_Bags.webp"
+    },
+    {
+      "manifestPath": "04_Apparel/04_06_Watches.webp",
+      "assetPath": "assets/icons-web/04_Apparel/04_06_Watches.webp"
+    },
+    {
+      "manifestPath": "04_Apparel/04_07_Fashion_Accessories.webp",
+      "assetPath": "assets/icons-web/04_Apparel/04_07_Fashion_Accessories.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/05_beauty_wellness.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/05_beauty_wellness.webp"
+    },
+    {
+      "manifestPath": "05_Beauty_And_Wellness/05_01_Beauty_Products.webp",
+      "assetPath": "assets/icons-web/05_Beauty_And_Wellness/05_01_Beauty_Products.webp"
+    },
+    {
+      "manifestPath": "05_Beauty_And_Wellness/05_02_Spa.webp",
+      "assetPath": "assets/icons-web/05_Beauty_And_Wellness/05_02_Spa.webp"
+    },
+    {
+      "manifestPath": "05_Beauty_And_Wellness/05_03_Massage.webp",
+      "assetPath": "assets/icons-web/05_Beauty_And_Wellness/05_03_Massage.webp"
+    },
+    {
+      "manifestPath": "05_Beauty_And_Wellness/05_04_Gym.webp",
+      "assetPath": "assets/icons-web/05_Beauty_And_Wellness/05_04_Gym.webp"
+    },
+    {
+      "manifestPath": "05_Beauty_And_Wellness/05_05_Personal_Training.webp",
+      "assetPath": "assets/icons-web/05_Beauty_And_Wellness/05_05_Personal_Training.webp"
+    },
+    {
+      "manifestPath": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.webp",
+      "assetPath": "assets/icons-web/05_Beauty_And_Wellness/05_06_Salon_And_Barber.webp"
+    },
+    {
+      "manifestPath": "05_Beauty_And_Wellness/05_07_Nails_And_Beauty_Services.webp",
+      "assetPath": "assets/icons-web/05_Beauty_And_Wellness/05_07_Nails_And_Beauty_Services.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/06_vehicle_rentals.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/06_vehicle_rentals.webp"
+    },
+    {
+      "manifestPath": "06_Vehicle_Rentals/06_01_Car_Rental.webp",
+      "assetPath": "assets/icons-web/06_Vehicle_Rentals/06_01_Car_Rental.webp"
+    },
+    {
+      "manifestPath": "06_Vehicle_Rentals/06_02_Bike_Rental.webp",
+      "assetPath": "assets/icons-web/06_Vehicle_Rentals/06_02_Bike_Rental.webp"
+    },
+    {
+      "manifestPath": "06_Vehicle_Rentals/06_03_Vehicle_Repair.webp",
+      "assetPath": "assets/icons-web/06_Vehicle_Rentals/06_03_Vehicle_Repair.webp"
+    },
+    {
+      "manifestPath": "06_Vehicle_Rentals/06_04_Car_Wash.webp",
+      "assetPath": "assets/icons-web/06_Vehicle_Rentals/06_04_Car_Wash.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/07_experiences.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/07_experiences.webp"
+    },
+    {
+      "manifestPath": "07_Experiences/07_01_Events.webp",
+      "assetPath": "assets/icons-web/07_Experiences/07_01_Events.webp"
+    },
+    {
+      "manifestPath": "07_Experiences/07_02_Photography.webp",
+      "assetPath": "assets/icons-web/07_Experiences/07_02_Photography.webp"
+    },
+    {
+      "manifestPath": "07_Experiences/07_03_Workshops_And_Classes.webp",
+      "assetPath": "assets/icons-web/07_Experiences/07_03_Workshops_And_Classes.webp"
+    },
+    {
+      "manifestPath": "07_Experiences/07_04_Sports_And_Recreation.webp",
+      "assetPath": "assets/icons-web/07_Experiences/07_04_Sports_And_Recreation.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/08_flowers_gifts.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/08_flowers_gifts.webp"
+    },
+    {
+      "manifestPath": "08_Flowers_And_Gifts/08_01_Flowers.webp",
+      "assetPath": "assets/icons-web/08_Flowers_And_Gifts/08_01_Flowers.webp"
+    },
+    {
+      "manifestPath": "08_Flowers_And_Gifts/08_02_Gift_Hampers.webp",
+      "assetPath": "assets/icons-web/08_Flowers_And_Gifts/08_02_Gift_Hampers.webp"
+    },
+    {
+      "manifestPath": "08_Flowers_And_Gifts/08_03_Cakes.webp",
+      "assetPath": "assets/icons-web/08_Flowers_And_Gifts/08_03_Cakes.webp"
+    },
+    {
+      "manifestPath": "08_Flowers_And_Gifts/08_04_Chocolates.webp",
+      "assetPath": "assets/icons-web/08_Flowers_And_Gifts/08_04_Chocolates.webp"
+    },
+    {
+      "manifestPath": "08_Flowers_And_Gifts/08_05_Personalized_Gifts.webp",
+      "assetPath": "assets/icons-web/08_Flowers_And_Gifts/08_05_Personalized_Gifts.webp"
+    },
+    {
+      "manifestPath": "08_Flowers_And_Gifts/08_06_Occasion_Gifts.webp",
+      "assetPath": "assets/icons-web/08_Flowers_And_Gifts/08_06_Occasion_Gifts.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/09_marketplace.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/09_marketplace.webp"
+    },
+    {
+      "manifestPath": "09_Marketplace/09_01_Home_And_Living.webp",
+      "assetPath": "assets/icons-web/09_Marketplace/09_01_Home_And_Living.webp"
+    },
+    {
+      "manifestPath": "09_Marketplace/09_02_Books_And_Stationery.webp",
+      "assetPath": "assets/icons-web/09_Marketplace/09_02_Books_And_Stationery.webp"
+    },
+    {
+      "manifestPath": "09_Marketplace/09_03_General_Retail.webp",
+      "assetPath": "assets/icons-web/09_Marketplace/09_03_General_Retail.webp"
+    },
+    {
+      "manifestPath": "09_Marketplace/09_04_Hardware_And_DIY.webp",
+      "assetPath": "assets/icons-web/09_Marketplace/09_04_Hardware_And_DIY.webp"
+    },
+    {
+      "manifestPath": "09_Marketplace/09_05_Pet_Supplies.webp",
+      "assetPath": "assets/icons-web/09_Marketplace/09_05_Pet_Supplies.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/10_restaurants_food.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/10_restaurants_food.webp"
+    },
+    {
+      "manifestPath": "10_Restaurants_And_Food/10_01_Restaurant.webp",
+      "assetPath": "assets/icons-web/10_Restaurants_And_Food/10_01_Restaurant.webp"
+    },
+    {
+      "manifestPath": "10_Restaurants_And_Food/10_02_Fast_Food.webp",
+      "assetPath": "assets/icons-web/10_Restaurants_And_Food/10_02_Fast_Food.webp"
+    },
+    {
+      "manifestPath": "10_Restaurants_And_Food/10_03_Cafe.webp",
+      "assetPath": "assets/icons-web/10_Restaurants_And_Food/10_03_Cafe.webp"
+    },
+    {
+      "manifestPath": "10_Restaurants_And_Food/10_04_Bakery.webp",
+      "assetPath": "assets/icons-web/10_Restaurants_And_Food/10_04_Bakery.webp"
+    },
+    {
+      "manifestPath": "10_Restaurants_And_Food/10_05_Desserts.webp",
+      "assetPath": "assets/icons-web/10_Restaurants_And_Food/10_05_Desserts.webp"
+    },
+    {
+      "manifestPath": "10_Restaurants_And_Food/10_06_Juice_Bar.webp",
+      "assetPath": "assets/icons-web/10_Restaurants_And_Food/10_06_Juice_Bar.webp"
+    },
+    {
+      "manifestPath": "10_Restaurants_And_Food/10_07_Catering.webp",
+      "assetPath": "assets/icons-web/10_Restaurants_And_Food/10_07_Catering.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/11_groceries_essentials.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/11_groceries_essentials.webp"
+    },
+    {
+      "manifestPath": "11_Groceries_And_Essentials/11_01_Supermarket.webp",
+      "assetPath": "assets/icons-web/11_Groceries_And_Essentials/11_01_Supermarket.webp"
+    },
+    {
+      "manifestPath": "11_Groceries_And_Essentials/11_02_Convenience_Store.webp",
+      "assetPath": "assets/icons-web/11_Groceries_And_Essentials/11_02_Convenience_Store.webp"
+    },
+    {
+      "manifestPath": "11_Groceries_And_Essentials/11_03_Fresh_Produce.webp",
+      "assetPath": "assets/icons-web/11_Groceries_And_Essentials/11_03_Fresh_Produce.webp"
+    },
+    {
+      "manifestPath": "11_Groceries_And_Essentials/11_04_Butchery.webp",
+      "assetPath": "assets/icons-web/11_Groceries_And_Essentials/11_04_Butchery.webp"
+    },
+    {
+      "manifestPath": "11_Groceries_And_Essentials/11_05_Seafood.webp",
+      "assetPath": "assets/icons-web/11_Groceries_And_Essentials/11_05_Seafood.webp"
+    },
+    {
+      "manifestPath": "11_Groceries_And_Essentials/11_06_Organic_Store.webp",
+      "assetPath": "assets/icons-web/11_Groceries_And_Essentials/11_06_Organic_Store.webp"
+    },
+    {
+      "manifestPath": "11_Groceries_And_Essentials/11_07_Household_Essentials.webp",
+      "assetPath": "assets/icons-web/11_Groceries_And_Essentials/11_07_Household_Essentials.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/12_laundry_cleaning.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/12_laundry_cleaning.webp"
+    },
+    {
+      "manifestPath": "12_Laundry_And_Cleaning/12_01_Laundry.webp",
+      "assetPath": "assets/icons-web/12_Laundry_And_Cleaning/12_01_Laundry.webp"
+    },
+    {
+      "manifestPath": "12_Laundry_And_Cleaning/12_02_Dry_Cleaning.webp",
+      "assetPath": "assets/icons-web/12_Laundry_And_Cleaning/12_02_Dry_Cleaning.webp"
+    },
+    {
+      "manifestPath": "12_Laundry_And_Cleaning/12_03_Ironing.webp",
+      "assetPath": "assets/icons-web/12_Laundry_And_Cleaning/12_03_Ironing.webp"
+    },
+    {
+      "manifestPath": "12_Laundry_And_Cleaning/12_04_Home_Cleaning.webp",
+      "assetPath": "assets/icons-web/12_Laundry_And_Cleaning/12_04_Home_Cleaning.webp"
+    },
+    {
+      "manifestPath": "12_Laundry_And_Cleaning/12_05_Office_Cleaning.webp",
+      "assetPath": "assets/icons-web/12_Laundry_And_Cleaning/12_05_Office_Cleaning.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/13_health_pharmacy.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/13_health_pharmacy.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_01_Pharmacy.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_01_Pharmacy.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_02_Medical_Supplies.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_02_Medical_Supplies.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_03_Baby_Products.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_03_Baby_Products.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_04_Supplements.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_04_Supplements.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_05_Hospitals_And_Clinics.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_05_Hospitals_And_Clinics.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_06_Telemedicine.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_06_Telemedicine.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_07_Mobile_Diagnostic_Services.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_07_Mobile_Diagnostic_Services.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_08_Mental_Health.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_08_Mental_Health.webp"
+    },
+    {
+      "manifestPath": "13_Health_And_Pharmacy/13_09_Therapy.webp",
+      "assetPath": "assets/icons-web/13_Health_And_Pharmacy/13_09_Therapy.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/14_tech_electronics.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/14_tech_electronics.webp"
+    },
+    {
+      "manifestPath": "14_Tech_And_Electronics/14_01_Smartphones.webp",
+      "assetPath": "assets/icons-web/14_Tech_And_Electronics/14_01_Smartphones.webp"
+    },
+    {
+      "manifestPath": "14_Tech_And_Electronics/14_02_Tech_Accessories.webp",
+      "assetPath": "assets/icons-web/14_Tech_And_Electronics/14_02_Tech_Accessories.webp"
+    },
+    {
+      "manifestPath": "14_Tech_And_Electronics/14_03_Computers.webp",
+      "assetPath": "assets/icons-web/14_Tech_And_Electronics/14_03_Computers.webp"
+    },
+    {
+      "manifestPath": "14_Tech_And_Electronics/14_04_Gaming.webp",
+      "assetPath": "assets/icons-web/14_Tech_And_Electronics/14_04_Gaming.webp"
+    },
+    {
+      "manifestPath": "14_Tech_And_Electronics/14_05_Audio.webp",
+      "assetPath": "assets/icons-web/14_Tech_And_Electronics/14_05_Audio.webp"
+    },
+    {
+      "manifestPath": "14_Tech_And_Electronics/14_06_Telecom_Services.webp",
+      "assetPath": "assets/icons-web/14_Tech_And_Electronics/14_06_Telecom_Services.webp"
+    },
+    {
+      "manifestPath": "14_Tech_And_Electronics/14_07_Smart_Devices.webp",
+      "assetPath": "assets/icons-web/14_Tech_And_Electronics/14_07_Smart_Devices.webp"
+    },
+    {
+      "manifestPath": "14_Tech_And_Electronics/14_08_Device_Repairs.webp",
+      "assetPath": "assets/icons-web/14_Tech_And_Electronics/14_08_Device_Repairs.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/15_safaris_tours.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/15_safaris_tours.webp"
+    },
+    {
+      "manifestPath": "15_Safaris_And_Tours/15_01_Safaris.webp",
+      "assetPath": "assets/icons-web/15_Safaris_And_Tours/15_01_Safaris.webp"
+    },
+    {
+      "manifestPath": "15_Safaris_And_Tours/15_02_City_Tours.webp",
+      "assetPath": "assets/icons-web/15_Safaris_And_Tours/15_02_City_Tours.webp"
+    },
+    {
+      "manifestPath": "15_Safaris_And_Tours/15_03_Cultural_Tours.webp",
+      "assetPath": "assets/icons-web/15_Safaris_And_Tours/15_03_Cultural_Tours.webp"
+    },
+    {
+      "manifestPath": "15_Safaris_And_Tours/15_04_Adventure_Tours.webp",
+      "assetPath": "assets/icons-web/15_Safaris_And_Tours/15_04_Adventure_Tours.webp"
+    },
+    {
+      "manifestPath": "15_Safaris_And_Tours/15_05_Travel_Packages.webp",
+      "assetPath": "assets/icons-web/15_Safaris_And_Tours/15_05_Travel_Packages.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/16_concierge_services.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/16_concierge_services.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_01_Reservations.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_01_Reservations.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_02_Personal_Assistance.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_02_Personal_Assistance.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_03_Shopping_Assistance.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_03_Shopping_Assistance.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_04_Gift_Sourcing.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_04_Gift_Sourcing.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_05_Travel_Planning.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_05_Travel_Planning.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_06_Property_Coordination.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_06_Property_Coordination.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_07_Moving_Assistance.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_07_Moving_Assistance.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_08_Cleaning_Coordination.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_08_Cleaning_Coordination.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_09_VIP_Assistance.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_09_VIP_Assistance.webp"
+    },
+    {
+      "manifestPath": "16_Concierge_Services/16_10_Courier_And_Errands.webp",
+      "assetPath": "assets/icons-web/16_Concierge_Services/16_10_Courier_And_Errands.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/17_play.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/17_play.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_01_Bowling.webp",
+      "assetPath": "assets/icons-web/17_Play/17_01_Bowling.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_02_Arcade_And_Timed_Play.webp",
+      "assetPath": "assets/icons-web/17_Play/17_02_Arcade_And_Timed_Play.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_03_Escape_Rooms.webp",
+      "assetPath": "assets/icons-web/17_Play/17_03_Escape_Rooms.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_04_Indoor_Sports_Courts.webp",
+      "assetPath": "assets/icons-web/17_Play/17_04_Indoor_Sports_Courts.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_05_Outdoor_Sports_Courts.webp",
+      "assetPath": "assets/icons-web/17_Play/17_05_Outdoor_Sports_Courts.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_06_Football_Pitches.webp",
+      "assetPath": "assets/icons-web/17_Play/17_06_Football_Pitches.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_07_Outdoor_Team_Games.webp",
+      "assetPath": "assets/icons-web/17_Play/17_07_Outdoor_Team_Games.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_08_Go_Karting.webp",
+      "assetPath": "assets/icons-web/17_Play/17_08_Go_Karting.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_09_Paintball.webp",
+      "assetPath": "assets/icons-web/17_Play/17_09_Paintball.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_10_Ziplining_And_High_Ropes.webp",
+      "assetPath": "assets/icons-web/17_Play/17_10_Ziplining_And_High_Ropes.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_11_Public_Swim_Sessions.webp",
+      "assetPath": "assets/icons-web/17_Play/17_11_Public_Swim_Sessions.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_12_Swimming_Lessons.webp",
+      "assetPath": "assets/icons-web/17_Play/17_12_Swimming_Lessons.webp"
+    },
+    {
+      "manifestPath": "17_Play/17_13_Pool_Lane_Hire.webp",
+      "assetPath": "assets/icons-web/17_Play/17_13_Pool_Lane_Hire.webp"
+    },
+    {
+      "manifestPath": "00_Main_Category_Icons/18_flights.webp",
+      "assetPath": "assets/icons-web/00_Main_Category_Icons/18_flights.webp"
+    },
+    {
+      "manifestPath": "18_Flights/18_01_Helicopter_Charters.webp",
+      "assetPath": "assets/icons-web/18_Flights/18_01_Helicopter_Charters.webp"
+    },
+    {
+      "manifestPath": "18_Flights/18_02_Scenic_Flights.webp",
+      "assetPath": "assets/icons-web/18_Flights/18_02_Scenic_Flights.webp"
+    },
+    {
+      "manifestPath": "18_Flights/18_03_Safari_Flights.webp",
+      "assetPath": "assets/icons-web/18_Flights/18_03_Safari_Flights.webp"
+    },
+    {
+      "manifestPath": "18_Flights/18_04_Private_Charters.webp",
+      "assetPath": "assets/icons-web/18_Flights/18_04_Private_Charters.webp"
+    }
+  ],
+  "files": [
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/01_adults_only.webp",
+      "sha256": "a4a53ce8f4f58b780574262d4a80d9272e0620f7c75d2887d71562343bcc6d27"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/02_airport_transfers.webp",
+      "sha256": "69bae5e8ed5e44c20931e70ffda72ddc6e691801ecbf53f42f386663a7c21800"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/03_alcohol_beverages.webp",
+      "sha256": "236404f5c62d79677b90d5dab84be1c1ba3272d0400f18ee10376d14dc0bb69f"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/04_apparel.webp",
+      "sha256": "a5f705c29dcb22cf55a37c9be54a00a23904a0166bab0aef9e0e6834a8ced743"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/05_beauty_wellness.webp",
+      "sha256": "f2c5a6d787c18622c2e549f211f05e7f256964623f2666ee692042a6dd93453f"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/06_vehicle_rentals.webp",
+      "sha256": "9425d3c94f6d51f5fc5046d84a0b271e0427f9fae2b68eee71d81195bb0903cc"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/07_experiences.webp",
+      "sha256": "fa70514347ce5b1c800cf890ac58676d0b266c3f66d8c0e9f76169c2ceedde92"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/08_flowers_gifts.webp",
+      "sha256": "532cd82e5da9fa6255acf06c7f22c49e8db2544bb923c857c9de4d46e13b335b"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/09_marketplace.webp",
+      "sha256": "970146aee15d7b91872d86ce0a5b135327c03bea8aa530e23d5e53e0cd06f79e"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/10_restaurants_food.webp",
+      "sha256": "f4e4867fad4c4e557a34849d12014edfc2a8891ff8cecaf4e07a7b2cb89db274"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/11_groceries_essentials.webp",
+      "sha256": "494e8af91ed1d3915387d6c90dd6985a34ee5ce349491184b546583231cee29d"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/12_laundry_cleaning.webp",
+      "sha256": "34bb97e388493e8cadb020750f252153e5f0a80dc351c7bb0c5564fa8ff385e6"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/13_health_pharmacy.webp",
+      "sha256": "f054aa5e30d557a765ab2d6c8ea4c561bb2f17f5a70f2fe3a01323e5c39b0b50"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/14_tech_electronics.webp",
+      "sha256": "ef8ea3172d3dc4c2fc9901eb844c17bb71b7d820fd9d97e2b40ed21880456049"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/15_safaris_tours.webp",
+      "sha256": "7565e2285c265d715ca5e21b6b0075aeaaf7eec7593b01be1d371c21dc55ec0a"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/16_concierge_services.webp",
+      "sha256": "6e256527847b71300e81acbdc64253a6191453b45d09956cce0543f3cc7bf6eb"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/17_play.webp",
+      "sha256": "1dd655443abcad973eaafb5ebae1d9c109b8cac74a43f58c63ab5320259c56cc"
+    },
+    {
+      "path": "assets/icons-web/00_Main_Category_Icons/18_flights.webp",
+      "sha256": "5e40e17f0e781a10b7adfde76d05fd22bfd7a677cad98031a4b5bb295d22373c"
+    },
+    {
+      "path": "assets/icons-web/01_Adults_Only/01_01_Erotic_Products.webp",
+      "sha256": "4af05c5f2844743dfd7ce775629a1cff85849d43b1a8d3fe1bca687d9cfb890a"
+    },
+    {
+      "path": "assets/icons-web/01_Adults_Only/01_02_Tobacco_And_Vapes.webp",
+      "sha256": "dc0fb0f1b8937c2a8abc08d92b751f5d06e3b1219b0915c07d21feeba5dc74a4"
+    },
+    {
+      "path": "assets/icons-web/01_Adults_Only/01_03_Adult_Wellness.webp",
+      "sha256": "a3ab685ce855da806af74653c8fbef90fc640c4be1689cd638f5ac5fb9aeadd5"
+    },
+    {
+      "path": "assets/icons-web/02_Airport_Transfers/02_01_Airport_Pickup.webp",
+      "sha256": "0b5d2f3fa9a2ed7f36f9e1e5f1c72854bff5a551820a7bbe222fdc94b01945a3"
+    },
+    {
+      "path": "assets/icons-web/02_Airport_Transfers/02_02_Airport_Dropoff.webp",
+      "sha256": "43d0ad653b36518fec3f311da0a0ddf0a29c669b8ff15504668a4e2cf310b957"
+    },
+    {
+      "path": "assets/icons-web/02_Airport_Transfers/02_03_Meet_And_Greet.webp",
+      "sha256": "b679fa7928ccb9b9cd3227c5bf759bc6beb632cb7261ccdf7de274f520828aa1"
+    },
+    {
+      "path": "assets/icons-web/02_Airport_Transfers/02_04_Executive_Transfer.webp",
+      "sha256": "9b0596567ae15c87ebae5937ae921f5553f74b1eabd516bcf1570c4677aba9b6"
+    },
+    {
+      "path": "assets/icons-web/03_Alcohol_And_Beverages/03_01_Wine.webp",
+      "sha256": "457757fa7df71ecfd75c7dfa378f94e8d5fe8b665aa3c7224e561777b39ac195"
+    },
+    {
+      "path": "assets/icons-web/03_Alcohol_And_Beverages/03_02_Spirits.webp",
+      "sha256": "308adac1e50f7e9338a3790400badc9752fe68f62a1012addb72f147750dd7a5"
+    },
+    {
+      "path": "assets/icons-web/03_Alcohol_And_Beverages/03_03_Beer.webp",
+      "sha256": "a571427faa1001e054830ef9ca547b8df25e1aafa0ee5acb0cc8919e785ca384"
+    },
+    {
+      "path": "assets/icons-web/03_Alcohol_And_Beverages/03_04_Champagne.webp",
+      "sha256": "cbee41584a321805dd63fb2c6ac84d6bdf7eedb84a1c90c02dc388005eb6a675"
+    },
+    {
+      "path": "assets/icons-web/03_Alcohol_And_Beverages/03_05_Cocktail_Mixers.webp",
+      "sha256": "2a0d46e4c3d4892cffb9a730223974a39701bfa68d8166fe10fa55b926e8d392"
+    },
+    {
+      "path": "assets/icons-web/03_Alcohol_And_Beverages/03_06_Liquor_Stores.webp",
+      "sha256": "05150fae4eef9cc20c2b5cccf650c3b11cedcf1f7cc626963e8bf0014fe8d27c"
+    },
+    {
+      "path": "assets/icons-web/03_Alcohol_And_Beverages/03_07_NonAlcoholic_Drinks.webp",
+      "sha256": "31d4302263700fbbb44b6de08c1b35b67e07015cbc3a72643101a7446fab6e51"
+    },
+    {
+      "path": "assets/icons-web/04_Apparel/04_01_Mens_Fashion.webp",
+      "sha256": "b736f7d39efbf108f0889beb9494eba45325dff7c740c65e0e3c2a2f3aa98198"
+    },
+    {
+      "path": "assets/icons-web/04_Apparel/04_02_Womens_Fashion.webp",
+      "sha256": "2b7a6f984c62c82e3a304d567d9d4068edc866549597334d85e227e7839f5dc7"
+    },
+    {
+      "path": "assets/icons-web/04_Apparel/04_03_Kids_Fashion.webp",
+      "sha256": "b2ed1dea385bc6b1b854e29d409c88e2720ca8e7ddd40f3498516080b4780c22"
+    },
+    {
+      "path": "assets/icons-web/04_Apparel/04_04_Shoes.webp",
+      "sha256": "569c26200dcbe3f6da701cf4b43dcbf27e1750499185665192f376620f142cb5"
+    },
+    {
+      "path": "assets/icons-web/04_Apparel/04_05_Bags.webp",
+      "sha256": "cd7c78af2738542a981890f1c773a4970b7d89df8a4e8235e3d2b74f06ffe1fa"
+    },
+    {
+      "path": "assets/icons-web/04_Apparel/04_06_Watches.webp",
+      "sha256": "879c68a32c4788b7b27791df069601447d92201cb2906d7f6e2de5a8600fb0fe"
+    },
+    {
+      "path": "assets/icons-web/04_Apparel/04_07_Fashion_Accessories.webp",
+      "sha256": "73c8d4c85b34fd2b20e218ec41d620c27c8552fa14a07d2fad841109945865be"
+    },
+    {
+      "path": "assets/icons-web/05_Beauty_And_Wellness/05_01_Beauty_Products.webp",
+      "sha256": "3dcf80e6567f15be82213fa662a9f743f2cb8b380e5015c82a05c7010ec611bf"
+    },
+    {
+      "path": "assets/icons-web/05_Beauty_And_Wellness/05_02_Spa.webp",
+      "sha256": "ab4276a578e7008ea3b15ab7f52c7755f8815d9498dd8755c44982eb9c80b881"
+    },
+    {
+      "path": "assets/icons-web/05_Beauty_And_Wellness/05_03_Massage.webp",
+      "sha256": "cce7a590b7c00ed0c04eb938446ce43d5593630fd8f7fe34640eecaeb29f5413"
+    },
+    {
+      "path": "assets/icons-web/05_Beauty_And_Wellness/05_04_Gym.webp",
+      "sha256": "1e606603eede68c3771a9a32f8228ea2664cd415882e07728078b8288517ed29"
+    },
+    {
+      "path": "assets/icons-web/05_Beauty_And_Wellness/05_05_Personal_Training.webp",
+      "sha256": "925235707296e2d80b0b670bb4f1d5aa92c8b30d8f7ca964647d2c6f4853c094"
+    },
+    {
+      "path": "assets/icons-web/05_Beauty_And_Wellness/05_06_Salon_And_Barber.webp",
+      "sha256": "099d782bb030e59d00828c0a0af2f9d202fa9363c7938d3f7e0ae06c81721432"
+    },
+    {
+      "path": "assets/icons-web/05_Beauty_And_Wellness/05_07_Nails_And_Beauty_Services.webp",
+      "sha256": "6d5d64097d0bbaccfed9f924f07e2b3c7e31a189e44f248e88b1b3e451c5faf9"
+    },
+    {
+      "path": "assets/icons-web/06_Vehicle_Rentals/06_01_Car_Rental.webp",
+      "sha256": "3a7412fe3e93710286197a401adcb71446261f3a8836993fa8bafd87613b7e90"
+    },
+    {
+      "path": "assets/icons-web/06_Vehicle_Rentals/06_02_Bike_Rental.webp",
+      "sha256": "82c4f7b825c567d74837737c89633b08ee8d0c18812c6b4949b3f65333d2fbbe"
+    },
+    {
+      "path": "assets/icons-web/06_Vehicle_Rentals/06_03_Vehicle_Repair.webp",
+      "sha256": "1d55b9a2860a886878dc66aad3ba5c64c888f9ea8e4f7eed8410cfefb8b886c1"
+    },
+    {
+      "path": "assets/icons-web/06_Vehicle_Rentals/06_04_Car_Wash.webp",
+      "sha256": "3f3dde08cbbffa5c1b126db9e323317753cf9a892cb006aa93e970fb1bdb39d7"
+    },
+    {
+      "path": "assets/icons-web/07_Experiences/07_01_Events.webp",
+      "sha256": "0764176bbc795b96a9d83b04f2a4b932690d6ed3e70956849751cf76c1c79451"
+    },
+    {
+      "path": "assets/icons-web/07_Experiences/07_02_Photography.webp",
+      "sha256": "80c8207cb15eb071bd32235df60b80722ea7dbddb1ebd5c05bf8a8808f90eb53"
+    },
+    {
+      "path": "assets/icons-web/07_Experiences/07_03_Workshops_And_Classes.webp",
+      "sha256": "2841907adc4c77d67ca7e572e42275697d5a7a025c528d1bc3807b965866facd"
+    },
+    {
+      "path": "assets/icons-web/07_Experiences/07_04_Sports_And_Recreation.webp",
+      "sha256": "b775ff7991ff2f684c615a8fe47c809ff7b251866361ef99013621c65a0d79cc"
+    },
+    {
+      "path": "assets/icons-web/08_Flowers_And_Gifts/08_01_Flowers.webp",
+      "sha256": "5465df3429b53404fa70ad5630be5a6be3f80a600e6b06eece8ca74c9d704d5b"
+    },
+    {
+      "path": "assets/icons-web/08_Flowers_And_Gifts/08_02_Gift_Hampers.webp",
+      "sha256": "8dec1a7d92e19f4e5475b9e0004c406dee160c81ae4d19684fc2b6f44d3ca9fe"
+    },
+    {
+      "path": "assets/icons-web/08_Flowers_And_Gifts/08_03_Cakes.webp",
+      "sha256": "d29180faf42509691307b155420a7f5bcb47e2838c4f809dfadb9ecdb6753807"
+    },
+    {
+      "path": "assets/icons-web/08_Flowers_And_Gifts/08_04_Chocolates.webp",
+      "sha256": "c6f48d0029eb625a6fc29e985edeb602327be9fc74bf216a80576921ba23b56d"
+    },
+    {
+      "path": "assets/icons-web/08_Flowers_And_Gifts/08_05_Personalized_Gifts.webp",
+      "sha256": "0efd05720e360c96f691e93b778b3ca25b64517f1de9e263cb0711ca0e0d090a"
+    },
+    {
+      "path": "assets/icons-web/08_Flowers_And_Gifts/08_06_Occasion_Gifts.webp",
+      "sha256": "c94c2827b1fc5eedbf23c2111eac05c7397733aed76be84a7d29cc5d8d4e986e"
+    },
+    {
+      "path": "assets/icons-web/09_Marketplace/09_01_Home_And_Living.webp",
+      "sha256": "c65215e1af814f15e1d65b290f6c8b6ac440fad6bdffdbe082f26dd8e38b0124"
+    },
+    {
+      "path": "assets/icons-web/09_Marketplace/09_02_Books_And_Stationery.webp",
+      "sha256": "2552dc356b912e1bb8093ec7d77f07438b92589b95545bc02248ad616a06cf81"
+    },
+    {
+      "path": "assets/icons-web/09_Marketplace/09_03_General_Retail.webp",
+      "sha256": "39b4a2c1380ca52752849cc9b3a44d2ed33f975206c15e5ae2389de1c2697225"
+    },
+    {
+      "path": "assets/icons-web/09_Marketplace/09_04_Hardware_And_DIY.webp",
+      "sha256": "4a9f2a8a895724b9e65911f22b1f2482571c109fda70d619fe0443f59d1237da"
+    },
+    {
+      "path": "assets/icons-web/09_Marketplace/09_05_Pet_Supplies.webp",
+      "sha256": "d04a98a33816c704a9d7c9ae50bbffc5d43d80b569b638f55ff6bb8c90f58ebb"
+    },
+    {
+      "path": "assets/icons-web/10_Restaurants_And_Food/10_01_Restaurant.webp",
+      "sha256": "b977fc47805154451c70d08df160f307a30cd84e7e4bae13b58e22e5af958146"
+    },
+    {
+      "path": "assets/icons-web/10_Restaurants_And_Food/10_02_Fast_Food.webp",
+      "sha256": "b3dc66a5559620c8888dd674d07048bc978ba65ece6cdd7710e98acb5474fdb9"
+    },
+    {
+      "path": "assets/icons-web/10_Restaurants_And_Food/10_03_Cafe.webp",
+      "sha256": "d206bdf5845dae37d3f575116f564d660f815f3d0ee5df4c52dcda96dfa71e4d"
+    },
+    {
+      "path": "assets/icons-web/10_Restaurants_And_Food/10_04_Bakery.webp",
+      "sha256": "093d6aee2768a7b718634288e0d5f301a1e4c8ef87b1c27579b8153d500adf93"
+    },
+    {
+      "path": "assets/icons-web/10_Restaurants_And_Food/10_05_Desserts.webp",
+      "sha256": "f7524af530e93eb9023f1a753c65e9cc275623046e4eb6f90133ba9713f448c5"
+    },
+    {
+      "path": "assets/icons-web/10_Restaurants_And_Food/10_06_Juice_Bar.webp",
+      "sha256": "75f8867a173e9a428ddd5138c0e3f6d425101c5240e873a2c1c824e8625a0927"
+    },
+    {
+      "path": "assets/icons-web/10_Restaurants_And_Food/10_07_Catering.webp",
+      "sha256": "6f98980a394912b965d418d09f877d0c81249b58d2fb8f0a9cd48c7fe7a98f3d"
+    },
+    {
+      "path": "assets/icons-web/11_Groceries_And_Essentials/11_01_Supermarket.webp",
+      "sha256": "ec58831ee991aa07017cb8f980e23340024460de383bb9c5513eca06dcc39508"
+    },
+    {
+      "path": "assets/icons-web/11_Groceries_And_Essentials/11_02_Convenience_Store.webp",
+      "sha256": "893bc7bee25fd09bd2af6b51a6aa2983739e5200d6f92ef9e7cfef17b5e13515"
+    },
+    {
+      "path": "assets/icons-web/11_Groceries_And_Essentials/11_03_Fresh_Produce.webp",
+      "sha256": "c1787619715f58628b9db26acecd04f0d2dce0a74c809871c14edf83cc973db6"
+    },
+    {
+      "path": "assets/icons-web/11_Groceries_And_Essentials/11_04_Butchery.webp",
+      "sha256": "ccee62fcce3b0f742f82709af5346c51b479b48de2e4b2cf969ae7cd020b6129"
+    },
+    {
+      "path": "assets/icons-web/11_Groceries_And_Essentials/11_05_Seafood.webp",
+      "sha256": "ba6bb36a783e587623457a3b915222b49ab34668d8f6826f9023245cad2c37e1"
+    },
+    {
+      "path": "assets/icons-web/11_Groceries_And_Essentials/11_06_Organic_Store.webp",
+      "sha256": "6551c556d2316e4e5aea04de6d11a85f4330d33eac4483153ed3bc1648f64588"
+    },
+    {
+      "path": "assets/icons-web/11_Groceries_And_Essentials/11_07_Household_Essentials.webp",
+      "sha256": "ad318c4f4c36c95cb99ba0721740d9a5cf09e67d88a59c23a9d47bd7c0a8437c"
+    },
+    {
+      "path": "assets/icons-web/12_Laundry_And_Cleaning/12_01_Laundry.webp",
+      "sha256": "9857fb41da4f22ed7bd47889cec2d59cf5d74ffc656954b9148043b321180fa9"
+    },
+    {
+      "path": "assets/icons-web/12_Laundry_And_Cleaning/12_02_Dry_Cleaning.webp",
+      "sha256": "af7a1c30a7670ef3692025babdcfe2ab9785bfd10166812b5f2fe547616016d4"
+    },
+    {
+      "path": "assets/icons-web/12_Laundry_And_Cleaning/12_03_Ironing.webp",
+      "sha256": "120474b7d0598743f9a61ca9905f795181f3ebd45ccce17c8d12a189f861fef3"
+    },
+    {
+      "path": "assets/icons-web/12_Laundry_And_Cleaning/12_04_Home_Cleaning.webp",
+      "sha256": "6aa7c014f6d98d86b6fb4b53ed8bfc7d716fe5afaa24c833a3a757a521357535"
+    },
+    {
+      "path": "assets/icons-web/12_Laundry_And_Cleaning/12_05_Office_Cleaning.webp",
+      "sha256": "d3ac47d1a52f2ccab1c856693d8fce46a0b588b5564b915f3e25451b986ca44e"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_01_Pharmacy.webp",
+      "sha256": "32a2d0a74035d6f69198e02be21633d7d0a09c6aa90dcfc8d3baabe25aa1e5eb"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_02_Medical_Supplies.webp",
+      "sha256": "2c1edb1940bcabbb21d7a0b03fbd48c91d658715745a8a7768823732cd7dbbdc"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_03_Baby_Products.webp",
+      "sha256": "2da9fb0eef2ea2a1e0092822cfacc62c96a691629329787aa8e51a5d0b1e2772"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_04_Supplements.webp",
+      "sha256": "84226baabef13fa294e80dd34affd40d33d41a3edac3ff035f4f8db896ea8b2b"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_05_Hospitals_And_Clinics.webp",
+      "sha256": "0e08e219f713d2979d1d1c406de86fd2a0cb7bb0af20fac8c099965daa109c74"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_06_Telemedicine.webp",
+      "sha256": "693e55f21412d8cb9b588ee9c5a93dcac972fc2044fccfca20a3be19cebd45e4"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_07_Mobile_Diagnostic_Services.webp",
+      "sha256": "ee175fd5157eb281d23c9e86efb06b3ad4b268873999616b4fb9540569d3c366"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_08_Mental_Health.webp",
+      "sha256": "dc93a0a7a9713e989f7daa86faefab9c5c80d88983551953875c0e12917e9270"
+    },
+    {
+      "path": "assets/icons-web/13_Health_And_Pharmacy/13_09_Therapy.webp",
+      "sha256": "b690daa3e749ad1da96ce6b0d89e391c0d08565c9255adf73e0b912ec1b1f3af"
+    },
+    {
+      "path": "assets/icons-web/14_Tech_And_Electronics/14_01_Smartphones.webp",
+      "sha256": "ecfe9f4f9da2ffdda954d9c966227a9e99e3f73987b558408cab4639c0983b3d"
+    },
+    {
+      "path": "assets/icons-web/14_Tech_And_Electronics/14_02_Tech_Accessories.webp",
+      "sha256": "2aeb4b7b7d53ea2df0b6e6edbf1fe756c1f8f4088b6b3cfd7164168ef8e516ac"
+    },
+    {
+      "path": "assets/icons-web/14_Tech_And_Electronics/14_03_Computers.webp",
+      "sha256": "da60be1ab5c0702cc424fa91da0ba3a969daef924cf11089b5bf09a4fbc4c1f0"
+    },
+    {
+      "path": "assets/icons-web/14_Tech_And_Electronics/14_04_Gaming.webp",
+      "sha256": "74773ab10ad7637c8092acf2366d857cf71ab4a0291497e411f845fb3aa67e3f"
+    },
+    {
+      "path": "assets/icons-web/14_Tech_And_Electronics/14_05_Audio.webp",
+      "sha256": "81533aa091b6d4316613a8407f22b134180036e2f4345cab0cca87cb69ba5865"
+    },
+    {
+      "path": "assets/icons-web/14_Tech_And_Electronics/14_06_Telecom_Services.webp",
+      "sha256": "0380c63187c14e57c9790138bbc372c560261b185847c98eaa679d54b4eef4cd"
+    },
+    {
+      "path": "assets/icons-web/14_Tech_And_Electronics/14_07_Smart_Devices.webp",
+      "sha256": "bb7da5ee662fd1efa7fbb92c3c8fe01864403d9fc67a701f3550f3de546d1a9d"
+    },
+    {
+      "path": "assets/icons-web/14_Tech_And_Electronics/14_08_Device_Repairs.webp",
+      "sha256": "e087bed023713868183867a70660a13f49e4f8e1aa4a5e8d2fe98d9a96ee1cd0"
+    },
+    {
+      "path": "assets/icons-web/15_Safaris_And_Tours/15_01_Safaris.webp",
+      "sha256": "94376bc48d4d932ca677a247a8311382e595e3f6fece274612f89c031da9a8a4"
+    },
+    {
+      "path": "assets/icons-web/15_Safaris_And_Tours/15_02_City_Tours.webp",
+      "sha256": "b2166ccea888b694ea47dfd638999d49d7bc967f783f510ddbafe12792a0cd2a"
+    },
+    {
+      "path": "assets/icons-web/15_Safaris_And_Tours/15_03_Cultural_Tours.webp",
+      "sha256": "3564ecb2ca5313ea91e4b593a970971fba80760e89ac294b3a286eda2b048cf5"
+    },
+    {
+      "path": "assets/icons-web/15_Safaris_And_Tours/15_04_Adventure_Tours.webp",
+      "sha256": "1727857f2e2b6878f465c7f7a62a6edbcd573399e312220cfdf35565f6010e10"
+    },
+    {
+      "path": "assets/icons-web/15_Safaris_And_Tours/15_05_Travel_Packages.webp",
+      "sha256": "0b248bc2b88b62cd8706d68af10574d4bbd6e4f5ad7c0ede8c5ff36d68e27b14"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_01_Reservations.webp",
+      "sha256": "ab4ef05880b8c1469bef3a139b2727cebd4ec086d860a239ef1e11d5642fdeda"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_02_Personal_Assistance.webp",
+      "sha256": "3c3f6db587a588a19d5572191f20a3a3ec1ebbfea6d5a40a33299152c402c89d"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_03_Shopping_Assistance.webp",
+      "sha256": "01ceb5ceab584fa60a9a365c56a9defad9c95bc1b88e4a5aa42b0ebb21dcbc56"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_04_Gift_Sourcing.webp",
+      "sha256": "c94b366ee549213854f4b777a452300692b2af7fdb34722c3bfebc6b4012d453"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_05_Travel_Planning.webp",
+      "sha256": "e75ddcfecb91fed5c50113563bc6b42e244059cdaf6fb712ce0c7ed47bc841f0"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_06_Property_Coordination.webp",
+      "sha256": "5f8c20812fd696050a3089d1df23ec05e83cda61074dab53d1221fd1d5e89bdc"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_07_Moving_Assistance.webp",
+      "sha256": "0c199a21a47009f04df7d65fdf609ac80e77401902032ef357e19cd4b0caf4b9"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_08_Cleaning_Coordination.webp",
+      "sha256": "33d45a52cc42bcd3da0c438517d16bebfdb83fca0061175ab01675e16f55b89e"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_09_VIP_Assistance.webp",
+      "sha256": "fcf33b6d9124e39097b7cae65a7186357db807e0510813a76bbef5a327e4b0ae"
+    },
+    {
+      "path": "assets/icons-web/16_Concierge_Services/16_10_Courier_And_Errands.webp",
+      "sha256": "16584d6ac08e3f45a4d56e2b429aaa5a792e67252a72b0d62156f6faacb14b10"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_01_Bowling.webp",
+      "sha256": "ec03ff26297769e4eed2a8a04ac83740b96368df8473f927ae3442e16dadcdad"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_02_Arcade_And_Timed_Play.webp",
+      "sha256": "62488cf03823ad012ca25fa2a74edc4af69a6ae3a420a88d230e7b6ad38fad18"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_03_Escape_Rooms.webp",
+      "sha256": "0a2c399a9b798851b087a193e756b35b45c3c47f146a2e4b55cc8ef9bd810a37"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_04_Indoor_Sports_Courts.webp",
+      "sha256": "76cc03596f6f07ec3080b962dbbe00aed02efdd8230f7ce15e49df6324dc7a88"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_05_Outdoor_Sports_Courts.webp",
+      "sha256": "1c05fbbc2e7f4ccb606d30e725b124a88dd5659f80eaebe21f795cb0eab180bd"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_06_Football_Pitches.webp",
+      "sha256": "4a2fb3a44c7203ed17956ad862d71d091a44902de9c55b8dca9e2a7ec4db70c9"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_07_Outdoor_Team_Games.webp",
+      "sha256": "edf5679e705a67167cc62aabcf8f0ec46dccf0df950223cc9e2665a5894cf45a"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_08_Go_Karting.webp",
+      "sha256": "93f489e80a2774db7af34893216033078f74d2e688ee8d10148d3c042eb4485c"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_09_Paintball.webp",
+      "sha256": "99d3a1f3b6a2a7e93c6f544572e2926308e984d433cac25609baefea5dc90a7a"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_10_Ziplining_And_High_Ropes.webp",
+      "sha256": "4538a393df7eed505e2eacc24ef3b09eefb1efb851354a69ff33ccb846470dcb"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_11_Public_Swim_Sessions.webp",
+      "sha256": "44e0a56e83a9260890eae18c72f8b4a87e82edc9db30924f5039c16e1962cd91"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_12_Swimming_Lessons.webp",
+      "sha256": "d3a215e78444c753d048e64f69992a4323d53fbd2f7e59c801e3d7ae3874a6a1"
+    },
+    {
+      "path": "assets/icons-web/17_Play/17_13_Pool_Lane_Hire.webp",
+      "sha256": "f0f69ade26da2cc705983268aca87ad9850d396699b56891f87833a661571d73"
+    },
+    {
+      "path": "assets/icons-web/18_Flights/18_01_Helicopter_Charters.webp",
+      "sha256": "062167282a48e9327e1d6ea0aebfa04d86bf15bf2fdcd2e059089ea7078abcab"
+    },
+    {
+      "path": "assets/icons-web/18_Flights/18_02_Scenic_Flights.webp",
+      "sha256": "6a3d122683dfeab66d75559213bb802ba615c832612aa85fdfeda4e50063b85a"
+    },
+    {
+      "path": "assets/icons-web/18_Flights/18_03_Safari_Flights.webp",
+      "sha256": "9fc4ac248729c0b57fe03cfaeefe4b2e395997bc429bfc0849a01f82cae7fd21"
+    },
+    {
+      "path": "assets/icons-web/18_Flights/18_04_Private_Charters.webp",
+      "sha256": "661c4944aa9a82f89a0babdbffe04e1f70d56946efc6d1bb9656a6d97e7af3bc"
+    },
+    {
+      "path": "assets/icons-web/NexG_Discovery_Icons_Manifest.csv",
+      "sha256": "6e0e135860c1bfda31909b4350d82b114b436b323919559f6027cea9c3eb74da"
+    },
+    {
+      "path": "docs/discovery/DISCOVERY_CONFIGURATION_V1.1.json",
+      "sha256": "88db951eb711080e3412833b5ae21d54625b4042ca84942336ef1b0a47da30b7"
+    },
+    {
+      "path": "docs/discovery/TAXONOMY_V1.1.json",
+      "sha256": "0add84674a9a744e84e978934969c2209e4dea501266f90f50486cca6bf29972"
+    }
+  ]
+}

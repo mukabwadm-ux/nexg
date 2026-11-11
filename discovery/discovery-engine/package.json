@@ -1,0 +1,30 @@
+{
+  "name": "@nexg/discovery-engine",
+  "version": "0.6.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": { "types": "./dist/src/index.d.ts", "import": "./dist/src/index.js" } },
+  "engines": { "node": ">=24.21.0 <25" },
+  "packageManager": "npm@12.0.2",
+  "scripts": {
+    "generate": "node scripts/generate-contracts.mjs",
+    "generate:check": "node scripts/generate-contracts.mjs --check",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "test": "npm run generate:check && tsc -p tsconfig.test.json && node --test --test-concurrency=1 --test-reporter=spec .test-dist/test/*.test.js",
+    "check": "npm run typecheck && npm test && npm run build",
+    "release:check": "npm run build && node dist/src/cli.js",
+    "start": "node dist/src/server/main.js",
+    "bridge": "node --env-file-if-exists=.env.local dist/src/bridge/main.js",
+    "dev": "npm run build && npm start",
+    "search:up": "node scripts/search-local.mjs up",
+    "search:down": "node scripts/search-local.mjs down",
+    "search:status": "node scripts/search-local.mjs status",
+    "index": "node dist/src/indexing/cli.js",
+    "operator": "node dist/src/operations/cli.js",
+    "evaluate": "node dist/src/evaluation/cli.js",
+    "test:typesense": "tsc -p tsconfig.test.json && node --test --test-reporter=spec .test-dist/test/typesense.integration.js"
+  },
+  "dependencies": { "ajv": "8.20.0", "ajv-formats": "3.0.1", "fastify": "5.12.7" },
+  "devDependencies": { "@types/node": "24.19.2", "openapi-typescript": "7.13.0", "typescript": "5.8.3" }
+}

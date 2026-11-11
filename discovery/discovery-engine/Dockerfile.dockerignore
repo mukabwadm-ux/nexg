@@ -1,0 +1,15 @@
+# The build context is the repository root; send only what the Dockerfile copies.
+*
+!discovery/discovery-engine/package.json
+!discovery/discovery-engine/package-lock.json
+!discovery/discovery-engine/tsconfig.json
+!discovery/discovery-engine/src
+!discovery/discovery-engine/engines
+!discovery/discovery-engine/config
+!discovery/discovery-engine/docs/contracts
+!discovery/docs/discovery
+!discovery/assets/icons-web
+!discovery/demo-seed/subcategory-map.json
+**/node_modules
+**/dist
+**/.test-dist
