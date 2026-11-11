@@ -3,10 +3,11 @@
 Goal: a shareable link for testers. Sections 1–4 put the public site online
 and keep the staff console on your machine. Section 5 gives the console its
 own URL, which you need once other people are testing and registrations
-arrive while you are away from your laptop.
+arrive while you are away from your laptop. Section 6 puts the public API and
+its developer docs at `api.nexgapp.com`.
 
 There are two accounts to create and roughly forty minutes of work, plus
-twenty for the console. Supabase first: Vercel is useless without it, because
+twenty for the console and twenty for the API. Supabase first: Vercel is useless without it, because
 the site has no database of its own.
 
 ---
@@ -238,6 +239,114 @@ transatlantic round trip per query — the console makes a lot of them.
 Add a second factor. Supabase Auth supports TOTP, and a console that can take
 a merchant live and read uploaded national IDs deserves more than a password.
 That is a change to `apps/admin/app/sign-in`, not a setting.
+
+---
+
+## 6. The API and developer docs (~20 min)
+
+`apps/api` serves the public API (`/v1`), its developer docs (`/docs`) and the
+developer console (`/developers`), where people sign in and issue keys. It is
+a **third Vercel project** on the same repository, `nexg-api`, at
+`https://api.nexgapp.com`.
+
+### The one project that holds the service-role key
+
+Sections 2 and 5 say never to add `SUPABASE_SERVICE_ROLE_KEY`. The API is the
+exception. Every `/v1` request spends tokens from the PostgreSQL rate limiter
+(`fn_api_request_spend`), and merchant order reads go through
+`rpc_order_read_api`. Both run as the service role, from server code only
+(`apps/api/lib/auth.ts`, `apps/api/lib/orders.ts`). Without the key, every
+`/v1` call answers `503`, "The API is temporarily unavailable."
+
+Give it to **Production only**. Preview builds run unmerged branch code, and
+none of them needs it: on a preview, `/v1` answers `503` and the docs still
+render.
+
+### Steps
+
+1. **New Vercel project**, same GitHub repository, named `nexg-api`:
+
+   | Setting                    | Value                              |
+   | -------------------------- | ---------------------------------- |
+   | Root Directory             | `apps/api`                         |
+   | Framework                  | Next.js (detected)                 |
+   | Build and install commands | leave default                      |
+   | Node.js Version            | the same as the other two projects |
+
+   In the Root Directory settings, keep "Include files outside the root
+   directory" on (the API imports `@nexg/ui`, `@nexg/contracts` and
+   `@nexg/db`), and tick "Skip deployments when there are no changes to the
+   root directory or its dependencies", as on the other two.
+   `apps/api/vercel.json` already pins the functions to `dub1`, beside the
+   database.
+
+2. **Environment variables** (Project Settings → Environment Variables):
+
+   | Name                             | Value                                                                                                  | Environments    |
+   | -------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------- |
+   | `NEXT_PUBLIC_SUPABASE_URL`       | `https://bmrrifvtfvgagkhrmitv.supabase.co`                                                             | Production      |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | the **publishable** key (`sb_publishable_…`)                                                           | Production      |
+   | `SUPABASE_SERVICE_ROLE_KEY`      | Supabase → Project Settings → API Keys → **Legacy API Keys** → `service_role`, marked **Sensitive** | Production only |
+   | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | the same site key as the `nexg` project                                                                | Production      |
+   | `API_TRUSTED_PROXY_IP_HEADER`    | optional: `x-real-ip`                                                                                  | Production      |
+
+   - Take the Supabase values from Supabase (Project Settings → API Keys). The
+     other two projects store theirs as Sensitive, so Vercel will not show
+     them.
+   - For previews that can reach the database, tick Preview as well on the
+     two `NEXT_PUBLIC_SUPABASE_*` variables. Never on the service-role key.
+   - `API_TRUSTED_PROXY_IP_HEADER` decides how callers without a key are
+     rate-limited. Unset, they all share one bucket of 120 requests a minute.
+     Set to `x-real-ip`, each IP gets its own. Vercel overwrites that header,
+     so callers cannot forge it, as long as the Cloudflare record stays DNS
+     only.
+   - Not needed: `NEXT_PUBLIC_SITE_URL` (nothing in `apps/api` reads it,
+     though `.env.example` lists it) and a Turnstile secret (Supabase Auth
+     holds it).
+
+3. **Domain.** Project Settings → Domains → add `api.nexgapp.com`. Then in
+   Cloudflare, `nexgapp.com` → DNS → Records:
+
+   | Type  | Name      | Content                                                     | Proxy status |
+   | ----- | --------- | ----------------------------------------------------------- | ------------ |
+   | CNAME | `api`     | `cname.vercel-dns.com`                                      | DNS only     |
+   | TXT   | `_vercel` | the `vc-domain-verify=api.nexgapp.com,…` value Vercel shows | —            |
+
+   **Add** the TXT record next to the `_vercel` records already there; do not
+   edit them. There is one per verified name (`nexgapp.com`, `www`, `admin`),
+   because the Vercel team has no team-wide domain. Once Cloudflare serves
+   the record, Vercel marks the domain verified and issues its certificate.
+
+4. **Turnstile.** Cloudflare → Turnstile → the existing widget (the one whose
+   site key you used above) → Settings → Hostname Management → add
+   `api.nexgapp.com`. Do not create a second widget: Supabase checks every
+   sign-in token against this widget's secret, so a new widget's tokens
+   would be refused.
+
+5. **Redeploy** (Deployments → the latest deployment → ⋯ → Redeploy).
+   `NEXT_PUBLIC_` values are fixed when the site is built, and a project's
+   first deploy is never skipped: any merge to `main` builds it, with or
+   without variables. Redeploy whenever a variable changes.
+
+### Check it
+
+In order:
+
+1. `https://api.nexgapp.com/docs` loads → **domain, certificate and build
+   fine**.
+2. `curl -i https://api.nexgapp.com/v1/zones` → `200` with `"ok":true` →
+   **Supabase reachable and the service-role key working**. A `503` means a
+   Supabase variable is missing, or was added after the build.
+3. `curl -i "https://api.nexgapp.com/v1/catalog/merchants?limit=101"` →
+   `400` `invalid_request` with an `X-Request-Id` header → **errors come back
+   as JSON**.
+4. Open `/developers` signed out → redirected to `/sign-in`.
+5. Sign in with your own NexG account → your merchants appear by name →
+   **Turnstile, Supabase Auth and the console working**. If a correct
+   password is refused with "That email and password do not match", check
+   the Turnstile hostname first. The form shows that message for every
+   refusal, including a failed bot check; the browser console shows
+   Turnstile's error code.
 
 ---
 
