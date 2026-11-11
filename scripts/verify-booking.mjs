@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -45,7 +46,27 @@ async function run(label, directory, args) {
   if (code !== 0) process.exitCode = 1;
 }
 
+// Next writes `next-env.d.ts` on `next dev`/`next build` and git ignores it, so a fresh
+// checkout has none and the web typecheck cannot see Next's image-import types. CI builds
+// first and never notices; this script may run before any build.
+async function ensureNextTypes() {
+  const file = resolve(root, 'apps/web/next-env.d.ts');
+  if (existsSync(file)) return;
+  await writeFile(
+    file,
+    [
+      '/// <reference types="next" />',
+      '/// <reference types="next/image-types/global" />',
+      '',
+      '// NOTE: This file should not be edited',
+      '// see https://nextjs.org/docs/basic-features/typescript for more information.',
+      '',
+    ].join('\n'),
+  );
+}
+
 for (const directory of packages) {
+  if (directory === 'apps/web' && !onlyTests) await ensureNextTypes();
   if (!onlyTests)
     await run(`${directory}: typecheck`, directory, [
       resolve(root, directory, 'node_modules/typescript/bin/tsc'),
@@ -71,7 +92,11 @@ for (const directory of packages) {
         '--minWorkers=1',
       ];
       if (directory === 'apps/web')
-        args.push('lib/booking/bridge.test.ts', 'components/merchant/booking');
+        args.push(
+          'lib/booking/bridge.test.ts',
+          'lib/booking/public-access.test.ts',
+          'components/merchant/booking',
+        );
       await run(`${directory}: behavior tests`, directory, args);
     }
   }

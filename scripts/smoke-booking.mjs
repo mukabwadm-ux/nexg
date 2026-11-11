@@ -60,6 +60,13 @@ try {
       throw new Error('The local booking portal did not become ready within ten minutes.');
     await new Promise((done) => setTimeout(done, 1000));
   }
+  // The engine answers 409 until a workspace exists; the first setup creates it. Do that
+  // before opening the page, so it renders Booking setup instead of the initialization notice.
+  await api(
+    'configuration',
+    { businessName: 'NEXG local acceptance workspace', subcategoryId: 'haircare', published: true },
+    'PUT',
+  );
   console.log('Waiting for the isolated development portal to compile…');
   const initial = await page.goto(`${base}/booking-workspace`, {
     waitUntil: 'domcontentloaded',
