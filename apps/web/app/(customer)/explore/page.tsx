@@ -364,7 +364,7 @@ export default async function ExplorePage({
 
           {/* Categories */}
           <h2 className="mt-12 text-xl font-extrabold tracking-tight">Browse by category</h2>
-          <CategoryScroller className="mt-5" itemClass="[&>li]:w-[6.5rem]">
+          <CategoryScroller className="mt-5" itemClass="!gap-5 [&>li]:w-[6.5rem]">
             {[{ key: null as string | null, label: 'All', Icon: Store }]
               .concat(
                 usedCategories.map((category) => ({
