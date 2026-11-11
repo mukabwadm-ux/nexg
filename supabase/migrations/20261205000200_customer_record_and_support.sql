@@ -87,6 +87,10 @@ end;
 $$;
 revoke execute on function public.rpc_my_support_ticket_create(text, public.ticket_topic, text, jsonb) from public, anon;
 grant execute on function public.rpc_my_support_ticket_create(text, public.ticket_topic, text, jsonb) to authenticated;
+insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
+  ('rpc_my_support_ticket_create', 'The ticket is created and audited by rpc_support_ticket_create; this only links it to the signed-in account',
+   'audit_event support.ticket_created, support_ticket.user_id')
+on conflict (function_name) do nothing;
 
 -- 4. The customer's own tickets. No staff notes; only what the customer wrote, status and timing.
 -- REVIEW: add the staff reply text once the support desk marks which replies are customer-facing.
