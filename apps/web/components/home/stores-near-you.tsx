@@ -37,6 +37,17 @@ const CATEGORY: Record<string, { label: string; photo: string }> = {
   groceries_essentials: { label: 'Groceries', photo: 'groceries' },
 };
 
+/** "[Westlands Kitchen]" → "Westlands Kitchen": some names were entered in brackets. */
+const unbracket = (text: string) => text.replace(/[[\]]/g, '').trim() || text;
+
+/** 0.4 → "400 m", 2.36 → "2.4 km", 23.7 → "24 km". */
+const formatKm = (km: number) =>
+  km < 1
+    ? `${Math.max(100, Math.round(km * 10) * 100)} m`
+    : km < 10
+      ? `${km.toFixed(1)} km`
+      : `${Math.round(km)} km`;
+
 /** "22:00:00" → "22:00". */
 const hhmm = (time: string | null) => (time ? time.slice(0, 5) : null);
 
@@ -48,6 +59,8 @@ function StoreCard({ store }: { store: RankedStore }) {
   const photo =
     store.cover_photo_path ?? (category ? `/images/categories/${category.photo}.jpg` : null);
   const closes = hhmm(store.closes_today);
+  const name = unbracket(store.trading_name);
+  const area = store.branch_name ? unbracket(store.branch_name) : null;
 
   return (
     <li className={RAIL_CARD}>
@@ -79,7 +92,7 @@ function StoreCard({ store }: { store: RankedStore }) {
 
         <span className="flex flex-1 items-start justify-between gap-3 p-4">
           <span className="min-w-0">
-            <span className="block truncate text-base font-extrabold">{store.trading_name}</span>
+            <span className="block truncate text-base font-extrabold">{name}</span>
             <span className="mt-0.5 block truncate text-[0.8125rem] font-semibold text-white/50">
               {store.category_other ?? category?.label ?? 'Store'}
             </span>
@@ -95,24 +108,31 @@ function StoreCard({ store }: { store: RankedStore }) {
 
         <span className="mx-4 border-t border-dashed border-white/10" />
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 text-xs font-semibold text-white/55">
-          {store.km != null && (
-            <span className="text-gold inline-flex items-center gap-1">
-              <Navigation className="h-3 w-3" aria-hidden="true" />
-              {store.km < 1 ? `${Math.round(store.km * 1000)} m` : `${store.km.toFixed(1)} km`}
-            </span>
+          {area && (
+            <>
+              <span className="inline-flex min-w-0 items-center gap-1">
+                <MapPin className="h-3 w-3 shrink-0" aria-hidden="true" />
+                <span className="truncate">{area}</span>
+              </span>
+              <span aria-hidden="true">·</span>
+            </>
           )}
-          {store.km != null && store.branch_name && <span aria-hidden="true">·</span>}
-          {store.branch_name && (
-            <span className="inline-flex min-w-0 items-center gap-1">
-              <MapPin className="h-3 w-3 shrink-0" aria-hidden="true" />
-              <span className="truncate">{store.branch_name}</span>
-            </span>
-          )}
-          {(store.km != null || store.branch_name) && <span aria-hidden="true">·</span>}
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3 w-3" aria-hidden="true" />
             {open ? (closes ? `Open till ${closes}` : 'Open') : 'Closed today'}
           </span>
+          {/* Straight-line distance from the visitor's spot, when both are known. */}
+          {store.km != null && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span
+                className="text-gold inline-flex items-center gap-1"
+                title="Estimated distance from your location"
+              >
+                <Navigation className="h-3 w-3" aria-hidden="true" />~{formatKm(store.km)} away
+              </span>
+            </>
+          )}
         </span>
       </Link>
     </li>

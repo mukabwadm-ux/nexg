@@ -38,7 +38,9 @@ describe('rankStores', () => {
     expect(nearCount).toBe(2);
     expect(stores.slice(0, 2).map((s) => s.id)).toEqual(['near-1km', 'near-5km']);
     expect(stores[0]!.km).toBeCloseTo(1, 0);
-    expect(stores.find((s) => s.id === 'mombasa')!.km).toBeNull();
+    /* Not near, but still told how far it is. */
+    expect(stores.find((s) => s.id === 'mombasa')!.km).toBeGreaterThan(400);
+    expect(stores.find((s) => s.id === 'pick')!.km).toBeNull();
   });
 
   it("tops the row up with Nairobi's usual stores so it is never empty", () => {
