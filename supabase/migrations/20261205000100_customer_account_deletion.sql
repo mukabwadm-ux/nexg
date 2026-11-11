@@ -71,7 +71,9 @@ as $$
     -- REVIEW: business and staff accounts are deleted by NexG support, because they own merchant
     -- records and have links to auth.users with no delete rule.
     'business_account', case when exists (select 1 from public.staff_user s where s.user_id = p_user_id)
-        or exists (select 1 from public.merchant_application a where a.submitted_by = p_user_id)
+        or exists (select 1 from public.merchant_application_submission a where a.submitted_by = p_user_id)
+        or exists (select 1 from public.merchant_application_operation a where a.actor_id = p_user_id)
+        or exists (select 1 from public.merchant_application_payout a where a.declared_by = p_user_id)
         or exists (select 1 from public.merchant_user mu where mu.user_id = p_user_id)
         or exists (select 1 from public.connector_connection_consent cc where cc.agreed_by = p_user_id)
       then 'This sign-in is also used for a business or staff account. Contact NexG support to close it.' end
