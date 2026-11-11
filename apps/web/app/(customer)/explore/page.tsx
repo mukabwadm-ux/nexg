@@ -19,6 +19,8 @@ import { SiteHeader } from '@/components/site-header';
 import { unstable_cache } from 'next/cache';
 
 import { createPublicClient } from '@/lib/supabase/public';
+import { TimeOfDayPhrase } from '@/components/time-of-day-phrase';
+import { nairobiHour, timeOfDay } from '@/lib/time-of-day';
 
 export const metadata: Metadata = {
   title: 'Explore',
@@ -319,7 +321,10 @@ export default async function ExplorePage({
         <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-              What can we bring you <span className="text-gold">tonight?</span>
+              What can we bring you{' '}
+              <span className="text-gold">
+                <TimeOfDayPhrase initial={timeOfDay(nairobiHour())} />?
+              </span>
             </h1>
             <p className="text-muted mt-3 max-w-xl text-[0.9375rem] font-semibold leading-[1.7]">
               Merchants that deliver to {cityName} right now. Pick one, or ask a concierge and we’ll
