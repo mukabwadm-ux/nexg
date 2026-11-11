@@ -62,14 +62,14 @@ export function LanguageSwitcher({
                 router.refresh();
               }
             }}
-            className={`rounded-full px-2.5 py-1 text-xs font-bold transition-colors ${
+            className={`rounded-full font-bold transition-colors ${
               tone === 'dark'
                 ? on
-                  ? 'text-ink bg-white'
-                  : 'text-white/70 hover:text-white disabled:opacity-50'
+                  ? 'text-ink bg-white px-4 py-2 text-sm'
+                  : 'px-4 py-2 text-sm text-white/75 hover:text-white disabled:opacity-50'
                 : on
-                  ? 'bg-ink text-white'
-                  : 'text-muted hover:text-ink disabled:opacity-50'
+                  ? 'bg-ink px-2.5 py-1 text-xs text-white'
+                  : 'text-muted hover:text-ink px-2.5 py-1 text-xs disabled:opacity-50'
             }`}
           >
             {busy === option ? '…' : localeName(option)}
