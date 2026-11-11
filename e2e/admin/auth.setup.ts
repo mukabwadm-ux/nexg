@@ -1,3 +1,6 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
+
 import { expect, test as setup } from '@playwright/test';
 
 import { STAFF_SEEN_COOKIE } from '../../apps/admin/lib/idle';
@@ -42,11 +45,19 @@ setup('authenticate as staff', async ({ page }) => {
      them look idle: Playwright failed whichever admin test landed
      5 to 10 minutes after this sign-in. Saved without the stamp, the
      session is exactly a fresh sign-in, and the first request of
-     each spec stamps it again. */
-  await page.context().clearCookies({ name: STAFF_SEEN_COOKIE });
-  const cookies = await page.context().cookies();
-  expect(cookies.some((c) => c.name === STAFF_SEEN_COOKIE)).toBe(false);
-  expect(cookies.some((c) => c.name.startsWith('sb-'))).toBe(true);
+     each spec stamps it again.
 
-  await page.context().storageState({ path: ADMIN_STATE });
+     The stamp is taken out of the saved file itself, after the page
+     is closed. Clearing the cookie in the browser was not enough: the
+     landing page was still loading and prefetching, and on a slow CI
+     machine one of those responses stamped it again before the state
+     was written. */
+  const context = page.context();
+  await page.close();
+  const state = await context.storageState();
+  state.cookies = state.cookies.filter((c) => c.name !== STAFF_SEEN_COOKIE);
+  expect(state.cookies.some((c) => c.name.startsWith('sb-'))).toBe(true);
+
+  mkdirSync(dirname(ADMIN_STATE), { recursive: true });
+  writeFileSync(ADMIN_STATE, JSON.stringify(state, null, 2));
 });
