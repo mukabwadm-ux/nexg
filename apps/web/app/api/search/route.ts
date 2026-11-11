@@ -12,8 +12,9 @@ import { createPublicClient } from '@/lib/supabase/public';
  * read here is already public (the `_public` views and `merchant_public`
  * apply their own visibility rules), so the anonymous client is right.
  *
- * Three characters minimum, matching the input: two letters match half the
- * catalogue and tell nobody anything.
+ * Answers from the first character, matching the input, so results appear
+ * as soon as somebody starts typing; each group is capped, so a single
+ * letter still returns a short list.
  */
 
 export interface SearchItem {
@@ -79,6 +80,22 @@ function isJsonRecord(value: Json): value is { [key: string]: Json | undefined }
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+/*
+ * One or two letters match the start of a word ("p" finds Pharmacy and
+ * Pizza, not Vapes); from three letters on, anywhere in the text.
+ */
+const SHORT = 3;
+
+function matcher(lower: string): (text: string | null | undefined) => boolean {
+  if (lower.length >= SHORT) return (text) => !!text && text.toLowerCase().includes(lower);
+  return (text) =>
+    !!text &&
+    text
+      .toLowerCase()
+      .split(/[^\p{L}\p{N}]+/u)
+      .some((word) => word.startsWith(lower));
+}
+
 function categorySearchServices(
   categories: CategorySearchRow[],
   lower: string,
@@ -86,13 +103,15 @@ function categorySearchServices(
 ): SearchItem[] {
   const subcategories: SearchItem[] = [];
   const matchedCategories: SearchItem[] = [];
+  const hit = matcher(lower);
+  const short = lower.length < SHORT;
 
   for (const category of categories) {
     if (
-      category.label.toLowerCase().includes(lower) ||
-      category.description?.toLowerCase().includes(lower) ||
+      hit(category.label) ||
+      (!short && hit(category.description)) ||
       CATEGORY_SEARCH_TERMS[category.category]?.some(
-        (term) => term.startsWith(lower) || lower.includes(term),
+        (term) => term.startsWith(lower) || (!short && lower.includes(term)),
       )
     ) {
       matchedCategories.push({
@@ -109,7 +128,7 @@ function categorySearchServices(
         !isJsonRecord(subcategory) ||
         typeof subcategory.id !== 'string' ||
         typeof subcategory.name !== 'string' ||
-        !subcategory.name.toLowerCase().includes(lower)
+        !hit(subcategory.name)
       ) {
         continue;
       }
@@ -123,7 +142,10 @@ function categorySearchServices(
     }
   }
 
-  return [...subcategories.slice(0, 3), ...matchedCategories.slice(0, 2)];
+  /* One or two letters: the main categories first, they are the likelier aim. */
+  return short
+    ? [...matchedCategories.slice(0, 2), ...subcategories.slice(0, 3)]
+    : [...subcategories.slice(0, 3), ...matchedCategories.slice(0, 2)];
 }
 
 /** PostgREST's `or=` filter is comma- and bracket-delimited; strip what would end a clause. */
@@ -140,12 +162,20 @@ export async function GET(request: Request) {
   const city = (url.searchParams.get('city') ?? 'nairobi').replace(/[^a-z0-9-]/g, '') || 'nairobi';
   const q = safe(raw);
 
-  if (q.length < 3) {
+  if (q.length < 1) {
     return NextResponse.json({ groups: [] satisfies SearchGroup[] });
   }
 
   const lower = q.toLowerCase();
-  const like = `%${q}%`;
+  const short = lower.length < SHORT;
+  /* An `or=` clause matching the term in these columns: anywhere for three
+     letters or more; at the start of the text or of a word below that. */
+  const anyOf = (columns: string[]) =>
+    columns
+      .flatMap((column) =>
+        short ? [`${column}.ilike.${q}%`, `${column}.ilike.% ${q}%`] : [`${column}.ilike.%${q}%`],
+      )
+      .join(',');
   const supabase = createPublicClient();
 
   const { data: categoryRows, error: categoryError } = await supabase
@@ -164,10 +194,10 @@ export async function GET(request: Request) {
     lower,
     city,
   );
+  const hit = matcher(lower);
   const destinationServices: SearchItem[] = DESTINATION_SERVICES.filter(
     (s) =>
-      s.words.some((w) => w.startsWith(lower) || lower.includes(w)) ||
-      s.title.toLowerCase().includes(lower),
+      s.words.some((w) => w.startsWith(lower) || (!short && lower.includes(w))) || hit(s.title),
   )
     .slice(0, 3)
     .map((s) => ({ kind: 'service', title: s.title, subtitle: s.subtitle, href: s.href(city) }));
@@ -190,19 +220,19 @@ export async function GET(request: Request) {
       .from('merchant_public')
       .select('id, trading_name, category, category_other, branch_name, explore_visible')
       .eq('city_slug', city)
-      .or(`trading_name.ilike.${like},category_other.ilike.${like},branch_name.ilike.${like}`)
+      .or(anyOf(['trading_name', 'category_other', 'branch_name']))
       .limit(8),
     supabase
       .from('property_public')
       .select('slug, name, area, summary')
-      .or(`name.ilike.${like},area.ilike.${like},summary.ilike.${like}`)
+      .or(anyOf(['name', 'area', 'summary']))
       .limit(4),
     cityId
       ? supabase
           .from('curated_day_public')
           .select('slug, title, tagline')
           .eq('city_id', cityId)
-          .or(`title.ilike.${like},tagline.ilike.${like}`)
+          .or(anyOf(['title', 'tagline']))
           .limit(3)
       : Promise.resolve({ data: [] as { slug: string; title: string; tagline: string | null }[] }),
     cityId
@@ -211,7 +241,7 @@ export async function GET(request: Request) {
           .select('id, name, venue_name, starts_at')
           .eq('city_id', cityId)
           .gte('starts_at', new Date().toISOString())
-          .or(`name.ilike.${like},venue_name.ilike.${like}`)
+          .or(anyOf(['name', 'venue_name']))
           .order('starts_at')
           .limit(3)
       : Promise.resolve({

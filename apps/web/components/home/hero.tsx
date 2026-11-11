@@ -54,7 +54,7 @@ import { SiteMenu } from '../site-menu';
  *   - the location pill is the same place the rest of the site uses, and
  *     opens the same sheet. On a phone that has already allowed location
  *     it is the exact spot, read when the page opened.
- *   - the search answers from the third letter (/api/search) and Enter
+ *   - the search answers as soon as a letter is typed (/api/search) and Enter
  *     with nothing highlighted goes to Explore with the query.
  *   - popular searches are the four most searched topics of the last 30
  *     days (lib/popular-searches.ts); they and "Plan your trip" go where
@@ -83,7 +83,8 @@ interface City {
   name: string;
 }
 
-const MIN_CHARS = 3;
+/** Results start with the first letter typed. */
+const MIN_CHARS = 1;
 /** Session flag: the visitor has answered or dismissed the hero's location prompt. */
 const PROMPT_KEY = 'nexg.loc.heroPrompt';
 
@@ -188,10 +189,11 @@ export function Hero({
         {/* Three clips in turn: the kitchen, the lobby, the room. */}
         <HeroVideo />
         {/* Phone: dark from the middle down, where the text sits. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/50 to-[#0b0907] lg:hidden" />
-        {/* Desktop: dark on the left behind the text and buttons, easing to a
-            light veil on the right so the clip still reads. */}
-        <div className="absolute inset-0 hidden bg-gradient-to-r from-[#0b0907]/90 via-[#0b0907]/65 via-35% to-[#0b0907]/15 lg:block" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/70 to-[#0b0907] lg:hidden" />
+        {/* Desktop: the text is centred, so the veil is darkest in the middle
+            behind it and lighter towards the edges, where the clip reads. */}
+        <div className="absolute inset-0 hidden bg-[#0b0907]/60 lg:block" />
+        <div className="absolute inset-0 hidden bg-[radial-gradient(ellipse_55%_60%_at_50%_50%,rgba(11,9,7,0.75),transparent)] lg:block" />
         <div className="absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t from-[#0b0907] to-transparent lg:block" />
       </div>
 
@@ -206,18 +208,18 @@ export function Hero({
 
       {/* ─────────────────────────────────────────────── the message */}
       {/* Fills what the nav and the strip leave of one screen, centred in it. */}
-      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-center px-5 pb-5 pt-[6.5rem] sm:px-[30px] sm:pt-28 lg:pb-8 lg:pt-32">
+      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col items-center justify-center px-5 pb-8 pt-[6.5rem] text-center sm:px-[30px] sm:pt-28 lg:pb-12 lg:pt-32">
         <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
           {copy.eyebrow}
         </p>
         <h1
           aria-label={`${copy.titleLine1} ${copy.titleLine2}`}
-          className="mt-4 max-w-[40rem] text-[2.125rem] font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-[3.5rem]"
+          className="mt-4 max-w-[48rem] text-[2.125rem] font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-[4rem]"
         >
           <span className="block">{copy.titleLine1}</span>
           <span className="text-gold block">{copy.titleLine2}</span>
         </h1>
-        <p className="mt-5 max-w-md text-[0.9375rem] leading-[1.7] text-white/85 sm:text-base">
+        <p className="mt-5 max-w-xl text-[0.9375rem] leading-[1.7] text-white/85 sm:text-lg">
           {copy.lede}
         </p>
 
@@ -230,10 +232,10 @@ export function Hero({
         />
 
         {/* Popular searches */}
-        <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-3">
+        <div className="mt-6 flex w-full flex-col items-center gap-3 lg:w-auto lg:flex-row lg:gap-3">
           <p className="text-[0.8125rem] font-semibold text-white/85">{copy.popular}</p>
           {/* One row: it scrolls sideways on a phone rather than taking two. */}
-          <ul className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
+          <ul className="-mx-5 flex max-w-[calc(100%+2.5rem)] gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:max-w-none sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
             {popular.map(({ icon: Icon, label, href }) => (
               <li key={label}>
                 <Link
@@ -247,19 +249,6 @@ export function Hero({
             ))}
           </ul>
         </div>
-
-        <Link
-          href="/ask"
-          className={cn(
-            'focus-visible:ring-gold mt-8 flex h-12 items-center gap-3 rounded-full px-6 text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:text-base',
-            /* Outlined on a phone, filled from sm up — as drawn. */
-            'border-gold border-[1.5px] text-white sm:inline-flex sm:self-start sm:border-0 sm:bg-[#FFC93C] sm:text-[#141414] sm:hover:bg-[#FFD35F]',
-          )}
-        >
-          <Plane className="text-gold h-4 w-4 sm:text-[#141414]" aria-hidden="true" />
-          <span className="flex-1 sm:flex-none">{copy.plan}</span>
-          <ArrowRight className="text-gold h-4 w-4 sm:text-[#141414]" aria-hidden="true" />
-        </Link>
       </div>
 
       {/* ─────────────────────────────────────────────── why NexG */}
@@ -497,7 +486,7 @@ function HeroSearch({
   const items = React.useMemo(() => groups.flatMap((g) => g.items), [groups]);
   const term = q.trim();
 
-  /* Ask as they type, from the third letter. Debounced, and the previous
+  /* Ask as they type, from the first letter. Debounced, and the previous
      request is abandoned so a slow answer cannot overwrite a newer one. */
   React.useEffect(() => {
     if (term.length < MIN_CHARS) {
@@ -521,7 +510,7 @@ function HeroSearch({
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
-    }, 180);
+    }, 120);
     return () => {
       clearTimeout(timer);
       controller.abort();
@@ -562,7 +551,7 @@ function HeroSearch({
   let index = -1;
 
   return (
-    <div ref={boxRef} className="relative mt-8 max-w-[38rem]">
+    <div ref={boxRef} className="relative mt-8 w-full max-w-[42rem] text-left">
       <form
         role="search"
         onSubmit={(e) => {
@@ -604,7 +593,7 @@ function HeroSearch({
         </button>
       </form>
 
-      {/* ───────────────────────────── results, from the third letter */}
+      {/* ───────────────────────────── results, from the first letter */}
       {showPanel && (
         <div
           id={listId}
