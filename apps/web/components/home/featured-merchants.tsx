@@ -162,7 +162,7 @@ function Card({
     <li className={RAIL_CARD}>
       <Link
         href={href}
-        className="focus-visible:ring-gold group relative flex aspect-[3/4] max-h-[36rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E] ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2"
+        className="focus-visible:ring-gold group relative flex aspect-[15/14] max-h-[25rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E] ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2"
       >
         {photo ? (
           <Image
@@ -177,14 +177,14 @@ function Card({
              broken image or a stock photo of someone else's shop. */
           <span
             aria-hidden="true"
-            className="text-gold/40 absolute inset-0 flex items-center justify-center pb-24"
+            className="text-gold/40 absolute inset-0 flex items-center justify-center pb-16"
           >
             <Icon className="h-14 w-14" strokeWidth={1.5} />
           </span>
         )}
         <span
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-[#0b0907] via-[#0b0907]/75 via-30% to-transparent to-60%"
+          className="absolute inset-0 bg-gradient-to-t from-[#0b0907] via-[#0b0907]/80 via-45% to-transparent to-85%"
         />
 
         <span className="text-ink absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-[0.625rem] font-extrabold uppercase tracking-[0.16em]">
