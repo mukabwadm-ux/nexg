@@ -1,7 +1,14 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { STAFF_SEEN_COOKIE, STAFF_IDLE_TIMEOUT_MS, isStaffIdle } from '@/lib/idle';
+import {
+  STAFF_SEEN_COOKIE,
+  STAFF_SEEN_MAX_AGE_S,
+  isStaffSessionIdle,
+  readStaffSeen,
+  sessionIdOf,
+  writeStaffSeen,
+} from '@/lib/idle';
 
 /**
  * Keeps the Supabase session fresh and keeps signed-out visitors out of the
@@ -168,8 +175,19 @@ async function staffSessionMiddleware(request: NextRequest) {
      * Supabase's own token lifetime is a project-wide setting shared
      * with the public site, so the console cannot shorten it there. This
      * is the console's own rule, and it is deliberately stricter.
+     *
+     * The stamp names the sign-in session it was made in, so it can live
+     * as long as that sign-in (an idle hour is still idle) while a new
+     * sign-in, which has a new session id, starts clean.
      */
-    if (isStaffIdle(Number(request.cookies.get(STAFF_SEEN_COOKIE)?.value ?? 0), Date.now())) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const signIn = sessionIdOf(session?.access_token) ?? 'unknown';
+    const now = Date.now();
+    if (
+      isStaffSessionIdle(readStaffSeen(request.cookies.get(STAFF_SEEN_COOKIE)?.value), signIn, now)
+    ) {
       /*
        * End the session rather than merely redirecting. Clearing the
        * auth cookies here means the next request cannot present them
@@ -193,15 +211,16 @@ async function staffSessionMiddleware(request: NextRequest) {
       return expired;
     }
 
-    response.cookies.set(STAFF_SEEN_COOKIE, String(Date.now()), {
+    response.cookies.set(STAFF_SEEN_COOKIE, writeStaffSeen(signIn, now), {
       path: '/',
       httpOnly: true,
       sameSite: 'lax',
       /*
-       * The cookie outlives the timeout slightly so the gate reads
-       * "idle for over five minutes", never "never seen you".
+       * As long as the sign-in can live, so an idle session never outlasts
+       * its own stamp and reads as "never seen you". It used to expire after
+       * ten minutes, which let any session idle longer than that carry on.
        */
-      maxAge: Math.ceil(STAFF_IDLE_TIMEOUT_MS / 1000) * 2,
+      maxAge: STAFF_SEEN_MAX_AGE_S,
     });
   }
 
