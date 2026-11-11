@@ -370,3 +370,29 @@ Say this when you share the link, so nobody reports it as a bug:
 Both free tiers are enough for this. Supabase free pauses a project after a
 week of no activity — if the link goes quiet and then breaks, that is why;
 un-pause it from the dashboard.
+
+### Vercel's 100 deployments a day
+
+Vercel's free plan allows 100 deployments a day across the whole team,
+including projects that are not NexG. On 2026-11-11 NexG alone made 96: 36
+production deploys from `main` and 60 previews of pull-request branches. After
+that, every deploy, production included, was refused with "Deployment rate
+limited — retry in 24 hours".
+
+So each app's `vercel.json` (`apps/web`, `apps/admin`, `apps/api`) turns
+automatic deployments off for every branch except `main`:
+
+```json
+"git": { "deploymentEnabled": { "**": false, "main": true } }
+```
+
+- Merging to `main` still deploys to production, as before.
+- Pull requests get no preview link. GitHub CI still builds, lints,
+  typechecks and tests every one.
+- Vercel reads this from the branch being pushed, so a branch cut from `main`
+  before this change still makes previews until it is updated from `main`.
+- To preview a branch anyway, start a deployment of it by hand with the Vercel
+  CLI: `vercel api` → `POST /v13/deployments` with a `gitSource` naming the
+  branch. That is how the API's first production deploy was started.
+- If a preview on every pull request matters more than the cost, Vercel Pro
+  raises the limit far beyond this, and the `git` block can come out again.
