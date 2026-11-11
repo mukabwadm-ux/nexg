@@ -26,10 +26,11 @@ export function NotifyForm() {
   return (
     <form
       action={async (formData: FormData) => formAction(await withCaptcha(formData))}
-      className="mt-3"
+      className="mt-8 max-w-[38rem]"
     >
-      <p className="text-ink text-sm font-bold">Be first to know when it lands</p>
-      <div className="bg-surface shadow-card mt-2 flex items-end gap-2 rounded-xl p-1.5">
+      <p className="text-gold text-base font-bold">Be first to know when it lands</p>
+      {/* A dark pill with the gold button inside it, on the dark panel. */}
+      <div className="focus-within:ring-gold mt-3 flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] p-1.5 focus-within:ring-2">
         <Input
           id="notify_email"
           name="email"
@@ -37,7 +38,7 @@ export function NotifyForm() {
           label="Email address"
           labelHidden
           placeholder="Your email address"
-          className="border-0 focus:ring-0"
+          className="h-12 border-0 bg-transparent pl-5 text-base text-white placeholder:text-white/50 focus:ring-0"
           containerClassName="flex-1"
           required
         />
@@ -50,7 +51,13 @@ export function NotifyForm() {
 function NotifyButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" loading={pending} loadingText="Saving…" className="shrink-0">
+    <Button
+      type="submit"
+      variant="gold"
+      loading={pending}
+      loadingText="Saving…"
+      className="h-12 shrink-0 rounded-full px-7 text-base"
+    >
       Notify me
     </Button>
   );

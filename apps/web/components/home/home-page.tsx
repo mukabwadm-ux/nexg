@@ -286,21 +286,27 @@ export async function HomePageContent({
           </div>
         </section>
 
-        <section className="bg-gold py-14">
-          <div className="mx-auto grid max-w-[120rem] gap-8 px-4 sm:px-[30px] lg:grid-cols-2 lg:items-center">
-            <div>
-              <span className="bg-ink inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.625rem] font-bold uppercase tracking-wide text-white">
-                <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
+        {/* The app: a dark panel from the left edge with a deep rounded right
+            side, on gold, and the phone on the gold beside it. */}
+        <section className="relative overflow-hidden bg-[#D4AF37]">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-[#0b0907] lg:right-[42%] lg:rounded-r-[11rem]"
+          />
+          <div className="relative mx-auto grid max-w-[120rem] gap-10 px-4 sm:px-[30px] lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-center">
+            <div className="py-16 text-white sm:py-20 lg:py-28 lg:pr-16">
+              <span className="inline-flex items-center gap-2.5 rounded-full border border-white/20 px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.2em]">
+                <span aria-hidden="true" className="bg-gold h-2 w-2 rounded-full" />
                 {t('home.app.eyebrow')}
               </span>
 
-              <h2 className="mt-5 text-4xl/[1.06] font-extrabold tracking-tight sm:text-[3.125rem]/[1.06]">
+              <h2 className="mt-7 text-5xl/[1.02] font-extrabold tracking-tight sm:text-6xl/[1.02] lg:text-[4.25rem]/[1.02] xl:text-[4.75rem]/[1.02]">
                 {t('home.app.heading')}
                 <br />
-                your pocket.
+                your <span className="text-gold">pocket.</span>
               </h2>
 
-              <p className="text-ink/80 mt-4 max-w-md text-[0.9375rem] font-semibold leading-[1.7]">
+              <p className="mt-6 max-w-[40rem] text-base leading-[1.75] text-white/70 sm:text-lg">
                 {t('home.app.body')}
               </p>
 
@@ -308,7 +314,7 @@ export async function HomePageContent({
               <StoreBadges />
             </div>
 
-            <div className="hidden lg:block">
+            <div className="hidden py-16 lg:block">
               <AppPreview />
             </div>
           </div>
