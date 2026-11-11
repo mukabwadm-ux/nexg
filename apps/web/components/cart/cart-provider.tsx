@@ -26,6 +26,11 @@ interface CartApi extends CartState {
     merchant: { id: string; name: string },
     line: Omit<CartLine, 'quantity'>,
   ) => 'added' | 'switched';
+  /**
+   * Several lines from one merchant in one go, each with a quantity (a dish
+   * and the extras picked with it). Same one-shop rule as add.
+   */
+  addLines: (merchant: { id: string; name: string }, lines: CartLine[]) => 'added' | 'switched';
   setQuantity: (itemId: string, quantity: number) => void;
   clear: () => void;
 }
@@ -100,6 +105,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             : [...state.lines, { ...line, quantity: 1 }],
         });
         return 'added';
+      },
+      addLines: (merchant, incoming) => {
+        const wanted = incoming.filter((l) => l.quantity > 0);
+        if (wanted.length === 0) return 'added';
+        const switched =
+          !!state.merchantId && state.merchantId !== merchant.id && state.lines.length > 0;
+        const lines = switched ? [] : [...state.lines];
+        for (const line of wanted) {
+          const at = lines.findIndex((l) => l.id === line.id);
+          if (at >= 0) {
+            lines[at] = {
+              ...lines[at]!,
+              quantity: Math.min(lines[at]!.quantity + line.quantity, 50),
+            };
+          } else {
+            lines.push({ ...line, quantity: Math.min(line.quantity, 50) });
+          }
+        }
+        commit({ merchantId: merchant.id, merchantName: merchant.name, lines });
+        return switched ? 'switched' : 'added';
       },
       setQuantity: (id, quantity) => {
         const lines =
