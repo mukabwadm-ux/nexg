@@ -76,6 +76,38 @@
   --shell-border: #2a2a28;
   --shell-border-rgb: 42 42 40;
 
+  /* Text and lines sitting directly on the page background (not inside a
+     card). The same as ink, muted and border in the light theme; light on
+     the dark page in the dark theme, while text inside cards stays ink. */
+  --page-ink: #141414;
+  --page-ink-rgb: 20 20 20;
+  --page-muted: #4d4a44;
+  --page-muted-rgb: 77 74 68;
+  --page-line: #ddd8cc;
+  --page-line-rgb: 221 216 204;
+
   /* Geometry */
   --radius: 0.625rem;
+}
+
+/*
+ * The dark theme of the public site, after the Explore design: a near-black
+ * page, cream cards that keep their dark text, and gold accents. Set by the
+ * `dark` class on <html> (apps/web components/theme), only on the public
+ * site; the consoles never set it.
+ */
+.dark {
+  color-scheme: dark;
+
+  --bg: #0b0907;
+  --bg-rgb: 11 9 7;
+  --surface: #faf7f0;
+  --surface-rgb: 250 247 240;
+
+  --page-ink: #f6f3ec;
+  --page-ink-rgb: 246 243 236;
+  --page-muted: #a9a297;
+  --page-muted-rgb: 169 162 151;
+  --page-line: #2b2620;
+  --page-line-rgb: 43 38 32;
 }

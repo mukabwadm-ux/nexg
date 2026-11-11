@@ -16,8 +16,20 @@
   }
 
   body {
-    @apply bg-bg text-ink antialiased;
+    @apply bg-bg text-page antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /*
+   * Cards keep dark text in the dark theme: they are cream on a dark page,
+   * as on Explore, so whatever inherits its colour inside one reads as ink.
+   * In the base layer and wrapped in :where, so any text colour a card sets
+   * itself still wins.
+   */
+  .dark :where(.bg-surface, .bg-white, .bg-gold, .bg-gold-soft) {
+    color: rgb(var(--ink-rgb));
+    /* Native checkboxes, radios and date pickers inside a card stay light. */
+    color-scheme: light;
   }
 
   /* One consistent focus ring everywhere — keyboard users must always see it. */
@@ -43,6 +55,185 @@
   .label-micro {
     @apply text-micro text-muted-light font-bold uppercase;
   }
+}
+
+/*
+ * Dark theme of the public site: the page goes near-black, cards stay cream.
+ * These rules sit outside the Tailwind layers so they apply after the
+ * utilities, and they only ever act inside `.dark`.
+ *
+ * A "card" is anything with a light background: the surface and white
+ * tokens, gold and the status tints, and the light arbitrary colours
+ * (bg-[#F...], bg-[#E...]). Inside a card nothing changes. Outside one:
+ *   - text set to ink or the muted greys reads as the light page colours,
+ *     so a heading coloured ink on the page does not vanish on black;
+ *   - lines drawn with the border tokens use the dark page line;
+ *   - a bg-bg inset inside a card stays a light inset rather than a hole.
+ */
+.dark
+  :is(.text-ink, .text-foreground, [class^='text-ink/'], [class*=' text-ink/']):not(
+    :is(
+        .bg-surface,
+        .bg-white,
+        .bg-gold,
+        .bg-gold-soft,
+        .bg-success-bg,
+        .bg-danger-bg,
+        .bg-warning-bg,
+        .bg-info-bg,
+        [class*='bg-[#F'],
+        [class*='bg-[#E'],
+        [class*='bg-[#f'],
+        [class*='bg-[#e']
+      )
+      *,
+    .bg-surface,
+    .bg-white,
+    .bg-gold,
+    .bg-gold-soft,
+    [class*='bg-[#F'],
+    [class*='bg-[#E'],
+    [class*='bg-[#f'],
+    [class*='bg-[#e']
+  ) {
+  color: rgb(var(--page-ink-rgb));
+}
+.dark
+  :is(.text-muted, .text-muted-light, [class^='text-muted/'], [class*=' text-muted/']):not(
+    :is(
+        .bg-surface,
+        .bg-white,
+        .bg-gold,
+        .bg-gold-soft,
+        .bg-success-bg,
+        .bg-danger-bg,
+        .bg-warning-bg,
+        .bg-info-bg,
+        [class*='bg-[#F'],
+        [class*='bg-[#E'],
+        [class*='bg-[#f'],
+        [class*='bg-[#e']
+      )
+      *,
+    .bg-surface,
+    .bg-white,
+    .bg-gold,
+    .bg-gold-soft,
+    [class^='bg-[#F'],
+    [class*=' bg-[#F'],
+    [class^='bg-[#E'],
+    [class*=' bg-[#E'],
+    [class^='bg-[#f'],
+    [class*=' bg-[#f'],
+    [class^='bg-[#e'],
+    [class*=' bg-[#e']
+  ) {
+  color: rgb(var(--page-muted-rgb));
+}
+/* Links that darken to ink on hover brighten to the page text instead. */
+.dark
+  .hover\:text-ink:hover:not(
+    :is(
+        .bg-surface,
+        .bg-white,
+        .bg-gold,
+        .bg-gold-soft,
+        [class*='bg-[#F'],
+        [class*='bg-[#E'],
+        [class*='bg-[#f'],
+        [class*='bg-[#e']
+      )
+      *,
+    .bg-surface,
+    .bg-white,
+    .bg-gold,
+    .bg-gold-soft,
+    [class^='bg-[#F'],
+    [class*=' bg-[#F'],
+    [class^='bg-[#E'],
+    [class*=' bg-[#E'],
+    [class^='bg-[#f'],
+    [class*=' bg-[#f'],
+    [class^='bg-[#e'],
+    [class*=' bg-[#e']
+  ) {
+  color: rgb(var(--page-ink-rgb));
+}
+.dark
+  :is(.border-border, .border-border-strong):not(
+    :is(
+        .bg-surface,
+        .bg-white,
+        .bg-gold-soft,
+        [class*='bg-[#F'],
+        [class*='bg-[#E'],
+        [class*='bg-[#f'],
+        [class*='bg-[#e']
+      )
+      *
+  ) {
+  border-color: rgb(var(--page-line-rgb));
+}
+.dark
+  :is(.bg-surface, .bg-white, [class*='bg-[#F'], [class*='bg-[#f'])
+  :is(.bg-bg, [class*='bg-bg/']) {
+  background-color: rgb(241 236 225);
+}
+
+/*
+ * Hand-picked dark text colours (text-[#141414], text-[#4A4436] ...) on the
+ * page, outside a card: the near-black ones read as page text, the mid-tone
+ * ones as the muted page text. Matched on the hex's first digit.
+ */
+.dark
+  :is([class*='text-[#0'], [class*='text-[#1'], [class*='text-[#2'], [class*='text-[#3']):not(
+    :is(
+        .bg-surface,
+        .bg-white,
+        .bg-gold,
+        .bg-gold-soft,
+        [class*='bg-[#F'],
+        [class*='bg-[#E'],
+        [class*='bg-[#f'],
+        [class*='bg-[#e'],
+        [class*='bg-[#D'],
+        [class*='bg-[#d']
+      )
+      *,
+    .bg-surface,
+    .bg-white,
+    .bg-gold,
+    [class*='bg-[#F'],
+    [class*='bg-[#E'],
+    [class*='bg-[#f'],
+    [class*='bg-[#e'],
+    [class*='bg-[#D'],
+    [class*='bg-[#d']
+  ) {
+  color: rgb(var(--page-ink-rgb));
+}
+.dark
+  :is([class*='text-[#4'], [class*='text-[#5'], [class*='text-[#6']):not(
+    :is(
+        .bg-surface,
+        .bg-white,
+        .bg-gold,
+        .bg-gold-soft,
+        [class*='bg-[#F'],
+        [class*='bg-[#E'],
+        [class*='bg-[#f'],
+        [class*='bg-[#e'],
+        [class*='bg-[#D'],
+        [class*='bg-[#d']
+      )
+      *
+  ) {
+  color: rgb(var(--page-muted-rgb));
+}
+
+/* A dark panel on the dark page gets a faint edge so it still reads as a panel. */
+.dark :is(.bg-ink, .bg-shell):not(button, a, [role='button']) {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
 }
 
 /* Shared table boundaries and transient, local scrollbars. */

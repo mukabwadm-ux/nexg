@@ -8,6 +8,7 @@ import { getTranslations } from '@/lib/i18n';
 
 import { Logo } from './logo';
 import { SiteMenu } from './site-menu';
+import { ThemeToggle } from './theme/theme';
 
 export interface SiteHeaderProps {
   /** The right-hand call to action, which differs per page. */
@@ -50,6 +51,8 @@ export async function SiteHeader({ action, signIn }: SiteHeaderProps) {
           >
             <User className="h-4 w-4" aria-hidden="true" fill="currentColor" />
           </Link>
+
+          <ThemeToggle className="focus-visible:ring-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11" />
 
           <SiteMenu locale={locale} quickLink={action}>
             <button

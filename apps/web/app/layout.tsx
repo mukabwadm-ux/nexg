@@ -3,6 +3,8 @@ import '@nexg/ui/globals.css';
 import { ToastProvider } from '@nexg/ui';
 import type { Metadata, Viewport } from 'next';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
+import { THEME_SCRIPT } from '@/components/theme/script';
+import { ThemeSync } from '@/components/theme/theme';
 
 export const metadata: Metadata = {
   title: {
@@ -30,8 +32,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    /* The theme class is set by THEME_SCRIPT before React loads, hence the warning opt-out. */
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Light or dark before the first paint: no flash for dark-mode visitors. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <link
           rel="preload"
           href="/fonts/manrope/v1/manrope-latin.woff2"
@@ -42,7 +47,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* eslint-disable-next-line @next/next/no-css-tags -- Static font faces bypass the development CSS compiler. */}
         <link rel="stylesheet" href="/fonts/manrope/v1/manrope.css" />
       </head>
-      <body className="bg-bg text-ink min-h-dvh font-sans">
+      <body className="bg-bg text-page min-h-dvh font-sans">
+        <ThemeSync />
         <ToastProvider>{children}</ToastProvider>
         <RegisterServiceWorker />
       </body>

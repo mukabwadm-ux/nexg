@@ -109,7 +109,7 @@ export function ProductPurchase({
         <button
           type="button"
           onClick={add}
-          className="focus-visible:ring-gold text-ink focus-visible:ring-offset-bg inline-flex h-[3.75rem] min-w-[14rem] flex-1 items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#FFD35F] to-[#E5B32A] px-8 text-lg font-extrabold shadow-[0_10px_40px_-10px_rgba(229,179,42,0.6)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          className="focus-visible:ring-gold text-ink focus-visible:ring-offset-bg bg-gold inline-flex h-[3.75rem] min-w-[14rem] flex-1 items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#FFD35F] to-[#E5B32A] px-8 text-lg font-extrabold shadow-[0_10px_40px_-10px_rgba(229,179,42,0.6)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         >
           <Plus className="h-5 w-5" aria-hidden="true" />
           Add to cart

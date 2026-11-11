@@ -26,6 +26,7 @@ export function Logo({
   onDark = false,
   title = 'NexG Concierge',
   priority = false,
+  themed = false,
 }: {
   className?: string;
   onDark?: boolean;
@@ -33,7 +34,26 @@ export function Logo({
   title?: string | null;
   /** In a header, so it is not lazy-loaded. */
   priority?: boolean;
+  /**
+   * Sits straight on the page background: the light-ground art in the light
+   * theme and the dark-ground art in the dark theme. Only one of the two is
+   * ever displayed, so only one reaches the accessibility tree.
+   */
+  themed?: boolean;
 }) {
+  if (themed && !onDark) {
+    return (
+      <>
+        <Logo className={cn('dark:hidden', className)} title={title} priority={priority} />
+        <Logo
+          onDark
+          className={cn('hidden dark:block', className)}
+          title={title}
+          priority={priority}
+        />
+      </>
+    );
+  }
   const art = onDark ? LOCKUP.dark : LOCKUP.light;
   return (
     <Image

@@ -199,7 +199,7 @@ function ProductPhoto({ item }: { item: BestSeller }) {
   }
   const Icon = CATEGORY_ICON[item.category] ?? Store;
   return (
-    <span className="from-bg to-border/60 absolute inset-0 flex items-center justify-center bg-gradient-to-br">
+    <span className="from-bg to-border/60 absolute inset-0 flex items-center justify-center bg-gradient-to-br dark:from-[#F1ECE1]">
       <Icon aria-hidden="true" className="text-gold/60 h-12 w-12" />
     </span>
   );

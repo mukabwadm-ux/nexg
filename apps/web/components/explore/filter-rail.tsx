@@ -33,7 +33,7 @@ export function FilterRail({
 
   return (
     <aside aria-label="Filters" className="space-y-4">
-      <div className="text-ink rounded-3xl bg-[#FAF7F0] p-6 sm:p-7">
+      <div className="text-ink bg-surface rounded-3xl p-6 sm:p-7">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-lg font-extrabold">Filters</h2>
           {anyFilter && (
