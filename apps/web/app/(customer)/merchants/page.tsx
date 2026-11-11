@@ -1,6 +1,5 @@
-import { MERCHANT_AGREEMENTS, merchantAgreementHref } from '@nexg/contracts/merchant-agreements';
 import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
-import { ArrowRight, ArrowUpRight, Check, FileText, Minus, Plus } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, Minus, Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,7 +11,6 @@ import { MerchantRegisterCard } from '@/components/merchants/merchant-register-c
 import { StorefrontPreview } from '@/components/merchants/storefront-preview';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { NEW_TAB } from '@/lib/legal-documents';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
@@ -555,48 +553,6 @@ export default async function MerchantsPage() {
                 </Link>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Every category's agreement, readable before applying. */}
-        <section
-          id="merchant-agreements"
-          aria-labelledby="merchant-agreements-title"
-          className="pb-20 sm:pb-24"
-        >
-          <div className={CONTAINER}>
-            <SectionLabel>Legal</SectionLabel>
-            <h2
-              id="merchant-agreements-title"
-              className="mt-3 text-2xl font-extrabold tracking-tight sm:text-[2rem]"
-            >
-              Merchant agreements
-            </h2>
-            <p className="text-muted mt-3 max-w-2xl text-[0.9375rem] font-semibold">
-              Each category has its own NexG Merchant Agreement. You accept the one for your
-              category when you apply.
-            </p>
-            <ul className="mt-7 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-              {MERCHANT_AGREEMENTS.map((agreement) => (
-                <li key={agreement.id}>
-                  <a
-                    href={merchantAgreementHref(agreement)}
-                    {...NEW_TAB}
-                    className="border-border bg-surface hover:border-ink focus-visible:ring-gold flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-[0.875rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2"
-                  >
-                    <span>{agreement.title}</span>
-                    <span className="bg-bg text-muted inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[0.6875rem] font-extrabold">
-                      <FileText aria-hidden="true" className="h-3 w-3" />
-                      PDF
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <p className="text-muted-light mt-4 text-[0.75rem] font-semibold">
-              Vehicle Rentals uses the Vehicle Services agreement, Health uses Wellness, and App
-              Services uses Marketplace, until their own agreements are published.
-            </p>
           </div>
         </section>
       </main>
