@@ -71,15 +71,17 @@ export async function SiteFooter({
   const locales = await availableLocales();
 
   return (
-    <footer className="bg-bg px-4 pb-6 pt-10 sm:px-[30px] sm:pb-[30px]">
-      <div className="relative mx-auto max-w-[120rem] overflow-hidden rounded-[2rem] border-t-[3px] border-[#E5B32A] bg-[#141414] text-white">
-        {/* A warm glow in the top-right corner. */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-[#E5B32A]/15 blur-3xl"
-        />
+    /* Edge to edge: the dark band and its gold top line span the whole
+       window; the content inside keeps the page's 30px gutters. */
+    <footer className="relative overflow-hidden border-t-[3px] border-[#E5B32A] bg-[#141414] text-white">
+      {/* A warm glow in the top-right corner. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-[#E5B32A]/15 blur-3xl"
+      />
 
-        <div className="relative grid gap-10 px-6 py-10 sm:px-10 sm:py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] lg:gap-12 lg:px-16 lg:py-[4.5rem]">
+      <div className="relative mx-auto max-w-[120rem] px-4 sm:px-[30px]">
+        <div className="grid gap-10 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] lg:gap-12 lg:py-20">
           <div className="flex flex-col items-start gap-6">
             <Link
               href="/"
@@ -134,7 +136,7 @@ export async function SiteFooter({
           </nav>
         </div>
 
-        <div className="relative flex flex-col-reverse gap-4 px-6 pb-8 sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:pb-10 lg:px-16">
+        <div className="flex flex-col-reverse gap-4 border-t border-white/[0.08] py-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-white/55 sm:text-[0.9375rem]">
             © {new Date().getFullYear()} NexG Concierge. All rights reserved.
           </p>
