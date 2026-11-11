@@ -725,7 +725,7 @@ export function PayoutStep() {
                       setItems(next);
                     }}
                   >
-                    18+
+                    21+
                   </Chip>
                 )}
                 <button

@@ -116,7 +116,7 @@ export function Menu({
                     {i.name}
                     {i.age_restricted && (
                       <Pill tone="bg-danger-bg text-danger">
-                        <span className="ml-1">18+</span>
+                        <span className="ml-1">21+</span>
                       </Pill>
                     )}
                   </p>
