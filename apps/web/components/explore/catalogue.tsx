@@ -4,6 +4,7 @@ import { AddToCart } from '@/components/cart/add-to-cart';
 import { productHref } from '@/lib/best-sellers';
 import { promoBadge, type PromoPrice, type PromoPrices } from '@/lib/promotions';
 
+import { SectionTabs } from './section-tabs';
 import { TodayMarker } from './today-marker';
 
 export interface CatalogueItem {
@@ -49,14 +50,45 @@ export function price(kes: number | null): string {
  *
  * Items go into a one-merchant basket that is priced and paid at /checkout.
  */
+/*
+ * The heading over a merchant's list, by kind of business: a restaurant has a
+ * menu, a shop has products, a laundry or a salon has services.
+ */
+const SERVICE_CATEGORIES = new Set([
+  'laundry',
+  'laundry_cleaning',
+  'beauty',
+  'beauty_fashion',
+  'wellness',
+  'health',
+  'vehicle_services',
+  'vehicle_rentals',
+  'financial_services',
+  'logistics_shipping',
+  'concierge_services',
+  'travel_tours',
+  'airport_transfers',
+  'experiences',
+]);
+const MENU_CATEGORIES = new Set(['restaurant', 'restaurants_food']);
+
+export function catalogueTitle(category: string | null | undefined): string {
+  if (category && MENU_CATEGORIES.has(category)) return 'Menu';
+  if (category && SERVICE_CATEGORIES.has(category)) return 'Services';
+  return 'Shop';
+}
+
 export function Catalogue({
   merchantId,
   merchantName,
+  category = null,
   sections,
   promotions = {},
 }: {
   merchantId: string;
   merchantName: string;
+  /** The merchant's category, which names the list (Menu, Shop, Services). */
+  category?: string | null;
   sections: CatalogueSection[];
   /** Running promotions by item: the price shown is the price charged. */
   promotions?: PromoPrices;
@@ -70,32 +102,28 @@ export function Catalogue({
         ]
       : sections;
 
+  const itemCount = sections.reduce((n, s) => n + s.items.length, 0);
+
   return (
     <div className="space-y-8">
-      {/* Sticky section tabs, as in the reference. */}
+      {/* What this list is, in the business's own terms: a menu, a shop, services. */}
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-3xl font-extrabold tracking-tight">{catalogueTitle(category)}</h2>
+        <p className="text-muted text-sm font-semibold">
+          {itemCount} {itemCount === 1 ? 'item' : 'items'}
+          {sections.length > 1 && ` · ${sections.length} sections`}
+        </p>
+      </div>
+
+      {/* Sticky section tabs: the merchant's own sections, whatever the business. */}
       {groups.length > 1 && (
-        <nav
-          aria-label="Menu sections"
-          className="bg-bg/95 border-border sticky top-[4.5rem] z-20 -mx-1 flex gap-1 overflow-x-auto border-b px-1 py-2 backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {groups.map((section, index) => (
-            <a
-              key={section.id}
-              href={`#section-${section.id}`}
-              className={`hover:bg-surface shrink-0 rounded-full px-3.5 py-1.5 text-[0.8125rem] font-bold transition-colors ${
-                index === 0 ? 'bg-ink hover:bg-ink text-white' : 'text-muted hover:text-ink'
-              }`}
-            >
-              {section.name}
-            </a>
-          ))}
-        </nav>
+        <SectionTabs sections={groups.map((g) => ({ id: g.id, name: g.name }))} />
       )}
 
       {groups.map((section) => (
         <section key={section.id} id={`section-${section.id}`} className="scroll-mt-32">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h2 className="text-2xl font-extrabold tracking-tight">{section.name}</h2>
+            <h3 className="text-2xl font-extrabold tracking-tight">{section.name}</h3>
             {section.blurb && (
               <p className="text-muted-light text-xs font-semibold">{section.blurb}</p>
             )}

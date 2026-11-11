@@ -284,6 +284,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
               <Catalogue
                 merchantId={merchant.id}
                 merchantName={merchant.trading_name}
+                category={merchant.category_key ?? merchant.category}
                 sections={menu}
                 promotions={promotions}
               />
