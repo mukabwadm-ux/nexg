@@ -20,6 +20,7 @@ import {
   withErrorEnvelope,
 } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
+import { privateHeaders } from '@/lib/cache';
 import { orderReader } from '@/lib/orders';
 import { ListRequest } from '@nexg/contracts/api';
 
@@ -28,10 +29,11 @@ export const dynamic = 'force-dynamic';
 
 export const GET = withErrorEnvelope(async (request: Request) => {
   let credential;
+  let rate;
   try {
     credential = await authenticate(request);
     requireScope(credential, API_SCOPES.merchant_read);
-    await enforceRateLimit(credential, request, 'merchant_read');
+    rate = await enforceRateLimit(credential, request, 'merchant_read');
   } catch (e) {
     if (e instanceof ApiAuthError) {
       return jsonError(e.code, e.message, { status: e.status, retryAfter: e.retryAfter });
@@ -100,10 +102,6 @@ export const GET = withErrorEnvelope(async (request: Request) => {
         limit,
       },
     },
-    {
-      headers: {
-        'Cache-Control': 'no-store',
-      },
-    },
+    { headers: privateHeaders(rate) },
   );
 });

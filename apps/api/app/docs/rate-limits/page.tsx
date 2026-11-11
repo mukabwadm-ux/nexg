@@ -1,5 +1,5 @@
 import { DocPage } from '@/components/docs/doc-page';
-import { A, C, Callout, H2, List, P, Table } from '@/components/docs/prose';
+import { A, C, H2, List, P, Table } from '@/components/docs/prose';
 import { pageMetadata } from '@/lib/reference/navigation';
 
 export const metadata = pageMetadata('/docs/rate-limits');
@@ -13,6 +13,7 @@ export default function RateLimitsPage() {
         { id: 'costs', label: 'What requests cost' },
         { id: 'whose', label: 'Whose bucket' },
         { id: 'example', label: 'An example' },
+        { id: 'remaining', label: 'Tokens left' },
         { id: 'limited', label: 'When you are limited' },
       ]}
     >
@@ -53,7 +54,8 @@ export default function RateLimitsPage() {
         <li>
           <strong className="text-ink">No key</strong>: keyless callers share one bucket of 120
           tokens a minute (or get 60 a minute for each address, where NexG identifies callers by IP
-          at its edge). Fine for trying things, not for production.
+          at its edge). A keyless public read answered from NexG&apos;s cache spends nothing. Fine
+          for trying things, not for production.
         </li>
       </List>
       <P>
@@ -69,6 +71,13 @@ export default function RateLimitsPage() {
         reads.
       </P>
 
+      <H2 id="remaining">Tokens left</H2>
+      <P>
+        Every answer to a request with a key carries <C>RateLimit-Remaining</C>: the whole tokens
+        left in your bucket after that request. Pace yourself on it rather than waiting for a{' '}
+        <C>429</C>. Answers to keyless requests leave it out, because a cache may share them.
+      </P>
+
       <H2 id="limited">When you are limited</H2>
       <P>
         A refused request gets <C>429</C> with code <C>rate_limited</C> and a{' '}
@@ -81,13 +90,9 @@ export default function RateLimitsPage() {
         <li>Cache public data on your side; it is cacheable for a minute or more anyway.</li>
         <li>Page through lists one page at a time rather than in parallel.</li>
       </List>
-      <Callout tone="note" title="No remaining-token header yet">
-        <p>
-          Responses do not say how many tokens are left. Track your own rate, and treat{' '}
-          <C>Retry-After</C> as the answer when you hit the limit. See{' '}
-          <A href="/docs/errors">Errors</A> for retry code.
-        </p>
-      </Callout>
+      <P>
+        See <A href="/docs/errors">Errors</A> for retry code.
+      </P>
     </DocPage>
   );
 }

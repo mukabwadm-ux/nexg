@@ -10,6 +10,25 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-11',
+    kind: 'fixed',
+    title: 'Keys are always checked, and every /v1 answer is JSON',
+    body: [
+      'A key sent as X-Api-Key to merchants, a merchant, experiences, zones or services could be answered from NexG’s cache without being checked, so an unknown or revoked key got 200 instead of 401. A request that carries a key is now never answered from a cache: the key is checked and the request spends tokens every time. Requests without a key are cached as before.',
+      'Answers to requests with a key carry RateLimit-Remaining: the whole tokens left in your bucket after that request.',
+      'A path under /v1 that is not an endpoint answers 404 not_found as JSON instead of a web page, and a method an endpoint does not accept answers 405 method_not_allowed with an Allow header instead of an empty body.',
+    ],
+    endpoints: [
+      'list-merchants',
+      'get-merchant',
+      'list-zones',
+      'list-experiences',
+      'list-services',
+      'list-orders',
+      'get-order',
+    ],
+  },
+  {
     date: '2026-11-10',
     kind: 'added',
     title: 'Read one order by id',

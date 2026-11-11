@@ -28,6 +28,7 @@ import {
   withErrorEnvelope,
 } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
+import { readHeaders } from '@/lib/cache';
 import { ListRequest, PublicMerchant } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
@@ -37,10 +38,11 @@ export const revalidate = 60; // cache for 60 seconds
 export const GET = withErrorEnvelope(async (request: Request) => {
   // Resolve the credential first: a bad key is refused before any work is done.
   let credential;
+  let rate;
   try {
     credential = await authenticate(request);
     requireScope(credential, API_SCOPES.public_read);
-    await enforceRateLimit(credential, request);
+    rate = await enforceRateLimit(credential, request);
   } catch (e) {
     if (e instanceof ApiAuthError) {
       return jsonError(e.code, e.message, { status: e.status, retryAfter: e.retryAfter });
@@ -125,8 +127,6 @@ export const GET = withErrorEnvelope(async (request: Request) => {
   };
 
   return NextResponse.json(response, {
-    headers: {
-      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-    },
+    headers: readHeaders(credential, 'public, s-maxage=60, stale-while-revalidate=300', rate),
   });
 });

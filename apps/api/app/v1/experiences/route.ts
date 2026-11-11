@@ -20,6 +20,7 @@ import {
   withErrorEnvelope,
 } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
+import { readHeaders } from '@/lib/cache';
 import { PublicEvent, ListRequest } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
@@ -28,23 +29,30 @@ export const revalidate = 60;
 
 const CACHE = 'public, s-maxage=60, stale-while-revalidate=300';
 
-function page(items: PublicEvent[], nextCursor: string | null, limit: number) {
+function page(
+  items: PublicEvent[],
+  nextCursor: string | null,
+  limit: number,
+  headers: Record<string, string>,
+) {
   return NextResponse.json(
     {
       ok: true,
       data: { items, next_cursor: nextCursor },
       meta: { api_version: 'v1' as const, limit },
     },
-    { headers: { 'Cache-Control': CACHE } },
+    { headers },
   );
 }
 
 export const GET = withErrorEnvelope(async (request: Request) => {
   // Resolve the credential first: a bad key is refused before any work is done.
+  let credential;
+  let rate;
   try {
-    const credential = await authenticate(request);
+    credential = await authenticate(request);
     requireScope(credential, API_SCOPES.public_read);
-    await enforceRateLimit(credential, request);
+    rate = await enforceRateLimit(credential, request);
   } catch (e) {
     if (e instanceof ApiAuthError) {
       return jsonError(e.code, e.message, { status: e.status, retryAfter: e.retryAfter });
@@ -91,7 +99,7 @@ export const GET = withErrorEnvelope(async (request: Request) => {
       return jsonError('internal_error', 'Failed to fetch experiences', { detail: cityError });
     }
     // No such city has no events, rather than every city's events.
-    if (!cityRow) return page([], null, limit);
+    if (!cityRow) return page([], null, limit, readHeaders(credential, CACHE, rate));
     dbQuery = dbQuery.eq('city_id', cityRow.id);
   }
   if (q) {
@@ -127,5 +135,5 @@ export const GET = withErrorEnvelope(async (request: Request) => {
     return [];
   });
 
-  return page(items, nextCursor, limit);
+  return page(items, nextCursor, limit, readHeaders(credential, CACHE, rate));
 });

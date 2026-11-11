@@ -11,6 +11,7 @@ import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
 import { jsonError, withErrorEnvelope } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
+import { readHeaders } from '@/lib/cache';
 import { ApiService } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
@@ -18,10 +19,12 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
 export const GET = withErrorEnvelope(async (request: Request) => {
+  let credential;
+  let rate;
   try {
-    const credential = await authenticate(request);
+    credential = await authenticate(request);
     requireScope(credential, API_SCOPES.public_read);
-    await enforceRateLimit(credential, request);
+    rate = await enforceRateLimit(credential, request);
   } catch (error) {
     if (error instanceof ApiAuthError) {
       return jsonError(error.code, error.message, {
@@ -53,9 +56,7 @@ export const GET = withErrorEnvelope(async (request: Request) => {
       meta: { api_version: 'v1' as const, limit: 100 },
     },
     {
-      headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
-      },
+      headers: readHeaders(credential, 'public, s-maxage=300, stale-while-revalidate=3600', rate),
     },
   );
 });

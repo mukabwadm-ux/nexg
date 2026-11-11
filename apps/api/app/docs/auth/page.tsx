@@ -127,10 +127,19 @@ export default function AuthPage() {
         A valid key without the scope an endpoint needs gets <C>403</C> with code{' '}
         <C>not_found</C>. See <A href="/docs/errors">Errors</A> for the full list.
       </P>
+      <P>
+        A key is checked on every request that carries it, public endpoints included, so sending a
+        key to <C>/v1/zones</C> is a cheap way to test it.
+      </P>
 
       <H2 id="safety">Keeping keys safe</H2>
       <List>
         <li>Call the API from your server. Never put a key in browser code, a mobile app or a URL.</li>
+        <li>
+          Web pages on other sites cannot call the API: it sends no CORS headers. That is deliberate,
+          so a key never has to sit in a page. Fetch from your server and pass on what the page
+          needs.
+        </li>
         <li>
           Keep it in your host&apos;s secret store or environment, and never in a variable your
           framework exposes to the browser (in Next.js, anything named <C>NEXT_PUBLIC_…</C>).

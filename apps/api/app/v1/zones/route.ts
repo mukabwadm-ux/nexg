@@ -11,6 +11,7 @@ import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
 import { jsonError, withErrorEnvelope } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
+import { readHeaders } from '@/lib/cache';
 import { PublicZone } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
@@ -19,10 +20,12 @@ export const revalidate = 300; // zones change rarely
 
 export const GET = withErrorEnvelope(async (request: Request) => {
   // Resolve the credential first: a bad key is refused before any work is done.
+  let credential;
+  let rate;
   try {
-    const credential = await authenticate(request);
+    credential = await authenticate(request);
     requireScope(credential, API_SCOPES.public_read);
-    await enforceRateLimit(credential, request);
+    rate = await enforceRateLimit(credential, request);
   } catch (e) {
     if (e instanceof ApiAuthError) {
       return jsonError(e.code, e.message, { status: e.status, retryAfter: e.retryAfter });
@@ -53,8 +56,6 @@ export const GET = withErrorEnvelope(async (request: Request) => {
   };
 
   return NextResponse.json(response, {
-    headers: {
-      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
-    },
+    headers: readHeaders(credential, 'public, s-maxage=300, stale-while-revalidate=3600', rate),
   });
 });
