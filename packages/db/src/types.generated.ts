@@ -55078,6 +55078,7 @@ export type Database = {
       };
       rpc_merchant_withdraw_featured: { Args: { p_booking_id: string }; Returns: Json };
       rpc_merchant_workspace_access: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_min_order: { Args: { p_category: string; p_city_slug: string }; Returns: number };
       rpc_mpesa_payout_claim: {
         Args: { p_callback_secret: string; p_limit?: number };
         Returns: {

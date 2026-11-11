@@ -1,4 +1,4 @@
-import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
+import { Button } from '@nexg/ui';
 import { CalendarDays, Clock, Info, MapPin, MessageSquare, Store } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
@@ -11,6 +11,7 @@ import {
   type HoursRow,
   OpeningHours,
 } from '@/components/explore/catalogue';
+import { DeliveryFee } from '@/components/explore/delivery-fee';
 import { CATEGORY_ICON, CATEGORY_LABEL, MerchantCard } from '@/components/explore/merchant-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -20,6 +21,7 @@ import {
   PUBLIC_RESOURCE_COLUMNS,
   type PublicResource,
 } from '@/lib/booking/customer';
+import type { DeliveryRate } from '@/lib/delivery-fee';
 import { loadPromotedPrices } from '@/lib/promotions';
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -31,7 +33,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 export const revalidate = 60;
 
 const SELECT =
-  'id, trading_name, category, category_other, cover_photo_path, branch_name, branch_address, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at';
+  'id, trading_name, category, category_key, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, concierge_pick, featured, accepting_orders, explore_visible, listed_at, prep_minutes';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const supabase = createPublicClient();
@@ -97,6 +99,29 @@ export default async function MerchantPage({ params }: { params: { id: string } 
         .order('created_at'),
     ]);
   const resources = (bookable ?? []) as unknown as PublicResource[];
+
+  /*
+   * The prices in the chips under the name: the city's delivery rate card
+   * (priced from the visitor's spot on the client) and this category's
+   * minimum order. Either can be unset; its chip is then left out.
+   */
+  const citySlug = merchant.city_slug ?? 'nairobi';
+  const [{ data: rateRows }, { data: minOrder }] = await Promise.all([
+    supabase.rpc('rpc_delivery_rate', { p_city_slug: citySlug }),
+    supabase.rpc('rpc_min_order', {
+      p_city_slug: citySlug,
+      p_category: merchant.category_key ?? merchant.category ?? '',
+    }),
+  ]);
+  const rateRow = rateRows?.[0];
+  const deliveryRate: DeliveryRate | null =
+    rateRow && rateRow.base != null && rateRow.per_km != null && rateRow.max_km != null
+      ? { base: Number(rateRow.base), perKm: Number(rateRow.per_km), maxKm: Number(rateRow.max_km) }
+      : null;
+  const prepMinutes =
+    merchant.prep_minutes != null && merchant.prep_minutes > 0
+      ? Math.round(merchant.prep_minutes)
+      : null;
 
   const catalogueItems = (sections ?? []).flatMap((section) => section.catalogue_item ?? []);
   const photoPaths = catalogueItems.flatMap((item) => (item.photo_path ? [item.photo_path] : []));
@@ -205,19 +230,35 @@ export default async function MerchantPage({ params }: { params: { id: string } 
               />
               {open ? 'Open now' : 'Not taking orders'}
             </li>
-            {[
-              { icon: Clock, text: `${VALUE_PLACEHOLDER} min to your hotel` },
-              { icon: MapPin, text: `Delivery from KES ${VALUE_PLACEHOLDER}` },
-              { icon: Store, text: `Min. order KES ${VALUE_PLACEHOLDER}` },
-            ].map((chip) => (
+            {/* The merchant's own preparation time; no chip when they have not set one. */}
+            {prepMinutes && (
               <li
-                key={chip.text}
                 className="border-border bg-bg/60 flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold"
+                title="Preparation time set by the merchant"
               >
-                <chip.icon aria-hidden="true" className="text-muted-light h-3.5 w-3.5" />
-                {chip.text}
+                <Clock aria-hidden="true" className="text-muted-light h-3.5 w-3.5" />
+                Ready in {prepMinutes} min
               </li>
-            ))}
+            )}
+            {/* Priced from the visitor's spot, or "from" the base fee without one. */}
+            {deliveryRate && (
+              <li className="border-border bg-bg/60 flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold">
+                <MapPin aria-hidden="true" className="text-muted-light h-3.5 w-3.5" />
+                <DeliveryFee
+                  rate={deliveryRate}
+                  lat={merchant.branch_latitude ?? null}
+                  lng={merchant.branch_longitude ?? null}
+                  className="text-xs font-semibold"
+                />
+              </li>
+            )}
+            {/* The category's minimum order, once one is set in Admin. */}
+            {typeof minOrder === 'number' && minOrder > 0 && (
+              <li className="border-border bg-bg/60 flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold">
+                <Store aria-hidden="true" className="text-muted-light h-3.5 w-3.5" />
+                Min. order KES {minOrder.toLocaleString('en-KE')}
+              </li>
+            )}
           </ul>
 
           <Button asChild size="sm" className="shrink-0">
@@ -290,7 +331,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
               <h2 className="text-sm font-extrabold uppercase tracking-wide">Good to know</h2>
               <ul className="text-muted mt-3 space-y-2 text-[0.8125rem] leading-[1.7]">
                 <li>Allergen information is available on request.</li>
-                <li>Alcohol is delivered only to guests aged 18 or over, with ID.</li>
+                <li>Alcohol is delivered only to guests aged 21 or over, with ID.</li>
                 <li>Nothing is bought until you approve the concierge’s quote.</li>
               </ul>
             </div>
@@ -318,7 +359,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
                     Boolean(m.id) && Boolean(m.trading_name) && m.explore_visible !== false,
                 )
                 .map((m) => (
-                  <MerchantCard key={m.id} merchant={m} />
+                  <MerchantCard key={m.id} merchant={m} deliveryRate={deliveryRate} />
                 ))}
             </ul>
           </section>

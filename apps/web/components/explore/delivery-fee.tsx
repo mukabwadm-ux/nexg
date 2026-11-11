@@ -14,10 +14,13 @@ export function DeliveryFee({
   rate,
   lat,
   lng,
+  className = 'text-muted text-sm',
 }: {
   rate: DeliveryRate | null;
   lat: number | null;
   lng: number | null;
+  /** Text size and colour, which differ between a card and a chip. */
+  className?: string;
 }) {
   const { place, chip } = useLocation();
   if (!rate) return null;
@@ -31,20 +34,17 @@ export function DeliveryFee({
   const kes = (n: number) => `KES ${Math.round(n).toLocaleString('en-KE')}`;
 
   if (quote.kind === 'too_far') {
-    return <span className="text-muted text-sm">Too far to deliver · {quote.km} km</span>;
+    return <span className={className}>Too far to deliver · {quote.km} km</span>;
   }
   if (quote.kind === 'from') {
     return (
-      <span className="text-muted text-sm">
+      <span className={className}>
         Delivery from <span className="text-ink font-extrabold">{kes(quote.fee)}</span>
       </span>
     );
   }
   return (
-    <span
-      className="text-muted text-sm"
-      title="Estimated from your location; confirmed at checkout"
-    >
+    <span className={className} title="Estimated from your location; confirmed at checkout">
       Delivery <span className="text-ink font-extrabold">{kes(quote.fee)}</span> · {quote.km} km
     </span>
   );
