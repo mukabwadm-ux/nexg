@@ -8,6 +8,7 @@ export const metadata = { title: 'Orders' };
 export const dynamic = 'force-dynamic';
 
 const TONE: Record<string, string> = {
+  awaiting_payment: 'bg-bg text-muted',
   to_cook: 'bg-gold-soft text-gold-text',
   cooking: 'bg-info-bg text-info',
   you_are_late: 'bg-danger-bg text-danger',
@@ -19,6 +20,8 @@ const TONE: Record<string, string> = {
 };
 
 const WORD: Record<string, string> = {
+  /* Paid online and not paid yet: do not start it. */
+  awaiting_payment: 'WAITING FOR PAYMENT',
   to_cook: 'START IT',
   cooking: 'COOKING',
   you_are_late: 'YOU ARE LATE',

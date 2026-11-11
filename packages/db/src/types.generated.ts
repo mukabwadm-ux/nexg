@@ -20975,6 +20975,181 @@ export type Database = {
           },
         ];
       };
+      mpesa_payout: {
+        Row: {
+          amount_cents: number;
+          answered_at: string | null;
+          claimed_at: string | null;
+          conversation_id: string | null;
+          created_at: string;
+          finished_at: string | null;
+          id: string;
+          order_id: string | null;
+          originator_id: string;
+          payment_id: string | null;
+          phone: string | null;
+          purpose: string;
+          reason: string;
+          receipt: string | null;
+          refund_id: string | null;
+          requested_at: string | null;
+          requested_by: string | null;
+          result_code: number | null;
+          result_desc: string | null;
+          source_ref: string | null;
+          state: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_cents: number;
+          answered_at?: string | null;
+          claimed_at?: string | null;
+          conversation_id?: string | null;
+          created_at?: string;
+          finished_at?: string | null;
+          id?: string;
+          order_id?: string | null;
+          originator_id: string;
+          payment_id?: string | null;
+          phone?: string | null;
+          purpose: string;
+          reason: string;
+          receipt?: string | null;
+          refund_id?: string | null;
+          requested_at?: string | null;
+          requested_by?: string | null;
+          result_code?: number | null;
+          result_desc?: string | null;
+          source_ref?: string | null;
+          state?: string;
+          updated_at?: string;
+        };
+        Update: {
+          amount_cents?: number;
+          answered_at?: string | null;
+          claimed_at?: string | null;
+          conversation_id?: string | null;
+          created_at?: string;
+          finished_at?: string | null;
+          id?: string;
+          order_id?: string | null;
+          originator_id?: string;
+          payment_id?: string | null;
+          phone?: string | null;
+          purpose?: string;
+          reason?: string;
+          receipt?: string | null;
+          refund_id?: string | null;
+          requested_at?: string | null;
+          requested_by?: string | null;
+          result_code?: number | null;
+          result_desc?: string | null;
+          source_ref?: string | null;
+          state?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_live_orders_needs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_live_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_order_detail_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_arriving_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_delivery_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_qr_activity_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'order';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'order_money_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_payment_id_fkey';
+            columns: ['payment_id'];
+            isOneToOne: false;
+            referencedRelation: 'payment';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_refund_id_fkey';
+            columns: ['refund_id'];
+            isOneToOne: false;
+            referencedRelation: 'refund';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_refund_id_fkey';
+            columns: ['refund_id'];
+            isOneToOne: false;
+            referencedRelation: 'refunds_to_issue_v';
+            referencedColumns: ['refund_id'];
+          },
+          {
+            foreignKeyName: 'mpesa_payout_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       msg_canned_reply: {
         Row: {
           action_key: string | null;
@@ -24709,6 +24884,7 @@ export type Database = {
           outcome: string | null;
           payment_id: string;
           phone: string | null;
+          query_attempts: number;
           receipt: string | null;
           resolved_at: string | null;
           resolved_via: string | null;
@@ -24725,6 +24901,7 @@ export type Database = {
           outcome?: string | null;
           payment_id: string;
           phone?: string | null;
+          query_attempts?: number;
           receipt?: string | null;
           resolved_at?: string | null;
           resolved_via?: string | null;
@@ -24740,6 +24917,7 @@ export type Database = {
           outcome?: string | null;
           payment_id?: string;
           phone?: string | null;
+          query_attempts?: number;
           receipt?: string | null;
           resolved_at?: string | null;
           resolved_via?: string | null;
@@ -49042,6 +49220,7 @@ export type Database = {
     };
     Functions: {
       authz_outbox_readable: { Args: Record<PropertyKey, never>; Returns: boolean };
+      cron_expire_unpaid_mpesa_orders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_expire: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -49050,6 +49229,7 @@ export type Database = {
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_deleted_retention: { Args: Record<PropertyKey, never>; Returns: number };
       cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_payments_worker: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_push_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_refresh_reports: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_scan_partitions: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -49171,6 +49351,7 @@ export type Database = {
         }[];
       };
       fn_cod_allowed: { Args: Record<PropertyKey, never>; Returns: boolean };
+      fn_compact_reference: { Args: { p_reference: string }; Returns: string };
       fn_component_cost: {
         Args: {
           p_basis: Database['public']['Enums']['price_basis'];
@@ -49540,6 +49721,24 @@ export type Database = {
           title: string;
         }[];
       };
+      fn_mpesa_hold_return: {
+        Args: {
+          p_amount_cents: number;
+          p_order_id: string;
+          p_payment_id: string;
+          p_phone: string;
+          p_reason: string;
+          p_source_ref: string;
+        };
+        Returns: string;
+      };
+      fn_mpesa_paybill_ready: { Args: Record<PropertyKey, never>; Returns: boolean };
+      fn_mpesa_payout_originator: { Args: Record<PropertyKey, never>; Returns: string };
+      fn_mpesa_phone: { Args: { p_input: string }; Returns: string };
+      fn_mpesa_prompt_due: {
+        Args: { p_last_queried_at: string; p_sent_at: string };
+        Returns: boolean;
+      };
       fn_msg_absorb_legacy: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_msg_route: {
         Args: {
@@ -49641,6 +49840,8 @@ export type Database = {
         Returns: string;
       };
       fn_payment_reference: { Args: Record<PropertyKey, never>; Returns: string };
+      fn_payments_require: { Args: { p_city_id: string; p_what: string }; Returns: string };
+      fn_payments_worker_poke: { Args: { p_body?: Json }; Returns: Json };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
       fn_plan_flags: { Args: { p_plan_id: string }; Returns: Json };
@@ -49740,6 +49941,10 @@ export type Database = {
         };
       };
       fn_receipt_next_number: { Args: { p_prefix: string }; Returns: string };
+      fn_refund_mark_issued: {
+        Args: { p_actor_label?: string; p_provider_ref: string; p_refund_id: string };
+        Returns: Json;
+      };
       fn_refund_routes: { Args: { p_order_id: string }; Returns: Json };
       fn_render_featured_pitch: { Args: { p_payload: Json }; Returns: Json };
       fn_review_checks: { Args: { p_body: string; p_plan_id: string }; Returns: Json };
@@ -54706,6 +54911,44 @@ export type Database = {
       };
       rpc_merchant_withdraw_featured: { Args: { p_booking_id: string }; Returns: Json };
       rpc_merchant_workspace_access: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_mpesa_payout_claim: {
+        Args: { p_callback_secret: string; p_limit?: number };
+        Returns: {
+          amount_cents: number;
+          order_reference: string;
+          originator_id: string;
+          payout_id: string;
+          phone: string;
+        }[];
+      };
+      rpc_mpesa_payout_outcome: {
+        Args: {
+          p_callback_secret: string;
+          p_conversation_id?: string;
+          p_message?: string;
+          p_originator_id: string;
+          p_outcome: string;
+        };
+        Returns: Json;
+      };
+      rpc_mpesa_payout_resolve: {
+        Args: { p_note?: string; p_payout_id: string; p_receipt?: string; p_sent: boolean };
+        Returns: Json;
+      };
+      rpc_mpesa_payout_result: {
+        Args: {
+          p_amount_kes?: number;
+          p_callback_secret: string;
+          p_conversation_id: string;
+          p_originator_id: string;
+          p_payload?: Json;
+          p_receipt?: string;
+          p_result_code: number;
+          p_result_desc: string;
+        };
+        Returns: Json;
+      };
+      rpc_mpesa_payout_send: { Args: { p_payout_id: string; p_phone?: string }; Returns: Json };
       rpc_msg_contact: {
         Args: {
           p_body: string;
@@ -54979,12 +55222,40 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_payment_mpesa_callback_rejected: {
+        Args: { p_checkout_request_id: string; p_reason: string };
+        Returns: undefined;
+      };
+      rpc_payment_mpesa_check_now: { Args: { p_reference: string }; Returns: Json };
+      rpc_payment_mpesa_due_prompts: {
+        Args: { p_callback_secret: string; p_limit?: number; p_reference?: string };
+        Returns: {
+          amount_cents: number;
+          checkout_request_id: string;
+        }[];
+      };
       rpc_payment_mpesa_open_prompts: {
         Args: { p_reference: string };
         Returns: {
           amount_cents: number;
           checkout_request_id: string;
         }[];
+      };
+      rpc_payment_mpesa_paybill: {
+        Args: {
+          p_account: string;
+          p_amount_kes: number;
+          p_callback_secret: string;
+          p_msisdn?: string;
+          p_payload?: Json;
+          p_trans_id: string;
+        };
+        Returns: Json;
+      };
+      rpc_payment_mpesa_paybill_connect: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_payment_mpesa_paybill_registered: {
+        Args: { p_callback_secret: string; p_message: string; p_ok: boolean };
+        Returns: undefined;
       };
       rpc_payment_mpesa_prompt_wait: { Args: { p_reference: string }; Returns: Json };
       rpc_payment_mpesa_ready: { Args: { p_callback_secret: string }; Returns: boolean };
@@ -55401,6 +55672,7 @@ export type Database = {
         Args: { p_payload?: Json; p_provider_ref: string; p_refund_id: string };
         Returns: Json;
       };
+      rpc_refund_send_mpesa: { Args: { p_phone?: string; p_refund_id: string }; Returns: Json };
       rpc_reject_event_submission: {
         Args: { p_event_id: string; p_reason: string };
         Returns: {

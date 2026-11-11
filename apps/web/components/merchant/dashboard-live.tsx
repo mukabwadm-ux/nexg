@@ -24,6 +24,7 @@ import type { AttentionRow, BranchCard, OrderRow, WeekBar, WeekMoney } from './t
  */
 
 const WHAT_NOW: Record<string, { label: string; tone: string }> = {
+  awaiting_payment: { label: 'Waiting for payment', tone: 'bg-bg text-muted' },
   to_cook: { label: 'New', tone: 'bg-danger/10 text-danger' },
   cooking: { label: 'Preparing', tone: 'bg-info-bg text-info' },
   you_are_late: { label: 'Preparing · late', tone: 'bg-danger/10 text-danger' },

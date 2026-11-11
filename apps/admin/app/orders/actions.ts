@@ -173,3 +173,56 @@ export async function recordRefundSent(refundId: string, reference: string): Pro
   });
   return unwrap(done, markError, PATHS);
 }
+
+/* M-Pesa from the console. The database checks who may do each of these and
+   hands the work to the payments worker, the only place with the Daraja keys. */
+type LooseRpc = (
+  fn: string,
+  args?: Record<string, unknown>,
+) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+const rpc = () => createClient().rpc as unknown as LooseRpc;
+
+/** Asks M-Pesa now about a payment still waiting on a prompt. */
+export async function checkWithMpesa(paymentReference: string): Promise<Outcome> {
+  const { data, error } = await rpc()('rpc_payment_mpesa_check_now', {
+    p_reference: paymentReference,
+  });
+  return unwrap(data, error, PATHS);
+}
+
+/**
+ * Sends an approved refund back by M-Pesa (B2C). It goes to the number that
+ * paid; a phone is asked for only when M-Pesa never said which number that was.
+ */
+export async function sendRefundByMpesa(refundId: string, phone?: string): Promise<Outcome> {
+  const { data, error } = await rpc()('rpc_refund_send_mpesa', {
+    p_refund_id: refundId,
+    p_phone: phone?.trim() || null,
+  });
+  return unwrap(data, error, PATHS);
+}
+
+/** Sends money NexG does not keep (paid twice, paid for nothing owed) back by M-Pesa. */
+export async function sendPayout(payoutId: string, phone?: string): Promise<Outcome> {
+  const { data, error } = await rpc()('rpc_mpesa_payout_send', {
+    p_payout_id: payoutId,
+    p_phone: phone?.trim() || null,
+  });
+  return unwrap(data, error, PATHS);
+}
+
+/** Records what the M-Pesa statement shows for a payout without a clear answer. */
+export async function resolvePayout(
+  payoutId: string,
+  sent: boolean,
+  receipt: string,
+  note: string,
+): Promise<Outcome> {
+  const { data, error } = await rpc()('rpc_mpesa_payout_resolve', {
+    p_payout_id: payoutId,
+    p_sent: sent,
+    p_receipt: receipt.trim() || null,
+    p_note: note.trim(),
+  });
+  return unwrap(data, error, PATHS);
+}

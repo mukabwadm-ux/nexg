@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { normalisePhone } from '@/lib/daraja';
+import { callbackOrigin, normalisePhone } from '@/lib/daraja';
 import { sendMpesaPrompt } from '@/lib/mpesa-prompt';
 import { createClient } from '@/lib/supabase/server';
 
@@ -41,11 +41,27 @@ export async function POST(request: Request) {
   }
   const payment = begun.data as { reference: string; amount_cents: number };
 
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ?? new URL(request.url).origin;
+  /* The order number, without dashes, names the payment in the customer's
+     M-Pesa SMS. It is also the Paybill account number for this order, so a
+     Paybill report of the same money finds the order. */
+  const { data: placed } = await supabase
+    .from('order')
+    .select('reference')
+    .eq('id', input.orderId)
+    .maybeSingle();
+  const accountReference = placed?.reference
+    ? placed.reference
+        .replace(/[^A-Za-z0-9]/g, '')
+        .toUpperCase()
+        .slice(0, 12)
+    : undefined;
+
+  /* Where Safaricom calls back: the address that answers without a redirect. */
+  const origin = callbackOrigin(request);
   const sent = await sendMpesaPrompt({
     supabase,
     reference: payment.reference,
+    accountReference,
     amountCents: payment.amount_cents,
     phone,
     origin,

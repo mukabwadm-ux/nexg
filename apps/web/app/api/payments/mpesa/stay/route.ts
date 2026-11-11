@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { normalisePhone } from '@/lib/daraja';
+import { callbackOrigin, normalisePhone } from '@/lib/daraja';
 import { sendMpesaPrompt } from '@/lib/mpesa-prompt';
 import { createClient } from '@/lib/supabase/server';
 
@@ -41,8 +41,8 @@ export async function POST(request: Request) {
   }
   const payment = begun.data as { reference: string; amount_cents: number; expires_at: string };
 
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ?? new URL(request.url).origin;
+  /* Where Safaricom calls back: the address that answers without a redirect. */
+  const origin = callbackOrigin(request);
   const sent = await sendMpesaPrompt({
     supabase,
     reference: payment.reference,

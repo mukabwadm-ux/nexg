@@ -42,6 +42,8 @@ const dateTime = new Intl.DateTimeFormat('en-KE', {
   minute: '2-digit',
 });
 const orderStatuses: Record<string, { label: string; stage: number }> = {
+  /* Paid online and not paid yet: nothing to prepare until it is. */
+  awaiting_payment: { label: 'Waiting for payment', stage: 0 },
   to_cook: { label: 'Start preparation', stage: 0 },
   cooking: { label: 'Preparing', stage: 1 },
   you_are_late: { label: 'Preparation overdue', stage: 1 },

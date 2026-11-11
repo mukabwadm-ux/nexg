@@ -32,6 +32,8 @@ export type PromptOutcome =
 export async function sendMpesaPrompt(input: {
   supabase: Client;
   reference: string;
+  /* The account the customer's M-Pesa SMS names; defaults to the payment reference. */
+  accountReference?: string;
   amountCents: number;
   phone: string;
   origin: string;
@@ -67,6 +69,7 @@ export async function sendMpesaPrompt(input: {
     phone: input.phone,
     amountCents: input.amountCents,
     reference: input.reference,
+    accountReference: input.accountReference,
     callbackUrl: `${input.origin}/api/payments/mpesa/callback?token=${encodeURIComponent(callbackSecret)}`,
     description: input.description,
   });
@@ -99,17 +102,37 @@ export async function sendMpesaPrompt(input: {
  */
 export async function reconcileMpesaPrompts(supabase: Client, reference: string): Promise<boolean> {
   if (!darajaConfigured()) return false;
-  const callbackSecret = process.env.DARAJA_CALLBACK_SECRET?.trim() ?? '';
 
   const open = await loose(supabase)('rpc_payment_mpesa_open_prompts', { p_reference: reference });
-  const prompts = (open.data ?? []) as { checkout_request_id: string; amount_cents: number }[];
+  const prompts = (open.data ?? []) as OpenPrompt[];
   if (open.error || prompts.length === 0) return false;
 
+  const outcome = await askAndRecord(prompts);
+  return outcome.recorded > 0;
+}
+
+type OpenPrompt = { checkout_request_id: string; amount_cents: number };
+
+export interface SweepOutcome {
+  asked: number;
+  recorded: number;
+  stillOpen: number;
+  errors: string[];
+}
+
+/** Asks M-Pesa about each prompt and records any final answer exactly as a callback would be. */
+async function askAndRecord(prompts: OpenPrompt[]): Promise<SweepOutcome> {
+  const callbackSecret = process.env.DARAJA_CALLBACK_SECRET?.trim() ?? '';
   const record = loose(createPublicClient());
-  let recorded = false;
+  const outcome: SweepOutcome = { asked: 0, recorded: 0, stillOpen: 0, errors: [] };
   for (const prompt of prompts) {
+    outcome.asked += 1;
     const answer = await stkQuery(prompt.checkout_request_id);
-    if (answer.status !== 'paid' && answer.status !== 'failed') continue;
+    if (answer.status !== 'paid' && answer.status !== 'failed') {
+      outcome.stillOpen += 1;
+      if (answer.status === 'error') outcome.errors.push(answer.message);
+      continue;
+    }
     const { error } = await record('rpc_payment_mpesa_callback', {
       p_checkout_request_id: prompt.checkout_request_id,
       p_result_code: answer.resultCode,
@@ -125,7 +148,29 @@ export async function reconcileMpesaPrompts(supabase: Client, reference: string)
         ? { p_amount_kes: Math.ceil(Number(prompt.amount_cents) / 100) }
         : {}),
     });
-    if (!error) recorded = true;
+    if (error) outcome.errors.push(error.message);
+    else outcome.recorded += 1;
   }
-  return recorded;
+  return outcome;
+}
+
+/**
+ * The background half of the same job, for when nobody is on the pay page:
+ * every prompt across every payment that is due another question, or just
+ * one payment's prompts when staff press "Check with M-Pesa". The database
+ * decides what is due and spaces the questions out; the Vault token proves
+ * the caller is this server.
+ */
+export async function settleDuePrompts(input: { reference?: string } = {}): Promise<SweepOutcome> {
+  if (!darajaConfigured()) {
+    return { asked: 0, recorded: 0, stillOpen: 0, errors: ['M-Pesa is not configured.'] };
+  }
+  const callbackSecret = process.env.DARAJA_CALLBACK_SECRET?.trim() ?? '';
+  const due = await loose(createPublicClient())('rpc_payment_mpesa_due_prompts', {
+    p_callback_secret: callbackSecret,
+    p_reference: input.reference ?? null,
+    p_limit: 15,
+  });
+  if (due.error) return { asked: 0, recorded: 0, stillOpen: 0, errors: [due.error.message] };
+  return askAndRecord((due.data ?? []) as OpenPrompt[]);
 }
