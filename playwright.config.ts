@@ -81,6 +81,14 @@ export default defineConfig({
       {
         name: `web-${v.name}`,
         testDir: './e2e/web',
+        /*
+         * The settings artboard spec drives /merchant-live-preview/settings,
+         * a demo page that only renders under `next dev`: a production build,
+         * which is what these projects start, answers it with a 404. The spec
+         * also branches on its own project names. It runs with its own config,
+         * playwright.settings-artboard.config.ts, against `next dev` on 3141.
+         */
+        testIgnore: /merchant-settings-artboard\.spec\.ts/,
         use: { ...v.use, baseURL: WEB_URL },
       },
     ]),

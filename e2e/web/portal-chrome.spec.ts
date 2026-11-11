@@ -41,8 +41,11 @@ const PORTALS: Portal[] = [
       '/merchant/hours',
       '/merchant/stores',
       '/merchant/money',
-      '/merchant/analytics',
-      '/merchant/featured',
+      /* Reporting and featured slots moved here; the old
+         /merchant/analytics and /merchant/featured URLs only
+         redirect to these two now. */
+      '/merchant/insights',
+      '/merchant/promotions',
       '/merchant/messages',
       '/merchant/disputes',
       '/merchant/reviews',

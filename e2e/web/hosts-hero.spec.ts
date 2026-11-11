@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * The /hosts hero after the Design B ("Cream Editorial") restyle: same
- * copy, same two links, three stats, the three-panel unit card, and no
+ * The /hosts hero as rebuilt in #82 (host and guest benefits and
+ * packages), on the Design B ("Cream Editorial") layout: one headline,
+ * the two links, three stats, the three-panel dashboard card, and no
  * sideways scroll down to a 360px phone. Screenshots land in
  * docs/design-refs/hosts/implementation/ for comparison with the reference.
  */
@@ -29,26 +30,27 @@ for (const width of WIDTHS) {
 
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('h1')).toHaveText(
-      'Give your guests a concierge. Without hiring one.',
+      'List your property free. Run every unit from one place.',
     );
 
-    const list = hero.getByRole('link', { name: /List Your Airbnb/ });
+    const list = hero.getByRole('link', { name: /Start your free month/ });
     const how = hero.getByRole('link', { name: 'See how it works' });
     await expect(list).toHaveAttribute('href', '#list');
     await expect(how).toHaveAttribute('href', '#how');
 
-    for (const term of ['KES 0', '10 min']) {
+    // The third stat's number is the live city count, so only its caption is fixed.
+    for (const term of ['KES 0', '1 month']) {
       await expect(hero.locator('dt', { hasText: term })).toBeVisible();
     }
-    await expect(hero.locator('dd', { hasText: 'to list · guests pay per order' })).toBeVisible();
-    await expect(hero.locator('dd', { hasText: 'to set up a unit' })).toBeVisible();
+    await expect(hero.locator('dd', { hasText: 'to list your property' })).toBeVisible();
+    await expect(hero.locator('dd', { hasText: 'of management free' })).toBeVisible();
     await expect(hero.locator('dd', { hasText: 'across Kenya & Uganda' })).toBeVisible();
 
     // The card is aria-hidden, so check its three panels by text.
     for (const text of [
-      '[Apartment 4B, Kilimani]',
-      'Tonight · your guests',
-      '[Review placeholder]',
+      'Your host dashboard · 3 units',
+      'Apartment 4B · Kilimani',
+      'Guest ordered dinner to 4B',
     ]) {
       await expect(hero.getByText(text, { exact: false })).toBeVisible();
     }
