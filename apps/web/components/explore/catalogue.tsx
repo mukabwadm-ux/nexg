@@ -193,7 +193,7 @@ export function Catalogue({
                     )}
                     {item.age_restricted && (
                       <span className="border-border-strong text-muted rounded-full border px-2 py-0.5 text-[0.5625rem] font-bold uppercase tracking-wide">
-                        18+ · ID
+                        21+ · ID
                       </span>
                     )}
                     {!item.available && (

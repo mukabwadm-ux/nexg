@@ -148,7 +148,7 @@ export default async function ProductPage({ params }: { params: Params }) {
             <div className="mt-2 flex flex-wrap gap-2">
               {item.age_restricted && (
                 <span className="border-border-strong text-muted rounded-full border px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide">
-                  18+ · ID checked on delivery
+                  21+ · ID checked on delivery
                 </span>
               )}
               {!item.available && (
