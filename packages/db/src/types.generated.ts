@@ -50127,6 +50127,7 @@ export type Database = {
           created_at: string;
           current_order_reference: string | null;
           device_fingerprint: string | null;
+          email: string | null;
           employer_merchant_id: string | null;
           face_photo_path: string | null;
           first_name: string;
@@ -50341,6 +50342,7 @@ export type Database = {
           created_at: string;
           current_order_reference: string | null;
           device_fingerprint: string | null;
+          email: string | null;
           employer_merchant_id: string | null;
           face_photo_path: string | null;
           first_name: string;
@@ -56035,6 +56037,7 @@ export type Database = {
           created_at: string;
           current_order_reference: string | null;
           device_fingerprint: string | null;
+          email: string | null;
           employer_merchant_id: string | null;
           face_photo_path: string | null;
           first_name: string;
@@ -56120,6 +56123,7 @@ export type Database = {
           created_at: string;
           current_order_reference: string | null;
           device_fingerprint: string | null;
+          email: string | null;
           employer_merchant_id: string | null;
           face_photo_path: string | null;
           first_name: string;
@@ -56208,6 +56212,7 @@ export type Database = {
               created_at: string;
               current_order_reference: string | null;
               device_fingerprint: string | null;
+              email: string | null;
               employer_merchant_id: string | null;
               face_photo_path: string | null;
               first_name: string;
@@ -56373,6 +56378,7 @@ export type Database = {
           created_at: string;
           current_order_reference: string | null;
           device_fingerprint: string | null;
+          email: string | null;
           employer_merchant_id: string | null;
           face_photo_path: string | null;
           first_name: string;
@@ -56475,6 +56481,7 @@ export type Database = {
           created_at: string;
           current_order_reference: string | null;
           device_fingerprint: string | null;
+          email: string | null;
           employer_merchant_id: string | null;
           face_photo_path: string | null;
           first_name: string;
@@ -56610,6 +56617,7 @@ export type Database = {
           created_at: string;
           current_order_reference: string | null;
           device_fingerprint: string | null;
+          email: string | null;
           employer_merchant_id: string | null;
           face_photo_path: string | null;
           first_name: string;
