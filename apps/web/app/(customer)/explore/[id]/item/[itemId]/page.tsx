@@ -91,7 +91,7 @@ export default async function ProductPage({ params }: { params: Params }) {
   return (
     <>
       <SiteHeader />
-      <main id="main" className="mx-auto max-w-[72rem] px-4 pb-24 pt-5 sm:px-8">
+      <main id="main" className="mx-auto max-w-[120rem] px-4 pb-24 pt-5 sm:px-[30px]">
         <nav aria-label="Breadcrumb" className="text-muted-light text-xs font-semibold">
           <Link href="/explore" className="hover:text-ink transition-colors">
             Explore
