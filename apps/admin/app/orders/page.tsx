@@ -9,6 +9,7 @@ import {
   OrderPanel,
   type ItemRow,
   type OrderDetail,
+  type Payout,
   type TimelineRow,
 } from '@/components/live/order-panel';
 import {
@@ -142,7 +143,7 @@ export default async function OrdersPage({
   let candidates: Candidate[] = [];
 
   if (selectedId) {
-    const [d, t, i, waiting] = await Promise.all([
+    const [d, t, i, waiting, open, payouts] = await Promise.all([
       supabase.from('console_order_detail_v').select('*').eq('id', selectedId).maybeSingle(),
       supabase.from('console_order_timeline_v').select('*').eq('order_id', selectedId).order('at'),
       supabase.from('console_order_items_v').select('*').eq('order_id', selectedId),
@@ -151,14 +152,33 @@ export default async function OrdersPage({
          "where is my refund" is looking at this order. */
       supabase
         .from('refunds_to_issue_v')
-        .select('refund_id, amount_cents')
+        .select('refund_id, amount_cents, method')
         .eq('order_id', selectedId),
+      /* The payment still waiting on M-Pesa, if any: "Check with M-Pesa" asks about it. */
+      supabase
+        .from('payment')
+        .select('reference, provider, state')
+        .eq('order_id', selectedId)
+        .in('state', ['pending', 'authorised'])
+        .order('created_at', { ascending: false })
+        .limit(1),
+      /* Money going out by M-Pesa for this order: refunds, and money held to send back. */
+      supabase
+        .from('mpesa_payout')
+        .select(
+          'id, purpose, refund_id, state, amount_cents, phone, reason, result_desc, receipt, created_at',
+        )
+        .eq('order_id', selectedId)
+        .order('created_at', { ascending: false }),
     ]);
     detail = (d.data as OrderDetail | null) ?? null;
     if (detail) {
       detail.refund_waiting_to_send = (
-        (waiting.data as { refund_id: string; amount_cents: number }[] | null) ?? []
-      ).map((r) => ({ id: r.refund_id, amount_cents: r.amount_cents }));
+        (waiting.data as { refund_id: string; amount_cents: number; method: string }[] | null) ?? []
+      ).map((r) => ({ id: r.refund_id, amount_cents: r.amount_cents, method: r.method }));
+      const live = (open.data as { reference: string; provider: string }[] | null)?.[0];
+      detail.mpesa_waiting_reference = live?.provider === 'mpesa' ? live.reference : null;
+      detail.payouts = (payouts.data as Payout[] | null) ?? [];
     }
     timeline = (t.data as TimelineRow[] | null) ?? [];
     items = (i.data as ItemRow[] | null) ?? [];

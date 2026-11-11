@@ -8,12 +8,16 @@ import * as React from 'react';
 import {
   addNote,
   adjustItems,
+  checkWithMpesa,
   contact,
   markOrder,
   previewReprice,
   recordRefundSent,
   refundOrder,
   refundRoutes,
+  resolvePayout,
+  sendPayout,
+  sendRefundByMpesa,
   type Outcome,
 } from '@/app/orders/actions';
 import { cancelOrder, previewCancel, reassignRider } from '@/app/live/actions';
@@ -76,11 +80,31 @@ export interface OrderDetail {
   guest_contact_attempts: number;
   refunded_cents: number;
   refund_in_flight_cents: number;
-  refund_waiting_to_send?: { id: string; amount_cents: number }[] | null;
+  refund_waiting_to_send?: { id: string; amount_cents: number; method?: string }[] | null;
+  /* The payment still waiting on an M-Pesa prompt, if any. */
+  mpesa_waiting_reference?: string | null;
+  /* Money going out by M-Pesa for this order. */
+  payouts?: Payout[] | null;
   awaiting_merchant_ack: boolean;
   needs_action_reads_as: string | null;
   job_id: string | null;
 }
+
+/** One send of money to a phone by M-Pesa (public.mpesa_payout). */
+export interface Payout {
+  id: string;
+  purpose: 'order_refund' | 'return_excess';
+  refund_id: string | null;
+  state: 'held' | 'queued' | 'sending' | 'accepted' | 'sent' | 'failed' | 'uncertain' | 'cancelled';
+  amount_cents: number;
+  phone: string | null;
+  reason: string;
+  result_desc: string | null;
+  receipt: string | null;
+  created_at: string;
+}
+
+const PAYOUT_LIVE = ['queued', 'sending', 'accepted'];
 
 export interface TimelineRow {
   id: string;
@@ -170,6 +194,26 @@ export function OrderPanel({
         </p>
         {order.needs_action_reads_as && (
           <p className="text-danger mt-1 text-[0.75rem] font-bold">{order.needs_action_reads_as}</p>
+        )}
+        {order.mpesa_waiting_reference && !closed && (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() =>
+                void run(() => checkWithMpesa(order.mpesa_waiting_reference!)).then(() =>
+                  /* The answer comes back through the payments worker a few seconds later. */
+                  window.setTimeout(() => router.refresh(), 6000),
+                )
+              }
+              className="border-border-strong rounded-lg border px-3 py-1.5 text-[0.75rem] font-extrabold disabled:opacity-40"
+            >
+              {busy ? 'Asking…' : 'Check with M-Pesa'}
+            </button>
+            <span className="text-muted-light text-[0.6875rem] font-semibold">
+              Asks Safaricom what became of the prompt, in case its answer never reached NexG.
+            </span>
+          </div>
         )}
         {order.awaiting_merchant_ack && (
           <p className="text-gold-text mt-1 text-[0.75rem] font-bold">
@@ -380,16 +424,111 @@ export function OrderPanel({
                 : `${(order.refund_waiting_to_send ?? []).length} refunds are approved and have not left the account.`}
             </p>
             <p className="text-ink/70 mt-1 text-[0.75rem] font-semibold">
-              Send it back by M-Pesa or bank transfer, then record the reference here.
+              Send it by M-Pesa from here, or send it by hand (M-Pesa or bank transfer) and record
+              the reference.
             </p>
-            {(order.refund_waiting_to_send ?? []).map((r) => (
-              <RecordRefund
-                key={r.id}
-                amount={kes(r.amount_cents)}
-                busy={busy}
-                onRecord={(reference) => void run(() => recordRefundSent(r.id, reference))}
-              />
-            ))}
+            {(order.refund_waiting_to_send ?? []).map((r) => {
+              const payouts = (order.payouts ?? []).filter((p) => p.refund_id === r.id);
+              const live = payouts.find((p) => PAYOUT_LIVE.includes(p.state));
+              const uncertain = payouts.find((p) => p.state === 'uncertain');
+              const failed = payouts.find((p) => p.state === 'failed');
+              if (live) {
+                return (
+                  <p key={r.id} className="text-ink mt-2 text-[0.75rem] font-bold">
+                    {kes(r.amount_cents)} is going out by M-Pesa to {maskPhone(live.phone)}. It is
+                    marked sent when Safaricom confirms.
+                  </p>
+                );
+              }
+              if (uncertain) {
+                return (
+                  <ResolvePayout
+                    key={r.id}
+                    payout={uncertain}
+                    busy={busy}
+                    onResolve={(sent, receipt, note) =>
+                      void run(() => resolvePayout(uncertain.id, sent, receipt, note))
+                    }
+                  />
+                );
+              }
+              return (
+                <div key={r.id} className="mt-2">
+                  {failed?.result_desc && (
+                    <p className="text-danger text-[0.6875rem] font-bold">
+                      Last M-Pesa send did not go: {failed.result_desc}
+                    </p>
+                  )}
+                  {r.method !== 'wallet_credit' && (
+                    <SendByMpesa
+                      amount={kes(r.amount_cents)}
+                      busy={busy}
+                      onSend={(phone) => void run(() => sendRefundByMpesa(r.id, phone))}
+                    />
+                  )}
+                  <RecordRefund
+                    amount={kes(r.amount_cents)}
+                    busy={busy}
+                    onRecord={(reference) => void run(() => recordRefundSent(r.id, reference))}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {(order.payouts ?? []).some(
+          (p) => p.purpose === 'return_excess' && !['sent', 'cancelled'].includes(p.state),
+        ) && (
+          <div className="bg-danger-bg rounded-lg p-3">
+            <p className="text-danger text-[0.75rem] font-extrabold">
+              Money to send back: NexG received it and does not keep it.
+            </p>
+            {(order.payouts ?? [])
+              .filter(
+                (p) => p.purpose === 'return_excess' && !['sent', 'cancelled'].includes(p.state),
+              )
+              .map((p) => (
+                <div key={p.id} className="mt-2">
+                  <p className="text-ink text-[0.75rem] font-bold">
+                    {kes(p.amount_cents)} · {p.reason}
+                  </p>
+                  {PAYOUT_LIVE.includes(p.state) ? (
+                    <p className="text-ink/70 text-[0.6875rem] font-semibold">
+                      Going out by M-Pesa to {maskPhone(p.phone)}.
+                    </p>
+                  ) : p.state === 'uncertain' ? (
+                    <ResolvePayout
+                      payout={p}
+                      busy={busy}
+                      onResolve={(sent, receipt, note) =>
+                        void run(() => resolvePayout(p.id, sent, receipt, note))
+                      }
+                    />
+                  ) : (
+                    <>
+                      {p.state === 'failed' && p.result_desc && (
+                        <p className="text-danger text-[0.6875rem] font-bold">
+                          Last M-Pesa send did not go: {p.result_desc}
+                        </p>
+                      )}
+                      <SendByMpesa
+                        amount={kes(p.amount_cents)}
+                        busy={busy}
+                        askPhone={!p.phone}
+                        onSend={(phone) => void run(() => sendPayout(p.id, phone))}
+                      />
+                      <RecordRefund
+                        amount={kes(p.amount_cents)}
+                        busy={busy}
+                        onRecord={(reference) =>
+                          void run(() => resolvePayout(p.id, true, reference, 'Sent back by hand'))
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+              ))}
           </div>
         )}
 
@@ -829,6 +968,124 @@ function AddNote({
 }
 
 /** One approved refund: the reference of the money sent back, then mark it sent. */
+/** 254712345678 → 07•• ••• 678. Numbers stay masked on this screen. */
+function maskPhone(phone: string | null): string {
+  if (!phone || phone.length < 6) return 'the number that paid';
+  return `0${phone.slice(3, 4)}•• ••• ${phone.slice(-3)}`;
+}
+
+/**
+ * Sends money to a phone by M-Pesa (B2C). It goes to the number that paid;
+ * a number is asked for only when M-Pesa never said which number that was,
+ * and the database refuses any other.
+ */
+function SendByMpesa({
+  amount,
+  busy,
+  askPhone = false,
+  onSend,
+}: {
+  amount: string;
+  busy: boolean;
+  askPhone?: boolean;
+  onSend: (phone?: string) => void;
+}) {
+  const [phone, setPhone] = React.useState('');
+  const [asking, setAsking] = React.useState(askPhone);
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-2">
+      {asking && (
+        <input
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Safaricom number, e.g. 0712 345 678"
+          aria-label={`Phone to send ${amount} to`}
+          inputMode="tel"
+          className="border-border-strong bg-surface min-w-0 flex-1 basis-40 rounded-lg border px-3 py-2 text-[0.75rem] font-semibold"
+        />
+      )}
+      <button
+        type="button"
+        disabled={busy || (asking && phone.replace(/\D/g, '').length < 9)}
+        onClick={() => onSend(asking ? phone : undefined)}
+        className="bg-success rounded-lg px-3 py-2 text-[0.75rem] font-extrabold text-white disabled:opacity-40"
+      >
+        {busy ? 'Sending…' : `Send ${amount} by M-Pesa`}
+      </button>
+      {!asking && (
+        <button
+          type="button"
+          onClick={() => setAsking(true)}
+          className="text-muted text-[0.6875rem] font-bold underline underline-offset-2"
+        >
+          Number unknown?
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * A payout M-Pesa gave no clear answer about. Nothing goes out again until a
+ * person has read the M-Pesa statement and said what it shows.
+ */
+function ResolvePayout({
+  payout,
+  busy,
+  onResolve,
+}: {
+  payout: Payout;
+  busy: boolean;
+  onResolve: (sent: boolean, receipt: string, note: string) => void;
+}) {
+  const [receipt, setReceipt] = React.useState('');
+  const [note, setNote] = React.useState('');
+  return (
+    <div className="border-danger/30 mt-2 rounded-lg border p-2">
+      <p className="text-danger text-[0.75rem] font-extrabold">
+        Check the M-Pesa statement before sending {kes(payout.amount_cents)} again.
+      </p>
+      {payout.result_desc && (
+        <p className="text-ink/70 mt-0.5 text-[0.6875rem] font-semibold">{payout.result_desc}</p>
+      )}
+      <div className="mt-2 flex flex-wrap gap-2">
+        <input
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="What the statement shows"
+          aria-label="What the M-Pesa statement shows"
+          className="border-border-strong bg-surface min-w-0 flex-1 basis-40 rounded-lg border px-3 py-2 text-[0.75rem] font-semibold"
+        />
+        <input
+          value={receipt}
+          onChange={(e) => setReceipt(e.target.value)}
+          placeholder="M-Pesa receipt, if it went"
+          aria-label="M-Pesa receipt of the payout"
+          className="border-border-strong bg-surface min-w-0 flex-1 basis-32 rounded-lg border px-3 py-2 text-[0.75rem] font-semibold"
+        />
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={busy || note.trim() === '' || receipt.trim().length < 6}
+          onClick={() => onResolve(true, receipt, note)}
+          className="bg-ink rounded-lg px-3 py-2 text-[0.75rem] font-extrabold text-white disabled:opacity-40"
+        >
+          It went: record the receipt
+        </button>
+        <button
+          type="button"
+          disabled={busy || note.trim() === ''}
+          onClick={() => onResolve(false, '', note)}
+          className="border-border-strong rounded-lg border px-3 py-2 text-[0.75rem] font-extrabold disabled:opacity-40"
+        >
+          It did not go
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function RecordRefund({
   amount,
   busy,

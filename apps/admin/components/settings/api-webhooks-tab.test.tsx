@@ -144,10 +144,50 @@ describe('API & Webhooks tab', () => {
     expect(html).toContain('API documentation');
   });
 
-  it('warns when M-Pesa prompts go out and no answer comes back', () => {
+  it('warns when M-Pesa prompts go out and no callback comes back', () => {
     const html = apiTab(overview);
     expect(html).toContain('4 prompts sent, 0 answered');
-    expect(html).toContain('no answer from Safaricom was recorded');
+    expect(html).toContain('no callback from Safaricom was recorded');
+    expect(html).toContain('Safaricom does not follow redirects');
+  });
+
+  it('tells answers NexG asked for apart from callbacks, and flags refused callbacks', () => {
+    const mpesa = {
+      ...overview.webhooks[0]!,
+      answered_30d: 3,
+      queries_30d: 3,
+      last_query_at: '2026-11-10T13:11:30Z',
+      rejected_30d: 2,
+      waiting_now: 1,
+    };
+    const html = apiTab({ ...overview, webhooks: [mpesa, overview.webhooks[1]!] });
+    expect(html).toContain('3 answered by asking M-Pesa');
+    expect(html).toContain('1 waiting now');
+    expect(html).toContain('2 callbacks arrived with');
+  });
+
+  it('says when the payments worker or Paybill is not set up, and offers to connect Paybill', () => {
+    const html = apiTab(overview);
+    expect(html).toContain('Payments worker: not set');
+    expect(html).toContain('payments_worker_url');
+    expect(html).toContain('Paybill payments:');
+    expect(html).toContain('Connect Paybill');
+  });
+
+  it('shows money waiting on a person', () => {
+    const mpesa = {
+      ...overview.webhooks[0]!,
+      worker_url_set: true,
+      paybill: { ok: true, message: 'Success', at: '2026-11-10T13:11:30Z' },
+      payouts_held: 2,
+      payouts_uncertain: 1,
+    };
+    const html = apiTab({ ...overview, webhooks: [mpesa, overview.webhooks[1]!] });
+    expect(html).toContain('Payments worker: set');
+    expect(html).toContain('Paybill payments:');
+    expect(html).not.toContain('Connect Paybill');
+    expect(html).toContain('2 payments to send back');
+    expect(html).toContain('1 M-Pesa payout needs a statement check');
   });
 
   it('still shows the webhooks before their status can be read', () => {

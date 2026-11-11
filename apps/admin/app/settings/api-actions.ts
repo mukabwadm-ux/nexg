@@ -112,3 +112,16 @@ export async function readApiTest(testId: string): Promise<ApiTestOutcome> {
   if (outcome.done) revalidatePath('/settings');
   return outcome;
 }
+
+/**
+ * Asks Safaricom to report Paybill payments made from the M-Pesa menu to
+ * NexG (C2B URL registration), through the payments worker on the website,
+ * which holds the Daraja keys. Safaricom's answer shows in this tab.
+ */
+export async function connectPaybill(): Promise<ApiOutcome> {
+  const { data, error } = await call('rpc_payment_mpesa_paybill_connect', {});
+  if (error) return { ok: false, message: clean(error.message) };
+  const r = (data ?? {}) as { ok?: boolean; message?: string };
+  revalidatePath('/settings');
+  return { ok: r.ok !== false, message: r.message ?? 'Asked Safaricom.' };
+}

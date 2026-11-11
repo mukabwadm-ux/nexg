@@ -9,9 +9,11 @@ import {
   PaymentSummary,
   type StepState,
 } from '@/components/pay/payment-status';
+import { PaybillOption } from '@/components/pay/paybill-option';
 import { RetryPayment } from '@/components/pay/retry-payment';
 import { SiteHeader } from '@/components/site-header';
 import { bankCheckoutEnabled } from '@/lib/bank';
+import { paybillNumber } from '@/lib/daraja';
 import { reconcileBankPayment } from '@/lib/bank/payments';
 import { reconcileMpesaPrompts } from '@/lib/mpesa-prompt';
 import { failureCopy, failureKind, PROMPT_EXPIRES_AFTER_SECONDS } from '@/lib/payment-outcome';
@@ -212,6 +214,28 @@ export default async function PaymentReturn({ params }: { params: { reference: s
   const amount = `KES ${Math.round(payment.amount_cents / 100).toLocaleString('en-KE')}`;
   const phone = localPhone(payment.payer_phone);
 
+  /* Paying from the M-Pesa menu, when the shortcode is a Paybill and Safaricom
+     reports Paybill payments to NexG (Settings → API → Connect Paybill). */
+  const paybill =
+    orderOpen && order?.payment_method === 'mpesa_stk' && order.reference ? paybillNumber() : null;
+  const paybillReady = paybill
+    ? Boolean(
+        (
+          await (supabase.rpc as unknown as (fn: string) => PromiseLike<{ data: unknown }>)(
+            'fn_mpesa_paybill_ready',
+          )
+        ).data,
+      )
+    : false;
+  const paybillOption =
+    paybill && paybillReady && order?.reference ? (
+      <PaybillOption
+        paybill={paybill}
+        orderReference={order.reference}
+        amountCents={payment.amount_cents}
+      />
+    ) : null;
+
   const summary = (
     <PaymentSummary
       amount={amount}
@@ -269,6 +293,39 @@ export default async function PaymentReturn({ params }: { params: { reference: s
   }
 
   /* ─────────────────────────────────────────── failed or cancelled */
+  /* ─────────────────────────────── closed before anybody paid */
+  if (
+    payment.state === 'abandoned' ||
+    (payment.intent === 'order' &&
+      order &&
+      ['cancelled', 'refunded'].includes(order.stage) &&
+      !['paid', 'collected'].includes(order.payment_status))
+  ) {
+    return (
+      <>
+        <SiteHeader />
+        <PaymentStatusLayout
+          tone="neutral"
+          icon={CircleSlash}
+          title="This order was closed"
+          message={
+            payment.state === 'abandoned'
+              ? 'It was not paid within 30 minutes, so it was closed. Nothing was charged. Order again whenever you are ready.'
+              : 'This order was cancelled. Nothing was charged for it.'
+          }
+          aside={summary}
+        >
+          <ActionRow
+            actions={[
+              { label: 'Order again', href: '/explore' },
+              { label: 'Your orders', href: '/account?tab=orders' },
+            ]}
+          />
+        </PaymentStatusLayout>
+      </>
+    );
+  }
+
   if (payment.state === 'failed') {
     if (
       payment.intent === 'order' &&
@@ -321,6 +378,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
               bankEnabled={bankEnabled}
             />
           )}
+          {paybillOption}
         </PaymentStatusLayout>
       </>
     );
@@ -383,6 +441,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
               bankEnabled={bankEnabled}
             />
           )}
+          {unanswered && paybillOption}
         </PaymentStatusLayout>
       </>
     );
@@ -415,6 +474,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
             bankEnabled={bankEnabled}
           />
         )}
+        {notStarted && paybillOption}
       </PaymentStatusLayout>
     </>
   );

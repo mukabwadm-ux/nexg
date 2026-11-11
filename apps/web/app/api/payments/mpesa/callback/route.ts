@@ -16,7 +16,7 @@ type Item = {
 export async function POST(request: Request) {
   const token = new URL(request.url).searchParams.get('token');
   const accepted = NextResponse.json({ ResultCode: 0, ResultDesc: 'Accepted' });
-  if (!token || !callbackSecretValid(token)) return accepted;
+  const tokenOk = Boolean(token && callbackSecretValid(token));
 
   let body: {
     Body?: {
@@ -37,6 +37,22 @@ export async function POST(request: Request) {
   const cb = body?.Body?.stkCallback;
   if (!cb?.CheckoutRequestID || typeof cb.ResultCode !== 'number') return accepted;
 
+  /* A callback for one of our prompts that arrives without the right token
+     changes nothing, but it is written down: a callback address that has
+     lost its token is otherwise invisible until payments stop settling. */
+  if (!tokenOk) {
+    await (
+      createPublicClient().rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => PromiseLike<unknown>
+    )('rpc_payment_mpesa_callback_rejected', {
+      p_checkout_request_id: cb.CheckoutRequestID.slice(0, 120),
+      p_reason: token ? 'wrong_token' : 'missing_token',
+    });
+    return accepted;
+  }
+
   const items = cb.CallbackMetadata?.Item ?? [];
   const pick = (name: string) => items.find((i) => i.Name === name)?.Value;
   const amount = pick('Amount');
@@ -47,7 +63,7 @@ export async function POST(request: Request) {
     p_checkout_request_id: cb.CheckoutRequestID,
     p_result_code: cb.ResultCode,
     p_result_desc: cb.ResultDesc ?? '',
-    p_callback_secret: token,
+    p_callback_secret: token ?? '',
     p_payload: body,
     p_amount_kes: amount === undefined ? undefined : Number(amount),
     p_receipt: receipt === undefined ? undefined : String(receipt),

@@ -12,6 +12,7 @@ import {
   setApiEnabled,
   setApiSecret,
   startApiTest,
+  connectPaybill,
 } from '@/app/settings/api-actions';
 
 import { type IntegrationRow, Pill, STATUS_LABEL, STATUS_TONE, Tile } from './shared';
@@ -60,11 +61,21 @@ export interface ApiOrigins {
 export interface WebhookStatus {
   key: 'mpesa' | 'bank';
   secret_set: boolean;
+  /* For M-Pesa, Safaricom's own callbacks; answers NexG asked for are counted apart. */
   last_event_at: string | null;
   events_30d: number;
   unhandled_30d: number;
   prompts_30d?: number;
   answered_30d?: number;
+  worker_url_set?: boolean;
+  last_query_at?: string | null;
+  queries_30d?: number;
+  rejected_30d?: number;
+  waiting_now?: number;
+  paybill?: { ok: boolean; message: string; at: string } | null;
+  paybill_30d?: number;
+  payouts_held?: number;
+  payouts_uncertain?: number;
 }
 
 export interface ApiOverview {
@@ -401,6 +412,75 @@ const WEBHOOKS: {
   },
 ];
 
+/**
+ * The M-Pesa payments worker and Paybill: whether the database can call the
+ * website to ask M-Pesa about unanswered prompts and send payouts, whether
+ * Safaricom reports Paybill payments, and money waiting on a person.
+ */
+function MpesaWorker({ status }: { status: WebhookStatus }) {
+  const [busy, setBusy] = React.useState(false);
+  const [said, setSaid] = React.useState<string | null>(null);
+  const paybill = status.paybill ?? null;
+  return (
+    <div className="border-border mt-3 space-y-1.5 border-t pt-3 text-[0.75rem] font-semibold">
+      <p className={status.worker_url_set ? 'text-muted' : 'text-danger font-bold'}>
+        {status.worker_url_set ? (
+          <>Payments worker: set. Prompts without an answer are asked about every minute.</>
+        ) : (
+          <>
+            Payments worker: not set. Add <code className="font-mono">payments_worker_url</code> to
+            Vault (the website address followed by{' '}
+            <code className="font-mono">/api/payments/worker</code>) so unanswered prompts settle
+            and refunds send.
+          </>
+        )}
+      </p>
+      <p className="text-muted">
+        Paybill payments:{' '}
+        {paybill?.ok
+          ? `connected ${when(paybill.at)}. Customers can pay from the M-Pesa menu with the order number as the account.`
+          : paybill
+            ? `not connected. Safaricom said: ${paybill.message}`
+            : 'not connected. Payments made from the M-Pesa menu are not matched to orders yet.'}
+        {Number(status.paybill_30d ?? 0) > 0 ? ` ${status.paybill_30d} received in 30 days.` : ''}
+      </p>
+      {!paybill?.ok && (
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            disabled={busy || !status.worker_url_set}
+            onClick={async () => {
+              setBusy(true);
+              const r = await connectPaybill();
+              setSaid(r.message ?? null);
+              setBusy(false);
+            }}
+            className="bg-ink rounded-lg px-3 py-1.5 text-[0.75rem] font-extrabold text-white disabled:opacity-40"
+          >
+            {busy ? 'Asking Safaricom…' : 'Connect Paybill'}
+          </button>
+          {said && (
+            <span role="status" className="text-muted text-[0.6875rem] font-semibold">
+              {said}
+            </span>
+          )}
+        </div>
+      )}
+      {(Number(status.payouts_held ?? 0) > 0 || Number(status.payouts_uncertain ?? 0) > 0) && (
+        <p className="text-danger font-bold">
+          {Number(status.payouts_held ?? 0) > 0
+            ? `${status.payouts_held} payment${Number(status.payouts_held) === 1 ? '' : 's'} to send back. `
+            : ''}
+          {Number(status.payouts_uncertain ?? 0) > 0
+            ? `${status.payouts_uncertain} M-Pesa payout${Number(status.payouts_uncertain) === 1 ? ' needs' : 's need'} a statement check. `
+            : ''}
+          Open the order to act on it.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function WebhooksSection({
   origins,
   overview,
@@ -451,14 +531,29 @@ function WebhooksSection({
                 {s && w.key === 'mpesa'
                   ? ` · ${prompts} prompt${prompts === 1 ? '' : 's'} sent, ${s.answered_30d ?? 0} answered`
                   : ''}
+                {s && w.key === 'mpesa' && Number(s.queries_30d ?? 0) > 0
+                  ? ` · ${s.queries_30d} answered by asking M-Pesa (last ${when(s.last_query_at ?? null)})`
+                  : ''}
+                {s && w.key === 'mpesa' && Number(s.waiting_now ?? 0) > 0
+                  ? ` · ${s.waiting_now} waiting now`
+                  : ''}
               </p>
               {silent && (
                 <p className="text-danger mt-1.5 text-[0.75rem] font-bold">
-                  Prompts went out but no answer from Safaricom was recorded. Check that Safaricom
-                  can reach this address and that DARAJA_CALLBACK_SECRET on the website matches{' '}
-                  <code className="font-mono">daraja_callback_secret</code> in Vault.
+                  Prompts went out but no callback from Safaricom was recorded. Safaricom does not
+                  follow redirects: the address above must answer directly (www, not the bare
+                  domain, if one redirects to the other), and DARAJA_CALLBACK_SECRET on the website
+                  must match <code className="font-mono">daraja_callback_secret</code> in Vault.
                 </p>
               )}
+              {s && w.key === 'mpesa' && Number(s.rejected_30d ?? 0) > 0 && (
+                <p className="text-danger mt-1.5 text-[0.75rem] font-bold">
+                  {s.rejected_30d} callback{Number(s.rejected_30d) === 1 ? '' : 's'} arrived with a
+                  missing or wrong token and changed nothing. The website&apos;s
+                  DARAJA_CALLBACK_SECRET and Vault&apos;s daraja_callback_secret differ.
+                </p>
+              )}
+              {s && w.key === 'mpesa' && <MpesaWorker status={s} />}
             </Card>
           );
         })}
