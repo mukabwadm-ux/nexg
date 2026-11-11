@@ -8,7 +8,10 @@ import * as React from 'react';
 
 import { rankStores, type NearbyStore, type RankedStore } from '@/lib/stores-near';
 
-import { CardRail, RAIL_CARD } from './card-rail';
+import { CardRail } from './card-rail';
+
+/** The same card size as Best sellers, so the two rows line up. */
+const STORE_CARD = 'w-[16.5rem] shrink-0 snap-start sm:w-[18rem] lg:w-[calc((100%-3rem)/4)]';
 
 /**
  * "Find Stores Near You": the live stores that deliver to where the visitor
@@ -63,18 +66,18 @@ function StoreCard({ store }: { store: RankedStore }) {
   const area = store.branch_name ? unbracket(store.branch_name) : null;
 
   return (
-    <li className={RAIL_CARD}>
+    <li className={STORE_CARD}>
       <Link
         href={`/explore/${store.id}`}
         className="focus-visible:ring-gold group flex h-full flex-col overflow-hidden rounded-2xl bg-[#17140F] ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2"
       >
-        <span className="relative block h-44 overflow-hidden bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E]">
+        <span className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E]">
           {photo && (
             <Image
               src={photo}
               alt=""
               fill
-              sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 82vw"
+              sizes="(min-width: 1024px) 24vw, 18rem"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )}
@@ -90,9 +93,9 @@ function StoreCard({ store }: { store: RankedStore }) {
           )}
         </span>
 
-        <span className="flex flex-1 items-start justify-between gap-3 p-4">
+        <span className="flex flex-1 items-start justify-between gap-3 p-4 pb-3">
           <span className="min-w-0">
-            <span className="block truncate text-base font-extrabold">{name}</span>
+            <span className="block truncate text-[0.9375rem] font-extrabold">{name}</span>
             <span className="mt-0.5 block truncate text-[0.8125rem] font-semibold text-white/50">
               {store.category_other ?? category?.label ?? 'Store'}
             </span>
@@ -107,7 +110,7 @@ function StoreCard({ store }: { store: RankedStore }) {
         </span>
 
         <span className="mx-4 border-t border-dashed border-white/10" />
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 text-xs font-semibold text-white/55">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2.5 text-xs font-semibold text-white/55">
           {area && (
             <>
               <span className="inline-flex min-w-0 items-center gap-1">
