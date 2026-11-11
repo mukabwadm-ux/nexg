@@ -83,6 +83,53 @@ jobs:
         if: always()
         run: supabase stop --no-backup
 
+  booking-postgres:
+    name: Booking runtime on PostgreSQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Production stores bookings in PostgreSQL, so the booking suite (including
+    # concurrent double-booking checks) and the reviewed migrations run here too.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: booking
+          POSTGRES_PASSWORD: booking
+          POSTGRES_DB: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U booking" --health-interval 5s --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile --filter @nexg/booking-engine...
+
+      - name: Booking tests on PostgreSQL
+        env:
+          BOOKING_TEST_POSTGRES_URL: postgres://booking:booking@localhost:5432/postgres
+        run: pnpm --filter @nexg/booking-engine test
+
+      - name: Migrations apply to an empty database
+        env:
+          PGPASSWORD: booking
+          BOOKING_DATABASE_URL: postgres://booking:booking@localhost:5432/booking_migrations
+        run: |
+          psql -h localhost -U booking -d postgres -c 'create database booking_migrations'
+          pnpm --filter @nexg/booking-engine migrate
+
   verify:
     name: Install, build, lint, typecheck, test
     runs-on: ubuntu-latest

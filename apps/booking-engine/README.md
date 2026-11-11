@@ -6,7 +6,34 @@ This is the private Payload Reserve 4.4.2 / Payload 3.86.0 booking host. It is s
 
 Set the same `BOOKING_BRIDGE_SECRET` in this runtime and the web app, then run `pnpm --filter @nexg/booking-engine dev`. The default port is 3003 and the host is loopback only. Local persistence is a dedicated SQLite file under `.data`, not the merchant portal database. There is no Google account requirement.
 
-SQLite explicitly enables `transactionOptions: {}`. The runtime serializes whole SQLite write commands to avoid the documented adapter contention/underfill behavior. The real Payload transaction and Reserve resource-lock/conflict hooks remain active. PostgreSQL commands additionally serialize on the business row. Production startup is deliberately disabled until the same concurrency suite is verified against the deployment PostgreSQL database; development SQLite is the verified target. Automatic PostgreSQL schema push requires an explicit development flag.
+SQLite explicitly enables `transactionOptions: {}`. The runtime serializes whole SQLite write commands to avoid the documented adapter contention/underfill behavior. The real Payload transaction and Reserve resource-lock/conflict hooks remain active. PostgreSQL commands additionally serialize on the business row. Automatic PostgreSQL schema push requires an explicit development flag and is refused in production.
+
+## Production (PostgreSQL)
+
+Production stores bookings in a dedicated PostgreSQL database, never the merchant portal database. The full suite, including the concurrent last-place checks in `tests/concurrency.test.ts`, passes against PostgreSQL 16; CI runs it on every change:
+
+    BOOKING_TEST_POSTGRES_URL=postgres://user:pass@host:5432/postgres pnpm test
+
+Each test creates and drops its own database, so that user needs `CREATEDB`.
+
+The schema comes only from the reviewed migrations in `migrations/`:
+
+- `pnpm migrate` applies pending migrations to `BOOKING_DATABASE_URL` (the container runs it before starting).
+- `pnpm migrate:create <name>` writes a new migration after a schema change. Point it at a scratch database that has the current migrations applied, then review and commit the generated files.
+
+Runtime settings:
+
+| Variable                 | Value                                                                |
+| ------------------------ | -------------------------------------------------------------------- |
+| `BOOKING_DATABASE_URL`   | Dedicated PostgreSQL connection string                               |
+| `PAYLOAD_SECRET`         | Random, at least 32 characters, private to this service              |
+| `BOOKING_BRIDGE_SECRET`  | Random, at least 32 characters; the same value is set on the web app |
+| `PORT` or `BOOKING_PORT` | Listening port (the host usually sets `PORT`)                        |
+| `BOOKING_HOST`           | `0.0.0.0` in a container (the Dockerfile sets it)                    |
+
+The web app needs `BOOKING_ENGINE_URL` (this service's HTTPS address) and the same `BOOKING_BRIDGE_SECRET`. Build the image from the repository root with `docker build -f apps/booking-engine/Dockerfile .`. `GET /health` answers without a signature; every other route requires the signed bridge headers.
+
+CI publishes the image from `main` to `ghcr.io/mukabwadm-ux/nexg-booking-engine` (`.github/workflows/booking-engine-image.yml`). To run it on a server with its own PostgreSQL and HTTPS, follow [`deploy/vps`](../../deploy/vps/README.md).
 
 ## Contracts
 

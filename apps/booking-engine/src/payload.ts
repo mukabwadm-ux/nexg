@@ -8,6 +8,8 @@ import { postgresAdapter } from '@payloadcms/db-postgres';
 import { payloadReserve } from 'payload-reserve';
 
 const dataDir = fileURLToPath(new URL('../.data/', import.meta.url));
+/** Reviewed PostgreSQL schema migrations, applied by `pnpm migrate` before start. */
+export const migrationDir = fileURLToPath(new URL('../migrations/', import.meta.url));
 const tenantField = { name: 'businessId', type: 'text' as const, required: true, index: true };
 const tenantAccess = ({ req }: any) =>
   req.context?.nexgSystem === true
@@ -60,7 +62,14 @@ const extraFields = {
 };
 
 export async function createPayload(
-  options: { sqliteUrl?: string; secret?: string; postgresUrl?: string; cacheKey?: string } = {},
+  options: {
+    sqliteUrl?: string;
+    secret?: string;
+    postgresUrl?: string;
+    cacheKey?: string;
+    /** Tests only: build the schema in a disposable database. */
+    push?: boolean;
+  } = {},
 ) {
   process.env.DISABLE_PAYLOAD_HMR = 'true';
   await mkdir(dataDir, { recursive: true });
@@ -77,10 +86,11 @@ export async function createPayload(
     }
   }
   const pg = options.postgresUrl ?? process.env.BOOKING_DATABASE_URL;
-  if (process.env.NODE_ENV === 'production' && pg)
-    throw new Error(
-      'PostgreSQL production writes are disabled until the booking concurrency integration suite is verified against the deployment database.',
-    );
+  // The integration and concurrency suites pass against PostgreSQL 16
+  // (BOOKING_TEST_POSTGRES_URL), so production uses PostgreSQL. Its schema
+  // comes only from the reviewed migrations in ./migrations, never a push.
+  if (process.env.NODE_ENV === 'production' && (options.push || process.env.BOOKING_DB_PUSH))
+    throw new Error('Production schema changes must come from reviewed migrations.');
   if (process.env.NODE_ENV === 'production' && !pg)
     throw new Error(
       'Production requires a dedicated BOOKING_DATABASE_URL and reviewed migrations.',
@@ -88,7 +98,8 @@ export async function createPayload(
   const db = pg
     ? postgresAdapter({
         pool: { connectionString: pg },
-        push: process.env.BOOKING_DB_PUSH === 'true',
+        migrationDir,
+        push: options.push ?? process.env.BOOKING_DB_PUSH === 'true',
       })
     : sqliteAdapter({
         client: {
@@ -210,8 +221,17 @@ export async function createPayload(
     if (closed) return;
     closed = true;
     await destroy();
-    if (pg) await (payload.db as any).pool?.end();
-    else (payload.db as any).client?.close();
+    if (pg) {
+      const pool = (payload.db as any).pool;
+      if (pool) {
+        // Payload's postgres connect checks out one client to watch for
+        // connection resets and never returns it, so pool.end() would wait for
+        // it forever. Return every client that is not already idle first.
+        const idle = new Set((pool._idle ?? []).map((item: any) => item.client));
+        for (const client of pool._clients ?? []) if (!idle.has(client)) client.release();
+        await pool.end();
+      }
+    } else (payload.db as any).client?.close();
   };
   return payload;
 }

@@ -237,9 +237,15 @@ importers:
       '@types/node':
         specifier: 22.19.9
         version: 22.19.9
+      '@types/pg':
+        specifier: 8.20.0
+        version: 8.20.0
       '@types/react':
         specifier: 19.2.2
         version: 19.2.2
+      pg:
+        specifier: 8.20.0
+        version: 8.20.0
       typescript:
         specifier: 5.7.2
         version: 5.7.2
