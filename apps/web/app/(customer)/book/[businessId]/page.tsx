@@ -5,7 +5,7 @@ import { CustomerBookingForm } from '@/components/booking/customer-booking-form'
 import { CustomerBooking } from '@/components/merchant/booking/customer-booking';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { bookingEngineConfigured } from '@/lib/booking/bridge';
+import { bookingEngineEnabledForMerchant } from '@/lib/booking/bridge';
 import { nairobiDate, PUBLIC_RESOURCE_COLUMNS, type PublicResource } from '@/lib/booking/customer';
 import { createClient } from '@/lib/supabase/server';
 
@@ -15,11 +15,6 @@ export const metadata = {
 };
 export const dynamic = 'force-dynamic';
 
-/**
- * Customer booking. With the separate booking engine connected, its booking
- * flow; until then, booking straight on the main database, where the
- * merchant's Bookings board already lives.
- */
 export default async function CustomerBookingPage({
   params,
   searchParams,
@@ -27,30 +22,36 @@ export default async function CustomerBookingPage({
   params: { businessId: string };
   searchParams?: { resource?: string };
 }) {
-  if (bookingEngineConfigured(process.env)) {
+  const useEngine =
+    !searchParams?.resource && bookingEngineEnabledForMerchant(params.businessId, process.env);
+  if (useEngine && process.env.NODE_ENV !== 'production') {
     return <CustomerBooking businessId={params.businessId} />;
   }
   if (!/^[0-9a-f-]{36}$/i.test(params.businessId)) notFound();
 
   const supabase = createClient();
   // merchant_public only returns live businesses.
-  const [{ data: merchant }, { data: rows }, { data: auth }] = await Promise.all([
-    supabase
-      .from('merchant_public')
-      .select('id, trading_name')
-      .eq('id', params.businessId)
-      .maybeSingle(),
-    supabase
-      .from('bookable_resource')
-      .select(PUBLIC_RESOURCE_COLUMNS)
-      .eq('merchant_id', params.businessId)
-      .eq('active', true)
-      .order('created_at'),
-    supabase.auth.getUser(),
-  ]);
+  const [{ data: merchant }, { data: rows, error: resourceError }, { data: auth }] =
+    await Promise.all([
+      supabase
+        .from('merchant_public')
+        .select('id, trading_name')
+        .eq('id', params.businessId)
+        .maybeSingle(),
+      supabase
+        .from('bookable_resource')
+        .select(PUBLIC_RESOURCE_COLUMNS)
+        .eq('merchant_id', params.businessId)
+        .eq('active', true)
+        .order('created_at'),
+      supabase.auth.getUser(),
+    ]);
   if (!merchant?.id || !merchant.trading_name) notFound();
 
   const resources = (rows ?? []) as unknown as PublicResource[];
+  if (useEngine && !resourceError && rows && resources.length === 0) {
+    return <CustomerBooking businessId={merchant.id} />;
+  }
   const user = auth.user && !auth.user.is_anonymous ? auth.user : null;
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
   const text = (v: unknown) => (typeof v === 'string' ? v : '');

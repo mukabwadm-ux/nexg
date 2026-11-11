@@ -1,4 +1,6 @@
 import {
+  bookingEngineConfigured,
+  bookingEngineEnabledForMerchant,
   bootstrapMerchantBooking,
   forwardBookingRequest,
   problem,
@@ -29,6 +31,11 @@ async function route(request: Request, context: { params: { path: string[] } }) 
   }
   if (!identity)
     return problem(401, 'Sign in with an authorized merchant account.', 'unauthenticated');
+  if (
+    bookingEngineConfigured(process.env) &&
+    !bookingEngineEnabledForMerchant(identity.businessId, process.env)
+  )
+    return problem(404, 'The booking workspace is unavailable for this merchant.', 'not_found');
   if (!merchantBookingWorkAllowed(identity, request.method, context.params.path))
     return problem(
       403,

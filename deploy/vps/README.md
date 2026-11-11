@@ -107,15 +107,24 @@ curl -s https://booking.nexgapp.com/health
 
 It should return `{"ready":true,"engine":"Payload Reserve",...}`. Every other path refuses a request that is not signed with the bridge secret.
 
-## 8. Connecting the website (wait)
+## 8. Connect the booking clients
 
-The website takes customer bookings in Supabase today. The engine keeps its own database. If both take bookings, they end up in two places. So:
+In the production Vercel web project, set `BOOKING_ENGINE_URL` to `https://<BOOKING_DOMAIN>` and
+`BOOKING_BRIDGE_SECRET` to the booking service's matching secret. Keep both in server-only
+environment variables. With the connection configured, `BOOKING_ENGINE_MERCHANT_IDS` controls the
+production rollout as a comma-separated list of Supabase merchant IDs.
 
-1. Run the engine here and test it with no website traffic.
-2. Decide which system holds bookings. If it becomes the engine, plan moving the existing bookings before switching.
-3. Then, in Vercel's web project, set `BOOKING_ENGINE_URL` = `https://<BOOKING_DOMAIN>` and `BOOKING_BRIDGE_SECRET` = the same value as in `.env`. Both are server-only, never `NEXT_PUBLIC_`. Redeploy.
+1. Check the engine's HTTPS health and verify a signed read before adding a merchant.
+2. For each merchant, account for future Supabase reservations and transfer or retire the corresponding
+   legacy resources before opening engine intake. The public engine catalog refuses new intake while
+   active Supabase resources remain. Existing Supabase bookings are managed in `/merchant/bookings`.
+3. Add the merchant ID, redeploy, and have an authorized merchant owner import setup in
+   `/merchant/calendar` and publish the offerings. Verify the calendar and the public catalog for that
+   merchant. Other merchants continue using the Supabase booking flow.
+4. Check `/explore/<merchant-id>` and the consumer app merchant page. They link to
+   `/book/<merchant-id>` once the shared public catalog has a published offering.
 
-Until both are set, the website keeps using Supabase for bookings.
+Keep enrolled merchants in the rollout while they have bookings that customers still need to manage.
 
 ## Day to day
 

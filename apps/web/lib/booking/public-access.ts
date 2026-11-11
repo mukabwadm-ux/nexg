@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@nexg/db';
 
-import { localBookingSandboxEnabled } from './bridge';
+import { bookingEngineEnabledForMerchant, localBookingSandboxEnabled } from './bridge';
 
 const MERCHANT_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -9,6 +9,7 @@ const MERCHANT_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
 export async function publicMerchantBookingAccess(
   request: Request,
   businessId: string,
+  checkLegacyInventory = true,
 ): Promise<'available' | 'not_found' | 'unavailable'> {
   const source = new URL(request.url);
   const host = request.headers.get('host');
@@ -37,7 +38,22 @@ export async function publicMerchantBookingAccess(
       .eq('id', businessId)
       .maybeSingle();
     if (error) return 'unavailable';
-    return data?.id === businessId ? 'available' : 'not_found';
+    if (data?.id !== businessId) return 'not_found';
+    if (
+      checkLegacyInventory &&
+      process.env.NODE_ENV === 'production' &&
+      bookingEngineEnabledForMerchant(businessId, process.env)
+    ) {
+      const { data: resources, error: resourceError } = await client
+        .from('bookable_resource')
+        .select('id')
+        .eq('merchant_id', businessId)
+        .eq('active', true)
+        .limit(1);
+      if (resourceError || !resources) return 'unavailable';
+      if (resources.length > 0) return 'not_found';
+    }
+    return 'available';
   } catch {
     return 'unavailable';
   }

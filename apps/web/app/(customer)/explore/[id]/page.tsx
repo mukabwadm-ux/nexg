@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { PublishedBookingLink } from '@/components/booking/published-booking-link';
 import {
   Catalogue,
   type CatalogueSection,
@@ -14,6 +15,7 @@ import {
 import { CATEGORY_ICON, CATEGORY_LABEL, MerchantCard } from '@/components/explore/merchant-card';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { bookingEngineEnabledForMerchant } from '@/lib/booking/bridge';
 import {
   durationLabel,
   priceLabel,
@@ -97,6 +99,8 @@ export default async function MerchantPage({ params }: { params: { id: string } 
         .order('created_at'),
     ]);
   const resources = (bookable ?? []) as unknown as PublicResource[];
+  const checkEngineBooking =
+    resources.length === 0 && bookingEngineEnabledForMerchant(merchant.id, process.env);
 
   const catalogueItems = (sections ?? []).flatMap((section) => section.catalogue_item ?? []);
   const photoPaths = catalogueItems.flatMap((item) => (item.photo_path ? [item.photo_path] : []));
@@ -234,6 +238,7 @@ export default async function MerchantPage({ params }: { params: { id: string } 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
           <section aria-label="Catalogue" className="space-y-6">
             {resources.length > 0 && <BookSection merchantId={merchant.id} resources={resources} />}
+            {checkEngineBooking && <PublishedBookingLink merchantId={merchant.id} />}
             {menu.length > 0 ? (
               <Catalogue
                 merchantId={merchant.id}

@@ -6,12 +6,15 @@ const merchantId = '12345678-1234-4234-8234-123456789abc';
 const request = (host = 'merchant.test') =>
   new Request(`http://${host}/api/public/booking/${merchantId}/catalog`);
 let result: { data: unknown; error: unknown };
+let legacyResult: { data: unknown; error: unknown };
 beforeEach(() => {
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co');
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'public-test-key');
   vi.stubEnv('NODE_ENV', 'production');
   vi.stubEnv('NEXG_BOOKING_SANDBOX', '');
+  vi.stubEnv('BOOKING_ENGINE_MERCHANT_IDS', '');
   result = { data: { id: merchantId, status: 'live' }, error: null };
+  legacyResult = { data: [], error: null };
   mock.createClient.mockReset();
   mock.createClient.mockImplementation((_url, _key, options) => {
     if (
@@ -38,10 +41,16 @@ beforeEach(() => {
           error: null,
         };
       },
+      limit: async (limit: number) => {
+        if (filters.merchant_id !== merchantId || filters.active !== true || limit !== 1)
+          throw new Error('Legacy capacity lookup must be scoped to the active merchant.');
+        return legacyResult;
+      },
     };
     return {
       from: (table: string) => {
-        if (table !== 'merchant_public') throw new Error('Wrong publication owner.');
+        if (!['merchant_public', 'bookable_resource'].includes(table))
+          throw new Error('Wrong publication owner.');
         return query;
       },
     };
@@ -49,6 +58,19 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllEnvs());
 describe('public booking publication', () => {
+  it('blocks new engine intake while a production merchant still offers Supabase resources', async () => {
+    vi.stubEnv('BOOKING_ENGINE_URL', 'https://booking.example.test');
+    vi.stubEnv('BOOKING_BRIDGE_SECRET', 's'.repeat(40));
+    vi.stubEnv('BOOKING_ENGINE_MERCHANT_IDS', merchantId);
+    await expect(publicMerchantBookingAccess(request(), merchantId)).resolves.toBe('available');
+    legacyResult.data = [{ id: 'old-resource' }];
+    await expect(publicMerchantBookingAccess(request(), merchantId)).resolves.toBe('not_found');
+    await expect(publicMerchantBookingAccess(request(), merchantId, false)).resolves.toBe(
+      'available',
+    );
+    legacyResult = { data: null, error: { message: 'Unavailable' } };
+    await expect(publicMerchantBookingAccess(request(), merchantId)).resolves.toBe('unavailable');
+  });
   it('requires the anonymously visible live merchant rather than an authenticated owner draft', async () => {
     await expect(publicMerchantBookingAccess(request(), merchantId)).resolves.toBe('available');
     result.data = { id: merchantId, status: 'under_review' };

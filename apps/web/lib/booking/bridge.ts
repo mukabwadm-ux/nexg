@@ -165,6 +165,19 @@ export function bookingEngineConfigured(env: Record<string, string | undefined>)
   return Boolean(env.BOOKING_ENGINE_URL) && (env.BOOKING_BRIDGE_SECRET?.length ?? 0) >= 32;
 }
 
+export function bookingEngineEnabledForMerchant(
+  merchantId: string,
+  env: Record<string, string | undefined>,
+) {
+  if (!bookingEngineConfigured(env)) return false;
+  if (env.NODE_ENV !== 'production') return true;
+  return (
+    env.BOOKING_ENGINE_MERCHANT_IDS?.split(',').some(
+      (id) => id.trim().toLowerCase() === merchantId.toLowerCase(),
+    ) ?? false
+  );
+}
+
 export function localBookingSandboxEnabled(
   hostname: string,
   env: Record<string, string | undefined>,

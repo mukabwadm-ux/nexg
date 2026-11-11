@@ -5,6 +5,7 @@ import {
   allowedBookingPath,
   bookingCustomerSession,
   bookingEngineConfigured,
+  bookingEngineEnabledForMerchant,
   bookingHeaders,
   localBookingSandboxEnabled,
   sameOriginMutation,
@@ -152,5 +153,27 @@ describe('booking portal boundary', () => {
         BOOKING_BRIDGE_SECRET: 'a'.repeat(32),
       }),
     ).toBe(true);
+  });
+
+  it('keeps the production booking engine scoped to the enrolled merchant IDs', () => {
+    const env = {
+      NODE_ENV: 'production',
+      BOOKING_ENGINE_URL: 'https://booking.example.test',
+      BOOKING_BRIDGE_SECRET: 'a'.repeat(32),
+    };
+    const merchantId = '12345678-1234-4234-8234-123456789abc';
+    expect(bookingEngineEnabledForMerchant(merchantId, env)).toBe(false);
+    expect(
+      bookingEngineEnabledForMerchant(merchantId, {
+        ...env,
+        BOOKING_ENGINE_MERCHANT_IDS: ` ${merchantId.toUpperCase()} , other`,
+      }),
+    ).toBe(true);
+    expect(
+      bookingEngineEnabledForMerchant(merchantId, {
+        ...env,
+        BOOKING_ENGINE_MERCHANT_IDS: `${merchantId}-other`,
+      }),
+    ).toBe(false);
   });
 });

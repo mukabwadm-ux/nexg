@@ -13,6 +13,7 @@ beforeEach(() => {
   mock.access.mockReset();
   mock.forward.mockReset();
   vi.stubEnv('BOOKING_BRIDGE_SECRET', 's'.repeat(40));
+  vi.stubEnv('BOOKING_ENGINE_URL', 'https://booking.example.test');
 });
 afterEach(() => vi.unstubAllEnvs());
 describe('public booking proxy publication', () => {
@@ -48,5 +49,16 @@ describe('public booking proxy publication', () => {
     expect(await response.json()).toEqual({ business: { id: businessId }, offerings: [] });
     expect(response.headers.get('set-cookie')).toContain('nexg_booking_session=');
     expect(mock.forward.mock.calls[0]?.[2]).toMatchObject({ businessId, role: 'customer' });
+  });
+  it('keeps the public engine API closed to merchants outside the production rollout', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('BOOKING_ENGINE_MERCHANT_IDS', '12345678-1234-4234-8234-123456789abd');
+    const response = await GET(
+      new Request(`https://merchant.test/api/public/booking/${businessId}/catalog`),
+      { params: { businessId, path: ['catalog'] } },
+    );
+    expect(response.status).toBe(404);
+    expect(mock.forward).not.toHaveBeenCalled();
+    expect(response.headers.get('set-cookie')).toBeNull();
   });
 });

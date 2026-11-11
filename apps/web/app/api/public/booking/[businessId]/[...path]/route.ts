@@ -1,4 +1,10 @@
-import { bookingCustomerSession, forwardBookingRequest, problem } from '@/lib/booking/bridge';
+import {
+  bookingCustomerSession,
+  bookingEngineConfigured,
+  bookingEngineEnabledForMerchant,
+  forwardBookingRequest,
+  problem,
+} from '@/lib/booking/bridge';
 import { publicMerchantBookingAccess } from '@/lib/booking/public-access';
 
 export const runtime = 'nodejs';
@@ -11,7 +17,18 @@ async function route(
   const businessId = context.params.businessId;
   if (!/^[a-zA-Z0-9_-]{1,128}$/.test(businessId))
     return problem(404, 'This booking page does not exist.', 'not_found');
-  const access = await publicMerchantBookingAccess(request, businessId);
+  if (
+    bookingEngineConfigured(process.env) &&
+    !bookingEngineEnabledForMerchant(businessId, process.env)
+  )
+    return problem(404, 'This booking page does not exist.', 'not_found');
+  // Catalog, slot and create calls open new intake. Existing booking tokens
+  // still authorize reads and changes if legacy resources are later restored.
+  const access = await publicMerchantBookingAccess(
+    request,
+    businessId,
+    context.params.path.length === 1,
+  );
   if (access === 'not_found') return problem(404, 'This booking page does not exist.', 'not_found');
   if (access !== 'available')
     return problem(
