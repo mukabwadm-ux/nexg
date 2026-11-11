@@ -160,7 +160,7 @@ describe('private orders response', () => {
             ? [{ allowed: true, retry_after: 0, remaining: 57 }]
             : { ok: true, items: [{ id: 'order-one' }], next_cursor: null },
     }));
-    const response = await orders(keyedRequest(), { params: {} });
+    const response = await orders(keyedRequest());
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       ok: true,
@@ -176,7 +176,7 @@ describe('private orders response', () => {
 
   it('returns a private 401 for current-state denied credentials', async () => {
     rpc.mockResolvedValue({ data: [], error: null });
-    const response = await orders(keyedRequest(), { params: {} });
+    const response = await orders(keyedRequest());
     expect(response.status).toBe(401);
     expect(await response.json()).toMatchObject({
       ok: false,

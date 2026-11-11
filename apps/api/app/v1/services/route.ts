@@ -9,7 +9,7 @@
  */
 import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
-import { jsonError } from '@/lib/http';
+import { jsonError, withErrorEnvelope } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { ApiService } from '@nexg/contracts/api';
 
@@ -17,7 +17,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
-export async function GET(request: Request) {
+export const GET = withErrorEnvelope(async (request: Request) => {
   try {
     const credential = await authenticate(request);
     requireScope(credential, API_SCOPES.public_read);
@@ -40,8 +40,7 @@ export async function GET(request: Request) {
     .order('code', { ascending: true });
 
   if (error) {
-    console.error('services error:', error);
-    return jsonError('internal_error', 'Failed to fetch services', { status: 500 });
+    return jsonError('internal_error', 'Failed to fetch services', { detail: error });
   }
 
   return NextResponse.json(
@@ -59,4 +58,4 @@ export async function GET(request: Request) {
       },
     },
   );
-}
+});

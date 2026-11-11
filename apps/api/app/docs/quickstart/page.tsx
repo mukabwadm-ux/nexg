@@ -116,12 +116,12 @@ export default function QuickstartPage() {
           (wait, then retry) and <C>5xx</C> (retry with backoff).
         </li>
         <li>
-          You follow <C>next_cursor</C> until it is <C>null</C>, and stop if a page repeats.
+          You follow <C>next_cursor</C> until it is <C>null</C>.
         </li>
         <li>You read amounts as integers: shillings in catalogues, cents on orders.</li>
         <li>
-          You check the <A href="/docs/changelog">changelog</A>, and the known issues on each
-          endpoint you use.
+          You watch the <A href="/docs/changelog">changelog</A> for changes to the endpoints you
+          use.
         </li>
       </List>
       <Callout tone="note" title="Building for a bank or a partner system?">

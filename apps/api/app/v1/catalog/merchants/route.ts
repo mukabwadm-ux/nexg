@@ -11,12 +11,22 @@
  * - q: free-text search over trading_name, branch_name, category_other
  *
  * Sorting: by listed_at DESC, then id DESC (tiebreaker ensures stability).
- * The cursor encodes both values, so rows inserted between requests
- * don't cause duplicates or skips.
+ * The cursor encodes both values and the next page starts strictly after
+ * that (listed_at, id) pair, so rows inserted between requests don't cause
+ * duplicates or skips.
  */
 import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
-import { encodeCursor, decodeCursor, jsonError, parseQuery } from '@/lib/http';
+import {
+  decodeKeysetCursor,
+  encodeCursor,
+  filterValue,
+  invalidCursor,
+  jsonError,
+  keysetAfter,
+  parseQuery,
+  withErrorEnvelope,
+} from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { ListRequest, PublicMerchant } from '@nexg/contracts/api';
 
@@ -24,7 +34,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // cache for 60 seconds
 
-export async function GET(request: Request) {
+export const GET = withErrorEnvelope(async (request: Request) => {
   // Resolve the credential first: a bad key is refused before any work is done.
   let credential;
   try {
@@ -45,8 +55,10 @@ export async function GET(request: Request) {
     return queryResult.error;
   }
 
-  const { cursor, limit: rawLimit, city, category, q } = queryResult.data;
-  const limit = Math.min(Math.max(rawLimit ?? 25, 1), 100);
+  const { cursor, limit, city, category, q } = queryResult.data;
+
+  const after = cursor ? decodeKeysetCursor(cursor) : null;
+  if (cursor && !after) return invalidCursor();
 
   const supabase = createPublicClient();
 
@@ -60,13 +72,9 @@ export async function GET(request: Request) {
     .order('id', { ascending: false })
     .limit(limit + 1); // fetch one extra to know if there's a next page
 
-  // Apply cursor (listed_at and id)
-  if (cursor) {
-    const decoded = decodeCursor(cursor);
-    if (decoded) {
-      // listed_at is ISO string, use it directly
-      dbQuery = dbQuery.lt('listed_at', decoded.sortValue).lt('id', decoded.id);
-    }
+  // Start strictly after the cursor's (listed_at, id).
+  if (after) {
+    dbQuery = dbQuery.or(keysetAfter('listed_at', 'desc', after));
   }
 
   // Apply filters
@@ -77,7 +85,8 @@ export async function GET(request: Request) {
     dbQuery = dbQuery.eq('category', category);
   }
   if (q) {
-    const like = `%${q}%`;
+    // Quoted, so a comma or a parenthesis in the search is text, not filter syntax.
+    const like = filterValue(`%${q}%`);
     dbQuery = dbQuery.or(
       `trading_name.ilike.${like},branch_name.ilike.${like},category_other.ilike.${like}`,
     );
@@ -86,8 +95,7 @@ export async function GET(request: Request) {
   const { data: rows, error } = await dbQuery;
 
   if (error) {
-    console.error('merchant list error:', error);
-    return jsonError('internal_error', 'Failed to fetch merchants');
+    return jsonError('internal_error', 'Failed to fetch merchants', { detail: error });
   }
 
   // Check if there's a next page
@@ -121,4 +129,4 @@ export async function GET(request: Request) {
       'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
     },
   });
-}
+});

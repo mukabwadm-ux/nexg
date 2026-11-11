@@ -215,9 +215,31 @@ export const PublicZone = z
 export type PublicZone = z.infer<typeof PublicZone>;
 
 /**
+ * One ticket price for an event, at the organiser's face value.
+ *
+ * `event.ticket_bands` is a jsonb list. The console that writes it
+ * insists on a label and a positive price, but the price may arrive
+ * as a number or as numeric text, so it is read as either and always
+ * sent as a number. Anything else on a band is left out.
+ */
+export const TicketBand = z.object({
+  label: z.string(),
+  price_kes: z.coerce.number().positive(),
+  currency: z.string().optional(),
+});
+
+export type TicketBand = z.infer<typeof TicketBand>;
+
+/**
  * An experience (event), as the public is allowed to see it.
  *
  * Sorted by starts_at. Events in the past are filtered out by the view.
+ *
+ * `ticket_bands` and `suggested_blocks` are jsonb lists (`[]` when
+ * empty, never null). They were typed as objects here once, which no
+ * stored row could match, so every listing with an event in it failed.
+ * `suggested_blocks` is free-form JSON from the experiences console,
+ * so its entries are passed through as they are stored.
  */
 export const PublicEvent = z
   .object({
@@ -236,10 +258,10 @@ export const PublicEvent = z
     organiser_name: z.string().nullable(),
     organiser_url: z.string().nullable(),
     ticket_url: z.string().nullable(),
-    ticket_bands: z.record(z.string()).nullable(),
+    ticket_bands: z.array(TicketBand),
     nexg_can_hold_tickets: z.boolean().nullable(),
     practical_note: z.string().nullable(),
-    suggested_blocks: z.record(z.string()).nullable(),
+    suggested_blocks: z.array(z.unknown()),
   })
   .strict();
 
@@ -256,6 +278,11 @@ export type PublicEvent = z.infer<typeof PublicEvent>;
  * where the view can answer them.
  */
 export const ListRequest = PageRequest.extend({
+  /**
+   * Query strings are text: `?limit=5` arrives as "5". `PageRequest`
+   * expects a number, so without coercion every limit was refused.
+   */
+  limit: z.coerce.number().int().min(1).max(100).default(25),
   /** A city slug. Omit for every city. */
   city: z.string().max(64).optional(),
   /** A taxonomy vertical, e.g. `pharmacy`. */

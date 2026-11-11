@@ -50,7 +50,8 @@ const AUDIENCES = [
   },
   {
     name: 'Partners and developers',
-    today: 'Build on live merchants and catalogues, delivery zones and bookable services.',
+    today:
+      'Build on live merchants and catalogues, delivery zones, experiences and bookable services.',
     soon: 'Sandbox keys with test data, for building writes safely.',
     href: '/docs/quickstart',
   },
@@ -63,7 +64,7 @@ const AUDIENCES = [
   {
     name: 'Hotels and stays',
     today:
-      'Show guests what NexG offers in your city: merchants, their menus, and where NexG delivers.',
+      'Show guests what NexG offers in your city: merchants and their menus, where NexG delivers, and what is on.',
     soon: 'Airport transfers and couriers booked for guests from your system.',
     href: '/docs/connecting-systems',
   },
@@ -84,7 +85,7 @@ const STEPS = [
   },
   {
     title: 'Go live',
-    body: 'Keep the key on your server, handle errors and limits, and read each endpoint’s known issues. Banks and partner systems connect in sandbox first.',
+    body: 'Keep the key on your server, handle errors and limits, and follow cursors. Banks and partner systems connect in sandbox first.',
     href: '/docs/environments',
     link: 'Environments',
   },
@@ -130,9 +131,9 @@ export default function HomePage() {
               Connect your business to NexG.
             </h1>
             <p className="mt-6 max-w-[38rem] text-lg leading-8 text-white/75">
-              Read the merchants, catalogues and delivery zones on nexgapp.com, and your own orders,
-              as JSON over HTTPS. Banks send signed payment events back to NexG, in sandbox today,
-              so both sides keep the same record.
+              Read the merchants, catalogues, delivery zones and events on nexgapp.com, and your own
+              orders, as JSON over HTTPS. Banks send signed payment events back to NexG, in sandbox
+              today, so both sides keep the same record.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link

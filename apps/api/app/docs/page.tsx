@@ -18,7 +18,7 @@ const AUDIENCES = [
   {
     name: 'Partners and developers',
     today:
-      'Build on NexG’s public data: live merchants and catalogues, delivery zones and bookable services. Public reads work without a key.',
+      'Build on NexG’s public data: live merchants and catalogues, delivery zones, upcoming experiences and bookable services. Public reads work without a key.',
     soon: 'Sandbox keys with test data, for building writes without touching real orders.',
     href: '/docs/quickstart',
     link: 'Quickstart',
@@ -34,7 +34,7 @@ const AUDIENCES = [
   {
     name: 'Hotels and stays',
     today:
-      'Show guests what NexG offers in your city: live merchants and their menus, and the zones NexG delivers to.',
+      'Show guests what NexG offers in your city: live merchants and their menus, the zones NexG delivers to, and what is on.',
     soon: 'Airport transfers and couriers booked for guests from your own system.',
     href: '/docs/connecting-systems',
     link: 'Connecting your systems',
@@ -84,16 +84,14 @@ export default function IntroductionPage() {
       <H2 id="what-it-does">What the API does</H2>
       <P>
         NexG is a concierge delivery and booking platform for Kenya. What a guest sees on
-        nexgapp.com, from verified merchants and their catalogues to the zones NexG delivers to,
+        nexgapp.com, from verified merchants and their catalogues to delivery zones and events,
         is also available to your systems as JSON over HTTPS, from{' '}
         <C>https://api.nexgapp.com/v1</C>.
       </P>
       <List>
         <li>
-          <Strong>Read</Strong> NexG&apos;s public data: merchants, catalogues, zones and bookable
-          services, and upcoming experiences once a{' '}
-          <A href="/docs/reference/list-experiences">known issue</A> is fixed. No key is needed to
-          start.
+          <Strong>Read</Strong> NexG&apos;s public data: merchants, catalogues, zones, upcoming
+          experiences and bookable services. No key is needed to start.
         </li>
         <li>
           <Strong>Read your own orders</Strong> with a key bound to your merchant, newest first,
@@ -181,7 +179,6 @@ export default function IntroductionPage() {
         <li>
           Writes: booking a service with <C>POST /v1/orders</C>, and any <C>PATCH</C> endpoint.
         </li>
-        <li>Reading one order by id, <C>GET /v1/orders/{'{id}'}</C>.</li>
         <li>Events NexG sends to you, such as an order changing stage. Poll your orders for now.</li>
         <li>Sandbox API keys with test data.</li>
         <li>Two-way sync with a POS, ERP, booking or inventory system.</li>

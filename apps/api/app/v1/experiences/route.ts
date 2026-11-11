@@ -4,11 +4,21 @@
  * Returns upcoming events (experiences) in the system.
  *
  * The view filters to published events with future starts_at, so
- * no need to filter by date in the API. Sorted by starts_at ascending.
+ * no need to filter by date in the API. Sorted by starts_at ascending,
+ * then id descending; the cursor marks the last (starts_at, id) returned.
  */
 import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
-import { encodeCursor, decodeCursor, jsonError, parseQuery } from '@/lib/http';
+import {
+  decodeKeysetCursor,
+  encodeCursor,
+  filterValue,
+  invalidCursor,
+  jsonError,
+  keysetAfter,
+  parseQuery,
+  withErrorEnvelope,
+} from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { PublicEvent, ListRequest } from '@nexg/contracts/api';
 
@@ -16,11 +26,23 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
-export async function GET(request: Request) {
+const CACHE = 'public, s-maxage=60, stale-while-revalidate=300';
+
+function page(items: PublicEvent[], nextCursor: string | null, limit: number) {
+  return NextResponse.json(
+    {
+      ok: true,
+      data: { items, next_cursor: nextCursor },
+      meta: { api_version: 'v1' as const, limit },
+    },
+    { headers: { 'Cache-Control': CACHE } },
+  );
+}
+
+export const GET = withErrorEnvelope(async (request: Request) => {
   // Resolve the credential first: a bad key is refused before any work is done.
-  let credential;
   try {
-    credential = await authenticate(request);
+    const credential = await authenticate(request);
     requireScope(credential, API_SCOPES.public_read);
     await enforceRateLimit(credential, request);
   } catch (e) {
@@ -36,12 +58,14 @@ export async function GET(request: Request) {
     return queryResult.error;
   }
 
-  const { cursor, limit: rawLimit, city, q } = queryResult.data;
-  const limit = Math.min(Math.max(rawLimit ?? 25, 1), 100);
+  const { cursor, limit, city, q } = queryResult.data;
+
+  const after = cursor ? decodeKeysetCursor(cursor) : null;
+  if (cursor && !after) return invalidCursor();
 
   const supabase = createPublicClient();
 
-  // Build the query â€” events are sorted by starts_at, then id
+  // Events are sorted by starts_at, then id
   let dbQuery = supabase
     .from('event_public')
     .select(
@@ -51,62 +75,57 @@ export async function GET(request: Request) {
     .order('id', { ascending: false })
     .limit(limit + 1);
 
-  // Apply cursor
-  if (cursor) {
-    const decoded = decodeCursor(cursor);
-    if (decoded) {
-      dbQuery = dbQuery.gt('starts_at', decoded.sortValue).lt('id', decoded.id);
-    }
+  // Start strictly after the cursor's (starts_at, id).
+  if (after) {
+    dbQuery = dbQuery.or(keysetAfter('starts_at', 'asc', after));
   }
 
-  // Apply filters
   if (city) {
-    // Need city_id from city slug â€” join through city table
-    const { data: cityRow } = await supabase
+    // The view has the city's id, not its slug.
+    const { data: cityRow, error: cityError } = await supabase
       .from('city')
       .select('id')
       .eq('slug', city)
       .maybeSingle();
-    if (cityRow) {
-      dbQuery = dbQuery.eq('city_id', cityRow.id);
+    if (cityError) {
+      return jsonError('internal_error', 'Failed to fetch experiences', { detail: cityError });
     }
+    // No such city has no events, rather than every city's events.
+    if (!cityRow) return page([], null, limit);
+    dbQuery = dbQuery.eq('city_id', cityRow.id);
   }
   if (q) {
-    const like = `%${q}%`;
+    // Quoted, so a comma or a parenthesis in the search is text, not filter syntax.
+    const like = filterValue(`%${q}%`);
     dbQuery = dbQuery.or(`name.ilike.${like},venue_name.ilike.${like}`);
   }
 
   const { data: rows, error } = await dbQuery;
 
   if (error) {
-    console.error('experiences error:', error);
-    return jsonError('internal_error', 'Failed to fetch experiences');
+    return jsonError('internal_error', 'Failed to fetch experiences', { detail: error });
   }
 
   const hasMore = rows.length > limit;
-  const items = hasMore ? rows.slice(0, limit) : rows;
+  const pageRows = hasMore ? rows.slice(0, limit) : rows;
 
   let nextCursor: string | null = null;
-  const last = items[items.length - 1];
+  const last = pageRows[pageRows.length - 1];
   if (hasMore && last) {
     nextCursor = encodeCursor(last.starts_at ?? '', last.id ?? '');
   }
 
-  const response = {
-    ok: true,
-    data: {
-      items: (items as Array<Record<string, unknown>>).map((item) => PublicEvent.parse(item)),
-      next_cursor: nextCursor,
-    },
-    meta: {
-      api_version: 'v1' as const,
-      limit,
-    },
-  };
-
-  return NextResponse.json(response, {
-    headers: {
-      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-    },
+  /*
+   * Ticket bands and suggested blocks are entered by hand in the
+   * experiences console. One event with a band the schema cannot read is
+   * left out and logged, rather than failing the whole list for everyone.
+   */
+  const items = (pageRows as Array<Record<string, unknown>>).flatMap((row) => {
+    const parsed = PublicEvent.safeParse(row);
+    if (parsed.success) return [parsed.data];
+    console.error(`[api] experiences: event ${String(row.id)} left out`, parsed.error.issues);
+    return [];
   });
-}
+
+  return page(items, nextCursor, limit);
+});

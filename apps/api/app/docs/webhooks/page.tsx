@@ -121,8 +121,8 @@ export default function WebhooksPage() {
       <P>
         The bank webhook works with the NexG Sandbox Bank on NexG&apos;s test deployments. On the
         production site it answers <C>503 no_bank_configured</C> until a real bank is connected.
-        NexG&apos;s card and M-Pesa providers call NexG too, but on their own contracts, which are
-        not open to partners.
+        NexG&apos;s M-Pesa provider calls NexG too, but on its own contract, which is not open to
+        partners.
       </P>
 
       <H2 id="event">An event</H2>
