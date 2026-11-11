@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+/*
+ * The settings preview only renders under `next dev`, so this spec runs with its own config:
+ *   pnpm --filter @nexg/web exec next dev --port 3141
+ *   pnpm exec playwright test -c playwright.settings-artboard.config.ts
+ * The main config skips it, because the production build it starts answers this page with a 404.
+ */
 const preview = '/merchant-live-preview/settings';
 test.beforeEach(async ({ page }) => {
   await page.goto(preview, { waitUntil: 'domcontentloaded' });
