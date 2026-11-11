@@ -280,7 +280,7 @@ export async function HomePageContent({
           </section>
         )}
 
-        <section className="bg-ink py-16 text-white sm:py-20">
+        <section className="bg-bg text-ink py-16 sm:py-20">
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <JoinSection t={t} />
           </div>
