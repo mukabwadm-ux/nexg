@@ -23,7 +23,6 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -32,6 +31,7 @@ import type { SearchGroup, SearchItem } from '@/app/api/search/route';
 import type { Locale } from '@/lib/i18n/dictionaries';
 
 import { Logo } from '../logo';
+import { HeroVideo } from './hero-video';
 import { SiteMenu } from '../site-menu';
 
 /**
@@ -133,20 +133,13 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
     <section className="relative isolate z-50 flex min-h-[100svh] flex-col overflow-hidden bg-[#0b0907] text-white">
       {/* ─────────────────────────────────────────────── the photograph */}
       <div className="absolute inset-x-0 top-0 -z-10 h-[36rem] sm:h-[44rem] lg:inset-y-0 lg:h-auto">
-        {/* One wide photograph (2752 × 1536): the whole scene on desktop,
-            framed on her and the skyline in the top of a phone. */}
-        <Image
-          src="/images/hero/stay-sunset.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-[67%_30%] lg:object-[70%_center]"
-        />
+        {/* Three clips in turn: the kitchen, the lobby, the room. */}
+        <HeroVideo />
         {/* Phone: dark from the middle down, where the text sits. */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/50 to-[#0b0907] lg:hidden" />
-        {/* Desktop: dark behind the text on the left, the room already is. */}
-        <div className="absolute inset-0 hidden bg-gradient-to-r from-[#0b0907]/90 via-[#0b0907]/50 via-40% to-transparent to-70% lg:block" />
+        {/* Desktop: dark on the left behind the text and buttons, easing to a
+            light veil on the right so the clip still reads. */}
+        <div className="absolute inset-0 hidden bg-gradient-to-r from-[#0b0907]/90 via-[#0b0907]/65 via-35% to-[#0b0907]/15 lg:block" />
         <div className="absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t from-[#0b0907] to-transparent lg:block" />
       </div>
 
