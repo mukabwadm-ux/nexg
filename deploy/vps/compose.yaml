@@ -55,6 +55,36 @@ services:
       start_period: 90s
     networks: [internal, edge]
 
+  discovery-engine:
+    # Starts only with the discovery profile:
+    #   docker compose --profile discovery up -d
+    # Built and published by .github/workflows/discovery-engine-image.yml. It keeps
+    # no data of its own: it reads Supabase with the public key.
+    profiles: [discovery]
+    image: ${DISCOVERY_ENGINE_IMAGE:-ghcr.io/mukabwadm-ux/nexg-discovery-engine}:${DISCOVERY_ENGINE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      DISCOVERY_ENGINE_HOST: 0.0.0.0
+      DISCOVERY_ENGINE_PORT: '5190'
+      DISCOVERY_SOURCE: supabase
+      # Empty here so the booking engine starts without them; the engine
+      # itself refuses to start until both are set.
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-}
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:5190/api/discovery/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks: [edge]
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -66,6 +96,10 @@ services:
     environment:
       BOOKING_DOMAIN: ${BOOKING_DOMAIN:?Set BOOKING_DOMAIN in .env}
       ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
+      # Until the discovery engine runs, a local-only placeholder name that
+      # needs no certificate from Let's Encrypt. Never empty: an empty site
+      # name would stop Caddy, and the booking engine with it.
+      DISCOVERY_DOMAIN: ${DISCOVERY_DOMAIN:-discovery.localhost}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data

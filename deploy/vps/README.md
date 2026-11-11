@@ -4,11 +4,12 @@ Written for: whoever runs the NexG VPS.
 
 This folder runs NexG's back-end services on one Linux server with Docker:
 
-| Service          | What it is                                           | Reachable at                             |
-| ---------------- | ---------------------------------------------------- | ---------------------------------------- |
-| `booking-engine` | The Payload booking runtime (`apps/booking-engine`)  | `https://<BOOKING_DOMAIN>` through Caddy |
-| `booking-db`     | PostgreSQL 16, used only by the booking engine       | nowhere outside the server               |
-| `caddy`          | HTTPS in front, with certificates from Let's Encrypt | ports 80 and 443                         |
+| Service            | What it is                                                                          | Reachable at                               |
+| ------------------ | ----------------------------------------------------------------------------------- | ------------------------------------------ |
+| `booking-engine`   | The Payload booking runtime (`apps/booking-engine`)                                 | `https://<BOOKING_DOMAIN>` through Caddy   |
+| `booking-db`       | PostgreSQL 16, used only by the booking engine                                      | nowhere outside the server                 |
+| `discovery-engine` | The read-only Discovery service (`discovery/discovery-engine`), optional, see below | `https://<DISCOVERY_DOMAIN>` through Caddy |
+| `caddy`            | HTTPS in front, with certificates from Let's Encrypt                                | ports 80 and 443                           |
 
 The website stays on Vercel and the main database stays on Supabase. The VPS runs alongside them; nothing moves.
 
@@ -163,11 +164,25 @@ docker compose start booking-engine
 | `docker compose up` stops at "Set … in .env"                                           | That line in `.env` is empty                                                              |
 | `pull access denied` for the engine image                                              | Step 6 is not done                                                                        |
 
-## Next: the discovery engine
+## The discovery engine
 
-The discovery engine (`discovery/discovery-engine` on the `discovery` branch, PR #89) will join this setup as another service with its own domain. It needs no database of its own: it reads Supabase with the public key. Before it can run:
+The discovery engine (`discovery/discovery-engine`) runs as a second service with its own domain. It keeps no data of its own: it reads the website's Supabase project with the public key. It is light, a few hundred MB of memory at most. Its image is published once the engine's pull request (#128) is on `main`.
 
-- **Missing files:** its release check needs 134 icon files that #89 did not include. Without them it refuses to start.
-- **Missing image:** it needs a Dockerfile and an image built by CI, like the booking engine.
-- **Website proxy:** it does not accept calls from other sites, so the website will reach it through a server-side proxy route on nexgapp.com.
-- **Optional search:** Typesense needs about 2 GB more memory.
+1. **DNS:** an A record for its name, for example `discovery.nexgapp.com`, pointing at the VPS. Check it with `getent hosts discovery.nexgapp.com`.
+2. **`.env`:** fill in the discovery block:
+   - `DISCOVERY_DOMAIN`: the name from step 1.
+   - `SUPABASE_URL` and `SUPABASE_ANON_KEY`: the same public pair the website uses (Vercel's `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`). Never the service-role or secret key; the engine refuses one.
+3. **Image:** as in step 6, make `nexg-discovery-engine` public once, or keep the server signed in.
+4. **Start it:**
+
+   ```sh
+   docker compose --profile discovery up -d
+   docker compose restart caddy    # picks up DISCOVERY_DOMAIN
+   curl -s https://discovery.nexgapp.com/api/discovery/health
+   ```
+
+   `"readiness":"R0"` means no data source is configured: check the two Supabase lines in `.env`.
+
+From then on, add `--profile discovery` to `pull`, `up` and `logs`, for example `docker compose --profile discovery pull && docker compose --profile discovery up -d`.
+
+**The website does not use it yet.** `/discover` reads Supabase directly today. Pointing it at the engine is a separate change on the website: a server-side proxy route on nexgapp.com, because the engine does not accept calls from other sites, and a build setting. Typesense search is optional and needs about 2 GB more memory.
