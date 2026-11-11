@@ -1,5 +1,6 @@
 import { expect, test as setup } from '@playwright/test';
 
+import { STAFF_SEEN_COOKIE } from '../../apps/admin/lib/idle';
 import { ADMIN_STATE } from '../auth-state';
 
 /**
@@ -33,6 +34,19 @@ setup('authenticate as staff', async ({ page }) => {
      asserting a particular one would break the first time
      somebody changes a seed. */
   await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 30_000 });
+
+  /* The console signs out a session idle for five minutes, by a
+     last-seen cookie the middleware stamps on every request. This
+     session is saved once and the admin specs use it minutes later
+     (after the web specs, on one worker in CI), so a saved stamp made
+     them look idle: Playwright failed whichever admin test landed
+     5 to 10 minutes after this sign-in. Saved without the stamp, the
+     session is exactly a fresh sign-in, and the first request of
+     each spec stamps it again. */
+  await page.context().clearCookies({ name: STAFF_SEEN_COOKIE });
+  const cookies = await page.context().cookies();
+  expect(cookies.some((c) => c.name === STAFF_SEEN_COOKIE)).toBe(false);
+  expect(cookies.some((c) => c.name.startsWith('sb-'))).toBe(true);
 
   await page.context().storageState({ path: ADMIN_STATE });
 });
