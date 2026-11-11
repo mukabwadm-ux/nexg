@@ -94,8 +94,9 @@ pnpm --filter @nexg/ui test
 pnpm --filter @nexg/admin dev
 ```
 
-CI runs install → build → lint → typecheck → test → format check on every pull request, then
-Playwright. All of it must be green before merging.
+CI runs install → build → lint → typecheck → test → format check on every push to `main` and on
+every pull request, then Playwright. It does not block a push, so check the run after you push and
+fix a red one straight away.
 
 ## Design system
 
@@ -217,8 +218,8 @@ server code.
 
 - **Commits** follow [Conventional Commits](https://www.conventionalcommits.org): `feat(ui): …`,
   `fix(admin): …`, `chore: …`. Keep them small; each one must leave CI green.
-- **Branches** are `feat/…`, `fix/…` or `chore/…` off `main`, merged by pull request.
+- **Push straight to `main`.** No pull request or review is needed. Pull with `--rebase` first so
+  your commits sit on top of the latest `main`; force-pushing and deleting `main` are blocked.
+  Vercel deploys every push to `main` to production, so push only what is ready to go live.
 - **Copy** comes from the artboards. Headings, button labels and FAQ text are signed off — do not
   reword them.
-
-lets continue
