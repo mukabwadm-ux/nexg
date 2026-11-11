@@ -1,4 +1,22 @@
 import type { DiscoveryQuery } from '../providers/DiscoveryProvider';
+import { findCategory, findSubcategory } from '../data/taxonomy';
+import subcategoryMap from '../../demo-seed/subcategory-map.json';
+
+/** Resolve keys already used by the website's Explore links to Discovery's stable IDs. */
+function categorySelection(categoryId?: string, subcategoryId?: string) {
+  if (!categoryId || (findCategory(categoryId) && (!subcategoryId || findSubcategory(categoryId, subcategoryId)))) {
+    return { categoryId, subcategoryId };
+  }
+  if (categoryId === 'all' && !subcategoryId) return { categoryId: undefined, subcategoryId: undefined };
+
+  const rows = subcategoryMap.subcategories.filter(row => row.supabase.category === categoryId && row.discovery);
+  const match = rows.find(row => row.supabase.subcategory === subcategoryId)?.discovery;
+  if (match && findSubcategory(match.categoryId, match.subcategoryId)) return match;
+
+  const categories = new Set(rows.flatMap(row => row.discovery ? [row.discovery.categoryId] : []));
+  const alias = categories.size === 1 ? categories.values().next().value : categoryId.replaceAll('_', '-');
+  return { categoryId: alias && findCategory(alias) ? alias : categoryId, subcategoryId };
+}
 
 export interface RouteState extends DiscoveryQuery {
   view?: 'results' | 'experience' | 'tour'; merchantId?: string; itemId?: string; operatorSearch?: string; operatorOffset?: number;
@@ -17,7 +35,7 @@ export function parseRoute(search: string, state?: { discoveryRequest?: Discover
   const allowedSorts = ['recommended', 'rating', 'delivery', 'price_low', 'price_high'] as const;
   return {
     // Keep obsolete IDs for typed server recovery; dropping them could broaden scope.
-    categoryId: params.get('category') || undefined, subcategoryId: params.get('subcategory') || undefined, optionId: params.get('option') || undefined,
+    ...categorySelection(params.get('category') || undefined, params.get('subcategory') || undefined), optionId: params.get('option') || undefined,
     search: params.get('q') || undefined, area: params.get('area') || undefined, openNow: params.get('open') === '1' ? true : undefined,
     sort: allowedSorts.find(value => value === params.get('sort')) ?? 'recommended',
     offset: Number.isSafeInteger(offset) && offset >= 0 ? offset : 0,

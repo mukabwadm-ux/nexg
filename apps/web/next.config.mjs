@@ -39,6 +39,9 @@ const nextConfig = {
   async rewrites() {
     return [{ source: '/discover', destination: '/discover/index.html' }];
   },
+  async redirects() {
+    return [{ source: '/explore', destination: '/discover', permanent: false }];
+  },
   experimental: {
     // Without @nexg/ui here, importing a Button from the barrel pulls in
     // PhoneInput and therefore libphonenumber-js on every page.

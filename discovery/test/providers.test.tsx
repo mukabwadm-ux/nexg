@@ -190,6 +190,15 @@ test('shared read task preserves typed failure and ignores an aborted old respon
   await new Promise(resolve => setImmediate(resolve)); assert.deepEqual(snapshots.at(-1), { key: 'failed', loading: false, failure: { kind: 'restart' } });
 });
 
+test('Explore links resolve to the existing Discover categories and keep search terms', () => {
+  const route = parseRoute('?city=nairobi&category=restaurants_food&q=coffee');
+  assert.equal(route.categoryId, 'restaurants-food');
+  assert.equal(route.search, 'coffee');
+  assert.equal(parseRoute('?category=airport_transfers').categoryId, 'airport-transfers');
+  assert.equal(parseRoute('?category=pharmacy').categoryId, 'health-pharmacy');
+  assert.equal(parseRoute('?category=all').categoryId, undefined);
+});
+
 test('route/Back parsing keeps source IDs and cursor, while changed filters invalidate paging and exact context', () => {
   const route = parseRoute('?category=retired-category&subcategory=retired-child&view=results&q=Protocol&area=area-control&offset=2&cursor=opaque');
   assert.equal(route.categoryId, 'retired-category'); assert.equal(route.subcategoryId, 'retired-child'); assert.equal(route.cursor, 'opaque');
