@@ -33,9 +33,9 @@ export function FilterRail({
 
   return (
     <aside aria-label="Filters" className="space-y-4">
-      <div className="border-border bg-surface rounded-2xl border p-5">
+      <div className="text-ink rounded-3xl bg-[#FAF7F0] p-6 sm:p-7">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-[0.9375rem] font-extrabold">Filters</h2>
+          <h2 className="text-lg font-extrabold">Filters</h2>
           {anyFilter && (
             <Link
               href={hrefFor({
@@ -53,10 +53,10 @@ export function FilterRail({
         </div>
 
         <fieldset className="mt-5">
-          <legend className="text-muted-light text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
+          <legend className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-[0.18em]">
             Availability
           </legend>
-          <ul className="mt-3 space-y-2.5">
+          <ul className="mt-3.5 space-y-3">
             {[
               {
                 label: 'Open now',
@@ -77,15 +77,15 @@ export function FilterRail({
                 >
                   <span
                     aria-hidden="true"
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[0.625rem] font-bold transition-colors ${
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[0.625rem] font-bold transition-colors ${
                       option.on
                         ? 'border-gold bg-gold text-ink'
-                        : 'border-border-strong bg-surface group-hover:border-ink'
+                        : 'border-border-strong group-hover:border-ink bg-white'
                     }`}
                   >
                     {option.on ? '✓' : ''}
                   </span>
-                  <span className="text-[0.8125rem] font-semibold">{option.label}</span>
+                  <span className="text-[0.9375rem] font-semibold">{option.label}</span>
                 </Link>
               </li>
             ))}
@@ -94,10 +94,10 @@ export function FilterRail({
 
         {areas.length > 0 && (
           <fieldset className="mt-6">
-            <legend className="text-muted-light text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
+            <legend className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-[0.18em]">
               Area
             </legend>
-            <ul className="mt-3 space-y-2.5">
+            <ul className="mt-3.5 space-y-3">
               {areas.map((area) => {
                 const on = state.area === area;
                 return (
@@ -109,15 +109,17 @@ export function FilterRail({
                     >
                       <span
                         aria-hidden="true"
-                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[0.625rem] font-bold transition-colors ${
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[0.625rem] font-bold transition-colors ${
                           on
                             ? 'border-gold bg-gold text-ink'
-                            : 'border-border-strong bg-surface group-hover:border-ink'
+                            : 'border-border-strong group-hover:border-ink bg-white'
                         }`}
                       >
                         {on ? '✓' : ''}
                       </span>
-                      <span className="text-[0.8125rem] font-semibold">{area}</span>
+                      <span className="text-[0.9375rem] font-semibold">
+                        {area.replace(/[[\]]/g, '').trim() || area}
+                      </span>
                     </Link>
                   </li>
                 );
@@ -127,17 +129,17 @@ export function FilterRail({
         )}
       </div>
 
-      <div className="bg-ink rounded-2xl p-5 text-white">
-        <p className="text-gold text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
+      <div className="rounded-3xl border border-[#E5B32A]/30 bg-[#17140F] p-6 text-white sm:p-7">
+        <p className="text-gold text-[0.6875rem] font-extrabold uppercase tracking-[0.2em]">
           Can’t find it?
         </p>
-        <p className="mt-2 text-[1.0625rem] font-extrabold leading-snug">
+        <p className="mt-3 text-xl font-extrabold leading-snug">
           Ask a concierge. We’ll source it, wherever it is.
         </p>
-        <p className="mt-2 text-xs font-semibold leading-[1.7] text-white/55">
+        <p className="mt-3 text-sm leading-[1.7] text-white/60">
           A specific dish, a pharmacy that’s still open, a gift from a shop we haven’t listed yet.
         </p>
-        <Button variant="gold" size="sm" asChild className="mt-4 w-full">
+        <Button variant="gold" asChild className="mt-5 h-12 w-full rounded-xl text-base">
           <Link href="/#ask">Make a request</Link>
         </Button>
       </div>

@@ -218,12 +218,12 @@ export function MerchantCard({
       : null;
 
   return (
-    <li className="border-border bg-surface shadow-card hover:shadow-raised group overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-0.5">
+    <li className="text-ink group flex flex-col overflow-hidden rounded-3xl bg-[#FAF7F0] shadow-[0_20px_40px_-24px_rgba(0,0,0,0.6)] transition-all duration-200 hover:-translate-y-0.5">
       <Wrapper {...(wrapperProps as { href: string })} className="block">
-        <div className="from-bg to-border/40 relative flex h-44 items-center justify-center overflow-hidden bg-gradient-to-br">
+        <div className="relative flex h-52 items-center justify-center overflow-hidden bg-[#F1ECE1] bg-[radial-gradient(circle_at_50%_50%,rgba(229,179,42,0.32),transparent_55%)]">
           <span
-            className={`absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.625rem] font-extrabold ${
-              open ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger'
+            className={`absolute left-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold shadow-sm ${
+              open ? 'text-success' : 'text-danger'
             }`}
           >
             <span
@@ -250,7 +250,7 @@ export function MerchantCard({
           ) : (
             /* No photograph yet: the category mark, not a stock image of
                somebody else's shop. */
-            <Icon aria-hidden="true" className="text-muted-light/40 h-10 w-10" />
+            <Icon aria-hidden="true" className="text-gold-text h-14 w-14" strokeWidth={1.75} />
           )}
 
           {/*
@@ -260,7 +260,7 @@ export function MerchantCard({
            */}
           {prepMinutes && (
             <span
-              className="bg-ink absolute bottom-3 right-3 z-10 rounded-lg px-2.5 py-1 text-[0.6875rem] font-bold text-white"
+              className="bg-ink absolute bottom-4 right-4 z-10 rounded-full px-3.5 py-1.5 text-xs font-bold text-white"
               title="Preparation time set by the merchant"
             >
               {prepMinutes} min
@@ -268,11 +268,11 @@ export function MerchantCard({
           )}
         </div>
 
-        <div className="p-4">
-          <p className="truncate text-[0.9375rem] font-extrabold">
+        <div className="px-6 pb-2 pt-6">
+          <p className="truncate text-xl font-extrabold tracking-tight">
             {unbracket(merchant.trading_name)}
           </p>
-          <p className="text-muted-light mt-0.5 truncate text-xs font-semibold">
+          <p className="text-muted mt-1.5 truncate text-sm">
             {merchant.category_other ??
               merchant.category_label ??
               CATEGORY_LABEL[category] ??
@@ -282,7 +282,7 @@ export function MerchantCard({
         </div>
       </Wrapper>
 
-      <div className="flex items-center justify-between gap-3 px-4 pb-4">
+      <div className="mt-auto flex items-center justify-between gap-3 px-6 pb-6 pt-4">
         {placeholder ? (
           <span />
         ) : (
@@ -293,11 +293,19 @@ export function MerchantCard({
           />
         )}
         {placeholder ? (
-          <Button variant="gold" size="sm" disabled>
+          <Button
+            variant="gold"
+            disabled
+            className="h-11 rounded-full px-5 text-[0.9375rem] font-bold"
+          >
             Coming soon
           </Button>
         ) : (
-          <Button variant="gold" size="sm" asChild>
+          <Button
+            variant="gold"
+            asChild
+            className="h-11 shrink-0 rounded-full px-5 text-[0.9375rem] font-bold"
+          >
             <Link href={`/explore/${merchant.id}`}>{CTA[category] ?? 'View'}</Link>
           </Button>
         )}

@@ -32,9 +32,9 @@ export function BrowsingBar({ citySlug }: { citySlug: string }) {
   };
 
   return (
-    <div className="border-border bg-surface flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border px-4 py-3">
+    <div className="text-ink flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-[#FAF7F0] px-5 py-4 sm:px-7 sm:py-5">
       <MapPin aria-hidden="true" className="text-gold h-4 w-4 shrink-0" />
-      <span className="text-muted-light text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
+      <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-[0.2em]">
         Browsing
       </span>
 
@@ -45,13 +45,13 @@ export function BrowsingBar({ citySlug }: { citySlug: string }) {
           type="button"
           onClick={() => openSheet('explore')}
           aria-label={`Browsing near ${place!.label}. Change location`}
-          className="hover:text-gold-text inline-flex min-w-0 max-w-full items-center gap-1 text-[0.875rem] font-extrabold transition-colors"
+          className="hover:text-gold-text inline-flex min-w-0 max-w-full items-center gap-1 text-base font-extrabold transition-colors"
         >
           <span className="truncate">{place!.label}</span>
           <ChevronDown className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
         </button>
       ) : (
-        <span className="text-muted text-[0.875rem] font-semibold">
+        <span className="text-ink text-base">
           Set your location to see the stores that deliver to you.
         </span>
       )}
@@ -61,14 +61,14 @@ export function BrowsingBar({ citySlug }: { citySlug: string }) {
           <button
             type="button"
             onClick={() => openSheet('explore')}
-            className="bg-gold text-ink hover:bg-gold/90 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors"
+            className="bg-gold text-ink hover:bg-gold/90 inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-extrabold transition-colors"
           >
             <Navigation className="h-3 w-3" aria-hidden="true" />
             Set location
           </button>
         ) : place!.zone && place!.zone_id ? (
           <>
-            <span className="text-muted-light text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
+            <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-[0.2em]">
               Zone
             </span>
             {/* The zone narrows the listing; tapped again, it shows all of the city. */}
