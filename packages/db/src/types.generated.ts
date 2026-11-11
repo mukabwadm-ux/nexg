@@ -8149,6 +8149,173 @@ export type Database = {
           },
         ];
       };
+      customer_notification_pref: {
+        Row: {
+          choices: NonNullable<Json>;
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          choices?: NonNullable<Json>;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          choices?: NonNullable<Json>;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      customer_saved: {
+        Row: {
+          created_at: string;
+          id: string;
+          item_id: string | null;
+          kind: string;
+          merchant_id: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          item_id?: string | null;
+          kind: string;
+          merchant_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          item_id?: string | null;
+          kind?: string;
+          merchant_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'customer_saved_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       data_request: {
         Row: {
           blocking_reasons: NonNullable<Json>;
@@ -31878,6 +32045,7 @@ export type Database = {
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
+          user_id: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -31901,6 +32069,7 @@ export type Database = {
           status?: Database['public']['Enums']['ticket_status'];
           topic?: Database['public']['Enums']['ticket_topic'];
           updated_at?: string;
+          user_id?: string | null;
         };
         Update: {
           assigned_to?: string | null;
@@ -31923,6 +32092,7 @@ export type Database = {
           status?: Database['public']['Enums']['ticket_status'];
           topic?: Database['public']['Enums']['ticket_topic'];
           updated_at?: string;
+          user_id?: string | null;
         };
         Relationships: [
           {
@@ -49180,6 +49350,7 @@ export type Database = {
         Returns: number;
       };
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
+      fn_customer_deletion_blockers: { Args: { p_user_id: string }; Returns: Json };
       fn_data_request_blockers: { Args: { p_request_id: string }; Returns: Json };
       fn_decrypt_secret: { Args: { p_cipher: string }; Returns: string };
       fn_delivery_band: {
@@ -52475,6 +52646,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_guest_ensure: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_guest_reveal_phone: { Args: { p_guest_id: string; p_reason: string }; Returns: Json };
       rpc_handover_plan: {
         Args: { p_plan_id: string; p_reason: string; p_to: string };
@@ -54777,7 +54949,11 @@ export type Database = {
         Returns: Json;
       };
       rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
+      rpc_my_account_deletion: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_account_deletion_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_data_export_request: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_staff_avatar_set: { Args: { p_path: string }; Returns: string };
       rpc_my_staff_email_change: {
         Args: { p_current_password: string; p_new_email: string };
@@ -54794,6 +54970,16 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_my_support_ticket_create: {
+        Args: {
+          p_body: string;
+          p_details?: Json;
+          p_order_reference?: string;
+          p_topic?: Database['public']['Enums']['ticket_topic'];
+        };
+        Returns: Json;
+      };
+      rpc_my_support_tickets: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -54818,6 +55004,10 @@ export type Database = {
           p_status: Database['public']['Enums']['notification_status'];
         };
         Returns: undefined;
+      };
+      rpc_notification_pref_set: {
+        Args: { p_category: string; p_channel: string; p_enabled: boolean };
+        Returns: Json;
       };
       rpc_notifications_read: { Args: { p_id?: string }; Returns: Json };
       rpc_order_add_note: {
@@ -56344,6 +56534,7 @@ export type Database = {
         Args: { p_blocks?: Json; p_data: Json; p_id: string; p_kind: string };
         Returns: string;
       };
+      rpc_saved_add: { Args: { p_item_id?: string; p_merchant_id: string }; Returns: Json };
       rpc_send_plan: {
         Args: { p_guest_name?: string; p_guest_phone?: string; p_plan_id: string };
         Returns: {
@@ -57086,6 +57277,7 @@ export type Database = {
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
+          user_id: string | null;
         };
         SetofOptions: {
           from: '*';
@@ -57121,6 +57313,7 @@ export type Database = {
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
+          user_id: string | null;
         };
         SetofOptions: {
           from: '*';
