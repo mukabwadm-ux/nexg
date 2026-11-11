@@ -1,32 +1,37 @@
 import { unstable_cache } from 'next/cache';
-import { Button, Card, Tag } from '@nexg/ui';
-import { ArrowRight } from 'lucide-react';
+import { Button, Card } from '@nexg/ui';
 import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { BestSellers } from '@/components/home/best-sellers';
-import { DeliveryZones } from '@/components/home/delivery-zones';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
 import { NotifyForm } from '@/components/home/notify-form';
 import { PopularCategories } from '@/components/home/popular-categories';
+import { StoresNearYou } from '@/components/home/stores-near-you';
 import { SiteFooter } from '@/components/site-footer';
 import { BEST_SELLERS, bestSellerFromCatalogue, type BestSeller } from '@/lib/best-sellers';
 import { categoryTiles } from '@/lib/categories';
 import { translator, type Locale, type Translate } from '@/lib/i18n/dictionaries';
 import { rankPopularSearches } from '@/lib/popular-searches';
+import type { NearbyStore } from '@/lib/stores-near';
 import { createPublicClient } from '@/lib/supabase/public';
 
 const getHomeData = unstable_cache(
   async () => {
     const supabase = createPublicClient();
-    const [cityResult, zoneResult, featuredResult] = await Promise.all([
+    const [cityResult, storeResult, featuredResult] = await Promise.all([
       supabase.from('city').select('id, slug, name, status').order('sort', { ascending: true }),
+      /* Every live store, for Find Stores Near You. merchant_public only
+         returns what is live, and Nairobi is the one city being served, so
+         all of them are Nairobi's (as on Explore). */
       supabase
-        .from('zone')
-        .select('id, city_id, name')
-        .eq('active', true)
-        .order('name', { ascending: true }),
+        .from('merchant_public')
+        .select(
+          'id, trading_name, category, category_key, category_other, cover_photo_path, branch_name, branch_latitude, branch_longitude, concierge_pick, featured, accepting_orders, closed_today, closes_today, prep_minutes, listed_at, explore_visible',
+        )
+        .order('listed_at', { ascending: false })
+        .limit(300),
       supabase
         .from('featured_live_v')
         .select(
@@ -40,14 +45,39 @@ const getHomeData = unstable_cache(
     if (cityResult.error) {
       throw new Error(`Could not load homepage cities: ${cityResult.error.message}`);
     }
-    if (zoneResult.error) {
-      throw new Error(`Could not load homepage delivery zones: ${zoneResult.error.message}`);
-    }
     if (featuredResult.error) {
       throw new Error(`Could not load homepage features: ${featuredResult.error.message}`);
     }
+    /* A failed store read leaves the section out rather than the page. */
+    if (storeResult.error) {
+      console.warn('[home] stores near you not loaded', storeResult.error.message);
+    }
+    const stores: NearbyStore[] = (storeResult.data ?? []).flatMap((s) =>
+      s.id && s.trading_name && s.explore_visible !== false
+        ? [
+            {
+              id: s.id,
+              trading_name: s.trading_name,
+              category: s.category,
+              category_key: s.category_key,
+              category_other: s.category_other,
+              cover_photo_path: s.cover_photo_path,
+              branch_name: s.branch_name,
+              branch_latitude: s.branch_latitude,
+              branch_longitude: s.branch_longitude,
+              concierge_pick: s.concierge_pick,
+              featured: s.featured,
+              accepting_orders: s.accepting_orders,
+              closed_today: s.closed_today,
+              closes_today: s.closes_today,
+              prep_minutes: s.prep_minutes,
+              listed_at: s.listed_at,
+            },
+          ]
+        : [],
+    );
 
-    return { cities: cityResult.data, zones: zoneResult.data, featured: featuredResult.data };
+    return { cities: cityResult.data, stores, featured: featuredResult.data };
   },
   ['homepage-public-data'],
   { revalidate: 300 },
@@ -148,7 +178,7 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const [{ cities: allCities, zones, featured }, tileTaps, liveBestSellers, searchCounts] =
+  const [{ cities: allCities, stores, featured }, tileTaps, liveBestSellers, searchCounts] =
     await Promise.all([
       getHomeData(),
       getTileTaps(),
@@ -171,9 +201,6 @@ export async function HomePageContent({
       : null,
   }));
   const openCities = allCities.filter((c) => c.status !== 'waitlist');
-  const zonesInOpenCities = zones.filter((zone) =>
-    openCities.some((city) => city.id === zone.city_id),
-  );
 
   return (
     <>
@@ -216,42 +243,17 @@ export async function HomePageContent({
           />
         </section>
 
-        <section className="bg-ink py-14 text-white">
+        <section className="bg-ink py-16 text-white sm:py-20">
           <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
-            <Tag tone="goldOutline" className="px-3 py-1 uppercase tracking-[0.12em]">
-              {t('home.featured.eyebrow')}
-            </Tag>
-
-            <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
-                  {t('home.featured.heading')}
-                </h2>
-                <p className="mt-2 max-w-lg text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
-                  {t('home.featured.note')}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="border-white/20 bg-transparent text-white hover:bg-white/10"
-              >
-                <Link href="/explore">
-                  {t('home.featured.exploreAll')} <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-
             <FeaturedMerchants merchants={featured} t={t} />
 
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs font-semibold text-white/40">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-white/45">
                 {t('home.featured.ownBusiness')}
               </p>
               <Link
                 href="/merchants#featured"
-                className="text-gold text-xs font-bold hover:underline"
+                className="text-gold text-sm font-bold hover:underline"
               >
                 {t('home.featured.getFeatured')}
               </Link>
@@ -270,16 +272,13 @@ export async function HomePageContent({
           </div>
         </section>
 
-        <section id="delivery-zones" className="py-14 sm:py-16">
-          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
-            <DeliveryZones
-              zones={zonesInOpenCities.flatMap((zone) => {
-                const city = openCities.find((candidate) => candidate.id === zone.city_id);
-                return city ? [{ ...zone, citySlug: city.slug }] : [];
-              })}
-            />
-          </div>
-        </section>
+        {stores.length > 0 && (
+          <section id="stores-near-you" className="bg-ink py-14 text-white sm:py-16">
+            <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+              <StoresNearYou stores={stores} />
+            </div>
+          </section>
+        )}
 
         <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
           <Card

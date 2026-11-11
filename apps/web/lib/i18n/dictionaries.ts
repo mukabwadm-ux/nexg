@@ -154,9 +154,7 @@ const en: Dictionary = {
   'home.cat.financial': 'Financial services',
   'home.cat.flowers': 'Flowers & gifts',
   'home.featured.eyebrow': 'Featured merchants · Nairobi',
-  'home.featured.heading': 'Delivering to your door tonight',
-  'home.featured.note':
-    'A selection of partners in your city. Featured placements are paid for by the merchant and marked as sponsored.',
+  'home.featured.heading': 'Featured Merchants',
   'home.featured.exploreAll': 'Explore all merchants',
   'home.featured.ownBusiness': 'Own a business? Featured slots are limited per city and category.',
   'home.featured.getFeatured': 'Get featured on the homepage →',
@@ -327,9 +325,7 @@ const sw: Dictionary = {
   'home.cat.financial': 'Huduma za kifedha',
   'home.cat.flowers': 'Maua na zawadi',
   'home.featured.eyebrow': 'Wafanyabiashara maalum · Nairobi',
-  'home.featured.heading': 'Tunawasilisha mlangoni pako leo usiku',
-  'home.featured.note':
-    'Baadhi ya washirika katika jiji lako. Nafasi maalum hulipiwa na mfanyabiashara na huwekwa alama ya udhamini',
+  'home.featured.heading': 'Wafanyabiashara Maalum',
   'home.featured.exploreAll': 'Gundua wafanyabiashara wote',
   'home.featured.ownBusiness': 'Una biashara? Nafasi maalum ni chache kwa kila jiji na aina.',
   'home.featured.getFeatured': 'Pata nafasi maalum ukurasa wa mwanzo →',

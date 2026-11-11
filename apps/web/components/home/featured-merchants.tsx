@@ -1,9 +1,20 @@
 import { Tag } from '@nexg/ui';
-import { Flower2, Pill, Shirt, ShoppingCart, Sparkles, UtensilsCrossed, Wine } from 'lucide-react';
+import {
+  ArrowRight,
+  Flower2,
+  Pill,
+  Shirt,
+  ShoppingCart,
+  Sparkles,
+  UtensilsCrossed,
+  Wine,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import type { Translate } from '@/lib/i18n/dictionaries';
+
+import { CardRail, RAIL_CARD } from './card-rail';
 
 /**
  * The featured merchant cards on the homepage.
@@ -114,42 +125,89 @@ const PLACEHOLDERS = [
   },
 ] as const;
 
-/* A swipeable row on a phone, like Best sellers; a grid from tablet up. */
-const ROW =
-  '-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden';
-const CARD = 'w-[16.5rem] shrink-0 snap-start sm:w-auto';
-
-const COVER_FALLBACK = 'bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E]';
-
-function Cover({ children }: { children: React.ReactNode }) {
-  return (
-    <div className={`relative flex h-44 items-center justify-center sm:h-36 ${COVER_FALLBACK}`}>
-      {children}
-    </div>
-  );
-}
-
-function Sponsored({ label }: { label: string }) {
-  return (
-    <span className="absolute left-2 top-2 z-10">
-      <Tag tone="sponsored" size="sm" className="uppercase tracking-wide">
-        {label}
-      </Tag>
-    </span>
-  );
-}
-
 /*
- * The merchant's own preparation time, when they have set one. With none
- * recorded the chip is left out rather than showing a guess a guest might
- * plan around (ground rule 3).
+ * One tall photograph card: the photo fills it, a dark fade at the foot
+ * carries the words, and a glass button sits at the bottom. The whole card
+ * is one link: on a phone that is the difference between a comfortable
+ * target and a thin strip (ground rule 7), and one link per card is one
+ * thing for a screen reader to announce.
  */
-function Eta({ minutes, unit }: { minutes: number | null; unit: string }) {
-  if (minutes == null || !Number.isFinite(minutes) || minutes <= 0) return null;
+function Card({
+  href,
+  photo,
+  icon: Icon,
+  sponsored,
+  minutes,
+  minUnit,
+  meta,
+  name,
+  cta,
+}: {
+  href: string;
+  photo: string | null;
+  icon: typeof UtensilsCrossed;
+  sponsored: string;
+  minutes: number | null;
+  minUnit: string;
+  meta: string;
+  name: string;
+  cta: string;
+}) {
+  /* The merchant's own preparation time, when they have set one. With none
+     recorded the chip is left out rather than a guess a guest might plan
+     around (ground rule 3). */
+  const eta =
+    minutes != null && Number.isFinite(minutes) && minutes > 0 ? Math.round(minutes) : null;
   return (
-    <span className="bg-gold text-ink absolute bottom-2 right-2 z-10 rounded-full px-2 py-0.5 text-[0.625rem] font-bold">
-      {Math.round(minutes)} {unit}
-    </span>
+    <li className={RAIL_CARD}>
+      <Link
+        href={href}
+        className="focus-visible:ring-gold group relative flex aspect-[3/4] max-h-[36rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E] ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2"
+      >
+        {photo ? (
+          <Image
+            src={photo}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 82vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          /* No cover photograph yet: the category mark stands in rather than a
+             broken image or a stock photo of someone else's shop. */
+          <span
+            aria-hidden="true"
+            className="text-gold/40 absolute inset-0 flex items-center justify-center pb-24"
+          >
+            <Icon className="h-14 w-14" strokeWidth={1.5} />
+          </span>
+        )}
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-[#0b0907] via-[#0b0907]/75 via-30% to-transparent to-60%"
+        />
+
+        <span className="text-ink absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-[0.625rem] font-extrabold uppercase tracking-[0.16em]">
+          {sponsored}
+        </span>
+        {eta && (
+          <span className="bg-gold text-ink absolute right-4 top-4 rounded-full px-3 py-1.5 text-[0.6875rem] font-bold">
+            {eta} {minUnit}
+          </span>
+        )}
+
+        <span className="relative block p-5 sm:p-6">
+          <span className="text-gold block truncate text-[0.8125rem] font-semibold">{meta}</span>
+          <span className="mt-1.5 line-clamp-2 block text-2xl font-extrabold leading-tight tracking-tight">
+            {name}
+          </span>
+          <span className="mt-5 flex h-12 items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 text-[0.9375rem] font-bold backdrop-blur transition-colors group-hover:bg-white/20">
+            {cta}
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </span>
+        </span>
+      </Link>
+    </li>
   );
 }
 
@@ -165,102 +223,69 @@ export function FeaturedMerchants({
       Boolean(m.merchant_id) && Boolean(m.trading_name),
   );
 
-  if (rows.length === 0) {
-    return (
-      <ul className={ROW}>
-        {PLACEHOLDERS.map((merchant) => (
-          <li key={merchant.name} className={CARD}>
-            <Link
-              href={`/explore?category=${merchant.category}`}
-              className="focus-visible:ring-gold group block overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F] transition-colors hover:border-white/20 focus-visible:outline-none focus-visible:ring-2"
-            >
-              <Cover>
-                <Image
-                  src={`/images/categories/${merchant.image}.jpg`}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 18rem"
-                  className="object-cover opacity-90 transition-transform duration-300 group-hover:scale-105"
-                />
-                <Sponsored label={t('merchant.sponsored')} />
-              </Cover>
-              <div className="p-3">
-                <p className="truncate text-sm font-bold">{merchant.name}</p>
-                <p className="mt-0.5 truncate text-xs font-semibold text-white/50">
-                  {merchant.meta}
-                </p>
-                {/* Opens this kind of business on Explore until the slot is sold. */}
-                <span className="bg-gold text-ink group-hover:bg-gold/90 mt-3 block rounded-md py-1.5 text-center text-xs font-bold">
-                  {t(merchant.cta)}
-                </span>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
   return (
-    <ul className={ROW}>
-      {rows.map((merchant) => {
-        const category = merchant.merchant_category ?? 'other';
-        const Icon = CATEGORY_ICON[category] ?? Sparkles;
-        const label = CATEGORY_LABEL[category] ?? 'Merchant';
-        /* The merchant's approved blurb replaces the generic line
-           when there is one — it is what they paid to say. */
-        const where = [label, merchant.branch_name].filter(Boolean).join(' · ');
-
-        return (
-          <li
-            key={merchant.booking_id ?? merchant.merchant_id}
-            className={`${CARD} overflow-hidden rounded-2xl border border-white/[0.07] bg-[#17140F] transition-colors hover:border-white/20`}
-          >
-            {/*
-             * The whole card, not just the button at the bottom. On a
-             * phone that is the difference between a comfortable target
-             * and a 30-pixel strip (ground rule 7), and one link per card
-             * is also one thing for a screen reader to announce rather
-             * than three that all go to the same place.
-             */}
-            <Link
-              /* The booking id travels so a tap can be attributed to
-                 the slot that earned it, rather than guessed at later. */
-              href={`/explore/${merchant.merchant_id}?src=featured&b=${merchant.booking_id ?? ''}`}
-              className="focus-visible:ring-gold block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
-            >
-              <Cover>
-                <Sponsored label={t('merchant.sponsored')} />
-                {merchant.cover_photo_path ? (
-                  <Image
-                    src={merchant.cover_photo_path}
-                    alt=""
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 18rem"
-                    className="object-cover"
-                  />
-                ) : (
-                  /* No cover photograph yet: the category mark stands in rather
-                     than a broken image or a stock photo of someone else's shop. */
-                  <span aria-hidden="true" className="text-gold/45">
-                    <Icon className="h-10 w-10" />
-                  </span>
-                )}
-                <Eta minutes={merchant.prep_minutes} unit={t('merchant.min')} />
-              </Cover>
-              <div className="p-3">
-                <p className="truncate text-sm font-bold">{merchant.trading_name}</p>
-                <p className="mt-0.5 truncate text-xs font-semibold text-white/50">
-                  {merchant.blurb ?? where}
-                </p>
-                <span className="bg-gold text-ink mt-3 block rounded-md py-1.5 text-center text-xs font-bold">
-                  {t(CATEGORY_CTA[category] ?? 'merchant.cta.view')}
-                </span>
-              </div>
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
+    <CardRail
+      label="featured merchants"
+      heading={
+        <>
+          <Tag tone="goldOutline" className="px-4 py-2 uppercase tracking-[0.18em]">
+            {t('home.featured.eyebrow')}
+          </Tag>
+          <h2 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-[3.5rem]">
+            {t('home.featured.heading')}
+          </h2>
+        </>
+      }
+      actions={
+        <Link
+          href="/explore"
+          className="focus-visible:ring-gold inline-flex h-11 items-center gap-2 rounded-full border border-white/20 px-5 text-sm font-bold transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 sm:h-12 sm:px-6"
+        >
+          {t('home.featured.exploreAll')}
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      }
+    >
+      {rows.length === 0
+        ? /* Nothing sold yet: each card opens Explore for its kind of business. */
+          PLACEHOLDERS.map((merchant) => (
+            <Card
+              key={merchant.name}
+              href={`/explore?category=${merchant.category}`}
+              photo={`/images/categories/${merchant.image}.jpg`}
+              icon={CATEGORY_ICON[merchant.category] ?? Sparkles}
+              sponsored={t('merchant.sponsored')}
+              minutes={null}
+              minUnit={t('merchant.min')}
+              meta={merchant.meta}
+              name={merchant.name}
+              cta={t(merchant.cta)}
+            />
+          ))
+        : rows.map((merchant) => {
+            const category = merchant.merchant_category ?? 'other';
+            const where = [CATEGORY_LABEL[category] ?? 'Merchant', merchant.branch_name]
+              .filter(Boolean)
+              .join(' · ');
+            return (
+              <Card
+                key={merchant.booking_id ?? merchant.merchant_id}
+                /* The booking id travels so a tap can be attributed to the
+                   slot that earned it, rather than guessed at later. */
+                href={`/explore/${merchant.merchant_id}?src=featured&b=${merchant.booking_id ?? ''}`}
+                photo={merchant.cover_photo_path}
+                icon={CATEGORY_ICON[category] ?? Sparkles}
+                sponsored={t('merchant.sponsored')}
+                minutes={merchant.prep_minutes}
+                minUnit={t('merchant.min')}
+                /* The merchant's approved blurb, when there is one: it is what
+                   they paid to say. */
+                meta={merchant.blurb ?? where}
+                name={merchant.trading_name}
+                cta={t(CATEGORY_CTA[category] ?? 'merchant.cta.view')}
+              />
+            );
+          })}
+    </CardRail>
   );
 }
