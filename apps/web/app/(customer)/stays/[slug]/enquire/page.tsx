@@ -55,7 +55,7 @@ export default async function EnquirePage({
         signIn={{ label: 'List your Airbnb', href: '/hosts' }}
       />
 
-      <main id="main" className="mx-auto max-w-[96rem] px-4 pb-16 pt-6 sm:px-8 lg:px-16">
+      <main id="main" className="mx-auto max-w-[120rem] px-4 pb-16 pt-6 sm:px-[30px]">
         <Link
           href={`/stays/${property.slug!}`}
           className="text-muted hover:text-ink inline-flex items-center gap-1.5 text-[0.75rem] font-bold"

@@ -60,7 +60,7 @@ export default async function CategoriesPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16 lg:py-16">
+      <main className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px] lg:py-16">
         <CategoryExplorer categories={categories} />
       </main>
       <SiteFooter />

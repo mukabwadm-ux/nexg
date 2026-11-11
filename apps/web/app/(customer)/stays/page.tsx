@@ -71,7 +71,7 @@ export default async function StaysPage() {
             {/* ───────────────────────────────────────────── hero */}
             <section
               id="tailor"
-              className="mx-auto grid max-w-[96rem] gap-10 px-4 pb-16 pt-10 sm:px-8 lg:grid-cols-[minmax(0,660px)_minmax(0,540px)] lg:items-start lg:justify-between lg:gap-14 lg:px-16 lg:pt-20"
+              className="mx-auto grid max-w-[120rem] gap-10 px-4 pb-16 pt-10 sm:px-[30px] lg:grid-cols-[minmax(0,660px)_minmax(0,540px)] lg:items-start lg:justify-between lg:gap-14 lg:pt-20"
             >
               <div className="lg:pt-4">
                 <p className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-[0.78125rem] font-bold text-white">
@@ -122,7 +122,7 @@ export default async function StaysPage() {
         {/* ─────────────────────────────────────────── listings
             Back on the site's cream, with the standard light cards. */}
         <section className="bg-bg">
-          <div className="mx-auto max-w-[96rem] px-4 pb-16 pt-14 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[120rem] px-4 pb-16 pt-14 sm:px-[30px]">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-muted-light text-[0.75rem] font-extrabold uppercase tracking-[0.14em]">
@@ -162,7 +162,7 @@ export default async function StaysPage() {
 
         {/* ─────────────────────────────────────── how this works */}
         <section className="bg-ink py-14 text-white">
-          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <h2 className="text-[1.75rem] font-extrabold tracking-[-0.02em] sm:text-[2rem]">
               What happens after you ask.
             </h2>

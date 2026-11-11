@@ -88,7 +88,7 @@ export default async function ExperienceHome({
         {/* ─────────────────────────────────────────────────── hero */}
         {/* Design B, "Cream Editorial": copy on the left, an arched
             photograph on the right, three promise cards underneath. */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-14 pt-12 sm:px-8 lg:px-16 lg:pt-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-14 pt-12 sm:px-[30px] lg:pt-16">
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,55fr)_minmax(0,45fr)] lg:gap-12">
             <div className="min-w-0">
               <span className="inline-block rounded-full border border-[#E3CF95] bg-[#FBF3D6] px-3.5 py-1.5 text-xs font-bold tracking-[0.02em] text-[#86650D]">
@@ -199,7 +199,7 @@ export default async function ExperienceHome({
         </section>
 
         {/* ──────────────────────────────────────────── curated days */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-14 sm:px-[30px]">
           <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
             {t('xp.curated.heading', { city: where })}
           </h2>
@@ -243,7 +243,7 @@ export default async function ExperienceHome({
         </section>
 
         {/* ───────────────────────────────────────────────── events */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-20 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-20 sm:px-[30px]">
           <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
             {t('xp.events.heading', { city: where })}
           </h2>

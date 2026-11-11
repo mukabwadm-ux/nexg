@@ -44,7 +44,7 @@ export default async function AskPage() {
          * page, so it never waits behind a picture — and under 640px the
          * photo is not shown (and, being lazy, not downloaded).
          */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-14 pt-10 sm:px-8 lg:px-16 lg:pb-20 lg:pt-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-14 pt-10 sm:px-[30px] lg:pb-20 lg:pt-16">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,620px)_minmax(0,540px)] lg:justify-between lg:gap-x-14 lg:gap-y-10">
             <div className="min-w-0 lg:col-start-1 lg:row-start-1">
               <span className="text-ink inline-flex items-center gap-2 rounded-full border border-[#E3DCC9] bg-white px-3.5 py-1.5 text-[0.78125rem] font-bold">

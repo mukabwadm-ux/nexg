@@ -278,7 +278,7 @@ export default async function HostsPage() {
             photograph with the dark "your unit" card over its lower half
             on the right. Copy, links and the card's placeholders are
             unchanged from the previous hero. */}
-        <section className="mx-auto grid max-w-[96rem] gap-12 px-4 pb-16 pt-10 sm:px-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center lg:gap-10 lg:px-10 lg:pt-16 xl:grid-cols-[minmax(0,700px)_500px] xl:justify-between xl:gap-12 xl:px-16">
+        <section className="mx-auto grid max-w-[120rem] gap-12 px-4 pb-16 pt-10 sm:px-[30px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center lg:gap-10 lg:pt-16 xl:grid-cols-[minmax(0,700px)_500px] xl:justify-between xl:gap-12">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-2 rounded-full border border-[#E3DCC9] bg-white px-3.5 py-2 text-[0.78125rem] font-bold leading-tight">
               <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-[#D4A72C]" />
@@ -331,7 +331,7 @@ export default async function HostsPage() {
         <section
           id="benefits"
           aria-labelledby="host-benefits-title"
-          className="mx-auto max-w-[96rem] px-4 py-16 sm:px-8 lg:px-16 lg:py-20"
+          className="mx-auto max-w-[120rem] px-4 py-16 sm:px-[30px] lg:py-20"
         >
           <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
             <div>
@@ -404,7 +404,7 @@ export default async function HostsPage() {
           aria-labelledby="guest-benefits-title"
           className="bg-ink py-16 text-white lg:py-20"
         >
-          <div className="mx-auto grid max-w-[96rem] gap-12 px-4 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-center lg:gap-16 lg:px-16">
+          <div className="mx-auto grid max-w-[120rem] gap-12 px-4 sm:px-[30px] lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-center lg:gap-16">
             <div>
               <p className="text-gold text-[0.75rem] font-extrabold uppercase tracking-[0.14em]">
                 Benefits to your guests
@@ -462,7 +462,7 @@ export default async function HostsPage() {
         <section
           id="pricing"
           aria-labelledby="pricing-title"
-          className="mx-auto max-w-[96rem] px-4 py-16 sm:px-8 lg:px-16 lg:py-20"
+          className="mx-auto max-w-[120rem] px-4 py-16 sm:px-[30px] lg:py-20"
         >
           <p className="text-[0.75rem] font-extrabold uppercase tracking-[0.14em] text-[#8A6A12]">
             Packages
@@ -558,7 +558,7 @@ export default async function HostsPage() {
         </section>
 
         {/* ─────────────────────────────────────── how it works */}
-        <section id="how" className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
+        <section id="how" className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px]">
           <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#8A8A8A]">
             How it works
           </p>
@@ -600,7 +600,7 @@ export default async function HostsPage() {
          * 96rem grid as every other section.
          */}
         <section className="my-12 bg-[#D4A72C] py-12 sm:py-16">
-          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <div className="grid gap-8 lg:grid-cols-[1fr_34rem] lg:items-start lg:gap-12">
               <div>
                 <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#5B4708]">
@@ -661,7 +661,7 @@ export default async function HostsPage() {
          */}
         <section
           id="find"
-          className="mx-auto grid max-w-[96rem] gap-10 px-4 py-12 sm:px-8 lg:grid-cols-[1fr_30rem] lg:items-center lg:gap-14 lg:px-16"
+          className="mx-auto grid max-w-[120rem] gap-10 px-4 py-12 sm:px-[30px] lg:grid-cols-[1fr_30rem] lg:items-center lg:gap-14"
         >
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-[#DDD8CC] bg-white px-3 py-1.5 text-[0.6875rem] font-extrabold">
@@ -707,7 +707,7 @@ export default async function HostsPage() {
           /* Dark, so the white listing cards read as the thing being
              shown off rather than as more page. */
           <section className="bg-ink py-14 text-white">
-            <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+            <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
               <p className="text-gold text-[0.6875rem] font-extrabold uppercase tracking-[0.14em]">
                 How a listing looks
               </p>
@@ -744,7 +744,7 @@ export default async function HostsPage() {
         )}
 
         {/* ─────────────────────────────────────────── the form */}
-        <section id="list" className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
+        <section id="list" className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px]">
           <div className="rounded-2xl border border-[#ECE8DF] bg-white p-6 sm:p-10">
             <div className="grid gap-8 lg:grid-cols-[26rem_1fr] lg:items-start lg:gap-14">
               <div>
@@ -784,7 +784,7 @@ export default async function HostsPage() {
         </section>
 
         {/* ────────────────────────────────────────────── FAQ */}
-        <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px]">
           <div className="grid gap-8 lg:grid-cols-[26rem_1fr] lg:items-start lg:gap-14">
             <div>
               <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#8A8A8A]">
@@ -809,7 +809,7 @@ export default async function HostsPage() {
         </section>
 
         {/* ────────────────────────────────────────── CTA band */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-16 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-16 sm:px-[30px]">
           <div className="flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-[#141414] p-8 sm:p-10">
             <div>
               <h2 className="text-[1.5rem] font-extrabold tracking-[-0.02em] text-white sm:text-[1.875rem]">

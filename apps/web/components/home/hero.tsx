@@ -206,7 +206,7 @@ export function Hero({
 
       {/* ─────────────────────────────────────────────── the message */}
       {/* Fills what the nav and the strip leave of one screen, centred in it. */}
-      <div className="mx-auto flex w-full max-w-[96rem] flex-1 flex-col justify-center px-5 pb-5 pt-[6.5rem] sm:px-8 sm:pt-28 lg:px-16 lg:pb-8 lg:pt-32">
+      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-center px-5 pb-5 pt-[6.5rem] sm:px-[30px] sm:pt-28 lg:pb-8 lg:pt-32">
         <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
           {copy.eyebrow}
         </p>
@@ -262,7 +262,7 @@ export function Hero({
 
       {/* ─────────────────────────────────────────────── why NexG */}
       <div className="relative border-t border-white/10 bg-black/40 backdrop-blur">
-        <ul className="mx-auto grid max-w-[96rem] grid-cols-5 px-2 py-3 sm:px-8 lg:px-16 lg:py-4">
+        <ul className="mx-auto grid max-w-[120rem] grid-cols-5 px-2 py-3 sm:px-[30px] lg:py-4">
           {FEATURES.map(({ icon: Icon, title, body }, i) => (
             <li
               key={title}
@@ -373,7 +373,7 @@ function HeroNav({
     >
       <div
         className={cn(
-          'mx-auto flex max-w-[96rem] items-center justify-between gap-3 px-4 transition-[padding] sm:px-8 lg:px-16',
+          'mx-auto flex max-w-[120rem] items-center justify-between gap-3 px-4 transition-[padding] sm:px-[30px]',
           solid ? 'py-2' : 'py-3 sm:py-4',
         )}
       >

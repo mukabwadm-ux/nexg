@@ -97,7 +97,7 @@ export default async function JobPage({ params }: { params: { slug: string } }) 
     return (
       <>
         <SiteHeader action={{ label: 'See open roles', href: '/careers#roles' }} />
-        <main className="mx-auto max-w-[96rem] px-4 py-16 sm:px-8 lg:px-16">
+        <main className="mx-auto max-w-[120rem] px-4 py-16 sm:px-[30px]">
           <h1 className="text-[2rem] font-extrabold tracking-tight">
             This role is no longer open.
           </h1>
@@ -147,7 +147,7 @@ export default async function JobPage({ params }: { params: { slug: string } }) 
         signIn={{ label: 'All roles', href: '/careers#roles' }}
       />
 
-      <main className="mx-auto max-w-[96rem] px-4 pb-16 pt-6 sm:px-8 lg:px-16">
+      <main className="mx-auto max-w-[120rem] px-4 pb-16 pt-6 sm:px-[30px]">
         <Link
           href="/careers#roles"
           className="text-muted hover:text-ink inline-flex items-center gap-1.5 text-[0.75rem] font-bold"

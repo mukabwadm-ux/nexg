@@ -103,7 +103,7 @@ export function PopularCategories({
       <ul
         className={
           layout === 'row'
-            ? '-mx-4 mt-8 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-8 sm:gap-4 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-9 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden'
+            ? '-mx-4 mt-8 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-[30px] sm:gap-4 sm:px-[30px] lg:mx-0 lg:grid lg:grid-cols-9 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden'
             : 'mt-8 grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6'
         }
       >

@@ -30,7 +30,7 @@ export async function SiteFooter({
   /* Dark, so the logo reads at its best: the on-dark artwork, with light text. */
   return (
     <footer className="bg-ink text-white">
-      <div className="mx-auto flex max-w-[96rem] flex-col items-start gap-4 px-4 py-[3.75rem] sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-16">
+      <div className="mx-auto flex max-w-[120rem] flex-col items-start gap-4 px-4 py-[3.75rem] sm:flex-row sm:items-center sm:justify-between sm:px-[30px]">
         <Logo onDark className="h-28" />
         <div className="flex flex-col gap-2 sm:items-end">
           <nav aria-label="Footer" className="flex flex-wrap gap-4">

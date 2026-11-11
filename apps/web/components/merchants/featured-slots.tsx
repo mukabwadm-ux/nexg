@@ -47,7 +47,7 @@ const SLOTS = [
 export function FeaturedSlots() {
   return (
     <section id="featured" className="bg-ink text-white">
-      <div className="mx-auto max-w-[96rem] px-4 py-16 sm:px-8 sm:py-24 lg:px-16">
+      <div className="mx-auto max-w-[120rem] px-4 py-16 sm:px-[30px] sm:py-24">
         <div className="grid gap-10 lg:grid-cols-[1fr_31rem] lg:items-start">
           <div>
             <SectionLabel onDark>Get featured</SectionLabel>

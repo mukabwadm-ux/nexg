@@ -1,7 +1,7 @@
 import type * as React from 'react';
 
 /** The page width and gutters every section of the merchants page shares. */
-export const CONTAINER = 'mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16';
+export const CONTAINER = 'mx-auto max-w-[120rem] px-4 sm:px-[30px]';
 
 /** Section headings across the merchants page. */
 export const H2 =

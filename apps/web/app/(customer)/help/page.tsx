@@ -163,7 +163,7 @@ export default function HelpPage() {
 
       <main>
         {/* ------------------------------------------------------------ hero */}
-        <section className="mx-auto max-w-[96rem] px-4 pt-6 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pt-6 sm:px-[30px]">
           <div className="bg-ink relative overflow-hidden rounded-2xl px-6 py-14 text-center text-white sm:px-10 sm:py-16">
             <p className="text-gold text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
               Help &amp; contact
@@ -192,7 +192,7 @@ export default function HelpPage() {
         </section>
 
         {/* ---------------------------------------------------------- topics */}
-        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 py-14 sm:px-[30px]">
           <p className="text-gold-text text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
             Browse by topic
           </p>
@@ -224,7 +224,7 @@ export default function HelpPage() {
         </section>
 
         {/* --------------------------------------------- answers + contact */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-14 sm:px-[30px]">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-start">
             <div>
               <p className="text-gold-text text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
@@ -268,7 +268,7 @@ export default function HelpPage() {
         </section>
 
         {/* -------------------------------------------------------- channels */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-16 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-16 sm:px-[30px]">
           <p className="text-gold-text text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
             Talk to a person
           </p>
@@ -311,7 +311,7 @@ export default function HelpPage() {
           </Card>
         </section>
 
-        <section className="mx-auto max-w-[96rem] px-4 pb-16 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-16 sm:px-[30px]">
           <div className="border-border bg-surface rounded-2xl border p-6 sm:p-8">
             <p className="text-muted-light text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
               Office

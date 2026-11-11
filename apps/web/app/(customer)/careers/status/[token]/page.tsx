@@ -68,7 +68,7 @@ export default async function StatusPage({ params }: { params: { token: string }
     return (
       <>
         <SiteHeader action={{ label: 'See open roles', href: '/careers#roles' }} />
-        <main className="mx-auto max-w-[96rem] px-4 py-16 sm:px-8 lg:px-16">
+        <main className="mx-auto max-w-[120rem] px-4 py-16 sm:px-[30px]">
           <h1 className="text-[1.875rem] font-extrabold tracking-tight">That link has expired.</h1>
           <p className="text-muted mt-3 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8]">
             Status links last 90 days and are extended each time your application moves. Reply to

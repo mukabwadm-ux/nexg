@@ -103,7 +103,7 @@ export function BestSellers({
       <ul
         ref={row}
         onScroll={update}
-        className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-3 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-3 [scrollbar-width:none] sm:-mx-[30px] sm:px-[30px] lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden"
       >
         {items.map((item) => (
           <li

@@ -52,7 +52,7 @@ export default async function CareersPage() {
 
       <main>
         {/* ------------------------------------------------------------ hero */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-12 pt-8 sm:px-8 lg:px-16 lg:pb-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-12 pt-8 sm:px-[30px] lg:pb-16">
           <div className="grid gap-10 lg:grid-cols-[1fr_30rem] lg:items-center">
             <div>
               <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
@@ -144,7 +144,7 @@ export default async function CareersPage() {
 
         {/* ------------------------------------------------------ principles */}
         <section className="border-border bg-surface border-y py-14">
-          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <p className="text-gold-text text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
               How we work
             </p>
@@ -178,10 +178,7 @@ export default async function CareersPage() {
         </section>
 
         {/* ----------------------------------------------------------- roles */}
-        <section
-          id="roles"
-          className="mx-auto max-w-[96rem] scroll-mt-4 px-4 py-14 sm:px-8 lg:px-16"
-        >
+        <section id="roles" className="mx-auto max-w-[120rem] scroll-mt-4 px-4 py-14 sm:px-[30px]">
           <div className="border-border bg-surface rounded-2xl border p-6 sm:p-8">
             <p className="text-gold-text text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
               Open roles
@@ -222,7 +219,7 @@ export default async function CareersPage() {
         {/* --------------------------------------------------- how we hire */}
         <section
           id="how-we-hire"
-          className="mx-auto max-w-[96rem] scroll-mt-4 px-4 pb-14 sm:px-8 lg:px-16"
+          className="mx-auto max-w-[120rem] scroll-mt-4 px-4 pb-14 sm:px-[30px]"
         >
           <div className="grid gap-8 lg:grid-cols-[1fr_24rem] lg:items-start">
             <div>
@@ -291,7 +288,7 @@ export default async function CareersPage() {
         </section>
 
         {/* ------------------------------------------------- not a job ad */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-14 sm:px-[30px]">
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               {
@@ -331,7 +328,7 @@ export default async function CareersPage() {
         </section>
 
         {/* ------------------------------------------------------------- CTA */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-14 sm:px-[30px]">
           <div className="bg-gold text-ink flex flex-wrap items-center justify-between gap-6 rounded-2xl p-8 sm:p-12">
             <div className="max-w-lg">
               <h2 className="text-[2rem] font-extrabold leading-tight tracking-tight">

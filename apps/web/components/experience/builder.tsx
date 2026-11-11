@@ -383,7 +383,7 @@ export function Builder({
   }
 
   return (
-    <main className="mx-auto max-w-[96rem] px-4 py-10 sm:px-8 lg:px-16">
+    <main className="mx-auto max-w-[120rem] px-4 py-10 sm:px-[30px]">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_35rem] lg:items-start">
         {/* ───────────────────────────────────────────────── left */}
         <div className="min-w-0">

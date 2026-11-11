@@ -1,5 +1,4 @@
 import { unstable_cache } from 'next/cache';
-import { Button, Card } from '@nexg/ui';
 import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
@@ -7,6 +6,7 @@ import { BestSellers } from '@/components/home/best-sellers';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
 import { NotifyForm } from '@/components/home/notify-form';
+import { JoinSection } from '@/components/home/join-section';
 import { PopularCategories } from '@/components/home/popular-categories';
 import { StoresNearYou } from '@/components/home/stores-near-you';
 import { SiteFooter } from '@/components/site-footer';
@@ -233,7 +233,7 @@ export async function HomePageContent({
       <main>
         <section
           id="popular"
-          className="mx-auto max-w-[96rem] scroll-mt-20 px-4 py-16 sm:px-8 sm:py-20 lg:px-16 lg:py-24"
+          className="mx-auto max-w-[120rem] scroll-mt-20 px-4 py-16 sm:px-[30px] sm:py-20 lg:py-24"
         >
           <PopularCategories
             heading={t('home.popular.heading')}
@@ -244,7 +244,7 @@ export async function HomePageContent({
         </section>
 
         <section className="bg-ink py-16 text-white sm:py-20">
-          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <FeaturedMerchants merchants={featured} t={t} />
 
             <div className="mt-8 flex flex-wrap items-center justify-between gap-2">
@@ -262,7 +262,7 @@ export async function HomePageContent({
         </section>
 
         <section className="bg-surface">
-          <div className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[120rem] px-4 py-14 sm:px-[30px]">
             <BestSellers
               heading={t('home.bestSellers.heading')}
               seeAll={t('home.bestSellers.seeAll')}
@@ -274,42 +274,20 @@ export async function HomePageContent({
 
         {stores.length > 0 && (
           <section id="stores-near-you" className="bg-ink py-14 text-white sm:py-16">
-            <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+            <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
               <StoresNearYou stores={stores} />
             </div>
           </section>
         )}
 
-        <section className="mx-auto max-w-[96rem] px-4 py-12 sm:px-8 lg:px-16">
-          <Card
-            tone="ink"
-            className="flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between"
-          >
-            <div>
-              <h2 className="text-2xl font-extrabold tracking-tight">{t('home.join.heading')}</h2>
-              <p className="mt-2 max-w-md text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
-                {t('home.join.body')}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="gold" size="sm" asChild>
-                <Link href="/hosts">{t('home.join.listAirbnb')}</Link>
-              </Button>
-              <Button size="sm" asChild className="text-ink bg-white hover:bg-white/90">
-                <Link href="/riders">{t('home.join.becomeRider')}</Link>
-              </Button>
-              <Button size="sm" asChild className="text-ink bg-white hover:bg-white/90">
-                <Link href="/merchants">{t('home.join.registerBusiness')}</Link>
-              </Button>
-              <Button size="sm" asChild className="text-ink bg-white hover:bg-white/90">
-                <Link href="/careers">{t('home.join.viewOpenings')}</Link>
-              </Button>
-            </div>
-          </Card>
+        <section className="bg-ink py-16 text-white sm:py-20">
+          <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
+            <JoinSection t={t} />
+          </div>
         </section>
 
         <section className="bg-gold py-14">
-          <div className="mx-auto grid max-w-[96rem] gap-8 px-4 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-16">
+          <div className="mx-auto grid max-w-[120rem] gap-8 px-4 sm:px-[30px] lg:grid-cols-2 lg:items-center">
             <div>
               <span className="bg-ink inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.625rem] font-bold uppercase tracking-wide text-white">
                 <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />

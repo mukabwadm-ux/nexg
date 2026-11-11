@@ -43,7 +43,7 @@ export default async function ApplyPage({
         signIn={{ label: 'Back to the role', href: `/careers/${job.slug}` }}
       />
 
-      <main className="mx-auto max-w-[96rem] px-4 pb-16 pt-6 sm:px-8 lg:px-16">
+      <main className="mx-auto max-w-[120rem] px-4 pb-16 pt-6 sm:px-[30px]">
         <Link
           href={`/careers/${job.slug}`}
           className="text-muted hover:text-ink inline-flex items-center gap-1.5 text-[0.75rem] font-bold"

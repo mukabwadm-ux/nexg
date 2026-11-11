@@ -81,7 +81,7 @@ export function PlanPage({ initial }: { initial: PlanView }) {
             : 'They are calling the places on your list and will come back with a price you can approve or change.';
 
   return (
-    <main className="mx-auto max-w-[96rem] px-4 py-10 sm:px-8 lg:px-16">
+    <main className="mx-auto max-w-[120rem] px-4 py-10 sm:px-[30px]">
       <p className="text-gold-text text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
         {plan.reference}
       </p>

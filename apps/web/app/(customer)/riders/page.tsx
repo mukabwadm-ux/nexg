@@ -143,7 +143,7 @@ export default async function RidersPage() {
 
       <main>
         {/* ------------------------------------------------------------ hero */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-10 pt-8 sm:px-8 lg:px-16 lg:pb-14 lg:pt-12">
+        <section className="mx-auto max-w-[120rem] px-4 pb-10 pt-8 sm:px-[30px] lg:pb-14 lg:pt-12">
           <div className="grid gap-8 lg:grid-cols-[1fr_31rem] lg:gap-12">
             <div className="lg:pt-6">
               <span className="border-border-strong bg-surface inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
@@ -196,7 +196,7 @@ export default async function RidersPage() {
 
         {/* ---------------------------------------------------------- ticker */}
         <div className="bg-ink overflow-x-auto py-5">
-          <ul className="text-gold mx-auto flex max-w-[96rem] items-center gap-6 px-4 text-xs font-bold uppercase tracking-widest sm:px-8 lg:px-16">
+          <ul className="text-gold mx-auto flex max-w-[120rem] items-center gap-6 px-4 text-xs font-bold uppercase tracking-widest sm:px-[30px]">
             {TICKER.map((item) => (
               <li key={item} className="flex shrink-0 items-center gap-6">
                 {item}
@@ -209,7 +209,7 @@ export default async function RidersPage() {
         </div>
 
         {/* ------------------------------------------------------------- why */}
-        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 py-14 sm:px-[30px]">
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
             Why riders choose NexG
           </h2>
@@ -243,7 +243,7 @@ export default async function RidersPage() {
 
         {/* ----------------------------------------------------------- steps */}
         <section id="how" className="border-border bg-surface border-y py-14">
-          <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
               From application to first delivery
             </h2>
@@ -273,7 +273,7 @@ export default async function RidersPage() {
         </section>
 
         {/* ---------------------------------------------------- requirements */}
-        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 py-14 sm:px-[30px]">
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
@@ -347,7 +347,7 @@ export default async function RidersPage() {
                 'radial-gradient(circle, rgba(210,146,30,0.16) 0%, rgba(210,146,30,0.07) 42%, transparent 68%)',
             }}
           />
-          <div className="mx-auto grid max-w-[96rem] gap-8 px-4 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-16">
+          <div className="mx-auto grid max-w-[120rem] gap-8 px-4 sm:px-[30px] lg:grid-cols-2 lg:items-center">
             <div>
               <span className="bg-gold text-ink inline-block rounded-full px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest">
                 The rider app
@@ -385,7 +385,7 @@ export default async function RidersPage() {
         </section>
 
         {/* ------------------------------------------------------------- FAQ */}
-        <section className="mx-auto max-w-[96rem] px-4 py-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 py-14 sm:px-[30px]">
           <div className="grid gap-8 lg:grid-cols-[24rem_1fr]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
@@ -432,7 +432,7 @@ export default async function RidersPage() {
         </section>
 
         {/* ------------------------------------------------------------- CTA */}
-        <section className="mx-auto max-w-[96rem] px-4 pb-14 sm:px-8 lg:px-16">
+        <section className="mx-auto max-w-[120rem] px-4 pb-14 sm:px-[30px]">
           <Card
             tone="gold"
             className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
