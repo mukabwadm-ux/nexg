@@ -149,47 +149,51 @@ export default async function ProductPage({ params }: { params: Params }) {
   return (
     <>
       <SiteHeader />
-      <div className="relative overflow-hidden bg-[#0b0907] text-white">
+      <div className="bg-bg text-ink relative overflow-hidden">
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -left-48 top-10 h-[40rem] w-[40rem] rounded-full bg-[#E5B32A]/10 blur-3xl"
+          className="pointer-events-none absolute -left-48 top-10 h-[40rem] w-[40rem] rounded-full bg-[#E5B32A]/15 blur-3xl"
         />
         <main
           id="main"
           className="relative mx-auto max-w-[120rem] px-4 pb-24 pt-8 sm:px-[30px] lg:pt-10"
         >
-          <nav aria-label="Breadcrumb" className="text-sm text-white/55">
-            <Link href="/explore" className="transition-colors hover:text-white">
+          <nav aria-label="Breadcrumb" className="text-muted text-sm">
+            <Link href="/explore" className="hover:text-ink transition-colors">
               Explore
             </Link>
             <span className="mx-2.5" aria-hidden="true">
               ›
             </span>
-            <Link href={`/explore/${merchant.id}`} className="transition-colors hover:text-white">
+            <Link href={`/explore/${merchant.id}`} className="hover:text-ink transition-colors">
               {merchantName}
             </Link>
             <span className="mx-2.5" aria-hidden="true">
               ›
             </span>
-            <span className="font-bold text-white">{item.name}</span>
+            <span className="text-ink font-bold">{item.name}</span>
           </nav>
 
           <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-20">
             {/* The photo, or the category mark in a gold glow; a deep curve at the foot. */}
             <div className="relative aspect-[7/8] max-h-[46rem]">
-              <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] rounded-bl-[10rem] bg-gradient-to-br from-[#26221A] to-[#151310] ring-1 ring-white/10 sm:rounded-bl-[14rem]">
+              <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] rounded-bl-[10rem] bg-gradient-to-br from-[#F4EFE4] to-[#E8DFCB] ring-1 ring-[#E2D9C6] sm:rounded-bl-[14rem]">
                 {photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={photoUrl} alt={item.name} className="h-full w-full object-cover" />
                 ) : (
-                  <span className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_50%_50%,rgba(229,179,42,0.35),transparent_45%)]">
-                    <Icon aria-hidden="true" className="text-gold h-28 w-28" strokeWidth={1.5} />
+                  <span className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_50%_50%,rgba(229,179,42,0.4),transparent_45%)]">
+                    <Icon
+                      aria-hidden="true"
+                      className="text-gold-text h-28 w-28"
+                      strokeWidth={1.5}
+                    />
                   </span>
                 )}
               </div>
               {/* Over the curve, outside the clipped photo, as drawn. */}
               {prep && (
-                <span className="text-gold absolute bottom-8 left-8 rounded-full bg-black/60 px-5 py-2.5 text-base font-bold ring-1 ring-white/15 backdrop-blur sm:bottom-10 sm:left-10">
+                <span className="text-gold-text absolute bottom-8 left-8 rounded-full bg-white px-5 py-2.5 text-base font-bold shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)] ring-1 ring-[#E2D9C6] sm:bottom-10 sm:left-10">
                   Preparation · {prep}
                 </span>
               )}
@@ -198,7 +202,7 @@ export default async function ProductPage({ params }: { params: Params }) {
             <div className="lg:pt-2">
               <Link
                 href={`/explore/${merchant.id}`}
-                className="text-gold text-base font-bold transition-opacity hover:opacity-80"
+                className="text-gold-text text-base font-bold transition-opacity hover:opacity-80"
               >
                 {merchantName}
                 {merchant.branch_name ? ` · ${unbracket(merchant.branch_name)}` : ''}
@@ -206,35 +210,39 @@ export default async function ProductPage({ params }: { params: Params }) {
               <h1 className="mt-3 text-5xl/[1.02] font-extrabold tracking-tight sm:text-6xl/[1] lg:text-[5.5rem]/[0.98]">
                 {item.name}
               </h1>
-              <p className="mt-5 inline-flex rounded-full px-4 py-2 text-sm text-white/75 ring-1 ring-white/20">
+              <p className="text-muted mt-5 inline-flex rounded-full bg-white px-4 py-2 text-sm ring-1 ring-[#D9CFBC]">
                 {kind}
                 {section?.name ? ` · ${section.name}` : ''}
               </p>
 
               {promo ? (
                 <p className="mt-8 flex flex-wrap items-baseline gap-3">
-                  <span className="text-gold text-5xl font-extrabold">{price(promo.promo)}</span>
-                  <s className="text-lg font-semibold text-white/45">{price(item.price_kes)}</s>
-                  <span className="rounded-full bg-[#E5B32A]/15 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#FFD35F]">
+                  <span className="text-gold-text text-5xl font-extrabold">
+                    {price(promo.promo)}
+                  </span>
+                  <s className="text-muted-light text-lg font-semibold">{price(item.price_kes)}</s>
+                  <span className="bg-gold-soft text-gold-text rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wide">
                     {promoBadge(promo)} · {promo.name}
                   </span>
                 </p>
               ) : (
-                <p className="text-gold mt-8 text-5xl font-extrabold">{price(item.price_kes)}</p>
+                <p className="text-gold-text mt-8 text-5xl font-extrabold">
+                  {price(item.price_kes)}
+                </p>
               )}
 
               {(item.age_restricted || !item.available || !open) && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {item.age_restricted && (
-                    <span className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide text-white/75 ring-1 ring-white/20">
+                    <span className="text-muted rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ring-1 ring-[#D9CFBC]">
                       21+ · ID checked on delivery
                     </span>
                   )}
                   {!item.available && (
-                    <span className="text-sm font-bold text-red-400">Sold out today</span>
+                    <span className="text-danger text-sm font-bold">Sold out today</span>
                   )}
                   {!open && (
-                    <span className="text-sm font-bold text-red-400">
+                    <span className="text-danger text-sm font-bold">
                       {merchantName} is not taking orders right now
                     </span>
                   )}
@@ -242,7 +250,7 @@ export default async function ProductPage({ params }: { params: Params }) {
               )}
 
               {item.description && (
-                <p className="mt-6 text-lg leading-relaxed text-white/80">{item.description}</p>
+                <p className="text-ink/80 mt-6 text-lg leading-relaxed">{item.description}</p>
               )}
 
               <div className="mt-8">
@@ -255,7 +263,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                 ) : (
                   <Link
                     href={`/explore/${merchant.id}`}
-                    className="inline-flex rounded-full px-5 py-3 text-sm font-extrabold ring-1 ring-white/25 transition-colors hover:bg-white/10"
+                    className="inline-flex rounded-full px-5 py-3 text-sm font-extrabold ring-1 ring-[#D9CFBC] transition-colors hover:bg-white"
                   >
                     See what else {merchantName} has
                   </Link>
@@ -263,17 +271,17 @@ export default async function ProductPage({ params }: { params: Params }) {
               </div>
 
               {details.length > 0 && (
-                <dl className="mt-10 space-y-3 border-t border-white/10 pt-6">
+                <dl className="mt-10 space-y-3 border-t border-[#E2D9C6] pt-6">
                   {details.map(([label, value]) => (
                     <div key={label} className="flex gap-4 text-base">
-                      <dt className="w-28 shrink-0 text-white/55">{label}</dt>
+                      <dt className="text-muted w-28 shrink-0">{label}</dt>
                       <dd className="font-bold">{value}</dd>
                     </div>
                   ))}
                 </dl>
               )}
 
-              <p className="mt-6 text-sm leading-[1.7] text-white/50">
+              <p className="text-muted mt-6 text-sm leading-[1.7]">
                 Price set by {merchantName}. Delivery and service fees are shown at checkout before
                 you pay.
               </p>
