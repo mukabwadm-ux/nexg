@@ -23,6 +23,8 @@ export const WELCOME_HOST = 'nexg_welcome_host';
 /** True for customers who created an account at /sign-up: the template says
  *  "Welcome to NexG" without an application, and the link returns home. */
 export const WELCOME_CUSTOMER = 'nexg_welcome_customer';
+/** True for riders after they submit: the email says "rider dashboard" and links to /rider. */
+export const WELCOME_RIDER = 'nexg_welcome_rider';
 
 function clean(value: unknown, max: number): string | null {
   if (typeof value !== 'string') return null;
@@ -36,7 +38,7 @@ function clean(value: unknown, max: number): string | null {
 
 export function welcomeMetadata(
   business: { firstName?: unknown; name?: unknown },
-  role: 'merchant' | 'host' | 'customer' = 'merchant',
+  role: 'merchant' | 'host' | 'customer' | 'rider' = 'merchant',
 ) {
   return {
     [WELCOME_FLAG]: true,
@@ -44,6 +46,7 @@ export function welcomeMetadata(
     [WELCOME_BUSINESS]: clean(business.name, 200),
     [WELCOME_HOST]: role === 'host' ? true : null,
     [WELCOME_CUSTOMER]: role === 'customer' ? true : null,
+    [WELCOME_RIDER]: role === 'rider' ? true : null,
   };
 }
 
@@ -54,6 +57,7 @@ export const clearedWelcomeMetadata = {
   [WELCOME_BUSINESS]: null,
   [WELCOME_HOST]: null,
   [WELCOME_CUSTOMER]: null,
+  [WELCOME_RIDER]: null,
 } as const;
 
 /**

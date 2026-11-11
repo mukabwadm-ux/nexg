@@ -7,6 +7,7 @@ const ALLOWED_NEXT = new Set([
   '/reset-password',
   '/reset-password?next=%2Fmerchant',
   '/reset-password?next=%2Fhost',
+  '/reset-password?next=%2Frider',
 ]);
 
 export function safeAuthNext(requested: string | null): string {

@@ -66,8 +66,8 @@ const STEPS = [
   {
     n: 6,
     key: 'step_session' as const,
-    title: 'Onboarding session',
-    body: '45 minutes at the hub or online: kit, hand-off rules, cash rules, safety.',
+    title: 'Onboarding session & rider kit',
+    body: '45 minutes at the hub: pay for and collect your NexG rider kit, then hand-off rules, cash rules, safety. Order the kit first in Rider kit.',
     href: '/rider/support',
     action: 'Book a slot',
   },
@@ -302,11 +302,14 @@ export function DashboardPending({
               </p>
               <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/10 pt-3">
                 <span className="text-[0.6875rem] font-semibold text-white/55">
-                  You get your bag and kit here
+                  Pay for and collect your NexG rider kit here
                 </span>
-                <span className="text-[0.6875rem] font-extrabold text-white/70">
-                  Kit deposit: KES {DASH}, refundable
-                </span>
+                <Link
+                  href="/rider/kit"
+                  className="text-[0.6875rem] font-extrabold text-white/80 underline underline-offset-2"
+                >
+                  Order your kit
+                </Link>
               </div>
               <Link
                 href="/rider/support"

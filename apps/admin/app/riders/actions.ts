@@ -62,6 +62,39 @@ export async function activateRider(riderId: string, reason: string): Promise<Re
   return { ok: true, message: 'Rider activated.' };
 }
 
+/** The rider paid for their kit in person, at the onboarding session. */
+export async function markRiderKitPaid(
+  riderId: string,
+  input: { method: string; amountKes: number | null; reference: string },
+): Promise<ReviewResult> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_rider_kit_mark_paid', {
+    p_rider_id: riderId,
+    p_method: input.method,
+    ...(input.amountKes !== null ? { p_amount_kes: input.amountKes } : {}),
+    ...(input.reference.trim() ? { p_reference: input.reference.trim() } : {}),
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath(`/riders/${riderId}`);
+  revalidatePath('/riders');
+  return { ok: true, message: 'Kit payment recorded.' };
+}
+
+/** The kit was handed over (collected or delivered). Refused until it is paid. */
+export async function issueRiderKit(riderId: string): Promise<ReviewResult> {
+  const supabase = createClient();
+  /* Name the deposit argument (as null) so the two-argument overload is
+     chosen unambiguously; the kit price is recorded with the payment. */
+  const { error } = await supabase.rpc('rpc_rider_issue_kit', {
+    p_rider_id: riderId,
+    p_deposit_kes: null as unknown as number,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath(`/riders/${riderId}`);
+  revalidatePath('/riders');
+  return { ok: true, message: 'Kit marked as handed over.' };
+}
+
 /*
  * An SOS is acknowledged by a named person, not by a link somebody
  * might follow by accident. A form post, so it cannot be triggered by a

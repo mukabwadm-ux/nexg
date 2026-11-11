@@ -1,18 +1,39 @@
 'use client';
 
 import { Button, Input, PhoneInput, useToast } from '@nexg/ui';
-import { Check, Clock, MessageCircle, Shield } from 'lucide-react';
+import { Check, Clock, MessageCircle, RefreshCw, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { Chip } from '@/components/onboarding/controls';
 import { ContinueButton, FooterNote } from '@/components/onboarding/shell-frame';
+import {
+  CODE_PATTERN,
+  EMAIL_PATTERN,
+  sendEmailCode,
+  verifyEmailCode,
+  type EmailCodeWording,
+} from '@/lib/email-code';
 import { createClient } from '@/lib/supabase/client';
-import { ensureApplicantSession } from '@/lib/uploads';
 
 import { RiderShell } from './rider-shell';
 import { useRiderOnboarding } from './store';
-import type { RiderDraft } from './types';
+import { VEHICLES, type RiderDraft, type Vehicle } from './types';
+
+const WORDING: EmailCodeWording = {
+  exists:
+    'This email already has a NexG account. Sign in at the rider sign-in page, or use a different email.',
+  signedInAs: (email) =>
+    `You are signed in as ${email}. Sign out to apply as a rider with a different email.`,
+};
+
+/** What the /riders card already asked, so nobody types it twice. */
+export interface RiderStartPrefill {
+  firstName?: string;
+  phone?: string;
+  cityId?: string;
+  vehicle?: string;
+}
 
 /**
  * Step 1 — a name, a number, and which city.
@@ -21,100 +42,132 @@ import type { RiderDraft } from './types';
  * whether this is worth their afternoon will not fill a form; they will fill
  * three fields and see what happens. Everything else is taps.
  */
-export function RiderStartStep({ fleetToken }: { fleetToken?: string | null }) {
+export function RiderStartStep({
+  fleetToken,
+  prefill = {},
+}: {
+  fleetToken?: string | null;
+  prefill?: RiderStartPrefill;
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const { draft, setDraft, cities, patch, flushNow } = useRiderOnboarding();
 
-  const [firstName, setFirstName] = React.useState(draft?.first_name ?? '');
-  const [phone, setPhone] = React.useState<string | null>(draft?.phone ?? null);
-  const [cityId, setCityId] = React.useState<string | null>(draft?.city_id ?? null);
+  const [firstName, setFirstName] = React.useState(draft?.first_name ?? prefill.firstName ?? '');
+  const [phone, setPhone] = React.useState<string | null>(draft?.phone ?? prefill.phone ?? null);
+  const [cityId, setCityId] = React.useState<string | null>(
+    draft?.city_id ?? (cities.some((c) => c.id === prefill.cityId) ? prefill.cityId! : null),
+  );
+  const [email, setEmail] = React.useState('');
   const [starting, setStarting] = React.useState(false);
   const [code, setCode] = React.useState('');
-  const [devCode, setDevCode] = React.useState<string | null>(null);
-  const [verified, setVerified] = React.useState(!!draft?.phone_verified_at);
+  const [codeSentTo, setCodeSentTo] = React.useState<{ userId: string; email: string } | null>(
+    null,
+  );
+  const [emailError, setEmailError] = React.useState<string | null>(null);
+  const [verified, setVerified] = React.useState(false);
   const [verifying, setVerifying] = React.useState(false);
+
+  /* Already confirmed on this device (a returning applicant): skip the code. */
+  React.useEffect(() => {
+    void createClient()
+      .auth.getUser()
+      .then(({ data }) => {
+        const user = data.user;
+        if (user && !user.is_anonymous && user.email && user.email_confirmed_at) {
+          setEmail(user.email);
+          setVerified(true);
+        }
+      });
+  }, []);
 
   const chosenCity = cities.find((c) => c.id === cityId) ?? null;
   const isWaitlist = chosenCity?.status === 'waitlist';
   const started = !!draft;
 
+  /*
+   * One button: send the email code. The first time, this also opens the
+   * application (an anonymous session, then the draft); the code confirms the
+   * email on that same session, so it becomes the rider's login.
+   */
   const start = async () => {
-    if (!firstName.trim() || !phone) {
+    const clean = email.trim().toLowerCase();
+    if (!firstName.trim() || !phone || !EMAIL_PATTERN.test(clean)) {
       toast({
-        title: 'We need two things',
-        description: 'Your first name and a phone number.',
+        title: 'We need three things',
+        description: 'Your first name, an M-Pesa phone number and your email.',
         tone: 'danger',
       });
       return;
     }
     setStarting(true);
-
-    const session = await ensureApplicantSession();
-    if (!session) {
-      setStarting(false);
-      toast({
-        title: 'We could not start a secure session',
-        description: 'Check your connection and try again.',
-        tone: 'danger',
-      });
-      return;
-    }
-
+    setEmailError(null);
     const supabase = createClient();
-    const { data: riderId, error } = await supabase.rpc('rpc_rider_start', {
-      p_first_name: firstName,
-      p_phone: phone,
-      p_city_id: cityId ?? undefined,
-      p_fleet_token: fleetToken ?? undefined,
-    });
+    try {
+      const sent = await sendEmailCode(supabase.auth, clean, WORDING);
 
-    if (error || !riderId) {
+      if (!draft) {
+        const { data: riderId, error } = await supabase.rpc('rpc_rider_start', {
+          p_first_name: firstName,
+          p_phone: phone,
+          p_city_id: cityId ?? undefined,
+          p_fleet_token: fleetToken ?? undefined,
+        });
+        if (error || !riderId)
+          throw new Error(error?.message ?? 'We could not save that. Try again.');
+        const vehicle = VEHICLES.find((v) => v.value === prefill.vehicle)?.value as
+          | Vehicle
+          | undefined;
+        if (vehicle)
+          await supabase.rpc('rpc_rider_set_vehicle', {
+            p_rider_id: riderId as string,
+            p_vehicle: vehicle,
+          });
+        const { data: row } = await supabase
+          .from('rider')
+          .select('*')
+          .eq('id', riderId as string)
+          .maybeSingle();
+        if (row) setDraft(row as unknown as RiderDraft);
+      }
+
+      if (sent.verified) setVerified(true);
+      else {
+        setCode('');
+        setCodeSentTo({ userId: sent.userId, email: clean });
+      }
+    } catch (error) {
+      setEmailError(
+        error instanceof Error ? error.message : 'We could not send a code. Try again.',
+      );
+    } finally {
       setStarting(false);
-      toast({
-        title: 'We could not save that',
-        description: error?.message ?? 'Try again.',
-        tone: 'danger',
-      });
-      return;
     }
-
-    const { data: row } = await supabase
-      .from('rider')
-      .select('*')
-      .eq('id', riderId as string)
-      .maybeSingle();
-    if (row) setDraft(row as unknown as RiderDraft);
-
-    const { data: sent } = await supabase.rpc('rpc_rider_request_phone_code', {
-      p_rider_id: riderId as string,
-    });
-    setStarting(false);
-
-    const result = sent as { verified?: boolean; code?: string } | null;
-    if (result?.verified) {
-      setVerified(true);
-      return;
-    }
-    setDevCode(result?.code ?? null);
   };
 
   const verify = async () => {
-    if (!draft) return;
-    setVerifying(true);
-    const supabase = createClient();
-    const { error } = await supabase.rpc('rpc_rider_verify_phone_code', {
-      p_rider_id: draft.id,
-      p_code: code,
-    });
-    setVerifying(false);
-
-    if (error) {
-      toast({ title: 'That did not work', description: error.message, tone: 'danger' });
+    if (!codeSentTo) return;
+    if (!CODE_PATTERN.test(code)) {
+      setEmailError('Enter the 6- or 8-digit code from the email.');
       return;
     }
-    setVerified(true);
-    await patch({ phone_verified_at: new Date().toISOString() } as Partial<RiderDraft>);
+    setVerifying(true);
+    setEmailError(null);
+    try {
+      await verifyEmailCode(
+        createClient().auth,
+        codeSentTo.userId,
+        codeSentTo.email,
+        code,
+        WORDING,
+      );
+      setVerified(true);
+      setCodeSentTo(null);
+    } catch (error) {
+      setEmailError(error instanceof Error ? error.message : 'That code did not work.');
+    } finally {
+      setVerifying(false);
+    }
   };
 
   const waitlist = async () => {
@@ -150,7 +203,7 @@ export function RiderStartStep({ fleetToken }: { fleetToken?: string | null }) {
       intro={
         isWaitlist
           ? 'We are not dispatching there yet. Save your details and you are first in line — early riders get the first onboarding slots.'
-          : 'Your name and phone are all we need to start. Everything else is a few taps, and you can switch to your phone to snap the documents.'
+          : 'Your name, phone and email are all we need to start. Your email becomes your rider login. Everything else is a few taps, and you can switch to your phone to snap the documents.'
       }
       footer={
         isWaitlist && started ? (
@@ -188,7 +241,7 @@ export function RiderStartStep({ fleetToken }: { fleetToken?: string | null }) {
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <p className="text-[0.9375rem] font-extrabold">About you</p>
           <p className="text-muted-light text-xs font-semibold">
-            No account · no password · no paperwork yet
+            Your email becomes your login · no paperwork yet
           </p>
         </div>
 
@@ -211,41 +264,95 @@ export function RiderStartStep({ fleetToken }: { fleetToken?: string | null }) {
           />
         </div>
 
-        {!started && (
-          <Button
-            className="mt-4"
-            loading={starting}
-            loadingText="Saving…"
-            disabled={!firstName.trim() || !phone}
-            onClick={() => void start()}
-          >
-            Send me a code
-          </Button>
+        <div className="mt-4 flex flex-wrap items-end gap-2">
+          <div className="min-w-0 flex-1 basis-64">
+            <Input
+              id="rider_email"
+              type="email"
+              label="Email — this becomes your rider login"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              disabled={verified || codeSentTo !== null}
+              required
+            />
+          </div>
+          {!verified && codeSentTo === null && (
+            <Button
+              className="mb-[3px] h-11"
+              loading={starting}
+              loadingText="Sending…"
+              disabled={!firstName.trim() || !phone || !EMAIL_PATTERN.test(email.trim())}
+              onClick={() => void start()}
+            >
+              Send email code
+            </Button>
+          )}
+        </div>
+
+        {codeSentTo && !verified && (
+          <div className="border-border bg-bg mt-4 rounded-xl border p-4">
+            <p className="text-[0.8125rem] font-semibold">
+              We sent a code to <strong className="break-all">{codeSentTo.email}</strong>. Enter it
+              to confirm your email.
+            </p>
+            <div className="mt-3 flex flex-wrap items-end gap-2">
+              <div className="w-40">
+                <Input
+                  id="rider_email_code"
+                  label="Code"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  maxLength={8}
+                  value={code}
+                  onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      void verify();
+                    }
+                  }}
+                />
+              </div>
+              <Button className="mb-[3px] h-11" loading={verifying} onClick={() => void verify()}>
+                Confirm
+              </Button>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-4">
+              <button
+                type="button"
+                onClick={() => void start()}
+                className="text-gold-text inline-flex items-center gap-1 text-xs font-bold underline underline-offset-4"
+              >
+                <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /> Send again
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCodeSentTo(null);
+                  setCode('');
+                  setEmailError(null);
+                }}
+                className="text-gold-text text-xs font-bold underline underline-offset-4"
+              >
+                Change email
+              </button>
+            </div>
+          </div>
         )}
 
-        {started && !verified && (
-          <div className="mt-4">
-            <CodeEntry
-              code={code}
-              onChange={setCode}
-              onVerify={() => void verify()}
-              verifying={verifying}
-              onResend={() => void start()}
-            />
-            {devCode && (
-              <p className="border-warning/40 bg-warning-bg text-warning mt-3 rounded-xl border p-3 text-xs font-bold leading-[1.7]">
-                SMS is not connected on this environment, so we cannot text you. Your code is{' '}
-                <strong className="font-mono text-sm tracking-widest">{devCode}</strong>. Once a
-                sender is configured this code only ever exists in the message.
-              </p>
-            )}
-          </div>
+        {emailError && (
+          <p role="alert" className="text-danger mt-3 text-[0.8125rem] font-bold">
+            {emailError}
+          </p>
         )}
 
         {verified && (
           <p className="border-success/30 bg-success-bg text-success mt-4 flex items-center gap-2 rounded-xl border p-3 text-[0.8125rem] font-bold">
             <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
-            Phone verified · progress saves automatically from here
+            Email confirmed · progress saves automatically from here
           </p>
         )}
       </div>
@@ -290,81 +397,5 @@ export function RiderStartStep({ fleetToken }: { fleetToken?: string | null }) {
         ))}
       </ul>
     </RiderShell>
-  );
-}
-
-/** Six boxes, one code. Pasting the whole thing fills them all. */
-function CodeEntry({
-  code,
-  onChange,
-  onVerify,
-  verifying,
-  onResend,
-}: {
-  code: string;
-  onChange: (next: string) => void;
-  onVerify: () => void;
-  verifying: boolean;
-  onResend: () => void;
-}) {
-  const digits = code.padEnd(6, ' ').slice(0, 6).split('');
-
-  React.useEffect(() => {
-    if (code.length === 6) onVerify();
-    // Verifying as the sixth digit lands: nobody wants to press a button
-    // after typing a code they were just given.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code]);
-
-  return (
-    <div className="max-w-sm">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <label htmlFor="rider_otp" className="text-[0.8125rem] font-bold">
-          Enter the code we texted
-        </label>
-        <span className="flex gap-3">
-          <button
-            type="button"
-            onClick={onResend}
-            className="text-gold-text text-xs font-bold underline underline-offset-4"
-          >
-            resend
-          </button>
-          <button
-            type="button"
-            onClick={onResend}
-            className="text-gold-text text-xs font-bold underline underline-offset-4"
-          >
-            get it on WhatsApp
-          </button>
-        </span>
-      </div>
-
-      <div className="relative mt-2">
-        <input
-          id="rider_otp"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          maxLength={6}
-          value={code}
-          disabled={verifying}
-          onChange={(event) => onChange(event.target.value.replace(/\D/g, '').slice(0, 6))}
-          className="absolute inset-0 h-full w-full cursor-pointer text-transparent caret-transparent opacity-0"
-          aria-label="Six digit code"
-        />
-        <div aria-hidden="true" className="pointer-events-none flex gap-2">
-          {digits.map((digit, index) => (
-            <span
-              key={index}
-              className={`border-border-strong bg-surface flex h-12 w-full max-w-[3rem] items-center justify-center rounded-xl border text-lg font-extrabold ${
-                index === code.length ? 'border-ink' : ''
-              }`}
-            >
-              {digit.trim()}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
   );
 }

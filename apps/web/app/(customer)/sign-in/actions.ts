@@ -214,6 +214,70 @@ export async function sendMerchantPasswordSetupLink(captchaToken?: string): Prom
 }
 
 /**
+ * The rider welcome email, after the application is submitted: the same
+ * single-use password setup link hosts and merchants get, worded for riders
+ * and returning to /rider. The rider confirmed this email with a code during
+ * the application, so it is their login from here on.
+ */
+export async function sendRiderPasswordSetupLink(captchaToken?: string): Promise<AuthResult> {
+  const supabase = createClient();
+  const { data: auth, error: authError } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (authError || !user || user.is_anonymous || !user.email || !user.email_confirmed_at)
+    return { ok: false, message: 'Verify your email before setting up a password.' };
+
+  const { data: home, error: homeError } = await supabase.rpc('fn_partner_home');
+  const partner = home as { kind?: string; id?: string } | null;
+  if (homeError || partner?.kind !== 'rider' || !partner.id)
+    return {
+      ok: false,
+      message: 'We could not find your rider application. Contact NexG support.',
+    };
+
+  const { data: rider, error: riderError } = await supabase
+    .from('rider')
+    .select('first_name, email, submitted_at')
+    .eq('id', partner.id)
+    .maybeSingle();
+  if (
+    riderError ||
+    !rider ||
+    !rider.submitted_at ||
+    rider.email?.trim().toLowerCase() !== user.email.trim().toLowerCase()
+  )
+    return {
+      ok: false,
+      message: 'We could not confirm the application for this email. Contact NexG support.',
+    };
+
+  await supabase.auth.updateUser({
+    data: welcomeMetadata({ firstName: rider.first_name, name: null }, 'rider'),
+  });
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nexgapp.com';
+  const redirectTo = new URL('/auth/callback', siteUrl);
+  redirectTo.searchParams.set('next', '/reset-password?next=%2Frider');
+  const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+    redirectTo: redirectTo.toString(),
+    captchaToken: cleanToken(captchaToken),
+  });
+  if (isCaptchaError(error)) return { ok: false, message: CAPTCHA_MESSAGE };
+  if (error) {
+    const rateLimited =
+      error.status === 429 || `${error.code ?? ''} ${error.message}`.toLowerCase().includes('rate');
+    return {
+      ok: false,
+      rateLimited,
+      message: rateLimited
+        ? 'Your welcome email is queued: we can send one email a minute to the same address.'
+        : 'Your application is in, but we could not send the welcome email. Use "Forgot password" on the rider sign-in page to get the link.',
+    };
+  }
+
+  return { ok: true, message: 'Check your inbox for your welcome email and password link.' };
+}
+
+/**
  * The host welcome email: the same single-use password setup link merchants
  * get, worded for hosts and returning to /host. Sent only once the applicant
  * has verified the email on their host record.

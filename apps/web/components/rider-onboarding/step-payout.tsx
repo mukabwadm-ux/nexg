@@ -71,7 +71,8 @@ export function RiderPayoutStep({ slots }: { slots: SlotOption[] }) {
       toast({ title: 'Not quite ready', description: error.message, tone: 'danger' });
       return;
     }
-    router.push('/riders/status');
+    /* The status page sends the welcome email with the password link. */
+    router.push('/riders/status?welcome=1');
   };
 
   return (

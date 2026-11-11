@@ -9,7 +9,11 @@ import { createClient } from '@/lib/supabase/server';
  */
 export const dynamic = 'force-dynamic';
 
-export default async function RiderApplyIndex() {
+export default async function RiderApplyIndex({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | undefined>;
+}) {
   const supabase = createClient();
 
   const { data } = await supabase
@@ -20,5 +24,16 @@ export default async function RiderApplyIndex() {
     .maybeSingle();
 
   if (data?.submitted_at) redirect('/riders/status');
-  redirect(riderPathForStep(data?.onboarding_step ?? 1));
+  if (!data) {
+    /* A new applicant from the /riders card: keep what they already typed. */
+    const keep = new URLSearchParams();
+    for (const key of ['first_name', 'phone', 'city', 'vehicle', 'invite'] as const) {
+      const value = searchParams?.[key];
+      if (typeof value === 'string' && value.length > 0 && value.length <= 100)
+        keep.set(key, value);
+    }
+    const query = keep.toString();
+    redirect(query ? `${riderPathForStep(1)}?${query}` : riderPathForStep(1));
+  }
+  redirect(riderPathForStep(data.onboarding_step ?? 1));
 }
