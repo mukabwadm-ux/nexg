@@ -212,12 +212,14 @@ export function Hero({
         </p>
         <h1
           aria-label={`${copy.titleLine1} ${copy.titleLine2}`}
-          className="mt-3 max-w-[40rem] text-[2.125rem] font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]"
+          className="mt-4 max-w-[40rem] text-[2.125rem] font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-[3.5rem]"
         >
           <span className="block">{copy.titleLine1}</span>
           <span className="text-gold block">{copy.titleLine2}</span>
         </h1>
-        <p className="mt-3 max-w-md text-[0.9375rem] text-white/85 sm:text-base">{copy.lede}</p>
+        <p className="mt-5 max-w-md text-[0.9375rem] leading-[1.7] text-white/85 sm:text-base">
+          {copy.lede}
+        </p>
 
         <HeroSearch
           copy={copy}
@@ -228,7 +230,7 @@ export function Hero({
         />
 
         {/* Popular searches */}
-        <div className="mt-5 flex flex-col gap-2.5 lg:flex-row lg:items-center lg:gap-3">
+        <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-3">
           <p className="text-[0.8125rem] font-semibold text-white/85">{copy.popular}</p>
           {/* One row: it scrolls sideways on a phone rather than taking two. */}
           <ul className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
@@ -249,7 +251,7 @@ export function Hero({
         <Link
           href="/ask"
           className={cn(
-            'focus-visible:ring-gold mt-5 flex h-12 items-center gap-3 rounded-full px-6 text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:text-base',
+            'focus-visible:ring-gold mt-8 flex h-12 items-center gap-3 rounded-full px-6 text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:text-base',
             /* Outlined on a phone, filled from sm up — as drawn. */
             'border-gold border-[1.5px] text-white sm:inline-flex sm:self-start sm:border-0 sm:bg-[#FFC93C] sm:text-[#141414] sm:hover:bg-[#FFD35F]',
           )}
@@ -560,7 +562,7 @@ function HeroSearch({
   let index = -1;
 
   return (
-    <div ref={boxRef} className="relative mt-5 max-w-[38rem]">
+    <div ref={boxRef} className="relative mt-8 max-w-[38rem]">
       <form
         role="search"
         onSubmit={(e) => {
