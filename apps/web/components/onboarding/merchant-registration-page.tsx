@@ -10,7 +10,7 @@ export function MerchantRegistrationPage({ children }: { children: React.ReactNo
     <div className={styles.page}>
       <header className={styles.header}>
         <Link href="/" aria-label="NexG home" className={styles.brand}>
-          <Logo className={styles.logo} priority />
+          <Logo className={styles.logo} priority themed />
         </Link>
         <nav className={styles.navigation} aria-label="Registration">
           <Link href="#merchant-benefits" className={styles.navLink}>

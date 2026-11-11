@@ -230,7 +230,7 @@ export function Catalogue({
                   </div>
                 </div>
 
-                <div className="from-bg to-border/40 relative flex w-28 shrink-0 items-center justify-center bg-gradient-to-br sm:w-32">
+                <div className="from-bg to-border/40 relative flex w-28 shrink-0 items-center justify-center bg-gradient-to-br sm:w-32 dark:from-[#F1ECE1]">
                   {item.photo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img

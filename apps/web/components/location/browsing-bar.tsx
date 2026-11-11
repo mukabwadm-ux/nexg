@@ -32,7 +32,7 @@ export function BrowsingBar({ citySlug }: { citySlug: string }) {
   };
 
   return (
-    <div className="text-ink flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-[#FAF7F0] px-5 py-4 sm:px-7 sm:py-5">
+    <div className="text-ink bg-surface flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl px-5 py-4 sm:px-7 sm:py-5">
       <MapPin aria-hidden="true" className="text-gold h-4 w-4 shrink-0" />
       <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-[0.2em]">
         Browsing

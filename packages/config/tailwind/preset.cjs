@@ -25,6 +25,12 @@ module.exports = {
       colors: {
         bg: channel('--bg-rgb'),
         surface: channel('--surface-rgb'),
+        /* Text and lines directly on the page; they turn light in the dark theme. */
+        page: {
+          DEFAULT: channel('--page-ink-rgb'),
+          muted: channel('--page-muted-rgb'),
+          line: channel('--page-line-rgb'),
+        },
         ink: channel('--ink-rgb'),
         gold: {
           DEFAULT: channel('--gold-rgb'),

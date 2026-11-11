@@ -301,7 +301,7 @@ export default async function ExplorePage({
       <SiteHeader />
 
       {/* Dark page, cream panels, gold accents; a warm glow in the top-right. */}
-      <div className="relative overflow-hidden bg-[#0b0907] text-white">
+      <div className="bg-bg text-page relative overflow-hidden">
         <span
           aria-hidden="true"
           className="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#E5B32A]/15 blur-3xl"
@@ -334,7 +334,7 @@ export default async function ExplorePage({
           </h1>
           {/* The lede on the left and the search on the right, on one row. */}
           <div className="mt-5 flex flex-wrap items-center justify-between gap-6">
-            <p className="max-w-xl text-base leading-[1.75] text-white/60 sm:text-lg">
+            <p className="text-page-muted max-w-xl text-base leading-[1.75] sm:text-lg">
               Merchants that deliver to {cityName} right now. Pick one, or ask a concierge and we’ll
               find it.
             </p>
@@ -351,11 +351,11 @@ export default async function ExplorePage({
                 defaultValue={searchParams?.q ?? ''}
                 aria-label="Search merchants"
                 placeholder="Search merchants"
-                className="text-ink placeholder:text-muted-light focus-visible:ring-gold h-12 min-w-0 flex-1 rounded-xl border-0 bg-[#FAF7F0] px-5 text-base focus-visible:outline-none focus-visible:ring-2"
+                className="text-ink placeholder:text-muted-light focus-visible:ring-gold border-border bg-surface h-12 min-w-0 flex-1 rounded-xl border px-5 text-base focus-visible:outline-none focus-visible:ring-2"
               />
               <button
                 type="submit"
-                className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold h-12 shrink-0 rounded-xl px-7 text-base font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0907]"
+                className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold focus-visible:ring-offset-bg h-12 shrink-0 rounded-xl px-7 text-base font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               >
                 Search
               </button>
@@ -391,13 +391,13 @@ export default async function ExplorePage({
                         className={`flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full transition-all ${
                           on
                             ? 'bg-gold text-ink ring-4 ring-[#E5B32A]/25'
-                            : 'text-ink bg-[#FAF7F0] group-hover:ring-2 group-hover:ring-[#E5B32A]/60'
+                            : 'text-ink bg-surface ring-border ring-1 group-hover:ring-2 group-hover:ring-[#E5B32A]/60'
                         }`}
                       >
                         <Icon className="h-6 w-6" />
                       </span>
                       <span
-                        className={`text-xs leading-tight ${on ? 'font-extrabold text-white' : 'font-semibold text-white/60 group-hover:text-white'}`}
+                        className={`text-xs leading-tight ${on ? 'text-page font-extrabold' : 'text-page-muted group-hover:text-page font-semibold'}`}
                       >
                         {label}
                       </span>
@@ -481,7 +481,7 @@ export default async function ExplorePage({
 
             <div>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-base font-bold text-white">
+                <p className="text-page text-base font-bold">
                   {visible.length}{' '}
                   {visible.length === 1 ? 'merchant delivers' : 'merchants deliver'}{' '}
                   {near
@@ -494,7 +494,7 @@ export default async function ExplorePage({
                 {near && (
                   <Link
                     href={hrefFor({ near: null })}
-                    className="text-xs font-bold text-white/60 transition-colors hover:text-white"
+                    className="text-page-muted hover:text-page text-xs font-bold transition-colors"
                   >
                     Show all in {cityName}
                   </Link>
@@ -502,7 +502,7 @@ export default async function ExplorePage({
                 {query && (
                   <Link
                     href={hrefFor({ q: null })}
-                    className="text-xs font-bold text-white/60 transition-colors hover:text-white"
+                    className="text-page-muted hover:text-page text-xs font-bold transition-colors"
                   >
                     Clear “{searchParams?.q}”
                   </Link>

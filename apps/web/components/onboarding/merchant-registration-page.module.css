@@ -1,7 +1,7 @@
 .page {
-  --registration-ink: var(--ink);
-  --registration-muted: var(--muted);
-  --registration-line: var(--border);
+  --registration-ink: var(--page-ink);
+  --registration-muted: var(--page-muted);
+  --registration-line: var(--page-line);
   min-height: 100dvh;
   padding: 0 clamp(20px, 5vw, 76px) 48px;
   color: var(--registration-ink);
@@ -107,7 +107,7 @@
   max-width: none;
   margin: 0;
   padding: 0;
-  color: var(--registration-ink);
+  color: var(--ink);
   font-family: inherit;
   --mo-ink: var(--ink);
   --mo-muted: var(--muted);
@@ -120,6 +120,11 @@
 
 .form :global(.merchant-onboarding .mo-topline) {
   display: none;
+}
+
+/* The footnote sits on the page below the form card, not inside it. */
+.form :global(.merchant-onboarding .mo-footnote) {
+  color: var(--registration-muted);
 }
 
 .form :global(.merchant-onboarding .mo-status .mo-kicker) {

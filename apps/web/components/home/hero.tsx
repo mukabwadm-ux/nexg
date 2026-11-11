@@ -40,6 +40,7 @@ import { POPULAR_SEARCH_TOPICS, rankPopularSearches, topicForSearch } from '@/li
 import { Logo } from '../logo';
 import { HeroVideo } from './hero-video';
 import { SiteMenu } from '../site-menu';
+import { ThemeToggle } from '../theme/theme';
 
 /**
  * The homepage hero: "Everything You Need. Wherever You Stay."
@@ -451,6 +452,7 @@ function HeroNav({
           <Link href="/sign-in" aria-label={copy.signIn} className={cn(round, 'hidden sm:flex')}>
             <User className="text-gold h-5 w-5" aria-hidden="true" fill="currentColor" />
           </Link>
+          <ThemeToggle className={round} />
           <SiteMenu locale={locale}>
             <button type="button" aria-label="Open menu" className={round}>
               <Menu className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />

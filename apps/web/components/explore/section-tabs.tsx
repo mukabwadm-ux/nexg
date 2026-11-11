@@ -50,7 +50,7 @@ export function SectionTabs({ sections }: { sections: { id: string; name: string
   return (
     <nav
       aria-label="Sections"
-      className="bg-bg/95 sticky top-[4.5rem] z-20 -mx-1 border-b border-[#E9E2D4] px-1 py-3 backdrop-blur"
+      className="bg-bg/95 dark:border-page-line sticky top-[4.5rem] z-20 -mx-1 border-b border-[#E9E2D4] px-1 py-3 backdrop-blur"
     >
       <div
         ref={rail}
