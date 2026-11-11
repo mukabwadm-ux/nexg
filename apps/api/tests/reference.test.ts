@@ -25,6 +25,7 @@ import { ENDPOINTS, endpointBySlug } from '../lib/reference/endpoints';
 import { DOCS_NAV, GUIDE_SECTIONS } from '../lib/reference/navigation';
 import { requestSamples } from '../lib/reference/samples';
 import type { EndpointDoc, HttpMethod } from '../lib/reference/types';
+import { V1_ROUTES } from '../lib/routes';
 
 /**
  * The API reference is only worth reading if it is true. These tests hold
@@ -102,6 +103,14 @@ describe('the registry matches the routes that exist', () => {
       ),
     );
     expect([...served].sort()).toEqual([...documented].sort());
+  });
+
+  it('gives the middleware a route table with exactly those routes and methods', () => {
+    // The middleware answers anything else under /v1 with a JSON 404 or 405,
+    // so a route missing from the table would be unreachable.
+    const table = V1_ROUTES.flatMap((r) => r.methods.map((m) => key(m, r.path)));
+    expect(new Set(table).size).toBe(table.length);
+    expect([...table].sort()).toEqual([...served].sort());
   });
 
   it.each(ENDPOINTS.map((e) => [e.slug, e] as const))(

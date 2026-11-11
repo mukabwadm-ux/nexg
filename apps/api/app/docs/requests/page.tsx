@@ -147,26 +147,31 @@ export default function RequestsPage() {
 
       <H2 id="caching">Caching</H2>
       <P>
-        Public data may come from a shared cache, so a change at NexG, such as a merchant closing
-        early, can take a minute or more to reach you. Your own orders and every error are never
-        cached.
+        Public data requested without a key may come from a shared cache, so a change at NexG, such
+        as a merchant closing early, can take a minute or more to reach you. A request that carries
+        a key is never answered from a cache: NexG checks the key and spends tokens every time. Your
+        own orders and every error are never cached.
       </P>
       <Table
-        head={['Endpoints', 'Cache-Control', 'Fresh for']}
+        head={['Requests', 'Cache-Control', 'Fresh for']}
         rows={[
           [
-            'Merchants, a merchant, experiences',
+            'Merchants, a merchant, experiences, without a key',
             <C key="c">public, s-maxage=60, stale-while-revalidate=300</C>,
             '60 seconds',
           ],
           [
-            'Zones, services',
+            'Zones, services, without a key',
             <C key="c">public, s-maxage=300, stale-while-revalidate=3600</C>,
             '5 minutes',
           ],
-          ['Your orders, every error', <C key="c">no-store</C>, 'Never cached'],
+          ['Anything with a key, your orders, every error', <C key="c">no-store</C>, 'Never cached'],
         ]}
       />
+      <P>
+        Shared answers carry <C>Vary: X-Api-Key, Authorization</C>, so a cache never hands one to a
+        request that sends a key.
+      </P>
 
       <H2 id="request-ids">Request ids</H2>
       <P>

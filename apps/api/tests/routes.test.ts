@@ -20,6 +20,7 @@ import { GET as listMerchants } from '../app/v1/catalog/merchants/route';
 import { GET as getMerchant } from '../app/v1/catalog/merchants/[id]/route';
 import { GET as listExperiences } from '../app/v1/experiences/route';
 import { GET as listZones } from '../app/v1/zones/route';
+import { GET as listServices } from '../app/v1/services/route';
 import { GET as listOrders } from '../app/v1/orders/route';
 import { GET as getOrder } from '../app/v1/orders/[id]/route';
 
@@ -401,5 +402,112 @@ describe('GET /v1/orders/{id}', () => {
     const res = await getOrder(get(`/v1/orders/${ORDER.order_id}`), params);
 
     expect(res.status).toBe(403);
+  });
+});
+
+/*
+ * Who may cache an answer (2026-11-11). Vercel's CDN answered cached public
+ * URLs without running the route, so a key sent as X-Api-Key was never
+ * checked there. Answers to requests without a key stay shareable and vary on
+ * the credential headers; answers to requests with a key are never stored
+ * and say how many tokens are left.
+ */
+describe('who may cache an answer', () => {
+  const merchantParams = { params: { id: MERCHANT.id } };
+  const publicReads: Array<[string, (request: Request) => Promise<Response>, string, string]> = [
+    [
+      '/v1/catalog/merchants',
+      (r) => listMerchants(r),
+      'public, s-maxage=60, stale-while-revalidate=300',
+      'list',
+    ],
+    [
+      `/v1/catalog/merchants/${MERCHANT.id}`,
+      (r) => getMerchant(r, merchantParams),
+      'public, s-maxage=60, stale-while-revalidate=300',
+      'merchant',
+    ],
+    [
+      '/v1/experiences',
+      (r) => listExperiences(r),
+      'public, s-maxage=60, stale-while-revalidate=300',
+      'list',
+    ],
+    ['/v1/zones', (r) => listZones(r), 'public, s-maxage=300, stale-while-revalidate=3600', 'list'],
+    [
+      '/v1/services',
+      (r) => listServices(r),
+      'public, s-maxage=300, stale-while-revalidate=3600',
+      'list',
+    ],
+  ];
+
+  function serve(kind: string) {
+    from.mockImplementation((table: string) =>
+      kind === 'merchant' && table === 'merchant_public'
+        ? fakeQuery({ data: MERCHANT, error: null }).builder
+        : fakeQuery({ data: [], error: null }).builder,
+    );
+  }
+
+  it.each(publicReads)(
+    '%s without a key is shareable and varies on the key',
+    async (path, route, cache, kind) => {
+      serve(kind);
+
+      const res = await route(get(path));
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('cache-control')).toBe(cache);
+      expect(res.headers.get('vary')).toBe('X-Api-Key, Authorization');
+      expect(res.headers.get('ratelimit-remaining')).toBeNull();
+    },
+  );
+
+  it.each(publicReads)(
+    '%s with a key is never stored and reports the tokens left',
+    async (path, route, _cache, kind) => {
+      serve(kind);
+
+      const res = await route(keyed(path));
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('cache-control')).toBe('no-store');
+      expect(res.headers.get('vary')).toBe('X-Api-Key, Authorization');
+      expect(res.headers.get('ratelimit-remaining')).toBe('50');
+      expect(rpc.mock.calls.some(([name]) => name === 'fn_api_key_lookup')).toBe(true);
+    },
+  );
+
+  it('reports the tokens left on order reads', async () => {
+    allowRequests(() => ({ data: { ok: true, items: [ORDER], next_cursor: null }, error: null }));
+
+    const list = await listOrders(keyed('/v1/orders'));
+    const one = await getOrder(keyed(`/v1/orders/${ORDER.order_id}`), {
+      params: { id: ORDER.order_id },
+    });
+
+    for (const res of [list, one]) {
+      expect(res.status).toBe(200);
+      expect(res.headers.get('cache-control')).toBe('no-store');
+      expect(res.headers.get('ratelimit-remaining')).toBe('50');
+    }
+  });
+
+  it('leaves the header out when the limiter does not report a count', async () => {
+    rpc.mockImplementation(async (name: string) => {
+      if (name === 'fn_api_key_lookup') return { data: [MERCHANT_KEY], error: null };
+      if (name === 'fn_api_request_spend') {
+        return { data: [{ allowed: true, retry_after: 0 }], error: null };
+      }
+      throw new Error(`unexpected rpc ${name}`);
+    });
+    serve('list');
+
+    const res = await listZones(keyed('/v1/zones'));
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('ratelimit-remaining')).toBeNull();
   });
 });

@@ -96,8 +96,8 @@ export default function ErrorsPage() {
           ],
           [
             <C key="c">method_not_allowed</C>,
-            'Reserved. The API does not send it today.',
-            'An unsupported method gets an empty 405 instead; see below.',
+            'The endpoint exists but does not accept that method.',
+            'Use a method from the Allow header.',
           ],
         ]}
       />
@@ -110,12 +110,12 @@ export default function ErrorsPage() {
           ['400', 'invalid_request.', 'No. Fix the request.'],
           ['401', 'The key was refused.', 'No. Replace the key.'],
           ['403', 'The key lacks the scope, or no key was sent where one is needed.', 'No'],
+          ['404', 'not_found: no such record, or no endpoint at that path.', 'No'],
           [
-            '404',
-            'not_found: no such record. A path that does not exist is also 404, with a web page instead of JSON.',
+            '405',
+            'method_not_allowed: the path exists but not for that method. Allow lists the methods it accepts.',
             'No',
           ],
-          ['405', 'The path exists but not for that method. The body is empty.', 'No'],
           ['429', 'rate_limited.', 'Yes, after Retry-After'],
           ['500', 'internal_error. NexG logs the request id.', 'Yes, with backoff'],
           ['503', 'internal_error: NexG could not check the key or the limit.', 'Yes, with backoff'],

@@ -55,7 +55,9 @@ function cacheText(endpoint: EndpointDoc) {
   if (!endpoint.cache) return 'Not cached';
   if (endpoint.cache === 'no-store') return 'Never cached';
   const match = /s-maxage=(\d+)/.exec(endpoint.cache);
-  return match ? `Shared caches, ${match[1]} seconds` : endpoint.cache;
+  return match
+    ? `Without a key: shared caches, ${match[1]} seconds. With a key: never cached.`
+    : endpoint.cache;
 }
 
 export default function EndpointPage({ params }: { params: { slug: string } }) {

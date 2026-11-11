@@ -23,6 +23,11 @@ export interface ApiCredential {
   anonymous: boolean;
 }
 
+export interface RateLimitResult {
+  /** Whole tokens left in the bucket after this request, when the database reports it. */
+  remaining: number | null;
+}
+
 export class ApiAuthError extends Error {
   constructor(
     message: string,
@@ -140,7 +145,7 @@ export async function enforceRateLimit(
   credential: ApiCredential,
   request: Request,
   operation: ApiOperation = 'public_read',
-): Promise<void> {
+): Promise<RateLimitResult> {
   const { data, error } = await apiClient(true).rpc('fn_api_request_spend', {
     p_raw_key: credential.anonymous ? null : credential.rawKey,
     p_anonymous_ip: credential.anonymous ? trustedAnonymousIp(request) : null,
@@ -155,6 +160,7 @@ export async function enforceRateLimit(
   const result = (Array.isArray(data) ? data[0] : data) as {
     allowed?: unknown;
     retry_after?: unknown;
+    remaining?: unknown;
   } | null;
   if (
     !result ||
@@ -174,4 +180,11 @@ export async function enforceRateLimit(
       Math.max(1, Math.ceil(result.retry_after)),
     );
   }
+  const remaining =
+    typeof result.remaining === 'number' &&
+    Number.isInteger(result.remaining) &&
+    result.remaining >= 0
+      ? result.remaining
+      : null;
+  return { remaining };
 }

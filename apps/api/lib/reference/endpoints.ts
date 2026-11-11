@@ -678,7 +678,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     title: 'Book a service',
     summary: 'A merchant books a transfer, courier or venue for its guests, priced by NexG.',
     description: [
-      'Designed for a business that books NexG services for its own guests: a hotel or tour company booking an airport transfer, for example. The database function behind it exists; the HTTP route is not served yet, so a POST to /v1/orders returns 405 today.',
+      'Designed for a business that books NexG services for its own guests: a hotel or tour company booking an airport transfer, for example. The database function behind it exists; the HTTP route is not served yet, so a POST to /v1/orders answers 405 method_not_allowed today.',
       'You say what and how many; NexG works out the price from its fee settings, the same way checkout does. A request can never state a price. The total is frozen on the order when it is placed.',
       'Every booking needs an Idempotency-Key header. A retry with the same key returns the first answer instead of booking twice.',
     ],
