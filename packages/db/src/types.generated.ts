@@ -51670,6 +51670,14 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_delivery_rate: {
+        Args: { p_city_slug: string };
+        Returns: {
+          base: number;
+          max_km: number;
+          per_km: number;
+        }[];
+      };
       rpc_deposit_match_manual: {
         Args: { p_deposit_id: string; p_rider_id: string };
         Returns: {

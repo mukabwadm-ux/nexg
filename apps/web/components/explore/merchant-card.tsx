@@ -1,4 +1,4 @@
-import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
+import { Button } from '@nexg/ui';
 import {
   Activity,
   BellRing,
@@ -23,6 +23,10 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+
+import type { DeliveryRate } from '@/lib/delivery-fee';
+
+import { DeliveryFee } from './delivery-fee';
 
 export const CATEGORY_LABEL: Record<string, string> = {
   restaurant: 'Food',
@@ -157,6 +161,11 @@ export interface ExploreMerchant {
   concierge_pick: boolean | null;
   featured: boolean | null;
   accepting_orders: boolean | null;
+  /** The branch's pin, to price delivery from the visitor's spot. */
+  branch_latitude?: number | null;
+  branch_longitude?: number | null;
+  /** Minutes the merchant takes to prepare an order, when they have set it. */
+  prep_minutes?: number | null;
   /** A stand-in shown until real merchants go live; not linkable. */
   placeholder?: boolean;
 }
@@ -185,7 +194,17 @@ export const TAXONOMY_CATEGORIES = [
   'adults_only',
 ] as const;
 
-export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
+/** "[Westlands Kitchen]" -> "Westlands Kitchen": some names were entered in brackets. */
+const unbracket = (text: string) => text.replace(/[[\]]/g, '').trim() || text;
+
+export function MerchantCard({
+  merchant,
+  deliveryRate = null,
+}: {
+  merchant: ExploreMerchant;
+  /** The city's delivery rate card (rpc_delivery_rate); null hides the price. */
+  deliveryRate?: DeliveryRate | null;
+}) {
   const category = merchant.category_key ?? merchant.category ?? 'other';
   const Icon =
     CATEGORY_ICON[category] ?? CATEGORY_ICON_BY_NAME[merchant.category_icon_name ?? ''] ?? Store;
@@ -193,6 +212,10 @@ export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
   const placeholder = merchant.placeholder === true;
   const Wrapper = placeholder ? 'div' : Link;
   const wrapperProps = placeholder ? {} : { href: `/explore/${merchant.id}` };
+  const prepMinutes =
+    merchant.prep_minutes != null && merchant.prep_minutes > 0
+      ? Math.round(merchant.prep_minutes)
+      : null;
 
   return (
     <li className="border-border bg-surface shadow-card hover:shadow-raised group overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-0.5">
@@ -231,30 +254,44 @@ export function MerchantCard({ merchant }: { merchant: ExploreMerchant }) {
           )}
 
           {/*
-           * Delivery time is a business number and none is recorded, so it is
-           * bracketed rather than estimated (ground rule 3).
+           * The merchant's own preparation time. Not every merchant sets one
+           * (services and businesses that do not prepare orders), and then
+           * there is no badge rather than a guess (ground rule 3).
            */}
-          <span className="bg-ink absolute bottom-3 right-3 z-10 rounded-lg px-2.5 py-1 text-[0.6875rem] font-bold text-white">
-            {VALUE_PLACEHOLDER} min
-          </span>
+          {prepMinutes && (
+            <span
+              className="bg-ink absolute bottom-3 right-3 z-10 rounded-lg px-2.5 py-1 text-[0.6875rem] font-bold text-white"
+              title="Preparation time set by the merchant"
+            >
+              {prepMinutes} min
+            </span>
+          )}
         </div>
 
         <div className="p-4">
-          <p className="truncate text-[0.9375rem] font-extrabold">{merchant.trading_name}</p>
+          <p className="truncate text-[0.9375rem] font-extrabold">
+            {unbracket(merchant.trading_name)}
+          </p>
           <p className="text-muted-light mt-0.5 truncate text-xs font-semibold">
             {merchant.category_other ??
               merchant.category_label ??
               CATEGORY_LABEL[category] ??
               category}
-            {merchant.branch_name && ` Â· ${merchant.branch_name}`}
+            {merchant.branch_name && ` · ${unbracket(merchant.branch_name)}`}
           </p>
         </div>
       </Wrapper>
 
       <div className="flex items-center justify-between gap-3 px-4 pb-4">
-        <span className="text-muted-light text-xs font-semibold">
-          Delivery from KES {VALUE_PLACEHOLDER}
-        </span>
+        {placeholder ? (
+          <span />
+        ) : (
+          <DeliveryFee
+            rate={deliveryRate}
+            lat={merchant.branch_latitude ?? null}
+            lng={merchant.branch_longitude ?? null}
+          />
+        )}
         {placeholder ? (
           <Button variant="gold" size="sm" disabled>
             Coming soon

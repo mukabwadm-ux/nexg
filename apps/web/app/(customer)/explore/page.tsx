@@ -19,6 +19,7 @@ import { ExploreFollowsLocation } from '@/components/location/explore-sync';
 import { SiteHeader } from '@/components/site-header';
 import { unstable_cache } from 'next/cache';
 
+import type { DeliveryRate } from '@/lib/delivery-fee';
 import { createPublicClient } from '@/lib/supabase/public';
 import { TimeOfDayPhrase } from '@/components/time-of-day-phrase';
 import { nairobiHour, timeOfDay } from '@/lib/time-of-day';
@@ -44,7 +45,7 @@ const listingFor = unstable_cache(
       supabase
         .from('merchant_public')
         .select(
-          'id, trading_name, category, category_key, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, zone_id, concierge_pick, featured, accepting_orders, explore_visible, listed_at',
+          'id, trading_name, category, category_key, category_other, cover_photo_path, branch_name, branch_address, branch_latitude, branch_longitude, city_name, city_slug, zone_id, concierge_pick, featured, accepting_orders, explore_visible, listed_at, prep_minutes',
         )
         .order('listed_at', { ascending: false }),
       supabase
@@ -71,6 +72,27 @@ const listingFor = unstable_cache(
   },
   ['explore-listing'],
   { revalidate: 3600, tags: ['merchants'] },
+);
+
+/*
+ * The city's delivery rate card (base, per km, max km), so each card can
+ * show what delivery costs from the visitor's spot, priced the way checkout
+ * charges it. Five minutes, so a rate change in Admin shows up soon. Null
+ * when it cannot be read: the cards then leave the price out.
+ */
+const deliveryRateFor = unstable_cache(
+  async (citySlug: string): Promise<DeliveryRate | null> => {
+    const { data, error } = await createPublicClient().rpc('rpc_delivery_rate', {
+      p_city_slug: citySlug,
+    });
+    const row = data?.[0];
+    if (error || !row || row.base == null || row.per_km == null || row.max_km == null) {
+      return null;
+    }
+    return { base: Number(row.base), perKm: Number(row.per_km), maxKm: Number(row.max_km) };
+  },
+  ['explore-delivery-rate'],
+  { revalidate: 300 },
 );
 
 /*
@@ -133,6 +155,7 @@ export default async function ExplorePage({
   }
   const categories = categoriesRaw ?? [];
   const categoriesById = new Map(categories.map((category) => [category.category, category]));
+  const deliveryRate = await deliveryRateFor(citySlug).catch(() => null);
   const cityName = cities?.find((c) => c.slug === citySlug)?.name ?? 'your city';
   const cityId = cities?.find((c) => c.slug === citySlug)?.id;
   const selectedZone =
@@ -505,7 +528,11 @@ export default async function ExplorePage({
             ) : (
               <ul className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {visible.map((merchant) => (
-                  <MerchantCard key={merchant.id} merchant={merchant as ExploreMerchant} />
+                  <MerchantCard
+                    key={merchant.id}
+                    merchant={merchant as ExploreMerchant}
+                    deliveryRate={deliveryRate}
+                  />
                 ))}
               </ul>
             )}
