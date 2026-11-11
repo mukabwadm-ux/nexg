@@ -26,12 +26,12 @@ const COLUMNS: { key: string; links: FooterLink[] }[] = [
   {
     key: 'footer.company',
     links: [
-      { key: 'footer.about' },
-      { key: 'footer.howWeWork' },
-      { key: 'footer.blog' },
+      { key: 'footer.about', href: '/about' },
+      { key: 'footer.howWeWork', href: '/how-we-work' },
+      { key: 'footer.blog', href: '/blog' },
       /* The API reference and developer console (apps/api). */
       { key: 'footer.developers', href: 'https://api.nexgapp.com', external: true },
-      { key: 'footer.affiliate' },
+      { key: 'footer.affiliate', href: '/affiliate' },
     ],
   },
   {
