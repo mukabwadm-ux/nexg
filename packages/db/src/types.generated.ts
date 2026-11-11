@@ -25585,6 +25585,25 @@ export type Database = {
           },
         ];
       };
+      popular_search_count: {
+        Row: {
+          day: string;
+          searches: number;
+          topic: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          day?: string;
+          searches?: number;
+          topic: string;
+        };
+        Update: {
+          day?: string;
+          searches?: number;
+          topic?: string;
+        };
+        Relationships: [];
+      };
       property: {
         Row: {
           amenities: string[];
@@ -55444,6 +55463,14 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_popular_search_hit: { Args: { p_topic: string }; Returns: undefined };
+      rpc_popular_search_ranking: {
+        Args: { p_days?: number };
+        Returns: {
+          searches: number;
+          topic: string;
+        }[];
       };
       rpc_price_flag_resolve: {
         Args: { p_action: string; p_flag_id: string };

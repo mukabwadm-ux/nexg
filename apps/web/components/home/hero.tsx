@@ -6,20 +6,26 @@ import {
   ArrowRight,
   BedDouble,
   ChevronDown,
+  Compass,
   Flower2,
   Gem,
+  Gift,
   Headphones,
   MapPin,
   Menu,
+  Pill,
   Plane,
   Search,
+  Shirt,
   ShieldCheck,
+  ShoppingBasket,
   Sparkles,
   Store,
   CalendarDays,
   User,
   UtensilsCrossed,
   Wallet,
+  Wine,
   Zap,
   type LucideIcon,
 } from 'lucide-react';
@@ -29,6 +35,7 @@ import * as React from 'react';
 
 import type { SearchGroup, SearchItem } from '@/app/api/search/route';
 import type { Locale } from '@/lib/i18n/dictionaries';
+import { POPULAR_SEARCH_TOPICS, rankPopularSearches, topicForSearch } from '@/lib/popular-searches';
 
 import { Logo } from '../logo';
 import { HeroVideo } from './hero-video';
@@ -49,7 +56,9 @@ import { SiteMenu } from '../site-menu';
  *     it is the exact spot, read when the page opened.
  *   - the search answers from the third letter (/api/search) and Enter
  *     with nothing highlighted goes to Explore with the query.
- *   - popular searches and "Plan your trip" go where they say.
+ *   - popular searches are the four most searched topics of the last 30
+ *     days (lib/popular-searches.ts); they and "Plan your trip" go where
+ *     they say.
  */
 
 export interface HeroCopy {
@@ -86,6 +95,41 @@ const FEATURES: { icon: LucideIcon; title: string; body: string }[] = [
   { icon: Gem, title: 'NexG Plus', body: 'Exclusive access and priority service' },
 ];
 
+const TOPIC_ICON: Record<string, LucideIcon> = {
+  airport: Plane,
+  stays: BedDouble,
+  spa: Flower2,
+  restaurants: UtensilsCrossed,
+  groceries: ShoppingBasket,
+  pharmacy: Pill,
+  drinks: Wine,
+  flowers: Gift,
+  laundry: Shirt,
+  trip: Compass,
+};
+
+/**
+ * Count a hero search against its topic, at most once per topic per browser
+ * per day, without holding up the navigation. Only the topic is sent, never
+ * the words; a search that fits no topic is not sent at all.
+ */
+function recordSearch(query: string) {
+  const topic = topicForSearch(query);
+  if (!topic || typeof navigator === 'undefined') return;
+  const today = new Date().toISOString().slice(0, 10);
+  const key = `nexg.search-hit.${topic}`;
+  try {
+    if (window.localStorage.getItem(key) === today) return;
+    window.localStorage.setItem(key, today);
+  } catch {
+    /* Private mode or storage blocked: count it anyway. */
+  }
+  const body = JSON.stringify({ topic });
+  if (!navigator.sendBeacon?.('/api/search-hit', new Blob([body], { type: 'application/json' }))) {
+    void fetch('/api/search-hit', { method: 'POST', body, keepalive: true }).catch(() => undefined);
+  }
+}
+
 const KIND_ICON: Record<SearchItem['kind'], LucideIcon> = {
   service: Sparkles,
   merchant: Store,
@@ -94,7 +138,18 @@ const KIND_ICON: Record<SearchItem['kind'], LucideIcon> = {
   event: CalendarDays,
 };
 
-export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[]; locale: Locale }) {
+export function Hero({
+  copy,
+  cities,
+  locale,
+  popularTopics,
+}: {
+  copy: HeroCopy;
+  cities: City[];
+  locale: Locale;
+  /** Topic ids, most searched first (rankPopularSearches). */
+  popularTopics?: string[];
+}) {
   const { place, chip, openSheet, sheetOpen } = useLocation();
   const router = useRouter();
   /* The city the search is scoped to: the one in the location pill. The
@@ -114,20 +169,17 @@ export function Hero({ copy, cities, locale }: { copy: HeroCopy; cities: City[];
   /* No exact spot yet: nothing at all, or only the connection's guess. */
   const needsSpot = chip === 'empty' || chip === 'city';
 
-  const popular: { icon: LucideIcon; label: string; href: string }[] = [
-    { icon: Plane, label: 'Airport pickup', href: '/ask?need=Airport%20Transfer' },
-    { icon: BedDouble, label: 'Hotel stays', href: '/stays' },
-    {
-      icon: Flower2,
-      label: 'Massage & spa',
-      href: `/explore?city=${citySlug}&category=beauty_fashion`,
-    },
-    {
-      icon: UtensilsCrossed,
-      label: 'Restaurants near me',
-      href: `/explore?city=${citySlug}&category=restaurant`,
-    },
-  ];
+  const popular = (popularTopics ?? rankPopularSearches()).flatMap((id) => {
+    const topic = POPULAR_SEARCH_TOPICS.find((t) => t.id === id);
+    if (!topic) return [];
+    return [
+      {
+        icon: TOPIC_ICON[id] ?? Search,
+        label: topic.label,
+        href: topic.href ?? `/explore?city=${citySlug}&category=${topic.category}`,
+      },
+    ];
+  });
 
   return (
     <section className="relative isolate z-50 flex min-h-[100svh] flex-col overflow-hidden bg-[#0b0907] text-white">
@@ -499,6 +551,7 @@ function HeroSearch({
     } else if (e.key === 'Enter') {
       e.preventDefault();
       const chosen = active >= 0 ? items[active] : undefined;
+      recordSearch(term);
       if (chosen) router.push(chosen.href);
       else onSubmit(term);
     }
@@ -512,6 +565,7 @@ function HeroSearch({
         role="search"
         onSubmit={(e) => {
           e.preventDefault();
+          recordSearch(term);
           onSubmit(term);
         }}
         className="sm:focus-within:ring-gold flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:bg-white sm:p-1.5 sm:shadow-2xl sm:focus-within:ring-2"
@@ -584,7 +638,10 @@ function HeroSearch({
                       role="option"
                       aria-selected={active === i}
                       onMouseEnter={() => setActive(i)}
-                      onClick={() => setOpen(false)}
+                      onClick={() => {
+                        recordSearch(term);
+                        setOpen(false);
+                      }}
                       className={cn(
                         'flex items-center gap-3 rounded-xl px-3 py-2.5',
                         active === i ? 'bg-[#F6F3EC]' : 'hover:bg-[#F6F3EC]',
@@ -610,7 +667,10 @@ function HeroSearch({
           {items.length > 0 && (
             <button
               type="button"
-              onClick={() => onSubmit(term)}
+              onClick={() => {
+                recordSearch(term);
+                onSubmit(term);
+              }}
               className="mt-1 w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-[#9a7414] hover:bg-[#F6F3EC]"
             >
               See everything for “{term}” →

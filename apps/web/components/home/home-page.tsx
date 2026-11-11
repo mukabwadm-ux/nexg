@@ -14,6 +14,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { BEST_SELLERS, bestSellerFromCatalogue, type BestSeller } from '@/lib/best-sellers';
 import { categoryTiles } from '@/lib/categories';
 import { translator, type Locale, type Translate } from '@/lib/i18n/dictionaries';
+import { rankPopularSearches } from '@/lib/popular-searches';
 import { createPublicClient } from '@/lib/supabase/public';
 
 const getHomeData = unstable_cache(
@@ -65,6 +66,21 @@ const getTileTaps = unstable_cache(
     );
   },
   ['homepage-tile-taps'],
+  { revalidate: 300 },
+);
+
+/* Hero searches per topic over the last 30 days, for the Popular searches
+   buttons. Refreshed every five minutes; if it cannot be read, the buttons
+   keep their usual order. */
+const getSearchCounts = unstable_cache(
+  async (): Promise<Record<string, number>> => {
+    const { data, error } = await createPublicClient().rpc('rpc_popular_search_ranking', {
+      p_days: 30,
+    });
+    if (error || !data) return {};
+    return Object.fromEntries(data.map((row) => [row.topic, Number(row.searches)]));
+  },
+  ['homepage-search-counts'],
   { revalidate: 300 },
 );
 
@@ -132,11 +148,13 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const [{ cities: allCities, zones, featured }, tileTaps, liveBestSellers] = await Promise.all([
-    getHomeData(),
-    getTileTaps(),
-    getBestSellers().catch(() => [] as BestSeller[]),
-  ]);
+  const [{ cities: allCities, zones, featured }, tileTaps, liveBestSellers, searchCounts] =
+    await Promise.all([
+      getHomeData(),
+      getTileTaps(),
+      getBestSellers().catch(() => [] as BestSeller[]),
+      getSearchCounts().catch(() => ({}) as Record<string, number>),
+    ]);
   const supabase = createPublicClient();
   const { data: categoryRows, error: categoryError } = await supabase
     .from('category_config')
@@ -161,6 +179,7 @@ export async function HomePageContent({
     <>
       <Hero
         locale={locale}
+        popularTopics={rankPopularSearches(searchCounts)}
         cities={
           openCities.length > 0
             ? openCities.map((c) => ({ slug: c.slug, name: c.name }))
