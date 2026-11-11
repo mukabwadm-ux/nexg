@@ -195,6 +195,31 @@ jobs:
         if: always()
         run: supabase stop --no-backup
 
+  discovery-engine:
+    name: Discovery engine
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # The engine is its own npm project and needs Node 24 (its package.json engines field).
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: discovery/discovery-engine/package-lock.json
+
+      - name: Install
+        run: npm ci --prefix discovery/discovery-engine --no-audit --no-fund
+
+      - name: Check the icon pins are current
+        run: node discovery/discovery-engine/scripts/pin-web-icons.mjs --check
+
+      - name: Typecheck, test and build
+        run: npm --prefix discovery/discovery-engine run check
+
   e2e:
     name: Playwright
     runs-on: ubuntu-latest
