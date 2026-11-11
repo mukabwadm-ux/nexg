@@ -27842,6 +27842,7 @@ export type Database = {
           created_at: string;
           current_order_reference: string | null;
           device_fingerprint: string | null;
+          email: string | null;
           employer_merchant_id: string | null;
           face_photo_path: string | null;
           first_name: string;
@@ -27919,6 +27920,7 @@ export type Database = {
           created_at?: string;
           current_order_reference?: string | null;
           device_fingerprint?: string | null;
+          email?: string | null;
           employer_merchant_id?: string | null;
           face_photo_path?: string | null;
           first_name: string;
@@ -27995,6 +27997,7 @@ export type Database = {
           created_at?: string;
           current_order_reference?: string | null;
           device_fingerprint?: string | null;
+          email?: string | null;
           employer_merchant_id?: string | null;
           face_photo_path?: string | null;
           first_name?: string;
@@ -29135,6 +29138,140 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      rider_kit_order: {
+        Row: {
+          created_at: string;
+          delivery_address: string | null;
+          hand_over: string;
+          issued_at: string | null;
+          paid_amount_kes: number | null;
+          paid_at: string | null;
+          paid_method: string | null;
+          paid_recorded_by: string | null;
+          paid_reference: string | null;
+          price_kes: number | null;
+          rider_id: string;
+          status: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          delivery_address?: string | null;
+          hand_over: string;
+          issued_at?: string | null;
+          paid_amount_kes?: number | null;
+          paid_at?: string | null;
+          paid_method?: string | null;
+          paid_recorded_by?: string | null;
+          paid_reference?: string | null;
+          price_kes?: number | null;
+          rider_id: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          delivery_address?: string | null;
+          hand_over?: string;
+          issued_at?: string | null;
+          paid_amount_kes?: number | null;
+          paid_at?: string | null;
+          paid_method?: string | null;
+          paid_recorded_by?: string | null;
+          paid_reference?: string | null;
+          price_kes?: number | null;
+          rider_id?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_kit_order_paid_recorded_by_fkey';
+            columns: ['paid_recorded_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_rider_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'dispatch_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'finance_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_fleet_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_app_me_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_cash_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_home_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_kit_order_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
           },
         ];
       };
@@ -50055,6 +50192,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      fn_rider_kit_require_paid: { Args: { p_rider_id: string }; Returns: undefined };
       fn_rider_mine: { Args: { p_rider_id: string }; Returns: string };
       fn_rider_readiness: { Args: { p_rider_id: string }; Returns: Json };
       fn_rider_required_docs: {
@@ -56135,6 +56273,15 @@ export type Database = {
               isSetofReturn: false;
             };
           };
+      rpc_rider_kit_mark_paid: {
+        Args: { p_amount_kes?: number; p_method: string; p_reference?: string; p_rider_id: string };
+        Returns: Json;
+      };
+      rpc_rider_kit_order: {
+        Args: { p_delivery_address?: string; p_hand_over: string; p_rider_id: string };
+        Returns: Json;
+      };
+      rpc_rider_kit_status: { Args: { p_rider_id: string }; Returns: Json };
       rpc_rider_live_location: { Args: { p_reason?: string; p_rider_id: string }; Returns: Json };
       rpc_rider_log_call: {
         Args: { p_note: string; p_rider_id: string };

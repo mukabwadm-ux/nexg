@@ -4,6 +4,7 @@ import {
   Calendar,
   FileText,
   Heart,
+  Package,
   HelpCircle,
   LayoutDashboard,
   MessageSquare,
@@ -99,6 +100,7 @@ export function riderNav({
       badge: documentsToDo > 0 ? documentsToDo : null,
       tone: 'danger',
     },
+    { href: '/rider/kit', label: 'Rider kit', icon: i(<Package className="h-4 w-4" />) },
     {
       href: '/rider/incidents',
       label: 'Incidents',

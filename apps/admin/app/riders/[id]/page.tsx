@@ -10,6 +10,7 @@ import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { DocumentReview, type ReviewDocument } from '@/components/document-review';
 import { RiderRecordPanel, type RiderRecord } from '@/components/rider-record';
+import { RiderKitPanel, type RiderKitStatus } from '@/components/riders/rider-kit-panel';
 import { requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -29,6 +30,8 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
   // RLS already limits this to the cities this account covers, so "not found"
   // and "not yours" are deliberately the same answer.
   if (!rider) notFound();
+
+  const { data: kit } = await supabase.rpc('rpc_rider_kit_status', { p_rider_id: params.id });
 
   const [{ data: requirements }, { data: documents }, { data: readiness }, { data: employer }] =
     await Promise.all([
@@ -182,11 +185,8 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
               <h2 className="text-sm font-extrabold uppercase tracking-wide">Applicant</h2>
               <dl className="mt-3 space-y-2 text-sm">
                 {[
-                  ['Phone', rider.phone],
-                  [
-                    'Phone verified',
-                    rider.phone_verified_at ? 'Yes, by code' : 'No — confirm on the call',
-                  ],
+                  ['Phone (M-Pesa)', rider.phone],
+                  ['Email (login)', rider.email ?? '— not submitted yet'],
                   ['City', city?.name ?? '—'],
                   ['Vehicle', rider.vehicle ?? '— not chosen'],
                   ['Plate', rider.plate_no ?? '—'],
@@ -198,6 +198,8 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
                 ))}
               </dl>
             </Card>
+
+            <RiderKitPanel riderId={params.id} status={kit as unknown as RiderKitStatus | null} />
 
             <ActivatePanel
               kind="rider"

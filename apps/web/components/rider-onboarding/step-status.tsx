@@ -6,6 +6,7 @@ import Link from 'next/link';
 import * as React from 'react';
 
 import { RiderPreview } from './rider-preview';
+import { RiderWelcome } from './rider-welcome';
 import { useRiderOnboarding } from './store';
 
 export interface RiderStatusFacts {
@@ -45,11 +46,11 @@ export function RiderStatusStep({ facts }: { facts: RiderStatusFacts }) {
     },
     {
       title: facts.slot
-        ? `Kit & onboarding · ${formatWhen(facts.slot.startsAt)}`
-        : 'Kit & onboarding',
+        ? `Rider kit & onboarding · ${formatWhen(facts.slot.startsAt)}`
+        : 'Rider kit & onboarding',
       body: facts.slot
-        ? `${facts.slot.hub} · 45 minutes · bring your phone and bike.`
-        : 'Rider ops will call you to arrange a time at the hub.',
+        ? `${facts.slot.hub} · 45 minutes · bring your phone and bike. Order your NexG rider kit in your dashboard and pay for it at the session; your account goes live once it is paid.`
+        : 'Order your NexG rider kit in your dashboard. You pay for it at the onboarding session, and your account goes live once it is paid. Rider ops will call you to arrange a time at the hub.',
       state: (draft.kit_issued_at ? 'done' : 'next') as 'done' | 'next',
     },
     {
@@ -117,6 +118,9 @@ export function RiderStatusStep({ facts }: { facts: RiderStatusFacts }) {
           </ol>
 
           <div className="space-y-4">
+            {draft.submitted_at && !active && !waiting ? (
+              <RiderWelcome email={draft.email ?? null} />
+            ) : null}
             {facts.pendingChases.length > 0 && (
               <div className="border-border bg-surface rounded-2xl border p-5">
                 {facts.pendingChases.map((doc) => (

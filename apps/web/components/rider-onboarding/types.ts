@@ -31,6 +31,8 @@ export interface RiderDraft {
   onboarding_session_at: string | null;
   face_photo_path: string | null;
   phone_verified_at: string | null;
+  /** The confirmed login email, copied on submit. */
+  email?: string | null;
   submitted_at: string | null;
   waitlisted_at: string | null;
   kit_issued_at: string | null;

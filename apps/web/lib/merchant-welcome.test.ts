@@ -10,6 +10,7 @@ import {
   WELCOME_FLAG,
   WELCOME_CUSTOMER,
   WELCOME_HOST,
+  WELCOME_RIDER,
   clearedWelcomeMetadata,
   welcomeMetadata,
 } from './merchant-welcome';
@@ -23,12 +24,14 @@ describe('welcomeMetadata', () => {
       [WELCOME_BUSINESS]: 'Jane s Cafe',
       [WELCOME_HOST]: null,
       [WELCOME_CUSTOMER]: null,
+      [WELCOME_RIDER]: null,
     });
   });
 
   it('marks customers so the email welcomes them without an application', () => {
     const metadata = welcomeMetadata({ firstName: 'Amina', name: null }, 'customer');
     expect(metadata[WELCOME_CUSTOMER]).toBe(true);
+    expect(welcomeMetadata({ firstName: 'Kamau', name: null }, 'rider')[WELCOME_RIDER]).toBe(true);
     expect(metadata[WELCOME_HOST]).toBeNull();
   });
 
@@ -66,6 +69,7 @@ describe('password recovery template', () => {
       WELCOME_BUSINESS,
       WELCOME_HOST,
       WELCOME_CUSTOMER,
+      WELCOME_RIDER,
     ])
       expect(template).toContain(`.Data.${key}`);
   });
@@ -84,12 +88,13 @@ describe('password recovery template', () => {
     const links = template.match(
       /href="\{\{ \.SiteURL \}\}\/auth\/confirm\?token_hash=\{\{ \.TokenHash \}\}&amp;type=recovery&amp;next=[^"]+"/g,
     );
-    expect(links).toHaveLength(4);
+    expect(links).toHaveLength(5);
     const nexts = links!.map((link) =>
       new URLSearchParams(link.replace(/&amp;/g, '&').split('?')[1]!.replace(/"$/, '')).get('next'),
     );
     expect(nexts).toEqual([
       '/reset-password?next=%2Fhost',
+      '/reset-password?next=%2Frider',
       '/reset-password',
       '/reset-password?next=%2Fmerchant',
       '/reset-password',
