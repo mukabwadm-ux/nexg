@@ -10,56 +10,6 @@ import type { Translate } from '@/lib/i18n/dictionaries';
  * for, a headline, and a gold arrow with the action.
  */
 
-/* A rider on a NexG bike, drawn rather than photographed. */
-function RiderArt() {
-  return (
-    <svg
-      viewBox="0 0 430 345"
-      preserveAspectRatio="xMidYMid slice"
-      className="absolute inset-0 h-full w-full"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="join-rider-sky" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#FFC93C" />
-          <stop offset="1" stopColor="#E8A928" />
-        </linearGradient>
-      </defs>
-      <rect width="430" height="345" fill="url(#join-rider-sky)" />
-      <circle cx="390" cy="80" r="56" fill="#FFF4D6" opacity="0.55" />
-      <rect y="268" width="430" height="77" fill="#2A2416" />
-      <g stroke="#FFF4D6" strokeWidth="4" strokeDasharray="30 20" opacity="0.7">
-        <line x1="0" y1="250" x2="430" y2="250" />
-      </g>
-      {/* The delivery box */}
-      <rect x="76" y="90" width="106" height="86" rx="10" fill="#141414" />
-      <text
-        x="129"
-        y="143"
-        textAnchor="middle"
-        fill="#FFC93C"
-        fontFamily="Poppins, Manrope, sans-serif"
-        fontSize="24"
-        fontWeight="800"
-      >
-        NEXG
-      </text>
-      {/* Frame */}
-      <g stroke="#141414" strokeWidth="9" strokeLinecap="round" fill="none">
-        <path d="M150 222 L215 140 L300 140 L345 118" />
-        <path d="M215 140 L262 230" />
-        <path d="M200 104 L238 104" />
-      </g>
-      {/* Rider */}
-      <circle cx="262" cy="58" r="20" fill="#141414" />
-      <path d="M240 82 Q262 74 284 86 L292 140 L232 140 Z" fill="#141414" />
-      {/* Wheels */}
-      <circle cx="150" cy="222" r="40" fill="#fff" stroke="#141414" strokeWidth="9" />
-      <circle cx="370" cy="222" r="40" fill="#fff" stroke="#141414" strokeWidth="9" />
-    </svg>
-  );
-}
-
 /* A job card with applicants, for Careers. */
 function CareersArt() {
   return (
@@ -128,7 +78,15 @@ export function JoinSection({ t }: { t: Translate }) {
       title: t('home.join.ridersTitle'),
       action: t('home.join.becomeRider'),
       href: '/riders',
-      art: <RiderArt />,
+      art: (
+        <Image
+          src="/images/join/rider.jpg"
+          alt=""
+          fill
+          sizes={PHOTO_SIZES}
+          className="object-cover object-[60%_35%] transition-transform duration-500 group-hover:scale-105"
+        />
+      ),
     },
     {
       eyebrow: t('home.join.forMerchants'),
