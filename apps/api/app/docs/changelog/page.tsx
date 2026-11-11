@@ -59,8 +59,8 @@ export default function ChangelogPage() {
       </P>
       <P>
         Fixing a known issue so an endpoint does what these docs say it does counts as a fix, not
-        a break: each one is listed on its endpoint&apos;s page and will be logged here when it
-        lands. To stay safe through every kind of change, ignore fields you do not know, treat
+        a break: known issues are listed on the endpoint&apos;s page while they last, and each fix
+        is logged here. To stay safe through every kind of change, ignore fields you do not know, treat
         cursors as opaque, and branch on <C>error.code</C>, not on messages.
       </P>
 

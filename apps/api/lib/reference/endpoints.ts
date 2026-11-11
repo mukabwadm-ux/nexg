@@ -89,9 +89,8 @@ const LIMIT_PARAM: ParamDoc = {
   in: 'query',
   type: 'integer',
   required: false,
-  description: 'Results per page, 1 to 100. Defaults to 25.',
-  knownIssue:
-    'Any limit sent in the query string is refused with 400 invalid_request today, because the value arrives as text and the schema expects a number. Leave it out and you get 25.',
+  description:
+    'Results per page, 1 to 100. Defaults to 25. A value outside that range is refused with 400.',
 };
 
 const CURSOR_PARAM: ParamDoc = {
@@ -100,7 +99,14 @@ const CURSOR_PARAM: ParamDoc = {
   type: 'string',
   required: false,
   description:
-    'The next_cursor from the previous page, passed back unchanged. Leave it out for the first page.',
+    'The next_cursor from the previous page, passed back unchanged. Leave it out for the first page. A cursor this endpoint did not issue is refused with 400.',
+};
+
+/** Every unexpected failure now answers with the JSON envelope. */
+const UNEXPECTED_ERROR: ErrorDoc = {
+  status: 500,
+  code: 'internal_error',
+  when: 'Something unexpected failed on NexG’s side. NexG logs the X-Request-Id: quote it if you report the failure.',
 };
 
 function credentialErrors(scope: string, anonymousAllowed: boolean): ErrorDoc[] {
@@ -183,9 +189,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         type: 'string',
         required: false,
         description:
-          'Free text matched against the trading name, branch name and category_other. Up to 120 characters.',
-        knownIssue:
-          'Commas and parentheses in q are not escaped yet and can break the search. Strip them before sending.',
+          'Free text matched against the trading name, branch name and category_other, ignoring case. Up to 120 characters.',
       },
       CURSOR_PARAM,
       LIMIT_PARAM,
@@ -203,16 +207,8 @@ export const ENDPOINTS: EndpointDoc[] = [
     errors: [
       ...credentialErrors('public_read', true),
       QUERY_ERROR,
-      {
-        status: 400,
-        code: 'internal_error',
-        when: 'NexG could not read the merchants. Sent as 400 today; it should be 500 (see known issues).',
-      },
-      { status: 500, code: 'internal_error', when: 'Something unexpected failed on NexG’s side.' },
-    ],
-    knownIssues: [
-      'Pages after the first can skip merchants: the cursor compares the listing time and the id separately instead of together. Until it is fixed, prefer filters that fit in one page of 25.',
-      'A cursor that cannot be read is ignored, so the first page comes back again. Stop paging if a page repeats.',
+      { status: 500, code: 'internal_error', when: 'NexG could not read the merchants.' },
+      UNEXPECTED_ERROR,
     ],
     since: '2026-10-21',
     source: 'apps/api/app/v1/catalog/merchants/route.ts',
@@ -291,20 +287,13 @@ export const ENDPOINTS: EndpointDoc[] = [
     errors: [
       ...credentialErrors('public_read', true),
       { status: 400, code: 'invalid_request', when: 'The id is not a UUID.' },
+      { status: 404, code: 'not_found', when: 'No live merchant has that id.' },
       {
-        status: 400,
-        code: 'not_found',
-        when: 'No live merchant has that id. Sent as 400 today; it should be 404 (see known issues).',
-      },
-      {
-        status: 400,
+        status: 500,
         code: 'internal_error',
-        when: 'NexG could not read the merchant or its catalogue. Sent as 400 today; it should be 500.',
+        when: 'NexG could not read the merchant or its catalogue.',
       },
-      { status: 500, code: 'internal_error', when: 'Something unexpected failed on NexG’s side.' },
-    ],
-    knownIssues: [
-      'An unknown or non-live merchant answers HTTP 400 with code not_found rather than HTTP 404. Branch on error.code, which will not change.',
+      UNEXPECTED_ERROR,
     ],
     since: '2026-10-21',
     source: 'apps/api/app/v1/catalog/merchants/[id]/route.ts',
@@ -369,12 +358,8 @@ export const ENDPOINTS: EndpointDoc[] = [
     ],
     errors: [
       ...credentialErrors('public_read', true),
-      {
-        status: 400,
-        code: 'internal_error',
-        when: 'NexG could not read the zones. Sent as 400 today; it should be 500.',
-      },
-      { status: 500, code: 'internal_error', when: 'Something unexpected failed on NexG’s side.' },
+      { status: 500, code: 'internal_error', when: 'NexG could not read the zones.' },
+      UNEXPECTED_ERROR,
     ],
     notes: ['Zones are a small set and change rarely, so the whole list comes in one response.'],
     since: '2026-10-21',
@@ -404,8 +389,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         in: 'query',
         type: 'string',
         required: false,
-        description: 'A city slug, such as nairobi.',
-        knownIssue: 'An unknown city slug is ignored and events from every city are returned.',
+        description: 'A city slug, such as nairobi. A slug no city has returns an empty list.',
       },
       {
         name: 'q',
@@ -413,7 +397,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         type: 'string',
         required: false,
         description:
-          'Free text matched against the event name and venue name. Up to 120 characters.',
+          'Free text matched against the event name and venue name, ignoring case. Up to 120 characters.',
       },
       CURSOR_PARAM,
       LIMIT_PARAM,
@@ -467,27 +451,12 @@ export const ENDPOINTS: EndpointDoc[] = [
     errors: [
       ...credentialErrors('public_read', true),
       QUERY_ERROR,
-      {
-        status: 400,
-        code: 'internal_error',
-        when: 'NexG could not read the events. Sent as 400 today; it should be 500.',
-      },
-      {
-        status: 500,
-        code: 'internal_error',
-        when: 'Something unexpected failed while the request was being checked.',
-      },
-      {
-        status: 500,
-        code: null,
-        when: 'Today, whenever there is an upcoming event to list (see known issues). The request crashes, so the response has no JSON body.',
-      },
+      { status: 500, code: 'internal_error', when: 'NexG could not read the events.' },
+      UNEXPECTED_ERROR,
     ],
-    knownIssues: [
-      'This endpoint currently fails with HTTP 500, with no JSON body, whenever there is an upcoming event to list. The database stores ticket_bands and suggested_blocks as lists, as shown in the example, while the response schema in @nexg/contracts/api still expects objects. The example shows the shape the fix will return.',
-      'Pages after the first can skip events, for the same cursor reason as List merchants.',
+    notes: [
+      'Ticket bands are entered by hand. An event whose bands cannot be read is left out of the list, and logged for NexG to correct, rather than failing the whole list.',
     ],
-    warning: 'Fails with HTTP 500 while any upcoming event exists.',
     since: '2026-10-21',
     source: 'apps/api/app/v1/experiences/route.ts',
   },
@@ -615,13 +584,11 @@ export const ENDPOINTS: EndpointDoc[] = [
         when: 'NexG refused the read for this key, for example because it is not bound to a merchant.',
       },
       { status: 500, code: 'internal_error', when: 'NexG could not read the orders.' },
+      UNEXPECTED_ERROR,
     ],
     notes: [
       'The city, category and q parameters other list endpoints take are accepted here and ignored.',
       'Merchant keys work only while the merchant may operate: not while it is paused, suspended or delisted, and not while its application is waiting for approval.',
-    ],
-    knownIssues: [
-      'A cursor that cannot be read is ignored, so the first page comes back again. Stop paging if a page repeats.',
     ],
     since: '2026-10-22',
     source: 'apps/api/app/v1/orders/route.ts',
@@ -631,20 +598,26 @@ export const ENDPOINTS: EndpointDoc[] = [
     method: 'GET',
     host: 'api',
     path: '/v1/orders/{id}',
-    status: 'coming_soon',
+    status: 'live',
     group: 'Orders',
     title: 'Get one order',
-    summary: 'Read one of your merchant’s orders by its id.',
+    summary: 'One of your merchant’s orders, by its order_id.',
     description: [
-      'The database read behind List your orders already accepts a single order id, and returns the same object, so a client needs one parser for both. No route serves it yet: requests to this path return 404.',
-      'Until it ships, page through List your orders and match on order_id.',
+      'Returns one order placed with the merchant your key is bound to. The order is the same object List your orders returns, so one parser reads both.',
+      'An id that belongs to another merchant gets the same 404 as an id that does not exist, so a key cannot find out which order ids are real.',
     ],
     auth: { kind: 'key', scope: 'merchant_read', merchantBound: true },
     rateCost: 3,
     cache: 'no-store',
     paginated: false,
     params: [
-      { name: 'id', in: 'path', type: 'uuid', required: true, description: 'The order_id.' },
+      {
+        name: 'id',
+        in: 'path',
+        type: 'uuid',
+        required: true,
+        description: 'The order_id, from List your orders.',
+      },
       ...KEY_REQUIRED_HEADERS,
     ],
     example: { path: { id: '0f1e2d3c-4b5a-4697-8a8b-9c0d1e2f3a4b' } },
@@ -652,31 +625,47 @@ export const ENDPOINTS: EndpointDoc[] = [
     responseExample: {
       ok: true,
       data: {
-        items: [
-          {
-            order_id: '0f1e2d3c-4b5a-4697-8a8b-9c0d1e2f3a4b',
-            reference: 'NX-261110-0003',
-            service: '',
-            quantity: 3,
-            stage: 'delivered',
-            payment_method: 'mpesa_stk',
-            payment_status: 'paid',
-            currency: 'KES',
-            total_cents: 161625,
-            scheduled_for: null,
-            pickup_label: null,
-            dropoff_label: 'Rhapta Road, Westlands, Nairobi',
-            created_at: '2026-11-10T09:42:17.204+00:00',
-          },
-        ],
+        order: {
+          order_id: '0f1e2d3c-4b5a-4697-8a8b-9c0d1e2f3a4b',
+          reference: 'NX-261110-0003',
+          service: '',
+          quantity: 3,
+          stage: 'delivered',
+          payment_method: 'mpesa_stk',
+          payment_status: 'paid',
+          currency: 'KES',
+          total_cents: 161625,
+          scheduled_for: null,
+          pickup_label: null,
+          dropoff_label: 'Rhapta Road, Westlands, Nairobi',
+          created_at: '2026-11-10T09:42:17.204+00:00',
+        },
       },
       meta: { api_version: 'v1' },
     },
     responseResources: [
-      { schema: 'ApiOrder', title: 'Order', at: 'data.items[]', fields: ORDER_FIELDS },
+      { schema: 'ApiOrder', title: 'Order', at: 'data.order', fields: ORDER_FIELDS },
     ],
-    errors: [],
-    notes: ['The planned response is shown. It may change before it ships.'],
+    errors: [
+      ...credentialErrors('merchant_read', false),
+      { status: 400, code: 'invalid_request', when: 'The id is not a UUID.' },
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'NexG refused the read for this key, for example because it is not bound to a merchant.',
+      },
+      {
+        status: 404,
+        code: 'not_found',
+        when: 'Your merchant has no order with that id.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not read the order.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'Merchant keys work only while the merchant may operate: not while it is paused, suspended or delisted, and not while its application is waiting for approval.',
+    ],
+    since: '2026-11-10',
     source: 'apps/api/app/v1/orders/[id]/route.ts',
   },
   {

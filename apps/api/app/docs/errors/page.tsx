@@ -1,6 +1,6 @@
 import { CodeBlock } from '@/components/docs/code';
 import { DocPage } from '@/components/docs/doc-page';
-import { A, C, Callout, H2, P, Table } from '@/components/docs/prose';
+import { C, H2, P, Table } from '@/components/docs/prose';
 import { pageMetadata } from '@/lib/reference/navigation';
 
 export const metadata = pageMetadata('/docs/errors');
@@ -59,14 +59,14 @@ export default function ErrorsPage() {
       </P>
       <CodeBlock className="mt-6" code={SHAPE} language="http" title="Response" />
       <P>
-        Three answers come from the web server instead and have no JSON body: a <C>404</C> for a
-        path that does not exist, a <C>405</C> for a method a path does not take, and a{' '}
-        <C>500</C> when a request crashes. Check the status before you parse.
+        Two answers come from the web server instead and have no JSON body: a <C>404</C> for a
+        path that does not exist, and a <C>405</C> for a method a path does not take. Check the
+        status before you parse.
       </P>
       <P>
         JSON errors are never cached, and a <C>429</C> carries <C>Retry-After</C>, in seconds. Each
-        also carries an <C>X-Request-Id</C>, unique to that response. NexG does not record it yet,
-        so when you report a failure, give the time, the endpoint and the error code as well.
+        also carries an <C>X-Request-Id</C>, unique to that response. NexG logs the id of every
+        server error (5xx), so quote it when you report one.
       </P>
 
       <H2 id="codes">Error codes</H2>
@@ -82,7 +82,7 @@ export default function ErrorsPage() {
           [
             <C key="c">not_found</C>,
             'Something does not exist, or is not yours. A refused key (401) and a missing scope (403) also use this code, so nobody can tell which keys exist.',
-            'Read the status: 401, replace the key; 403, check its scopes; 400, the record is not there.',
+            'Read the status: 401, replace the key; 403, check its scopes; 404, the record is not there.',
           ],
           [
             <C key="c">rate_limited</C>,
@@ -107,29 +107,20 @@ export default function ErrorsPage() {
         head={['Status', 'When', 'Retry?']}
         rows={[
           ['200', 'It worked. Check ok anyway.', '—'],
-          ['400', 'invalid_request, or (today) not_found and internal_error on some endpoints.', 'No, unless the code is internal_error'],
+          ['400', 'invalid_request.', 'No. Fix the request.'],
           ['401', 'The key was refused.', 'No. Replace the key.'],
           ['403', 'The key lacks the scope, or no key was sent where one is needed.', 'No'],
-          ['404', 'No such path. The body is a web page, not JSON.', 'No'],
+          [
+            '404',
+            'not_found: no such record. A path that does not exist is also 404, with a web page instead of JSON.',
+            'No',
+          ],
           ['405', 'The path exists but not for that method. The body is empty.', 'No'],
           ['429', 'rate_limited.', 'Yes, after Retry-After'],
-          [
-            '500',
-            'internal_error, or no JSON body at all when a request crashed.',
-            'Yes, with backoff',
-          ],
+          ['500', 'internal_error. NexG logs the request id.', 'Yes, with backoff'],
           ['503', 'internal_error: NexG could not check the key or the limit.', 'Yes, with backoff'],
         ]}
       />
-      <Callout tone="issue">
-        <p>
-          A few failures arrive with the wrong status today: an unknown merchant is{' '}
-          <C>400 not_found</C> rather than <C>404</C>, and some database failures are{' '}
-          <C>400 internal_error</C> rather than <C>500</C>. The codes are right, so branch on{' '}
-          <C>error.code</C> first. Each case is listed on its endpoint in the{' '}
-          <A href="/docs/reference">reference</A>.
-        </p>
-      </Callout>
 
       <H2 id="handling">Handling errors</H2>
       <P>Retry what can succeed on a second try, and stop on what cannot.</P>

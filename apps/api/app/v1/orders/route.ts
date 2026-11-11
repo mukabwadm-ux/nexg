@@ -3,31 +3,30 @@
  *
  * A merchant reads their bookings through the API.
  *
- * A cursor-paginated list of orders, newest first.
+ * A cursor-paginated list of orders, newest first. One order by id is
+ * GET /v1/orders/{id}, in ./[id]/route.ts.
  *
  * The key decides the merchant. The caller never names one, so a key
  * cannot read another merchant's orders by guessing a UUID.
  */
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@nexg/db';
 
-import { jsonError, parseQuery } from '@/lib/http';
+import {
+  decodeKeysetCursor,
+  encodeCursor,
+  invalidCursor,
+  jsonError,
+  parseQuery,
+  withErrorEnvelope,
+} from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
+import { orderReader } from '@/lib/orders';
 import { ListRequest } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-function serviceRoleClient() {
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
-}
-
-export async function GET(request: Request, { params }: { params: { id?: string } }) {
+export const GET = withErrorEnvelope(async (request: Request) => {
   let credential;
   try {
     credential = await authenticate(request);
@@ -48,62 +47,6 @@ export async function GET(request: Request, { params }: { params: { id?: string 
     );
   }
 
-  const supabase = serviceRoleClient();
-  const id = params?.id;
-
-  if (id) {
-    // Single order by ID
-    const { data, error } = await (
-      supabase as unknown as {
-        rpc: (
-          name: string,
-          args: Record<string, unknown>,
-        ) => Promise<{ data: unknown; error: { message: string; code?: string } | null }>;
-      }
-    ).rpc('rpc_order_read_api', {
-      p_api_key: credential.rawKey,
-      p_order_id: id,
-    });
-
-    if (error) {
-      const code = (error as { code?: string }).code;
-      const badRequest = code === '22023';
-      const refused = code === '42501';
-
-      return jsonError(
-        refused ? 'not_found' : badRequest ? 'invalid_request' : 'internal_error',
-        refused ? 'This credential cannot read that order.' : 'The order could not be read.',
-        { status: refused ? 403 : badRequest ? 400 : 500 },
-      );
-    }
-
-    const result = (Array.isArray(data) ? data[0] : data) as {
-      ok: boolean;
-      items: unknown;
-      next_cursor: unknown;
-    } | null;
-
-    if (!result || !result.ok) {
-      return jsonError('internal_error', 'The order could not be read.');
-    }
-
-    return NextResponse.json(
-      {
-        ok: true,
-        data: {
-          items: Array.isArray(result.items) ? result.items : [result.items],
-        },
-        meta: { api_version: 'v1' as const },
-      },
-      {
-        headers: {
-          'Cache-Control': 'no-store',
-        },
-      },
-    );
-  }
-
-  // List of orders, with pagination
   const url = new URL(request.url);
   const queryResult = parseQuery(ListRequest, url.searchParams);
 
@@ -111,46 +54,24 @@ export async function GET(request: Request, { params }: { params: { id?: string 
     return queryResult.error;
   }
 
-  const { cursor, limit: rawLimit } = queryResult.data;
-  const limit = Math.min(Math.max(rawLimit ?? 25, 1), 100);
+  const { cursor, limit } = queryResult.data;
 
-  let cursorCreatedAt: string | null = null;
-  let cursorId: string | null = null;
+  // The cursor is (created_at, id) of the last order on the previous page.
+  const after = cursor ? decodeKeysetCursor(cursor) : null;
+  if (cursor && !after) return invalidCursor();
 
-  if (cursor) {
-    try {
-      const decoded = Buffer.from(cursor, 'base64url').toString('utf8');
-      const parts = decoded.split('|');
-      if (parts.length === 2) {
-        cursorCreatedAt = parts[0] ?? null;
-        cursorId = parts[1] ?? null;
-      }
-    } catch {
-      // Invalid cursor, treat as if not provided
-    }
-  }
-
-  const { data, error } = await (
-    supabase as unknown as {
-      rpc: (
-        name: string,
-        args: Record<string, unknown>,
-      ) => Promise<{ data: unknown; error: { message: string; code?: string } | null }>;
-    }
-  ).rpc('rpc_order_read_api', {
+  const { data, error } = await orderReader().rpc('rpc_order_read_api', {
     p_api_key: credential.rawKey,
     p_limit: limit,
-    p_cursor_created_at: cursorCreatedAt,
-    p_cursor_id: cursorId,
+    p_cursor_created_at: after?.at ?? null,
+    p_cursor_id: after?.id ?? null,
   });
 
   if (error) {
-    const refused = (error as { code?: string }).code === '42501';
-    return jsonError(
-      refused ? 'not_found' : 'internal_error',
-      refused ? 'This credential cannot read orders.' : 'The orders could not be read.',
-      { status: refused ? 403 : 500 },
-    );
+    const refused = error.code === '42501';
+    return refused
+      ? jsonError('not_found', 'This credential cannot read orders.', { status: 403 })
+      : jsonError('internal_error', 'The orders could not be read.', { detail: error });
   }
 
   const result = (Array.isArray(data) ? data[0] : data) as {
@@ -160,15 +81,12 @@ export async function GET(request: Request, { params }: { params: { id?: string 
   } | null;
 
   if (!result || !result.ok) {
-    return jsonError('internal_error', 'The orders could not be read.');
+    return jsonError('internal_error', 'The orders could not be read.', { detail: result });
   }
 
-  let nextCursor: string | null = null;
-  if (result.next_cursor) {
-    nextCursor = Buffer.from(`${result.next_cursor.created_at}|${result.next_cursor.id}`).toString(
-      'base64url',
-    );
-  }
+  const nextCursor = result.next_cursor
+    ? encodeCursor(result.next_cursor.created_at, result.next_cursor.id)
+    : null;
 
   return NextResponse.json(
     {
@@ -188,4 +106,4 @@ export async function GET(request: Request, { params }: { params: { id?: string 
       },
     },
   );
-}
+});

@@ -43,7 +43,7 @@ export default function MerchantIntegrationPage() {
       <List>
         <li>Read your own orders into your system, with a key bound to your merchant.</li>
         <li>Show your NexG listing and catalogue on your own website.</li>
-        <li>Use NexG&apos;s delivery zones and bookable services.</li>
+        <li>Use NexG&apos;s delivery zones, published experiences and bookable services.</li>
         <li>Keep your catalogue in your own system and import it to NexG as CSV.</li>
       </List>
       <Callout tone="soon" title="Not through the API yet">

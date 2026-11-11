@@ -250,7 +250,7 @@ export const EVENT_FIELDS: FieldDoc[] = [
     name: 'ticket_bands',
     type: 'array',
     description:
-      'Ticket prices at the organiser’s face value: a list of { label, price_kes, currency }. NexG never adds a margin to a ticket.',
+      'Ticket prices at the organiser’s face value: a list of { label, price_kes, currency }. price_kes is a positive number of shillings; currency may be absent. Empty when there are no bands. NexG never adds a margin to a ticket.',
   },
   {
     name: 'nexg_can_hold_tickets',
@@ -268,7 +268,7 @@ export const EVENT_FIELDS: FieldDoc[] = [
     name: 'suggested_blocks',
     type: 'array',
     description:
-      'What a day around the event usually includes: a list of { kind, mood, slot, title, swap_group }.',
+      'What a day around the event usually includes, as NexG’s team entered it: a list, usually of { kind, mood, slot, title, swap_group }. Read it defensively.',
   },
 ];
 

@@ -1,6 +1,6 @@
 import { CodeBlock } from '@/components/docs/code';
 import { DocPage } from '@/components/docs/doc-page';
-import { A, C, Callout, H2, H3, List, P, Table } from '@/components/docs/prose';
+import { A, C, H2, H3, List, P, Table } from '@/components/docs/prose';
 import { pageMetadata } from '@/lib/reference/navigation';
 
 export const metadata = pageMetadata('/docs/requests');
@@ -33,23 +33,19 @@ const ERROR = `{
   "meta": { "api_version": "v1" }
 }`;
 
-const PAGING = `// Follow next_cursor until it is null. Stop if a page repeats.
+const PAGING = `// Follow next_cursor until it is null.
 let cursor = null;
-const seen = new Set();
 
 do {
   const url = new URL('https://api.nexgapp.com/v1/orders');
+  url.searchParams.set('limit', '100');
   if (cursor) url.searchParams.set('cursor', cursor);
 
   const res = await fetch(url, { headers: { 'X-Api-Key': process.env.NEXG_API_KEY } });
   const body = await res.json();
   if (!body.ok) throw new Error(\`\${res.status} \${body.error.code}\`);
 
-  const fresh = body.data.items.filter((order) => !seen.has(order.order_id));
-  if (fresh.length === 0) break;
-  fresh.forEach((order) => seen.add(order.order_id));
-  await saveOrders(fresh);
-
+  await saveOrders(body.data.items); // upsert by order_id
   cursor = body.data.next_cursor;
 } while (cursor);`;
 
@@ -110,16 +106,13 @@ export default function RequestsPage() {
         ended. Pass it back as <C>cursor</C> to get the next page, unchanged; it is opaque and its
         contents may change. When <C>next_cursor</C> is <C>null</C>, there are no more pages.
       </P>
+      <P>
+        Pages hold 25 by default; ask for 1 to 100 with <C>limit</C>. Each page starts strictly
+        after the last row of the one before, so a row is never returned twice or skipped, even
+        when new rows arrive while you page. A cursor the endpoint did not issue is refused with{' '}
+        <C>400 invalid_request</C>.
+      </P>
       <CodeBlock className="mt-6" code={PAGING} language="javascript" title="Reading every page" />
-      <Callout tone="issue">
-        <p>
-          The <C>limit</C> parameter is refused with <C>400</C> today, so pages are always 25. On
-          merchants and experiences, pages after the first can skip rows. An unreadable cursor
-          returns the first page again, which is why the loop above stops when a page repeats.
-          These are listed on each endpoint and will be logged in the{' '}
-          <A href="/docs/changelog">changelog</A> when fixed.
-        </p>
-      </Callout>
 
       <H2 id="money">Money</H2>
       <P>
@@ -178,8 +171,8 @@ export default function RequestsPage() {
       <H2 id="request-ids">Request ids</H2>
       <P>
         Every JSON error carries an <C>X-Request-Id</C> header, unique to that response. Log it with
-        the failure. NexG does not record it yet, so when you report a problem, include the time,
-        the endpoint and the error code too.
+        the failure. NexG logs the id of every server error (5xx) with what went wrong, so quoting
+        it is the fastest way to have a failure looked into.
       </P>
     </DocPage>
   );

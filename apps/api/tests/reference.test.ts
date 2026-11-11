@@ -173,31 +173,26 @@ describe('the documented shapes match @nexg/contracts/api', () => {
     expect(() => detail.parse(endpoint('get-merchant').responseExample)).not.toThrow();
   });
 
-  it('the coming-soon examples follow their planned contracts', () => {
+  it('the coming-soon booking follows its planned contracts', () => {
     const booking = endpoint('create-order');
     expect(() => ServiceBooking.parse(booking.example.body)).not.toThrow();
     expect(() => BookingReceipt.parse(booking.responseExample)).not.toThrow();
+  });
+
+  it('the one-order example is a valid order', () => {
     const one = z
       .object({
         ok: z.literal(true),
-        data: z.object({ items: z.array(ApiOrder) }).strict(),
+        data: z.object({ order: ApiOrder }).strict(),
         meta: z.object({ api_version: z.literal('v1') }).strict(),
       })
       .strict();
     expect(() => one.parse(endpoint('get-order').responseExample)).not.toThrow();
   });
 
-  it('the experiences example has the database’s shape for bands and blocks', () => {
-    const asStored = PublicEvent.extend({
-      ticket_bands: z.array(
-        z
-          .object({ label: z.string(), price_kes: z.number().int(), currency: z.literal('KES') })
-          .strict(),
-      ),
-      suggested_blocks: z.array(z.record(z.string())),
-    }).strict();
+  it('the experiences example is a valid page of events', () => {
     expect(() =>
-      PageEnvelope(asStored).parse(endpoint('list-experiences').responseExample),
+      PageEnvelope(PublicEvent).parse(endpoint('list-experiences').responseExample),
     ).not.toThrow();
   });
 
@@ -217,27 +212,44 @@ describe('the documented shapes match @nexg/contracts/api', () => {
   });
 });
 
-describe('the known issues the docs admit to are still real', () => {
+describe('the fixes the changelog announces stay fixed', () => {
   /*
-   * Each test below pins a bug the reference warns readers about. When a
-   * fix lands, the test fails: delete the known issue from the registry
-   * (and the guides), add a "fixed" changelog entry, then delete the test.
+   * These were known issues on the reference until 2026-11-10. If one
+   * comes back, the changelog's "fixed" entry is no longer true.
    */
 
-  it('refuses a limit sent in the query string', () => {
-    expect(parseQuery(ListRequest, new URLSearchParams('limit=5')).ok).toBe(false);
+  it('accepts a limit sent in the query string, within 1 to 100', () => {
+    const five = parseQuery(ListRequest, new URLSearchParams('limit=5'));
+    expect(five.ok && five.data.limit).toBe(5);
+    expect(parseQuery(ListRequest, new URLSearchParams('limit=0')).ok).toBe(false);
+    expect(parseQuery(ListRequest, new URLSearchParams('limit=101')).ok).toBe(false);
+    expect(parseQuery(ListRequest, new URLSearchParams('limit=ten')).ok).toBe(false);
+    const none = parseQuery(ListRequest, new URLSearchParams(''));
+    expect(none.ok && none.data.limit).toBe(25);
   });
 
-  it('cannot parse an upcoming event as the database stores it', () => {
-    const [stored] = (
-      endpoint('list-experiences').responseExample as { data: { items: unknown[] } }
-    ).data.items;
-    expect(PublicEvent.safeParse(stored).success).toBe(false);
+  it('reads an event as the database stores it, prices as numbers', () => {
+    const stored = {
+      ...(endpoint('list-experiences').responseExample as { data: { items: object[] } }).data
+        .items[0],
+      // The console may store a price as numeric text, and bands without a currency.
+      ticket_bands: [{ label: 'Regular', price_kes: '3500' }],
+      suggested_blocks: [],
+    };
+    const parsed = PublicEvent.parse(stored);
+    expect(parsed.ticket_bands).toEqual([{ label: 'Regular', price_kes: 3500 }]);
+    expect(PublicEvent.safeParse({ ...stored, ticket_bands: [{ label: 'Free' }] }).success).toBe(
+      false,
+    );
   });
 
-  it('answers errors without an explicit status with HTTP 400', () => {
-    // Why an unknown merchant is 400 not_found, and some failures 400 internal_error.
-    expect(jsonError('not_found', 'Merchant not found').status).toBe(400);
+  it('answers each error code with its own status', () => {
+    expect(jsonError('invalid_request', 'x').status).toBe(400);
+    expect(jsonError('not_found', 'x').status).toBe(404);
+    expect(jsonError('rate_limited', 'x').status).toBe(429);
+    expect(jsonError('internal_error', 'x', { log: false }).status).toBe(500);
+    // Credential failures still choose 401 and 403 themselves.
+    expect(jsonError('not_found', 'x', { status: 401 }).status).toBe(401);
   });
 });
 

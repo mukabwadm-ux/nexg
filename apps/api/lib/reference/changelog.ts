@@ -11,6 +11,27 @@ import type { ChangelogEntry } from './types';
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-10',
+    kind: 'added',
+    title: 'Read one order by id',
+    body: [
+      'GET /v1/orders/{id} returns one of your merchant’s orders, as the same object the list returns. It needs a key with merchant_read; an id from another merchant is answered as not found.',
+    ],
+    endpoints: ['get-order'],
+  },
+  {
+    date: '2026-11-10',
+    kind: 'fixed',
+    title: 'Your orders, lists, paging, search and error statuses',
+    body: [
+      'GET /v1/orders works: every call used to fail with 500 inside the database read behind it. Pages of orders now start with the newest and follow the cursor without losing any.',
+      'limit is accepted (1 to 100) instead of always being refused. Pages after the first no longer skip merchants or events. A cursor the endpoint did not issue is refused with 400 instead of starting again at page one.',
+      'q may contain commas and parentheses. GET /v1/experiences lists upcoming events again: ticket_bands and suggested_blocks are lists, as the database stores them. An unknown city on experiences returns an empty list instead of every city.',
+      'An unknown merchant answers 404 instead of 400, and server failures answer 500 instead of 400, always with the JSON error body. NexG now logs the X-Request-Id of every server error, so a quoted id can be traced.',
+    ],
+    endpoints: ['list-merchants', 'get-merchant', 'list-zones', 'list-experiences', 'list-orders'],
+  },
+  {
+    date: '2026-11-10',
     kind: 'docs',
     title: 'New developer documentation',
     body: [

@@ -9,7 +9,7 @@
  */
 import { NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase';
-import { jsonError } from '@/lib/http';
+import { jsonError, withErrorEnvelope } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { PublicZone } from '@nexg/contracts/api';
 
@@ -17,11 +17,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 300; // zones change rarely
 
-export async function GET(request: Request) {
+export const GET = withErrorEnvelope(async (request: Request) => {
   // Resolve the credential first: a bad key is refused before any work is done.
-  let credential;
   try {
-    credential = await authenticate(request);
+    const credential = await authenticate(request);
     requireScope(credential, API_SCOPES.public_read);
     await enforceRateLimit(credential, request);
   } catch (e) {
@@ -38,8 +37,7 @@ export async function GET(request: Request) {
     .order('name', { ascending: true });
 
   if (error) {
-    console.error('zones error:', error);
-    return jsonError('internal_error', 'Failed to fetch zones');
+    return jsonError('internal_error', 'Failed to fetch zones', { detail: error });
   }
 
   const response = {
@@ -59,4 +57,4 @@ export async function GET(request: Request) {
       'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
     },
   });
-}
+});
