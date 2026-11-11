@@ -1,6 +1,6 @@
 'use client';
 
-import { CreditCard, Landmark, Loader2, RotateCw, Smartphone } from 'lucide-react';
+import { Landmark, Loader2, RotateCw, Smartphone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -18,33 +18,25 @@ import * as React from 'react';
  *            up front, and the bank when one is connected.
  *   failed   the attempt failed or was cancelled; every way to pay again.
  *   start    nothing has been sent to a provider yet; every way to pay.
- *
- * Card is offered only after a failed attempt and only when Paystack is
- * connected: starting a card payment while an M-Pesa prompt is still open
- * would reuse that open payment.
  */
 export function RetryPayment({
   orderId,
   mode,
   defaultPhone,
   bankEnabled = false,
-  cardReady = false,
 }: {
   orderId: string;
   mode: 'waiting' | 'expired' | 'failed' | 'start';
   defaultPhone?: string | null;
   /** Offer paying from a bank account (when a bank is connected). */
   bankEnabled?: boolean;
-  /** Offer card (when Paystack is connected). */
-  cardReady?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(mode !== 'waiting');
   const [phone, setPhone] = React.useState(defaultPhone ?? '');
-  const [busy, setBusy] = React.useState<'mpesa' | 'card' | 'bank' | null>(null);
+  const [busy, setBusy] = React.useState<'mpesa' | 'bank' | null>(null);
   const [message, setMessage] = React.useState<string | null>(null);
 
-  const offerCard = (mode === 'failed' || mode === 'start') && cardReady;
   const offerBank = mode !== 'waiting' && bankEnabled;
 
   async function mpesa(event: React.FormEvent) {
@@ -76,18 +68,15 @@ export function RetryPayment({
     }
   }
 
-  async function redirectTo(kind: 'card' | 'bank') {
+  async function bank() {
     setMessage(null);
-    setBusy(kind);
+    setBusy('bank');
     try {
-      const res = await fetch(
-        kind === 'card' ? '/api/payments/paystack/start' : '/api/payments/bank/start',
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ orderId }),
-        },
-      );
+      const res = await fetch('/api/payments/bank/start', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      });
       const body = (await res.json()) as {
         ok: boolean;
         message?: string;
@@ -103,12 +92,7 @@ export function RetryPayment({
         router.refresh();
         return;
       }
-      setMessage(
-        body.message ??
-          (kind === 'card'
-            ? 'Card payment could not start. Try M-Pesa instead.'
-            : 'Paying by bank could not start. Try M-Pesa instead.'),
-      );
+      setMessage(body.message ?? 'Paying by bank could not start. Try M-Pesa instead.');
     } catch {
       setMessage('No connection. Check your internet and try again; nothing was charged.');
     } finally {
@@ -170,40 +154,23 @@ export function RetryPayment({
         </button>
       </form>
 
-      {(offerCard || offerBank) && (
+      {offerBank && (
         <div className="mt-5">
           <p className="text-[0.8125rem] font-extrabold">Or pay another way</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {offerCard && (
-              <button
-                type="button"
-                disabled={busy !== null}
-                onClick={() => void redirectTo('card')}
-                className={outline}
-              >
-                {busy === 'card' ? (
-                  <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
-                ) : (
-                  <CreditCard aria-hidden="true" className="h-4 w-4" />
-                )}
-                Pay by card
-              </button>
-            )}
-            {offerBank && (
-              <button
-                type="button"
-                disabled={busy !== null}
-                onClick={() => void redirectTo('bank')}
-                className={outline}
-              >
-                {busy === 'bank' ? (
-                  <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Landmark aria-hidden="true" className="h-4 w-4" />
-                )}
-                Pay from your bank
-              </button>
-            )}
+            <button
+              type="button"
+              disabled={busy !== null}
+              onClick={() => void bank()}
+              className={outline}
+            >
+              {busy === 'bank' ? (
+                <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+              ) : (
+                <Landmark aria-hidden="true" className="h-4 w-4" />
+              )}
+              Pay from your bank
+            </button>
           </div>
         </div>
       )}

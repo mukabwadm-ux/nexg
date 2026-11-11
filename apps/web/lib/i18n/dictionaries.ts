@@ -122,7 +122,7 @@ const en: Dictionary = {
   'home.step2.body':
     'A vetted local concierge confirms the plan, the price and the timing with you.',
   'home.step3.title': 'Track and pay',
-  'home.step3.body': 'Follow it live in the app and settle by card or M-Pesa when it’s done.',
+  'home.step3.body': 'Follow it live in the app and settle by M-Pesa when it’s done.',
   'home.popular.heading': 'Popular categories',
   'home.popular.sub': 'Tap one to see who delivers it near you.',
   'home.popular.all': 'All categories',
@@ -174,7 +174,7 @@ const en: Dictionary = {
   'home.app.eyebrow': 'The NexG app · Coming soon',
   'home.app.heading': 'Your concierge, in',
   'home.app.body':
-    'Ask for anything in a sentence, watch your concierge move on the map, and pay by card or M-Pesa when it’s done. Launching first in Nairobi, then across East Africa.',
+    'Ask for anything in a sentence, watch your concierge move on the map, and pay by M-Pesa when it’s done. Launching first in Nairobi, then across East Africa.',
 
   'merchant.sponsored': 'Sponsored',
   'merchant.min': 'min',
@@ -295,7 +295,7 @@ const sw: Dictionary = {
   'home.step2.body':
     'Msaidizi wa hapa aliyehakikiwa atathibitisha mpango, bei na muda pamoja nawe.',
   'home.step3.title': 'Fuatilia na ulipe',
-  'home.step3.body': 'Fuatilia moja kwa moja kwenye programu na ulipe kwa kadi au M-Pesa ikiisha.',
+  'home.step3.body': 'Fuatilia moja kwa moja kwenye programu na ulipe kwa M-Pesa ikiisha.',
   'home.popular.heading': 'Kategoria maarufu',
   'home.popular.sub': 'Gusa moja uone wanaoleta karibu nawe.',
   'home.popular.all': 'Kategoria zote',
@@ -347,7 +347,7 @@ const sw: Dictionary = {
   'home.app.eyebrow': 'Programu ya NexG · Inakuja hivi karibuni',
   'home.app.heading': 'Msaidizi wako, ndani ya',
   'home.app.body':
-    'Omba chochote kwa sentensi moja, mfuatilie msaidizi wako kwenye ramani, na ulipe kwa kadi au M-Pesa ikiisha. Tunaanza Nairobi, kisha Afrika Mashariki nzima.',
+    'Omba chochote kwa sentensi moja, mfuatilie msaidizi wako kwenye ramani, na ulipe kwa M-Pesa ikiisha. Tunaanza Nairobi, kisha Afrika Mashariki nzima.',
 
   'merchant.sponsored': 'Imedhaminiwa',
   'merchant.min': 'dak',

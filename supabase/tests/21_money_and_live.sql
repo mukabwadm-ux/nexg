@@ -137,7 +137,7 @@ select is(
   (select count(*)::int from public.order_event
     where order_id = 'ab000000-0000-4000-8000-000000000001' and kind = 'paid'),
   1,
-  'Still once. Paystack retries, and a retry that charged twice is the worst bug here.');
+  'Still once. Providers retry, and a retry that charged twice is the worst bug here.');
 
 select is(
   (select count(*)::int from public.payment_event
@@ -347,7 +347,6 @@ select ok(
   not has_function_privilege('anon',
     'public.rpc_payment_webhook(text,text,text,boolean,jsonb,boolean,text,bigint,text)',
     'EXECUTE')
-  and has_function_privilege('anon', 'public.rpc_payment_paystack_webhook(text,text)', 'EXECUTE')
   and has_function_privilege('anon',
     'public.rpc_payment_mpesa_callback(text,integer,text,text,jsonb,numeric,text,text)', 'EXECUTE'),
   'Only the proof-checking provider entry points accept a caller without a session.');

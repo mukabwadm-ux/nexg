@@ -9,9 +9,9 @@ import {
   addNote,
   adjustItems,
   contact,
-  issueRefund,
   markOrder,
   previewReprice,
+  recordRefundSent,
   refundOrder,
   refundRoutes,
   type Outcome,
@@ -379,16 +379,16 @@ export function OrderPanel({
                 ? 'A refund is approved and has not left the account.'
                 : `${(order.refund_waiting_to_send ?? []).length} refunds are approved and have not left the account.`}
             </p>
+            <p className="text-ink/70 mt-1 text-[0.75rem] font-semibold">
+              Send it back by M-Pesa or bank transfer, then record the reference here.
+            </p>
             {(order.refund_waiting_to_send ?? []).map((r) => (
-              <button
+              <RecordRefund
                 key={r.id}
-                type="button"
-                disabled={busy}
-                onClick={() => run(() => issueRefund(r.id))}
-                className="bg-ink mt-2 rounded-lg px-3 py-2 text-[0.75rem] font-extrabold text-white disabled:opacity-40"
-              >
-                {busy ? 'Sending…' : `Send ${kes(r.amount_cents)} now`}
-              </button>
+                amount={kes(r.amount_cents)}
+                busy={busy}
+                onRecord={(reference) => void run(() => recordRefundSent(r.id, reference))}
+              />
             ))}
           </div>
         )}
@@ -825,6 +825,38 @@ function AddNote({
         {busy ? 'Saving…' : 'Add note'}
       </Button>
     </>
+  );
+}
+
+/** One approved refund: the reference of the money sent back, then mark it sent. */
+function RecordRefund({
+  amount,
+  busy,
+  onRecord,
+}: {
+  amount: string;
+  busy: boolean;
+  onRecord: (reference: string) => void;
+}) {
+  const [reference, setReference] = React.useState('');
+  return (
+    <div className="mt-2 flex flex-wrap gap-2">
+      <input
+        value={reference}
+        onChange={(e) => setReference(e.target.value)}
+        placeholder="M-Pesa or bank reference"
+        aria-label={`Reference for the ${amount} refund`}
+        className="border-border-strong bg-surface min-w-0 flex-1 basis-40 rounded-lg border px-3 py-2 text-[0.75rem] font-semibold"
+      />
+      <button
+        type="button"
+        disabled={busy || reference.trim().length < 4}
+        onClick={() => onRecord(reference)}
+        className="bg-ink rounded-lg px-3 py-2 text-[0.75rem] font-extrabold text-white disabled:opacity-40"
+      >
+        {busy ? 'Recording…' : `Mark ${amount} as sent`}
+      </button>
+    </div>
   );
 }
 

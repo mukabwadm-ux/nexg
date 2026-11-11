@@ -1,17 +1,9 @@
 'use client';
 
-import {
-  Banknote,
-  Check,
-  CreditCard,
-  Landmark,
-  Lock,
-  type LucideIcon,
-  Smartphone,
-} from 'lucide-react';
+import { Banknote, Check, Landmark, Lock, type LucideIcon, Smartphone } from 'lucide-react';
 import * as React from 'react';
 
-export type Method = 'card' | 'mpesa_stk' | 'bank_transfer' | 'cash_on_delivery';
+export type Method = 'mpesa_stk' | 'bank_transfer' | 'cash_on_delivery';
 
 export interface MethodOption {
   value: Method;
@@ -25,16 +17,13 @@ export interface MethodOption {
 
 /** The checkout's payment methods, in the order they are offered. */
 export function methodOptions({
-  cardReady,
   mpesaReady,
   bankEnabled,
 }: {
-  cardReady: boolean;
   mpesaReady: boolean;
   bankEnabled: boolean;
 }): MethodOption[] {
   return [
-    { value: 'card', label: 'Card', hint: 'Visa · Mastercard', icon: CreditCard, ready: cardReady },
     {
       value: 'mpesa_stk',
       label: 'M-Pesa',
@@ -75,20 +64,6 @@ function details(
   { phone, total, cashFee }: { phone: string; total: string | null; cashFee: string | null },
 ): Details {
   switch (method) {
-    case 'card':
-      return {
-        title: 'Pay by card on Paystack',
-        lead: 'Visa and Mastercard on Paystack’s secure page, which also offers mobile money and bank transfer.',
-        steps: [
-          'Place your order here.',
-          'Enter your card on Paystack’s page. Your bank may ask you to confirm with a code.',
-          'You come back to NexG with your receipt.',
-        ],
-        points: [
-          'NexG never sees or stores your card number.',
-          'Your order is confirmed only when Paystack confirms the payment.',
-        ],
-      };
     case 'mpesa_stk':
       return {
         title: 'Pay with M-Pesa',
@@ -211,19 +186,6 @@ export function PaymentMethods({
       <div className="border-border mt-4 border-t pt-4" aria-live="polite">
         <p className="text-[0.9375rem] font-extrabold">{d.title}</p>
         <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-relaxed">{d.lead}</p>
-
-        {value === 'card' && (
-          <ul className="mt-3 flex gap-1.5" aria-label="Cards accepted">
-            {['VISA', 'Mastercard'].map((brand) => (
-              <li
-                key={brand}
-                className="border-border text-ink rounded-md border px-2 py-0.5 text-[0.6875rem] font-extrabold tracking-wide"
-              >
-                {brand}
-              </li>
-            ))}
-          </ul>
-        )}
 
         <ol className="mt-4 space-y-2.5">
           {d.steps.map((step, i) => (

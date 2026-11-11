@@ -155,18 +155,6 @@ export const PageRequest = z
  * signature is checked before it is parsed. The ordering is the
  * contract: an unverified payload is bytes, not a payment.
  */
-export const PaystackEvent = z
-  .object({
-    event: z.string(),
-    data: z.object({
-      reference: z.string(),
-      amount: z.number().int(),
-      currency: z.string(),
-      status: z.string(),
-    }),
-  })
-  .passthrough();
-
 export const WhatsAppInbound = z
   .object({
     from: z.string(),

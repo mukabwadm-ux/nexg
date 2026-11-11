@@ -87,7 +87,7 @@ export function MerchantControls({
         description={
           state.pay_on_delivery
             ? `Allowed up to KES ${state.pay_on_delivery_cap_kes ?? '[—]'}`
-            : 'Card and M-Pesa only'
+            : 'M-Pesa only'
         }
         loading={busy === 'pay_on_delivery'}
         checked={state.pay_on_delivery}

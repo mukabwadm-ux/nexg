@@ -25,7 +25,7 @@ Unlike a plain delivery marketplace, NexG also does bespoke "experience day" pla
 
 - Multi-city, zone/coverage-aware (merchants and delivery are scoped to a city/zone).
 - Currency is KES throughout; amounts are stored in cents.
-- Checkout methods: card and M-Pesa (via Paystack today, with direct Safaricom Daraja STK Push being wired), and cash on delivery.
+- Checkout methods: M-Pesa (Safaricom Daraja STK Push), pay by bank (sandbox only so far), and cash on delivery. There is no card payment provider.
 - Two separate apps: `apps/web` (public, guest- and merchant-facing) and `apps/admin` (staff-only console), sharing one Supabase/Postgres backend and a design-system package (`packages/ui`).
 - Merchants manage their own catalogue pricing from a merchant portal; every paid order gets a detailed transaction/payout breakdown visible to both admin and the merchant.
 

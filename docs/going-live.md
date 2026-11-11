@@ -7,7 +7,7 @@ Three things are built and inert. Each one is wired end to end and refuses hones
 | | Set | Then |
 |---|---|---|
 | **Maps** | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAPS_ID` | The live map draws; a merchant drops a pin instead of typing coordinates |
-| **Payments** | `PAYSTACK_SECRET_KEY`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Guests pay, featured slots bill, refunds actually leave the account |
+| **Payments** | `DARAJA_CONSUMER_KEY`, `DARAJA_CONSUMER_SECRET`, `DARAJA_SHORTCODE`, `DARAJA_PASSKEY`, `DARAJA_CALLBACK_SECRET` | Guests pay by M-Pesa and featured slots bill |
 | **Realtime** | nothing | Already on |
 
 Every screen that depends on one of these names the exact variable it is waiting for. "Maps unavailable" wastes an afternoon; "set `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`" does not.
@@ -50,62 +50,56 @@ The browser key and Map ID are both required to draw a map. A key without a Map 
 
 ---
 
-## 2. Paystack
+## 2. M-Pesa (Safaricom Daraja)
+
+NexG takes payment by M-Pesa (STK Push), by bank (the NexG Sandbox Bank only, so far) and in cash on delivery. There is no card payment provider.
 
 ### What to create
 
-1. A Paystack account for **Nexgenius Concierge Limited**, in Kenya, with KES enabled.
-2. Settings → API Keys & Webhooks → copy the **secret** and **public** keys.
-3. Set the **webhook URL** to `https://<your web domain>/api/payments/paystack/webhook`.
-
-Check the endpoint answers before saving it:
-
-```
-curl https://<your web domain>/api/payments/paystack/webhook
-→ {"ok":true,"endpoint":"paystack webhook","configured":true}
-```
-
-`configured: false` means the secret key is not set on that deployment.
+1. A Daraja app on the Safaricom developer portal, with M-Pesa Express (STK Push) for the business Paybill or Till.
+2. Its **consumer key** and **consumer secret**, the **shortcode** and the **passkey**.
+3. A long random **callback secret**. It goes in the callback address, so only Safaricom's posts are trusted.
 
 ### Where they go
 
 | | |
 |---|---|
-| Vercel → `nexg-sepia` (web) | `PAYSTACK_SECRET_KEY`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` |
-| Vercel → `nexg-zjkl` (admin) | `PAYSTACK_SECRET_KEY` only — the console sends refunds and never takes a payment |
+| Vercel → `nexg-sepia` (web) | `DARAJA_ENV`, `DARAJA_CONSUMER_KEY`, `DARAJA_CONSUMER_SECRET`, `DARAJA_SHORTCODE`, `DARAJA_PASSKEY`, `DARAJA_CALLBACK_SECRET`, and for a Till `DARAJA_TILL_NUMBER` and `DARAJA_TRANSACTION_TYPE` |
+| Supabase Vault | the same callback secret, named `daraja_callback_secret` |
 
-Start with `sk_test_`. `paystackMode()` reports `test` or `live` from the key's own prefix, so nothing has to be told twice.
+Start with `DARAJA_ENV=sandbox` and Safaricom's public test shortcode and passkey. The callback address is built from `NEXT_PUBLIC_SITE_URL`: `https://<your web domain>/api/payments/mpesa/callback?token=<secret>`.
 
 ### How the money moves
 
 ```
-guest pays                    refund
-──────────                    ──────
-rpc_payment_begin_order       rpc_order_refund      (approved, not sent)
-  → payment row, pending        → refunds_to_issue_v
-/api/payments/paystack/start  issueRefund()
-  → Paystack, authorised        → Paystack /refund
-guest pays on Paystack        rpc_refund_issued
-  ↓ webhook                     → order partially_refunded / refunded
-rpc_payment_webhook
+guest pays                     refund
+──────────                     ──────
+rpc_payment_begin_order        rpc_order_refund      (approved, not sent)
+  → payment row, pending         → refunds_to_issue_v
+/api/payments/mpesa/start      Finance sends the money back
+  → STK prompt to the phone      by M-Pesa or bank transfer
+guest enters their PIN         order panel → reference recorded
+  ↓ Safaricom callback           → rpc_refund_issued
+rpc_payment_mpesa_callback       → order partially_refunded / refunded
+  → rpc_payment_webhook
   → order paid
 ```
 
-**The webhook is the truth, not the browser.** A guest who pays and closes the tab has still paid; one who reaches `/pay/<reference>` through the back button has not. Only `rpc_payment_webhook` moves an order to paid. The return page reports what the database already believes, and asks Paystack directly so it can say "paid" a second sooner — but it never writes.
+**The callback is the truth, not the browser.** A guest who pays and closes the tab has still paid; one who reaches `/pay/<reference>` through the back button has not. Only `rpc_payment_webhook` moves an order to paid. When a prompt has had no answer for 45 seconds, the payment page asks Safaricom directly so it can say "paid" sooner, but it never writes.
 
-Five things it refuses, each of which would otherwise look like success:
+Things it refuses, each of which would otherwise look like success:
 
-- **A duplicate delivery.** Paystack sends no event id and retries on any non-200, so the body is digested and the digest is unique. A retry does nothing.
-- **A forged body.** HMAC-SHA512 over the *raw* bytes, compared in constant time. An unsigned event is stored — a run of them is somebody probing — and not acted on.
+- **A duplicate delivery.** Every event is stored once against its dedupe key. A retry does nothing.
+- **A forged callback.** The secret token in the callback address is checked in the database before anything is stored, so a callback without it changes nothing.
 - **A different amount.** A provider settling one shilling against an 880-shilling order fails the payment, writes a `high` audit event, and leaves the order unpaid.
-- **Two open checkouts.** One live payment per order, enforced by a partial unique index. Asking twice returns the same checkout.
-- **A refund marked sent that was not.** Nothing is marked issued until Paystack has said yes, and if the provider succeeds but our write fails, the message hands you the provider reference rather than pretending.
+- **Two open payments.** One live payment per order, enforced by a partial unique index. Asking twice returns the same payment.
+- **A refund marked sent that was not.** Nothing is marked issued without the reference of the money that went back.
 
 ### What is still by hand
 
-- **Wallet credits.** There is no wallet ledger, so `wallet_credit` refunds say so and Finance applies them.
-- **Cash orders.** Nothing to reverse, so the refund route says to send M-Pesa and record the reference.
-- **Payouts to merchants and riders.** Statements and settlements are records; the money is moved by hand. Paystack Transfers would be the next piece.
+- **Refunds.** Finance sends the money back by M-Pesa or bank transfer and records the reference in the order panel.
+- **Wallet credits.** There is no wallet ledger, so Finance applies them and records them the same way.
+- **Payouts to merchants and riders.** Statements and settlements are records; the money is moved by hand. An M-Pesa B2C or bank payout integration would be the next piece.
 
 ---
 
@@ -141,9 +135,9 @@ The failure to know about: **the socket connecting before the session loads.** I
 
 1. **Deploy the code first.** This project once pushed a migration that pointed the sidebar at `/live` before the page existed in the deployed build, and every staff member got a 404. The database can be ahead of the schema; it must never be ahead of the routes.
 2. Set the Maps keys. Reload `/live` — the map appears, and nothing else changes.
-3. Set the Paystack **test** keys. Place an order, pay with a test card, watch the webhook land and the order turn paid.
-4. Approve a small refund and send it. Confirm it reaches `issued` and the order reads `partially_refunded`.
-5. Swap the test keys for live ones. Nothing else changes.
+3. Set the Daraja **sandbox** keys. Place an order, approve the prompt on the test phone, watch the callback land and the order turn paid.
+4. Approve a small refund, send it back by M-Pesa, and record its reference in the order panel. Confirm it reaches `issued` and the order reads `partially_refunded`.
+5. Swap the sandbox keys for live ones and set `DARAJA_ENV=live`. Nothing else changes.
 
 ## One thing worth knowing about privileges
 
@@ -151,7 +145,7 @@ Supabase sets `alter default privileges in schema public grant all on functions 
 
 Most functions guard themselves and raise. The ones that did not were the maintenance jobs and sweeps, written to be called by pg_cron — including `cron_retention`, which deletes on the retention schedule, and `fn_anonymise_guest`. Those are now revoked by name, and the default no longer grants to `anon`.
 
-A function that genuinely needs an anonymous caller — a QR scan, a careers applicant with a one-time token, a Paystack webhook — grants it explicitly. If you add one, grant it on purpose so a reviewer sees the line. `supabase/tests/21_money_and_live.sql` asserts both halves: that no `cron_*` is reachable, and that a logged-out visitor can still read a menu and scan a sticker.
+A function that genuinely needs an anonymous caller — a QR scan, a careers applicant with a one-time token, a payment provider's callback — grants it explicitly. If you add one, grant it on purpose so a reviewer sees the line. `supabase/tests/21_money_and_live.sql` asserts both halves: that no `cron_*` is reachable, and that a logged-out visitor can still read a menu and scan a sticker.
 
 ## What is still missing after all of this
 

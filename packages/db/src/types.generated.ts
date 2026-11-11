@@ -54998,10 +54998,6 @@ export type Database = {
         };
         Returns: Json;
       };
-      rpc_payment_paystack_webhook: {
-        Args: { p_raw_body: string; p_signature: string };
-        Returns: Json;
-      };
       rpc_payment_webhook: {
         Args: {
           p_amount_cents?: number;

@@ -100,7 +100,7 @@ export function AppPreview() {
             <span>
               <span className="block text-[0.5rem] font-bold">Pay how you like</span>
               <span className="text-muted-light block text-[0.45rem]">
-                Card · M-Pesa · On account
+                M-Pesa · On delivery · On account
               </span>
             </span>
             <span className="bg-surface rounded px-1.5 py-0.5 text-[0.4rem] font-bold">M-PESA</span>

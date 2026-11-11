@@ -1,4 +1,4 @@
-import { Check, CircleSlash, CreditCard, Landmark, Search, Smartphone, X } from 'lucide-react';
+import { Check, CircleSlash, Landmark, Search, Smartphone, X } from 'lucide-react';
 import type { Metadata } from 'next';
 
 import { AutoRefresh } from '@/components/pay/auto-refresh';
@@ -15,7 +15,6 @@ import { bankCheckoutEnabled } from '@/lib/bank';
 import { reconcileBankPayment } from '@/lib/bank/payments';
 import { reconcileMpesaPrompts } from '@/lib/mpesa-prompt';
 import { failureCopy, failureKind, PROMPT_EXPIRES_AFTER_SECONDS } from '@/lib/payment-outcome';
-import { paystackConfigured, verify } from '@/lib/paystack';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
@@ -71,7 +70,6 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     }
   }
 
-  const cardReady = paystackConfigured();
   const bankEnabled = bankCheckoutEnabled();
 
   /* Pay-on-delivery orders have no payment yet: checkout sends the guest here
@@ -156,12 +154,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
                 ]}
               />
             ) : (
-              <RetryPayment
-                orderId={placed.id}
-                mode="start"
-                bankEnabled={bankEnabled}
-                cardReady={cardReady}
-              />
+              <RetryPayment orderId={placed.id} mode="start" bankEnabled={bankEnabled} />
             )}
           </PaymentStatusLayout>
         </>
@@ -216,18 +209,6 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     !['paid', 'collected'].includes(order?.payment_status ?? '') &&
     !['cancelled', 'refunded'].includes(order?.stage ?? '');
 
-  /* Still open with Paystack: ask it, so a card payment that just went
-     through shows as paid, and one the guest cancelled shows as cancelled. */
-  let settledNow = false;
-  let paystackOutcome: string | null = null;
-  if (payment.state !== 'paid' && payment.provider === 'paystack' && paystackConfigured()) {
-    const asked = await verify(params.reference);
-    settledNow = asked.ok && asked.data?.status === 'success';
-    if (asked.ok && (asked.data?.status === 'abandoned' || asked.data?.status === 'failed')) {
-      paystackOutcome = asked.data.gateway_response || asked.data.status;
-    }
-  }
-
   const amount = `KES ${Math.round(payment.amount_cents / 100).toLocaleString('en-KE')}`;
   const phone = localPhone(payment.payer_phone);
 
@@ -256,7 +237,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     ) : null;
 
   /* ─────────────────────────────────────────── paid */
-  if (payment.state === 'paid' || settledNow) {
+  if (payment.state === 'paid') {
     return (
       <>
         <SiteHeader />
@@ -287,8 +268,8 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     );
   }
 
-  /* ───────────────────────── failed, cancelled, or abandoned at Paystack */
-  if (payment.state === 'failed' || paystackOutcome) {
+  /* ─────────────────────────────────────────── failed or cancelled */
+  if (payment.state === 'failed') {
     if (
       payment.intent === 'order' &&
       order &&
@@ -311,7 +292,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
       );
     }
 
-    const reason = paystackOutcome ?? payment.failure_reason;
+    const reason = payment.failure_reason;
     const kind = failureKind(reason);
     const copy = failureCopy(kind, amount);
     return (
@@ -338,7 +319,6 @@ export default async function PaymentReturn({ params }: { params: { reference: s
               mode="failed"
               defaultPhone={phone}
               bankEnabled={bankEnabled}
-              cardReady={cardReady}
             />
           )}
         </PaymentStatusLayout>
@@ -401,7 +381,6 @@ export default async function PaymentReturn({ params }: { params: { reference: s
               mode={unanswered ? 'expired' : 'waiting'}
               defaultPhone={phone}
               bankEnabled={bankEnabled}
-              cardReady={cardReady}
             />
           )}
         </PaymentStatusLayout>
@@ -409,8 +388,8 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     );
   }
 
-  /* ──────────── nothing sent yet (the prompt could not go out), or a card
-     payment still open at Paystack */
+  /* ──────────── nothing sent yet (the prompt could not go out), or still
+     being confirmed */
   const notStarted = payment.state === 'pending';
   return (
     <>
@@ -418,7 +397,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
       <AutoRefresh seconds={5} />
       <PaymentStatusLayout
         tone="waiting"
-        icon={payment.provider === 'paystack' && !notStarted ? CreditCard : Smartphone}
+        icon={Smartphone}
         title={notStarted ? 'Finish paying for your order' : 'Confirming your payment'}
         message={
           notStarted
@@ -428,20 +407,12 @@ export default async function PaymentReturn({ params }: { params: { reference: s
         aside={summary}
       >
         {progress('current')}
-        {payment.provider === 'paystack' && payment.authorization_url && !notStarted && (
-          <ActionRow
-            actions={[
-              { label: 'Continue to Paystack', href: payment.authorization_url, external: true },
-            ]}
-          />
-        )}
         {orderOpen && notStarted && (
           <RetryPayment
             orderId={payment.order_id!}
             mode="start"
             defaultPhone={phone}
             bankEnabled={bankEnabled}
-            cardReady={cardReady}
           />
         )}
       </PaymentStatusLayout>
@@ -466,9 +437,6 @@ const METHOD_LABEL: Record<string, string> = {
 function methodLabel(payment: Payment, order: OrderRow | null, phone: string | null) {
   if (payment.provider === 'mpesa') return phone ? `M-Pesa · ${phone}` : 'M-Pesa';
   if (payment.provider?.startsWith('bank_')) return 'Bank';
-  if (payment.provider === 'paystack' && (payment.provider_ref || payment.authorization_url)) {
-    return 'Card · Paystack';
-  }
   return (order && METHOD_LABEL[order.payment_method]) ?? '—';
 }
 

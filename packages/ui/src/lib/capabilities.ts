@@ -2,8 +2,8 @@
  * What is actually connected, answered in one place.
  *
  * Two halves hold the truth and neither is enough alone. The
- * database knows what NexG *means* to have — that payments go
- * through Paystack, that the map is Google's — and the deployment
+ * database knows what NexG *means* to have — that the map is
+ * Google's, that messages go out through a worker — and the deployment
  * knows whether the keys are really there. A screen that trusted
  * only the database would claim a map it cannot draw; one that
  * trusted only the environment would not know what was missing.
@@ -65,31 +65,6 @@ export function maps(): Capability & { key: string; mapId: string } {
   };
 }
 
-/**
- * Paystack.
- *
- * The public key is what the browser needs to open a checkout; the
- * secret is what the server needs to start one and to verify a
- * webhook. The secret is never read in client code — this function
- * runs in both places, so it only ever reports whether it is set.
- */
-export function payments(): Capability & { publicKey: string } {
-  const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY ?? '';
-  /* `process.env` on the client only carries NEXT_PUBLIC_ names, so
-     in a browser the secret always reads as absent. The server is
-     the half that decides whether a payment can actually start, and
-     it is the half that calls this before doing so. */
-  const secret = typeof window === 'undefined' ? (process.env.PAYSTACK_SECRET_KEY ?? '') : 'client';
-
-  return {
-    ...result(
-      { NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: publicKey, PAYSTACK_SECRET_KEY: secret },
-      'No payment provider is connected, so nothing is charged and a refund is recorded rather than moved.',
-    ),
-    publicKey,
-  };
-}
-
 /** Whether a message queued in `notification_log` will ever go out. */
 export function notifications(): Capability {
   return result(
@@ -117,7 +92,6 @@ export function realtime(): Capability {
 export function allCapabilities(): Record<string, Capability> {
   return {
     maps: maps(),
-    payments: payments(),
     notifications: notifications(),
     realtime: realtime(),
   };
