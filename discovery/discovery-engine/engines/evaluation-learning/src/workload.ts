@@ -18,6 +18,9 @@ export async function runWorkload(options: { rps: number; seconds: number; maxIn
   for (let index = 0; index < options.rps * options.seconds; index++) {
     const scheduledMs = index * 1000 / options.rps;
     await new Promise(resolve => setTimeout(resolve, Math.max(0, start + scheduledMs - performance.now())));
+    // A timer can fire a fraction of a millisecond before performance.now() reaches its due time. An arrival is
+    // never recorded before it was scheduled; otherwise its latency comes out negative and the summary rejects it.
+    while (performance.now() - start < scheduledMs) await new Promise(resolve => setTimeout(resolve, 1));
     if (active >= options.maxInflight) { const completedMs = performance.now() - start; rows.push({ scheduledMs, completedMs, latencyMs: completedMs - scheduledMs, status: 'capacity_drop', code: 'CLIENT_CAPACITY_DROP' }); continue; }
     active++;
     jobs.push((async () => {
