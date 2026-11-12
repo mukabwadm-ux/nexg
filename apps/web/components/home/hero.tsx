@@ -310,10 +310,10 @@ function HeroSearch({ copy }: { copy: HeroCopy }) {
         e.preventDefault();
         go();
       }}
-      className="sm:focus-within:ring-gold mt-8 flex w-full flex-col gap-3 sm:w-0 sm:min-w-full sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:bg-white sm:p-1.5 sm:shadow-2xl sm:focus-within:ring-2"
+      className="sm:focus-within:ring-gold mt-8 flex w-full flex-col gap-3 sm:w-0 sm:min-w-full sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:bg-white sm:p-1 sm:shadow-2xl sm:focus-within:ring-2"
     >
       <div className="focus-within:ring-gold flex min-w-0 flex-1 items-center rounded-full bg-white shadow-2xl focus-within:ring-2 sm:shadow-none sm:focus-within:ring-0">
-        <Search className="ml-4 h-5 w-5 shrink-0 text-[#141414]" aria-hidden="true" />
+        <Search className="ml-4 h-4 w-4 shrink-0 text-[#141414]" aria-hidden="true" />
         <input
           type="search"
           name="q"
@@ -323,12 +323,12 @@ function HeroSearch({ copy }: { copy: HeroCopy }) {
           aria-label={copy.searchPlaceholder}
           autoComplete="off"
           enterKeyHint="search"
-          className="h-12 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 text-[0.9375rem] text-[#141414] shadow-none placeholder:text-[#6b6560] focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-auto [&::-webkit-search-cancel-button]:hidden"
+          className="h-11 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 text-sm text-[#141414] shadow-none placeholder:text-[#6b6560] focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-auto [&::-webkit-search-cancel-button]:hidden"
         />
       </div>
       <button
         type="submit"
-        className="focus-visible:ring-gold flex h-12 items-center justify-center gap-2 rounded-full bg-[#FFC93C] px-6 text-base font-bold text-[#141414] transition-colors hover:bg-[#FFD35F] focus-visible:outline-none focus-visible:ring-2 sm:h-auto sm:min-w-[8.5rem] sm:py-3"
+        className="focus-visible:ring-gold flex h-11 items-center justify-center gap-2 rounded-full bg-[#FFC93C] px-5 text-sm font-bold text-[#141414] transition-colors hover:bg-[#FFD35F] focus-visible:outline-none focus-visible:ring-2 sm:h-auto sm:min-w-[7rem] sm:py-2"
       >
         {copy.searchButton}
         <ArrowRight className="h-4 w-4" aria-hidden="true" />
