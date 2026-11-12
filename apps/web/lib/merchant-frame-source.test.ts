@@ -33,10 +33,22 @@ beforeEach(() => {
   });
 });
 describe('managed Home and setup source boundaries', () => {
-  it('loads only a safe merchant summary for approved managed Home', async () => {
+  it('gives an approved managed Home the operational dashboard summary', async () => {
+    const result = await merchantContext({ setup: true });
+    expect(result.operational).toBe(true);
+    expect(mocks.from).toHaveBeenCalledWith('merchant_home_v');
+  });
+  it('loads only a safe merchant summary for an unapproved managed Home', async () => {
+    mocks.requireMerchant.mockResolvedValue({
+      id: 'merchant',
+      userId: 'actor',
+      kind: 'merchant',
+      home: '/merchant',
+      access: { state: 'pending', setup: true, operations: false },
+    });
     const result = await merchantContext({ setup: true });
     expect(result.m?.name).toBe('Acacia Kitchen');
-    expect(mocks.from).toHaveBeenCalledWith('merchant');
+    expect(result.operational).toBe(false);
     expect(mocks.from).not.toHaveBeenCalledWith('merchant_home_v');
   });
   it('keeps setup editor framing away from operational aggregates', async () => {

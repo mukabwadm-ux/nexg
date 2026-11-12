@@ -331,10 +331,11 @@ export function ApplicationReviewDetail({
             </Card>
           )}
           <Card className="p-5">
-            <h2 className="text-sm font-extrabold">Separate activation</h2>
+            <h2 className="text-sm font-extrabold">Approval takes the merchant live</h2>
             <p className="text-muted mt-2 text-sm leading-relaxed">
-              This review changes application access only. Document verification, finance checks,
-              publication and accepting work remain separate.
+              Approve once every required document is verified. Approving unlocks the workspace and
+              takes the merchant live, so their home becomes the dashboard. Take live and Deactivate
+              stay on the merchant record.
             </p>
           </Card>
         </aside>

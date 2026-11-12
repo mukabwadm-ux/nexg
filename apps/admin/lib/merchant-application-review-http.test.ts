@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  approvalBlocker,
   merchantApplicationReviewHandler,
   type ReviewTransportPorts,
 } from './merchant-application-review-http';
@@ -223,5 +224,63 @@ describe('staff application review transport', () => {
     expect(await response.json()).toMatchObject({
       type: 'urn:nexg:application-review:review_unavailable',
     });
+  });
+
+  it('refuses an approval while required documents are unverified, before saving anything', async () => {
+    const goLive = vi.fn(async () => null);
+    const p = ports({
+      approvalBlocker: vi.fn(async () => '1 of 3 required documents are verified.'),
+      goLive,
+    });
+    const response = await merchantApplicationReviewHandler(p)(reviewRequest(reviewCommand()));
+    expect(response.status).toBe(412);
+    expect((await response.json()).detail).toBe('1 of 3 required documents are verified.');
+    expect(p.rpc).not.toHaveBeenCalled();
+    expect(goLive).not.toHaveBeenCalled();
+  });
+
+  it('takes an approved merchant live and reports it', async () => {
+    const goLive = vi.fn(async () => null);
+    const p = ports({ approvalBlocker: vi.fn(async () => null), goLive });
+    const response = await merchantApplicationReviewHandler(p)(reviewRequest(reviewCommand()));
+    expect(response.status).toBe(200);
+    expect(goLive).toHaveBeenCalledWith(merchantId, expect.any(AbortSignal));
+    expect(response.headers.get('x-merchant-live')).toBe('true');
+  });
+
+  it('keeps a saved approval and reports why going live failed', async () => {
+    const p = ports({
+      approvalBlocker: vi.fn(async () => null),
+      goLive: vi.fn(async () => 'You need merchant_ops or super_admin.'),
+    });
+    const response = await merchantApplicationReviewHandler(p)(reviewRequest(reviewCommand()));
+    expect(response.status).toBe(200);
+    expect(response.headers.get('x-merchant-live')).toBe('false');
+    expect(decodeURIComponent(response.headers.get('x-merchant-live-detail')!)).toBe(
+      'You need merchant_ops or super_admin.',
+    );
+  });
+});
+
+describe('approval readiness', () => {
+  const required = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  it('names what is missing and what is waiting', () => {
+    expect(
+      approvalBlocker(
+        required,
+        [
+          { requirement_id: 'a', status: 'verified' },
+          { requirement_id: 'b', status: 'uploaded' },
+        ],
+        1,
+      ),
+    ).toBe(
+      '1 of 3 required documents are verified (1 not uploaded yet, 1 uploaded and waiting for verification). Verify them in Merchants › Documents, then approve.',
+    );
+  });
+  it('needs a primary location', () => {
+    const all = required.map((r) => ({ requirement_id: r.id, status: 'verified' }));
+    expect(approvalBlocker(required, all, 0)).toMatch(/no primary location/);
+    expect(approvalBlocker(required, all, 1)).toBeNull();
   });
 });

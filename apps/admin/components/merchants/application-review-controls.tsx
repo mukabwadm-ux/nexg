@@ -93,7 +93,8 @@ export function ApplicationReviewControls({
             body: JSON.stringify(command),
           });
           controller.signal.throwIfAborted();
-          const body: unknown = response.ok ? await response.json().catch(() => null) : null;
+          const body: unknown =
+            response.ok || response.status === 412 ? await response.json().catch(() => null) : null;
           controller.signal.throwIfAborted();
           return { kind: 'response', response, body } as const;
         })(),
@@ -118,9 +119,11 @@ export function ApplicationReviewControls({
         setPhase('confirmed');
         setMessage(
           command.decision === 'approved'
-            ? saved.data.access.operations
-              ? 'Application approved. Workspace access is unlocked. Activation is separate.'
-              : 'Application approved. Current account restrictions still apply. Activation is separate.'
+            ? response.headers.get('x-merchant-live') === 'true'
+              ? 'Application approved. The merchant is live and their home is now the dashboard.'
+              : `Application approved, but the merchant is not live yet: ${decodeURIComponent(
+                  response.headers.get('x-merchant-live-detail') ?? 'reason unavailable',
+                )} Use Take live on the merchant record.`
             : command.decision === 'changes_requested'
               ? 'Changes requested. The merchant can update and resubmit the application.'
               : 'Application rejected.',
@@ -133,6 +136,14 @@ export function ApplicationReviewControls({
         setMessage(
           'The application changed or was already reviewed. Reload the current application before making another decision.',
         );
+      } else if (response.status === 412) {
+        attempt.current = null;
+        setPhase('ready');
+        const detail =
+          body && typeof body === 'object' && 'detail' in body && typeof body.detail === 'string'
+            ? body.detail
+            : 'This merchant is not ready to approve yet.';
+        setMessage(`Not approved yet. ${detail}`);
       } else if (response.status === 400 || response.status === 422) {
         attempt.current = null;
         setPhase('ready');
@@ -175,8 +186,8 @@ export function ApplicationReviewControls({
     <Card className="p-5">
       <h2 className="text-base font-extrabold">Review revision {revision}</h2>
       <p className="text-muted mt-2 text-sm leading-relaxed">
-        Approval unlocks workspace access. Publication and accepting work require separate
-        activation checks.
+        Approval needs every required document verified. It unlocks the workspace and takes the
+        merchant live.
       </p>
       <fieldset className="mt-4 space-y-4" disabled={frozen}>
         <legend className="sr-only">Application decision</legend>

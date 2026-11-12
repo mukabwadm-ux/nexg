@@ -129,7 +129,9 @@ describe('application review decision controls', () => {
     ports.getUser.mockReturnValueOnce(auth.promise);
     fetcher.mockImplementation(
       async (_url, init) =>
-        new Response(JSON.stringify(saved(JSON.parse(String(init?.body)).operationId))),
+        new Response(JSON.stringify(saved(JSON.parse(String(init?.body)).operationId)), {
+          headers: { 'x-merchant-live': 'true' },
+        }),
     );
     await render(form());
     await click('Confirm approve workspace access');
@@ -149,7 +151,7 @@ describe('application review decision controls', () => {
       reason: '',
     });
     expect(container.textContent).toContain(
-      'Application approved. Workspace access is unlocked. Activation is separate.',
+      'Application approved. The merchant is live and their home is now the dashboard.',
     );
     expect(container.querySelector('button')?.disabled).toBe(true);
     await act(async () => {
@@ -181,10 +183,14 @@ describe('application review decision controls', () => {
     expect(container.textContent).not.toContain('Application approved.');
     expect(posted(1)).toEqual(original);
     await act(async () => {
-      next.resolve(new Response(JSON.stringify(saved(original.operationId))));
+      next.resolve(
+        new Response(JSON.stringify(saved(original.operationId)), {
+          headers: { 'x-merchant-live': 'true' },
+        }),
+      );
     });
     expect(container.textContent).toContain(
-      'Application approved. Workspace access is unlocked. Activation is separate.',
+      'Application approved. The merchant is live and their home is now the dashboard.',
     );
     expect(ports.refresh.mock.calls).toHaveLength(1);
   });

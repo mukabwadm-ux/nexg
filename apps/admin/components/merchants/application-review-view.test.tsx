@@ -72,7 +72,7 @@ describe('application review server-rendered facts', () => {
     expect(html).toContain('Publication: applied');
   });
 
-  it('offers review only for the current submitted pending revision and keeps activation separate', () => {
+  it('offers review only for the current submitted pending revision and explains that approval takes the merchant live', () => {
     const current = {
       ...record,
       revision: 2,
@@ -83,10 +83,8 @@ describe('application review server-rendered facts', () => {
     );
     expect(html).toContain('Review revision 2');
     expect(html).toContain('Confirm approve workspace access');
-    expect(html).toContain('Publication and accepting work require separate activation checks');
-    expect(html).toContain(
-      'Document verification, finance checks, publication and accepting work remain separate',
-    );
+    expect(html).toContain('Approval needs every required document verified');
+    expect(html).toContain('Approving unlocks the workspace and takes the merchant live');
   });
 
   it('keeps cityless applications in their own bounded queue with a cursor link', () => {

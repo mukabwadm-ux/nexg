@@ -30,13 +30,15 @@ export const dynamic = 'force-dynamic';
  * decided for itself would be the one place that disagreed.
  */
 export default async function MerchantDashboard() {
-  const { m, live, supabase, me } = await merchantContext({ setup: true });
+  const { m, live, operational, supabase, me } = await merchantContext({ setup: true });
+  // An approved new-form merchant always gets the dashboard, live or not.
+  const dashboard = live || (me.access.state !== 'legacy' && operational);
 
   // New applications render from their revisioned owner record before any
   // operational counts, order/finance views or sample legacy progress reads.
-  // Once staff take an approved application live, `live` is true and the
-  // home is the dashboard below instead of the setup checklist.
-  if (me.access.state !== 'legacy' && !live) {
+  // Once staff approve the application, the home is the dashboard below
+  // instead of the registration checklist.
+  if (me.access.state !== 'legacy' && !operational) {
     if (!me.access.setup)
       return (
         <main className="p-6">
@@ -154,7 +156,7 @@ export default async function MerchantDashboard() {
 
   /* The live half reads three more things. A merchant still in
      setup pays for none of them. */
-  const [orderRes, moneyRes, barRes] = live
+  const [orderRes, moneyRes, barRes] = dashboard
     ? await Promise.all([
         supabase
           .from('merchant_orders_v')
@@ -192,7 +194,7 @@ export default async function MerchantDashboard() {
           </div>
         </div>
       )}{' '}
-      {live ? (
+      {dashboard ? (
         <>
           <HomeLive
             m={m}

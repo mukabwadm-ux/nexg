@@ -16,6 +16,13 @@ export interface ReviewTransportPorts {
     args: Record<string, unknown>,
     signal: AbortSignal,
   ) => Promise<ReviewRpcResult>;
+  /**
+   * Approval is the go-live decision, so it waits for the documents. Returns
+   * null when the merchant may be approved, otherwise what is still missing.
+   */
+  approvalBlocker?: (merchantId: string, signal: AbortSignal) => Promise<string | null>;
+  /** Takes an approved merchant live. Returns null when live, else why not. */
+  goLive?: (merchantId: string, signal: AbortSignal) => Promise<string | null>;
 }
 const BODY_LIMIT = 12 * 1024;
 const DEADLINE_MS = 10000;
@@ -181,6 +188,12 @@ export function merchantApplicationReviewHandler(ports: ReviewTransportPorts) {
           reader.releaseLock();
         }
       });
+      if (input.decision === 'approved' && ports.approvalBlocker) {
+        const blocker = await bounded(() =>
+          ports.approvalBlocker!(input.merchantId, controller.signal),
+        );
+        if (blocker) return problem(new ReviewSourceError(412, 'not_ready_to_approve', blocker));
+      }
       const result = await bounded(() =>
         ports.rpc(
           'rpc_merchant_application_review',
@@ -215,6 +228,17 @@ export function merchantApplicationReviewHandler(ports: ReviewTransportPorts) {
         record.operation_id !== input.operationId
       )
         throw new Error('Invalid review response.');
+      if (input.decision === 'approved' && ports.goLive) {
+        // The approval is saved either way; going live is reported, not assumed.
+        let notLive: string | null;
+        try {
+          notLive = await bounded(() => ports.goLive!(input.merchantId, controller.signal));
+        } catch {
+          notLive = 'Going live could not be confirmed. Use Take live on the merchant record.';
+        }
+        headers['x-merchant-live'] = notLive ? 'false' : 'true';
+        if (notLive) headers['x-merchant-live-detail'] = encodeURIComponent(notLive.slice(0, 300));
+      }
       return Response.json(record, { headers });
     } catch (error) {
       return problem(
@@ -231,4 +255,33 @@ export function merchantApplicationReviewHandler(ports: ReviewTransportPorts) {
       request.signal.removeEventListener('abort', cancel);
     }
   };
+}
+
+/**
+ * Why a merchant cannot be approved yet, or null when it can. The same rules
+ * `rpc_merchant_go_live` enforces, checked first so approval and going live
+ * happen together.
+ */
+export function approvalBlocker(
+  required: { id: string; label?: string | null }[],
+  documents: { requirement_id: string; status: string }[],
+  primaryBranches: number,
+): string | null {
+  const verified = new Set(
+    documents.filter((d) => d.status === 'verified').map((d) => d.requirement_id),
+  );
+  const uploaded = new Set(documents.map((d) => d.requirement_id));
+  const unverified = required.filter((r) => !verified.has(r.id));
+  const notUploaded = unverified.filter((r) => !uploaded.has(r.id)).length;
+  if (unverified.length) {
+    const waiting = unverified.length - notUploaded;
+    const parts = [
+      notUploaded ? `${notUploaded} not uploaded yet` : null,
+      waiting ? `${waiting} uploaded and waiting for verification` : null,
+    ].filter(Boolean);
+    return `${required.length - unverified.length} of ${required.length} required documents are verified (${parts.join(', ')}). Verify them in Merchants › Documents, then approve.`;
+  }
+  if (primaryBranches === 0)
+    return 'This merchant has no primary location yet, so it cannot go live. Approve once the location is saved.';
+  return null;
 }

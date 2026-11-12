@@ -20,6 +20,8 @@ interface MerchantContext {
   supabase: ReturnType<typeof createClient>;
   m: MerchantHome | null;
   live: boolean;
+  /** True when `m` is the full operational summary rather than the shell. */
+  operational: boolean;
   nav: MerchantNavItem[];
 }
 
@@ -42,13 +44,12 @@ export async function merchantContext(
       .maybeSingle();
     if (error) throw new Error('Your business setup could not be loaded. Please retry.');
     /*
-     * A new-form merchant that staff have taken live (Admin › Merchants ›
-     * record › Take live) gets the same operational context as a live
-     * legacy merchant, so its home is the dashboard rather than the setup
-     * checklist. Draft editors keep the shell, and so does anyone whose
-     * operational summary cannot be read.
+     * Once staff approve a new-form application (which also takes it live),
+     * the merchant gets the operational context, so its home is the
+     * dashboard rather than the registration checklist. Draft editors keep
+     * the shell, and so does anyone whose operational summary cannot be read.
      */
-    if (me.access.operations && !options.draft && data?.status === 'live') {
+    if (me.access.operations && !options.draft) {
       const operational = await operationalContext(me, supabase);
       if (operational.m) return operational;
     }
@@ -100,6 +101,7 @@ export async function merchantContext(
       supabase,
       m,
       live: false,
+      operational: false,
       nav: merchantNav({
         live: false,
         ordersOpen: 0,
@@ -133,6 +135,7 @@ async function operationalContext(
     supabase,
     m,
     live,
+    operational: true,
     nav: merchantNav({
       live,
       ordersOpen: m?.orders_open ?? 0,
