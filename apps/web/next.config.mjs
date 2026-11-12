@@ -32,12 +32,14 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   /*
-   * NexG Discovery: a static app built into public/discover by `discovery/scripts/build-for-web.mjs` (the
-   * `build` and `discover` scripts). Its pages are query strings on one HTML file, so /discover serves it.
+   * NexG Discovery: its own app, built into public/discover by `discovery/scripts/build-for-web.mjs` (the
+   * `build` and `discover` scripts). The /discover page (app/discover) shows the site header over it.
    * Same origin as the rest of the site, so its cart is this site's cart (localStorage "nexg.cart.v1").
+   * The build also leaves Discovery's own index.html there, which has no site header; its address
+   * goes to the page instead, query string and all.
    */
-  async rewrites() {
-    return [{ source: '/discover', destination: '/discover/index.html' }];
+  async redirects() {
+    return [{ source: '/discover/index.html', destination: '/discover', permanent: false }];
   },
   experimental: {
     // Without @nexg/ui here, importing a Button from the barrel pulls in

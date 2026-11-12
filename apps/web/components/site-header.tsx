@@ -15,6 +15,8 @@ export interface SiteHeaderProps {
   action?: { label: string; href: string };
   /** Destination and accessible label for the account icon. */
   signIn?: { label: string; href: string };
+  /** False leaves the account icon out: Discovery's header has none (owner, 12 Nov 2026). */
+  account?: boolean;
 }
 
 /**
@@ -22,13 +24,13 @@ export interface SiteHeaderProps {
  *
  * The chip lives here rather than on each page on purpose. Every
  * public surface already renders this component — Home, Explore,
- * merchant pages, Experiences, Hotels, Help, Careers, Legal, the
- * QR landing — so putting it here is what makes "one chip, every
+ * Discovery, merchant pages, Experiences, Hotels, Help, Careers, Legal,
+ * the QR landing — so putting it here is what makes "one chip, every
  * public page" true by construction instead of by twenty people
  * remembering. Informational pages keep it too, so the next
  * click into Explore is already placed.
  */
-export async function SiteHeader({ action, signIn }: SiteHeaderProps) {
+export async function SiteHeader({ action, signIn, account: showAccount = true }: SiteHeaderProps) {
   const { locale } = await getTranslations();
   /* /account sends a signed-out visitor to sign in and back again, so the
      icon needs no session check here (which would stop the header caching). */
@@ -44,13 +46,15 @@ export async function SiteHeader({ action, signIn }: SiteHeaderProps) {
         <div className="flex items-center gap-2 sm:gap-3">
           <DeliverToChip tone="dark" />
           <NotificationBell tone="dark" />
-          <Link
-            href={account.href}
-            aria-label={account.label}
-            className="focus-visible:ring-gold text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11"
-          >
-            <User className="h-4 w-4" aria-hidden="true" fill="currentColor" />
-          </Link>
+          {showAccount && (
+            <Link
+              href={account.href}
+              aria-label={account.label}
+              className="focus-visible:ring-gold text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11"
+            >
+              <User className="h-4 w-4" aria-hidden="true" fill="currentColor" />
+            </Link>
+          )}
 
           <ThemeToggle className="focus-visible:ring-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11" />
 

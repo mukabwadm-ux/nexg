@@ -3,18 +3,36 @@ import { useEffect, useId, useRef, useState } from 'react';
 
 export interface NavSection { anchor: string; title: string; count: number }
 
-/** Phones, where the store bar docks at the very top and the site header steps aside (owner, 9 Nov 2026). */
+/** Phones, where the store bar docks at the top and Discovery's bar steps aside (owner, 9 Nov 2026). */
 export const PHONE_QUERY = '(max-width: 767px)';
 
 /** The gap left between the bar and a section heading that a chip scrolls to. */
 const LANDING_GAP = 12;
 
+/** How much of Discovery's bar scrolls away on phones (its location row, --header-collapse in px); 0 on wider screens. */
+export function headerCollapseOf(element: Element | null): number {
+  if (!element) return 0;
+  const value = Number.parseFloat(getComputedStyle(element).getPropertyValue('--header-collapse'));
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
+}
+
 /**
- * How far down the pinned site header reaches: its height, less the part that scrolls away. On phones the
- * header's account and location rows scroll off (a negative sticky `top`), so only its last row stays.
+ * The page's own header above Discovery's bar: on the NexG website the site header, pinned at the top (owner,
+ * 12 Nov 2026); on its own, none. Read off the bar's sticky top (styles.css: that height less the collapse), which
+ * the browser has already worked out in pixels.
+ */
+export function siteHeaderHeightOf(element: Element | null): number {
+  if (!element) return 0;
+  const top = Number.parseFloat(getComputedStyle(element).top);
+  return Math.max(0, Math.round((Number.isFinite(top) ? top : 0) + headerCollapseOf(element)));
+}
+
+/**
+ * How far down Discovery's pinned bar reaches: its sticky `top` plus its height. The top is the page's header
+ * above it (the site header on the website), less the bar's location row on phones, which scrolls away.
  */
 export function headerReachOf(height: number, stickyTop: number): number {
-  return Math.max(0, Math.round(height + (Number.isFinite(stickyTop) ? Math.min(0, stickyTop) : 0)));
+  return Math.max(0, Math.round(height + (Number.isFinite(stickyTop) ? stickyTop : 0)));
 }
 
 /**
@@ -26,30 +44,34 @@ export function shouldDock(phone: boolean, naturalTop: number, reach: number): b
   return phone && naturalTop <= reach + 0.5;
 }
 
-/** Phones settle the site header into one row once its top rows (`collapse` pixels) have scrolled away; wider screens never do. */
+/** Phones settle Discovery's bar into its search row once the location row (`collapse` pixels) has scrolled away; wider screens never do. */
 export function isCompactHeader(phone: boolean, collapse: number, scrollY: number): boolean {
   return phone && collapse > 0 && scrollY >= collapse - 0.5;
 }
 
-/** Where a section heading lands after a chip's scroll: under the bar, which on phones is docked at the very top by then. */
-export function sectionLanding(phone: boolean, reach: number, barHeight: number): number {
-  return (phone ? 0 : reach) + barHeight + LANDING_GAP;
+/**
+ * Where a section heading lands after a chip's scroll: under the bar, which on phones is docked at the top by then,
+ * right under the page's own header (`top`: the site header on the website, none on its own).
+ */
+export function sectionLanding(phone: boolean, reach: number, barHeight: number, top = 0): number {
+  return (phone ? top : reach) + barHeight + LANDING_GAP;
 }
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isPhone = () => window.matchMedia(PHONE_QUERY).matches;
+const discoveryBar = () => document.querySelector<HTMLElement>('.discovery-header');
 
 function headerReach(): number {
-  const header = document.querySelector<HTMLElement>('.discovery-header');
+  const header = discoveryBar();
   return header ? headerReachOf(header.offsetHeight, Number.parseFloat(getComputedStyle(header).top)) : 0;
 }
 
 /**
- * Where a store's section bar sits once the page has scrolled to it: under the site header on wider screens, at
- * the very top on phones. Storefronts use it to bring their list back into view.
+ * Where a store's section bar sits once the page has scrolled to it: under Discovery's bar on wider screens, docked
+ * at the top on phones (under the site header on the website). Storefronts use it to bring their list back into view.
  */
 export function storeBarTop(): number {
-  return isPhone() ? 0 : headerReach();
+  return isPhone() ? siteHeaderHeightOf(discoveryBar()) : headerReach();
 }
 
 /**
@@ -65,29 +87,56 @@ export function showStoreBar(container: HTMLElement | null, { onlyWhenPast = fal
   window.scrollTo({ top, behavior: smooth && !reducedMotion() ? 'smooth' : 'auto' });
 }
 
-/** The pinned header's reach, kept current as the header changes size or the screen crosses the phone width. */
-function useHeaderReach() {
-  const [reach, setReach] = useState(0);
+/**
+ * The most the pinned headers cover: the page's own header (the site header on the website) and Discovery's whole
+ * bar. A trip's booking card and a store's departments pin under it.
+ */
+export function useHeaderHeight() {
+  const [height, setHeight] = useState(0);
   useEffect(() => {
-    const header = document.querySelector<HTMLElement>('.discovery-header');
+    const header = discoveryBar();
+    if (!header || typeof ResizeObserver === 'undefined') return;
+    const measure = () => setHeight(Math.round(siteHeaderHeightOf(header) + header.getBoundingClientRect().height));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    window.addEventListener('resize', measure);
+    return () => { observer.disconnect(); window.removeEventListener('resize', measure); };
+  }, []);
+  return height;
+}
+
+/**
+ * The pinned bar's reach and the page header's height above it, kept current as the bar changes size or the screen
+ * crosses a width where either header changes.
+ */
+function useHeaderReach() {
+  const [place, setPlace] = useState({ reach: 0, top: 0 });
+  useEffect(() => {
+    const header = discoveryBar();
     const phone = window.matchMedia(PHONE_QUERY);
-    const measure = () => setReach(headerReach());
+    const measure = () => {
+      const next = { reach: headerReach(), top: siteHeaderHeightOf(header) };
+      setPlace((current) => (current.reach === next.reach && current.top === next.top ? current : next));
+    };
     measure();
     const observer = header ? new ResizeObserver(measure) : undefined;
     if (header) observer?.observe(header);
     phone.addEventListener('change', measure);
-    return () => { observer?.disconnect(); phone.removeEventListener('change', measure); };
+    window.addEventListener('resize', measure);
+    return () => { observer?.disconnect(); phone.removeEventListener('change', measure); window.removeEventListener('resize', measure); };
   }, []);
-  return reach;
+  return place;
 }
 
 /**
  * The sticky section bar every storefront shares (Wolt-style): the store's own search ("Search {store}"), then one
  * chip per section. The chip for the section on screen lights up as you scroll, and a click scrolls to it.
  *
- * Wider screens pin the bar under the site header, the search beside the chips. Phones stack a full-width search
- * over the chips, and once the bar reaches the top it docks there: `html[data-store-docked]` lets the site header
- * slide away (styles.css), so the screen keeps one search, the store's. Scrolling back above the bar undocks it.
+ * Wider screens pin the bar under Discovery's bar, the search beside the chips. Phones stack a full-width search
+ * over the chips, and once the bar reaches Discovery's bar it docks at the top: `html[data-store-docked]` lets
+ * Discovery's bar slide away (styles.css), so the screen keeps one search, the store's. On the NexG website the
+ * site header stays pinned above, and the bar docks right under it. Scrolling back above the bar undocks it.
  */
 export function SectionNav({ sections, label, search }: {
   sections: NavSection[];
@@ -101,9 +150,12 @@ export function SectionNav({ sections, label, search }: {
   // While a chip's own scroll runs, that chip stays lit instead of every section the page passes on the way.
   const target = useRef<{ anchor: string; until: number }>(undefined);
   const fieldId = useId();
-  const reach = useHeaderReach();
+  const { reach, top } = useHeaderReach();
   const reachRef = useRef(reach);
   reachRef.current = reach;
+  // Where a docked bar sits: right under the page's own header (the site header on the website), else the very top.
+  const topRef = useRef(top);
+  topRef.current = top;
   const [docked, setDocked] = useState(false);
   const dockedRef = useRef(false);
   const [active, setActive] = useState(sections[0]?.anchor);
@@ -113,7 +165,7 @@ export function SectionNav({ sections, label, search }: {
   /** Where the bar's top edge would be if it weren't pinned: the zero-height mark just before it. */
   const natural = () => mark.current?.getBoundingClientRect().top ?? 0;
   const barHeight = () => bar.current?.offsetHeight ?? 0;
-  const landing = () => sectionLanding(isPhone(), reachRef.current, barHeight());
+  const landing = () => sectionLanding(isPhone(), reachRef.current, barHeight(), topRef.current);
 
   // Docking (phones), from the mark's place: see shouldDock.
   const recheckDock = useRef(() => {});
@@ -171,7 +223,7 @@ export function SectionNav({ sections, label, search }: {
         if (!arrived && performance.now() < lock.until) { setActive(lock.anchor); return; }
         target.current = undefined;
       }
-      const line = (dockedRef.current ? 0 : reachRef.current) + barHeight() + 24;
+      const line = (dockedRef.current ? topRef.current : reachRef.current) + barHeight() + 24;
       let current = sections[0]?.anchor;
       for (const section of sections) {
         const element = document.getElementById(section.anchor);
@@ -231,9 +283,9 @@ export function SectionNav({ sections, label, search }: {
     const element = rail.current;
     if (element) element.scrollBy({ left: direction * element.clientWidth * 0.7, behavior: reducedMotion() ? 'auto' : 'smooth' });
   };
-  /** On phones a search happens docked at the top, with the results under it (as in Wolt Market). */
+  /** On phones a search happens docked at the top (under the site header on the website), with the results under it (as in Wolt Market). */
   const dock = (behavior: ScrollBehavior) => {
-    const offset = natural();
+    const offset = natural() - topRef.current;
     if (isPhone() && offset > 0.5) window.scrollTo({ top: Math.ceil(window.scrollY + offset), behavior });
   };
   const type = (value: string) => {
@@ -245,7 +297,7 @@ export function SectionNav({ sections, label, search }: {
 
   return <>
     <div ref={mark} className="section-nav-mark" aria-hidden="true" />
-    <div ref={bar} className="section-nav" data-docked={docked || undefined} style={{ top: docked ? 0 : reach }}>
+    <div ref={bar} className="section-nav" data-docked={docked || undefined} style={{ top: docked ? top : reach }}>
       {search && <div className="section-nav__search" role="search" aria-label={search.label}>
         <label htmlFor={fieldId} className="section-nav__icon"><Search size={18} strokeWidth={1.75} aria-hidden="true" /><span className="sr-only">{search.label}</span></label>
         <input ref={input} id={fieldId} type="search" value={search.value} maxLength={120} placeholder={search.placeholder} enterKeyHint="search" autoComplete="off"

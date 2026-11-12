@@ -1,6 +1,41 @@
 @font-face{font-family:Quicksand;src:url('../assets/fonts/Quicksand-Variable.ttf') format('truetype');font-style:normal;font-weight:300 700;font-display:swap}
 :root{font-family:Quicksand,Arial,sans-serif;color:#f3eee2;background:#111315;font-synthesis:none;font-weight:500;--gold:#e5b65f;--muted:#b4b7b5;--line:rgba(255,255,255,.12);--surface:#101b20;--radius:20px}
 
+/* The page Discovery is on: its dark ground behind and below the app, and no smooth scrolling (the website's
+   html has it; Discovery's own scroll restoring jumps). */
+html:has(#discovery-root),body:has(#discovery-root){background:#111315}
+html:has(#discovery-root){scroll-behavior:auto}
+
+/* On the NexG website, /discover also carries the site's header and so the site's base styles: Tailwind's
+   preflight and packages/ui globals.css. These put back, inside Discovery only, what a page of its own has. Every
+   Discovery rule is scoped to #discovery-root at build time (src/styleScope.ts) and so outranks these;
+   :where() keeps them at the id alone, above every class-based rule of the site's. */
+#discovery-root{line-height:normal;tab-size:8;-moz-tab-size:8;font-feature-settings:normal;font-variation-settings:normal;-webkit-font-smoothing:auto;-moz-osx-font-smoothing:auto;text-rendering:auto;-webkit-tap-highlight-color:initial}
+#discovery-root :where(*){border-width:revert;border-style:revert;border-color:revert}
+#discovery-root :where(*)::before,#discovery-root :where(*)::after{box-sizing:revert;border-width:revert;border-style:revert;border-color:revert}
+#discovery-root :where(:focus-visible){outline:revert;outline-offset:revert;box-shadow:revert}
+#discovery-root :where(h1,h2,h3,h4,h5,h6){font-size:revert;font-weight:revert}
+#discovery-root :where(blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre,fieldset,ol,ul,menu){margin:revert}
+#discovery-root :where(fieldset,legend,ol,ul,menu,dialog){padding:revert}
+#discovery-root :where(ol,ul,menu){list-style:revert}
+#discovery-root :where(a){color:revert;text-decoration:revert}
+#discovery-root :where(hr){height:revert;color:revert;border-top-width:revert}
+#discovery-root :where(code,kbd,samp,pre){font-family:revert;font-feature-settings:revert;font-variation-settings:revert;font-size:revert}
+#discovery-root :where(small,sub,sup){font-size:revert}
+#discovery-root :where(sub,sup){position:revert;top:revert;bottom:revert;line-height:revert;vertical-align:revert}
+#discovery-root :where(table){text-indent:revert;border-color:revert;border-collapse:revert}
+#discovery-root :where(button,input,optgroup,select,textarea){margin:revert;padding:revert;color:revert;font-family:revert;font-feature-settings:revert;font-variation-settings:revert;font-size:revert;font-weight:revert;line-height:revert;letter-spacing:revert}
+#discovery-root :where(button,select){text-transform:revert}
+#discovery-root :where(button,input[type=button],input[type=reset],input[type=submit]){-webkit-appearance:revert;appearance:revert;background-color:revert;background-image:revert}
+#discovery-root :where([type=search]){-webkit-appearance:revert;appearance:revert;outline-offset:revert}
+#discovery-root :where([type=search])::-webkit-search-decoration{-webkit-appearance:revert}
+#discovery-root :where(progress){vertical-align:revert}
+#discovery-root :where(textarea){resize:revert}
+#discovery-root :where(button,[role=button],:disabled){cursor:revert}
+#discovery-root :where(img,svg,video,canvas,audio,iframe,embed,object){display:revert;vertical-align:revert}
+#discovery-root :where(img,video){max-width:revert}
+#discovery-root :where(input,textarea)::placeholder{opacity:revert;color:revert}
+
 /* Base. Page sections live with their components: discovery.css (home, category, results, merchant card,
    store rows), homepage.css (feature carousel), rail.css, cards/cards.css and storefronts/store.css. */
 *{box-sizing:border-box}
@@ -37,11 +72,11 @@ option{background:#172126;color:#f3eee2}
 .back-button{display:flex;align-items:center;gap:8px;margin-bottom:20px;padding:0;color:var(--gold);font-size:13px}
 .pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 20px;margin-top:32px;font-size:13px}
 
-/* Header (DiscoveryHeader): location, search and account stay at the top while the page moves. ------- */
-.discovery-header{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:156px minmax(170px,auto) minmax(220px,520px) auto;align-items:center;gap:clamp(14px,2vw,30px);width:100%;padding:16px max(32px,calc((100vw - 1424px)/2 + 32px));border-bottom:1px solid var(--line);background:rgba(15,18,19,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 8px 24px rgba(0,0,0,.16);transition-property:translate,visibility;transition-duration:220ms,0s;transition-delay:0s,0s;transition-timing-function:var(--ease-out)}
-.wordmark{justify-self:start;width:fit-content;padding:0;text-align:left}
-.wordmark img{width:156px;height:40px;object-fit:contain;object-position:left center}
-.header-area{display:flex;align-items:center;gap:6px;min-width:0;color:var(--muted);font-size:13px;white-space:nowrap}
+/* Discovery's bar (DiscoveryHeader): the catalog area and the search, pinned while the page moves. On the NexG
+   website it sits under the site's own header (logo, Deliver to, menu: owner, 12 Nov 2026), whose height comes in
+   as --site-header-height (apps/web/components/discovery/discovery-app.tsx); on its own it is at the very top. -- */
+.discovery-header{position:sticky;top:var(--site-header-height,0px);z-index:20;display:grid;grid-template-columns:minmax(150px,1fr) minmax(220px,520px) minmax(150px,1fr);align-items:center;gap:clamp(14px,2vw,30px);width:100%;padding:16px max(32px,calc((100vw - 1424px)/2 + 32px));border-bottom:1px solid var(--line);background:rgba(15,18,19,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 8px 24px rgba(0,0,0,.16);transition-property:translate,visibility;transition-duration:220ms,0s;transition-delay:0s,0s;transition-timing-function:var(--ease-out)}
+.header-area{display:flex;align-items:center;justify-self:start;gap:6px;min-width:0;max-width:100%;color:var(--muted);font-size:13px;white-space:nowrap}
 .header-area svg{color:var(--gold)}
 .header-area select{max-width:210px;min-height:44px;background:none;border:0}
 .header-location-status{max-width:210px;overflow:hidden;text-overflow:ellipsis}
@@ -64,54 +99,27 @@ option{background:#172126;color:#f3eee2}
 .search-suggest__price{flex:none;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
 .search-suggest__status{padding:8px 12px 4px;color:var(--muted);font-size:12px}
 @media (prefers-reduced-motion:reduce){.search-suggest{animation:none}}
-.header-auth{display:flex;align-items:center;justify-self:end;gap:18px;white-space:nowrap;font-size:13px;font-weight:700}
-.header-auth a{text-decoration:none}
-.header-login{display:inline-flex;align-items:center;min-height:40px}
-.header-login__icon{display:none}
-.header-auth .header-signup{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:24px;background:var(--gold);color:#21190d;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
-.header-auth .header-signup:active{scale:.96}
-@media (hover:hover) and (pointer:fine){.header-auth a:hover{color:var(--gold)}.header-auth .header-signup:hover{background:#f0c979;color:#21190d}.header-search button:hover{background:#f0c979}}
-@media(max-width:1050px){
-  .discovery-header{grid-template-columns:140px minmax(120px,1fr) auto;gap:10px 16px;padding:14px 32px}
-  .wordmark img{width:140px}
-  .header-area{grid-column:2;grid-row:1;gap:4px;font-size:11px}
-  .header-search{grid-column:1/-1;grid-row:2;max-width:none}
-  .header-auth{grid-column:3;grid-row:1}
-}
-/* Phones (owner, 9 Nov 2026): the account and location rows scroll away with the page (the negative top), then
-   the header settles into one row, logo, search and account (.is-compact). In a store it steps aside while the
-   store's own search is docked at the top (SectionNav sets html[data-store-docked]). Fixed row heights keep the
-   header's height the same in both layouts, so nothing on the page moves when it changes. */
+@media (hover:hover) and (pointer:fine){.header-search button:hover{background:#f0c979}}
+@media(max-width:1050px){.discovery-header{grid-template-columns:minmax(120px,1fr) minmax(220px,520px) minmax(0,1fr);gap:10px 16px;padding:14px 32px}}
+/* Phones (owner, 9 Nov 2026): the location row scrolls away with the page (the part of `top` above the page's
+   header), so the search stays pinned; .is-compact hides the row once it has gone. In a store the bar steps aside
+   while the store's own search is docked (SectionNav sets html[data-store-docked]). Fixed row heights keep the
+   bar's height the same either way, so nothing on the page moves when it changes. */
 @media(max-width:767px){
-  .discovery-header{--header-collapse:104px;top:calc(-1 * var(--header-collapse));grid-template-columns:minmax(0,1fr) auto;grid-template-rows:44px 40px 46px;gap:8px 12px;padding:12px 20px 8px}
-  .wordmark{grid-area:1/1}
-  .wordmark img{width:100px;height:36px}
-  .header-auth{grid-area:1/2;gap:14px}
-  .header-auth .header-signup{min-height:40px;padding:0 16px}
-  .header-area{grid-area:2/1/3/-1;font-size:12.5px}
+  .discovery-header{--header-collapse:52px;top:calc(var(--site-header-height,0px) - var(--header-collapse));grid-template-columns:minmax(0,1fr);grid-template-rows:40px 46px;gap:8px;padding:12px 20px 8px}
+  .header-area{grid-area:1/1;font-size:12.5px}
   .header-area select{min-height:40px}
   .header-area select,.header-location-status{max-width:calc(100vw - 72px)}
-  .header-search{grid-area:3/1/4/-1;align-self:stretch;max-width:none;gap:8px;padding-left:16px}
+  .header-search{grid-area:2/1;align-self:stretch;max-width:none;gap:8px;padding-left:16px}
   .header-search>svg{display:none}
   /* 16px keeps phones from zooming into the field on focus. */
   .header-search input{padding:0;font-size:16px}
   .header-search input::placeholder{font-size:14px}
-  .discovery-header.is-compact{grid-template-columns:auto minmax(0,1fr) auto}
-  .discovery-header.is-compact .wordmark{grid-area:3/1;animation:header-settle 160ms var(--ease-out)}
-  .discovery-header.is-compact .wordmark img{width:80px;height:29px}
-  .discovery-header.is-compact .header-search{grid-area:3/2}
-  .discovery-header.is-compact .header-auth{grid-area:3/3;animation:header-settle 160ms var(--ease-out)}
   .discovery-header.is-compact .header-area{visibility:hidden}
-  .discovery-header.is-compact .header-signup{display:none}
-  .discovery-header.is-compact .header-login{justify-content:center;width:44px;height:44px;border-radius:50%;background:#1b2327;box-shadow:var(--shadow-ring);transition-property:scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
-  .discovery-header.is-compact .header-login:active{scale:.96}
-  .discovery-header.is-compact .header-login__icon{display:block}
-  .discovery-header.is-compact .header-login__label{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
   html[data-store-docked] .discovery-header{translate:0 -100%;visibility:hidden;transition-delay:0s,220ms}
-  /* Whoever is typing in the header keeps it. */
+  /* Whoever is typing in the bar keeps it. */
   html[data-store-docked] .discovery-header:focus-within{translate:none;visibility:visible;transition-delay:0s}
 }
-@keyframes header-settle{from{opacity:0}}
 
 /* Page frame (App) ------------------------------------------------------------------------------------ */
 .discovery-main{max-width:1424px;min-height:70vh;margin:auto;padding:24px 32px 64px}

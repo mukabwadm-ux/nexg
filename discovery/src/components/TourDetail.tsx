@@ -1,10 +1,11 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import type { DiscoveryProvider } from '../providers/DiscoveryProvider';
 import { isTourOperator, tourLabel } from '../data/tourPresentation';
 import { localDateKey } from '../data/massagePresentation';
 import { useProviderRead } from '../hooks/useProviderRead';
 import { CatalogState } from './CatalogState';
+import { useHeaderHeight } from './storefronts/SectionNav';
 import { ExperienceGrid } from './ExperienceCard';
 import { initialTripPlan, TourPlanner } from './tours/TourPlanner';
 import { TripBooking, type TripChoice } from './tours/TripBooking';
@@ -15,21 +16,6 @@ import './experiences.css';
 import './tours.css';
 import './cards/cards.css';
 import './tours/trip.css';
-
-/** Height of the sticky site header, so the booking card can stick just below it. */
-function useHeaderHeight() {
-  const [height, setHeight] = useState(0);
-  useEffect(() => {
-    const header = document.querySelector<HTMLElement>('.discovery-header');
-    if (!header || typeof ResizeObserver === 'undefined') return;
-    const measure = () => setHeight(Math.round(header.getBoundingClientRect().height));
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(header);
-    return () => observer.disconnect();
-  }, []);
-  return height;
-}
 
 /**
  * One trip, always read from its operator's catalogue. Each part shows only when the listing has it:

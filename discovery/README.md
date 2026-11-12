@@ -12,6 +12,11 @@
 >   original icon pack it checks. The website only needs `src/providers/catalogBridge.ts`, moved here from the engine.
 >   The opt-in engine provider keeps a copy of the engine's contract in `src/providers/engineContract/` and needs the
 >   engine service to run.
+> - **The site's own header is on top** (owner, 12 Nov 2026). `/discover` is a page of the website
+>   (`apps/web/app/discover`): it renders the site header, without the account icon, and Discovery renders into
+>   `#discovery-root` under it (`window.nexgDiscovery.mount`, `src/main.tsx`). Discovery's own bar keeps the catalog
+>   area and the search, pinned under the site header. Every Discovery style is scoped to `#discovery-root` at build
+>   time (`src/styleScope.ts`), and `styles.css` undoes the site's base styles inside it.
 > - CI runs `npm --prefix discovery test`.
 
 Independent Discovery frontend and repository, V1.1. This project owns its screens/components and will be merged into NEXG-PLATFORM after standalone development and review.

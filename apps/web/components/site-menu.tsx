@@ -37,9 +37,9 @@ import { Logo } from './logo';
 const SECTIONS = [
   /* Explore is left out of the menu; the page itself stays. */
   /*
-   * Discovery. It is a separate app the
-   * website serves at /discover (discovery/, rewritten in next.config.mjs), not a
-   * Next.js page, so its row loads it in full rather than through the router.
+   * Discovery. The /discover page mounts a separate app (discovery/) under the site
+   * header, so its row loads it in full rather than through the router: Discovery's
+   * stylesheet is then in place before it renders.
    */
   {
     number: '01',

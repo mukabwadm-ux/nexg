@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import { scopeStyles } from './src/styleScope';
 import { demoMediaFromSnapshot } from './src/providers/catalogBridge';
 import { packDemoMedia } from './src/providers/demoMedia';
 import { supabaseSettings } from './src/providers/supabaseSettings';
@@ -99,6 +100,17 @@ export default defineConfig(({ command, mode }) => {
     // A build without the stand-in cinema system leaves its sample data file out (src/data/cinema/connector.ts).
     define: { __NEXG_CINEMA_STAND_IN__: JSON.stringify(env.VITE_CINEMA_SOURCE === 'stand-in') },
     publicDir: false,
+    // Every rule applies inside Discovery's root only, so the website's header and Discovery share a page safely.
+    css: { postcss: { plugins: [scopeStyles()] } },
+    build: {
+      rollupOptions: {
+        // The website's /discover page loads these two by name (apps/web/components/discovery/discovery-app.tsx).
+        output: {
+          entryFileNames: 'assets/discovery.js',
+          assetFileNames: (asset) => (asset.names.includes('index.css') ? 'assets/discovery.css' : 'assets/[name]-[hash][extname]'),
+        },
+      },
+    },
     server: { host: '127.0.0.1', port, strictPort: true, proxy },
     preview: { host: '127.0.0.1', port, strictPort: true, proxy },
   };

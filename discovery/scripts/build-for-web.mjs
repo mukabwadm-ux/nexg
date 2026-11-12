@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Packages NexG Discovery for the NexG website. The result is a static build served at /discover on the
- * website's own origin. Discovery's cart (localStorage "nexg.cart.v1") is then the website's cart, and "Go to
- * checkout" and sign-in stay on one site.
+ * Packages NexG Discovery for the NexG website. The result is a static build under /discover/ on the website's
+ * own origin, which the website's /discover page renders under the site header (assets/discovery.js and
+ * assets/discovery.css, by name). Discovery's cart (localStorage "nexg.cart.v1") is then the website's cart, and
+ * "Go to checkout" and sign-in stay on one site.
  *
  * From the website (apps/web), as part of its build:
  *   node ../../discovery/scripts/build-for-web.mjs public/discover [--install]

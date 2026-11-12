@@ -10,7 +10,7 @@ import { CartPill } from '../../cart/CartPill';
 import { CartSheet, CartSwitchDialog } from '../../cart/CartSheet';
 import { useStoreCart, type CartOutcome } from '../../cart/useStoreCart';
 import { OfferingSheet } from '../../cards/OfferingSheet';
-import { headerReachOf, SectionNav, showStoreBar } from '../SectionNav';
+import { headerReachOf, SectionNav, showStoreBar, useHeaderHeight } from '../SectionNav';
 import { StoreHero } from '../StoreHero';
 import { DISCOVER, GroceryDepartments } from './GroceryDepartments';
 import { GroceryAisle, GroceryRail, HistoryMark } from './GroceryShelves';
@@ -44,21 +44,6 @@ const matchLine = (naming: CatalogNaming, matches: number, term: string) =>
   matches ? `${naming.count(matches)} ${matches === 1 ? 'matches' : 'match'} “${term}”` : `No ${naming.items} match “${term}”`;
 const railAnchor = (department: Pick<CatalogDepartment, 'id'>) => `rail-${department.id.replace(/[^a-z0-9]+/gi, '-')}`;
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/** The sticky site header's height, so the sticky sidebar sits under it. */
-function useHeaderHeight() {
-  const [height, setHeight] = useState(0);
-  useEffect(() => {
-    const header = document.querySelector<HTMLElement>('.discovery-header');
-    if (!header) return;
-    const measure = () => setHeight(Math.round(header.getBoundingClientRect().height));
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(header);
-    return () => observer.disconnect();
-  }, []);
-  return height;
-}
 
 /**
  * The retail storefront for every product store (owner, 9 Nov 2026; isRetailStore): groceries, electronics, pharmacy,
@@ -128,7 +113,7 @@ export function SupermarketStorefront({ merchant, activeItem, itemMissing = fals
     return () => window.clearTimeout(timer);
   }, [term, matches, naming]);
 
-  /** Brings the top of the main column (a department's breadcrumb) up under the site header when the shopper is further down. */
+  /** Brings the top of the main column (a department's breadcrumb) up under the pinned headers when the shopper is further down. */
   const showMain = () => {
     const element = main.current;
     const header = document.querySelector<HTMLElement>('.discovery-header');

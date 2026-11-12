@@ -14,27 +14,13 @@ import { DatePicker } from './DatePicker';
 import { ExperienceGrid } from './ExperienceCard';
 import { MerchantLogo } from './MerchantCard';
 import { RailHeading } from './Rail';
+import { useHeaderHeight } from './storefronts/SectionNav';
 import { Stepper } from './cards/OfferingSheet';
 import { TripFacts } from './tours/TripFacts';
 import { TripOverview, TripPhotos } from './tours/TripSections';
 import { departureLabel, tripPrice, type TripDeparture } from './tours/tripFormat';
 import './tours/trip.css';
 import './experiences.css';
-
-/** Height of the sticky site header, so the booking card sticks just below it. */
-function useHeaderHeight() {
-  const [height, setHeight] = useState(0);
-  useEffect(() => {
-    const header = document.querySelector<HTMLElement>('.discovery-header');
-    if (!header || typeof ResizeObserver === 'undefined') return;
-    const measure = () => setHeight(Math.round(header.getBoundingClientRect().height));
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(header);
-    return () => observer.disconnect();
-  }, []);
-  return height;
-}
 
 function deviceStorage(): Storage | undefined {
   try {
