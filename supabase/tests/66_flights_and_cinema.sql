@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(19);
+select plan(24);
 
 select is(
   (select jsonb_array_length(subcategories) from public.category_config where category = 'flights'),
@@ -123,5 +123,31 @@ select is(public.rpc_cinema_seat_map('e5000000-0000-4000-8000-000000000008')->'t
   '["A1"]'::jsonb, 'Confirmed seats stay unavailable.');
 
 reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', 'e5000000-0000-4000-8000-000000000003', true);
+select is(public.rpc_cinema_release_hold(current_setting('nexg_test.cinema_hold')::uuid)->>'status',
+  'released', 'A guest can release their own hold.');
+
+-- Every write is in the audit log; fn_wiring_check fails any that is not.
+reset role;
+select is(
+  (select count(*)::int from audit.audit_event where action = 'cinema.showing_published'
+     and target_id in ('e5000000-0000-4000-8000-000000000008', 'e5000000-0000-4000-8000-000000000009')),
+  2, 'Publishing a showing is audited.');
+select is(
+  (select count(*)::int from audit.audit_event where action = 'cinema.seats_held'
+     and target_id in (current_setting('nexg_test.cinema_hold')::uuid,
+                       current_setting('nexg_test.cinema_next_hold')::uuid)),
+  2, 'Each new seat hold is audited once; a retried request is not.');
+select is(
+  (select count(*)::int from audit.audit_event where action = 'cinema.hold_released'
+     and target_id = current_setting('nexg_test.cinema_hold')::uuid
+     and actor_id = 'e5000000-0000-4000-8000-000000000003'),
+  1, 'A released hold is audited with the guest who released it.');
+select is(
+  (select count(*)::int from audit.audit_event where action = 'cinema.hold_confirmed'
+     and target_id = current_setting('nexg_test.cinema_next_hold')::uuid),
+  1, 'A confirmed hold is audited.');
+
 select * from finish();
 rollback;
