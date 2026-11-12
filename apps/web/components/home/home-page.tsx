@@ -266,7 +266,7 @@ export async function HomePageContent({
             className="bg-night absolute inset-0 lg:right-[42%] lg:rounded-r-[11rem]"
           />
           <div className="relative mx-auto grid max-w-[120rem] gap-10 px-4 sm:px-[30px] lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-center">
-            <div className="py-16 text-white sm:py-20 lg:py-28 lg:pr-16">
+            <div className="py-10 text-white sm:py-12 lg:py-10 lg:pr-16">
               <span className="inline-flex items-center gap-2.5 rounded-full border border-white/20 px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.2em]">
                 <span aria-hidden="true" className="bg-gold h-2 w-2 rounded-full" />
                 {t('home.app.eyebrow')}
@@ -282,8 +282,13 @@ export async function HomePageContent({
               <StoreBadges />
             </div>
 
-            <div className="hidden py-16 lg:block">
-              <AppPreview />
+            {/* The phone at 62% of its drawn size: the section stays compact. */}
+            <div className="hidden py-6 lg:block">
+              <div className="h-[25.5rem]">
+                <div className="origin-top scale-[0.62]">
+                  <AppPreview />
+                </div>
+              </div>
             </div>
           </div>
         </section>
