@@ -85,9 +85,9 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
       />
 
       {/* ─────────────────────────────────────────────── the message */}
-      {/* At the foot of the hero, 40px above its bottom edge. The block is as
-          wide as the headline, and the search takes that width. */}
-      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-end px-5 pb-10 pt-[6.5rem] sm:px-[30px] sm:pt-28 lg:pt-32">
+      {/* Centred in what the nav leaves of the hero. The block is as wide as
+          the headline, and the search takes that width. */}
+      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-center px-5 pb-8 pt-[6.5rem] sm:px-[30px] sm:pt-28 lg:pb-12 lg:pt-32">
         <div className="sm:w-fit">
           <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
             {copy.eyebrow}
