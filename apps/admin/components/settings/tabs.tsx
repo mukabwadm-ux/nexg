@@ -5,6 +5,7 @@ import * as React from 'react';
 import { rollbackVersion, stageChange, togglePaymentMethod } from '@/app/settings/actions';
 
 import { PaymentToggle, RollbackButton, SettingField } from './controls';
+import { HolidayCalendar, type HolidayAdminRow } from './holidays';
 import {
   CATEGORY_LABEL,
   type ChangeSetRow,
@@ -69,6 +70,9 @@ export interface TabProps {
   definitions: DefinitionRow[];
   changeSets: ChangeSetRow[];
   canEdit: (group: string) => boolean;
+  /* The selected city's public holidays, or null where the database has
+     no holiday calendar yet (code ships before its migration runs). */
+  holidays?: { country: string; rows: HolidayAdminRow[] } | null;
 }
 
 /* Find a definition so a field can render its own help and type. */
@@ -84,6 +88,7 @@ export function CitiesTab({
   zones,
   definitions,
   canEdit,
+  holidays,
 }: TabProps & { city: CityRow | null }) {
   const live = cities.filter((c) => c.status === 'live').length;
   const soft = cities.filter((c) => c.status === 'soft_launch');
@@ -211,18 +216,6 @@ export function CitiesTab({
                 onStage={stageChange}
               />
               <SettingField
-                label="Public holidays"
-                help="Merchants get a prompt to confirm hours 3 days ahead."
-                group="cities"
-                cityId={null}
-                settingKey="city.holiday_calendar"
-                value={city?.holiday_calendar ?? 'KE-2026'}
-                valueType="text"
-                canEdit={canEdit('cities')}
-                lockedBy={GROUP_OWNER.cities}
-                onStage={stageChange}
-              />
-              <SettingField
                 label="New-city template"
                 help="Zones, fee bands and rules copied when a city goes from waitlist to soft launch."
                 group="cities"
@@ -236,6 +229,22 @@ export function CitiesTab({
               />
             </Card>
           </Section>
+
+          {city && holidays ? (
+            <Section
+              title={`Public holidays · ${holidays.country}`}
+              sub={`Merchants in ${city.name} mark each one open or closed. Correct a date here and their answers move with it.`}
+            >
+              <HolidayCalendar
+                cityId={city.city_id}
+                cityName={city.name}
+                country={holidays.country}
+                holidays={holidays.rows}
+                canEdit={canEdit('cities')}
+                lockedBy={GROUP_OWNER.cities ?? 'Ops manager edits this'}
+              />
+            </Section>
+          ) : null}
         </div>
 
         {/* ───────────────────────── the city panel */}

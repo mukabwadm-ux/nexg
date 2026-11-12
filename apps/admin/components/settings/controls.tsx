@@ -17,7 +17,7 @@ import type { Outcome } from '@/app/settings/actions';
  * rule.
  */
 
-function useRun() {
+export function useRun() {
   const { toast } = useToast();
   const router = useRouter();
   const [pending, setPending] = React.useState(false);

@@ -53061,6 +53061,31 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_holiday_calendar: {
+        Args: { p_city_id: string };
+        Returns: {
+          closed_count: number;
+          date: string;
+          estimated: boolean;
+          holiday_id: string;
+          label: string;
+          open_count: number;
+          scope: string;
+          source: string;
+        }[];
+      };
+      rpc_holiday_remove: { Args: { p_holiday_id: string }; Returns: Json };
+      rpc_holiday_save: {
+        Args: {
+          p_city_id?: string;
+          p_country_wide?: boolean;
+          p_date: string;
+          p_estimated?: boolean;
+          p_holiday_id?: string;
+          p_label: string;
+        };
+        Returns: Json;
+      };
       rpc_hospitality_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_apply: { Args: { p_payload: Json }; Returns: Json };
       rpc_host_document_add: {

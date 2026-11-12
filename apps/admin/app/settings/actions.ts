@@ -212,6 +212,42 @@ export async function activateDue(): Promise<Outcome> {
  * writes a high-severity event. Switching one back ON is refused
  * when there is no provider connected behind it.
  */
+// ─────────────────────────────────────────────── public holidays
+
+/**
+ * Add a public holiday (a city and whether it covers the whole country),
+ * or correct one in place (its id). A corrected date keeps the merchants'
+ * answers, which belong to the holiday rather than the day.
+ */
+export async function saveHoliday(input: {
+  holidayId?: string;
+  cityId?: string;
+  countryWide?: boolean;
+  date: string;
+  label: string;
+  estimated: boolean;
+}): Promise<Outcome> {
+  const { data, error } = await s().rpc('rpc_holiday_save', {
+    p_date: input.date,
+    p_label: input.label,
+    p_estimated: input.estimated,
+    p_holiday_id: input.holidayId,
+    p_city_id: input.cityId,
+    p_country_wide: input.countryWide,
+  });
+  const bad = fail(error);
+  if (bad) return bad;
+  return done((data as { note?: string } | null)?.note ?? 'Saved.');
+}
+
+/** Take a holiday off the calendar. The merchants' answers go with it. */
+export async function removeHoliday(holidayId: string): Promise<Outcome> {
+  const { data, error } = await s().rpc('rpc_holiday_remove', { p_holiday_id: holidayId });
+  const bad = fail(error);
+  if (bad) return bad;
+  return done((data as { note?: string } | null)?.note ?? 'Removed.');
+}
+
 export async function togglePaymentMethod(
   key: string,
   enabled: boolean,

@@ -17,6 +17,7 @@ import {
 } from '@/components/settings/api';
 import { SaveBar, ScheduledBanner } from '@/components/settings/controls';
 import { EmailRoutingTab, type EmailRouteRow } from '@/components/settings/email-routing';
+import type { HolidayAdminRow } from '@/components/settings/holidays';
 import {
   type ChangeSetRow,
   type CityRow,
@@ -155,6 +156,23 @@ export default async function SettingsPage({
     null;
   const city = cityRows.find((c) => c.city_id === cityId) ?? null;
 
+  /* The selected city's public holidays. Null when the database has no
+     holiday calendar yet — the code goes live before its migration is
+     applied by hand — and the Cities tab then leaves the section out. */
+  let holidays: TabProps['holidays'] = null;
+  if (tab === 'cities' && cityId) {
+    const [list, place] = await Promise.all([
+      s.rpc('rpc_holiday_calendar', { p_city_id: cityId }),
+      s.from('city').select('country').eq('id', cityId).maybeSingle(),
+    ]);
+    if (!list.error && place.data) {
+      holidays = {
+        country: place.data.country,
+        rows: (list.data as HolidayAdminRow[] | null) ?? [],
+      };
+    }
+  }
+
   /*
    * Which groups this person may edit. Asked of the database rather
    * than inferred from the role list here, so the lock icons and the
@@ -260,6 +278,7 @@ export default async function SettingsPage({
     definitions: defs,
     changeSets: sets,
     canEdit,
+    holidays,
   };
 
   /* The open draft for this tab and city, which the save bar reads. */
