@@ -12,6 +12,7 @@ import { MerchantTabs } from '@/components/merchants/shell';
 import { loadMerchantApplicationQueue, ReviewSourceError } from '@/lib/merchant-application-review';
 import type { ApplicationReviewQueueQuery } from '@/lib/merchant-application-review-contracts';
 import { requireModule, requireStaff } from '@/lib/staff';
+import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Merchant applications' };
 export const dynamic = 'force-dynamic';
@@ -43,6 +44,18 @@ export default async function MerchantApplicationsPage({
         </main>
       </ConsoleShell>
     );
+  }
+  /* Deleted merchants live in Merchants › Deleted, not in the review queue. */
+  const ids = source.items.map((item) => item.merchantId);
+  if (ids.length) {
+    const { data: gone } = await createClient()
+      .from('merchant')
+      .select('id')
+      .in('id', ids)
+      .not('deleted_at', 'is', null);
+    const deleted = new Set(((gone as { id: string }[] | null) ?? []).map((row) => row.id));
+    if (deleted.size)
+      source = { ...source, items: source.items.filter((item) => !deleted.has(item.merchantId)) };
   }
   return (
     <ApplicationReviewActor key={source.actorId} actorId={source.actorId}>

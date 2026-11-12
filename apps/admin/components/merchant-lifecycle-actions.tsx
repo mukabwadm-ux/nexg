@@ -18,7 +18,8 @@ export function MerchantLifecycleActions({
   merchantName: string;
   status: string;
   isDeactivated: boolean;
-  onSetDeactivated: (deactivated: boolean, reason: string) => Promise<ReviewResult>;
+  /** Leave out to show the Delete control only (applications under review). */
+  onSetDeactivated?: (deactivated: boolean, reason: string) => Promise<ReviewResult>;
   onDelete: (confirmationName: string, reason: string) => Promise<ReviewResult>;
 }) {
   const { toast } = useToast();
@@ -50,11 +51,15 @@ export function MerchantLifecycleActions({
 
   return (
     <Card className="p-5">
-      <h2 className="text-sm font-extrabold uppercase tracking-wide">Merchant access</h2>
-      <p className="text-muted mt-2 text-sm font-semibold leading-[1.7]">
-        Deactivation keeps the merchant’s records and can be reversed. Reactivating a live merchant
-        leaves order intake off until it is reviewed.
-      </p>
+      <h2 className="text-sm font-extrabold uppercase tracking-wide">
+        {onSetDeactivated ? 'Merchant access' : 'Delete merchant'}
+      </h2>
+      {onSetDeactivated ? (
+        <p className="text-muted mt-2 text-sm font-semibold leading-[1.7]">
+          Deactivation keeps the merchant’s records and can be reversed. Reactivating a live
+          merchant leaves order intake off until it is reviewed.
+        </p>
+      ) : null}
 
       <div className="mt-4">
         <Input
@@ -66,19 +71,21 @@ export function MerchantLifecycleActions({
         />
       </div>
 
-      <Button
-        block
-        className="mt-3"
-        variant={isDeactivated ? 'outline' : 'danger'}
-        loading={busy === 'deactivate'}
-        disabled={!reason.trim() || busy !== null}
-        onClick={() => void run('deactivate', () => onSetDeactivated(!isDeactivated, reason))}
-      >
-        {isDeactivated ? 'Reactivate merchant' : 'Deactivate merchant'}
-      </Button>
+      {onSetDeactivated ? (
+        <Button
+          block
+          className="mt-3"
+          variant={isDeactivated ? 'outline' : 'danger'}
+          loading={busy === 'deactivate'}
+          disabled={!reason.trim() || busy !== null}
+          onClick={() => void run('deactivate', () => onSetDeactivated(!isDeactivated, reason))}
+        >
+          {isDeactivated ? 'Reactivate merchant' : 'Deactivate merchant'}
+        </Button>
+      ) : null}
 
-      <div className="border-border mt-5 border-t pt-4">
-        <h3 className="text-sm font-extrabold">Delete merchant</h3>
+      <div className={onSetDeactivated ? 'border-border mt-5 border-t pt-4' : 'mt-4'}>
+        {onSetDeactivated ? <h3 className="text-sm font-extrabold">Delete merchant</h3> : null}
         <p className="text-muted mt-1 text-xs font-semibold leading-[1.7]">
           This immediately removes the merchant from public listings and active operations and
           revokes team access. The record stays in Deleted for 90 days and can be restored during

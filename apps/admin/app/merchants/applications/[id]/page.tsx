@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { unstable_noStore as noStore } from 'next/cache';
 import Link from 'next/link';
 
+import { deleteMerchant } from '@/app/merchants/actions';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { ApplicationAgreement } from '@/components/merchants/application-agreement';
@@ -15,7 +16,9 @@ import {
   loadMerchantApplicationReview,
   ReviewSourceError,
 } from '@/lib/merchant-application-review';
+import { MerchantLifecycleActions } from '@/components/merchant-lifecycle-actions';
 import { requireModule, requireStaff } from '@/lib/staff';
+import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Review merchant application' };
 export const dynamic = 'force-dynamic';
@@ -46,6 +49,16 @@ export default async function ManagedMerchantApplicationPage({
       </ConsoleShell>
     );
   }
+  /* The name Delete asks staff to type is the one the database checks. */
+  const canDelete = staff.isSuperAdmin || staff.roles.includes('merchant_ops');
+  const { data: merchant } = canDelete
+    ? await createClient()
+        .from('merchant')
+        .select('trading_name, legal_name, status, deleted_at')
+        .eq('id', params.id)
+        .maybeSingle()
+    : { data: null };
+  const merchantName = merchant?.trading_name || merchant?.legal_name || '';
   return (
     <ApplicationReviewActor key={source.actorId} actorId={source.actorId}>
       <ConsoleShell staff={staff} current="/merchants">
@@ -73,6 +86,20 @@ export default async function ManagedMerchantApplicationPage({
           ) : null}
           <ApplicationAgreement merchantId={params.id} />
           <ApplicationReviewDetail {...source} />
+          {merchant && !merchant.deleted_at && merchantName ? (
+            <div className="mt-6 max-w-md">
+              <MerchantLifecycleActions
+                merchantId={params.id}
+                merchantName={merchantName}
+                status={merchant.status}
+                isDeactivated={false}
+                onDelete={async (confirmationName, reason) => {
+                  'use server';
+                  return deleteMerchant(params.id, confirmationName, reason);
+                }}
+              />
+            </div>
+          ) : null}
         </main>
       </ConsoleShell>
     </ApplicationReviewActor>
