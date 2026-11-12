@@ -7,8 +7,8 @@ import './homepage.css';
 const ROTATION_INTERVAL = 6000;
 const TRACK_GAP = 18;
 const CARD_PEEK = 30;
-/** The page's content column (1424px less its 32px gutters); wide screens line the first card up with it. */
-const CONTENT_WIDTH = 1360;
+/** The page's content column: the site's 120rem (1920px) less its 30px gutters. Wide screens line the first card up with it. */
+const CONTENT_WIDTH = 1860;
 
 function displayCategoryLabel(label: string) {
   return label.replace(/\s+and\s+/gi, ' & ');

@@ -175,7 +175,7 @@
 .transfer-pick.is-selected .offering-card__action svg{display:none}
 
 /* Class chips: one row that scrolls sideways on phones, never wrapping. */
-.transfer-chips{display:flex;gap:8px;margin:-6px -20px;padding:6px 20px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain}
+.transfer-chips{display:flex;gap:8px;margin:-6px calc(-1 * var(--gutter));padding:6px var(--gutter);overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain}
 .transfer-chips::-webkit-scrollbar{display:none}
 .transfer-chips button{display:inline-flex;align-items:center;gap:8px;flex:none;min-height:40px;padding:0 16px;border-radius:999px;background:#131f24;box-shadow:var(--shadow-ring);color:#e3e6e2;font-size:14px;font-weight:700;white-space:nowrap;transition-property:scale,background-color,color,box-shadow;transition-duration:150ms;transition-timing-function:var(--ease-out)}
 .transfer-chips button span{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
@@ -189,7 +189,7 @@
 .transfer-empty svg{color:var(--gold)}
 
 /* The selected transfer: docked over the safe area on phones, as Wolt's basket bar is. */
-.transfer-bar{position:sticky;bottom:0;z-index:15;display:flex;align-items:center;gap:12px;margin:24px -20px 0;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:rgba(15,18,19,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -1px 0 var(--line),0 -12px 32px rgba(0,0,0,.4);transition-property:translate,opacity;transition-duration:220ms;transition-timing-function:var(--ease-out)}
+.transfer-bar{position:sticky;bottom:0;z-index:15;display:flex;align-items:center;gap:12px;margin:24px calc(-1 * var(--gutter)) 0;padding:12px var(--gutter) calc(12px + env(safe-area-inset-bottom));background:rgba(15,18,19,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -1px 0 var(--line),0 -12px 32px rgba(0,0,0,.4);transition-property:translate,opacity;transition-duration:220ms;transition-timing-function:var(--ease-out)}
 @starting-style{.transfer-bar{translate:0 16px;opacity:0}}
 .transfer-bar__text{display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.35}
 .transfer-bar__label{display:none}

@@ -49,8 +49,8 @@
 
 @media (max-width:760px){
   .rail__track{grid-auto-columns:var(--rail-item-phone,min(78vw,320px));gap:12px}
-  /* Runs to the screen edges inside the page's 20px phone gutter, so the next card slides in from the edge. */
-  .rail--bleed .rail__track{margin-inline:-20px;padding-inline:20px;scroll-padding-inline:20px}
+  /* Runs to the screen edges through the page's gutter, so the next card slides in from the edge. */
+  .rail--bleed .rail__track{margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter);scroll-padding-inline:var(--gutter)}
   .rail-heading__action{margin-right:-8px;padding:0 8px}
 }
 /* Narrow phones: a count drops under the title, so the title keeps one line beside its action. */

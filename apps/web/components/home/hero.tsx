@@ -189,14 +189,17 @@ function HeroNav({
       <div
         className={cn(
           'mx-auto flex max-w-[120rem] items-center justify-between gap-3 px-4 transition-[padding] sm:px-[30px]',
-          solid ? 'py-2' : 'py-3 sm:py-4',
+          solid ? 'py-1' : 'py-3 sm:py-4',
         )}
       >
         <Link href="/" aria-label="NexG Concierge, home" className="shrink-0">
           <Logo
             onDark
             priority
-            className={cn('w-auto transition-[height]', solid ? 'h-11 sm:h-12' : 'h-16 sm:h-20')}
+            className={cn(
+              'w-auto transition-[height]',
+              solid ? 'h-[3.25rem] sm:h-14' : 'h-16 sm:h-20',
+            )}
           />
         </Link>
 

@@ -1,7 +1,7 @@
 /* Home page feature carousel (HomepageFeatureCarousel): category ideas that run past the content column, with
    the neighbouring cards peeking in. On wide screens the first card lines up with the page (see the component). */
 
-.homepage-feature-carousel{position:relative;margin:24px calc(50% - 50vw) 40px}
+.homepage-feature-carousel{position:relative;margin:24px calc(-1 * var(--gutter)) 40px}
 .homepage-feature-carousel__stage{position:relative}
 .homepage-feature-carousel__viewport{position:relative;overflow:hidden;isolation:isolate;touch-action:pan-y}
 .homepage-feature-carousel__track{display:flex;gap:18px;transition:transform 300ms var(--ease-out);will-change:transform}
@@ -31,7 +31,7 @@
 .homepage-feature-carousel__arrow:focus-visible,.homepage-feature-carousel__toggle:focus-visible{outline:2px solid #ffc259;outline-offset:3px}
 
 /* Progress and pause sit under the cards, lined up with the content column. */
-.homepage-feature-carousel__footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:12px max(48px,calc((100% - 1360px) / 2)) 0}
+.homepage-feature-carousel__footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:12px max(48px,calc((100% - var(--page-max)) / 2 + var(--gutter))) 0}
 .homepage-feature-carousel__progress{grid-column:2;display:flex;align-items:center;justify-self:center;gap:5px}
 .homepage-feature-carousel__progress>span{width:16px;height:3px;border-radius:5px;background:#384348;transition-property:scale,background-color;transition-duration:200ms;transition-timing-function:var(--ease-out)}
 .homepage-feature-carousel__progress>span.is-active{scale:1.625 1;background:var(--gold)}
@@ -59,7 +59,7 @@
 @media (hover:none){.homepage-feature-carousel__arrow{display:none}}
 @media (max-width:640px){
   .homepage-feature-carousel__arrow{width:40px;height:40px;min-height:40px;margin-top:-20px}
-  .homepage-feature-carousel__footer{padding:10px 20px 0}
+  .homepage-feature-carousel__footer{padding:10px var(--gutter) 0}
   .homepage-feature-carousel__progress{gap:4px}
   .homepage-feature-carousel__progress>span{width:9px}
   .homepage-feature-carousel__progress>span.is-active{scale:1.78 1}

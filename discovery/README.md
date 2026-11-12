@@ -17,6 +17,9 @@
 >   `#discovery-root` under it (`window.nexgDiscovery.mount`, `src/main.tsx`). Discovery's own bar keeps the catalog
 >   area and the search, pinned under the site header. Every Discovery style is scoped to `#discovery-root` at build
 >   time (`src/styleScope.ts`), and `styles.css` undoes the site's base styles inside it.
+> - **The page column is the site's** (owner, 12 Nov 2026): up to 120rem wide with 30px gutters, 16px below 640px
+>   (`--page-max` and `--gutter` in `styles.css`). Rows that run edge to edge bleed through the gutter rather than
+>   `100vw`, which counts the scrollbar and scrolled the page sideways.
 > - CI runs `npm --prefix discovery test`.
 
 Independent Discovery frontend and repository, V1.1. This project owns its screens/components and will be merged into NEXG-PLATFORM after standalone development and review.

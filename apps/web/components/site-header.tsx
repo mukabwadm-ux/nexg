@@ -38,9 +38,11 @@ export async function SiteHeader({ action, signIn, account: showAccount = true }
 
   return (
     <header className="bg-night sticky top-0 z-50 border-b border-white/10 text-white">
-      <div className="mx-auto flex min-h-[3.75rem] max-w-[120rem] items-center justify-between gap-3 px-4 py-2 sm:px-[30px]">
+      <div className="mx-auto flex min-h-[3.75rem] max-w-[120rem] items-center justify-between gap-3 px-4 py-1 sm:px-[30px]">
+        {/* A bigger logo (owner, 12 Nov 2026): 52px on phones and 56px from 640px, was 44px and 48px.
+            It takes the bar's padding (4px above and below, was 8px), so the header stays 61px and 65px tall. */}
         <Link href="/" aria-label="NexG Concierge, home" className="shrink-0">
-          <Logo onDark priority className="h-11 w-auto sm:h-12" />
+          <Logo onDark priority className="h-[3.25rem] w-auto sm:h-14" />
         </Link>
 
         {/* min-w-0 lets the Deliver to chip narrow on small phones, where at

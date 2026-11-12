@@ -5,14 +5,14 @@
    on its lower edge, and a store search that docks at the very top while the site header steps aside. */
 
 /* Hero: a full-bleed cover under the sticky site header, with the identity over its lower edge. */
-.store-hero{position:relative;isolation:isolate;display:flex;align-items:flex-end;height:clamp(250px,22vw,340px);margin:-24px calc(50% - 50vw) 0;overflow:hidden;background:#0d1417}
+.store-hero{position:relative;isolation:isolate;display:flex;align-items:flex-end;height:clamp(250px,22vw,340px);margin:-24px calc(-1 * var(--gutter)) 0;overflow:hidden;background:#0d1417}
 .store-hero__image{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 45%}
 .store-hero__image.image-fallback{background:radial-gradient(120% 140% at 85% 0%,rgba(229,182,95,.16),transparent 55%),linear-gradient(135deg,#1b2a2f,#0d1417 70%)}
 .store-hero__image.image-fallback svg{display:none}
 .store-hero__shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(6,10,12,.95) 0%,rgba(6,10,12,.7) 30%,rgba(6,10,12,.1) 70%,rgba(6,10,12,.35) 100%)}
-.store-hero__back{position:absolute;top:20px;left:max(32px,calc((100vw - 1424px)/2 + 32px));z-index:1;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px 0 13px;border-radius:999px;background:rgba(8,13,15,.68);box-shadow:var(--shadow-ring);color:#f3eee2;font-size:13px;font-weight:700;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.store-hero__back{position:absolute;top:20px;left:var(--gutter);z-index:1;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px 0 13px;border-radius:999px;background:rgba(8,13,15,.68);box-shadow:var(--shadow-ring);color:#f3eee2;font-size:13px;font-weight:700;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
 .store-hero__back:active{scale:.96}
-.store-hero__identity{display:flex;align-items:flex-end;gap:24px;width:100%;max-width:1424px;margin:0 auto;padding:0 32px 32px}
+.store-hero__identity{display:flex;align-items:flex-end;gap:24px;width:100%;max-width:var(--page-max);margin:0 auto;padding:0 var(--gutter) 32px}
 .store-hero .store-hero__logo{flex:none;width:96px;height:96px;object-fit:cover;border-radius:22px;background:#0b1215;box-shadow:0 0 0 1px oklch(1 0 0 / .14),0 12px 32px rgba(0,0,0,.45);outline:1px solid oklch(1 0 0 / .1);outline-offset:-1px}
 /* A store without a logo shows its first letter on phones, where the logo anchors the centred identity. */
 .store-hero .store-hero__logo.merchant-logo--initial{display:none;background:linear-gradient(145deg,#2c2517,#16130c);font-size:30px}
@@ -41,7 +41,7 @@
    unpinned, which is how the bar knows when to dock. */
 .section-nav-mark{display:flow-root;height:0}
 .section-nav{position:sticky;z-index:15;display:flex;align-items:center;gap:12px;min-height:64px;margin:0;padding:12px 0;isolation:isolate}
-.section-nav::before{content:'';position:absolute;inset:0 calc(50% - 50vw);z-index:-1;background:rgba(15,18,19,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--line);transition-property:box-shadow;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+.section-nav::before{content:'';position:absolute;inset:0 calc(-1 * var(--gutter));z-index:-1;background:rgba(15,18,19,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--line);transition-property:box-shadow;transition-duration:200ms;transition-timing-function:var(--ease-out)}
 /* Room to dock: the bar's container stays a screen taller than what sits above the bar in it (SectionNav sets the
    offset), so a short list or a narrow search never pulls a pinned bar back down the page. */
 :has(> .section-nav){min-height:calc(var(--store-bar-offset,0px) + 100lvh)}
@@ -134,8 +134,8 @@
   .store-hero__image{position:relative;inset:auto;z-index:auto;display:block;height:clamp(190px,52vw,220px)}
   .store-hero__image.image-fallback{display:block}
   .store-hero__shade{inset:0 0 auto;height:clamp(190px,52vw,220px);background:linear-gradient(180deg,rgba(6,10,12,.5),rgba(6,10,12,0) 44%)}
-  .store-hero__back{top:12px;left:20px}
-  .store-hero__identity{position:relative;z-index:1;flex-direction:column;align-items:center;gap:12px;margin-top:-36px;padding:0 20px;text-align:center}
+  .store-hero__back{top:12px;left:var(--gutter)}
+  .store-hero__identity{position:relative;z-index:1;flex-direction:column;align-items:center;gap:12px;margin-top:-36px;padding:0 var(--gutter);text-align:center}
   .store-hero .store-hero__logo{width:72px;height:72px;border-radius:18px;box-shadow:0 0 0 3px #111315,0 8px 20px rgba(0,0,0,.4)}
   .store-hero .store-hero__logo.merchant-logo--initial{display:grid;font-size:26px}
   .store-hero__text{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;text-shadow:none}
@@ -160,8 +160,8 @@
   .section-nav__search input{min-height:44px;font-size:16px}
   .section-nav__icon{min-height:44px}
   /* The chips run to the screen edges, so the next one visibly peeks in. */
-  .section-nav__rail-wrap{margin-inline:-20px}
-  .section-nav__rail{padding:2px 20px;scroll-padding-inline:20px}
+  .section-nav__rail-wrap{margin-inline:calc(-1 * var(--gutter))}
+  .section-nav__rail{padding:2px var(--gutter);scroll-padding-inline:var(--gutter)}
   .section-nav__rail a{padding:0 13px;font-size:13.5px}
   .store-sections{gap:32px;margin-top:16px}
   .store-section{scroll-margin-top:124px}

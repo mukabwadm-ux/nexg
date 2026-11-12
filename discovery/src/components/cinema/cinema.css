@@ -178,7 +178,7 @@ html:has(.seat-sheet[open]){overflow:hidden}
   .seat-sheet__saved{flex-wrap:wrap}
   .seat-sheet__saved .seat-sheet__primary{flex:1 1 100%}
   .seat-map{--seat:27px;--gap:5px}
-  .film-hero__media{margin-inline:-20px;border-radius:0}
+  .film-hero__media{margin-inline:calc(-1 * var(--gutter));border-radius:0}
   .cinema-day{min-width:88px}
 }
 
