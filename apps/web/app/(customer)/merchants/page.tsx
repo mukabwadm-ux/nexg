@@ -1,14 +1,13 @@
-import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
-import { ArrowRight, ArrowUpRight, Check, Minus, Plus } from 'lucide-react';
+import { VALUE_PLACEHOLDER } from '@nexg/ui';
+import { ArrowRight, ArrowUpRight, Banknote, Bike, Check, Minus, Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { DashboardPreview } from '@/components/merchants/dashboard-preview';
 import { FeaturedSlots } from '@/components/merchants/featured-slots';
-import { CONTAINER, H2, Highlight, SectionLabel } from '@/components/merchants/landing';
+import { CARD, CONTAINER, H2, SectionLabel, THEME_VARS } from '@/components/merchants/landing';
 import { MerchantRegisterCard } from '@/components/merchants/merchant-register-card';
-import { StorefrontPreview } from '@/components/merchants/storefront-preview';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -21,13 +20,33 @@ export const metadata: Metadata = {
 
 /* Copy from the `Merchants` artboard, signed off (ground rule 6). */
 
-/** The categories guests ask for most, drawn dark in the grid. */
-const MOST_ASKED = new Set([
-  'airport_transfers',
-  'restaurants_food',
-  'laundry_cleaning',
-  'travel_tours',
-]);
+/**
+ * The categories guests ask for most, shown as photographs. The label comes
+ * from category_config; a category switched off there drops out. Photos in
+ * public/images/merchant-page (see its CREDITS.md).
+ */
+const PHOTO_CATEGORIES = [
+  {
+    key: 'restaurants_food',
+    image: '/images/merchant-page/barista.jpg',
+    focus: 'object-[66%_center]',
+  },
+  {
+    key: 'alcohol_beverages',
+    image: '/images/merchant-page/bartender.jpg',
+    focus: 'object-[50%_center]',
+  },
+  {
+    key: 'fashion_apparel',
+    image: '/images/merchant-page/tailor.jpg',
+    focus: 'object-[38%_center]',
+  },
+  {
+    key: 'groceries_essentials',
+    image: '/images/merchant-page/market-stall.jpg',
+    focus: 'object-[56%_center]',
+  },
+] as const;
 
 const BENEFITS = [
   {
@@ -95,12 +114,75 @@ const FAQ = [
   },
 ] as const;
 
-const darkButton =
-  'bg-ink focus-visible:ring-gold inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-extrabold text-white transition-colors hover:bg-ink/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+/** The orders in the dashboard row of the benefits list. Bracketed: no real data. */
+const SAMPLE_ORDERS = [
+  { items: '2 × [Menu item]', state: 'Accept', look: 'bg-gold text-ink' },
+  { items: '1 × [Menu item]', state: 'On the way', look: 'bg-white text-ink' },
+  { items: '1 × [Drink]', state: 'Delivered', look: 'bg-success-bg text-success' },
+] as const;
+
+const BUTTON =
+  'focus-visible:ring-gold inline-flex items-center justify-center gap-2 rounded-full px-6 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+
+/** The main action: ink on the cream page, gold on the dark one. */
+const primaryButton = `${BUTTON} bg-ink text-white hover:bg-ink/85 dark:bg-gold dark:text-night dark:hover:bg-[#FEDD5C]`;
+
+/** Ink in both themes: for the gold panel. */
+const inkButton = `${BUTTON} bg-ink text-white hover:bg-ink/85`;
 
 export const dynamic = 'force-dynamic';
 // Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
 export const fetchCache = 'force-no-store';
+
+/** The picture beside each benefit. Decorative. */
+function BenefitVisual({ index }: { index: number }) {
+  const frame = 'relative h-48 overflow-hidden rounded-3xl sm:h-56';
+  if (index === 1) {
+    return (
+      <div className={`${frame} bg-gold text-ink flex items-center justify-center`}>
+        <Bike className="h-24 w-24" strokeWidth={1.5} />
+      </div>
+    );
+  }
+  if (index === 3) {
+    return (
+      <div
+        className={`${frame} flex flex-col justify-center gap-2.5 bg-white/[0.05] p-5 ring-1 ring-inset ring-white/10`}
+      >
+        {SAMPLE_ORDERS.map((order) => (
+          <div
+            key={order.state}
+            className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.06] px-4 py-3"
+          >
+            <span className="truncate text-[0.8125rem] font-bold text-white/85">
+              #{VALUE_PLACEHOLDER} · {order.items}
+            </span>
+            <span
+              className={`shrink-0 rounded-full px-3 py-1 text-[0.6875rem] font-bold ${order.look}`}
+            >
+              {order.state}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className={frame}>
+      <Image
+        src={
+          index === 0
+            ? '/images/merchant-page/market-stall.jpg'
+            : '/images/merchant-page/card-terminal.jpg'
+        }
+        alt=""
+        fill
+        sizes="(min-width: 1024px) 30rem, 100vw"
+        className={`object-cover ${index === 0 ? 'object-center' : 'object-[62%_center]'}`}
+      />
+    </div>
+  );
+}
 
 export default async function MerchantsPage() {
   const connectedRegistrationEnabled = process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false';
@@ -135,6 +217,13 @@ export default async function MerchantsPage() {
 
   const commissionValue = commission?.value ?? null;
   const allCities = cities ?? [];
+  const allCategories = categories ?? [];
+  const photoCategories = PHOTO_CATEGORIES.flatMap((photo) => {
+    const row = allCategories.find((category) => category.category === photo.key);
+    return row
+      ? [{ category: row.category, label: row.label, image: photo.image, focus: photo.focus }]
+      : [];
+  });
 
   return (
     <>
@@ -143,57 +232,37 @@ export default async function MerchantsPage() {
         action={{ label: 'List your business', href: registrationHref }}
       />
 
-      <main>
+      <main className={THEME_VARS}>
         {/* ------------------------------------------------------------ hero */}
-        <section className="bg-night relative isolate overflow-hidden text-white">
-          <Image
-            src="/images/hero/stay-sunset.jpg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="-z-20 object-cover object-[72%_center]"
-          />
+        <section className="overflow-hidden">
           <div
-            aria-hidden="true"
-            className="bg-night/75 lg:from-night lg:via-night/85 lg:to-night/25 absolute inset-0 -z-10 lg:bg-transparent lg:bg-gradient-to-r"
-          />
-          <div
-            aria-hidden="true"
-            className="from-night/80 absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-t to-transparent"
-          />
-
-          <div
-            className={`${CONTAINER} grid gap-14 pb-20 pt-12 lg:grid-cols-[1fr_26rem] lg:items-center lg:gap-16 lg:pb-28 lg:pt-20`}
+            className={`${CONTAINER} grid gap-12 pb-16 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:items-center lg:gap-16 lg:pb-24 lg:pt-16`}
           >
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 text-xs font-bold text-white/85 backdrop-blur-sm">
+              <span
+                className={`${CARD} text-muted inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold`}
+              >
                 <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
                 Now onboarding merchants in Nairobi
               </span>
 
-              <h1 className="mt-6 text-4xl/[1.04] font-extrabold tracking-tight sm:text-5xl/[1.04] lg:text-[4.5rem]/[1.02]">
-                Put your business in <span className="text-gold">every guest&apos;s</span> hands.
+              <h1 className="mt-6 max-w-[40rem] text-4xl/[1.04] font-extrabold tracking-tight sm:text-5xl/[1.04] lg:text-[4.5rem]/[1.02]">
+                Put your business in every guest&apos;s hands.
               </h1>
 
-              <p className="mt-5 max-w-[32.5rem] text-[1.0625rem] font-semibold leading-[1.7] text-white/70">
+              <p className="text-muted mt-5 max-w-[32.5rem] text-[1.0625rem] font-semibold leading-[1.7]">
                 List your restaurant, bar, laundry, florist or boutique and let our riders bring
                 your products to their door.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Button
-                  variant="gold"
-                  size="lg"
-                  asChild
-                  className="rounded-full"
-                  trailingIcon={<ArrowRight className="h-4 w-4" />}
-                >
-                  <Link href={registrationHref}>Register Your Business</Link>
-                </Button>
+                <Link href={registrationHref} className={`${primaryButton} h-12`}>
+                  Register Your Business
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                </Link>
                 <Link
                   href="#how"
-                  className="focus-visible:ring-gold inline-flex h-12 items-center justify-center rounded-full border border-white/30 px-6 text-sm font-extrabold text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+                  className={`${BUTTON} border-border-strong hover:border-ink h-12 border dark:hover:border-white/60`}
                 >
                   See how it works
                 </Link>
@@ -209,25 +278,101 @@ export default async function MerchantsPage() {
                 ].map((stat, index) => (
                   <div
                     key={stat.label}
-                    className={index > 0 ? 'border-l border-white/15 pl-4 sm:pl-10' : 'pr-2'}
+                    className={index > 0 ? 'border-border-strong border-l pl-4 sm:pl-10' : 'pr-2'}
                   >
                     <dt className="sr-only">{stat.label}</dt>
                     <dd>
                       <span className="block text-2xl font-extrabold tracking-tight">
                         {stat.value}
                       </span>
-                      <span className="block text-xs font-semibold text-white/55">
-                        {stat.label}
-                      </span>
+                      <span className="text-muted block text-xs font-semibold">{stat.label}</span>
                     </dd>
                   </div>
                 ))}
               </dl>
             </div>
 
-            <StorefrontPreview />
+            {/* Two arched photographs with what a merchant gets pinned to them.
+                Decorative: the copy beside it says the same. */}
+            <div
+              aria-hidden="true"
+              className="relative mx-auto aspect-[6/5] w-full max-w-[36rem] lg:mr-0"
+            >
+              <span className="bg-gold absolute left-[26%] top-[3%] h-14 w-14 rounded-full sm:h-20 sm:w-20" />
+              <div className="absolute right-0 top-0 h-[86%] w-[58%] overflow-hidden rounded-b-[2rem] rounded-t-full shadow-[0_30px_60px_-30px_rgb(0_0_0/0.45)]">
+                <Image
+                  src="/images/merchant-page/boutique-checkout.jpg"
+                  alt=""
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 21rem, 58vw"
+                  className="object-cover object-[42%_center]"
+                />
+              </div>
+              <div className="ring-bg absolute bottom-[12%] left-0 h-[60%] w-[42%] overflow-hidden rounded-b-[1.5rem] rounded-t-full shadow-[0_24px_50px_-26px_rgb(0_0_0/0.5)] ring-[6px]">
+                <Image
+                  src="/images/merchant-page/bartender.jpg"
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 15rem, 42vw"
+                  className="object-cover object-[46%_center]"
+                />
+              </div>
+
+              <div
+                className={`${CARD} absolute -right-1 top-[8%] flex items-center gap-2.5 rounded-2xl px-3 py-2.5 shadow-[0_14px_30px_-12px_rgb(0_0_0/0.35)] sm:-right-6`}
+              >
+                <span className="bg-gold text-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+                  <Banknote className="h-4 w-4" />
+                </span>
+                <span>
+                  <span className="block text-[0.75rem] font-extrabold">
+                    Weekly M-Pesa settlement
+                  </span>
+                  <span className="text-muted block text-[0.625rem] font-semibold">
+                    To your till or bank
+                  </span>
+                </span>
+              </div>
+
+              <div
+                className={`${CARD} absolute bottom-0 left-[20%] flex items-center gap-3 rounded-2xl px-3.5 py-3 shadow-[0_14px_30px_-12px_rgb(0_0_0/0.4)]`}
+              >
+                <span className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                  <Check className="h-4 w-4" />
+                </span>
+                <span>
+                  <span className="block text-[0.8125rem] font-extrabold">
+                    New order from [Hotel]
+                  </span>
+                  <span className="text-muted block text-[0.6875rem] font-semibold">
+                    Rider assigned · pickup in 8 min
+                  </span>
+                </span>
+              </div>
+            </div>
           </div>
         </section>
+
+        {/* ------------------------------------------------- category strip */}
+        {/* Decorative: the same categories are listed, as links, just below. */}
+        <div aria-hidden="true" className="bg-gold text-ink overflow-hidden py-4">
+          <div className="flex w-max animate-[marquee_70s_linear_infinite] hover:[animation-play-state:paused]">
+            {[0, 1].map((copy) => (
+              <ul key={copy} className="flex shrink-0">
+                {allCategories.map((category) => (
+                  <li
+                    key={category.category}
+                    className="flex items-center gap-6 whitespace-nowrap pl-6 text-sm font-extrabold sm:text-base"
+                  >
+                    {category.label}
+                    <span className="bg-ink/60 h-1.5 w-1.5 rounded-full" />
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
 
         {/* ------------------------------------------------------ categories */}
         <section className="py-20 sm:py-24">
@@ -236,7 +381,7 @@ export default async function MerchantsPage() {
               <div>
                 <SectionLabel>Categories</SectionLabel>
                 <h2 className={`mt-3 max-w-2xl ${H2}`}>
-                  Built for the businesses guests <Highlight>ask for most</Highlight>
+                  Built for the businesses guests ask for most
                 </h2>
               </div>
               <p className="text-muted max-w-xs text-sm font-semibold leading-relaxed">
@@ -244,40 +389,57 @@ export default async function MerchantsPage() {
               </p>
             </div>
 
-            {/* Two to a row on a phone, as before the redesign, so the list
-                stays short; the running number joins in from sm up. */}
-            <ul className="mt-10 grid grid-cols-2 gap-2.5 sm:mt-12 sm:gap-3 lg:grid-cols-4">
-              {(categories ?? []).map((category, index) => {
-                const dark = MOST_ASKED.has(category.category);
+            <ul className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:grid-cols-4">
+              {photoCategories.map((category, index) => (
+                <li key={category.category}>
+                  <Link
+                    href={registrationHref}
+                    aria-label={`Register your ${category.label} business`}
+                    className="focus-visible:ring-gold group block rounded-3xl focus-visible:outline-none focus-visible:ring-2"
+                  >
+                    <span className="relative block aspect-[4/5] overflow-hidden rounded-3xl">
+                      <Image
+                        src={category.image}
+                        alt=""
+                        fill
+                        sizes="(min-width: 1024px) 25vw, 50vw"
+                        className={`object-cover ${category.focus} transition-transform duration-500 ease-out group-hover:scale-[1.04]`}
+                      />
+                      <span className="bg-gold text-ink absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-[0.6875rem] font-extrabold tabular-nums">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                    </span>
+                    <span className="mt-3 flex items-center justify-between gap-2 px-1">
+                      <span className="text-[0.875rem] font-extrabold leading-snug sm:text-base">
+                        {category.label}
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="bg-ink group-hover:bg-gold group-hover:text-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-colors dark:bg-white/10"
+                      >
+                        <ArrowUpRight className="h-4 w-4" />
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <ul className="mt-8 flex flex-wrap gap-2">
+              {allCategories.map((category) => {
+                const lead = PHOTO_CATEGORIES.some((photo) => photo.key === category.category);
                 return (
                   <li key={category.category}>
                     <Link
                       href={registrationHref}
                       aria-label={`Register your ${category.label} business`}
-                      className={`focus-visible:ring-gold group flex h-full items-center gap-2 rounded-2xl border px-3 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 sm:gap-3 sm:px-4 sm:py-4 ${
-                        dark
-                          ? 'bg-ink border-ink text-white'
-                          : 'bg-surface border-border text-ink hover:border-ink'
+                      className={`focus-visible:ring-gold inline-flex h-9 items-center rounded-full border px-4 text-[0.8125rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 ${
+                        lead
+                          ? 'bg-ink dark:bg-gold dark:text-night border-transparent text-white'
+                          : 'border-border-strong hover:border-ink bg-[var(--m-card)] dark:hover:border-white/50'
                       }`}
                     >
-                      <span
-                        className={`hidden text-[0.6875rem] font-extrabold tabular-nums sm:inline ${
-                          dark ? 'text-gold' : 'text-muted-light'
-                        }`}
-                      >
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <span className="min-w-0 flex-1 text-[0.8125rem] font-extrabold leading-snug sm:text-sm">
-                        {category.label}
-                      </span>
-                      <span
-                        aria-hidden="true"
-                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors sm:h-8 sm:w-8 ${
-                          dark ? 'bg-gold text-ink' : 'bg-bg text-ink group-hover:bg-gold'
-                        }`}
-                      >
-                        <ArrowUpRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </span>
+                      {category.label}
                     </Link>
                   </li>
                 );
@@ -287,62 +449,41 @@ export default async function MerchantsPage() {
         </section>
 
         {/* -------------------------------------------------------- benefits */}
-        <section className="pb-20 sm:pb-28">
+        <section className="bg-[#141414] py-20 text-white sm:py-28">
           <div className={CONTAINER}>
-            <SectionLabel>Why NexG</SectionLabel>
-            <h2 className={`mt-3 max-w-2xl ${H2}`}>
-              A new front door, without a new <Highlight>headache</Highlight>
-            </h2>
-            <p className="text-muted mt-4 max-w-xl text-[0.9375rem] font-semibold leading-[1.7]">
+            <SectionLabel onDark>Why NexG</SectionLabel>
+            <h2 className={`mt-3 max-w-2xl ${H2}`}>A new front door, without a new headache</h2>
+            <p className="mt-4 max-w-xl text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
               You keep cooking, pressing, arranging and selling. NexG handles the guest, the rider
               and the payment.
             </p>
 
-            <ul className="mt-12 grid gap-4 lg:grid-cols-3">
-              {BENEFITS.map((benefit, index) => {
-                const look =
-                  index === 0
-                    ? 'bg-gold text-ink lg:row-span-2 lg:min-h-[26rem] justify-between'
-                    : index === 2
-                      ? 'bg-ink text-white'
-                      : `bg-surface border-border text-ink border ${index === 3 ? 'lg:col-span-2' : ''}`;
-                const number =
-                  index === 0
-                    ? 'bg-ink text-gold'
-                    : index === 2
-                      ? 'bg-gold text-ink'
-                      : 'bg-ink text-white';
-                const body =
-                  index === 0 ? 'text-ink/80' : index === 2 ? 'text-white/65' : 'text-muted';
-                return (
-                  <li
-                    key={benefit.title}
-                    className={`flex flex-col gap-8 rounded-3xl p-7 sm:p-8 ${look}`}
+            <ol className="mt-12 border-b border-white/10">
+              {BENEFITS.map((benefit, index) => (
+                <li
+                  key={benefit.title}
+                  className="grid gap-6 border-t border-white/10 py-8 sm:grid-cols-[3rem_minmax(0,1fr)] lg:grid-cols-[4rem_minmax(0,1fr)_minmax(0,30rem)] lg:items-center lg:gap-10 lg:py-10"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="text-gold text-sm font-extrabold tabular-nums"
                   >
-                    <span
-                      aria-hidden="true"
-                      className={`flex h-11 w-11 items-center justify-center rounded-xl text-sm font-extrabold ${number}`}
-                    >
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <div>
-                      <h3
-                        className={`font-extrabold tracking-tight ${
-                          index === 0 ? 'text-[1.75rem] leading-tight' : 'text-xl'
-                        }`}
-                      >
-                        {benefit.title}
-                      </h3>
-                      <p
-                        className={`mt-2 max-w-md text-[0.9375rem] font-semibold leading-[1.7] ${body}`}
-                      >
-                        {benefit.body}
-                      </p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h3 className="max-w-sm text-2xl font-extrabold leading-tight tracking-tight sm:text-[1.75rem]">
+                      {benefit.title}
+                    </h3>
+                    <p className="mt-3 max-w-md text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
+                      {benefit.body}
+                    </p>
+                  </div>
+                  <div aria-hidden="true" className="sm:col-start-2 lg:col-start-auto">
+                    <BenefitVisual index={index} />
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
@@ -353,29 +494,26 @@ export default async function MerchantsPage() {
           <div className={`${CONTAINER} grid gap-12 lg:grid-cols-[1fr_27rem] lg:gap-16`}>
             <div>
               <SectionLabel>Get started</SectionLabel>
-              <h2 className={`mt-3 ${H2}`}>
-                Live in <Highlight>three steps</Highlight>
-              </h2>
+              <h2 className={`mt-3 ${H2}`}>Live in three steps</h2>
               <p className="text-muted mt-4 text-[0.9375rem] font-semibold">
                 Most merchants are taking orders within a few days of registering.
               </p>
 
-              <ol className="relative mt-10 space-y-4">
-                <span
-                  aria-hidden="true"
-                  className="bg-border-strong absolute bottom-8 left-[1.1875rem] top-8 w-px"
-                />
+              <ol className="mt-10">
                 {STEPS.map((step, index) => (
-                  <li key={step.title} className="relative flex gap-5">
+                  <li
+                    key={step.title}
+                    className="border-border-strong flex gap-6 border-t py-7 last:pb-0 sm:gap-8"
+                  >
                     <span
                       aria-hidden="true"
-                      className="bg-ink text-gold ring-bg relative z-10 mt-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ring-4"
+                      className="text-gold-text dark:text-gold w-8 shrink-0 text-[2.5rem] font-extrabold tabular-nums leading-none"
                     >
                       {index + 1}
                     </span>
-                    <div className="border-border bg-surface flex-1 rounded-2xl border p-5 sm:p-6">
-                      <h3 className="text-base font-extrabold">{step.title}</h3>
-                      <p className="text-muted mt-1.5 text-[0.875rem] font-semibold leading-[1.7]">
+                    <div>
+                      <h3 className="text-lg font-extrabold">{step.title}</h3>
+                      <p className="text-muted mt-1.5 max-w-lg text-[0.9375rem] font-semibold leading-[1.7]">
                         {step.body}
                       </p>
                     </div>
@@ -415,9 +553,12 @@ export default async function MerchantsPage() {
                 ))}
               </ul>
 
-              <Button variant="gold" block className="mt-8 h-14 rounded-full text-base" asChild>
-                <Link href={registrationHref}>Register Your Business</Link>
-              </Button>
+              <Link
+                href={registrationHref}
+                className={`${BUTTON} bg-gold text-ink mt-8 h-14 w-full text-base hover:bg-[#FEDD5C]`}
+              >
+                Register Your Business
+              </Link>
             </div>
           </div>
         </section>
@@ -432,9 +573,7 @@ export default async function MerchantsPage() {
           >
             <div>
               <SectionLabel>Register</SectionLabel>
-              <h2 className={`mt-3 ${H2}`}>
-                Register your <Highlight>business</Highlight>
-              </h2>
+              <h2 className={`mt-3 ${H2}`}>Register your business</h2>
               <p className="text-muted mt-4 max-w-md text-[0.9375rem] font-semibold leading-[1.7]">
                 Two minutes now. A member of the merchant team will call to confirm details and walk
                 you through the dashboard.
@@ -445,7 +584,7 @@ export default async function MerchantsPage() {
                   <li key={item} className="flex items-center gap-3">
                     <span
                       aria-hidden="true"
-                      className="bg-ink text-gold flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                      className="bg-ink text-gold dark:bg-gold dark:text-night flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
                     >
                       <Check className="h-3.5 w-3.5" />
                     </span>
@@ -456,23 +595,26 @@ export default async function MerchantsPage() {
             </div>
 
             {/* One card for both paths. The fallback form brings no surface of
-                its own, and nothing here clips, so its pickers can open. */}
-            <div className="border-border border-t-gold bg-surface rounded-3xl border border-t-[6px] p-6 shadow-[0_24px_50px_-28px_rgb(20_20_20/0.35)] sm:p-10">
-              {connectedRegistrationEnabled ? (
-                <>
-                  <h3 className="text-2xl font-extrabold tracking-tight">Register your business</h3>
-                  <p className="text-muted mt-3 text-[0.9375rem] font-semibold leading-[1.7]">
-                    Start with the essentials. Finish your setup from your merchant Home.
-                  </p>
-                  <Link href={registrationHref} className={`${darkButton} mt-7`}>
-                    Start registration
-                    <ArrowRight aria-hidden="true" className="text-gold h-4 w-4" />
-                  </Link>
-                </>
-              ) : (
+                its own, and nothing here clips, so its pickers can open. Its
+                inputs are drawn for a light card, so it stays cream. */}
+            {connectedRegistrationEnabled ? (
+              <div
+                className={`${CARD} rounded-3xl p-6 shadow-[0_24px_50px_-28px_rgb(20_20_20/0.35)] sm:p-10`}
+              >
+                <h3 className="text-2xl font-extrabold tracking-tight">Register your business</h3>
+                <p className="text-muted mt-3 text-[0.9375rem] font-semibold leading-[1.7]">
+                  Start with the essentials. Finish your setup from your merchant Home.
+                </p>
+                <Link href={registrationHref} className={`${primaryButton} mt-7 h-12`}>
+                  Start registration
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                </Link>
+              </div>
+            ) : (
+              <div className="border-border bg-surface rounded-3xl border p-6 shadow-[0_24px_50px_-28px_rgb(20_20_20/0.35)] sm:p-10">
                 <MerchantRegisterCard cities={allCities} />
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -481,13 +623,11 @@ export default async function MerchantsPage() {
           <div className={`${CONTAINER} grid gap-10 lg:grid-cols-[26rem_1fr] lg:gap-16`}>
             <div>
               <SectionLabel>FAQ</SectionLabel>
-              <h2 className={`mt-3 ${H2}`}>
-                Questions merchants <Highlight>ask</Highlight>
-              </h2>
+              <h2 className={`mt-3 ${H2}`}>Questions merchants ask</h2>
               <p className="text-muted mt-4 text-[0.9375rem] font-semibold">
                 Anything else, the merchant team is a call away.
               </p>
-              <Link href="/help" className={`${darkButton} mt-7`}>
+              <Link href="/help" className={`${primaryButton} mt-7 h-12`}>
                 Talk to the merchant team
               </Link>
             </div>
@@ -497,13 +637,13 @@ export default async function MerchantsPage() {
                 <li key={item.q}>
                   <details
                     open={index === 0}
-                    className="border-border bg-surface group rounded-2xl border px-5 py-4 open:shadow-[0_18px_40px_-26px_rgb(20_20_20/0.35)] sm:px-6 sm:py-5"
+                    className={`${CARD} group rounded-2xl px-5 py-4 open:shadow-[0_18px_40px_-26px_rgb(20_20_20/0.35)] sm:px-6 sm:py-5`}
                   >
                     <summary className="focus-visible:ring-gold flex cursor-pointer list-none items-center justify-between gap-4 text-[0.9375rem] font-extrabold focus-visible:outline-none focus-visible:ring-2 [&::-webkit-details-marker]:hidden">
                       {item.q}
                       <span
                         aria-hidden="true"
-                        className="border-border text-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-full border group-open:hidden"
+                        className="border-border-strong flex h-8 w-8 shrink-0 items-center justify-center rounded-full border group-open:hidden"
                       >
                         <Plus className="h-4 w-4" />
                       </span>
@@ -527,31 +667,34 @@ export default async function MerchantsPage() {
         {/* ------------------------------------------------------------- CTA */}
         <section className="pb-20 sm:pb-24">
           <div className={CONTAINER}>
-            <div className="bg-gold text-ink relative isolate overflow-hidden rounded-3xl px-7 py-12 sm:px-12 sm:py-16">
+            <div className="bg-gold text-ink relative isolate grid overflow-hidden rounded-3xl lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-stretch">
               <span
                 aria-hidden="true"
-                className="bg-ink/[0.07] absolute -right-24 -top-28 -z-10 h-80 w-80 rounded-full"
+                className="bg-ink/[0.07] absolute -left-24 -top-28 -z-10 h-80 w-80 rounded-full"
               />
-              <span
-                aria-hidden="true"
-                className="border-ink/[0.07] absolute -bottom-40 right-40 -z-10 h-72 w-72 rounded-full border-[2.5rem]"
-              />
-              <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="max-w-xl text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-[2.75rem]">
-                    Ready to reach thousands of guests?
-                  </h2>
-                  <p className="text-ink/75 mt-3 max-w-md text-[0.9375rem] font-semibold">
-                    Register today and be on the concierge&apos;s list before the next check-in.
-                  </p>
-                </div>
-                <Link
-                  href={registrationHref}
-                  className={`${darkButton} shrink-0 px-7 py-4 text-base`}
-                >
+              <div className="px-7 py-12 sm:px-12 sm:py-16">
+                <h2 className="max-w-xl text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-[2.75rem]">
+                  Ready to reach thousands of guests?
+                </h2>
+                <p className="text-ink/75 mt-3 max-w-md text-[0.9375rem] font-semibold">
+                  Register today and be on the concierge&apos;s list before the next check-in.
+                </p>
+                <Link href={registrationHref} className={`${inkButton} mt-8 h-14 px-7 text-base`}>
                   Register Your Business
                   <ArrowRight aria-hidden="true" className="text-gold h-4 w-4" />
                 </Link>
+              </div>
+              <div
+                aria-hidden="true"
+                className="relative mx-7 mb-7 h-56 overflow-hidden rounded-[1.75rem] sm:mx-12 sm:mb-12 lg:m-5 lg:ml-0 lg:h-auto lg:rounded-l-[8rem]"
+              >
+                <Image
+                  src="/images/merchant-page/barista.jpg"
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 30rem, 100vw"
+                  className="object-cover object-[68%_25%]"
+                />
               </div>
             </div>
           </div>

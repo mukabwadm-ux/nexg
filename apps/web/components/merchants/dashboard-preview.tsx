@@ -1,7 +1,7 @@
 import { VALUE_PLACEHOLDER } from '@nexg/ui';
 
 import { Logo } from '../logo';
-import { SectionLabel } from './landing';
+import { CARD, SectionLabel } from './landing';
 
 /**
  * The merchant dashboard band from the `Merchants` artboard.
@@ -42,22 +42,22 @@ const ORDERS = [
 
 const STATE_STYLES: Record<string, string> = {
   Accept: 'bg-gold text-ink',
-  Preparing: 'border-border text-ink border bg-surface',
+  Preparing: 'border-border border bg-[var(--m-card)]',
   'On the way': 'bg-ink text-white',
   Delivered: 'bg-success-bg text-success',
 };
 
 export function DashboardPreview() {
   return (
-    <section className="bg-ink py-16 text-white sm:pb-[6.9375rem] sm:pt-24">
+    <section className="py-16 sm:pb-[6.9375rem] sm:pt-24">
       <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
-        <SectionLabel onDark>Merchant dashboard</SectionLabel>
+        <SectionLabel>Merchant dashboard</SectionLabel>
 
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
           <h2 className="max-w-xl text-3xl/[1.06] font-extrabold tracking-tight sm:text-[3.125rem]/[1.06]">
-            Every order, rider and shilling in <span className="text-gold">one place.</span>
+            Every order, rider and shilling in one place.
           </h2>
-          <p className="max-w-xs text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
+          <p className="text-muted max-w-xs text-[0.9375rem] font-semibold leading-[1.7]">
             Accept with one tap, watch the rider arrive, and see what you&apos;ve sold today without
             leaving the counter.
           </p>
@@ -67,12 +67,12 @@ export function DashboardPreview() {
             merchant portal, and a screen reader gains nothing from the mock. */}
         <div
           aria-hidden="true"
-          className="bg-surface text-ink shadow-raised mt-10 overflow-hidden rounded-2xl"
+          className={`${CARD} mt-10 overflow-hidden rounded-2xl shadow-[0_30px_60px_-34px_rgb(20_20_20/0.45)]`}
         >
           <div className="flex">
-            <aside className="border-border bg-surface hidden w-56 shrink-0 flex-col border-r p-5 sm:flex">
+            <aside className="border-border hidden w-56 shrink-0 flex-col border-r p-5 sm:flex">
               <p className="flex items-center gap-2 text-[0.8125rem] font-extrabold">
-                <Logo className="h-8 w-auto shrink-0" />
+                <Logo themed className="h-8 w-auto shrink-0" />
                 [Your business]
               </p>
               <ul className="mt-4 space-y-1.5">
@@ -80,7 +80,9 @@ export function DashboardPreview() {
                   <li
                     key={item}
                     className={`rounded-md px-3 py-2.5 text-sm font-semibold ${
-                      index === 0 ? 'bg-ink font-bold text-white' : 'text-muted'
+                      index === 0
+                        ? 'bg-ink dark:bg-gold dark:text-night font-bold text-white'
+                        : 'text-muted'
                     }`}
                   >
                     {item}
@@ -103,7 +105,7 @@ export function DashboardPreview() {
             <div className="bg-bg min-w-0 flex-1 p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <p className="text-lg font-extrabold">Today</p>
-                <p className="border-border bg-surface rounded-lg border px-3 py-1.5 text-xs font-bold">
+                <p className="border-border rounded-lg border bg-[var(--m-card)] px-3 py-1.5 text-xs font-bold">
                   Mon 21 Sep
                 </p>
               </div>
@@ -120,7 +122,7 @@ export function DashboardPreview() {
                     className={`rounded-xl border p-4 ${
                       tile.dark
                         ? 'bg-ink border-transparent text-white'
-                        : 'border-border bg-surface'
+                        : 'border-border bg-[var(--m-card)]'
                     }`}
                   >
                     <p
@@ -135,7 +137,7 @@ export function DashboardPreview() {
                 ))}
               </div>
 
-              <div className="bg-surface mt-5 overflow-x-auto rounded-xl p-2 sm:p-3">
+              <div className="mt-5 overflow-x-auto rounded-xl bg-[var(--m-card)] p-2 sm:p-3">
                 <table className="w-full min-w-[34rem] border-collapse text-left">
                   <thead>
                     <tr className="border-border border-b">

@@ -316,3 +316,14 @@ div.ui-table-viewport[data-table-viewport] {
     scrollbar-color: var(--table-scroll-thumb) transparent;
   }
 }
+
+/* A row that scrolls sideways forever: the content is written twice and
+   moves by half its width. Stops for reduced motion (see the base layer). */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
