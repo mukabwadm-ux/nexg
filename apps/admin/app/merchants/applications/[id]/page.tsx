@@ -62,6 +62,15 @@ export default async function ManagedMerchantApplicationPage({
           >
             Back to applications
           </Link>
+          {source.record.review.state === 'approved' ? (
+            <Link
+              prefetch={false}
+              href={`/merchants/${encodeURIComponent(params.id)}`}
+              className="bg-ink text-bg ml-4 mt-4 inline-flex min-h-11 items-center rounded-lg px-4 text-sm font-bold"
+            >
+              Manage merchant: documents, Take live, edit
+            </Link>
+          ) : null}
           <ApplicationAgreement merchantId={params.id} />
           <ApplicationReviewDetail {...source} />
         </main>

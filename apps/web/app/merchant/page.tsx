@@ -34,7 +34,9 @@ export default async function MerchantDashboard() {
 
   // New applications render from their revisioned owner record before any
   // operational counts, order/finance views or sample legacy progress reads.
-  if (me.access.state !== 'legacy') {
+  // Once staff take an approved application live, `live` is true and the
+  // home is the dashboard below instead of the setup checklist.
+  if (me.access.state !== 'legacy' && !live) {
     if (!me.access.setup)
       return (
         <main className="p-6">

@@ -31,7 +31,9 @@ export async function merchantContext(
   });
   const supabase = createClient();
 
-  if (!me.access.operations || ((options.setup || options.draft) && me.access.state !== 'legacy')) {
+  const shellOnly =
+    !me.access.operations || ((options.setup || options.draft) && me.access.state !== 'legacy');
+  if (shellOnly) {
     // This is a safe shell summary, not an operational view with hidden data.
     const { data, error } = await supabase
       .from('merchant')
@@ -39,6 +41,17 @@ export async function merchantContext(
       .eq('id', me.id)
       .maybeSingle();
     if (error) throw new Error('Your business setup could not be loaded. Please retry.');
+    /*
+     * A new-form merchant that staff have taken live (Admin › Merchants ›
+     * record › Take live) gets the same operational context as a live
+     * legacy merchant, so its home is the dashboard rather than the setup
+     * checklist. Draft editors keep the shell, and so does anyone whose
+     * operational summary cannot be read.
+     */
+    if (me.access.operations && !options.draft && data?.status === 'live') {
+      const operational = await operationalContext(me, supabase);
+      if (operational.m) return operational;
+    }
     const m = data
       ? ({
           merchant_id: data.id,
@@ -97,6 +110,13 @@ export async function merchantContext(
     };
   }
 
+  return operationalContext(me, supabase);
+}
+
+async function operationalContext(
+  me: MerchantContext['me'],
+  supabase: MerchantContext['supabase'],
+): Promise<MerchantContext> {
   const { data } = await supabase
     .from('merchant_home_v')
     .select('*')

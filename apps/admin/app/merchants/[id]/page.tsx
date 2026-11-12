@@ -46,8 +46,21 @@ export default async function MerchantApplicationPage({ params }: { params: { id
       </ConsoleShell>
     );
   }
-  if (managed) redirect(`/merchants/applications/${encodeURIComponent(params.id)}`);
   const supabase = createClient();
+  /*
+   * A new-form application is reviewed on its own read-only page. Once it is
+   * approved, staff manage the merchant here like any other: documents,
+   * Take live, deactivate, delete.
+   */
+  if (managed) {
+    const { data: application } = await supabase
+      .from('merchant_application')
+      .select('review_state')
+      .eq('merchant_id', params.id)
+      .maybeSingle();
+    if (application?.review_state !== 'approved')
+      redirect(`/merchants/applications/${encodeURIComponent(params.id)}`);
+  }
 
   const { data: merchant, error: merchantError } = await supabase
     .from('merchant')
@@ -210,6 +223,15 @@ export default async function MerchantApplicationPage({ params }: { params: { id
         >
           ← Back to the pipeline
         </Link>
+        {managed ? (
+          <Link
+            prefetch={false}
+            href={`/merchants/applications/${encodeURIComponent(params.id)}`}
+            className="text-gold-text ml-4 text-xs font-bold"
+          >
+            View the approved application
+          </Link>
+        ) : null}
 
         <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div className="space-y-6">
