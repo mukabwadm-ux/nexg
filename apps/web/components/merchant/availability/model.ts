@@ -22,6 +22,8 @@ export type DayHours = {
   day: number;
   state: 'open' | 'closed' | 'unspecified';
   intervals: Interval[];
+  /** The name of a dated entry that has one, such as a public holiday. */
+  label?: string;
 };
 export type Resource = {
   id: string;

@@ -13012,6 +13012,7 @@ export type Database = {
           created_at: string;
           created_by: string | null;
           date: string;
+          estimated: boolean;
           id: string;
           label: string;
           prompt_merchants_days_before: number;
@@ -13024,6 +13025,7 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           date: string;
+          estimated?: boolean;
           id?: string;
           label: string;
           prompt_merchants_days_before?: number;
@@ -13035,6 +13037,7 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           date?: string;
+          estimated?: boolean;
           id?: string;
           label?: string;
           prompt_merchants_days_before?: number;
@@ -18711,6 +18714,134 @@ export type Database = {
           },
           {
             foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_holiday_hours: {
+        Row: {
+          answered_at: string;
+          closed: boolean;
+          holiday_id: string;
+          merchant_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          answered_at?: string;
+          closed: boolean;
+          holiday_id: string;
+          merchant_id: string;
+        };
+        Update: {
+          answered_at?: string;
+          closed?: boolean;
+          holiday_id?: string;
+          merchant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_holiday_hours_holiday_id_fkey';
+            columns: ['holiday_id'];
+            isOneToOne: false;
+            referencedRelation: 'holiday_calendar';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
@@ -54143,6 +54274,32 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_merchant_holiday_set: {
+        Args: { p_closed: boolean; p_holiday_id: string; p_merchant_id: string };
+        Returns: {
+          answered_at: string;
+          closed: boolean;
+          holiday_id: string;
+          merchant_id: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant_holiday_hours';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_merchant_holidays: {
+        Args: { p_merchant_id: string };
+        Returns: {
+          answered_at: string;
+          closed: boolean;
+          date: string;
+          estimated: boolean;
+          holiday_id: string;
+          label: string;
+        }[];
       };
       rpc_merchant_hours_override: {
         Args: {

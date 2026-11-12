@@ -6,7 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { CalendarDays, Clock3 } from 'lucide-react';
 import { BookingsBoard } from '../bookings-board';
+import type { HolidayRow } from '../hours-vocab';
 import type { BookingBoardData } from '@/lib/booking/board-data';
+import { HolidaysCard } from './holidays';
 import { dateAdd, localDate, type DayHours } from './model';
 import { HoursView } from './views';
 import { SetupHours } from './setup-hours';
@@ -26,6 +28,7 @@ export function LiveAvailability({
   legacyHoursHref,
   initialBookingId,
   board,
+  holidays,
 }: {
   hours: DayHours[] | null;
   dateHours: Record<string, DayHours>;
@@ -37,6 +40,8 @@ export function LiveAvailability({
   initialBookingId?: string;
   /** The main-database bookings board, used while the booking engine is not hosted. */
   board?: BookingBoardData;
+  /** Null when the database has no holiday calendar yet. */
+  holidays?: HolidayRow[] | null;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<'hours' | 'bookings'>(initialBookingId ? 'bookings' : 'hours');
@@ -71,36 +76,46 @@ export function LiveAvailability({
           ) : (
             <BookingWorkspace initialBookingId={initialBookingId} />
           )
-        ) : hours ? (
-          <>
-            <div className="av-date-toolbar">
-              <button className="av-button" onClick={() => setDate(dateAdd(date, -7))}>
-                Previous week
-              </button>
-              <button className="av-button" onClick={() => setDate(localDate(now))}>
-                This week
-              </button>
-              <button className="av-button" onClick={() => setDate(dateAdd(date, 7))}>
-                Next week
-              </button>
-            </div>
-            <HoursView
-              s={{ hours, dateHours, now, events: [] }}
-              date={date}
-              onEdit={canEdit ? () => setEditing(true) : undefined}
-              onSelect={() => {}}
-            />
-          </>
         ) : (
-          <section className="av-card">
-            <h2>Opening hours</h2>
-            <p role="status">{hoursMessage}</p>
-            {legacyHoursHref && (
-              <Link href={legacyHoursHref} className="av-link">
-                Open existing hours
-              </Link>
-            )}
-          </section>
+          <>
+            {hours ? (
+              <div className="av-date-toolbar">
+                <button className="av-button" onClick={() => setDate(dateAdd(date, -7))}>
+                  Previous week
+                </button>
+                <button className="av-button" onClick={() => setDate(localDate(now))}>
+                  This week
+                </button>
+                <button className="av-button" onClick={() => setDate(dateAdd(date, 7))}>
+                  Next week
+                </button>
+              </div>
+            ) : null}
+            {/* The workspace is one screen tall and its cards would share
+                that height. Scrolling the tab as one column lets the week
+                and the holidays each keep theirs. */}
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              {hours ? (
+                <HoursView
+                  s={{ hours, dateHours, now, events: [] }}
+                  date={date}
+                  onEdit={canEdit ? () => setEditing(true) : undefined}
+                  onSelect={() => {}}
+                />
+              ) : (
+                <section className="av-card">
+                  <h2>Opening hours</h2>
+                  <p role="status">{hoursMessage}</p>
+                  {legacyHoursHref && (
+                    <Link href={legacyHoursHref} className="av-link">
+                      Open existing hours
+                    </Link>
+                  )}
+                </section>
+              )}
+              {holidays ? <HolidaysCard holidays={holidays} canEdit={canEdit} /> : null}
+            </div>
+          </>
         )}
       </div>
       {editing && (

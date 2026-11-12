@@ -606,6 +606,32 @@ export async function setOverride(input: {
   );
 }
 
+/**
+ * Open or closed on one public holiday. One answer covers every branch,
+ * and the business is the signed-in workspace, never an id the browser
+ * sends. `workspace-setup` lets both the Hours board and the Availability
+ * workspace use it.
+ */
+export async function setHolidayHours(input: {
+  holidayId: string;
+  closed: boolean;
+}): Promise<Outcome> {
+  const { client, merchantId } = await merchantActionClient({ access: 'workspace-setup' });
+  const { data, error } = await client.rpc('rpc_merchant_holiday_set', {
+    p_merchant_id: merchantId,
+    p_holiday_id: input.holidayId,
+    p_closed: input.closed,
+  });
+  return unwrap(
+    data,
+    error,
+    [...ALL, '/merchant/availability'],
+    input.closed
+      ? 'Saved. Guests see you as closed that day.'
+      : 'Saved. Guests see your usual hours that day.',
+  );
+}
+
 // ──────────────────────────────────────────────────── reviews
 
 export async function replyToReview(ratingId: string, body: string): Promise<Outcome> {

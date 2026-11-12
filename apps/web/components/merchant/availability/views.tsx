@@ -95,7 +95,9 @@ export function HoursView({
                   </td>
                   <td>
                     {s.dateHours?.[d] ? (
-                      <span className="av-badge av-amber">Special date hours</span>
+                      <span className="av-badge av-amber">
+                        {s.dateHours[d]?.label ?? 'Special date hours'}
+                      </span>
                     ) : exceptions.length ? (
                       <button className="av-link" onClick={() => onSelect(exceptions[0]!)}>
                         Date exception · {exceptions[0]!.title}

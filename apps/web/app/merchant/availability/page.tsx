@@ -1,6 +1,7 @@
 import { loadSetupHours } from '@/app/merchant/setup-hours-actions';
 import { LiveAvailability } from '@/components/merchant/availability/live';
 import type { DayHours } from '@/components/merchant/availability/model';
+import type { HolidayRow } from '@/components/merchant/hours-vocab';
 import { weekFromSaved } from '@/components/merchant/availability/saved-hours';
 import { profiles } from '@/components/merchant/offerings/model';
 import { bookingEngineEnabledForMerchant } from '@/lib/booking/bridge';
@@ -28,7 +29,7 @@ export default async function MerchantAvailabilityPage({
     bookingEngineEnabledForMerchant(merchant.id, process.env) &&
     (process.env.NODE_ENV !== 'production' ||
       (await legacyBookingState(client, merchant.id)) === 'clear');
-  const [saved, application, overrides, readOnlyWeek, board] = await Promise.all([
+  const [saved, application, overrides, readOnlyWeek, board, holidayRes] = await Promise.all([
     canEdit ? loadSetupHours() : null,
     canEdit ? loadApplicationView(client, merchant.id, { includePayout: false }) : null,
     client
@@ -45,6 +46,7 @@ export default async function MerchantAvailabilityPage({
           .is('branch_id', null)
           .eq('service', 'All day'),
     engine ? null : loadBookingBoard(client, merchant.id),
+    client.rpc('rpc_merchant_holidays', { p_merchant_id: merchant.id }),
   ]);
   const taggedRows = readOnlyWeek?.data;
   const hasAmbiguousWeek = taggedRows?.some((row) => row.weekday_convention !== 'monday_zero');
@@ -75,6 +77,20 @@ export default async function MerchantAvailabilityPage({
       intervals: override.closed ? [] : [{ start, end, nextDay: end <= start }],
     };
   }
+  /* Null when the database has no holiday calendar yet: code goes live
+     before its migration is applied by hand. */
+  const holidays = holidayRes.error ? null : ((holidayRes.data as HolidayRow[] | null) ?? []);
+  /* A holiday the business closes for is a closed date, unless a date
+     override already speaks for the day, which wins in the database too. */
+  for (const holiday of holidays ?? []) {
+    if (holiday.closed !== true || dateHours[holiday.date]) continue;
+    dateHours[holiday.date] = {
+      day: (new Date(`${holiday.date}T12:00:00Z`).getUTCDay() + 6) % 7,
+      state: 'closed',
+      intervals: [],
+      label: holiday.label,
+    };
+  }
   return (
     <LiveAvailability
       key={initialBookingId ?? 'availability'}
@@ -90,6 +106,7 @@ export default async function MerchantAvailabilityPage({
       }
       canEdit={canEdit}
       board={board ?? undefined}
+      holidays={holidays}
       legacyHoursHref={merchant.access.state === 'legacy' ? '/merchant/hours' : undefined}
       hoursMessage={
         (saved?.ok && saved.value.ambiguous) || hasAmbiguousWeek

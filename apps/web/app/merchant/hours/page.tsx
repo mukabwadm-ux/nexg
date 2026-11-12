@@ -1,7 +1,14 @@
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
+import { HolidayList } from '@/components/merchant/holiday-hours';
 import { CloseEarly, CopyHours, HoursSlot } from '@/components/merchant/hours-client';
-import { DAYS, hhmm, type HoursRow } from '@/components/merchant/hours-vocab';
+import {
+  DAYS,
+  hhmm,
+  holidayDate,
+  type HolidayRow,
+  type HoursRow,
+} from '@/components/merchant/hours-vocab';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Hours' };
@@ -33,7 +40,7 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
   if (!m) return null;
 
   const supabase = createClient();
-  const [hoursRes, overrideRes, branchRes] = await Promise.all([
+  const [hoursRes, overrideRes, branchRes, holidayRes] = await Promise.all([
     supabase.from('merchant_hours_v').select('*').eq('merchant_id', m.merchant_id),
     supabase.from('merchant_override_v').select('*').eq('merchant_id', m.merchant_id).order('date'),
     supabase
@@ -41,10 +48,15 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
       .select('id, name, state, paused_at')
       .eq('merchant_id', m.merchant_id)
       .order('is_primary', { ascending: false }),
+    supabase.rpc('rpc_merchant_holidays', { p_merchant_id: m.merchant_id }),
   ]);
 
   const allHours = (hoursRes.data as HoursRow[] | null) ?? [];
   const overrides = (overrideRes.data as OverrideRow[] | null) ?? [];
+  /* Null when the database has no holiday calendar yet: code goes live
+     before its migration is applied by hand, and the board then leaves
+     the panel out rather than showing an error. */
+  const holidays = holidayRes.error ? null : ((holidayRes.data as HolidayRow[] | null) ?? []);
   const branches =
     (branchRes.data as
       | { id: string; name: string; state: string; paused_at: string | null }[]
@@ -76,13 +88,13 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
 
   const thisWeek = overrides.filter((o) => !o.past);
   const activeToday = overrides.find((o) => o.active_today);
-  const nextHoliday = thisWeek.find((o) => o.reason?.toLowerCase().includes('holiday'));
+  const nextHoliday = holidays?.[0];
 
   return (
     <Board>
       <PageHead
         title="Hours"
-        lead="When guests can order from each branch. Carried over from your current listing; Nairobi public holidays follow the city default unless you override them."
+        lead="When guests can order from each branch. Carried over from your current listing. Public holidays keep your usual hours until you mark them closed."
       />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <Tile
@@ -104,8 +116,19 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
         />
         <Tile
           label="Next holiday"
-          value={nextHoliday ? nextHoliday.date.slice(5) : '—'}
-          note={nextHoliday?.reason ?? 'none scheduled'}
+          value={nextHoliday ? holidayDate(nextHoliday.date, false) : '—'}
+          note={
+            nextHoliday
+              ? `${nextHoliday.label} · ${
+                  nextHoliday.closed === null
+                    ? 'not answered'
+                    : nextHoliday.closed
+                      ? 'closed'
+                      : 'open'
+                }`
+              : 'none scheduled'
+          }
+          noteTone={nextHoliday && nextHoliday.closed === null ? 'gold' : 'plain'}
         />
         <Tile
           label="Guests see"
@@ -182,10 +205,16 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
             </p>
           </Panel>
 
-          <Panel title="Overrides & holidays">
+          {holidays ? (
+            <Panel title="Public holidays">
+              <HolidayList holidays={holidays} />
+            </Panel>
+          ) : null}
+
+          <Panel title="Date overrides">
             {overrides.length === 0 ? (
               <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
-                None set. Public holidays follow the city default until you override one.
+                None set.
               </p>
             ) : (
               <div className="overflow-x-auto">
