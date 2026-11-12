@@ -182,7 +182,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={photoUrl} alt={item.name} className="h-full w-full object-cover" />
                 ) : (
-                  <span className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_50%_50%,rgba(253, 209, 40,0.4),transparent_45%)]">
+                  <span className="bg-[radial-gradient(circle_at_50%_50%,rgba(253, 209, 40,0.4),transparent_45%)] absolute inset-0 flex items-center justify-center">
                     <Icon
                       aria-hidden="true"
                       className="text-gold-text h-28 w-28"

@@ -2,7 +2,7 @@
   --av-bg: #f6f3ec;
   --av-border: #e8e2d8;
   --av-muted: #586476;
-  --av-gold: #FDD128;
+  --av-gold: #fdd128;
   color: #15191f;
   font-family: var(--font-manrope), Arial, sans-serif;
 }
@@ -1883,7 +1883,7 @@
   font-weight: 650;
 }
 .root :global(.av-day-today) {
-  background: #FDD128;
+  background: #fdd128;
   color: #121212;
 }
 .root :global(.av-day-add) {

@@ -2,7 +2,7 @@
   --pm-ink: #171b24;
   --pm-muted: #586071;
   --pm-line: #e3e1dc;
-  --pm-gold: #FDD128;
+  --pm-gold: #fdd128;
   color: var(--pm-ink);
   font-family: var(--font-manrope), Arial, sans-serif;
   font-size: 14px;
@@ -234,7 +234,7 @@
   color: #283244;
 }
 .root :global(.pm-chip[aria-pressed='true']) {
-  border-color: #FDD128;
+  border-color: #fdd128;
   background: #fcf6e9;
   color: #775617;
 }
@@ -266,7 +266,7 @@
 }
 .root :global(tr[data-selected='true']) {
   background: #fcf6e9;
-  outline: 1px solid #FDD128;
+  outline: 1px solid #fdd128;
   outline-offset: -1px;
 }
 .root :global(.pm-row-button) {
@@ -648,7 +648,7 @@
 }
 .root :global(.pm-app-categories span:first-child) {
   background: #fff5df;
-  border: 1px solid #FDD128;
+  border: 1px solid #fdd128;
 }
 .root :global(.pm-visual) {
   position: relative;

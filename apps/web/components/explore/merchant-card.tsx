@@ -220,7 +220,7 @@ export function MerchantCard({
   return (
     <li className="text-ink bg-surface group flex flex-col overflow-hidden rounded-3xl shadow-[0_20px_40px_-24px_rgba(0,0,0,0.6)] transition-all duration-200 hover:-translate-y-0.5">
       <Wrapper {...(wrapperProps as { href: string })} className="block">
-        <div className="relative flex h-52 items-center justify-center overflow-hidden bg-[#F1ECE1] bg-[radial-gradient(circle_at_50%_50%,rgba(253, 209, 40,0.32),transparent_55%)]">
+        <div className="bg-[radial-gradient(circle_at_50%_50%,rgba(253, 209, 40,0.32),transparent_55%)] relative flex h-52 items-center justify-center overflow-hidden bg-[#F1ECE1]">
           <span
             className={`absolute left-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold shadow-sm ${
               open ? 'text-success' : 'text-danger'
