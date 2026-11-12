@@ -209,7 +209,7 @@ export function RiderAreasStep() {
           rows={2}
           defaultValue={draft?.notes ?? ''}
           onBlur={(event) => patch({ notes: event.target.value }, 3)}
-          placeholder="e.g. I also ride for another app on weekdays · I prefer hotel pickups"
+          placeholder="e.g. I also ride for another app on weekdays · I prefer Airbnb drop-offs"
           className="border-border-strong bg-bg focus-visible:ring-gold mt-4 w-full rounded-xl border px-3 py-2.5 text-[0.875rem] font-semibold focus:outline-none focus-visible:ring-2"
         />
         <p className="text-muted-light mt-2 text-xs font-semibold">Optional. One line is enough.</p>

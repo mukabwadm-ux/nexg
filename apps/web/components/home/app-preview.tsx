@@ -25,7 +25,7 @@ export function AppPreview() {
           <div className="flex items-start justify-between px-5 pt-7">
             <span>
               <span className="block text-[0.6875rem] text-[#6b6560]">Good evening</span>
-              <span className="mt-1 block text-lg font-extrabold">Staying at [your hotel]</span>
+              <span className="mt-1 block text-lg font-extrabold">Staying at [your Airbnb]</span>
             </span>
             <Bell className="mt-1 h-3.5 w-3.5 text-[#6b6560]" fill="currentColor" />
           </div>
@@ -59,7 +59,7 @@ export function AppPreview() {
                 On the way
               </span>
             </div>
-            <p className="mt-1 text-[0.6875rem] text-white/60">JKIA → your hotel · Tonight</p>
+            <p className="mt-1 text-[0.6875rem] text-white/60">JKIA → your Airbnb · Tonight</p>
             <div className="mt-3 flex items-center gap-2.5 rounded-xl bg-white/10 p-2.5">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9AE2E] text-[0.625rem] font-bold text-[#141414]">
                 CN

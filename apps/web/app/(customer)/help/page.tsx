@@ -45,7 +45,7 @@ const TOPICS = [
   {
     icon: MapPin,
     title: 'Tracking & delivery',
-    body: 'Live tracking, late orders, wrong items, hotel hand-off',
+    body: 'Live tracking, late orders, wrong items, Airbnb hand-off',
     anchor: 'delivery',
   },
   {

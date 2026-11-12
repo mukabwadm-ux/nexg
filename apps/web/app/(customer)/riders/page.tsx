@@ -34,7 +34,7 @@ const TICKER = [
   'Flowers',
   'Beauty products',
   'Pharmacy runs',
-  'Hotel errands',
+  'Airbnb errands',
 ] as const;
 
 const WHY = [
@@ -51,7 +51,7 @@ const WHY = [
   {
     icon: ShieldCheck,
     title: 'Guests you can trust',
-    body: 'Every request comes from a verified guest or partner hotel, with the address and contact confirmed before you set off.',
+    body: 'Every request comes from a verified guest or partner Airbnb host, with the address and contact confirmed before you set off.',
   },
   {
     icon: MessageSquare,
@@ -71,7 +71,7 @@ const STEPS = [
   },
   {
     title: 'Onboard and collect your kit',
-    body: 'A short session on how NexG works with hotels and guests, then your branded bag and jacket.',
+    body: 'A short session on how NexG works with Airbnb hosts and guests, then your branded bag and jacket.',
   },
   {
     title: 'Go online and ride',
@@ -214,7 +214,7 @@ export default async function RidersPage() {
             Why riders choose NexG
           </h2>
           <p className="text-muted mt-2 max-w-lg text-[0.9375rem] font-semibold leading-[1.7]">
-            Fewer, better requests from hotels and guests — not a race to the bottom on every
+            Fewer, better requests from Airbnb hosts and guests — not a race to the bottom on every
             corner.
           </p>
 

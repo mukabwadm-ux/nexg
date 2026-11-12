@@ -57,7 +57,7 @@ const MOODS: {
     blurb: 'Spa, pool day, coffee farm, a long breakfast',
     icon: PartyPopper,
   },
-  { key: 'stay', label: 'Stay', blurb: 'Airbnb or boutique hotel for the night', icon: Bed },
+  { key: 'stay', label: 'Stay', blurb: 'An Airbnb for the night', icon: Bed },
   { key: 'events', label: 'Events', blurb: 'Marathon, RnB House, rugby, festivals', icon: Ticket },
 ];
 
@@ -464,7 +464,7 @@ export function Builder({
               <Input
                 id="stay"
                 label=""
-                placeholder="Hotel, Airbnb or an area"
+                placeholder="Airbnb or an area"
                 defaultValue={view?.plan?.stay_label ?? ''}
                 onChange={(e) => queue({ stay_label: e.target.value })}
               />

@@ -36,7 +36,7 @@ const STEPS = [
   {
     icon: Bike,
     title: 'A NexG rider brings it',
-    body: 'The merchant prepares your order and a vetted NexG rider delivers it to your door, room or gate, with the hand-off arranged for hotels.',
+    body: 'The merchant prepares your order and a vetted NexG rider delivers it to your door, room or gate, with the hand-off arranged for Airbnbs.',
   },
 ] as const;
 

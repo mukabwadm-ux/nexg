@@ -33,13 +33,13 @@ export const TEAMS: { key: TeamKey; name: string; blurb: string }[] = [
     key: 'growth',
     name: 'Growth & Partnerships',
     blurb:
-      'Hotels, serviced apartments, merchants and featured placements. Relationships first, dashboards second.',
+      'Airbnb hosts, serviced apartments, merchants and featured placements. Relationships first, dashboards second.',
   },
   {
     key: 'launch',
     name: 'City Launch',
     blurb:
-      'Open the next city: recruit riders and merchants, sign the first hotels, run the first hundred orders yourself.',
+      'Open the next city: recruit riders and merchants, sign the first Airbnb hosts, run the first hundred orders yourself.',
   },
 ];
 
@@ -47,7 +47,7 @@ export const PRINCIPLES = [
   {
     number: '01',
     title: 'Guests first, always',
-    body: 'Every decision starts with the person waiting in a hotel room. If it’s slower or more confusing for them, it’s wrong.',
+    body: 'Every decision starts with the person waiting in an Airbnb. If it’s slower or more confusing for them, it’s wrong.',
   },
   {
     number: '02',
@@ -62,7 +62,7 @@ export const PRINCIPLES = [
   {
     number: '04',
     title: 'Own the city',
-    body: 'Each city has a small team that knows its hotels, streets and merchants by name. Local judgement beats a central playbook.',
+    body: 'Each city has a small team that knows its Airbnbs, streets and merchants by name. Local judgement beats a central playbook.',
   },
 ] as const;
 
@@ -104,7 +104,7 @@ export const ROLES: Role[] = [
     commitment: 'Full-time',
   },
   {
-    title: 'Hotel Partnerships Manager',
+    title: 'Host Partnerships Manager',
     team: 'growth',
     location: 'Nairobi',
     commitment: 'Hybrid · Full-time',

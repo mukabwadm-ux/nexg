@@ -350,7 +350,7 @@ export function DashboardSetup({
                 </tr>
                 <tr className="text-[0.8125rem] font-semibold">
                   <td className="text-muted-light px-4 py-3 font-extrabold">NX-SAMPLE</td>
-                  <td className="text-muted px-4 py-3">[Hotel] · 412</td>
+                  <td className="text-muted px-4 py-3">[Airbnb] · 412</td>
                   <td className="text-muted px-4 py-3">Folio</td>
                   <td className="text-muted px-4 py-3">Preparing</td>
                   <td className="text-muted-light px-4 py-3">Rider · 6 min</td>

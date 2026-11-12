@@ -97,7 +97,7 @@ export const BLOG_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Who it is for' },
       {
         type: 'p',
-        text: 'Guests in hotels, Airbnbs and at home. Hosts who want to give their guests a concierge. Merchants who want to reach guests nearby. And riders who want to deliver across Nairobi.',
+        text: 'Guests in Airbnbs and at home. Hosts who want to give their guests a concierge. Merchants who want to reach guests nearby. And riders who want to deliver across Nairobi.',
       },
       { type: 'h2', text: 'Where we are starting' },
       {

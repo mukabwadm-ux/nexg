@@ -82,7 +82,7 @@ const STEPS = [
 ];
 
 const MODULES = [
-  { n: 1, title: 'Pickups & hand-offs', note: 'Hotels, apartments, reception, lockbox · 6 min' },
+  { n: 1, title: 'Pickups & hand-offs', note: 'Airbnbs, apartments, reception, lockbox · 6 min' },
   { n: 2, title: 'Cash rules & deposits', note: 'Cap, paybill, matching · 5 min' },
   { n: 3, title: 'Safety & SOS', note: 'Rain, night, incidents · 4 min' },
 ];
@@ -431,7 +431,7 @@ export function DashboardPending({
                   <td className="px-4 py-3">
                     <span className="text-muted-light font-extrabold">NX-SAMPLE</span>
                     <span className="text-muted-light block text-[0.6875rem]">
-                      [Merchant] Westlands → [Hotel] · reception
+                      [Merchant] Westlands → [Airbnb] · lockbox
                     </span>
                   </td>
                   <td className="text-muted px-4 py-3">Room folio</td>

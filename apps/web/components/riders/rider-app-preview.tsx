@@ -80,7 +80,7 @@ export function RiderAppPreview() {
         <p className="text-gold text-[0.625rem] font-bold uppercase tracking-widest">New request</p>
         <div className="mt-1 flex items-start justify-between gap-2">
           <p className="text-[0.8125rem] font-extrabold leading-snug text-white">
-            Dinner · [Restaurant] → [Hotel]
+            Dinner · [Restaurant] → [Airbnb]
           </p>
           <p className="text-gold shrink-0 text-right text-[0.75rem] font-extrabold leading-tight">
             KES

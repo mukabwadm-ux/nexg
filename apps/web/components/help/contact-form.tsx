@@ -13,7 +13,7 @@ const ROLES: { value: Role; label: string }[] = [
   { value: 'guest', label: 'I’m a guest' },
   { value: 'rider', label: 'Rider' },
   { value: 'merchant', label: 'Merchant' },
-  { value: 'hotel', label: 'Hotel' },
+  { value: 'hotel', label: 'Airbnb host' },
 ];
 
 /** What each kind of person is likely to be writing about. */

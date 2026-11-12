@@ -65,7 +65,7 @@ const PRINCIPLES = [
 const PEOPLE = [
   {
     who: 'Guests',
-    body: 'In a hotel, an Airbnb or at home: order, ask and plan from one place.',
+    body: 'In an Airbnb or at home: order, ask and plan from one place.',
     href: '/explore',
   },
   {
@@ -94,7 +94,7 @@ export default function AboutPage() {
           eyebrow="About us"
           title="A concierge for"
           gold="wherever you stay."
-          lede="NexG brings together local stores, vetted riders and a real person on the concierge desk, so that a guest in a hotel room, an Airbnb or at home can get what they need without knowing the city. We are starting in Nairobi."
+          lede="NexG brings together local stores, vetted riders and a real person on the concierge desk, so that a guest in an Airbnb or at home can get what they need without knowing the city. We are starting in Nairobi."
         />
 
         <section className="mx-auto max-w-[120rem] px-4 py-16 sm:px-[30px] sm:py-20">

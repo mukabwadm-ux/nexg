@@ -139,7 +139,7 @@ export function StayingAtField() {
         id="staying_at"
         name="staying_at"
         label="Where are you staying?"
-        placeholder="Hotel, apartment or address"
+        placeholder="Airbnb, apartment or address"
         leadingIcon={<MapPin className="h-4 w-4" />}
         className="h-[46px] rounded-xl [&:not([aria-invalid=true])]:border-[#DDD6C6]"
         /*
@@ -232,7 +232,7 @@ export function StayingAtField() {
               </span>
             ) : (
               <span className="text-muted-light text-[0.75rem] font-semibold">
-                Type a hotel, estate or building — or use your location.
+                Type an Airbnb, estate or building — or use your location.
               </span>
             )}
             {consent !== 'unavailable' ? (
