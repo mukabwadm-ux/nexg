@@ -15,7 +15,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 export const metadata: Metadata = {
   title: 'List your business',
   description:
-    'Hotel guests, travellers and expats ask NexG for what they need. List your restaurant, bar, laundry, florist or boutique and let our riders bring your products to their door.',
+    'Airbnb guests, travellers and expats ask NexG for what they need. List your restaurant, bar, laundry, florist or boutique and let our riders bring your products to their door.',
 };
 
 /* Copy from the `Merchants` artboard, signed off (ground rule 6). */
@@ -51,7 +51,7 @@ const PHOTO_CATEGORIES = [
 const BENEFITS = [
   {
     title: "Customers you can't reach today",
-    body: 'Hotel guests and visitors who do not know your street, but know NexG. Their concierge recommends you.',
+    body: 'Airbnb guests and visitors who do not know your street, but know NexG. Their concierge recommends you.',
   },
   {
     title: 'Our riders, not yours',
@@ -325,7 +325,7 @@ export default async function MerchantsPage() {
                 </span>
                 <span>
                   <span className="block text-[0.8125rem] font-extrabold">
-                    New order from [Hotel]
+                    New order from [Airbnb]
                   </span>
                   <span className="text-muted block text-[0.6875rem] font-semibold">
                     Rider assigned · pickup in 8 min

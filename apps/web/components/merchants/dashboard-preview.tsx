@@ -16,7 +16,7 @@ const NAV = ['Orders', 'Menu & catalogue', 'Opening hours', 'Payouts', 'Reviews'
 const ORDERS = [
   {
     items: '2 × [Menu item], 1 × [Drink]',
-    to: '[Hotel], Rm [—]',
+    to: '[Airbnb], Unit [—]',
     rider: 'Awaiting',
     state: 'Accept',
   },
@@ -28,13 +28,13 @@ const ORDERS = [
   },
   {
     items: '3 × [Menu item]',
-    to: '[Hotel], Rm [—]',
+    to: '[Airbnb], Unit [—]',
     rider: '[Rider] · picked up',
     state: 'On the way',
   },
   {
     items: '1 × [Menu item], 2 × [Drink]',
-    to: '[Hotel], Rm [—]',
+    to: '[Airbnb], Unit [—]',
     rider: '[Rider]',
     state: 'Delivered',
   },
