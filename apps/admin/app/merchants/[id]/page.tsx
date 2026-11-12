@@ -22,6 +22,7 @@ import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
+import { DocumentsLive } from '@/components/merchants/documents-live';
 import { MerchantPerformance } from '@/components/merchants/performance';
 import { isManagedMerchantApplication, ReviewSourceError } from '@/lib/merchant-application-review';
 import {
@@ -306,6 +307,7 @@ export default async function MerchantApplicationPage({
         >
           <div className="space-y-6">
             <div>
+              <DocumentsLive merchantId={params.id} />
               <h2 className="text-lg font-extrabold tracking-tight">Documents</h2>
               <p className="text-muted mt-1 text-sm font-semibold">
                 {outstanding.length === 0

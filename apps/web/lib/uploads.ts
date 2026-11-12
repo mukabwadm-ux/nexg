@@ -40,6 +40,12 @@ export async function ensureApplicantSession(): Promise<string | null> {
 
 export type OwnerType = 'rider' | 'merchant';
 
+/** Where an upload has got to, for a progress bar: checking, sending (0-1), recording. */
+export type UploadProgress =
+  | { stage: 'checking' }
+  | { stage: 'sending'; fraction: number }
+  | { stage: 'recording' };
+
 export interface UploadOutcome {
   ok: boolean;
   /** Present when ok; the row in public.document. */
@@ -62,6 +68,7 @@ export async function uploadDocument({
   file,
   expiresAt,
   side,
+  onProgress,
 }: {
   ownerType: OwnerType;
   ownerId: string;
@@ -70,8 +77,11 @@ export async function uploadDocument({
   expiresAt?: string | null;
   /** Front or back, for a document that has two — a national ID. */
   side?: 'front' | 'back';
+  /** Called as the upload moves along, so the screen can show it. */
+  onProgress?: (progress: UploadProgress) => void;
 }): Promise<UploadOutcome> {
   const supabase = createClient();
+  onProgress?.({ stage: 'checking' });
 
   let version: number | undefined;
   let userId: string | null;
@@ -105,13 +115,20 @@ export async function uploadDocument({
   const extension = file.name.includes('.') ? file.name.split('.').pop()!.toLowerCase() : 'bin';
   const path = `${ownerType}/${ownerId}/${kind}/${crypto.randomUUID()}.${extension}`;
 
-  const { error: storageError } = await supabase.storage
-    .from('partner-documents')
-    .upload(path, file, { contentType: file.type, upsert: false });
+  const storageError = onProgress
+    ? await uploadWithProgress(supabase, path, file, (fraction) =>
+        onProgress({ stage: 'sending', fraction }),
+      )
+    : (
+        await supabase.storage
+          .from('partner-documents')
+          .upload(path, file, { contentType: file.type, upsert: false })
+      ).error?.message;
 
   if (storageError) {
-    return { ok: false, message: storageError.message };
+    return { ok: false, message: storageError };
   }
+  onProgress?.({ stage: 'recording' });
 
   if (version !== undefined) {
     try {
@@ -157,6 +174,59 @@ export async function uploadDocument({
   }
 
   return { ok: true, documentId: data as unknown as string };
+}
+
+/**
+ * The same upload supabase-js makes, over XMLHttpRequest so the bytes sent
+ * can be reported (fetch cannot). Same endpoint, same signed-in token, same
+ * storage policies; no upsert, so a reviewed file is never overwritten.
+ * Returns an error message, or null when the file arrived.
+ */
+async function uploadWithProgress(
+  supabase: ReturnType<typeof createClient>,
+  path: string,
+  file: File,
+  onFraction: (fraction: number) => void,
+): Promise<string | null> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  if (!token) return 'Your session ended. Sign in and retry.';
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\/$/, '');
+  const url = `${base}/storage/v1/object/partner-documents/${path
+    .split('/')
+    .map(encodeURIComponent)
+    .join('/')}`;
+
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.setRequestHeader('apikey', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+    xhr.setRequestHeader('x-upsert', 'false');
+    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) onFraction(event.loaded / event.total);
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onFraction(1);
+        resolve(null);
+        return;
+      }
+      let message = 'The file could not be sent. Try again.';
+      try {
+        const body = JSON.parse(xhr.responseText) as { message?: string; error?: string };
+        message = body.message ?? body.error ?? message;
+      } catch {
+        /* Not JSON: keep the plain message. */
+      }
+      resolve(message);
+    };
+    xhr.onerror = () => resolve('The connection dropped while sending. Try again.');
+    xhr.send(file);
+  });
 }
 
 export interface SavedDocument {

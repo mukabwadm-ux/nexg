@@ -6,6 +6,7 @@ import { loadMerchantHomeSource } from '@/lib/merchant-home-source';
 import { HomeSetup } from '@/components/merchant/home-setup';
 import { DashboardLive } from '@/components/merchant/dashboard-live';
 import { DashboardSetup } from '@/components/merchant/dashboard-setup';
+import { DocumentsLive } from '@/components/merchant/documents-live';
 import { firstName, merchantContext } from '@/components/merchant/frame';
 import type {
   AttentionRow,
@@ -58,16 +59,19 @@ export default async function MerchantDashboard() {
         includePayout: !me.isAnonymous,
       });
       return (
-        <ConnectedApplication
-          key={`${me.userId}:${saved.record.merchant_id}:${saved.record.revision}:${saved.record.review.state}:${saved.payout.version}`}
-          actorId={me.userId}
-          anonymousSession={me.isAnonymous}
-          emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'}
-          initialRecord={saved.record}
-          initialPayout={saved.payout}
-          savedHome={saved.home}
-          home
-        />
+        <>
+          <DocumentsLive ownerId={me.id} />
+          <ConnectedApplication
+            key={`${me.userId}:${saved.record.merchant_id}:${saved.record.revision}:${saved.record.review.state}:${saved.payout.version}`}
+            actorId={me.userId}
+            anonymousSession={me.isAnonymous}
+            emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'}
+            initialRecord={saved.record}
+            initialPayout={saved.payout}
+            savedHome={saved.home}
+            home
+          />
+        </>
       );
     } catch {
       return (
@@ -237,6 +241,7 @@ export default async function MerchantDashboard() {
         </>
       ) : progress ? (
         <>
+          <DocumentsLive ownerId={me.id} />
           <HomeSetup
             businessName={m.name}
             progress={progress}
