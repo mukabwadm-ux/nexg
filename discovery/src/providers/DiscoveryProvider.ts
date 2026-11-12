@@ -179,6 +179,12 @@ export interface CollectionResult {
   reasonCodes?: string[];
 }
 
+/** Stores and items for the suggestions under the search box (owner, 12 Nov 2026). Categories come from the taxonomy, not the provider. */
+export interface SearchSuggestions {
+  merchants: { id: string; name: string; context?: string }[];
+  items: { merchantId: string; merchantName: string; itemId: string; name: string; price?: number }[];
+}
+
 export interface DiscoveryProvider {
   readonly version: string;
   readonly capabilities: {
@@ -197,4 +203,6 @@ export interface DiscoveryProvider {
   getCollections(categoryId: string, query?: Pick<DiscoveryQuery, 'area' | 'search' | 'sort' | 'openNow'>, signal?: AbortSignal): Promise<CollectionResult>;
   getMerchant(id: string, signal?: AbortSignal): Promise<Merchant>;
   getAreas(signal?: AbortSignal): Promise<string[]>;
+  /** Optional: a few stores and items whose names match what the shopper is typing. */
+  getSuggestions?(search: string, signal?: AbortSignal): Promise<SearchSuggestions>;
 }

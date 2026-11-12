@@ -1,0 +1,67 @@
+{
+  "note": "Stand-in cinema system for the five local demo cinemas (M0751-M0755). Sample films, screens, prices and a weekly programme, owner decision 11 Nov 2026: local demo only, never a hosted database or a deploy (vite.config.ts refuses VITE_CINEMA_SOURCE=stand-in on Vercel and CI). The films are made up. Real cinemas send this through their own ticketing systems.",
+  "currency": "KES",
+  "formatSurcharge": { "2D": 0, "3D": 200, "IMAX": 500 },
+  "films": [
+    { "id": "film-long-rains", "title": "The Long Rains", "classification": "PG", "languages": ["English", "Swahili"], "runtimeMinutes": 118, "genres": ["Drama"], "synopsis": "When the rains fail for a second year, a schoolteacher in Makueni sets out to bring her scattered family home for the harvest that might not come." },
+    { "id": "film-matatu-kings", "title": "Matatu Kings", "classification": "PG", "languages": ["Swahili", "English"], "runtimeMinutes": 96, "genres": ["Comedy"], "synopsis": "Two rival matatu crews have one week to win back Nairobi's loudest route, and the only judge who matters is a very tired grandmother." },
+    { "id": "film-kilele", "title": "Kilele", "classification": "PG", "languages": ["English"], "runtimeMinutes": 124, "genres": ["Adventure"], "synopsis": "A young porter and a stubborn climber attempt the mountain's hardest face in the last clear week of the season." },
+    { "id": "film-night-shift", "title": "Night Shift", "classification": "16", "languages": ["English"], "runtimeMinutes": 108, "genres": ["Thriller"], "synopsis": "A night nurse notices that the same patient keeps being admitted under different names." },
+    { "id": "film-starlight-lamu", "title": "Starlight Over Lamu", "classification": "PG", "languages": ["English"], "runtimeMinutes": 112, "genres": ["Romance"], "synopsis": "An architect restoring an old Lamu house falls for the dhow builder who refuses to sell it." },
+    { "id": "film-lion-counted-stars", "title": "The Lion Who Counted Stars", "classification": "GE", "languages": ["English", "Swahili"], "runtimeMinutes": 88, "genres": ["Animation", "Family"], "synopsis": "A lion cub who can't roar learns to lead his pride by the stars instead." },
+    { "id": "film-signal-lost", "title": "Signal Lost", "classification": "PG", "languages": ["English"], "runtimeMinutes": 131, "genres": ["Science fiction"], "synopsis": "A ground station at Malindi picks up a message from a satellite that was switched off thirty years ago." },
+    { "id": "film-harambee-fc", "title": "Harambee FC", "classification": "PG", "languages": ["English"], "runtimeMinutes": 104, "genres": ["Sports", "Drama"], "synopsis": "A village football team with eleven players and one pair of boots reaches the national cup." },
+    { "id": "film-red-earth", "title": "Red Earth", "classification": "16", "languages": ["English"], "runtimeMinutes": 127, "genres": ["Action"], "synopsis": "A retired ranger is pulled back for one last patrol when a convoy disappears on the Tsavo road." },
+    { "id": "film-grandmas-recipe", "title": "Grandma's Recipe", "classification": "GE", "languages": ["English"], "runtimeMinutes": 99, "genres": ["Family", "Comedy"], "synopsis": "Three cousins enter a cooking contest with a recipe nobody has written down." }
+  ],
+  "screens": [
+    { "id": "hall-1", "name": "Screen 1", "rows": [
+      ["A", "ww..ssssssssss..ww"], ["B", "sss.ssssssssss.sss"], ["C", "sss.ssssssssss.sss"], ["D", "sss.ssssssssss.sss"],
+      ["E", "sss.ssssssssss.sss"], ["F", "sss.ssssssssss.sss"], ["G", "sss.ssssssssss.sss"], ["H", "vvv.vvvvvvvvvv.vvv"],
+      ["I", "vvv.vvvvvvvvvv.vvv"], ["J", "....vvvvvvvvvv...."]
+    ] },
+    { "id": "hall-2", "name": "Screen 2", "rows": [
+      ["A", "w..ssssssss..w"], ["B", "ss.ssssssss.ss"], ["C", "ss.ssssssss.ss"], ["D", "ss.ssssssss.ss"],
+      ["E", "ss.ssssssss.ss"], ["F", "ss.ssssssss.ss"], ["G", "vv.vvvvvvvv.vv"]
+    ] },
+    { "id": "lounge", "name": "VIP Lounge", "rows": [
+      ["A", "w..vvvv..w"], ["B", "vv.vvvv.vv"], ["C", "vv.vvvv.vv"], ["D", "vv.vvvv.vv"], ["E", "vv.vvvv.vv"]
+    ] }
+  ],
+  "cinemas": [
+    { "code": "M0751", "merchantId": "c1000000-0000-4000-8000-000000000751", "prices": { "standard": 650, "vip": 1100, "wheelchair": 650 }, "sessions": [
+      { "film": "film-long-rains", "screen": "hall-1", "format": "2D", "times": ["12:30", "15:45", "19:30"] },
+      { "film": "film-signal-lost", "screen": "hall-1", "format": "3D", "times": ["22:30"] },
+      { "film": "film-lion-counted-stars", "screen": "hall-2", "format": "2D", "times": ["10:30", "15:30"], "days": [0, 5, 6] },
+      { "film": "film-matatu-kings", "screen": "hall-2", "format": "2D", "times": ["13:00", "18:15", "21:00"] },
+      { "film": "film-starlight-lamu", "screen": "lounge", "format": "2D", "times": ["17:15"] },
+      { "film": "film-night-shift", "screen": "lounge", "format": "2D", "times": ["20:00"] }
+    ] },
+    { "code": "M0752", "merchantId": "c1000000-0000-4000-8000-000000000752", "prices": { "standard": 750, "vip": 1300, "wheelchair": 750 }, "sessions": [
+      { "film": "film-kilele", "screen": "hall-1", "format": "IMAX", "times": ["11:00", "14:30", "18:00", "21:30"] },
+      { "film": "film-grandmas-recipe", "screen": "hall-2", "format": "2D", "times": ["10:45"], "days": [0, 6] },
+      { "film": "film-harambee-fc", "screen": "hall-2", "format": "2D", "times": ["13:15", "18:45"] },
+      { "film": "film-red-earth", "screen": "hall-2", "format": "2D", "times": ["16:00", "21:15"] }
+    ] },
+    { "code": "M0753", "merchantId": "c1000000-0000-4000-8000-000000000753", "prices": { "standard": 550, "vip": 950, "wheelchair": 550 }, "sessions": [
+      { "film": "film-matatu-kings", "screen": "hall-2", "format": "2D", "times": ["11:30", "16:45", "21:30"] },
+      { "film": "film-long-rains", "screen": "hall-2", "format": "2D", "times": ["14:00", "19:00"] },
+      { "film": "film-grandmas-recipe", "screen": "lounge", "format": "2D", "times": ["12:00"] },
+      { "film": "film-starlight-lamu", "screen": "lounge", "format": "2D", "times": ["18:30", "21:15"] }
+    ] },
+    { "code": "M0754", "merchantId": "c1000000-0000-4000-8000-000000000754", "prices": { "standard": 800, "vip": 1400, "wheelchair": 800 }, "sessions": [
+      { "film": "film-signal-lost", "screen": "hall-1", "format": "3D", "times": ["13:30", "17:00", "20:45"] },
+      { "film": "film-lion-counted-stars", "screen": "hall-2", "format": "2D", "times": ["10:00", "12:15"] },
+      { "film": "film-kilele", "screen": "hall-2", "format": "2D", "times": ["14:30", "19:15"] },
+      { "film": "film-night-shift", "screen": "hall-2", "format": "2D", "times": ["22:00"] },
+      { "film": "film-harambee-fc", "screen": "lounge", "format": "2D", "times": ["16:30"] },
+      { "film": "film-red-earth", "screen": "lounge", "format": "2D", "times": ["21:00"] }
+    ] },
+    { "code": "M0755", "merchantId": "c1000000-0000-4000-8000-000000000755", "prices": { "standard": 500, "vip": 900, "wheelchair": 500 }, "sessions": [
+      { "film": "film-long-rains", "screen": "hall-2", "format": "2D", "times": ["11:00", "18:00"] },
+      { "film": "film-harambee-fc", "screen": "hall-2", "format": "2D", "times": ["13:30"] },
+      { "film": "film-grandmas-recipe", "screen": "hall-2", "format": "2D", "times": ["15:45"], "days": [0, 6] },
+      { "film": "film-night-shift", "screen": "hall-2", "format": "2D", "times": ["20:30"] }
+    ] }
+  ]
+}

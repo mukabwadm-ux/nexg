@@ -26,5 +26,6 @@ export function lazySupabaseProvider(env: SupabaseEnv = import.meta.env): Discov
     async getCollections(category, query, signal) { return (await load()).getCollections(category, query, signal); },
     async getMerchant(id, signal) { return (await load()).getMerchant(id, signal); },
     async getAreas(signal) { return (await load()).getAreas(signal); },
+    async getSuggestions(search, signal) { const loaded = await load(); return loaded.getSuggestions ? loaded.getSuggestions(search, signal) : { merchants: [], items: [] }; },
   };
 }

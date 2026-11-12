@@ -7,6 +7,8 @@ export interface RouteState extends DiscoveryQuery {
    * shopper into another store. Each department change is its own history step, so Back walks back through them.
    */
   department?: { merchantId: string; id: string };
+  /** A film's page (`?film=`): the film and every cinema showing it. */
+  film?: string;
 }
 /** The department for the store the route shows, if the route names one for it. */
 export const routeDepartment = (route: Pick<RouteState, 'merchantId' | 'department'>) =>
@@ -30,6 +32,7 @@ export function parseRoute(search: string, state?: { discoveryRequest?: Discover
     department: params.get('merchant') && params.get('department') ? { merchantId: params.get('merchant')!, id: params.get('department')! } : undefined,
     operatorSearch: params.get('merchant') ? params.get('operatorSearch') || undefined : undefined,
     operatorOffset: params.get('merchant') && Number.isSafeInteger(operatorOffset) && operatorOffset >= 0 ? operatorOffset : 0,
+    film: params.get('merchant') ? undefined : params.get('film') || undefined,
     ...(state?.discoveryRequest ? { engineRequest: state.discoveryRequest, limit: state.discoveryRequest.limit } : {}),
   };
 }
@@ -39,7 +42,7 @@ export function routeUrl(route: RouteState): string {
     open: route.openNow ? '1' : undefined, sort: route.sort && route.sort !== 'recommended' ? route.sort : undefined,
     offset: route.offset || undefined, cursor: route.cursor, context: route.engineRequest || route.contextRequired ? 'required' : undefined, view: route.view, merchant: route.merchantId, item: route.itemId,
     department: routeDepartment(route),
-    operatorSearch: route.operatorSearch, operatorOffset: route.operatorOffset || undefined };
+    operatorSearch: route.operatorSearch, operatorOffset: route.operatorOffset || undefined, film: route.merchantId ? undefined : route.film };
   for (const [key, value] of Object.entries(values)) if (value !== undefined) params.set(key, String(value));
   // The app's own path: "/" on its own, "/discover" when the NexG website serves it (Vite `base` "/discover/").
   // Without the trailing slash, so a reload or a shared link isn't redirected first.
