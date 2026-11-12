@@ -43,7 +43,9 @@ export async function SiteHeader({ action, signIn, account: showAccount = true }
           <Logo onDark priority className="h-11 w-auto sm:h-12" />
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* min-w-0 lets the Deliver to chip narrow on small phones, where at
+            full width it would push the row past the screen edge. */}
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <DeliverToChip tone="dark" />
           <NotificationBell tone="dark" />
           {showAccount && (

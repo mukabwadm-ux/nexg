@@ -11,15 +11,15 @@ import { expect, test } from '@playwright/test';
  * suite had been unable to start a browser.
  *
  * What is worth asserting is the accessible name: the headline is
- * two lines styled apart ("Everything You Need." / "Wherever You
- * Stay."), and the aria-label is what makes a screen reader say
+ * two lines styled apart ("Everything You Need." / "Right Where You
+ * Are."), and the aria-label is what makes a screen reader say
  * them as one sentence rather than run them together.
  */
 test('the homepage headline has a stable accessible name', async ({ page }) => {
   await page.goto('/');
   const heading = page.getByRole('heading', { level: 1 }).first();
   await expect(heading).toBeVisible();
-  await expect(heading).toHaveAttribute('aria-label', 'Everything You Need. Wherever You Stay.');
+  await expect(heading).toHaveAttribute('aria-label', 'Everything You Need. Right Where You Are.');
 });
 
 /**

@@ -60,8 +60,11 @@ export function DeliverToChip({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
 
   const { title, hint } = describe(chip, place);
 
+  /* The wrapper and the button may both shrink (min-w-0), so in a crowded
+     header row the title truncates instead of pushing the row wider than
+     a small phone. */
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative flex min-w-0">
       <button
         type="button"
         onClick={() => {
@@ -73,7 +76,7 @@ export function DeliverToChip({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
         aria-label={`Deliver to ${title}. Change the delivery location.`}
         className={
           tone === 'dark'
-            ? 'focus-visible:ring-gold flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 text-left text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:max-w-[13rem] sm:px-4'
+            ? 'focus-visible:ring-gold flex h-10 min-w-0 max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 text-left text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:max-w-[13rem] sm:px-4'
             : 'border-border bg-surface hover:border-ink/40 flex max-w-full items-center gap-2 rounded-xl border px-2 py-1.5 text-left transition-colors sm:gap-3 sm:px-3 sm:py-2'
         }
       >
