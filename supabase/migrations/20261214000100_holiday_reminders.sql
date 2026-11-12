@@ -16,10 +16,16 @@
 -- send. A holiday added late, inside its window, is picked up the next
 -- morning. A merchant that answers is not reminded.
 --
+-- Demo workspaces are left out, because they are not businesses: the
+-- merchants supabase/demo-accounts.sql made (found by their fixed ids, even
+-- if renamed) and anything else named "[Demo] …".
+--
 -- The bell is the existing one (fn_notify_user), tagged per holiday: it is
 -- pushed to devices that subscribed, and because the kind is listed in
 -- notification_email_kind it is emailed too. Set that row's enabled to false
 -- to stop the emails without a deploy.
+--
+-- Safe to run more than once.
 
 -- ───────────────────────────────────────────────────── who was reminded
 
@@ -41,6 +47,7 @@ alter table public.merchant_holiday_reminder enable row level security;
 revoke all on public.merchant_holiday_reminder from anon, authenticated;
 grant select on public.merchant_holiday_reminder to authenticated;
 
+drop policy if exists merchant_holiday_reminder_read on public.merchant_holiday_reminder;
 create policy merchant_holiday_reminder_read on public.merchant_holiday_reminder
   for select to authenticated
   using (authz.works_merchant(merchant_id) or authz.is_merchant_member(merchant_id));
@@ -79,6 +86,13 @@ begin
       on m.city_id = c.id and m.status = 'live' and m.deleted_at is null
     where h.date >= (now() at time zone c.timezone)::date
       and h.date <= (now() at time zone c.timezone)::date + h.prompt_merchants_days_before
+      /* Not a demo workspace: neither one supabase/demo-accounts.sql made
+         (its fixed ids, found as demo-accounts-remove.sql finds them) nor
+         any other "[Demo] …". */
+      and m.trading_name not like '[Demo]%'
+      and not exists (select 1 from public.category_config cc
+                      cross join (values ('live'), ('new')) as k (kind)
+                      where m.id = md5('demo-merchant-' || k.kind || '-' || cc.category::text)::uuid)
       and not exists (select 1 from public.merchant_holiday_hours a
                       where a.merchant_id = m.id and a.holiday_id = h.id)
       and not exists (select 1 from public.merchant_holiday_reminder x
@@ -132,7 +146,7 @@ end;
 $$;
 
 comment on function public.cron_holiday_reminders is
-  'Rings the team of each live merchant that has not answered a public holiday inside its prompt_merchants_days_before window, once per merchant and holiday. Run every morning by pg_cron (holiday-reminders).';
+  'Rings the team of each live merchant (demo workspaces aside) that has not answered a public holiday inside its prompt_merchants_days_before window, once per merchant and holiday. Run every morning by pg_cron (holiday-reminders).';
 
 revoke execute on function public.cron_holiday_reminders() from public, anon, authenticated;
 grant execute on function public.cron_holiday_reminders() to service_role;

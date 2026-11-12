@@ -2,16 +2,16 @@
 --
 -- `cron_holiday_reminders` rings the team of each live merchant that has not
 -- answered a holiday inside its `prompt_merchants_days_before` window, once per
--- merchant and holiday. Merchants that answered, are not live, or are in
--- another country are left alone; a second run sends nothing; a holiday added
--- late is picked up by the next run.
+-- merchant and holiday. Merchants that answered, are not live, are demo
+-- workspaces or are in another country are left alone; a second run sends
+-- nothing; a holiday added late is picked up by the next run.
 --
 -- A test country with its own holidays, dated from today, keeps the seeded
 -- Kenyan calendar and the day the suite runs out of the counts.
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(14);
+select plan(15);
 
 -- ------------------------------------------------------------------ fixtures
 
@@ -31,7 +31,9 @@ from (values
   ('70000000-0000-0000-0000-0000000000b1'::uuid, 'b.owner@remind.example'),
   ('70000000-0000-0000-0000-0000000000c3'::uuid, 'c.owner@remind.example'),
   ('70000000-0000-0000-0000-0000000000d1'::uuid, 'd.owner@remind.example'),
-  ('70000000-0000-0000-0000-0000000000e1'::uuid, 'e.owner@remind.example')
+  ('70000000-0000-0000-0000-0000000000e1'::uuid, 'e.owner@remind.example'),
+  ('70000000-0000-0000-0000-0000000000f1'::uuid, 'f.owner@remind.example'),
+  ('70000000-0000-0000-0000-0000000000f2'::uuid, 'g.owner@remind.example')
 ) as u (id, email);
 
 /* A: live, two people. B: live, answers Founders Day. C: not live yet.
@@ -51,9 +53,26 @@ values
   ('70000000-0000-0000-0000-00000000000e', 'Epsilon Limited', 'Epsilon', 'restaurant', 'Esther E',
    '+254700000705', 'epsilon@remind.example', '70000000-0000-0000-0000-0000000000c2');
 
+/* Two demo workspaces, both live. F has the fixed id supabase/demo-accounts.sql
+   gives its restaurant demo, and was renamed during a demo. G is named
+   "[Demo] …". Where the demo accounts are loaded, F already exists and is
+   moved in. */
+insert into public.merchant (
+  id, legal_name, trading_name, category, contact_name, contact_phone, contact_email, city_id
+)
+values
+  (md5('demo-merchant-live-restaurants_food')::uuid, 'Fresh Name Limited', 'Fresh Name',
+   'restaurants_food', 'Demo Owner', '+254700000706', 'f.demo@remind.example',
+   '70000000-0000-0000-0000-0000000000c1'),
+  ('70000000-0000-0000-0000-00000000000f', '[Demo] Showroom Limited', '[Demo] Showroom',
+   'restaurant', 'Demo Owner', '+254700000707', 'g.demo@remind.example',
+   '70000000-0000-0000-0000-0000000000c1')
+on conflict (id) do update set city_id = excluded.city_id, trading_name = excluded.trading_name;
+
 update public.merchant set status = 'live', went_live_at = now()
 where id in ('70000000-0000-0000-0000-00000000000a', '70000000-0000-0000-0000-00000000000b',
-             '70000000-0000-0000-0000-00000000000d', '70000000-0000-0000-0000-00000000000e');
+             '70000000-0000-0000-0000-00000000000d', '70000000-0000-0000-0000-00000000000e',
+             '70000000-0000-0000-0000-00000000000f', md5('demo-merchant-live-restaurants_food')::uuid);
 
 insert into public.merchant_user (merchant_id, user_id, role) values
   ('70000000-0000-0000-0000-00000000000a', '70000000-0000-0000-0000-0000000000a1', 'owner'),
@@ -61,7 +80,10 @@ insert into public.merchant_user (merchant_id, user_id, role) values
   ('70000000-0000-0000-0000-00000000000b', '70000000-0000-0000-0000-0000000000b1', 'owner'),
   ('70000000-0000-0000-0000-00000000000c', '70000000-0000-0000-0000-0000000000c3', 'owner'),
   ('70000000-0000-0000-0000-00000000000d', '70000000-0000-0000-0000-0000000000d1', 'owner'),
-  ('70000000-0000-0000-0000-00000000000e', '70000000-0000-0000-0000-0000000000e1', 'owner');
+  ('70000000-0000-0000-0000-00000000000e', '70000000-0000-0000-0000-0000000000e1', 'owner'),
+  (md5('demo-merchant-live-restaurants_food')::uuid, '70000000-0000-0000-0000-0000000000f1', 'owner'),
+  ('70000000-0000-0000-0000-00000000000f', '70000000-0000-0000-0000-0000000000f2', 'owner')
+on conflict do nothing;
 
 /* What decides the workspace: an application row. */
 insert into public.merchant_application (merchant_id, payload)
@@ -158,6 +180,15 @@ select is(
   'a merchant that answered is not rung about that holiday'
 );
 
+select is(
+  (select count(*)::integer from public.merchant_holiday_reminder r
+    where r.holiday_id::text like '70000000-%'
+      and r.merchant_id in (md5('demo-merchant-live-restaurants_food')::uuid,
+                            '70000000-0000-0000-0000-00000000000f')),
+  0,
+  'demo workspaces are left out: the demo script''s, even renamed, and any named [Demo]'
+);
+
 -- ----------------------------------------------------------- the next run
 
 update public.user_notification set read_at = now()
@@ -191,7 +222,7 @@ values ('70000000-0000-0000-0000-000000000f06', 'Remindland', current_date + 1, 
 select is(
   public.cron_holiday_reminders() ->> 'reminders',
   '3',
-  'a holiday added late is picked up by the next run, for the three live merchants'
+  'a holiday added late is picked up by the next run, for the three live merchants that are not demos'
 );
 
 -- ----------------------------------------------------------- who may run it
