@@ -85,20 +85,23 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
       />
 
       {/* ─────────────────────────────────────────────── the message */}
-      {/* Fills what the nav leaves of the hero, centred in it. */}
-      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-center px-5 pb-8 pt-[6.5rem] sm:px-[30px] sm:pt-28 lg:pb-12 lg:pt-32">
-        <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
-          {copy.eyebrow}
-        </p>
-        <h1
-          aria-label={`${copy.titleLine1} ${copy.titleLine2}`}
-          className="mt-4 max-w-[48rem] text-3xl font-extrabold leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.375rem]"
-        >
-          <span className="block">{copy.titleLine1}</span>
-          <span className="text-gold block">{copy.titleLine2}</span>
-        </h1>
+      {/* At the foot of the hero, 40px above its bottom edge. The block is as
+          wide as the headline, and the search takes that width. */}
+      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-end px-5 pb-10 pt-[6.5rem] sm:px-[30px] sm:pt-28 lg:pt-32">
+        <div className="sm:w-fit">
+          <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
+            {copy.eyebrow}
+          </p>
+          <h1
+            aria-label={`${copy.titleLine1} ${copy.titleLine2}`}
+            className="mt-4 max-w-[48rem] text-3xl font-extrabold leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.375rem]"
+          >
+            <span className="block">{copy.titleLine1}</span>
+            <span className="text-gold block">{copy.titleLine2}</span>
+          </h1>
 
-        <HeroSearch copy={copy} />
+          <HeroSearch copy={copy} />
+        </div>
       </div>
 
       <a
@@ -307,7 +310,7 @@ function HeroSearch({ copy }: { copy: HeroCopy }) {
         e.preventDefault();
         go();
       }}
-      className="sm:focus-within:ring-gold mt-8 flex w-full max-w-[38rem] flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:bg-white sm:p-1.5 sm:shadow-2xl sm:focus-within:ring-2"
+      className="sm:focus-within:ring-gold mt-8 flex w-full flex-col gap-3 sm:w-0 sm:min-w-full sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:bg-white sm:p-1.5 sm:shadow-2xl sm:focus-within:ring-2"
     >
       <div className="focus-within:ring-gold flex min-w-0 flex-1 items-center rounded-full bg-white shadow-2xl focus-within:ring-2 sm:shadow-none sm:focus-within:ring-0">
         <Search className="ml-4 h-5 w-5 shrink-0 text-[#141414]" aria-hidden="true" />
