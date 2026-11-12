@@ -26,17 +26,7 @@ export function SectionLabel({
   );
 }
 
-/** A gold marker under the words a heading leans on. Wraps cleanly across lines. */
+/** The words a heading leans on. Plain now: the gold marker under them was removed. */
 export function Highlight({ children }: { children: React.ReactNode }) {
-  return (
-    <span
-      className="[-webkit-box-decoration-break:clone] [box-decoration-break:clone]"
-      style={{
-        backgroundImage:
-          'linear-gradient(to top, transparent 0.04em, rgb(var(--gold-rgb) / 0.75) 0.04em, rgb(var(--gold-rgb) / 0.75) 0.22em, transparent 0.22em)',
-      }}
-    >
-      {children}
-    </span>
-  );
+  return <>{children}</>;
 }
