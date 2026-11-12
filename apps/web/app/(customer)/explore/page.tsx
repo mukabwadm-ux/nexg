@@ -304,7 +304,7 @@ export default async function ExplorePage({
       <div className="bg-bg text-page relative overflow-hidden">
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#E5B32A]/15 blur-3xl"
+          className="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#FDD128]/15 blur-3xl"
         />
         <main className="relative mx-auto max-w-[120rem] px-4 pb-20 pt-8 sm:px-[30px]">
           {/* Keeps ?city= in step with the chip, so changing the
@@ -390,8 +390,8 @@ export default async function ExplorePage({
                         aria-hidden="true"
                         className={`flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full transition-all ${
                           on
-                            ? 'bg-gold text-ink ring-4 ring-[#E5B32A]/25'
-                            : 'text-ink bg-surface ring-border ring-1 group-hover:ring-2 group-hover:ring-[#E5B32A]/60'
+                            ? 'bg-gold text-ink ring-4 ring-[#FDD128]/25'
+                            : 'text-ink bg-surface ring-border ring-1 group-hover:ring-2 group-hover:ring-[#FDD128]/60'
                         }`}
                       >
                         <Icon className="h-6 w-6" />

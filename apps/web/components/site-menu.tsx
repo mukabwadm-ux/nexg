@@ -28,7 +28,7 @@ import { Logo } from './logo';
  * Measured off the artboard rather than approximated: the panel is 480px on a
  * cream (#F6F3EC) ground with 36px gutters, the deliver-to card is white, the
  * partner block is ink (#141414) with gold icon tiles, and the primary button
- * is gold (#D4A72C). Nav labels were ~26px ExtraBold on a 61px row pitch; they are now 20px
+ * is gold (#FDD128). Nav labels were ~26px ExtraBold on a 61px row pitch; they are now 20px
  * on a 52px pitch, smaller than the artboard by request.
  *
  * Copy is from the artboard and is signed off (ground rule 6).

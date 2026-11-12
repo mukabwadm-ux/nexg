@@ -73,11 +73,11 @@ export async function SiteFooter({
   return (
     /* Edge to edge: the dark band and its gold top line span the whole
        window; the content inside keeps the page's 30px gutters. */
-    <footer className="relative overflow-hidden border-t-[3px] border-[#E5B32A] bg-[#000] text-white">
+    <footer className="relative overflow-hidden border-t-[3px] border-[#FDD128] bg-[#000] text-white">
       {/* A warm glow in the top-right corner. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute -right-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-[#E5B32A]/15 blur-3xl"
+        className="pointer-events-none absolute -right-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-[#FDD128]/15 blur-3xl"
       />
 
       <div className="relative mx-auto max-w-[120rem] px-4 sm:px-[30px]">

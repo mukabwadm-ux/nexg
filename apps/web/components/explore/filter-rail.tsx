@@ -129,7 +129,7 @@ export function FilterRail({
         )}
       </div>
 
-      <div className="rounded-3xl border border-[#E5B32A]/30 bg-[#17140F] p-6 text-white sm:p-7">
+      <div className="rounded-3xl border border-[#FDD128]/30 bg-[#17140F] p-6 text-white sm:p-7">
         <p className="text-gold text-[0.6875rem] font-extrabold uppercase tracking-[0.2em]">
           Can’t find it?
         </p>

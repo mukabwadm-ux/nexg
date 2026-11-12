@@ -281,7 +281,7 @@ export default async function HostsPage() {
         <section className="mx-auto grid max-w-[120rem] gap-12 px-4 pb-16 pt-10 sm:px-[30px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center lg:gap-10 lg:pt-16 xl:grid-cols-[minmax(0,700px)_500px] xl:justify-between xl:gap-12">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-2 rounded-full border border-[#E3DCC9] bg-white px-3.5 py-2 text-[0.78125rem] font-bold leading-tight">
-              <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-[#D4A72C]" />
+              <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-[#FDD128]" />
               For Airbnb &amp; short-stay hosts · First month free
             </p>
 
@@ -359,7 +359,7 @@ export default async function HostsPage() {
                 <li
                   key={item.title}
                   className={`group rounded-2xl border p-6 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(60,40,10,0.12)] motion-reduce:transform-none motion-reduce:transition-none ${
-                    lead ? 'border-[#D4A72C] bg-[#F2C94C]' : 'border-[#ECE6D8] bg-white'
+                    lead ? 'border-[#FDD128] bg-[#F2C94C]' : 'border-[#ECE6D8] bg-white'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -599,7 +599,7 @@ export default async function HostsPage() {
          * bleeds to the viewport while the content stays on the same
          * 96rem grid as every other section.
          */}
-        <section className="my-12 bg-[#D4A72C] py-12 sm:py-16">
+        <section className="my-12 bg-[#FDD128] py-12 sm:py-16">
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <div className="grid gap-8 lg:grid-cols-[1fr_34rem] lg:items-start lg:gap-12">
               <div>
@@ -665,7 +665,7 @@ export default async function HostsPage() {
         >
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-[#DDD8CC] bg-white px-3 py-1.5 text-[0.6875rem] font-extrabold">
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#D4A72C]" />
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#FDD128]" />
               Looking for a place, not listing one?
             </p>
 
@@ -768,7 +768,7 @@ export default async function HostsPage() {
                     <li key={point} className="flex items-center gap-2.5">
                       <span
                         aria-hidden="true"
-                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#D4A72C]"
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FDD128]"
                       >
                         <Check className="h-3 w-3 text-[#141414]" />
                       </span>
@@ -912,7 +912,7 @@ function HeroVisual() {
         className="relative z-10 -mt-6 rounded-[24px] bg-[#141311] p-4 shadow-[0_30px_70px_rgba(0,0,0,0.35)] sm:-mt-[194px] lg:-mt-[184px] xl:-mt-[230px]"
       >
         <div className="flex items-center gap-3 rounded-2xl bg-[#222120] p-3.5">
-          <span className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[#D4A72C]">
+          <span className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[#FDD128]">
             <LayoutDashboard className="h-5 w-5 text-[#141414]" />
           </span>
           <span className="min-w-0">
@@ -950,7 +950,7 @@ function HeroVisual() {
           ))}
         </div>
 
-        <div className="mt-3 flex items-center gap-3 rounded-2xl bg-[#D4A72C] p-4">
+        <div className="mt-3 flex items-center gap-3 rounded-2xl bg-[#FDD128] p-4">
           <Coins className="h-5 w-5 shrink-0 text-[#141414]" />
           {/* #3D2F05 (5.8:1 on the gold) replaces #5B4708, which was 4:1. */}
           <p className="text-[0.84375rem] font-bold leading-snug text-[#141414]">
@@ -968,7 +968,7 @@ function HeroVisual() {
 function HostViewMock() {
   return (
     <div aria-hidden="true" className="rounded-2xl border border-[#2A2A2A] bg-[#141414] p-5">
-      <p className="text-[0.5625rem] font-extrabold uppercase tracking-[0.12em] text-[#D4A72C]">
+      <p className="text-[0.5625rem] font-extrabold uppercase tracking-[0.12em] text-[#FDD128]">
         Your host view
       </p>
       <p className="mt-1 text-[1rem] font-extrabold text-white">Your units, one place.</p>
@@ -1016,7 +1016,7 @@ function HostViewMock() {
         ))}
       </div>
 
-      <p className="mt-3 rounded-lg bg-[#D4A72C] py-2 text-center text-[0.6875rem] font-extrabold text-[#141414]">
+      <p className="mt-3 rounded-lg bg-[#FDD128] py-2 text-center text-[0.6875rem] font-extrabold text-[#141414]">
         + Add a unit
       </p>
     </div>

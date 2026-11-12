@@ -260,7 +260,7 @@ export async function HomePageContent({
 
         {/* The app: a dark panel from the left edge with a deep rounded right
             side, on gold, and the phone on the gold beside it. */}
-        <section className="relative overflow-hidden bg-[#D4AF37]">
+        <section className="relative overflow-hidden bg-[#FDD128]">
           <div
             aria-hidden="true"
             className="bg-night absolute inset-x-0 inset-y-[3px] rounded-r-[3rem] lg:right-[42%] lg:rounded-r-[11rem]"

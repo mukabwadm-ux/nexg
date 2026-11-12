@@ -143,7 +143,7 @@ export function LeadForm({ initialNeed }: { initialNeed?: string }) {
                 'min-h-[2.5rem] rounded-full border px-4 py-1.5 text-sm transition-colors',
                 'focus-visible:ring-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                 need === option
-                  ? 'text-ink border-[#D4A72C] bg-[#D4A72C] font-semibold'
+                  ? 'text-ink border-[#FDD128] bg-[#FDD128] font-semibold'
                   : 'text-ink hover:bg-bg border-[#DDD6C6] bg-white font-medium',
               )}
             >

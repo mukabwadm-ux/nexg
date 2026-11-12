@@ -15,7 +15,7 @@ const tagVariants = cva(
         /**
          * The gold pill on a dark band — "FEATURED MERCHANTS · NAIROBI".
          * Sampled from the artboard over #141414: fill #312A18, border
-         * #725C20, text #D4A72C, which resolve to gold at 15% and 50%.
+         * #725C20, text #FDD128, which resolve to gold at 15% and 50%.
          * The cream `gold` tone is for light backgrounds and reads as a
          * bright slab against the dark.
          */

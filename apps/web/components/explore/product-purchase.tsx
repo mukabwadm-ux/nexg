@@ -109,7 +109,7 @@ export function ProductPurchase({
         <button
           type="button"
           onClick={add}
-          className="focus-visible:ring-gold text-ink focus-visible:ring-offset-bg bg-gold inline-flex h-[3.75rem] min-w-[14rem] flex-1 items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#FFD35F] to-[#E5B32A] px-8 text-lg font-extrabold shadow-[0_10px_40px_-10px_rgba(229,179,42,0.6)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          className="focus-visible:ring-gold text-ink focus-visible:ring-offset-bg bg-gold inline-flex h-[3.75rem] min-w-[14rem] flex-1 items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#FEDD5C] to-[#FDD128] px-8 text-lg font-extrabold shadow-[0_10px_40px_-10px_rgba(253, 209, 40,0.6)] transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         >
           <Plus className="h-5 w-5" aria-hidden="true" />
           Add to cart
@@ -160,7 +160,7 @@ export function ProductPurchase({
                     onClick={() => toggle(p.id)}
                     className={`focus-visible:ring-gold relative flex h-full w-full flex-col items-start rounded-3xl p-5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 ${
                       on
-                        ? 'bg-[#FFF6DC] ring-2 ring-[#E5B32A]'
+                        ? 'bg-[#FFF6DC] ring-2 ring-[#FDD128]'
                         : 'bg-white ring-1 ring-[#E2D9C6] hover:ring-[#CDBF9F]'
                     }`}
                   >

@@ -256,7 +256,7 @@ function HeroNav({
                       dismissPrompt();
                       onWhere();
                     }}
-                    className="focus-visible:ring-gold flex-1 rounded-full bg-[#FFC93C] px-4 py-2.5 text-[0.8125rem] font-bold text-[#141414] hover:bg-[#FFD35F] focus-visible:outline-none focus-visible:ring-2"
+                    className="focus-visible:ring-gold flex-1 rounded-full bg-[#FDD128] px-4 py-2.5 text-[0.8125rem] font-bold text-[#141414] hover:bg-[#FEDD5C] focus-visible:outline-none focus-visible:ring-2"
                   >
                     {copy.promptCta}
                   </button>
@@ -329,7 +329,7 @@ function HeroSearch({ copy }: { copy: HeroCopy }) {
       </div>
       <button
         type="submit"
-        className="focus-visible:ring-gold flex h-11 items-center justify-center gap-2 rounded-full bg-[#FFC93C] px-5 text-[0.8125rem] font-bold text-[#141414] transition-colors hover:bg-[#FFD35F] focus-visible:outline-none focus-visible:ring-2 sm:h-auto sm:min-w-[7rem] sm:py-2"
+        className="focus-visible:ring-gold flex h-11 items-center justify-center gap-2 rounded-full bg-[#FDD128] px-5 text-[0.8125rem] font-bold text-[#141414] transition-colors hover:bg-[#FEDD5C] focus-visible:outline-none focus-visible:ring-2 sm:h-auto sm:min-w-[7rem] sm:py-2"
       >
         {copy.searchButton}
         <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />

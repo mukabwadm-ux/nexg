@@ -183,7 +183,7 @@ export function SetupLocationEditor({
                 type="button"
                 onClick={() => void save()}
                 disabled={loading || saving || loadFailed}
-                className="rounded bg-[#d4a72c] px-4 py-2 font-bold"
+                className="rounded bg-[#FDD128] px-4 py-2 font-bold"
               >
                 {saving ? 'Saving…' : 'Save location'}
               </button>

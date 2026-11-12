@@ -171,8 +171,11 @@
   ) {
   color: rgb(var(--page-ink-rgb));
 }
+/* Matched on the class attribute: written as .border-border, the build turns
+   it into * (the base layer applies that class to everything), and every
+   border on the page, gold ones included, went grey. */
 .dark
-  :is(.border-border, .border-border-strong):not(
+  :is([class~='border-border'], [class~='border-border-strong']):not(
     :is(
         .bg-surface,
         .bg-white,

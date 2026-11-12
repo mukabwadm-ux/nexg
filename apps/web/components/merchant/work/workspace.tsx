@@ -634,7 +634,7 @@ export function WorkWorkspace({
                         type="button"
                         disabled={pending}
                         onClick={() => void advance()}
-                        className="w-full rounded-md bg-[#d4a72c] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
+                        className="w-full rounded-md bg-[#FDD128] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
                       >
                         {pending
                           ? preview
