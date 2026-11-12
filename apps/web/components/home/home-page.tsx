@@ -13,7 +13,6 @@ import { SiteFooter } from '@/components/site-footer';
 import { BEST_SELLERS, bestSellerFromCatalogue, type BestSeller } from '@/lib/best-sellers';
 import { categoryTiles } from '@/lib/categories';
 import { translator, type Locale, type Translate } from '@/lib/i18n/dictionaries';
-import { rankPopularSearches } from '@/lib/popular-searches';
 import type { NearbyStore } from '@/lib/stores-near';
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -99,21 +98,6 @@ const getTileTaps = unstable_cache(
   { revalidate: 300 },
 );
 
-/* Hero searches per topic over the last 30 days, for the Popular searches
-   buttons. Refreshed every five minutes; if it cannot be read, the buttons
-   keep their usual order. */
-const getSearchCounts = unstable_cache(
-  async (): Promise<Record<string, number>> => {
-    const { data, error } = await createPublicClient().rpc('rpc_popular_search_ranking', {
-      p_days: 30,
-    });
-    if (error || !data) return {};
-    return Object.fromEntries(data.map((row) => [row.topic, Number(row.searches)]));
-  },
-  ['homepage-search-counts'],
-  { revalidate: 300 },
-);
-
 /*
  * Best sellers, ranked by the database (rpc_best_sellers): paid Best seller
  * slots first, then the most sold products of the last 30 days, then
@@ -178,13 +162,11 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const [{ cities: allCities, stores, featured }, tileTaps, liveBestSellers, searchCounts] =
-    await Promise.all([
-      getHomeData(),
-      getTileTaps(),
-      getBestSellers().catch(() => [] as BestSeller[]),
-      getSearchCounts().catch(() => ({}) as Record<string, number>),
-    ]);
+  const [{ stores, featured }, tileTaps, liveBestSellers] = await Promise.all([
+    getHomeData(),
+    getTileTaps(),
+    getBestSellers().catch(() => [] as BestSeller[]),
+  ]);
   const supabase = createPublicClient();
   const { data: categoryRows, error: categoryError } = await supabase
     .from('category_config')
@@ -200,27 +182,17 @@ export async function HomePageContent({
       ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data.publicUrl
       : null,
   }));
-  const openCities = allCities.filter((c) => c.status !== 'waitlist');
 
   return (
     <>
       <Hero
         locale={locale}
-        popularTopics={rankPopularSearches(searchCounts)}
-        cities={
-          openCities.length > 0
-            ? openCities.map((c) => ({ slug: c.slug, name: c.name }))
-            : [{ slug: 'nairobi', name: 'Nairobi' }]
-        }
         copy={{
           eyebrow: t('hero.eyebrow'),
           titleLine1: t('hero.title1'),
           titleLine2: t('hero.title2'),
-          lede: t('hero.lede'),
           searchPlaceholder: t('hero.searchPlaceholder'),
           searchButton: t('hero.search'),
-          popular: t('hero.popular'),
-          plan: t('hero.plan'),
           signIn: t('nav.signIn'),
           scroll: t('hero.scroll'),
           promptTitle: t('hero.prompt.title'),
@@ -243,7 +215,7 @@ export async function HomePageContent({
           />
         </section>
 
-        <section className="bg-ink py-16 text-white sm:py-20">
+        <section className="bg-ink dark:bg-night py-16 text-white sm:py-20">
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <FeaturedMerchants merchants={featured} t={t} />
 
@@ -261,7 +233,7 @@ export async function HomePageContent({
           </div>
         </section>
 
-        <section className="bg-surface">
+        <section className="band-surface">
           <div className="mx-auto max-w-[120rem] px-4 py-14 sm:px-[30px]">
             <BestSellers
               heading={t('home.bestSellers.heading')}
@@ -273,7 +245,7 @@ export async function HomePageContent({
         </section>
 
         {stores.length > 0 && (
-          <section id="stores-near-you" className="bg-ink py-14 text-white sm:py-16">
+          <section id="stores-near-you" className="bg-ink dark:bg-night py-14 text-white sm:py-16">
             <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
               <StoresNearYou stores={stores} />
             </div>
@@ -291,7 +263,7 @@ export async function HomePageContent({
         <section className="relative overflow-hidden bg-[#D4AF37]">
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-[#0b0907] lg:right-[42%] lg:rounded-r-[11rem]"
+            className="bg-night absolute inset-0 lg:right-[42%] lg:rounded-r-[11rem]"
           />
           <div className="relative mx-auto grid max-w-[120rem] gap-10 px-4 sm:px-[30px] lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-center">
             <div className="py-16 text-white sm:py-20 lg:py-28 lg:pr-16">
@@ -305,10 +277,6 @@ export async function HomePageContent({
                 <br />
                 your <span className="text-gold">pocket.</span>
               </h2>
-
-              <p className="mt-6 max-w-[40rem] text-base leading-[1.75] text-white/70 sm:text-lg">
-                {t('home.app.body')}
-              </p>
 
               <NotifyForm />
               <StoreBadges />

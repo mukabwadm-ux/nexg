@@ -94,12 +94,9 @@ const en: Dictionary = {
   // ── the homepage
   'hero.eyebrow': 'Stay · Explore · Experience',
   'hero.title1': 'Everything You Need.',
-  'hero.title2': 'Wherever You Stay.',
-  'hero.lede': 'Services, experiences and opportunities — all in one place.',
+  'hero.title2': 'Right Where You Are.',
   'hero.searchPlaceholder': 'Search for restaurants, services, experiences…',
   'hero.search': 'Search',
-  'hero.popular': 'Popular searches:',
-  'hero.plan': 'Start Your Order',
   'hero.openSearch': 'Search',
   'hero.scroll': 'Scroll to explore',
   'hero.prompt.title': 'Where should we deliver?',
@@ -179,8 +176,6 @@ const en: Dictionary = {
   'home.join.careersTitle': 'A small team builds it',
   'home.app.eyebrow': 'The NexG app · Coming soon',
   'home.app.heading': 'Your concierge, in',
-  'home.app.body':
-    'Ask for anything in a sentence, watch your concierge move on the map, and pay by M-Pesa when it’s done. Launching first in Nairobi, then across East Africa.',
 
   'merchant.sponsored': 'Sponsored',
   'merchant.min': 'min',
@@ -288,12 +283,9 @@ const sw: Dictionary = {
   // ── ukurasa wa mwanzo
   'hero.eyebrow': 'Kaa · Gundua · Furahia',
   'hero.title1': 'Kila Unachohitaji.',
-  'hero.title2': 'Popote Unapokaa.',
-  'hero.lede': 'Huduma, matukio na fursa — mahali pamoja.',
+  'hero.title2': 'Pale Pale Ulipo.',
   'hero.searchPlaceholder': 'Tafuta migahawa, huduma, matukio…',
   'hero.search': 'Tafuta',
-  'hero.popular': 'Utafutaji maarufu:',
-  'hero.plan': 'Anza Oda Yako',
   'hero.openSearch': 'Tafuta',
   'hero.scroll': 'Sogeza kuona zaidi',
   'hero.prompt.title': 'Tukuletee wapi?',
@@ -372,8 +364,6 @@ const sw: Dictionary = {
   'home.join.careersTitle': 'Timu ndogo inalijenga',
   'home.app.eyebrow': 'Programu ya NexG · Inakuja hivi karibuni',
   'home.app.heading': 'Msaidizi wako, ndani ya',
-  'home.app.body':
-    'Omba chochote kwa sentensi moja, mfuatilie msaidizi wako kwenye ramani, na ulipe kwa M-Pesa ikiisha. Tunaanza Nairobi, kisha Afrika Mashariki nzima.',
 
   'merchant.sponsored': 'Imedhaminiwa',
   'merchant.min': 'dak',
