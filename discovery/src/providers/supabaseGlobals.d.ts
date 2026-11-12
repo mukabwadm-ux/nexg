@@ -4,7 +4,7 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL?: string;
   readonly VITE_SUPABASE_ANON_KEY?: string;
   readonly VITE_NEXG_CHECKOUT_URL?: string;
-  /** "stand-in": sample showtimes and seats for the local demo cinemas (src/data/cinema/standInCinema.ts). Unset: no cinema system yet. */
+  /** "supabase": published cinema showings and seats. "stand-in": local sample programme. */
   readonly VITE_CINEMA_SOURCE?: string;
 }
 

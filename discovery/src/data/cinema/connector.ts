@@ -1,4 +1,5 @@
 import type { CinemaConnector } from './cinema';
+import { supabaseCinemaConnector } from './supabaseCinema';
 import { standInConnector, type StandInData } from './standInCinema';
 
 /** Set by vite.config.ts. Tests run without Vite, so it is absent there and the stand-in stays available. */
@@ -13,9 +14,10 @@ const loadStandIn = (): Promise<StandInData> => standInBuilt
 /**
  * The cinema system this build reads. Unset: none yet, so cinema pages say showtimes aren't on NexG yet.
  * "stand-in": the sample programme for the local demo cinemas (refused in deploy builds by vite.config.ts).
- * Derrick NexG's cinema API (one format for every ticketing system) becomes the next value here.
+ * "supabase": the operator-published programme and seats from the shared backend.
  */
 export function cinemaConnector(source = import.meta.env?.VITE_CINEMA_SOURCE): CinemaConnector | undefined {
   if (source === 'stand-in') return standInConnector(loadStandIn);
+  if (source === 'supabase') return supabaseCinemaConnector(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
   return undefined;
 }

@@ -8,6 +8,7 @@ import {
 } from '../src/data/cinema/cinema';
 import { standInConnector, standInProgramme, standInSeats, type StandInData } from '../src/data/cinema/standInCinema';
 import { cinemaConnector } from '../src/data/cinema/connector';
+import { supabaseCinemaConnector } from '../src/data/cinema/supabaseCinema';
 import { forgetTicketRequest, keepTicketRequest, readTicketRequests, type RequestStorage, type TicketRequest } from '../src/data/cinema/ticketRequests';
 import { SeatMap } from '../src/components/cinema/SeatMap';
 import { CinemaStorefront } from '../src/components/cinema/CinemaStorefront';
@@ -19,6 +20,27 @@ const now = new Date('2026-11-12T06:00:00Z');
 const plan: SeatPlan = { screenId: 'x:hall', screenName: 'Screen 9', rows: seatRows([['A', 'w..ss'], ['B', 'ss.vv']]) };
 const showing = (extra: Partial<Showing> = {}): Showing => ({ id: 's1', filmId: 'f1', merchantId: 'm1', screenId: 'x:hall', screenName: 'Screen 9',
   startsAt: '2026-11-12T19:30:00+03:00', format: '2D', prices: { standard: 600, vip: 1000, wheelchair: 600 }, currency: 'KES', ...extra });
+
+test('the Supabase cinema connector reads the programme and the selected showing’s seat map', async () => {
+  const calls: { path: string; body: unknown }[] = [];
+  const connector = supabaseCinemaConnector('https://cinema.example.test', 'sb_publishable_cinema_test',
+    async (input, init) => {
+      const path = new URL(String(input)).pathname;
+      calls.push({ path, body: JSON.parse(String(init?.body)) });
+      assert.equal(init?.method, 'POST');
+      const observedAt = now.toISOString();
+      return Response.json(path.endsWith('rpc_cinema_programme')
+        ? { films: [], showings: [showing()], observedAt }
+        : { showingId: 's1', plan, taken: ['A1'], observedAt });
+    });
+  assert.equal((await connector.getProgramme({ from: now, days: 7, merchantId: 'm1' })).showings[0]?.id, 's1');
+  assert.deepEqual((await connector.getSeats(showing())).taken, ['A1']);
+  await assert.rejects(() => connector.getSeats(showing({ id: 'different' })), /invalid seat map/);
+  assert.deepEqual(calls.slice(0, 2), [
+    { path: '/rest/v1/rpc/rpc_cinema_programme', body: { p_from: '2026-11-12', p_days: 7, p_merchant_id: 'm1', p_film_id: null } },
+    { path: '/rest/v1/rpc/rpc_cinema_seat_map', body: { p_showing_id: 's1' } },
+  ]);
+});
 
 test('seat plans number seats left to right and keep aisles as gaps', () => {
   assert.deepEqual(plan.rows[0]!.cells.map((cell) => cell?.id ?? '.'), ['A1', '.', '.', 'A2', 'A3']);

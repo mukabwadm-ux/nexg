@@ -51282,6 +51282,35 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_cinema_confirm_hold: {
+        Args: { p_confirmation_ref: string; p_hold_id: string };
+        Returns: Json;
+      };
+      rpc_cinema_hold_seats: {
+        Args: {
+          p_expected_total_minor: number;
+          p_request_id: string;
+          p_seat_ids: string[];
+          p_showing_id: string;
+        };
+        Returns: Json;
+      };
+      rpc_cinema_programme: {
+        Args: { p_days?: number; p_film_id?: string; p_from: string; p_merchant_id?: string };
+        Returns: Json;
+      };
+      rpc_cinema_publish_showing: {
+        Args: {
+          p_film: Json;
+          p_merchant_id: string;
+          p_rows?: Json;
+          p_screen: Json;
+          p_showing: Json;
+        };
+        Returns: string;
+      };
+      rpc_cinema_release_hold: { Args: { p_hold_id: string }; Returns: Json };
+      rpc_cinema_seat_map: { Args: { p_showing_id: string }; Returns: Json };
       rpc_claim_plan: {
         Args: { p_plan_id: string };
         Returns: {
@@ -58059,7 +58088,8 @@ export type Database = {
         | 'vehicle_services'
         | 'wellness'
         | 'concierge_services'
-        | 'logistics_shipping';
+        | 'logistics_shipping'
+        | 'flights';
       merchant_control_source: 'merchant' | 'staff' | 'system';
       merchant_user_role: 'owner' | 'manager';
       mood: 'wild' | 'taste' | 'night' | 'slow' | 'stay' | 'events';
@@ -59860,6 +59890,7 @@ export const Constants = {
         'wellness',
         'concierge_services',
         'logistics_shipping',
+        'flights',
       ],
       merchant_control_source: ['merchant', 'staff', 'system'],
       merchant_user_role: ['owner', 'manager'],

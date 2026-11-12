@@ -14,6 +14,7 @@
  * yet. A subcategory or option reads only its exact groups.
  */
 import subcategoryMap from '../../demo-seed/subcategory-map.json';
+import { withPlatformCatalogueRows } from '../../discovery-engine/src/adapters/supabase/platformCatalogueRows';
 import { CatalogBridge, areaFromAddress, type BridgeMapRow, type DemoMedia, type ItemRow, type MerchantRow } from './catalogBridge';
 import { findCategory, findSubcategory } from '../data/taxonomy';
 import type { CollectionResult, DiscoveryProvider, DiscoveryQuery, Merchant, MerchantResult, OfferingResult, SearchSuggestions } from './DiscoveryProvider';
@@ -306,7 +307,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     // Called through a wrapper: a bare window.fetch throws "Illegal invocation" when called as a method.
     this.#fetch = options.fetch ?? ((input, init) => globalThis.fetch(input, init));
     this.#now = options.now ?? Date.now;
-    this.#rows = supabaseMapRows(options.map ?? subcategoryMap);
+    this.#rows = withPlatformCatalogueRows(supabaseMapRows(options.map ?? subcategoryMap));
     this.#visible = this.#rows.filter((row) => row.status === 'mapped' && !!row.discovery && !!findCategory(row.discovery.categoryId));
     this.#mediaSource = options.media;
     this.#timeoutMs = options.timeoutMs ?? 12_000;
@@ -466,8 +467,9 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     // areaFromAddress never yields an area with a comma or outer spaces, so no merchant can match one.
     if (area !== undefined && (area !== area.trim() || area.includes(','))) return 'empty';
     const sourceIds = option?.sourceIds ?? subcategory?.sourceIds;
-    if (sourceIds && !sourceIds.length) return 'unmapped';
-    const rows = this.#visible.filter((row) => sourceIds ? sourceIds.includes(row.demoSubcategoryId) : !category || row.discovery!.categoryId === category.id);
+    const rows = this.#visible.filter((row) => sourceIds
+      ? sourceIds.includes(row.demoSubcategoryId) || (!option && row.supabase.category === 'flights' && row.discovery?.subcategoryId === subcategory?.id)
+      : !category || row.discovery!.categoryId === category.id);
     if (!rows.length) return 'unmapped';
     const categories = sourceIds ? [] : sortedKeys(rows.map((row) => row.supabase.category));
     // The demo API's search also matched category and subcategory names. A category's name matches its whole

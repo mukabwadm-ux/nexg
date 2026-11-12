@@ -80,7 +80,7 @@ export default defineConfig(({ command, mode }) => {
   if (!/^\d{2,5}$/.test(enginePort) || Number(enginePort) > 65535) throw new Error('DISCOVERY_ENGINE_PORT must be a valid port');
   if (env.VITE_DISCOVERY_PROVIDER && !['platform', 'engine', 'supabase'].includes(env.VITE_DISCOVERY_PROVIDER)) throw new Error('VITE_DISCOVERY_PROVIDER must be platform or engine or supabase');
   // The browser reads Supabase directly with the public key, so its settings are checked before anything is served or built.
-  if (env.VITE_DISCOVERY_PROVIDER === 'supabase') {
+  if (env.VITE_DISCOVERY_PROVIDER === 'supabase' || env.VITE_CINEMA_SOURCE === 'supabase') {
     const { origin } = supabaseSettings(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY);
     // A build for visitors must not point their browsers at the builder's own machine; local checks opt in.
     if (command === 'build' && new URL(origin).protocol === 'http:' && env.DISCOVERY_ALLOW_LOCAL_SUPABASE !== '1') {
@@ -88,7 +88,7 @@ export default defineConfig(({ command, mode }) => {
     }
   }
   // The stand-in cinema system (sample showtimes and seats for the local demo cinemas) never ships to visitors.
-  if (env.VITE_CINEMA_SOURCE && env.VITE_CINEMA_SOURCE !== 'stand-in') throw new Error('VITE_CINEMA_SOURCE must be stand-in or unset');
+  if (env.VITE_CINEMA_SOURCE && !['stand-in', 'supabase'].includes(env.VITE_CINEMA_SOURCE)) throw new Error('VITE_CINEMA_SOURCE must be stand-in, supabase or unset');
   if (command === 'build' && env.VITE_CINEMA_SOURCE === 'stand-in' && (process.env.VERCEL || process.env.CI)) throw new Error('VITE_CINEMA_SOURCE=stand-in is for local checks only');
   // Where the app is served: "/" on its own, "/discover/" inside the NexG website (scripts/build-for-web.mjs).
   const base = env.DISCOVERY_BASE || '/';

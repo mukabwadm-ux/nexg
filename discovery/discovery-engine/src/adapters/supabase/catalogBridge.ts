@@ -6,7 +6,9 @@
  * setting change only. It sends GET requests with the public key: never the service-role key, never a write.
  */
 
-/** One row of demo-seed/subcategory-map.json. */
+import { withPlatformCatalogueRows } from './platformCatalogueRows.js';
+
+/** One row of the platform subcategory map. */
 export interface BridgeMapRow {
   demoSubcategoryId: string; demoLabel: string; demoCategoryId: string; demoCategoryLabel: string;
   supabase: { category: string; subcategory: string };
@@ -133,6 +135,7 @@ export class CatalogBridge {
   #byId = new Map<string, BridgeMerchant>();
   #loadedAt: number | undefined;
   constructor(map: readonly BridgeMapRow[], private readonly media: DemoMedia = { merchants: new Map(), items: new Map() }) {
+    map = withPlatformCatalogueRows(map);
     for (const row of map) this.#byPair.set(`${row.supabase.category}/${row.supabase.subcategory}`, row);
   }
   get loadedAt(): number | undefined { return this.#loadedAt; }
