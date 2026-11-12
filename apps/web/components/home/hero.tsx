@@ -94,7 +94,7 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
           </p>
           <h1
             aria-label={`${copy.titleLine1} ${copy.titleLine2}`}
-            className="mt-4 max-w-[48rem] text-3xl font-extrabold leading-[1.173] tracking-tight sm:text-4xl sm:leading-[2.55rem] lg:text-[2.375rem]"
+            className="mt-4 max-w-[48rem] text-3xl font-extrabold leading-[1.2] tracking-tight sm:text-4xl sm:leading-[1.2] lg:text-[2.375rem]"
           >
             <span className="block">{copy.titleLine1}</span>
             <span className="text-gold block">{copy.titleLine2}</span>
