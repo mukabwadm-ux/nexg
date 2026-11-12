@@ -90,6 +90,9 @@ export async function SiteFooter({
             >
               <Logo onDark className="h-28 w-auto sm:h-32" />
             </Link>
+            <span className="border-gold/70 text-gold rounded-full border px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.2em]">
+              {t('footer.available')}
+            </span>
           </div>
 
           <nav aria-label="Footer" className="grid gap-4 sm:grid-cols-3 sm:gap-5 lg:gap-8">

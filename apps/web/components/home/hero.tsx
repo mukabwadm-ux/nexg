@@ -2,20 +2,7 @@
 
 import { useLocation } from '@nexg/location';
 import { cn } from '@nexg/ui';
-import {
-  ArrowRight,
-  ChevronDown,
-  Gem,
-  Headphones,
-  MapPin,
-  Menu,
-  Search,
-  ShieldCheck,
-  User,
-  Wallet,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react';
+import { ArrowRight, ChevronDown, MapPin, Menu, Search, User } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -60,14 +47,6 @@ export interface HeroCopy {
 /** Session flag: the visitor has answered or dismissed the hero's location prompt. */
 const PROMPT_KEY = 'nexg.loc.heroPrompt';
 
-const FEATURES: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: Zap, title: 'Speed', body: 'Fast, reliable and convenient' },
-  { icon: ShieldCheck, title: 'Verified Partners', body: 'Trusted and quality service providers' },
-  { icon: Headphones, title: '24/7 Support', body: 'Personal assistance anytime' },
-  { icon: Wallet, title: 'Secure Payments', body: 'M-Pesa and pay on delivery' },
-  { icon: Gem, title: 'NexG Plus', body: 'Exclusive access and priority service' },
-];
-
 export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
   const { place, chip, openSheet, sheetOpen } = useLocation();
 
@@ -83,7 +62,7 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
   const needsSpot = chip === 'empty' || chip === 'city';
 
   return (
-    <section className="bg-night relative isolate z-50 flex min-h-[100svh] flex-col overflow-hidden text-white">
+    <section className="bg-night relative isolate z-50 flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden text-white lg:min-h-[calc(100svh-4.75rem)]">
       {/* ─────────────────────────────────────────────── the photograph */}
       <div className="absolute inset-x-0 top-0 -z-10 h-[36rem] sm:h-[44rem] lg:inset-y-0 lg:h-auto">
         {/* Three clips in turn: the kitchen, the lobby, the room. */}
@@ -106,7 +85,7 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
       />
 
       {/* ─────────────────────────────────────────────── the message */}
-      {/* Fills what the nav and the strip leave of one screen, centred in it. */}
+      {/* Fills what the nav leaves of the hero, centred in it. */}
       <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-center px-5 pb-8 pt-[6.5rem] sm:px-[30px] sm:pt-28 lg:pb-12 lg:pt-32">
         <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
           {copy.eyebrow}
@@ -120,35 +99,6 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
         </h1>
 
         <HeroSearch copy={copy} />
-      </div>
-
-      {/* ─────────────────────────────────────────────── why NexG */}
-      <div className="relative border-t border-white/10 bg-black/40 backdrop-blur">
-        <ul className="mx-auto grid max-w-[120rem] grid-cols-5 px-2 py-3 sm:px-[30px] lg:py-4">
-          {FEATURES.map(({ icon: Icon, title, body }, i) => (
-            <li
-              key={title}
-              className={cn(
-                'flex flex-col items-center gap-1 px-1 text-center lg:flex-row lg:items-center lg:gap-3 lg:px-5 lg:text-left',
-                i > 0 && 'border-l border-white/10',
-              )}
-            >
-              <Icon
-                className="text-gold h-5 w-5 shrink-0 lg:h-7 lg:w-7"
-                aria-hidden="true"
-                strokeWidth={1.5}
-              />
-              <span>
-                <span className="block text-[0.6875rem] font-bold leading-tight sm:text-xs lg:text-sm">
-                  {title}
-                </span>
-                <span className="mt-0.5 block text-[0.5625rem] leading-snug text-white/65 sm:text-[0.6875rem] lg:text-xs">
-                  {body}
-                </span>
-              </span>
-            </li>
-          ))}
-        </ul>
       </div>
 
       <a
