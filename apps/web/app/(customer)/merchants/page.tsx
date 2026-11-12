@@ -485,7 +485,7 @@ export default async function MerchantsPage() {
         <FeaturedSlots />
 
         {/* ------------------------------------------------------------- FAQ */}
-        <section className="pb-20 sm:pb-28">
+        <section className="py-20 sm:py-28">
           <div className={`${CONTAINER} grid gap-10 lg:grid-cols-[26rem_1fr] lg:gap-16`}>
             <div>
               <SectionLabel>FAQ</SectionLabel>
