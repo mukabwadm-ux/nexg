@@ -8,6 +8,7 @@ import { SiteHeader } from '@/components/site-header';
 import { bookingEngineEnabledForMerchant } from '@/lib/booking/bridge';
 import { nairobiDate, PUBLIC_RESOURCE_COLUMNS, type PublicResource } from '@/lib/booking/customer';
 import { createClient } from '@/lib/supabase/server';
+import { discoverMerchantHref } from '@/lib/discover-links';
 
 export const metadata = {
   title: 'Book with a NEXG merchant',
@@ -61,7 +62,10 @@ export default async function CustomerBookingPage({
       <SiteHeader />
       <main id="main" className="mx-auto max-w-[48rem] px-4 pb-16 pt-6 sm:px-8">
         <nav aria-label="Breadcrumb" className="text-muted-light text-xs font-semibold">
-          <Link href={`/explore/${merchant.id}`} className="hover:text-ink transition-colors">
+          <Link
+            href={discoverMerchantHref(merchant.id)}
+            className="hover:text-ink transition-colors"
+          >
             {merchant.trading_name}
           </Link>
           <span className="mx-2" aria-hidden="true">
@@ -77,7 +81,7 @@ export default async function CustomerBookingPage({
           {resources.length === 0 ? (
             <p className="text-muted text-[0.9375rem] font-semibold">
               {merchant.trading_name} isn’t taking online bookings yet.{' '}
-              <Link href={`/explore/${merchant.id}`} className="text-ink underline">
+              <Link href={discoverMerchantHref(merchant.id)} className="text-ink underline">
                 Back to their page
               </Link>
               .

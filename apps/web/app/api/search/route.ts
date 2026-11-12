@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { Json } from '@nexg/db';
 
 import { createPublicClient } from '@/lib/supabase/public';
+import { discoverCategoryHref, discoverMerchantHref } from '@/lib/discover-links';
 
 /**
  * The hero search, answered as somebody types.
@@ -96,11 +97,7 @@ function matcher(lower: string): (text: string | null | undefined) => boolean {
       .some((word) => word.startsWith(lower));
 }
 
-function categorySearchServices(
-  categories: CategorySearchRow[],
-  lower: string,
-  city: string,
-): SearchItem[] {
+function categorySearchServices(categories: CategorySearchRow[], lower: string): SearchItem[] {
   const subcategories: SearchItem[] = [];
   const matchedCategories: SearchItem[] = [];
   const hit = matcher(lower);
@@ -118,7 +115,7 @@ function categorySearchServices(
         kind: 'service',
         title: category.label,
         subtitle: category.description,
-        href: `/explore?city=${city}&category=${encodeURIComponent(category.category)}`,
+        href: discoverCategoryHref(category.category),
       });
     }
 
@@ -137,7 +134,7 @@ function categorySearchServices(
         kind: 'service',
         title: subcategory.name,
         subtitle: category.label,
-        href: `/explore?city=${city}&category=${encodeURIComponent(category.category)}&subcategory=${encodeURIComponent(subcategory.id)}`,
+        href: discoverCategoryHref(category.category),
       });
     }
   }
@@ -192,7 +189,6 @@ export async function GET(request: Request) {
   const categoryServices = categorySearchServices(
     (categoryRows ?? []) as CategorySearchRow[],
     lower,
-    city,
   );
   const hit = matcher(lower);
   const destinationServices: SearchItem[] = DESTINATION_SERVICES.filter(
@@ -263,7 +259,7 @@ export async function GET(request: Request) {
           subtitle: [m.category_other ?? m.category?.replace('_', ' & '), m.branch_name]
             .filter(Boolean)
             .join(' · '),
-          href: `/explore/${m.id}`,
+          href: discoverMerchantHref(m.id),
         })),
     },
     {

@@ -129,7 +129,7 @@ export default async function ScanPage({ params }: { params: { code: string } })
       </Card>
 
       <Link
-        href="/explore"
+        href="/discover"
         className="bg-ink mt-5 block rounded-xl px-5 py-4 text-center text-[0.9375rem] font-extrabold text-white"
       >
         See what’s open nearby

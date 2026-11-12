@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 
 import { kesFromCents, useCart } from './cart-provider';
 import { type Method, methodOptions, PaymentMethods } from './payment-methods';
+import { discoverMerchantHref } from '@/lib/discover-links';
 
 interface Quote {
   ok: boolean;
@@ -126,7 +127,7 @@ export function CheckoutForm({
         <p className="text-lg font-extrabold">Your cart is empty</p>
         <p className="text-muted mt-1 text-sm">Pick something from a merchant to get started.</p>
         <Link
-          href="/explore"
+          href="/discover"
           className="bg-gold text-ink mt-5 inline-block rounded-full px-5 py-2.5 text-sm font-extrabold"
         >
           Browse merchants
@@ -261,7 +262,7 @@ export function CheckoutForm({
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-lg font-extrabold">{cart.merchantName}</h2>
             <Link
-              href={`/explore/${cart.merchantId}`}
+              href={discoverMerchantHref(cart.merchantId)}
               className="text-gold-text text-sm font-bold hover:underline"
             >
               Add more

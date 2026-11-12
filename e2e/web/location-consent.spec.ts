@@ -26,7 +26,6 @@ import { expect, test } from '@playwright/test';
 
 const PUBLIC_ROUTES = [
   '/',
-  '/explore',
   '/discover',
   '/ask',
   '/help',
@@ -90,7 +89,7 @@ test.describe('location is never read without a gesture', () => {
     await page.goto('/');
     await page.mouse.wheel(0, 2000);
     await page.waitForTimeout(500);
-    await page.goto('/explore');
+    await page.goto('/help');
     await page.waitForTimeout(1500);
 
     const calls = await page.evaluate(
@@ -103,7 +102,7 @@ test.describe('location is never read without a gesture', () => {
     await page.addInitScript(SPY);
     /* Not the homepage: there the hero asks beside its location pill and
        the sheet does not open by itself. */
-    await page.goto('/explore');
+    await page.goto('/help');
     await page.waitForTimeout(3000);
 
     /* The sheet opens by itself on a first visit. That must not
@@ -183,7 +182,7 @@ test.describe('location is never read without a gesture', () => {
 
   test('nothing anywhere starts a watchPosition', async ({ page }) => {
     await page.addInitScript(SPY);
-    await page.goto('/explore');
+    await page.goto('/help');
     await page.waitForTimeout(2000);
 
     const watches = await page.evaluate(() =>

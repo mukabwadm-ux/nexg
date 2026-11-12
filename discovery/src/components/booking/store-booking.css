@@ -1,0 +1,4 @@
+.store-booking{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:16px auto 0;max-width:1200px;padding:14px 18px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:#f3eee2;font-size:14px;font-weight:600}
+.store-booking svg{color:var(--gold);flex:none}
+.store-booking__text{flex:1 1 180px}
+.store-booking__action{flex:none;text-decoration:none}

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   if (!tag && !path) {
     // The public surfaces that read merchant data.
     revalidateTag('merchants');
-    for (const p of ['/', '/explore', '/merchants', '/riders']) revalidatePath(p);
+    for (const p of ['/', '/discover', '/merchants', '/riders']) revalidatePath(p);
   }
 
   return NextResponse.json({ ok: true, tag, path, at: new Date().toISOString() });

@@ -152,7 +152,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
               <ActionRow
                 actions={[
                   { label: 'Your orders', href: '/account?tab=orders' },
-                  { label: 'Back to Explore', href: '/explore', kind: 'secondary' },
+                  { label: 'Back to Discovery', href: '/discover', kind: 'secondary' },
                 ]}
               />
             ) : (
@@ -179,7 +179,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
           <ActionRow
             actions={[
               { label: 'Your orders', href: '/account?tab=orders' },
-              { label: 'Back to Explore', href: '/explore', kind: 'secondary' },
+              { label: 'Back to Discovery', href: '/discover', kind: 'secondary' },
             ]}
           />
         </PaymentStatusLayout>
@@ -317,7 +317,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
         >
           <ActionRow
             actions={[
-              { label: 'Order again', href: '/explore' },
+              { label: 'Order again', href: '/discover' },
               { label: 'Your orders', href: '/account?tab=orders' },
             ]}
           />

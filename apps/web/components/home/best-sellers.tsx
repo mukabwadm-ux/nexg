@@ -1,6 +1,5 @@
 'use client';
 
-import { useLocation } from '@nexg/location';
 import { ArrowLeft, ArrowRight, Bike, Clock, Star, Store } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,6 +7,7 @@ import * as React from 'react';
 
 import { CATEGORY_ICON } from '@/components/explore/merchant-card';
 import type { BestSeller } from '@/lib/best-sellers';
+import { discoverCategoryHref } from '@/lib/discover-links';
 
 /**
  * Best sellers: a row of products from different merchants, scrolled with
@@ -29,8 +29,6 @@ export function BestSellers({
   sponsored: string;
   items: BestSeller[];
 }) {
-  const { place, chip } = useLocation();
-  const exact = chip === 'set' || chip === 'qr' || chip === 'room';
   const row = React.useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = React.useState(true);
   const [atEnd, setAtEnd] = React.useState(false);
@@ -38,11 +36,7 @@ export function BestSellers({
   const hrefFor = (item: BestSeller) => {
     if (item.href) return item.href;
     if (item.category === 'airport') return '/ask?need=Airport%20Transfer';
-    const params = new URLSearchParams();
-    if (place?.city_slug) params.set('city', place.city_slug);
-    params.set('category', item.category);
-    if (exact && place) params.set('near', `${place.lat.toFixed(4)},${place.lng.toFixed(4)}`);
-    return `/explore?${params.toString()}`;
+    return discoverCategoryHref(item.category);
   };
 
   /* Which arrows still have somewhere to go. */
@@ -76,7 +70,7 @@ export function BestSellers({
           {heading}
         </h2>
         <div className="flex items-center gap-3">
-          <Link href="/explore" className="text-sm font-bold underline underline-offset-4">
+          <Link href="/discover" className="text-sm font-bold underline underline-offset-4">
             {seeAll}
           </Link>
           <button

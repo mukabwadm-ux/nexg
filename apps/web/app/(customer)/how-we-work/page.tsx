@@ -99,7 +99,7 @@ export default function HowWeWorkPage() {
           </ol>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/explore"
+              href="/discover"
               className="bg-gold text-ink hover:bg-gold/90 inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold"
             >
               Explore stores <ArrowRight className="h-4 w-4" aria-hidden="true" />

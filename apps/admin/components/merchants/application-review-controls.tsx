@@ -120,7 +120,7 @@ export function ApplicationReviewControls({
         setMessage(
           command.decision === 'approved'
             ? response.headers.get('x-merchant-live') === 'true'
-              ? 'Application approved. The merchant is live, shown in Explore, and their home is now the dashboard.'
+              ? 'Application approved. The merchant is live, shown in Discovery, and their home is now the dashboard.'
               : `Application approved, but going live is not finished: ${decodeURIComponent(
                   response.headers.get('x-merchant-live-detail') ?? 'reason unavailable',
                 )} Use Take live on the merchant record.`

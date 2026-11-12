@@ -36,7 +36,7 @@ describe('booking readiness', () => {
     const html = await render({ exploreVisible: false, subcategory: null });
     expect(html).toContain('Customers cannot book this merchant yet.');
     expect(html).toContain('No subcategory is set');
-    expect(html).toContain('Hidden from Explore');
+    expect(html).toContain('Hidden from Discovery');
     expect(fetcher).not.toHaveBeenCalled();
   });
 

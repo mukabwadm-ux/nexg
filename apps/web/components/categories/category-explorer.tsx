@@ -30,6 +30,7 @@ import Link from 'next/link';
 import * as React from 'react';
 
 import { getCategoryImage } from '@nexg/contracts';
+import { discoverCategoryHref } from '@/lib/discover-links';
 
 export interface ExplorerCategory {
   id: string;
@@ -295,7 +296,7 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
                         {matchingSubs.slice(0, 7).map((sub) => (
                           <Link
                             key={sub.id}
-                            href={`/explore?category=${cat.id}&subcategory=${sub.id}`}
+                            href={discoverCategoryHref(cat.id)}
                             className="border-border bg-bg text-muted-light hover:border-gold hover:bg-gold/5 hover:text-ink inline-block rounded-lg border px-2.5 py-1 text-xs font-semibold transition-all"
                           >
                             {sub.name}
@@ -303,7 +304,7 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
                         ))}
                         {matchingSubs.length > 7 && (
                           <Link
-                            href={`/explore?category=${cat.id}`}
+                            href={discoverCategoryHref(cat.id)}
                             className="text-gold inline-block px-1.5 py-1 text-xs font-bold transition-colors hover:underline"
                           >
                             +{matchingSubs.length - 7} more
@@ -317,7 +318,7 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
                 {/* Card Footer Link */}
                 <div className="border-border bg-surface border-t px-6 py-4">
                   <Link
-                    href={`/explore?category=${cat.id}`}
+                    href={discoverCategoryHref(cat.id)}
                     className="group/link text-ink hover:text-gold flex items-center justify-between text-xs font-extrabold transition-colors"
                   >
                     <span>Browse all in {cat.name}</span>

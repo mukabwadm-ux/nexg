@@ -112,7 +112,7 @@ export function LocationBanner({
           Tell me when
         </Action>
         {place?.nearest_city_slug ? (
-          <Action href={`/explore?city=${place.nearest_city_slug}`} variant="link">
+          <Action href="/discover" variant="link">
             Browse {place.nearest_city}
           </Action>
         ) : null}

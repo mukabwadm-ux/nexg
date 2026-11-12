@@ -48,7 +48,7 @@ const GROUPS = [
   {
     kind: 'category_top',
     title: 'Category top',
-    note: 'First result in Explore for that category · 1 per category per city',
+    note: 'First result in Discovery for that category · 1 per category per city',
   },
   {
     kind: 'popular_request',

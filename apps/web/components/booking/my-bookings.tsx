@@ -14,6 +14,7 @@ import {
   timeLabel,
 } from '@/lib/booking/customer';
 import { createClient } from '@/lib/supabase/client';
+import { discoverMerchantHref } from '@/lib/discover-links';
 
 /** The customer's bookings, with Cancel while the business's cut-off allows it. */
 export function MyBookings({ bookings }: { bookings: MyBooking[] | null }) {
@@ -33,7 +34,7 @@ export function MyBookings({ bookings }: { bookings: MyBooking[] | null }) {
     return (
       <p className="text-muted text-sm font-semibold">
         No bookings yet.{' '}
-        <Link href="/explore" className="text-ink underline">
+        <Link href="/discover" className="text-ink underline">
           Find something to book
         </Link>
         .
@@ -75,7 +76,7 @@ export function MyBookings({ bookings }: { bookings: MyBooking[] | null }) {
                   <>
                     {' · '}
                     <Link
-                      href={`/explore/${b.merchant_id}`}
+                      href={discoverMerchantHref(b.merchant_id)}
                       className="underline underline-offset-2"
                     >
                       {b.merchant_name}

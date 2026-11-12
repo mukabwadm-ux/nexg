@@ -15,6 +15,7 @@ import { CatalogState } from './CatalogState';
 import { isCinema } from '../data/cinema/cinema';
 import { CinemaStorefront } from './cinema/CinemaStorefront';
 import { failureFrom, type ReadFailure } from '../providers/readState';
+import { StoreBookingBar } from './booking/StoreBookingBar';
 
 interface StorefrontProps {
   merchantId: string;
@@ -110,6 +111,7 @@ export function Storefront({ merchantId, provider, onBack, onHome, itemId, categ
       <button type="button" className="store-back" onClick={onBack}><ArrowLeft size={17} strokeWidth={2} aria-hidden="true" />Back</button>
       <CatalogState failure={failed} retry={() => setRetry(value => value + 1)} />
     </>}
+    {merchant && !isCinema(merchant) && <StoreBookingBar merchantId={merchant.id} />}
     {merchant && (isCinema(merchant) && onFilm ? <CinemaStorefront key={merchant.id} merchant={merchant} onBack={onBack} onFilm={onFilm} /> : massage ? <MassageStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} /> : retail ? <SupermarketStorefront key={merchant.id} merchant={merchant} activeItem={activeItem} itemMissing={itemMissing} onBack={onBack} onHome={onHome} onSelectItem={selectItem} onCloseItem={closeItem} department={department} onDepartment={onDepartment} /> : isTourOperator(merchant) ? <TourOperatorStorefront key={merchant.id} merchant={merchant} onBack={onBack} onOpen={onTour} search={operatorSearch} offset={operatorOffset} onChange={onOperatorChange} /> : isRestaurant
       ? <RestaurantStorefront
         key={merchant.id}

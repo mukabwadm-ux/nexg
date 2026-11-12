@@ -27,6 +27,7 @@ import Link from 'next/link';
 import type { DeliveryRate } from '@/lib/delivery-fee';
 
 import { DeliveryFee } from './delivery-fee';
+import { discoverMerchantHref } from '@/lib/discover-links';
 
 export const CATEGORY_LABEL: Record<string, string> = {
   restaurant: 'Food',
@@ -211,7 +212,7 @@ export function MerchantCard({
   const open = merchant.accepting_orders !== false;
   const placeholder = merchant.placeholder === true;
   const Wrapper = placeholder ? 'div' : Link;
-  const wrapperProps = placeholder ? {} : { href: `/explore/${merchant.id}` };
+  const wrapperProps = placeholder ? {} : { href: discoverMerchantHref(merchant.id) };
   const prepMinutes =
     merchant.prep_minutes != null && merchant.prep_minutes > 0
       ? Math.round(merchant.prep_minutes)
@@ -306,7 +307,7 @@ export function MerchantCard({
             asChild
             className="h-11 shrink-0 rounded-full px-5 text-[0.9375rem] font-bold"
           >
-            <Link href={`/explore/${merchant.id}`}>{CTA[category] ?? 'View'}</Link>
+            <Link href={discoverMerchantHref(merchant.id)}>{CTA[category] ?? 'View'}</Link>
           </Button>
         )}
       </div>

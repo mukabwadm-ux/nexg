@@ -15,6 +15,7 @@ import Link from 'next/link';
 import type { Translate } from '@/lib/i18n/dictionaries';
 
 import { CardRail, RAIL_CARD } from './card-rail';
+import { discoverCategoryHref, discoverMerchantHref } from '@/lib/discover-links';
 
 /**
  * The featured merchant cards on the homepage.
@@ -238,7 +239,7 @@ export function FeaturedMerchants({
       }
       actions={
         <Link
-          href="/explore"
+          href="/discover"
           className="focus-visible:ring-gold inline-flex h-11 items-center gap-2 rounded-full border border-white/20 px-5 text-sm font-bold transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 sm:h-12 sm:px-6"
         >
           {t('home.featured.exploreAll')}
@@ -251,7 +252,7 @@ export function FeaturedMerchants({
           PLACEHOLDERS.map((merchant) => (
             <Card
               key={merchant.name}
-              href={`/explore?category=${merchant.category}`}
+              href={discoverCategoryHref(merchant.category)}
               photo={`/images/categories/${merchant.image}.jpg`}
               icon={CATEGORY_ICON[merchant.category] ?? Sparkles}
               sponsored={t('merchant.sponsored')}
@@ -272,7 +273,7 @@ export function FeaturedMerchants({
                 key={merchant.booking_id ?? merchant.merchant_id}
                 /* The booking id travels so a tap can be attributed to the
                    slot that earned it, rather than guessed at later. */
-                href={`/explore/${merchant.merchant_id}?src=featured&b=${merchant.booking_id ?? ''}`}
+                href={discoverMerchantHref(merchant.merchant_id)}
                 photo={merchant.cover_photo_path}
                 icon={CATEGORY_ICON[category] ?? Sparkles}
                 sponsored={t('merchant.sponsored')}

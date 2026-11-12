@@ -112,7 +112,7 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
             ) : (orders.data ?? []).length === 0 ? (
               <p className="text-muted text-sm font-semibold">
                 No orders yet.{' '}
-                <Link href="/explore" className="text-ink underline">
+                <Link href="/discover" className="text-ink underline">
                   Find something near you
                 </Link>
                 .

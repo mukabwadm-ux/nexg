@@ -163,7 +163,7 @@ export function HealthTab({
           call this week
         </Tile>
         <Tile label="Red" value={num(red.length)} tone={red.length > 0 ? 'danger' : undefined}>
-          hidden from Explore while red
+          hidden from Discovery while red
         </Tile>
         <Tile
           label="Not enough data"
@@ -268,7 +268,7 @@ export function HealthTab({
                 {
                   level: 2,
                   title: 'Temporary delist',
-                  body: 'Hidden from Explore, 7 days to fix.',
+                  body: 'Hidden from Discovery, 7 days to fix.',
                 },
                 { level: 3, title: 'Suspension', body: 'Payout held · needs a second approver.' },
               ].map((s) => (
@@ -1101,7 +1101,7 @@ export function BranchesTab({
           <div>
             <dt className="inline font-extrabold">Guests see: </dt>
             <dd className="text-muted inline">
-              the nearest open branch only; the chain appears once in Explore.
+              the nearest open branch only; the chain appears once in Discovery.
             </dd>
           </div>
         </dl>

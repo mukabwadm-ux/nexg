@@ -24,9 +24,9 @@
       "description": "Tell a concierge what you need"
     },
     {
-      "name": "Explore",
-      "short_name": "Explore",
-      "url": "/explore?source=pwa-shortcut",
+      "name": "Discovery",
+      "short_name": "Discovery",
+      "url": "/discover?source=pwa-shortcut",
       "description": "Everything open near you right now"
     }
   ]

@@ -20,7 +20,7 @@ export interface ControlState {
  *
  * Each switch saves on its own. They are independent facts about the
  * business, not a form: turning off pay-on-delivery should not wait behind a
- * decision about Explore visibility, and there is no Save button on the
+ * decision about Discovery visibility, and there is no Save button on the
  * artboard because there is nothing to batch.
  */
 export function MerchantControls({
@@ -72,7 +72,7 @@ export function MerchantControls({
 
       <Switch
         id={`explore_${merchantId}`}
-        label="Visible in Explore"
+        label="Visible in Discovery"
         description={state.explore_visible ? 'Listed publicly' : 'Hidden from the listing'}
         loading={busy === 'explore_visible'}
         checked={state.explore_visible}

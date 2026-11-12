@@ -197,7 +197,7 @@ export default function ConnectingSystemsPage() {
       <P>
         Read your merchant and catalogue as NexG publishes them, and show them in your own
         design. Link back to your storefront at{' '}
-        <C>https://nexgapp.com/explore/{'{merchant id}'}</C> so guests can order.
+        <C>https://nexgapp.com/discover?merchant={'{merchant id}'}</C> so guests can order.
       </P>
       <CodeTabs className="mt-6" samples={merchantSamples} title="Request" />
 

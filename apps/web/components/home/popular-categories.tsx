@@ -1,9 +1,9 @@
 'use client';
 
-import { useLocation } from '@nexg/location';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { discoverCategoryHref } from '@/lib/discover-links';
 
 /**
  * Popular categories: photo tiles that open Explore for one category,
@@ -66,17 +66,9 @@ export function PopularCategories({
   /** One scrolling row (homepage) or a wrapping grid (/categories). */
   layout?: 'row' | 'grid';
 }) {
-  const { place, chip } = useLocation();
-  const exact = chip === 'set' || chip === 'qr' || chip === 'room';
-  const city = place?.city_slug ?? null;
-
   const hrefFor = (item: PopularCategory) => {
     if (item.href) return item.href;
-    const params = new URLSearchParams();
-    if (city) params.set('city', city);
-    if (item.category) params.set('category', item.category);
-    if (exact && place) params.set('near', `${place.lat.toFixed(4)},${place.lng.toFixed(4)}`);
-    return `/explore?${params.toString()}`;
+    return discoverCategoryHref(item.category);
   };
 
   return (

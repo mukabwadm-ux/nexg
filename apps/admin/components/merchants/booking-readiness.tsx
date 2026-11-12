@@ -31,7 +31,7 @@ type Published = { state: 'published'; offerings: number } | { state: 'none' | '
 
 /**
  * The public catalog the customer's booking page reads. Only a merchant that
- * is live and shown in Explore has one, so anything else is "none".
+ * is live and shown in Discovery has one, so anything else is "none".
  */
 async function engineCatalog(merchantId: string, listed: boolean): Promise<Published> {
   if (!listed) return { state: 'none' };
@@ -67,7 +67,7 @@ export async function BookingReadiness(input: BookingReadinessInput) {
       : null,
     !live ? 'Not live yet. Take live once the documents are verified.' : null,
     live && !input.exploreVisible
-      ? 'Hidden from Explore, so customers cannot find or open its booking page.'
+      ? 'Hidden from Discovery, so customers cannot find or open its booking page.'
       : null,
     listed && input.activeResources === 0 && catalog.state === 'none'
       ? 'Nothing is published for booking. The merchant adds and publishes services in Availability.'
@@ -81,7 +81,7 @@ export async function BookingReadiness(input: BookingReadinessInput) {
         ? `${profile.name}: ${MODEL_LABEL[profile.defaultModelId] ?? profile.defaultModelId}`
         : 'None',
     ],
-    ['Shown in Explore', listed ? 'Yes' : 'No'],
+    ['Shown in Discovery', listed ? 'Yes' : 'No'],
     [
       'Published for booking',
       input.activeResources > 0

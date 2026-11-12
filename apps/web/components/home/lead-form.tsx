@@ -298,7 +298,7 @@ function ThankYou({
 
       <div className="mt-4 flex flex-wrap gap-2">
         <Button variant="outline" size="sm" asChild>
-          <a href="/explore">Browse while you wait</a>
+          <a href="/discover">Browse while you wait</a>
         </Button>
         <Button
           variant="outline"

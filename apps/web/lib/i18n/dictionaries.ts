@@ -152,7 +152,7 @@ const en: Dictionary = {
   'home.cat.flowers': 'Flowers & gifts',
   'home.featured.eyebrow': 'Featured merchants · Nairobi',
   'home.featured.heading': 'Featured Merchants',
-  'home.featured.exploreAll': 'Explore all merchants',
+  'home.featured.exploreAll': 'See all in Discovery',
   'home.featured.ownBusiness': 'Own a business? Featured slots are limited per city and category.',
   'home.featured.getFeatured': 'Get featured on the homepage →',
   'home.services.heading': 'Everything we arrange',

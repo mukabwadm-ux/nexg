@@ -133,7 +133,7 @@ export async function importCatalogueCsv(input: {
   }
 
   revalidatePath('/merchant/menu');
-  revalidatePath('/explore', 'layout');
+  revalidatePath('/discover');
   return {
     ok: true,
     message: `Imported: ${created} added, ${updated} updated.`,

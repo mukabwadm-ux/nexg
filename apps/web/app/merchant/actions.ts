@@ -255,7 +255,7 @@ export async function setItemPrice(itemId: string, priceKes: number): Promise<Ou
   if (error) return { ok: false, message: error.message };
   if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
   revalidatePath('/merchant/menu');
-  revalidatePath('/explore', 'layout');
+  revalidatePath('/discover');
   return { ok: true, message: 'Price updated. New orders use it straight away.' };
 }
 

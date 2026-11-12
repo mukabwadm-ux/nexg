@@ -1,3 +1,5 @@
+import { discoverMerchantHref } from '@/lib/discover-links';
+
 /**
  * Best sellers: individual products from different merchants.
  *
@@ -8,7 +10,7 @@
  * product page, where it can be added to the cart and taken to checkout.
  *
  * BEST_SELLERS below is SAMPLE DATA, one per category, shown only while no
- * live merchant has a popular product. Those cards open Explore for their
+ * live merchant has a popular product. Those cards open Discovery for their
  * category, because there is no product behind them.
  *
  * Sample photos are CC0; provenance in public/images/best-sellers/CREDITS.md.
@@ -17,7 +19,7 @@ export interface BestSeller {
   id: string;
   name: string;
   merchant: string;
-  /** Merchant category, for "see more like this" on Explore. */
+  /** Merchant category, for "see more like this" in Discovery. */
   category: string;
   /** A sample photo in public/images/best-sellers/, without the extension. */
   image: string | null;
@@ -69,7 +71,7 @@ export function bestSellerFromCatalogue(item: CatalogueBestSeller): BestSeller {
 
 /** Where one product of one merchant opens. */
 export function productHref(merchantId: string, itemId: string): string {
-  return `/explore/${merchantId}/item/${itemId}`;
+  return discoverMerchantHref(merchantId, itemId);
 }
 
 export const BEST_SELLERS: BestSeller[] = [

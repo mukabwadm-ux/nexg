@@ -9,6 +9,7 @@ import * as React from 'react';
 import { rankStores, type NearbyStore, type RankedStore } from '@/lib/stores-near';
 
 import { CardRail } from './card-rail';
+import { discoverMerchantHref } from '@/lib/discover-links';
 
 /** The same card size as Best sellers, so the two rows line up. */
 const STORE_CARD = 'w-[16.5rem] shrink-0 snap-start sm:w-[18rem] lg:w-[calc((100%-3rem)/4)]';
@@ -68,7 +69,7 @@ function StoreCard({ store }: { store: RankedStore }) {
   return (
     <li className={STORE_CARD}>
       <Link
-        href={`/explore/${store.id}`}
+        href={discoverMerchantHref(store.id)}
         className="focus-visible:ring-gold group flex h-full flex-col overflow-hidden rounded-2xl bg-[#17140F] ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2"
       >
         <span className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E]">
@@ -157,9 +158,7 @@ export function StoresNearYou({ stores }: { stores: NearbyStore[] }) {
   if (shown.length === 0) return null;
 
   const where = place?.zone ?? place?.label ?? 'you';
-  const seeAll = spot
-    ? `/explore?city=nairobi&near=${spot.lat.toFixed(4)},${spot.lng.toFixed(4)}`
-    : '/explore?city=nairobi';
+  const seeAll = '/discover';
 
   return (
     <CardRail

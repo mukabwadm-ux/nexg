@@ -61,14 +61,16 @@ export async function POST(request: Request) {
         })
         .abortSignal(signal);
       if (error) return error.message;
-      // Live and hidden from Explore means nobody can find or book it.
+      // Live and hidden from Discovery means nobody can find or book it.
       const listed = await client
         .rpc('rpc_merchant_set_controls', {
           p_merchant_id: merchantId,
           p_explore_visible: true,
         })
         .abortSignal(signal);
-      return listed.error ? `Live, but not shown in Explore yet (${listed.error.message}).` : null;
+      return listed.error
+        ? `Live, but not shown in Discovery yet (${listed.error.message}).`
+        : null;
     },
   })(request);
 }

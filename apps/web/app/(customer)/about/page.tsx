@@ -22,7 +22,7 @@ const PILLARS = [
   {
     title: 'Local stores, delivered',
     body: 'Restaurants, pharmacies, groceries, drinks, flowers and laundry from Nairobi merchants, brought to your door, room or gate.',
-    href: '/explore',
+    href: '/discover',
     cta: 'Explore stores',
   },
   {
@@ -66,7 +66,7 @@ const PEOPLE = [
   {
     who: 'Guests',
     body: 'In an Airbnb or at home: order, ask and plan from one place.',
-    href: '/explore',
+    href: '/discover',
   },
   {
     who: 'Hosts',
