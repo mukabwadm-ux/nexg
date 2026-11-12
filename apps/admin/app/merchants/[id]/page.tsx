@@ -22,14 +22,27 @@ import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
+import { MerchantPerformance } from '@/components/merchants/performance';
 import { isManagedMerchantApplication, ReviewSourceError } from '@/lib/merchant-application-review';
+import {
+  rangeFrom,
+  summarise,
+  type PerformanceOrder,
+  type PerformanceRating,
+} from '@/lib/merchant-performance';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Merchant application' };
+export const metadata: Metadata = { title: 'Merchant' };
 export const dynamic = 'force-dynamic';
 
-export default async function MerchantApplicationPage({ params }: { params: { id: string } }) {
+export default async function MerchantApplicationPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams?: { range?: string };
+}) {
   const staff = await requireStaff();
   requireModule(staff, 'merchants');
   let managed: boolean;
@@ -91,6 +104,13 @@ export default async function MerchantApplicationPage({ params }: { params: { id
       ? await supabase.rpc('rpc_featured_pitch_preview', { p_merchant_id: params.id })
       : { data: null };
 
+  /* Two windows back, plus a day for the Nairobi offset. */
+  const range = rangeFrom(searchParams?.range);
+  const now = new Date();
+  const performanceSince = new Date(
+    now.getTime() - (range.days * 2 + 1) * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
   const [
     { data: requirements },
     { data: documents },
@@ -100,6 +120,8 @@ export default async function MerchantApplicationPage({ params }: { params: { id
     { data: fleet },
     { data: chases },
     { count: activeResources },
+    { data: performanceOrders, error: performanceError },
+    { data: performanceRatings },
   ] = await Promise.all([
     /*
      * The same function the merchant's own documents step called, rather than
@@ -143,6 +165,22 @@ export default async function MerchantApplicationPage({ params }: { params: { id
       .select('id', { count: 'exact', head: true })
       .eq('merchant_id', params.id)
       .eq('active', true),
+    /* This window and the one before it, for the Performance section. */
+    supabase
+      .from('order')
+      .select(
+        'placed_at, stage, subtotal_cents, confirmed_at, ready_at, promised_ready_at, guest_id, order_item(name, quantity, line_total_cents, removed_at)',
+      )
+      .eq('merchant_id', params.id)
+      .gte('placed_at', performanceSince)
+      .order('placed_at', { ascending: true })
+      .limit(5000),
+    supabase
+      .from('order_rating')
+      .select('stars, created_at')
+      .eq('merchant_id', params.id)
+      .gte('created_at', performanceSince)
+      .limit(5000),
   ]);
 
   const applicable =
@@ -215,11 +253,21 @@ export default async function MerchantApplicationPage({ params }: { params: { id
   const city = merchant.city as { name: string } | null;
   const primary = branches?.[0];
   const canManageLifecycle = staff.isSuperAdmin || staff.roles.includes('merchant_ops');
+  const performance = summarise(
+    (performanceOrders as PerformanceOrder[] | null) ?? [],
+    (performanceRatings as PerformanceRating[] | null) ?? [],
+    range.days,
+    now,
+  );
+  /* Trading merchants always; anyone else once they have taken an order. */
+  const showPerformance =
+    ['live', 'paused', 'suspended'].includes(merchant.status) ||
+    (performanceOrders?.length ?? 0) > 0;
   return (
     <ConsoleShell staff={staff} current="/merchants">
       <ConsoleHeader
         title={merchant.trading_name}
-        breadcrumb="Merchants → Application"
+        breadcrumb={showPerformance ? 'Merchants → Merchant' : 'Merchants → Application'}
         action={<StatusBadge status={merchant.status as StatusKey} />}
       />
 
@@ -240,7 +288,22 @@ export default async function MerchantApplicationPage({ params }: { params: { id
           </Link>
         ) : null}
 
-        <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+        {showPerformance && (
+          <div className="mt-4">
+            <MerchantPerformance
+              merchantId={params.id}
+              range={range.key}
+              data={performance}
+              failed={!!performanceError}
+            />
+          </div>
+        )}
+
+        <div
+          className={`grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start ${
+            showPerformance ? 'mt-10' : 'mt-4'
+          }`}
+        >
           <div className="space-y-6">
             <div>
               <h2 className="text-lg font-extrabold tracking-tight">Documents</h2>

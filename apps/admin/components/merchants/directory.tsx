@@ -119,9 +119,12 @@ export function Directory({
                   className="border-border flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 last:border-b-0"
                 >
                   <div className="min-w-0">
-                    <p className="text-[0.875rem] font-extrabold">
+                    <Link
+                      href={`/merchants/${app.id}`}
+                      className="block text-[0.875rem] font-extrabold hover:underline"
+                    >
                       {app.trading_name ?? '[Trading name]'}
-                    </p>
+                    </Link>
                     <p className="text-muted-light text-[0.6875rem] font-semibold">
                       {CATEGORY_LABEL[app.category ?? 'other'] ?? 'Other'} ·{' '}
                       {app.branch_name ?? app.city_name ?? DASH} ·{' '}
@@ -204,7 +207,7 @@ export function Directory({
                   }`}
                 >
                   <td className="px-4 py-3">
-                    <Link href={href({ selected: m.id })} className="block">
+                    <Link href={`/merchants/${m.id}`} className="block">
                       <span className="flex flex-wrap items-center gap-1.5">
                         <span className="text-[0.8125rem] font-extrabold">
                           {m.trading_name ?? '[Trading name]'}
@@ -277,28 +280,6 @@ export function Directory({
               within 30 days
             </Tile>
           </div>
-
-          {selected ? (
-            <Card className="p-5">
-              <p className="text-[0.8125rem] font-extrabold">Open the full record</p>
-              <p className="text-muted mt-2 text-[0.75rem] font-semibold leading-[1.7]">
-                Controls, compliance, payouts and the status timeline live on the merchant&rsquo;s
-                own page, which is deep-linkable so it can be pasted to somebody.
-              </p>
-              <Link
-                href={`/merchants/${selected}`}
-                className="bg-ink hover:bg-ink/90 mt-3 inline-block rounded-lg px-4 py-2 text-[0.8125rem] font-bold text-white transition-colors"
-              >
-                Open merchant
-              </Link>
-            </Card>
-          ) : (
-            <Card className="p-5">
-              <p className="text-muted text-sm font-semibold">
-                Pick a merchant to open their record.
-              </p>
-            </Card>
-          )}
         </div>
       </div>
     </>
