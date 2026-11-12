@@ -21,6 +21,8 @@ export const metadata: Metadata = {
  * across visitors. The catalogue underneath is still cheap.
  */
 export const dynamic = 'force-dynamic';
+// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
+export const fetchCache = 'force-no-store';
 
 /**
  * Customize Your Experience · the front door.

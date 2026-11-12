@@ -17,6 +17,8 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
+// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
+export const fetchCache = 'force-no-store';
 
 /**
  * The guest side of the Airbnb module.

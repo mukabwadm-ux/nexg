@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: 'Browse all categories and services across Nairobi on NexG.',
 };
 export const dynamic = 'force-dynamic';
+// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
+export const fetchCache = 'force-no-store';
 
 /**
  * All categories explorer.

@@ -19,6 +19,8 @@ export const metadata: Metadata = {
  * them. Their plan is loaded in the browser against their session.
  */
 export const dynamic = 'force-dynamic';
+// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
+export const fetchCache = 'force-no-store';
 
 export default async function BuildPage({
   searchParams,

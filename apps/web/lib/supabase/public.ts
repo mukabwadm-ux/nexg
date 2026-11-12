@@ -13,6 +13,16 @@ import type { Database } from '@nexg/db';
  * Explore, the marketing pages. Anything that depends on who is asking must
  * keep using the cookie client, because this one has no session and row-level
  * security will correctly show it nothing.
+ *
+ * Caching has to be chosen, because Next 14 caches a plain fetch, which is what
+ * supabase-js makes, in the Data Cache with no expiry, and Vercel keeps that
+ * cache across deploys. `dynamic = 'force-dynamic'` does not stop it: in
+ * November 2026 /categories, /merchants, /stays and /hosts served the same
+ * database response for a day and more. So:
+ *   - a page that must show live data also exports
+ *     `fetchCache = 'force-no-store'`;
+ *   - a page that may be a little behind sets `revalidate`, or wraps the read
+ *     in `unstable_cache` with one.
  */
 /* Annotated for the same reason as the other two: the generated
    `Database` type is past what TypeScript will serialise. */

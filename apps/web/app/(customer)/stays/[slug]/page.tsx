@@ -16,6 +16,8 @@ import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const dynamic = 'force-dynamic';
+// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
+export const fetchCache = 'force-no-store';
 
 interface PropertyRow {
   id: string;

@@ -11,6 +11,8 @@ import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = { title: 'Ask about this stay' };
 export const dynamic = 'force-dynamic';
+// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
+export const fetchCache = 'force-no-store';
 
 /**
  * The enquiry, with the property already named.

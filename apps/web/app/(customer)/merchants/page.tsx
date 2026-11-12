@@ -99,6 +99,8 @@ const darkButton =
   'bg-ink focus-visible:ring-gold inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-extrabold text-white transition-colors hover:bg-ink/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
 export const dynamic = 'force-dynamic';
+// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
+export const fetchCache = 'force-no-store';
 
 export default async function MerchantsPage() {
   const connectedRegistrationEnabled = process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false';

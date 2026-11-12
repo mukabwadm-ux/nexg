@@ -43,6 +43,8 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
+// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
+export const fetchCache = 'force-no-store';
 
 /*
  * Pricing, in one place so the hero, the plans, the form and the FAQ
