@@ -1,5 +1,5 @@
 import { VALUE_PLACEHOLDER } from '@nexg/ui';
-import { ArrowRight, ArrowUpRight, Banknote, Bike, Check, Minus, Plus } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Banknote, Check, Minus, Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -137,13 +137,6 @@ export const fetchCache = 'force-no-store';
 /** The picture beside each benefit. Decorative. */
 function BenefitVisual({ index }: { index: number }) {
   const frame = 'relative h-48 overflow-hidden rounded-3xl sm:h-56';
-  if (index === 1) {
-    return (
-      <div className={`${frame} bg-gold text-ink flex items-center justify-center`}>
-        <Bike className="h-24 w-24" strokeWidth={1.5} />
-      </div>
-    );
-  }
   if (index === 3) {
     return (
       <div
@@ -167,18 +160,20 @@ function BenefitVisual({ index }: { index: number }) {
       </div>
     );
   }
+  const photo = [
+    { src: '/images/merchant-page/market-stall.jpg', focus: 'object-center' },
+    { src: '/images/merchant-page/rider.jpg', focus: 'object-[50%_30%]' },
+    { src: '/images/merchant-page/card-terminal.jpg', focus: 'object-[62%_center]' },
+  ][index];
+  if (!photo) return null;
   return (
     <div className={frame}>
       <Image
-        src={
-          index === 0
-            ? '/images/merchant-page/market-stall.jpg'
-            : '/images/merchant-page/card-terminal.jpg'
-        }
+        src={photo.src}
         alt=""
         fill
         sizes="(min-width: 1024px) 30rem, 100vw"
-        className={`object-cover ${index === 0 ? 'object-center' : 'object-[62%_center]'}`}
+        className={`object-cover ${photo.focus}`}
       />
     </div>
   );

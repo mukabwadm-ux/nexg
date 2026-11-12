@@ -12,3 +12,4 @@ without checking that licence.
 | `tailor.jpg`            | Fashion & Apparel card                                         |
 | `market-stall.jpg`      | Groceries & Essentials card; "Customers you can't reach today" |
 | `card-terminal.jpg`     | "Paid without chasing"                                         |
+| `rider.jpg`             | "Our riders, not yours"                                        |
