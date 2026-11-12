@@ -205,7 +205,7 @@ export async function HomePageContent({
       <main>
         <section
           id="popular"
-          className="mx-auto max-w-[120rem] scroll-mt-20 px-4 py-16 sm:px-[30px] sm:py-20 lg:py-24"
+          className="mx-auto max-w-[120rem] scroll-mt-20 px-4 py-10 sm:px-[30px] sm:py-12 lg:py-14"
         >
           <PopularCategories
             heading={t('home.popular.heading')}
