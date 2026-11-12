@@ -132,6 +132,22 @@ from (values
 ) as v(first_name, last_name, phone, vehicle, plate_no, status)
 on conflict (phone) do nothing;
 
+-- The booking engine picks a merchant's booking type from its subcategory,
+-- so a merchant without one can never be set up for booking. Mitindo is left
+-- out: it is filed under beauty but sells clothes, and needs a real category.
+update public.merchant m
+set subcategory = v.subcategory
+from (values
+  ('demo.sokoni@nexg.invalid',  'restaurant'),
+  ('demo.hifadhi@nexg.invalid', 'restaurant'),
+  ('demo.asubuhi@nexg.invalid', 'cafe'),
+  ('demo.safi@nexg.invalid',    'laundry'),
+  ('demo.afya@nexg.invalid',    'pharmacy_retail'),
+  ('demo.zamani@nexg.invalid',  'liquor_stores'),
+  ('demo.ua@nexg.invalid',      'flowers')
+) as v(contact_email, subcategory)
+where m.contact_email = v.contact_email and m.subcategory is null;
+
 commit;
 
 select

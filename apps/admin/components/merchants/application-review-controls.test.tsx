@@ -151,7 +151,7 @@ describe('application review decision controls', () => {
       reason: '',
     });
     expect(container.textContent).toContain(
-      'Application approved. The merchant is live and their home is now the dashboard.',
+      'Application approved. The merchant is live, shown in Explore, and their home is now the dashboard.',
     );
     expect(container.querySelector('button')?.disabled).toBe(true);
     await act(async () => {
@@ -190,7 +190,7 @@ describe('application review decision controls', () => {
       );
     });
     expect(container.textContent).toContain(
-      'Application approved. The merchant is live and their home is now the dashboard.',
+      'Application approved. The merchant is live, shown in Explore, and their home is now the dashboard.',
     );
     expect(ports.refresh.mock.calls).toHaveLength(1);
   });

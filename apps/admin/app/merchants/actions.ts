@@ -52,9 +52,20 @@ export async function goLive(merchantId: string, reason: string): Promise<Review
   });
   if (error) return { ok: false, message: error.message };
 
+  // Live and hidden from Explore means nobody can find or book it.
+  const listed = await supabase.rpc('rpc_merchant_set_controls', {
+    p_merchant_id: merchantId,
+    p_explore_visible: true,
+  });
+
   revalidatePath(`/merchants/${merchantId}`);
   revalidatePath('/merchants');
-  return { ok: true, message: 'Live. The business now shows on the public site.' };
+  return listed.error
+    ? {
+        ok: true,
+        message: `Live, but not shown in Explore yet: ${listed.error.message} Switch it on from the directory.`,
+      }
+    : { ok: true, message: 'Live and shown in Explore. Customers can now find and book it.' };
 }
 
 /**

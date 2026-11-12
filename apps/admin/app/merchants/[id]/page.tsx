@@ -21,6 +21,7 @@ import { MerchantLifecycleActions } from '@/components/merchant-lifecycle-action
 import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
+import { BookingReadiness } from '@/components/merchants/booking-readiness';
 import { isManagedMerchantApplication, ReviewSourceError } from '@/lib/merchant-application-review';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
@@ -98,6 +99,7 @@ export default async function MerchantApplicationPage({ params }: { params: { id
     { data: categoryConfig },
     { data: fleet },
     { data: chases },
+    { count: activeResources },
   ] = await Promise.all([
     /*
      * The same function the merchant's own documents step called, rather than
@@ -136,6 +138,11 @@ export default async function MerchantApplicationPage({ params }: { params: { id
       .eq('owner_type', 'merchant')
       .eq('owner_id', params.id)
       .is('fulfilled_document_id', null),
+    supabase
+      .from('bookable_resource')
+      .select('id', { count: 'exact', head: true })
+      .eq('merchant_id', params.id)
+      .eq('active', true),
   ]);
 
   const applicable =
@@ -391,6 +398,14 @@ export default async function MerchantApplicationPage({ params }: { params: { id
                 }}
               />
             )}
+
+            <BookingReadiness
+              merchantId={params.id}
+              status={merchant.status}
+              exploreVisible={!!merchant.explore_visible}
+              subcategory={merchant.subcategory ?? null}
+              activeResources={activeResources ?? 0}
+            />
 
             {merchant.deactivated_at ? (
               <Card tone="muted" className="p-5">
