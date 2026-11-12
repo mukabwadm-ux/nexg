@@ -263,7 +263,7 @@ export async function HomePageContent({
         <section className="relative overflow-hidden bg-[#D4AF37]">
           <div
             aria-hidden="true"
-            className="bg-night absolute inset-0 lg:right-[42%] lg:rounded-r-[11rem]"
+            className="bg-night absolute inset-x-0 inset-y-[3px] rounded-r-[3rem] lg:right-[42%] lg:rounded-r-[11rem]"
           />
           <div className="relative mx-auto grid max-w-[120rem] gap-10 px-4 sm:px-[30px] lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-center">
             <div className="py-10 text-white sm:py-12 lg:py-10 lg:pr-16">
