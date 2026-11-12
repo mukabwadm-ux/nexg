@@ -180,7 +180,6 @@ function BenefitVisual({ index }: { index: number }) {
 }
 
 export default async function MerchantsPage() {
-  const connectedRegistrationEnabled = process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false';
   const registrationHref = '/merchants/apply';
   const supabase = createPublicClient();
 
@@ -576,27 +575,16 @@ export default async function MerchantsPage() {
               </ul>
             </div>
 
-            {/* One card for both paths. The fallback form brings no surface of
-                its own, and nothing here clips, so its pickers can open. Its
-                inputs are drawn for a light card, so it stays cream. */}
-            {connectedRegistrationEnabled ? (
-              <div
-                className={`${CARD} rounded-3xl p-6 shadow-[0_24px_50px_-28px_rgb(20_20_20/0.35)] sm:p-10`}
-              >
-                <h3 className="text-2xl font-extrabold tracking-tight">Register your business</h3>
-                <p className="text-muted mt-3 text-[0.9375rem] font-semibold leading-[1.7]">
-                  Start with the essentials. Finish your setup from your merchant Home.
-                </p>
-                <Link href={registrationHref} className={`${primaryButton} mt-7 h-12`}>
-                  Start registration
-                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
-                </Link>
-              </div>
-            ) : (
-              <div className="border-border bg-surface rounded-3xl border p-6 shadow-[0_24px_50px_-28px_rgb(20_20_20/0.35)] sm:p-10">
-                <MerchantRegisterCard cities={allCities} />
-              </div>
-            )}
+            {/* The register form, as before: it collects the essentials here and
+                carries them into the registration form, already filled in. A
+                cream card in both themes, the way the form's fields are drawn. */}
+            <div className="border-border bg-surface rounded-3xl border p-6 shadow-[0_24px_50px_-28px_rgb(20_20_20/0.35)] sm:p-8">
+              <h3 className="text-2xl font-extrabold tracking-tight">Register your business</h3>
+              <p className="text-muted mb-6 mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
+                Start with the essentials. We&apos;ll take you through the rest.
+              </p>
+              <MerchantRegisterCard cities={allCities} categories={allCategories} />
+            </div>
           </div>
         </section>
 

@@ -13,7 +13,17 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 export default async function Registration({
   searchParams,
 }: {
-  searchParams: { merchantId?: string; operationId?: string };
+  searchParams: {
+    merchantId?: string;
+    operationId?: string;
+    /* From the register card on /merchants, carried through /merchants/apply. */
+    trading_name?: string;
+    contact_name?: string;
+    phone?: string;
+    email?: string;
+    category?: string;
+    town?: string;
+  };
 }) {
   if (process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'false')
     return (
@@ -110,6 +120,7 @@ export default async function Registration({
         includePayout: !data.user.is_anonymous,
       })
     : undefined;
+  const prefill = saved ? undefined : prefillFrom(searchParams);
   return (
     <MerchantRegistrationPage>
       <ConnectedApplication
@@ -119,7 +130,33 @@ export default async function Registration({
         emailOtpEnabled={process.env.MERCHANT_EMAIL_OTP_ENABLED !== 'false'}
         initialRecord={saved?.record}
         initialPayout={saved?.payout}
+        {...(prefill ? { prefill } : {})}
       />
     </MerchantRegistrationPage>
   );
+}
+
+/**
+ * What the register card on /merchants already asked, in the shape the
+ * registration form starts from, so nobody types it twice. Trimmed and
+ * length-capped: it arrives in the URL.
+ */
+function prefillFrom(params: Record<string, string | undefined>) {
+  const text = (value: string | undefined, max = 120) => (value ?? '').trim().slice(0, max);
+  const [firstName = '', ...rest] = text(params.contact_name).split(/\s+/).filter(Boolean);
+  const business = {
+    name: text(params.trading_name),
+    firstName,
+    lastName: rest.join(' '),
+    phone: text(params.phone, 20),
+    email: text(params.email, 160),
+  };
+  const categoryId = text(params.category, 60);
+  const town = text(params.town, 60);
+  if (!Object.values(business).some(Boolean) && !categoryId && !town) return undefined;
+  return {
+    business: Object.fromEntries(Object.entries(business).filter(([, value]) => value)),
+    ...(/^[a-z_]+$/.test(categoryId) ? { categoryId } : {}),
+    ...(town ? { location: { town } } : {}),
+  };
 }

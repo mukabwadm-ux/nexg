@@ -73,6 +73,7 @@ export function ConnectedApplication({
   anonymousSession = false,
   emailOtpEnabled = false,
   savedHome,
+  prefill,
 }: {
   initialRecord?: MerchantApplicationRecord;
   initialPayout?: PayoutRecord;
@@ -81,6 +82,8 @@ export function ConnectedApplication({
   anonymousSession?: boolean;
   emailOtpEnabled?: boolean;
   savedHome?: MerchantSavedHomeSource;
+  /* Answers from the register card on /merchants, for a brand-new application only. */
+  prefill?: Record<string, unknown>;
 }) {
   const router = useRouter();
   const record = useRef(initialRecord);
@@ -631,7 +634,7 @@ export function ConnectedApplication({
         initialData={
           initialRecord
             ? { ...initialRecord.payload, payout: payoutForm(initialPayout?.payout ?? null) }
-            : undefined
+            : prefill
         }
         initialHome={home}
         savedHome={savedHome}

@@ -12,34 +12,38 @@ export interface CityOption {
   status: string;
 }
 
-export const MERCHANT_CATEGORIES = [
-  { value: 'restaurant', label: 'Food' },
-  { value: 'bar_liquor', label: 'Drinks' },
-  { value: 'laundry', label: 'Laundry' },
-  { value: 'florist', label: 'Flowers' },
-  { value: 'beauty_fashion', label: 'Beauty & Fashion' },
-  { value: 'pharmacy', label: 'Pharmacy' },
-  { value: 'supermarket', label: 'Supermarket' },
-  { value: 'gift_shop', label: 'Gift shop' },
-  { value: 'other', label: 'Other' },
-];
+/** A row of category_config: the categories the registration form offers. */
+export interface CategoryOption {
+  category: string;
+  label: string;
+}
 
 /** For a merchant whose city is not open yet; the apply flow captures them. */
 const OTHER_CITY = '__other__';
 
 /**
  * The inline "Register your business" card from the `Merchants` artboard.
- * Continuing carries the answers into /merchants/apply, where the location pin
- * and documents are collected.
+ * Continuing carries the answers into /merchants/apply, which passes them on
+ * to the registration form so they are already filled in there; the location
+ * pin and documents are collected in that form.
+ *
+ * The categories are the ones the registration form itself offers
+ * (category_config), so the choice made here is the one it opens with.
  */
-export function MerchantRegisterCard({ cities }: { cities: CityOption[] }) {
+export function MerchantRegisterCard({
+  cities,
+  categories,
+}: {
+  cities: CityOption[];
+  categories: CategoryOption[];
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [tradingName, setTradingName] = React.useState('');
   const [contactName, setContactName] = React.useState('');
   const [phone, setPhone] = React.useState<string | null>(null);
   const [email, setEmail] = React.useState('');
-  const [category, setCategory] = React.useState<string | null>('restaurant');
+  const [category, setCategory] = React.useState<string | null>(categories[0]?.category ?? null);
   const [cityId, setCityId] = React.useState<string | null>(cities[0]?.id ?? null);
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -73,7 +77,11 @@ export function MerchantRegisterCard({ cities }: { cities: CityOption[] }) {
     if (phone) params.set('phone', phone);
     params.set('email', email);
     if (category) params.set('category', category);
-    if (cityId && cityId !== OTHER_CITY) params.set('city', cityId);
+    if (cityId && cityId !== OTHER_CITY) {
+      params.set('city', cityId);
+      const town = cities.find((c) => c.id === cityId)?.name;
+      if (town) params.set('town', town);
+    }
     router.push(`/merchants/apply?${params.toString()}`);
   };
 
@@ -124,7 +132,7 @@ export function MerchantRegisterCard({ cities }: { cities: CityOption[] }) {
         <ChipGroup
           id="reg_category"
           label="What do you sell?"
-          options={MERCHANT_CATEGORIES}
+          options={categories.map((c) => ({ value: c.category, label: c.label }))}
           value={category}
           onChange={setCategory}
           selectedTone="gold"
