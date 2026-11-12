@@ -193,7 +193,6 @@ export async function HomePageContent({
           titleLine2: t('hero.title2'),
           searchPlaceholder: t('hero.searchPlaceholder'),
           searchButton: t('hero.search'),
-          signIn: t('nav.signIn'),
           scroll: t('hero.scroll'),
           promptTitle: t('hero.prompt.title'),
           promptBody: t('hero.prompt.body'),

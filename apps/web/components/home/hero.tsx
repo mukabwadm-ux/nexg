@@ -2,7 +2,7 @@
 
 import { useLocation } from '@nexg/location';
 import { cn } from '@nexg/ui';
-import { ArrowRight, ChevronDown, MapPin, Menu, Search, User } from 'lucide-react';
+import { ArrowRight, ChevronDown, MapPin, Menu, Search } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -18,7 +18,7 @@ import { ThemeToggle } from '../theme/theme';
  *
  * Built from the two supplied comps (desktop and phone). It carries its own
  * navigation rather than the global SiteHeader, because the comp puts the
- * nav on the photograph: logo, where you are, your account and the menu.
+ * nav on the photograph: logo, where you are, the theme switch and the menu.
  * That nav stays fixed and picks up a dark ground once the photo has
  * scrolled away, so the menu is never out of reach further down the page.
  *
@@ -36,7 +36,6 @@ export interface HeroCopy {
   titleLine2: string;
   searchPlaceholder: string;
   searchButton: string;
-  signIn: string;
   scroll: string;
   promptTitle: string;
   promptBody: string;
@@ -107,7 +106,7 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
 
       <a
         href="#popular"
-        className="flex flex-col items-center pb-2 text-[0.6875rem] text-white/70 lg:hidden"
+        className="flex flex-col items-center pb-2 text-[0.6875rem] text-white/70 sm:hidden"
       >
         <ChevronDown className="text-gold h-4 w-4" aria-hidden="true" />
         {copy.scroll}
@@ -272,10 +271,6 @@ function HeroNav({
             )}
           </div>
 
-          {/* The comp: an account button on desktop, a search button on a phone. */}
-          <Link href="/sign-in" aria-label={copy.signIn} className={cn(round, 'hidden sm:flex')}>
-            <User className="text-gold h-5 w-5" aria-hidden="true" fill="currentColor" />
-          </Link>
           <ThemeToggle className={round} />
           <SiteMenu locale={locale}>
             <button type="button" aria-label="Open menu" className={round}>
