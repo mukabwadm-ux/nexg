@@ -18849,6 +18849,134 @@ export type Database = {
           },
         ];
       };
+      merchant_holiday_reminder: {
+        Row: {
+          holiday_id: string;
+          merchant_id: string;
+          recipients: number;
+          reminded_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          holiday_id: string;
+          merchant_id: string;
+          recipients?: number;
+          reminded_at?: string;
+        };
+        Update: {
+          holiday_id?: string;
+          merchant_id?: string;
+          recipients?: number;
+          reminded_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_holiday_reminder_holiday_id_fkey';
+            columns: ['holiday_id'];
+            isOneToOne: false;
+            referencedRelation: 'holiday_calendar';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       merchant_hours: {
         Row: {
           branch_id: string | null;
@@ -49514,6 +49642,7 @@ export type Database = {
       cron_featured_reconcile: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_holiday_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_deleted_retention: { Args: Record<PropertyKey, never>; Returns: number };
       cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_payments_worker: { Args: Record<PropertyKey, never>; Returns: Json };
