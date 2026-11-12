@@ -234,14 +234,7 @@ export default async function MerchantsPage() {
             className={`${CONTAINER} grid gap-12 pb-16 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:items-center lg:gap-16 lg:pb-24 lg:pt-16`}
           >
             <div>
-              <span
-                className={`${CARD} text-muted inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold`}
-              >
-                <span aria-hidden="true" className="bg-gold h-1.5 w-1.5 rounded-full" />
-                Now onboarding merchants in Nairobi
-              </span>
-
-              <h1 className="mt-6 max-w-[40rem] text-4xl/[1.04] font-extrabold tracking-tight sm:text-5xl/[1.04] lg:text-[4.5rem]/[1.02]">
+              <h1 className="max-w-[40rem] text-4xl/[1.04] font-extrabold tracking-tight sm:text-5xl/[1.04] lg:text-[4.5rem]/[1.02]">
                 Put your business in every guest&apos;s hands.
               </h1>
 
@@ -254,12 +247,6 @@ export default async function MerchantsPage() {
                 <Link href={registrationHref} className={`${primaryButton} h-12`}>
                   Register Your Business
                   <ArrowRight aria-hidden="true" className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="#how"
-                  className={`${BUTTON} border-border-strong hover:border-ink h-12 border dark:hover:border-white/60`}
-                >
-                  See how it works
                 </Link>
               </div>
 
