@@ -414,7 +414,11 @@ export function OfferingsWorkspace({
             : publication === 'draft'
               ? 'Offering unpublished in this browser preview.'
               : 'Changes saved in this browser.'
-          : 'Offering saved as a draft.',
+          : saved.publication === 'published'
+            ? 'Offering published. Guests can order it while your business is live.'
+            : publication === 'draft' && draft.publication === 'published'
+              ? 'Offering unpublished. Guests no longer see it.'
+              : 'Offering saved as a draft.',
       );
       if (!preview) onSetupSaved?.();
     } catch (e) {
@@ -1127,7 +1131,7 @@ export function OfferingsWorkspace({
           <p className="of-setup-note">
             {preview
               ? 'Demo · Changes are saved in this browser only.'
-              : 'Offerings are saved as drafts while your business is being set up.'}
+              : 'Save a draft to finish later, or publish it. Guests see published offerings once your business is live.'}
           </p>
           {notice && (
             <p className="of-setup-notice" role="status">
@@ -1164,6 +1168,7 @@ export function OfferingsWorkspace({
               onConnections={() => guard(() => openPanel('connections'))}
               onReload={() => guard(() => void load())}
               setupDraftOnly={!preview}
+              canPublish
               onUploadImage={onUploadImage}
             />
           ) : loading ? (

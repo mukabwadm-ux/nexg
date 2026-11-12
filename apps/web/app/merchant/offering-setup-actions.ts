@@ -145,9 +145,91 @@ export async function loadSetupOfferings(): Promise<
             'A saved offering uses an unsupported format. Contact support before changing it.',
         };
     }
-    return { ok: true, merchantId, items: data as Offering[] };
+    /* The draft rows always say "draft"; whether guests can order an
+       offering is its catalogue item's `available`, which Publish sets. */
+    const items = data as Offering[];
+    const { data: live } = items.length
+      ? await client
+          .from('catalogue_item')
+          .select('id')
+          .eq('merchant_id', merchantId)
+          .eq('available', true)
+          .in(
+            'id',
+            items.map((item) => item.id),
+          )
+      : { data: [] as { id: string }[] };
+    const published = new Set((live ?? []).map((row) => row.id));
+    return {
+      ok: true,
+      merchantId,
+      items: items.map((item) =>
+        published.has(item.id) ? { ...item, publication: 'published' as const } : item,
+      ),
+    };
   } catch {
     return { ok: false, message: 'Could not access your saved offering drafts.' };
+  }
+}
+
+/**
+ * Saves an offering from the setup editor and publishes or unpublishes it.
+ *
+ * The details are always saved through the setup draft (the same checks as
+ * Save draft); publishing then switches its catalogue item on, the same
+ * switch the menu page uses. A published item is switched off for the save,
+ * because the draft save only edits hidden items, and back on after it, so a
+ * failed save leaves it as it was.
+ */
+export async function saveSetupOfferingPublication(
+  input: Offering,
+  publish: boolean,
+): Promise<{ ok: true; item: Offering } | { ok: false; message: string }> {
+  try {
+    const { client, merchantId } = await merchantActionClient({ access: 'workspace-setup' });
+    const profile = profiles.find((entry) => entry.id === input.profileId);
+    if (publish && profile) {
+      const issues = validateOffering({ ...input, publication: 'published' }, true, profile);
+      if (issues.length) return { ok: false, message: issues[0]!.message };
+    }
+    const { data: current } = await client
+      .from('catalogue_item')
+      .select('available')
+      .eq('id', input.id)
+      .eq('merchant_id', merchantId)
+      .maybeSingle();
+    const wasLive = current?.available === true;
+    const setAvailable = async (available: boolean) => {
+      const { data, error } = await client
+        .from('catalogue_item')
+        .update({ available })
+        .eq('id', input.id)
+        .eq('merchant_id', merchantId)
+        .select('id')
+        .maybeSingle();
+      return !error && Boolean(data);
+    };
+
+    if (wasLive && !(await setAvailable(false)))
+      return { ok: false, message: 'Could not update this offering. Please try again.' };
+    const saved = await saveSetupOffering({ ...input, publication: 'draft' });
+    if (!saved.ok) {
+      if (wasLive) await setAvailable(true);
+      return saved;
+    }
+    if (publish && !(await setAvailable(true)))
+      return {
+        ok: false,
+        message: 'Saved as a draft, but it could not be published. Try Publish again.',
+      };
+    revalidatePath('/merchant');
+    revalidatePath('/merchant/menu');
+    return {
+      ok: true,
+      item: { ...saved.item, publication: publish ? 'published' : 'draft' },
+    };
+  } catch {
+    return { ok: false, message: 'Could not save this offering. Your changes are still open.' };
   }
 }
 

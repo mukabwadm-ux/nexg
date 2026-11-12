@@ -7,6 +7,7 @@ import {
   loadLegacySetupOfferings,
   loadSetupOfferings,
   saveSetupOffering,
+  saveSetupOfferingPublication,
   type LegacyOffering,
 } from '@/app/merchant/offering-setup-actions';
 import { createClient } from '@/lib/supabase/client';
@@ -84,9 +85,14 @@ export function SetupOfferings({
         return { revision: 1, configuration: defaultConfiguration(profile), offerings };
       },
       async save(_profile, item, publication) {
-        if (publication && publication !== 'draft')
-          throw new Error('Offerings can only be saved as drafts during setup.');
-        const result = await saveSetupOffering(item);
+        /* Publish, or Save changes on a published offering, keeps it
+           published; Save draft and Unpublish leave it hidden. */
+        const target = publication ?? item.publication;
+        if (target === 'archived') throw new Error('Archiving is not available during setup.');
+        const result =
+          target === 'published' || item.publication === 'published'
+            ? await saveSetupOfferingPublication(item, target === 'published')
+            : await saveSetupOffering(item);
         if (!result.ok) throw new Error(result.message);
         return {
           ...result.item,

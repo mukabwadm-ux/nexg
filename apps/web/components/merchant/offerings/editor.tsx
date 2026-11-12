@@ -139,6 +139,7 @@ export function OfferingEditor({
   onReload,
   onAdd,
   setupDraftOnly = false,
+  canPublish = false,
   onUploadImage,
   readOnly = false,
 }: {
@@ -159,6 +160,9 @@ export function OfferingEditor({
   onReload: () => void;
   onAdd: () => void;
   setupDraftOnly?: boolean;
+  /* Shows Publish even where saving is otherwise draft-only: the setup
+     drawer, whose source publishes through the catalogue item. */
+  canPublish?: boolean;
   onUploadImage?: (item: Offering, file: File) => Promise<{ path: string; url: string }>;
   readOnly?: boolean;
 }) {
@@ -1043,7 +1047,7 @@ export function OfferingEditor({
             <button type="button" className="of-button" disabled={busy} onClick={() => onSave()}>
               {busy ? 'Saving…' : item.publication === 'published' ? 'Save changes' : 'Save draft'}
             </button>
-            {!setupDraftOnly && (
+            {(!setupDraftOnly || canPublish) && (
               <button
                 type="button"
                 className="of-button of-primary"
@@ -1056,7 +1060,9 @@ export function OfferingEditor({
                   ? dirty
                     ? 'Publish changes'
                     : 'Unpublish'
-                  : 'Publish offering'}
+                  : canPublish
+                    ? 'Publish'
+                    : 'Publish offering'}
               </button>
             )}
           </>
