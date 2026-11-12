@@ -172,7 +172,7 @@ export function JoinSection({ t }: { t: Translate }) {
                 <span className="text-gold-text mt-7 text-xs font-extrabold uppercase tracking-[0.2em]">
                   {card.eyebrow}
                 </span>
-                <span className="mt-3 max-w-[16rem] text-2xl font-extrabold leading-tight tracking-tight sm:text-[1.75rem]">
+                <span className="mt-3 text-xl font-extrabold leading-tight tracking-tight sm:text-[1.375rem] lg:text-[1.0625rem] xl:text-[1.375rem]">
                   {card.title}
                 </span>
                 <span className="mt-5 inline-flex items-center gap-3 text-base font-semibold">
