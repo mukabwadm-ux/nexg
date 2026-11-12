@@ -272,7 +272,7 @@ export async function HomePageContent({
                 {t('home.app.eyebrow')}
               </span>
 
-              <h2 className="mt-7 text-5xl/[1.02] font-extrabold tracking-tight sm:text-6xl/[1.02] lg:text-[4.25rem]/[1.02] xl:text-[4.75rem]/[1.02]">
+              <h2 className="mt-7 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
                 {t('home.app.heading')}
                 <br />
                 your <span className="text-gold">pocket.</span>

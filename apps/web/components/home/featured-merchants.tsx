@@ -231,7 +231,7 @@ export function FeaturedMerchants({
           <Tag tone="goldOutline" className="px-4 py-2 uppercase tracking-[0.18em]">
             {t('home.featured.eyebrow')}
           </Tag>
-          <h2 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-[3.5rem]">
+          <h2 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
             {t('home.featured.heading')}
           </h2>
         </>

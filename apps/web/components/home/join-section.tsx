@@ -125,7 +125,7 @@ export function JoinSection({ t }: { t: Translate }) {
       />
 
       <div className="relative mx-auto max-w-3xl text-center">
-        <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-[4rem]">
+        <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
           {plain} <span className="text-gold-text">{gold}</span>
         </h2>
         <p className="text-muted mx-auto mt-5 max-w-2xl text-[0.9375rem] font-semibold leading-[1.75] sm:text-base">
