@@ -77,6 +77,7 @@ export async function MerchantRegistrationForm() {
         initialRecord={saved?.record}
         initialPayout={saved?.payout}
         rememberInUrl={false}
+        showDemo={false}
       />
     </MerchantRegistrationFormFrame>
   );

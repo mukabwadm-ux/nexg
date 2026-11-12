@@ -75,6 +75,7 @@ export function ConnectedApplication({
   savedHome,
   prefill,
   rememberInUrl = true,
+  showDemo = true,
 }: {
   initialRecord?: MerchantApplicationRecord;
   initialPayout?: PayoutRecord;
@@ -91,6 +92,8 @@ export function ConnectedApplication({
    * (/merchants), which finds the saved draft by itself.
    */
   rememberInUrl?: boolean;
+  /* The "Try demo · sample data" button. Off on /merchants. */
+  showDemo?: boolean;
 }) {
   const router = useRouter();
   const record = useRef(initialRecord);
@@ -717,7 +720,7 @@ export function ConnectedApplication({
           return true;
         }}
         onDemo={
-          home
+          home || !showDemo
             ? undefined
             : (selection: MerchantOnboardingDemoSelection) => {
                 const context = createMerchantOnboardingDemoContext(selection);
