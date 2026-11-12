@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { DashboardPreview } from '@/components/merchants/dashboard-preview';
 import { FeaturedSlots } from '@/components/merchants/featured-slots';
 import { CARD, CONTAINER, H2, SectionLabel, THEME_VARS } from '@/components/merchants/landing';
 import { MerchantRegistrationForm } from '@/components/merchants/registration-form';
@@ -407,8 +406,6 @@ export default async function MerchantsPage() {
             </div>
           </div>
         </section>
-
-        <DashboardPreview />
 
         {/* ------------------------------------------- steps and pricing */}
         <section id="how" className="scroll-mt-20 py-20 sm:py-28">
