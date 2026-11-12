@@ -5,7 +5,7 @@ import { MerchantLifecycleActions } from './merchant-lifecycle-actions';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 vi.mock('@nexg/ui', async (actual) => ({
-  ...(await actual<typeof import('@nexg/ui')>()),
+  ...(await actual<object>()),
   useToast: () => ({ toast: vi.fn() }),
 }));
 
