@@ -54430,12 +54430,20 @@ export type Database = {
         };
       };
       rpc_merchant_holiday_set: {
-        Args: { p_closed: boolean; p_holiday_id: string; p_merchant_id: string };
+        Args: {
+          p_closed: boolean;
+          p_closes?: string;
+          p_holiday_id: string;
+          p_merchant_id: string;
+          p_opens?: string;
+        };
         Returns: {
           answered_at: string;
           closed: boolean;
+          closes: string | null;
           holiday_id: string;
           merchant_id: string;
+          opens: string | null;
         };
         SetofOptions: {
           from: '*';
@@ -54449,11 +54457,17 @@ export type Database = {
         Returns: {
           answered_at: string;
           closed: boolean;
+          closes: string;
           date: string;
           estimated: boolean;
           holiday_id: string;
           label: string;
+          opens: string;
         }[];
+      };
+      rpc_merchant_hours_override_clear: {
+        Args: { p_merchant_id: string; p_override_id: string };
+        Returns: undefined;
       };
       rpc_merchant_hours_override: {
         Args: {

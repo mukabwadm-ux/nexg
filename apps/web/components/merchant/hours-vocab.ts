@@ -44,6 +44,9 @@ export interface HolidayRow {
   estimated: boolean;
   closed: boolean | null;
   answered_at: string | null;
+  /* Custom hours that day; null (or absent, before the migration) means the usual hours. */
+  opens?: string | null;
+  closes?: string | null;
 }
 
 const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

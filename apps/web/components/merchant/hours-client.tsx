@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { copyHours, setHours, setOverride } from '@/app/merchant/actions';
+import { clearOverride, copyHours, setHours, setOverride } from '@/app/merchant/actions';
 import {
   Actions,
   Drawer,
@@ -251,5 +251,44 @@ export function CopyHours({
       </Submit>
       <Said outcome={outcome} />
     </div>
+  );
+}
+
+/** Takes one upcoming date override off: a holiday of the merchant's own, or a close-early. */
+export function RemoveOverride({ overrideId, label }: { overrideId: string; label: string }) {
+  const [confirming, setConfirming] = React.useState(false);
+  const { pending, outcome, run } = useAction();
+
+  if (!confirming)
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        aria-label={`Remove ${label}`}
+        className="text-muted hover:text-danger text-[0.75rem] font-extrabold"
+      >
+        Remove
+      </button>
+    );
+
+  return (
+    <span className="inline-flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => run(() => clearOverride({ overrideId }))}
+        className="bg-danger rounded-md px-2.5 py-1 text-[0.75rem] font-extrabold text-white disabled:opacity-50"
+      >
+        {pending ? 'Removing…' : 'Yes, remove'}
+      </button>
+      <button
+        type="button"
+        onClick={() => setConfirming(false)}
+        className="text-muted text-[0.75rem] font-extrabold"
+      >
+        Keep
+      </button>
+      {outcome && !outcome.ok ? <Said outcome={outcome} /> : null}
+    </span>
   );
 }

@@ -615,20 +615,132 @@ export async function setOverride(input: {
 export async function setHolidayHours(input: {
   holidayId: string;
   closed: boolean;
+  /* Both or neither: open with these hours instead of the usual ones. */
+  opens?: string | null;
+  closes?: string | null;
 }): Promise<Outcome> {
   const { client, merchantId } = await merchantActionClient({ access: 'workspace-setup' });
-  const { data, error } = await client.rpc('rpc_merchant_holiday_set', {
+  const outcome = await answerHoliday(client, merchantId, input);
+  return unwrap(
+    outcome.data,
+    outcome.error,
+    [...ALL, '/merchant/availability'],
+    holidaySaved(input),
+  );
+}
+
+/**
+ * One answer for several public holidays at once: the ones a merchant
+ * ticked on the Hours board. Saved one by one; the first refusal stops the
+ * rest and says which holiday it was.
+ */
+export async function setHolidayHoursMany(input: {
+  holidays: { id: string; label: string }[];
+  closed: boolean;
+  opens?: string | null;
+  closes?: string | null;
+}): Promise<Outcome> {
+  const { client, merchantId } = await merchantActionClient({ access: 'workspace-setup' });
+  let saved = 0;
+  for (const holiday of input.holidays) {
+    const { error } = await answerHoliday(client, merchantId, { ...input, holidayId: holiday.id });
+    if (error) {
+      for (const p of [...ALL, '/merchant/availability']) revalidatePath(p);
+      return {
+        ok: false,
+        message: `${holiday.label}: ${error.message.replace(/^.*?:\s*/, '')}${
+          saved ? ` The ${saved} before it ${saved === 1 ? 'was' : 'were'} saved.` : ''
+        }`,
+      };
+    }
+    saved += 1;
+  }
+  return unwrap(
+    {},
+    null,
+    [...ALL, '/merchant/availability'],
+    `${saved} holiday${saved === 1 ? '' : 's'} saved. ${holidaySaved(input).replace('Saved. ', '')}`,
+  );
+}
+
+/* Only sends the times when there are times, so the call matches the older
+   three-argument function until its migration is applied. */
+function answerHoliday(
+  client: Awaited<ReturnType<typeof merchantActionClient>>['client'],
+  merchantId: string,
+  input: { holidayId: string; closed: boolean; opens?: string | null; closes?: string | null },
+) {
+  const custom = !input.closed && input.opens && input.closes;
+  return client.rpc('rpc_merchant_holiday_set', {
     p_merchant_id: merchantId,
     p_holiday_id: input.holidayId,
     p_closed: input.closed,
+    ...(custom ? { p_opens: input.opens!, p_closes: input.closes! } : {}),
+  });
+}
+
+function holidaySaved(input: { closed: boolean; opens?: string | null; closes?: string | null }) {
+  if (input.closed) return 'Saved. Guests see you as closed that day.';
+  if (input.opens && input.closes)
+    return `Saved. Guests see you open ${input.opens} to ${input.closes} that day.`;
+  return 'Saved. Guests see your usual hours that day.';
+}
+
+/**
+ * A holiday of the merchant's own: a date they close, or open with
+ * different hours. It is a date override with a name, so it beats the
+ * weekly hours and any public-holiday answer for that day.
+ */
+export async function addOwnHoliday(input: {
+  date: string;
+  name: string;
+  closed: boolean;
+  opens?: string | null;
+  closes?: string | null;
+  branchId?: string | null;
+}): Promise<Outcome> {
+  const name = input.name.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date)) return { ok: false, message: 'Pick a date.' };
+  if (!name) return { ok: false, message: 'Give the day a name, such as "Staff party".' };
+  if (!input.closed && (!input.opens || !input.closes))
+    return { ok: false, message: 'Give both an opening and a closing time.' };
+  if (!input.closed && input.opens === input.closes)
+    return { ok: false, message: 'Opening and closing times cannot be the same.' };
+  const { client, merchantId } = await merchantActionClient({ access: 'workspace-setup' });
+  if (input.branchId)
+    await requireMerchantActionObject(client, 'merchant_branch', input.branchId, merchantId);
+  const { data, error } = await client.rpc('rpc_merchant_hours_override', {
+    p_merchant_id: merchantId,
+    p_date: input.date,
+    p_opens: input.closed ? undefined : input.opens!,
+    p_closes: input.closed ? undefined : input.closes!,
+    p_closed: input.closed,
+    p_branch_id: input.branchId ?? undefined,
+    p_reason: name.slice(0, 80),
+    p_source: 'merchant' as never,
   });
   return unwrap(
     data,
     error,
     [...ALL, '/merchant/availability'],
     input.closed
-      ? 'Saved. Guests see you as closed that day.'
-      : 'Saved. Guests see your usual hours that day.',
+      ? `Saved. Guests see you as closed for ${name}.`
+      : `Saved. Guests see you open ${input.opens} to ${input.closes} for ${name}.`,
+  );
+}
+
+/** Takes one of the merchant's own days off the calendar again. */
+export async function clearOverride(input: { overrideId: string }): Promise<Outcome> {
+  const { client, merchantId } = await merchantActionClient({ access: 'workspace-setup' });
+  const { data, error } = await client.rpc('rpc_merchant_hours_override_clear', {
+    p_merchant_id: merchantId,
+    p_override_id: input.overrideId,
+  });
+  return unwrap(
+    data,
+    error,
+    [...ALL, '/merchant/availability'],
+    'Removed. That day is back to its usual hours.',
   );
 }
 

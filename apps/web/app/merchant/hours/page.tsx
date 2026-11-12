@@ -1,7 +1,12 @@
 import { Panel, Row, Tile } from '@/components/merchant/bits';
 import { Board, PageHead, merchantContext } from '@/components/merchant/frame';
 import { HolidayList } from '@/components/merchant/holiday-hours';
-import { CloseEarly, CopyHours, HoursSlot } from '@/components/merchant/hours-client';
+import {
+  CloseEarly,
+  CopyHours,
+  HoursSlot,
+  RemoveOverride,
+} from '@/components/merchant/hours-client';
 import {
   DAYS,
   hhmm,
@@ -94,7 +99,7 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
     <Board>
       <PageHead
         title="Hours"
-        lead="When guests can order from each branch. Carried over from your current listing. Public holidays keep your usual hours until you mark them closed."
+        lead="When guests can order from each branch. Carried over from your current listing. Public holidays keep your usual hours until you set them closed or give them custom hours."
       />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <Tile
@@ -206,9 +211,11 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
           </Panel>
 
           {holidays ? (
-            <Panel title="Public holidays">
-              <HolidayList holidays={holidays} />
-            </Panel>
+            <div id="holidays" className="scroll-mt-24">
+              <Panel title="Holidays">
+                <HolidayList holidays={holidays} branchId={branchId} branchName={branchName} />
+              </Panel>
+            </div>
           ) : null}
 
           <Panel title="Date overrides">
@@ -226,6 +233,9 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
                       <th className="px-4 py-2">Reason</th>
                       <th className="px-4 py-2">Branch</th>
                       <th className="px-4 py-2">Status</th>
+                      <th className="px-4 py-2">
+                        <span className="sr-only">Remove</span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -238,7 +248,11 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
                       >
                         <td className="px-4 py-2.5 font-extrabold">{o.date}</td>
                         <td className="text-muted px-4 py-2.5">
-                          {o.closed ? 'Closed' : `until ${hhmm(o.closes)}`}
+                          {o.closed
+                            ? 'Closed'
+                            : o.opens
+                              ? `${hhmm(o.opens)}–${hhmm(o.closes)}`
+                              : `until ${hhmm(o.closes)}`}
                         </td>
                         <td className="text-muted px-4 py-2.5">{o.reason ?? '—'}</td>
                         <td className="text-muted px-4 py-2.5">{o.branch_name ?? 'All'}</td>
@@ -254,6 +268,11 @@ export default async function HoursPage({ searchParams }: { searchParams?: { bra
                           >
                             {o.active_today ? 'Active today' : o.past ? 'Past' : 'Scheduled'}
                           </span>
+                        </td>
+                        <td className="px-4 py-2.5 text-right">
+                          {o.past ? null : (
+                            <RemoveOverride overrideId={o.id} label={o.reason ?? o.date} />
+                          )}
                         </td>
                       </tr>
                     ))}
