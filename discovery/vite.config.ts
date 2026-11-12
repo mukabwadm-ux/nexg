@@ -86,6 +86,9 @@ export default defineConfig(({ command, mode }) => {
       throw new Error('VITE_SUPABASE_URL points at a local Supabase. Set the hosted project URL for a release build, or DISCOVERY_ALLOW_LOCAL_SUPABASE=1 for a local check');
     }
   }
+  // The stand-in cinema system (sample showtimes and seats for the local demo cinemas) never ships to visitors.
+  if (env.VITE_CINEMA_SOURCE && env.VITE_CINEMA_SOURCE !== 'stand-in') throw new Error('VITE_CINEMA_SOURCE must be stand-in or unset');
+  if (command === 'build' && env.VITE_CINEMA_SOURCE === 'stand-in' && (process.env.VERCEL || process.env.CI)) throw new Error('VITE_CINEMA_SOURCE=stand-in is for local checks only');
   // Where the app is served: "/" on its own, "/discover/" inside the NexG website (scripts/build-for-web.mjs).
   const base = env.DISCOVERY_BASE || '/';
   if (!base.startsWith('/') || !base.endsWith('/') || base.includes('//') || /[^a-zA-Z0-9_/-]/.test(base)) throw new Error('DISCOVERY_BASE must look like / or /discover/');
@@ -93,6 +96,8 @@ export default defineConfig(({ command, mode }) => {
   return {
     base,
     plugins: [react(), discoveryIconAssets(), demoMediaModule()],
+    // A build without the stand-in cinema system leaves its sample data file out (src/data/cinema/connector.ts).
+    define: { __NEXG_CINEMA_STAND_IN__: JSON.stringify(env.VITE_CINEMA_SOURCE === 'stand-in') },
     publicDir: false,
     server: { host: '127.0.0.1', port, strictPort: true, proxy },
     preview: { host: '127.0.0.1', port, strictPort: true, proxy },

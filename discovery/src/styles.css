@@ -49,6 +49,21 @@ option{background:#172126;color:#f3eee2}
 .header-search input{flex:1;min-width:0;padding:13px 0;border:0;outline:none;background:none;font-size:14px}
 .header-search button{display:grid;place-items:center;width:40px;min-height:40px;border-radius:50%;background:var(--gold);color:#21190d;transition-property:scale,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
 .header-search button:active{scale:.96}
+/* Suggestions under the search bar (owner, 12 Nov 2026). Same surface as the category menu, on the 8px rhythm. */
+.header-search{position:relative}
+.search-suggest{position:absolute;z-index:30;top:calc(100% + 8px);left:0;right:0;max-height:min(70vh,520px);overflow:auto;padding:8px;border-radius:20px;background:#172126;background-clip:padding-box;box-shadow:0 0 0 1px rgba(255,255,255,.14),0 18px 52px #0009;overscroll-behavior:contain;color:#f3eee2;text-align:left;transform-origin:top center;animation:search-suggest-in 160ms var(--ease-out)}
+@keyframes search-suggest-in{from{opacity:0;translate:0 -4px;scale:.99}}
+.search-suggest__group{padding:12px 12px 4px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.02em}
+.search-suggest__option{display:flex;align-items:center;gap:12px;min-height:44px;padding:8px 12px;border-radius:12px;cursor:pointer}
+.search-suggest__option.is-active{background:rgba(255,255,255,.07)}
+.search-suggest__icon{display:grid;flex:none;place-items:center;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);color:var(--gold)}
+.search-suggest__text{display:flex;flex:1;flex-direction:column;min-width:0}
+.search-suggest__label{overflow:hidden;font-size:14px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.search-suggest__label strong{color:var(--gold);font-weight:700}
+.search-suggest__context{overflow:hidden;color:var(--muted);font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+.search-suggest__price{flex:none;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.search-suggest__status{padding:8px 12px 4px;color:var(--muted);font-size:12px}
+@media (prefers-reduced-motion:reduce){.search-suggest{animation:none}}
 .header-auth{display:flex;align-items:center;justify-self:end;gap:18px;white-space:nowrap;font-size:13px;font-weight:700}
 .header-auth a{text-decoration:none}
 .header-login{display:inline-flex;align-items:center;min-height:40px}

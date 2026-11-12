@@ -16,8 +16,9 @@
 import subcategoryMap from '../../demo-seed/subcategory-map.json';
 import { CatalogBridge, areaFromAddress, type BridgeMapRow, type DemoMedia, type ItemRow, type MerchantRow } from './catalogBridge';
 import { findCategory, findSubcategory } from '../data/taxonomy';
-import type { CollectionResult, DiscoveryProvider, DiscoveryQuery, Merchant, MerchantResult, OfferingResult } from './DiscoveryProvider';
+import type { CollectionResult, DiscoveryProvider, DiscoveryQuery, Merchant, MerchantResult, OfferingResult, SearchSuggestions } from './DiscoveryProvider';
 import { collectionDefinitions } from '../data/discoveryConfiguration';
+import { rankByMatch } from '../data/searchSuggestions';
 import { pageOfferings, toMerchant } from './platformMerchantProvider';
 import { ProviderReadError } from './readState';
 import { SUPABASE_PROVIDER_VERSION, supabaseCapabilities, supabaseSettings } from './supabaseSettings';
@@ -194,7 +195,14 @@ interface Scope {
   area?: string;
   labelRows?: readonly BridgeMapRow[];
   labelCategories?: readonly string[];
+  /** Merchants with an item whose name or description matches the search (owner, 12 Nov 2026: "ugali" finds the grill that lists it). */
+  itemMerchants?: readonly string[];
 }
+
+/** Items a search can match in one read; matches past it are left out, never guessed. */
+const ITEM_MATCH_ROWS = 1000;
+/** Merchants an item match can add: their UUIDs ride in the request URL, so they stay within gateway URL limits. */
+const ITEM_MATCH_MERCHANTS = 150;
 
 /** and(category_key.eq.X,subcategory.in.(a,b)) groups for the rows' Supabase keys, in a stable order. */
 function keyGroups(rows: readonly BridgeMapRow[]): [string, string][] {
@@ -208,7 +216,8 @@ const sortedKeys = (keys: readonly string[]) => [...new Set(keys)].sort();
 
 /**
  * PostgREST filters for the scope's Supabase keys, search and area. Deterministic, so pages stay stable.
- * Search matches the merchant's name, or, as on the demo API, its category or subcategory name.
+ * Search matches the merchant's name, an item it lists, or, as on the demo API, its category or subcategory name.
+ * Every match stays inside the selected category and area.
  */
 function merchantFilters(scope: Scope): Record<string, string> {
   const whole = sortedKeys(scope.categories);
@@ -219,9 +228,10 @@ function merchantFilters(scope: Scope): Record<string, string> {
     : sorted.length === 1 && only ? { category_key: `eq.${only[0]}`, subcategory: `in.(${only[1]})` }
     : { or: `(${terms.join(',')})` };
   const labels = [...sortedKeys(scope.labelCategories ?? []).map((key) => `category_key.eq.${key}`), ...keyGroups(scope.labelRows ?? []).map(groupTerm)];
-  if (scope.search && labels.length) {
+  const items = scope.itemMerchants?.length ? [`id.in.(${scope.itemMerchants.join(',')})`] : [];
+  if (scope.search && (labels.length || items.length)) {
     const name = `trading_name.ilike.${quoted(`*${likePattern(scope.search)}*`)}`;
-    params = { and: `(or(${terms.join(',')}),or(${[name, ...labels].join(',')}))` };
+    params = { and: `(or(${terms.join(',')}),or(${[name, ...items, ...labels].join(',')}))` };
   } else if (scope.search) params.trading_name = `ilike.*${likePattern(scope.search)}*`;
   if (scope.area) params.branch_address = `match.${areaPattern(scope.area)}`;
   return params;
@@ -308,13 +318,14 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     const limit = Math.min(48, Math.max(1, query.limit ?? 24));
     const scope = this.#scope(query);
     if (typeof scope === 'string') return { merchants: [], total: 0, offset, hasMore: false, mapping: scope === 'unmapped' ? 'unmapped' : 'mapped' };
+    const matched = await this.#itemMatches(scope, signal);
     const { rows, total } = await this.#read('merchant_public', {
-      select: MERCHANT_COLUMNS, ...merchantFilters(scope), order: MERCHANT_ORDER, limit: String(limit), offset: String(offset),
+      select: MERCHANT_COLUMNS, ...merchantFilters({ ...scope, itemMerchants: [...matched.keys()] }), order: MERCHANT_ORDER, limit: String(limit), offset: String(offset),
     }, true, signal);
     const page = rows.map(merchantRow);
     // A shorter page than the count allows means the server capped the reply; paging on would skip merchants.
     if (total === undefined || page.length !== Math.max(0, Math.min(limit, total - offset)) || new Set(page.map((row) => row.id)).size !== page.length) throw unavailable();
-    const merchants = await this.#hydrate(page, LIST_ITEMS, query, signal);
+    const merchants = await this.#hydrate(page, LIST_ITEMS, query, signal, false, matched);
     return { merchants, total, offset, hasMore: offset + limit < total, mapping: 'mapped' };
   }
 
@@ -332,7 +343,8 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     if (!definitions.length) return { collections: [], partial: false };
     const scope = this.#scope({ ...query, categoryId });
     if (typeof scope === 'string') return { collections: [], partial: false };
-    const rows = (await this.#readAll('merchant_public', { select: MERCHANT_COLUMNS, ...merchantFilters(scope), order: MERCHANT_ORDER }, signal)).map(merchantRow);
+    const matched = await this.#itemMatches(scope, signal);
+    const rows = (await this.#readAll('merchant_public', { select: MERCHANT_COLUMNS, ...merchantFilters({ ...scope, itemMerchants: [...matched.keys()] }), order: MERCHANT_ORDER }, signal)).map(merchantRow);
     const byPair = new Map(this.#rows.map((row) => [pairKey(row), row.demoSubcategoryId]));
     const demoSubcategory = (row: MerchantRow) => byPair.get(`${row.category_key}/${row.subcategory}`);
     const signatures = new Set<string>();
@@ -352,7 +364,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     const covered = new Set(chosen.flatMap(({ definition }) => findSubcategory(categoryId, definition.subcategoryId)?.sourceIds ?? []));
     const rest = rows.filter((row) => !covered.has(demoSubcategory(row) ?? '')).slice(0, REST_MERCHANTS);
     const unique = [...new Map([...chosen.flatMap(({ shown }) => shown), ...rest].map((row) => [row.id, row])).values()];
-    const merchants = new Map((await this.#hydrate(unique, COLLECTION_ITEMS, { categoryId }, signal)).map((merchant) => [merchant.id, merchant]));
+    const merchants = new Map((await this.#hydrate(unique, COLLECTION_ITEMS, { categoryId }, signal, false, matched)).map((merchant) => [merchant.id, merchant]));
     const collections: CollectionResult['collections'] = chosen.map(({ definition, shown }) => ({ id: definition.id, title: definition.title, subcategoryId: definition.subcategoryId, merchants: shown.map((row) => merchants.get(row.id)!) }));
     if (rest.length) {
       collections.push({ id: `${categoryId}:collection:rest`, title: restTitle(categoryId, chosen.length > 0),
@@ -382,6 +394,57 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     }
     // Two screens ask at once; they share one read. An aborted caller stops waiting, not the read.
     return untilAborted(this.#areas.value, signal).then((areas) => [...areas]);
+  }
+
+  /**
+   * Suggestions under the search box: up to 5 stores and up to 6 items, each item with its store. Candidates have the
+   * typed letters in order; they are ranked by how closely they match, and promoted (featured) stores get a boost
+   * (rankByMatch). Only stores Discovery shows (mapped groups) are suggested. Two reads at once, then one for the items' stores.
+   */
+  async getSuggestions(search: string, signal?: AbortSignal): Promise<SearchSuggestions> {
+    const term = search.trim();
+    if (term.length < 2 || term.length > MAX_TEXT) return { merchants: [], items: [] };
+    // Only categories on screen (hidden ones, such as Play, are left out), read whole, so stores with no subcategory count.
+    const rows = this.#visible;
+    const scope = merchantFilters({ rows, categories: sortedKeys(rows.map((row) => row.supabase.category)) });
+    // Letters in order with anything between: "ugli" still finds "Ugali". The ranking puts close matches first.
+    const pattern = `ilike.*${[...term.replace(/\s+/g, '')].map(likePattern).join('*')}*`;
+    const [stores, found] = await Promise.all([
+      this.#read('merchant_public', { select: 'id,trading_name,category_key,subcategory,branch_address,featured', ...scope, trading_name: pattern, order: MERCHANT_ORDER, limit: '40' }, false, signal),
+      this.#read('catalogue_public', { select: 'id,merchant_id,name,price_kes', name: pattern, order: 'name.asc,id.asc', limit: '60' }, false, signal),
+    ]);
+    const byPair = new Map(rows.map((row) => [pairKey(row), row]));
+    const context = (value: unknown) => {
+      const row = fields(value);
+      const mapped = byPair.get(`${text(row.category_key)}/${text(row.subcategory)}`);
+      const label = mapped?.discovery ? findSubcategory(mapped.discovery.categoryId, mapped.discovery.subcategoryId)?.label : undefined;
+      return [label, areaFromAddress(text(row.branch_address))].filter(Boolean).join(' · ') || undefined;
+    };
+    const candidates = stores.rows.map((value) => {
+      const row = fields(value);
+      const label = context(value);
+      return { id: uuid(row.id), name: required(row.trading_name), featured: row.featured === true, ...(label ? { context: label } : {}) };
+    });
+    const merchants = rankByMatch(candidates, term, (entry) => entry.name, (entry) => entry.featured).slice(0, 5)
+      .map(({ featured: _featured, ...entry }) => entry);
+    const items = rankByMatch(found.rows.flatMap((value) => {
+      const row = fields(value);
+      try { return [{ id: uuid(row.id), merchantId: uuid(row.merchant_id), name: required(row.name), price: finite(row.price_kes) }]; } catch { return []; }
+    }), term, (entry) => entry.name);
+    const ids = [...new Set(items.map((item) => item.merchantId))].slice(0, 12);
+    if (!ids.length) return { merchants, items: [] };
+    // The items' stores, only where Discovery shows them: an item at a hidden or unmapped store is never suggested.
+    const owners = await this.#read('merchant_public', { select: 'id,trading_name', ...scope, id: `in.(${ids.join(',')})`, limit: String(ids.length) }, false, signal);
+    const names = new Map(owners.rows.map((value) => { const row = fields(value); return [uuid(row.id), required(row.trading_name)] as const; }));
+    const perStore = new Map<string, number>();
+    const suggested = items.flatMap((item) => {
+      const merchantName = names.get(item.merchantId);
+      const count = perStore.get(item.merchantId) ?? 0;
+      if (!merchantName || count >= 2) return [];
+      perStore.set(item.merchantId, count + 1);
+      return [{ merchantId: item.merchantId, merchantName, itemId: item.id, name: item.name, ...(item.price !== null && item.price > 0 ? { price: item.price } : {}) }];
+    }).slice(0, 6);
+    return { merchants, items: suggested };
   }
 
   /**
@@ -446,21 +509,59 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     return [...areas].sort((left, right) => left.localeCompare(right, 'en-KE'));
   }
 
-  /** Items for the merchants, then the bridge's shaping, then the platform's. Keeps the server's merchant order. */
-  async #hydrate(rows: readonly SupabaseMerchantRow[], perMerchant: number, selection: DiscoveryQuery | undefined, signal?: AbortSignal, sections = false): Promise<Merchant[]> {
+  /**
+   * Merchants whose items match the scope's search by name or description, with those items in catalogue order.
+   * One bounded read. Matching items is an addition to the name and label match: if the read fails, search carries
+   * on with those alone rather than failing the page.
+   */
+  async #itemMatches(scope: Scope, signal?: AbortSignal): Promise<Map<string, SupabaseItemRow[]>> {
+    const matched = new Map<string, SupabaseItemRow[]>();
+    if (!scope.search) return matched;
+    const pattern = quoted(`*${likePattern(scope.search)}*`);
+    let rows: unknown[];
+    try {
+      ({ rows } = await this.#read('catalogue_public', {
+        select: ITEM_COLUMNS, or: `(name.ilike.${pattern},description.ilike.${pattern})`,
+        order: 'merchant_id.asc,sort.asc.nullsfirst,id.asc', limit: String(ITEM_MATCH_ROWS),
+      }, false, signal));
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      return matched;
+    }
+    for (const value of rows) {
+      let row: SupabaseItemRow;
+      try { row = itemRow(value); } catch { continue; }
+      const list = matched.get(row.merchant_id);
+      if (list) list.push(row);
+      else if (matched.size < ITEM_MATCH_MERCHANTS) matched.set(row.merchant_id, [row]);
+    }
+    return matched;
+  }
+
+  /**
+   * Items for the merchants, then the bridge's shaping, then the platform's. Keeps the server's merchant order.
+   * Items a search matched come first on their merchant's card, so "ugali" shows under the grill that lists it.
+   */
+  async #hydrate(rows: readonly SupabaseMerchantRow[], perMerchant: number, selection: DiscoveryQuery | undefined, signal?: AbortSignal, sections = false,
+    matched: ReadonlyMap<string, readonly SupabaseItemRow[]> = new Map()): Promise<Merchant[]> {
     if (!rows.length) return [];
     const media = rows.some((row) => DEMO_MERCHANT.test(row.id)) ? this.#loadMedia() : Promise.resolve(NO_MEDIA);
     const ids = rows.map((row) => row.id);
     const batches: string[][] = [];
     for (let index = 0; index < ids.length; index += ITEM_BATCH) batches.push(ids.slice(index, index + ITEM_BATCH));
-    const items = (await Promise.all(batches.map((batch) => this.#itemBatch(batch, perMerchant, signal)))).flat();
+    const read = (await Promise.all(batches.map((batch) => this.#itemBatch(batch, perMerchant, signal)))).flat();
+    // A matched item past the list cap was not read with its merchant's first items; add it so it can lead the card.
+    const seen = new Set(read.map((item) => item.id));
+    const items = [...read, ...ids.flatMap((id) => (matched.get(id) ?? []).filter((item) => !seen.has(item.id)))];
     const now = this.#now();
     const bridge = new CatalogBridge(this.#rows, await media);
     bridge.replace({ merchants: [...rows], items }, now);
     const merchants = rows.map((row) => {
       const merchant = bridge.merchant(row.id);
+      const hits = new Set((matched.get(row.id) ?? []).map((item) => item.id));
+      const ordered = hits.size ? [...merchant.items.filter((item) => hits.has(item.id)), ...merchant.items.filter((item) => !hits.has(item.id))] : merchant.items;
       // The platform mapper reads featured placements from the badges, as the demo API sent them.
-      const shaped = toMerchant({ ...merchant, badges: row.featured ? ['Featured'] : [], items: merchant.items.slice(0, perMerchant) }, selection);
+      const shaped = toMerchant({ ...merchant, badges: row.featured ? ['Featured'] : [], items: ordered.slice(0, perMerchant) }, selection);
       return closedEarly(row, now) ? { ...shaped, isOpen: false } : shaped;
     });
     if (!sections) return merchants;

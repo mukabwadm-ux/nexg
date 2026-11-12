@@ -315,7 +315,9 @@ test('search escapes LIKE wildcards, and the area filter matches exactly what ar
   const { provider, calls } = setup();
   const wild = await provider.getMerchants({ search: ' %_ ' });
   assert.deepEqual(names(wild), ['Hodari 50%_Off Café']);
-  assert.equal(calls[0]!.url.searchParams.get('trading_name'), 'ilike.*\\%\\_*');
+  assert.equal(reads(calls, 'merchant_public')[0]!.url.searchParams.get('trading_name'), 'ilike.*\\%\\_*');
+  // The item read escapes the same way, inside a quoted or() value.
+  assert.equal(reads(calls, 'catalogue_public')[0]!.url.searchParams.get('or'), '(name.ilike."*\\\\%\\\\_*",description.ilike."*\\\\%\\\\_*")');
   // As on the demo API, a search also matches category and subcategory names: "cafe" finds every Café merchant.
   assert.deepEqual(names(await provider.getMerchants({ search: 'CAFE' })), ['Amani Café', 'Hodari 50%_Off Café', 'Jua Café', 'Kahawa House']);
   assert.deepEqual(names(await provider.getMerchants({ search: 'kahawa' })), ['Kahawa House']);
@@ -336,6 +338,63 @@ test('search escapes LIKE wildcards, and the area filter matches exactly what ar
   assert.equal(calls.length, before, 'an area no address can name needs no request');
   assert.deepEqual(names(await provider.getMerchants({ area: "St. Austin's (Upper" })), []);
   assert.deepEqual(names(await provider.getMerchants({ area: 'all', categoryId: 'travel-tours' })), ['Mara Safaris']);
+});
+
+test('search finds a store by an item it lists, inside the selected category and area, with the matching items first', async () => {
+  // Owner, 12 Nov 2026: "when i search ugali or a merchant offering, nothing appears".
+  const grill = id('c1', 11);
+  const extra = [merchant(grill, 'Sokoni Grill House', 'restaurants_food', 'caf', 'Westlands, Nairobi')];
+  const menu = [
+    ...Array.from({ length: 31 }, (_, index) => item(id('f1', 501 + index), grill, `Grill item ${index + 1}`, 300, index)),
+    // Past the 30-item list cap, and matched only by its description.
+    item(id('f1', 600), grill, 'Sukuma plate', 350, 40, 'Served with ugali'),
+    item(id('f1', 601), grill, 'Ugali', 100, 41),
+    // The same dish at a spa: outside the Restaurants scope, so it never adds the spa there.
+    item(id('f1', 602), id('c1', 6), 'Ugali bowl', 200, 0),
+  ];
+  const { provider, calls } = setup({ merchants: [...merchants, ...extra], items: [...items, ...menu] });
+  const found = await provider.getMerchants({ search: 'ugali' });
+  assert.deepEqual(names(found), ['Sokoni Grill House', 'Utulivu Spa']);
+  const card = plain(found.merchants[0]);
+  assert.deepEqual(card.items.slice(0, 2).map((entry) => entry.name), ['Sukuma plate', 'Ugali']);
+  assert.equal(card.items.length, 30);
+  const scoped = await provider.getMerchants({ categoryId: 'restaurants-food', search: 'ugali' });
+  assert.deepEqual(names(scoped), ['Sokoni Grill House']);
+  // Both item matches ride in the name group; the category group is what keeps the spa out.
+  assert.match(reads(calls, 'merchant_public').at(-1)!.url.searchParams.get('and') ?? '', new RegExp(`^\\(or\\(category_key\\.in\\.\\(restaurants_food\\)\\),or\\(trading_name\\.ilike\\."\\*ugali\\*",id\\.in\\.\\(${id('c1', 6)},${grill}\\)\\)\\)$`));
+  assert.deepEqual(names(await provider.getMerchants({ categoryId: 'restaurants-food', search: 'ugali', area: 'Kilimani' })), []);
+  // Category rows use the same match.
+  const rows = await provider.getCollections('restaurants-food', { search: 'ugali' });
+  assert.ok(rows.collections.every((collection) => collection.merchants.every((entry) => entry.name === 'Sokoni Grill House')));
+});
+
+test('suggestions list stores and items with the letters in order, best and promoted first, only from shown stores', async () => {
+  const extra = [
+    merchant(id('c1', 11), 'Sokoni Grill House', 'restaurants_food', 'caf', 'Westlands, Nairobi'),
+    merchant(id('c1', 12), 'Ugali Corner', 'restaurants_food', 'caf', 'Kilimani, Nairobi'),
+    merchant(id('c1', 13), 'Mama Ugali Grill', 'restaurants_food', 'caf', 'Karen, Nairobi', { featured: true }),
+  ];
+  const menu = [item(id('f1', 601), id('c1', 11), 'Ugali', 100, 0), item(id('f1', 602), id('c1', 11), 'Ugali & sukuma', 250, 1),
+    item(id('f1', 603), id('c1', 11), 'Ugali & beef', 400, 2), item(id('f1', 604), id('c1', 4), 'Ugali voucher', 50, 0)];
+  const { provider, calls } = setup({ merchants: [...merchants, ...extra], items: [...items, ...menu] });
+  const result = await provider.getSuggestions('ugli');
+  assert.deepEqual(result.merchants.map((entry) => entry.name), ['Mama Ugali Grill', 'Ugali Corner']);
+  assert.equal(result.merchants[1]?.context, 'Café · Kilimani');
+  // Two items per store at most; the banking store is not shown in Discovery, so its item is never suggested.
+  assert.deepEqual(result.items.map((entry) => [entry.name, entry.merchantName, entry.price]), [['Ugali', 'Sokoni Grill House', 100], ['Ugali & beef', 'Sokoni Grill House', 400]]);
+  assert.equal(reads(calls, 'catalogue_public')[0]!.url.searchParams.get('name'), 'ilike.*u*g*l*i*');
+  assert.deepEqual(await provider.getSuggestions('u'), { merchants: [], items: [] });
+});
+
+test('an item read that finds nothing, or fails, leaves search exactly as it was', async () => {
+  const quiet = setup();
+  const before = await quiet.provider.getMerchants({ search: 'kahawa house' });
+  assert.deepEqual(names(before), ['Kahawa House']);
+  assert.equal(reads(quiet.calls, 'merchant_public')[0]!.url.searchParams.get('trading_name'), 'ilike.*kahawa house*');
+  const failing = setup({ failView: 'catalogue_public' });
+  // Item reads fail here too, so only the store page itself is checked: the name match still answers.
+  await assert.rejects(failing.provider.getMerchants({ search: 'kahawa' }), kind('unavailable'));
+  assert.equal(reads(failing.calls, 'merchant_public').length, 1, 'a failed item match does not stop the store read');
 });
 
 test('unsupported sorts, Open now and unknown selections fail with typed reasons before any request', async () => {
