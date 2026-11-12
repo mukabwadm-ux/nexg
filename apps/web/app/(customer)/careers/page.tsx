@@ -143,7 +143,7 @@ export default async function CareersPage() {
         </section>
 
         {/* ------------------------------------------------------ principles */}
-        <section className="border-border bg-surface border-y py-14">
+        <section className="border-border band-surface border-y py-14">
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <p className="text-gold-text text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
               How we work

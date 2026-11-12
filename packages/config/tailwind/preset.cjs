@@ -25,6 +25,8 @@ module.exports = {
       colors: {
         bg: channel('--bg-rgb'),
         surface: channel('--surface-rgb'),
+        /* The near-black of dark sections; #111315 in the dark theme. */
+        night: channel('--night-rgb'),
         /* Text and lines directly on the page; they turn light in the dark theme. */
         page: {
           DEFAULT: channel('--page-ink-rgb'),

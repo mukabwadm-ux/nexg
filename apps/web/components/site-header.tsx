@@ -35,7 +35,7 @@ export async function SiteHeader({ action, signIn }: SiteHeaderProps) {
   const account = signIn ?? { label: 'Your account', href: '/account' };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0907] text-white">
+    <header className="bg-night sticky top-0 z-50 border-b border-white/10 text-white">
       <div className="mx-auto flex min-h-[3.75rem] max-w-[120rem] items-center justify-between gap-3 px-4 py-2 sm:px-[30px]">
         <Link href="/" aria-label="NexG Concierge, home" className="shrink-0">
           <Logo onDark priority className="h-11 w-auto sm:h-12" />

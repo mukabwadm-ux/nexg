@@ -51,6 +51,18 @@
 }
 
 @layer utilities {
+  /*
+   * A full-width band in the surface colour (white in the light theme). In
+   * the dark theme it takes the page colour rather than turning into a cream
+   * stripe; it is not a card, so the text on it follows the page.
+   */
+  .band-surface {
+    background-color: rgb(var(--surface-rgb));
+  }
+  .dark .band-surface {
+    background-color: rgb(var(--night-rgb));
+  }
+
   /* Console micro-label: uppercase, tracked out, muted (see the KPI tiles). */
   .label-micro {
     @apply text-micro text-muted-light font-bold uppercase;

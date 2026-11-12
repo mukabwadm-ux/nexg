@@ -86,6 +86,11 @@
   --page-line: #ddd8cc;
   --page-line-rgb: 221 216 204;
 
+  /* The near-black of the dark sections (hero, header, featured bands) and the
+     dark page. Warm black in the light theme; the dark theme uses #111315. */
+  --night: #0b0907;
+  --night-rgb: 11 9 7;
+
   /* Geometry */
   --radius: 0.625rem;
 }
@@ -99,8 +104,10 @@
 .dark {
   color-scheme: dark;
 
-  --bg: #0b0907;
-  --bg-rgb: 11 9 7;
+  --bg: #111315;
+  --bg-rgb: 17 19 21;
+  --night: #111315;
+  --night-rgb: 17 19 21;
   --surface: #faf7f0;
   --surface-rgb: 250 247 240;
 

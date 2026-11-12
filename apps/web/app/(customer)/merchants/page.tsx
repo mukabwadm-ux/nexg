@@ -143,7 +143,7 @@ export default async function MerchantsPage() {
 
       <main>
         {/* ------------------------------------------------------------ hero */}
-        <section className="relative isolate overflow-hidden bg-[#0b0907] text-white">
+        <section className="bg-night relative isolate overflow-hidden text-white">
           <Image
             src="/images/hero/stay-sunset.jpg"
             alt=""
@@ -154,11 +154,11 @@ export default async function MerchantsPage() {
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[#0b0907]/75 lg:bg-transparent lg:bg-gradient-to-r lg:from-[#0b0907] lg:via-[#0b0907]/85 lg:to-[#0b0907]/25"
+            className="bg-night/75 lg:from-night lg:via-night/85 lg:to-night/25 absolute inset-0 -z-10 lg:bg-transparent lg:bg-gradient-to-r"
           />
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-t from-[#0b0907]/80 to-transparent"
+            className="from-night/80 absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-t to-transparent"
           />
 
           <div

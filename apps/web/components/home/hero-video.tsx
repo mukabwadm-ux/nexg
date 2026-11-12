@@ -42,7 +42,7 @@ export function HeroVideo({ className }: { className?: string }) {
   }, [active, still]);
 
   return (
-    <div className={cn('absolute inset-0 bg-[#0b0907]', className)} aria-hidden="true">
+    <div className={cn('bg-night absolute inset-0', className)} aria-hidden="true">
       {CLIPS.map((src, i) => (
         <video
           key={src}

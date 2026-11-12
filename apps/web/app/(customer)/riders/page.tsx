@@ -242,7 +242,7 @@ export default async function RidersPage() {
         </section>
 
         {/* ----------------------------------------------------------- steps */}
-        <section id="how" className="border-border bg-surface border-y py-14">
+        <section id="how" className="border-border band-surface border-y py-14">
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
               From application to first delivery
