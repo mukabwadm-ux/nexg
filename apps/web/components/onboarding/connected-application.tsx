@@ -74,6 +74,7 @@ export function ConnectedApplication({
   emailOtpEnabled = false,
   savedHome,
   prefill,
+  rememberInUrl = true,
 }: {
   initialRecord?: MerchantApplicationRecord;
   initialPayout?: PayoutRecord;
@@ -84,6 +85,12 @@ export function ConnectedApplication({
   savedHome?: MerchantSavedHomeSource;
   /* Answers from the register card on /merchants, for a brand-new application only. */
   prefill?: Record<string, unknown>;
+  /*
+   * Writes the application into the address, as /merchants/register, so a
+   * reload reopens it. Off where the form sits inside another page
+   * (/merchants), which finds the saved draft by itself.
+   */
+  rememberInUrl?: boolean;
 }) {
   const router = useRouter();
   const record = useRef(initialRecord);
@@ -182,7 +189,7 @@ export function ConnectedApplication({
           : browserUuid();
       keys.current.set(fingerprint, operationId);
     }
-    if (command.command === 'start')
+    if (command.command === 'start' && rememberInUrl)
       window.history.replaceState(
         null,
         '',
@@ -458,7 +465,7 @@ export function ConnectedApplication({
     const saved = MerchantApplicationRecord.parse(result);
     record.current = saved;
     setStatus(saved.review.state);
-    if (!home)
+    if (!home && rememberInUrl)
       window.history.replaceState(null, '', `/merchants/register?merchantId=${saved.merchant_id}`);
     return saved;
   }

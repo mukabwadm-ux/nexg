@@ -97,6 +97,14 @@
   line-height: 1.7;
 }
 
+/* The same form inside the dark band on /merchants: the notes that sit
+   outside the form's cards read on the dark, the cards stay cream. */
+.embedded {
+  --registration-ink: #ffffff;
+  --registration-muted: rgb(255 255 255 / 62%);
+  --registration-line: var(--border);
+}
+
 .form {
   scroll-margin-top: 24px;
   container-name: registration-form;

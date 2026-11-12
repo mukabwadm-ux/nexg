@@ -5,6 +5,11 @@ import { Logo } from '@/components/logo';
 
 import styles from './merchant-registration-page.module.css';
 
+/** The registration form's styling, for the form placed inside another page's dark band. */
+export function MerchantRegistrationFormFrame({ children }: { children: React.ReactNode }) {
+  return <div className={`${styles.embedded} ${styles.form}`}>{children}</div>;
+}
+
 export function MerchantRegistrationPage({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.page}>

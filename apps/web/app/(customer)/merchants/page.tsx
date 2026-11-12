@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { DashboardPreview } from '@/components/merchants/dashboard-preview';
 import { FeaturedSlots } from '@/components/merchants/featured-slots';
 import { CARD, CONTAINER, H2, SectionLabel, THEME_VARS } from '@/components/merchants/landing';
-import { MerchantRegisterCard } from '@/components/merchants/merchant-register-card';
+import { MerchantRegistrationForm } from '@/components/merchants/registration-form';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -45,25 +45,6 @@ const PHOTO_CATEGORIES = [
     key: 'groceries_essentials',
     image: '/images/merchant-page/market-stall.jpg',
     focus: 'object-[56%_center]',
-  },
-] as const;
-
-const BENEFITS = [
-  {
-    title: "Customers you can't reach today",
-    body: 'Airbnb guests and visitors who do not know your street, but know NexG. Their concierge recommends you.',
-  },
-  {
-    title: 'Our riders, not yours',
-    body: 'No fleet to hire or manage. A vetted NexG rider collects from your counter and the guest tracks it live.',
-  },
-  {
-    title: 'Paid without chasing',
-    body: 'Guests pay NexG by M-Pesa. You get settled to your M-Pesa or bank every week, with a statement per order.',
-  },
-  {
-    title: 'One simple dashboard',
-    body: 'Update your menu or catalogue, pause items, set opening hours and accept orders from your phone or laptop.',
   },
 ] as const;
 
@@ -114,13 +95,6 @@ const FAQ = [
   },
 ] as const;
 
-/** The orders in the dashboard row of the benefits list. Bracketed: no real data. */
-const SAMPLE_ORDERS = [
-  { items: '2 × [Menu item]', state: 'Accept', look: 'bg-gold text-ink' },
-  { items: '1 × [Menu item]', state: 'On the way', look: 'bg-white text-ink' },
-  { items: '1 × [Drink]', state: 'Delivered', look: 'bg-success-bg text-success' },
-] as const;
-
 const BUTTON =
   'focus-visible:ring-gold inline-flex items-center justify-center gap-2 rounded-full px-6 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
@@ -134,66 +108,16 @@ export const dynamic = 'force-dynamic';
 // Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
 export const fetchCache = 'force-no-store';
 
-/** The picture beside each benefit. Decorative. */
-function BenefitVisual({ index }: { index: number }) {
-  const frame = 'relative h-48 overflow-hidden rounded-3xl sm:h-56';
-  if (index === 3) {
-    return (
-      <div
-        className={`${frame} flex flex-col justify-center gap-2.5 bg-white/[0.05] p-5 ring-1 ring-inset ring-white/10`}
-      >
-        {SAMPLE_ORDERS.map((order) => (
-          <div
-            key={order.state}
-            className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.06] px-4 py-3"
-          >
-            <span className="truncate text-[0.8125rem] font-bold text-white/85">
-              #{VALUE_PLACEHOLDER} · {order.items}
-            </span>
-            <span
-              className={`shrink-0 rounded-full px-3 py-1 text-[0.6875rem] font-bold ${order.look}`}
-            >
-              {order.state}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  const photo = [
-    { src: '/images/merchant-page/market-stall.jpg', focus: 'object-center' },
-    { src: '/images/merchant-page/rider.jpg', focus: 'object-[50%_30%]' },
-    { src: '/images/merchant-page/card-terminal.jpg', focus: 'object-[62%_center]' },
-  ][index];
-  if (!photo) return null;
-  return (
-    <div className={frame}>
-      <Image
-        src={photo.src}
-        alt=""
-        fill
-        sizes="(min-width: 1024px) 30rem, 100vw"
-        className={`object-cover ${photo.focus}`}
-      />
-    </div>
-  );
-}
-
 export default async function MerchantsPage() {
-  const registrationHref = '/merchants/apply';
+  /* The form is on this page, in the Register section. */
+  const registrationHref = '#register';
   const supabase = createPublicClient();
 
   const [
-    { data: cities, error: citiesError },
     { count: cityCount, error: cityCountError },
     { data: commission, error: commissionError },
     { data: categories, error: categoriesError },
   ] = await Promise.all([
-    supabase
-      .from('city')
-      .select('id, name, slug, status')
-      .neq('status', 'waitlist')
-      .order('sort', { ascending: true }),
     // The hero counts the whole footprint, not just the cities open today —
     // "cities to grow into" is the point of the number.
     supabase.from('city').select('id', { count: 'exact', head: true }),
@@ -203,14 +127,12 @@ export default async function MerchantsPage() {
     supabase.from('category_config').select('category, label').eq('is_active', true).order('sort'),
   ]);
 
-  if (citiesError) throw new Error(`Could not load merchant cities: ${citiesError.message}`);
   if (cityCountError) throw new Error(`Could not count merchant cities: ${cityCountError.message}`);
   if (commissionError) throw new Error(`Could not load merchant fees: ${commissionError.message}`);
   if (categoriesError)
     throw new Error(`Could not load merchant categories: ${categoriesError.message}`);
 
   const commissionValue = commission?.value ?? null;
-  const allCities = cities ?? [];
   const allCategories = categories ?? [];
   const photoCategories = PHOTO_CATEGORIES.flatMap((photo) => {
     const row = allCategories.find((category) => category.category === photo.key);
@@ -429,42 +351,60 @@ export default async function MerchantsPage() {
           </div>
         </section>
 
-        {/* -------------------------------------------------------- benefits */}
-        <section className="bg-[#141414] py-20 text-white sm:py-28">
-          <div className={CONTAINER}>
-            <SectionLabel onDark>Why NexG</SectionLabel>
-            <h2 className={`mt-3 max-w-2xl ${H2}`}>A new front door, without a new headache</h2>
-            <p className="mt-4 max-w-xl text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
-              You keep cooking, pressing, arranging and selling. NexG handles the guest, the rider
-              and the payment.
-            </p>
+        {/* -------------------------------------------------------- register */}
+        {/* The registration form itself, the one /merchants/register uses:
+            it saves as a draft and asks for the business email to be
+            verified before it can be submitted. Every "Register Your
+            Business" on the page comes here. */}
+        <section
+          id="register"
+          className="scroll-mt-20 bg-[#141414] py-20 text-white sm:py-28"
+          aria-labelledby="register-title"
+        >
+          <div
+            className={`${CONTAINER} grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,40rem)] lg:items-start lg:gap-16`}
+          >
+            <div className="lg:sticky lg:top-28">
+              <SectionLabel onDark>Register</SectionLabel>
+              <h2 id="register-title" className={`mt-3 max-w-md ${H2}`}>
+                Register your business
+              </h2>
+              <p className="mt-4 max-w-md text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
+                Tell us who you are and what you sell. Verify your business email, submit, and the
+                merchant team reviews your application within two working days.
+              </p>
 
-            <ol className="mt-12 border-b border-white/10">
-              {BENEFITS.map((benefit, index) => (
-                <li
-                  key={benefit.title}
-                  className="grid gap-6 border-t border-white/10 py-8 sm:grid-cols-[3rem_minmax(0,1fr)] lg:grid-cols-[4rem_minmax(0,1fr)_minmax(0,30rem)] lg:items-center lg:gap-10 lg:py-10"
+              <p className="mt-10 text-xs font-extrabold uppercase tracking-[0.14em] text-white/45">
+                Have these ready
+              </p>
+              <ul className="mt-4 space-y-4">
+                {REQUIREMENTS.map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="bg-gold text-night flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="text-[0.9375rem] font-bold text-white/85">{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-10 text-sm font-semibold text-white/60">
+                Already on NexG?{' '}
+                <Link
+                  href="/merchants/sign-in?next=%2Fmerchant"
+                  className="text-gold rounded-sm font-extrabold underline underline-offset-4 hover:text-[#FEDD5C]"
                 >
-                  <span
-                    aria-hidden="true"
-                    className="text-gold text-sm font-extrabold tabular-nums"
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <div>
-                    <h3 className="max-w-sm text-2xl font-extrabold leading-tight tracking-tight sm:text-[1.75rem]">
-                      {benefit.title}
-                    </h3>
-                    <p className="mt-3 max-w-md text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
-                      {benefit.body}
-                    </p>
-                  </div>
-                  <div aria-hidden="true" className="sm:col-start-2 lg:col-start-auto">
-                    <BenefitVisual index={index} />
-                  </div>
-                </li>
-              ))}
-            </ol>
+                  Sign in
+                </Link>
+              </p>
+            </div>
+
+            <div className="min-w-0">
+              <MerchantRegistrationForm />
+            </div>
           </div>
         </section>
 
@@ -546,47 +486,6 @@ export default async function MerchantsPage() {
 
         {/* ------------------------------------------------------- featured */}
         <FeaturedSlots />
-
-        {/* -------------------------------------------------------- register */}
-        <section className="py-20 sm:py-28">
-          <div
-            className={`${CONTAINER} grid gap-10 lg:grid-cols-[1fr_36rem] lg:items-center lg:gap-16`}
-          >
-            <div>
-              <SectionLabel>Register</SectionLabel>
-              <h2 className={`mt-3 ${H2}`}>Register your business</h2>
-              <p className="text-muted mt-4 max-w-md text-[0.9375rem] font-semibold leading-[1.7]">
-                Two minutes now. A member of the merchant team will call to confirm details and walk
-                you through the dashboard.
-              </p>
-
-              <ul className="mt-8 space-y-4">
-                {REQUIREMENTS.map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <span
-                      aria-hidden="true"
-                      className="bg-ink text-gold dark:bg-gold dark:text-night flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-                    >
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                    <span className="text-[0.9375rem] font-bold">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* The register form, as before: it collects the essentials here and
-                carries them into the registration form, already filled in. A
-                cream card in both themes, the way the form's fields are drawn. */}
-            <div className="border-border bg-surface rounded-3xl border p-6 shadow-[0_24px_50px_-28px_rgb(20_20_20/0.35)] sm:p-8">
-              <h3 className="text-2xl font-extrabold tracking-tight">Register your business</h3>
-              <p className="text-muted mb-6 mt-2 text-[0.9375rem] font-semibold leading-[1.7]">
-                Start with the essentials. We&apos;ll take you through the rest.
-              </p>
-              <MerchantRegisterCard cities={allCities} categories={allCategories} />
-            </div>
-          </div>
-        </section>
 
         {/* ------------------------------------------------------------- FAQ */}
         <section className="pb-20 sm:pb-28">
