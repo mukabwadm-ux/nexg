@@ -85,9 +85,10 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
       />
 
       {/* ─────────────────────────────────────────────── the message */}
-      {/* Centred in what the nav leaves of the hero. The block is as wide as
+      {/* Centred in what the nav leaves of the hero, then nudged down by about a
+          tenth of the hero on larger screens. The block is as wide as
           the headline, and the search takes that width. */}
-      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-center px-5 pb-8 pt-[6.5rem] sm:px-[30px] sm:pt-28 lg:pb-12 lg:pt-32">
+      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-center px-5 pb-8 pt-[6.5rem] sm:relative sm:top-[9svh] sm:px-[30px] sm:pt-28 lg:pb-12 lg:pt-32">
         <div className="sm:w-fit">
           <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
             {copy.eyebrow}
