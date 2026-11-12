@@ -28,20 +28,21 @@ import { Logo } from './logo';
  * Measured off the artboard rather than approximated: the panel is 480px on a
  * cream (#F6F3EC) ground with 36px gutters, the deliver-to card is white, the
  * partner block is ink (#141414) with gold icon tiles, and the primary button
- * is gold (#D4A72C). Nav labels are ~26px ExtraBold on a 61px row pitch.
+ * is gold (#D4A72C). Nav labels were ~26px ExtraBold on a 61px row pitch; they are now 20px
+ * on a 52px pitch, smaller than the artboard by request.
  *
  * Copy is from the artboard and is signed off (ground rule 6).
  */
 
 const SECTIONS = [
-  { number: '01', key: 'nav.explore', href: '/explore', noteKey: null, note: null, live: false },
+  /* Explore is left out of the menu; the page itself stays. */
   /*
-   * Discovery, next to Explore so the two can be compared. It is a separate app the
+   * Discovery. It is a separate app the
    * website serves at /discover (discovery/, rewritten in next.config.mjs), not a
    * Next.js page, so its row loads it in full rather than through the router.
    */
   {
-    number: '02',
+    number: '01',
     key: 'nav.discovery',
     href: '/discover',
     noteKey: null,
@@ -50,7 +51,7 @@ const SECTIONS = [
     fullLoad: true,
   },
   {
-    number: '03',
+    number: '02',
     key: 'nav.experience',
     href: '/experience',
     noteKey: 'nav.experience.note',
@@ -58,7 +59,7 @@ const SECTIONS = [
     live: false,
   },
   {
-    number: '04',
+    number: '03',
     key: 'nav.stays',
     href: '/stays',
     noteKey: 'nav.stays.note',
@@ -66,7 +67,7 @@ const SECTIONS = [
     live: false,
   },
   {
-    number: '05',
+    number: '04',
     key: 'nav.askConcierge',
     href: '/ask',
     noteKey: null,
@@ -222,13 +223,13 @@ export function SiteMenu({
                       href={section.href}
                       fullLoad={'fullLoad' in section && section.fullLoad}
                       onClick={close}
-                      className="focus-visible:ring-gold hover:text-gold-text flex min-h-[3rem] items-center gap-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 sm:min-h-[3.8rem] sm:gap-4"
+                      className="focus-visible:ring-gold hover:text-gold-text flex min-h-[3rem] items-center gap-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 sm:min-h-[3.25rem] sm:gap-4"
                     >
                       <span className="text-gold-text w-6 shrink-0 self-start pt-1 text-[0.6875rem] font-bold sm:self-center sm:pt-0 sm:text-xs">
                         {section.number}
                       </span>
                       <span className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                        <span className="flex-1 text-lg font-bold leading-snug tracking-tight sm:text-[1.625rem] sm:font-extrabold sm:leading-none">
+                        <span className="flex-1 text-base font-bold leading-snug tracking-tight sm:text-xl sm:font-extrabold sm:leading-none">
                           {t(section.key)}
                         </span>
                         {(section.noteKey || section.note) && (
