@@ -99,7 +99,7 @@ function CategoryDiscoveryPage({ category, provider, query, onChange, onSubcateg
       {offeringCategory && <section className="discovery-section" aria-label={hostsTitle}><RailHeading title={hostsTitle} /><CatalogSkeleton layout="rail" shape="merchant" label={`Loading ${hostsTitle.toLocaleLowerCase('en-KE')}`} /></section>}
       <section className="discovery-section" aria-label={`Loading ${title}`}><CatalogSkeleton layout={offeringCategory ? 'rail' : 'rows'} label={`Loading ${title}`} /></section>
     </> : catalog.error ? <CatalogState error={catalog.error} failure={catalog.failure} retry={catalog.retry} />
-    : !collections.length ? <CatalogState emptyTitle="Nothing listed here yet" emptyText="Choose a type above to see everyone listed in it." />
+    : !collections.length ? <CatalogState emptyTitle="No stores here yet" emptyText={`${title} stores will show here as they join NexG.`} />
     : <>
       {hosts.length > 0 && <section className="discovery-section discovery-section--hosts" aria-labelledby={`${ids}hosts`}>
         <RailHeading id={`${ids}hosts`} title={hostsTitle} />

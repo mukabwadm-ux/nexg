@@ -301,14 +301,16 @@ test('with no subcategories at all, as in production today, every store is liste
   assert.deepEqual(await provider.getAreas(), ['Karen', 'Kilimani', 'Westlands']);
 });
 
-test('hidden categories (Play, Flights) are off every screen, and their mapped stores stay out of "all"', async () => {
-  assert.ok(!categories.some((category) => HIDDEN_CATEGORY_IDS.has(category.id)));
-  assert.deepEqual([...HIDDEN_CATEGORY_IDS].map((categoryId) => findCategory(categoryId)), [undefined, undefined]);
+test('Play and Flights are on screen: a Play store lists under Play, and Flights reads nothing until it has a platform category', async () => {
+  assert.equal(HIDDEN_CATEGORY_IDS.size, 0);
+  assert.ok(categories.some((category) => category.id === 'play') && categories.some((category) => category.id === 'flights'));
+  assert.ok(findCategory('play') && findCategory('flights'));
   const bowling = merchant(id('c1', 31), 'Strike Bowling', 'activities_games_sports', 'bowling', 'Westlands, Nairobi');
-  const { provider, calls } = setup({ merchants: [...merchants, bowling] });
-  assert.ok(!names(await provider.getMerchants({ limit: 48 })).includes('Strike Bowling'));
-  await assert.rejects(provider.getMerchants({ categoryId: 'play' }), kind('invalid'));
-  assert.ok(!calls.some((call) => call.url.searchParams.get('category_key')?.includes('activities_games_sports')));
+  const { provider } = setup({ merchants: [...merchants, bowling] });
+  assert.ok(names(await provider.getMerchants({ categoryId: 'play' })).includes('Strike Bowling'));
+  const flights = await provider.getMerchants({ categoryId: 'flights' });
+  assert.deepEqual(flights.merchants, []);
+  assert.equal(flights.mapping, 'unmapped');
 });
 
 test('search escapes LIKE wildcards, and the area filter matches exactly what areaFromAddress names', async () => {

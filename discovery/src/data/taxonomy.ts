@@ -55,11 +55,11 @@ export function iconUrl(reference: string | null | undefined): string | undefine
 }
 
 /**
- * Categories in the V1.1 docs that the NexG website doesn't show yet, because the platform has no category for
- * them on main: Play needs `activities_games_sports`, and Flights has no platform category at all. Remove an id
- * here once its platform category lands. The docs stay as they are, so nothing else needs to change.
+ * Categories in the V1.1 docs that the NexG website leaves off screen. Empty: the owner chose (12 Nov 2026) to
+ * show Play and Flights before the platform has categories for them, with their pages saying no stores have
+ * joined yet. Add an id here to take a category off every screen; the docs stay as they are.
  */
-export const HIDDEN_CATEGORY_IDS: ReadonlySet<string> = new Set(['play', 'flights']);
+export const HIDDEN_CATEGORY_IDS: ReadonlySet<string> = new Set();
 
 /** Navigation is generated from the final pack-derived V1.1 docs, never the old platform registry. */
 const allCategories: DiscoveryCategory[] = taxonomy.categories.map((category, index) => {
