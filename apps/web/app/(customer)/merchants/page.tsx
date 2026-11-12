@@ -175,9 +175,8 @@ export default async function MerchantsPage() {
               </h1>
 
               <p className="mt-5 max-w-[32.5rem] text-[1.0625rem] font-semibold leading-[1.7] text-white/70">
-                Hotel guests, travellers and expats ask NexG for what they need. List your
-                restaurant, bar, laundry, florist or boutique and let our riders bring your products
-                to their door.
+                List your restaurant, bar, laundry, florist or boutique and let our riders bring
+                your products to their door.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
