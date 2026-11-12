@@ -12,6 +12,7 @@ import { supabaseCinemaConnector } from '../src/data/cinema/supabaseCinema';
 import { forgetTicketRequest, keepTicketRequest, readTicketRequests, type RequestStorage, type TicketRequest } from '../src/data/cinema/ticketRequests';
 import { SeatMap } from '../src/components/cinema/SeatMap';
 import { CinemaStorefront } from '../src/components/cinema/CinemaStorefront';
+import { MoviesPage } from '../src/components/cinema/MoviesPage';
 import { parseRoute, routeUrl } from '../src/routing/discoveryRoute';
 
 const standIn = data as unknown as StandInData;
@@ -173,4 +174,13 @@ test('a film has its own page address, and a store address drops it', () => {
   assert.equal(routeUrl(route), '/?film=film-long-rains');
   assert.equal(parseRoute('?merchant=m1&film=film-long-rains').film, undefined);
   assert.equal(routeUrl({ ...route, merchantId: 'm1' }), '/?merchant=m1');
+});
+
+test('Movies has a discoverable route and an empty programme when showtimes are unavailable', () => {
+  const route = parseRoute('?view=movies');
+  assert.equal(route.view, 'movies');
+  assert.equal(routeUrl({ ...route, film: 'f1' }), '/?view=movies&film=f1');
+  const markup = renderToStaticMarkup(<MoviesPage onBack={() => {}} onFilm={() => {}} />);
+  assert.match(markup, /<h1 id="movies-title">Movies<\/h1>/);
+  assert.match(markup, /No showtimes here yet/);
 });

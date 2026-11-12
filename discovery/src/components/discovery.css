@@ -6,6 +6,8 @@
 /* Page frame ------------------------------------------------------------------------------------------ */
 .home-page,.category-page,.results-screen{display:flex;flex-direction:column;min-width:0}
 .category-page-heading,.results-heading{margin:8px 0 16px}
+.discovery-home-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.home-movies-link{min-height:44px;gap:8px}
 .category-page-heading h1,.results-heading h1{font-size:clamp(30px,3vw,42px);line-height:1.1;letter-spacing:-.03em;text-wrap:balance}
 .category-discovery__filters{margin:0 0 24px}
 .discovery-types{margin:0 0 28px;min-width:0}

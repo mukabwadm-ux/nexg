@@ -1,7 +1,7 @@
 import type { DiscoveryQuery } from '../providers/DiscoveryProvider';
 
 export interface RouteState extends DiscoveryQuery {
-  view?: 'results' | 'experience' | 'tour'; merchantId?: string; itemId?: string; operatorSearch?: string; operatorOffset?: number;
+  view?: 'results' | 'experience' | 'tour' | 'movies'; merchantId?: string; itemId?: string; operatorSearch?: string; operatorOffset?: number;
   /**
    * A retail store's open department (`&department=`), kept with the store it belongs to, so it never follows the
    * shopper into another store. Each department change is its own history step, so Back walks back through them.
@@ -27,7 +27,8 @@ export function parseRoute(search: string, state?: { discoveryRequest?: Discover
     contextRequired: params.get('context') === 'required' ? true : undefined,
     view: params.get('view') === 'tour' && params.get('merchant') && params.get('item') ? 'tour'
       : params.get('view') === 'experience' && params.get('merchant') && params.get('item') ? 'experience'
-      : params.get('view') === 'results' || params.get('subcategory') || params.get('option') ? 'results' : undefined,
+      : params.get('view') === 'results' || params.get('subcategory') || params.get('option') ? 'results'
+      : params.get('view') === 'movies' && !params.get('category') && !params.get('merchant') ? 'movies' : undefined,
     merchantId: params.get('merchant') || undefined, itemId: params.get('item') || undefined,
     department: params.get('merchant') && params.get('department') ? { merchantId: params.get('merchant')!, id: params.get('department')! } : undefined,
     operatorSearch: params.get('merchant') ? params.get('operatorSearch') || undefined : undefined,

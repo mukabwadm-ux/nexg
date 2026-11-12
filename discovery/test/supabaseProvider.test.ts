@@ -301,14 +301,21 @@ test('with no subcategories at all, as in production today, every store is liste
   assert.deepEqual(await provider.getAreas(), ['Karen', 'Kilimani', 'Westlands']);
 });
 
-test('hidden categories (Play, Flights) are off every screen, and their mapped stores stay out of "all"', async () => {
-  assert.ok(!categories.some((category) => HIDDEN_CATEGORY_IDS.has(category.id)));
-  assert.deepEqual([...HIDDEN_CATEGORY_IDS].map((categoryId) => findCategory(categoryId)), [undefined, undefined]);
+test('Play and Flights show their operators and an empty specialty stays available', async () => {
+  assert.equal(HIDDEN_CATEGORY_IDS.size, 0);
+  assert.ok(categories.some((category) => category.id === 'play') && categories.some((category) => category.id === 'flights'));
+  assert.ok(findCategory('play') && findCategory('flights'));
   const bowling = merchant(id('c1', 31), 'Strike Bowling', 'activities_games_sports', 'bowling', 'Westlands, Nairobi');
-  const { provider, calls } = setup({ merchants: [...merchants, bowling] });
-  assert.ok(!names(await provider.getMerchants({ limit: 48 })).includes('Strike Bowling'));
-  await assert.rejects(provider.getMerchants({ categoryId: 'play' }), kind('invalid'));
-  assert.ok(!calls.some((call) => call.url.searchParams.get('category_key')?.includes('activities_games_sports')));
+  const charter = merchant(id('c1', 32), 'Charter Operator', 'flights', 'private_charters', 'Westlands, Nairobi');
+  const scenic = merchant(id('c1', 33), 'Scenic Operator', 'flights', 'scenic_flights', 'Westlands, Nairobi');
+  const { provider } = setup({ merchants: [...merchants, bowling, charter, scenic] });
+
+  assert.ok(names(await provider.getMerchants({ categoryId: 'play' })).includes('Strike Bowling'));
+  assert.deepEqual(names(await provider.getMerchants({ categoryId: 'flights' })), ['Charter Operator', 'Scenic Operator']);
+  assert.deepEqual(names(await provider.getMerchants({ categoryId: 'flights', subcategoryId: 'flights:private-charters' })), ['Charter Operator']);
+  const safari = await provider.getMerchants({ categoryId: 'flights', subcategoryId: 'flights:safari-flights' });
+  assert.deepEqual(safari.merchants, []);
+  assert.equal(safari.mapping, 'mapped');
 });
 
 test('search escapes LIKE wildcards, and the area filter matches exactly what areaFromAddress names', async () => {

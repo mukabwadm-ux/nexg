@@ -28,7 +28,7 @@ test('promoted stores rise above a similar match but never above a much closer o
 
 test('the box lists search first, then categories, stores and items', () => {
   assert.equal(taxonomySuggestions('bakery')[0]?.label, 'Bakery');
-  assert.deepEqual(taxonomySuggestions('bowl'), [], 'Play is hidden on the website, so Bowling is not suggested');
+  assert.deepEqual(taxonomySuggestions('bowl').map((entry) => entry.label), ['Bowling']);
   assert.equal(taxonomySuggestions('rest')[0]?.label, 'Restaurants & Food');
   assert.deepEqual(taxonomySuggestions('   '), []);
   const list = suggestionList('ugali', {
