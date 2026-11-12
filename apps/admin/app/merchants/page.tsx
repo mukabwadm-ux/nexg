@@ -46,7 +46,7 @@ export const dynamic = 'force-dynamic';
 export default async function MerchantsPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; filter?: string; selected?: string };
+  searchParams?: { tab?: string; filter?: string; selected?: string; q?: string };
 }) {
   const staff = await requireStaff();
   requireModule(staff, 'merchants');
@@ -116,7 +116,7 @@ export default async function MerchantsPage({
             applications={await loadApplications(supabase, rows)}
             counts={counts}
             filter={filter}
-            selected={searchParams?.selected ?? null}
+            query={searchParams?.q ?? ''}
           />
         )}
 

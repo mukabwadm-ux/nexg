@@ -30,7 +30,7 @@ export type MerchantTab = (typeof MERCHANT_TABS)[number]['key'];
 export function MerchantTabs({ current }: { current: string }) {
   return (
     <nav
-      className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 sm:-mx-8 sm:px-8"
+      className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:rgb(var(--border-strong-rgb))_transparent] sm:-mx-8 sm:px-8"
       aria-label="Merchants sections"
     >
       {MERCHANT_TABS.map((tab) =>
