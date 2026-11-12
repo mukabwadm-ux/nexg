@@ -46,9 +46,9 @@ const PHOTO_SIZES = '(min-width: 1024px) 16rem, 14rem';
  * The four circles step down, up, down, up on desktop, and a dotted gold line
  * runs through their centres. The line is drawn on a 1000-wide canvas
  * stretched to the row: each column's centre is at 125, 375, 625, 875, and
- * the low circles' centres sit 112px (the offset) below the high ones'.
+ * the low circles' centres sit 90px (the offset) below the high ones'.
  */
-const LINE = 'M0 244 L125 244 L375 132 L625 244 L875 132 L1000 104';
+const LINE = 'M0 198 L125 198 L375 108 L625 198 L875 108 L1000 86';
 
 export function JoinSection({ t }: { t: Translate }) {
   const cards: {
@@ -154,14 +154,14 @@ export function JoinSection({ t }: { t: Translate }) {
 
         <ol className="relative grid grid-cols-1 gap-14 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-14 lg:grid-cols-4 lg:gap-6">
           {cards.map((card, index) => (
-            <li key={card.href} className={index % 2 === 0 ? 'lg:mt-28' : undefined}>
+            <li key={card.href} className={index % 2 === 0 ? 'lg:mt-[5.625rem]' : undefined}>
               <Link
                 href={card.href}
                 className="focus-visible:ring-gold focus-visible:ring-offset-bg group flex flex-col items-center rounded-3xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4"
               >
                 {/* A gold-ringed circle in a dark halo, with its number. */}
                 <span className="relative rounded-full bg-[#EFE3C4] p-3">
-                  <span className="border-gold relative block h-56 w-56 overflow-hidden rounded-full border-4 bg-[#17140F] lg:h-60 lg:w-60">
+                  <span className="border-gold relative block h-[11.25rem] w-[11.25rem] overflow-hidden rounded-full border-4 bg-[#17140F] lg:h-48 lg:w-48">
                     {card.art}
                   </span>
                   <span className="bg-gold text-ink border-bg absolute right-3 top-3 flex h-14 w-14 items-center justify-center rounded-full border-4 text-lg font-extrabold tabular-nums">
