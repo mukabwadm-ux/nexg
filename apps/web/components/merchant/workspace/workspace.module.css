@@ -166,10 +166,18 @@
   align-content: start;
   gap: 4px;
   padding: 0 12px 10px;
+  /* Scrolls up and down when the list is taller than the window, never
+     sideways, and without a visible bar in the dark sidebar. */
+  overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar {
+  display: none;
 }
 .navLink {
   display: flex;
+  min-width: 0;
   min-height: 44px;
   align-items: center;
   gap: 12px;
@@ -202,6 +210,10 @@
 }
 .navLabel {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .navLock {
   font-size: 10px;
