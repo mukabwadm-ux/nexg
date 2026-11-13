@@ -60,7 +60,7 @@ export function CheckoutForm({
     [mpesaReady, bankEnabled],
   );
   const [method, setMethod] = React.useState<Method>(
-    () => options.find((o) => o.ready)?.value ?? 'cash_on_delivery',
+    () => options.find((o) => o.ready)?.value ?? 'mpesa_stk',
   );
   const [phone, setPhone] = React.useState('');
   const [name, setName] = React.useState('');

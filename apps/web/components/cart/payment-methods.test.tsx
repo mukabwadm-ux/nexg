@@ -32,18 +32,17 @@ function render(
 }
 
 describe('payment methods', () => {
-  it('offers M-Pesa and pay on delivery, and bank only when it is connected', () => {
-    expect(all.map((o) => o.value)).toEqual(['mpesa_stk', 'cash_on_delivery']);
+  it('offers M-Pesa, and bank only when it is connected, but not pay on delivery', () => {
+    expect(all.map((o) => o.value)).toEqual(['mpesa_stk']);
     expect(methodOptions({ mpesaReady: true, bankEnabled: true }).map((o) => o.value)).toEqual([
       'mpesa_stk',
       'bank_transfer',
-      'cash_on_delivery',
     ]);
   });
 
   it('shows a method with nothing connected behind it as coming soon, and does not let it be picked', () => {
     const options = methodOptions({ mpesaReady: false, bankEnabled: false });
-    const html = render('cash_on_delivery', { options });
+    const html = render('mpesa_stk', { options });
     expect(html).toContain('Coming soon');
     expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*?M-Pesa/);
   });

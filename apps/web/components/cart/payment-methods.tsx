@@ -1,6 +1,6 @@
 'use client';
 
-import { Banknote, Check, Landmark, Lock, type LucideIcon, Smartphone } from 'lucide-react';
+import { Check, Landmark, Lock, type LucideIcon, Smartphone } from 'lucide-react';
 import * as React from 'react';
 
 export type Method = 'mpesa_stk' | 'bank_transfer' | 'cash_on_delivery';
@@ -15,7 +15,13 @@ export interface MethodOption {
   ready: boolean;
 }
 
-/** The checkout's payment methods, in the order they are offered. */
+/**
+ * The checkout's payment methods, in the order they are offered.
+ *
+ * Pay on delivery is no longer offered: guests pay online before the order
+ * goes to the merchant. `cash_on_delivery` stays in the type so orders placed
+ * that way earlier still show and settle as before.
+ */
 export function methodOptions({
   mpesaReady,
   bankEnabled,
@@ -42,13 +48,6 @@ export function methodOptions({
           },
         ]
       : []),
-    {
-      value: 'cash_on_delivery',
-      label: 'Pay on delivery',
-      hint: 'Cash to the rider',
-      icon: Banknote,
-      ready: true,
-    },
   ];
 }
 
