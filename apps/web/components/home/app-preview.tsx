@@ -20,7 +20,10 @@ export function AppPreview() {
   return (
     <div aria-hidden="true" className="relative mx-auto w-full max-w-[34rem] py-6">
       {/* The phone. */}
-      <div className="relative ml-auto mr-6 w-[19.5rem] rounded-[2.75rem] bg-[#141414] p-2.5 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.45)]">
+      <div
+        data-reveal-item
+        className="relative ml-auto mr-6 w-[19.5rem] rounded-[2.75rem] bg-[#141414] p-2.5 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.45)]"
+      >
         <div className="relative h-[37rem] overflow-hidden rounded-[2.25rem] bg-white text-[#141414]">
           <div className="flex items-start justify-between px-5 pt-7">
             <span>
@@ -89,14 +92,20 @@ export function AppPreview() {
       </div>
 
       {/* Floating beside the phone. */}
-      <div className="absolute left-0 top-[30%] w-[15rem] rounded-2xl bg-white p-4 text-[#141414] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.35)]">
+      <div
+        data-reveal-item="left"
+        className="absolute left-0 top-[30%] w-[15rem] rounded-2xl bg-white p-4 text-[#141414] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.35)]"
+      >
         <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-[#8a8178]">
           Live
         </p>
         <p className="mt-1 text-[0.9375rem] font-extrabold">Concierge on the way</p>
         <p className="mt-1 text-xs text-[#6b6560]">Watch it move on the map</p>
       </div>
-      <div className="absolute -right-2 bottom-0 w-[13rem] rounded-2xl bg-white p-4 text-[#141414] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.35)]">
+      <div
+        data-reveal-item="right"
+        className="absolute -right-2 bottom-0 w-[13rem] rounded-2xl bg-white p-4 text-[#141414] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.35)]"
+      >
         <p className="text-xs text-[#6b6560]">Pay how you like</p>
         <p className="mt-1 text-lg font-extrabold">M-Pesa</p>
       </div>

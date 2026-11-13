@@ -101,6 +101,7 @@ export function PopularCategories({
       >
         {items.map((item) => (
           <li
+            data-reveal-item
             key={item.key}
             className={layout === 'row' ? 'w-[6.75rem] shrink-0 sm:w-32 lg:w-auto' : undefined}
           >

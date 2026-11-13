@@ -136,6 +136,7 @@ export function JoinSection({ t }: { t: Translate }) {
       <div className="relative mt-14 lg:mt-20">
         {/* The dotted path through the circles' centres, behind them. */}
         <svg
+          data-reveal-line
           aria-hidden="true"
           viewBox="0 0 1000 400"
           preserveAspectRatio="none"
@@ -154,7 +155,11 @@ export function JoinSection({ t }: { t: Translate }) {
 
         <ol className="relative grid grid-cols-1 gap-14 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-14 lg:grid-cols-4 lg:gap-6">
           {cards.map((card, index) => (
-            <li key={card.href} className={index % 2 === 0 ? 'lg:mt-[5.625rem]' : undefined}>
+            <li
+              data-reveal-item
+              key={card.href}
+              className={index % 2 === 0 ? 'lg:mt-[5.625rem]' : undefined}
+            >
               <Link
                 href={card.href}
                 className="focus-visible:ring-gold focus-visible:ring-offset-bg group flex flex-col items-center rounded-3xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4"

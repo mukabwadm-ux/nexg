@@ -101,6 +101,7 @@ export function BestSellers({
       >
         {items.map((item) => (
           <li
+            data-reveal-item
             key={item.id}
             className="w-[16.5rem] shrink-0 snap-start sm:w-[18rem] lg:w-[calc((100%-3rem)/4)]"
           >

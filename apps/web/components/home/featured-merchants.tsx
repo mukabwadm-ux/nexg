@@ -160,7 +160,7 @@ function Card({
   const eta =
     minutes != null && Number.isFinite(minutes) && minutes > 0 ? Math.round(minutes) : null;
   return (
-    <li className={RAIL_CARD}>
+    <li data-reveal-item className={RAIL_CARD}>
       <Link
         href={href}
         className="focus-visible:ring-gold group relative flex aspect-[15/14] max-h-[25rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E] ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2"

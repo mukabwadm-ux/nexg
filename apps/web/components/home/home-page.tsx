@@ -5,6 +5,7 @@ import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { BestSellers } from '@/components/home/best-sellers';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
+import { Reveal } from '@/components/reveal';
 import { NotifyForm } from '@/components/home/notify-form';
 import { JoinSection } from '@/components/home/join-section';
 import { PopularCategories } from '@/components/home/popular-categories';
@@ -206,17 +207,21 @@ export async function HomePageContent({
           id="popular"
           className="mx-auto max-w-[120rem] scroll-mt-20 px-4 py-10 sm:px-[30px] sm:py-12 lg:py-14"
         >
-          <PopularCategories
-            heading={t('home.popular.heading')}
-            sub={t('home.popular.sub')}
-            allLabel={t('home.popular.all')}
-            items={categoryTiles(t, categories, tileTaps)}
-          />
+          <Reveal variant="iris">
+            <PopularCategories
+              heading={t('home.popular.heading')}
+              sub={t('home.popular.sub')}
+              allLabel={t('home.popular.all')}
+              items={categoryTiles(t, categories, tileTaps)}
+            />
+          </Reveal>
         </section>
 
         <section className="bg-ink dark:bg-night py-16 text-white sm:py-20">
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
-            <FeaturedMerchants merchants={featured} t={t} />
+            <Reveal variant="wipe">
+              <FeaturedMerchants merchants={featured} t={t} />
+            </Reveal>
 
             <div className="mt-8 flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-semibold text-white/45">
@@ -234,26 +239,32 @@ export async function HomePageContent({
 
         <section className="band-surface">
           <div className="mx-auto max-w-[120rem] px-4 py-14 sm:px-[30px]">
-            <BestSellers
-              heading={t('home.bestSellers.heading')}
-              seeAll={t('home.bestSellers.seeAll')}
-              sponsored={t('merchant.sponsored')}
-              items={liveBestSellers.length > 0 ? liveBestSellers : BEST_SELLERS}
-            />
+            <Reveal variant="rise">
+              <BestSellers
+                heading={t('home.bestSellers.heading')}
+                seeAll={t('home.bestSellers.seeAll')}
+                sponsored={t('merchant.sponsored')}
+                items={liveBestSellers.length > 0 ? liveBestSellers : BEST_SELLERS}
+              />
+            </Reveal>
           </div>
         </section>
 
         {stores.length > 0 && (
           <section id="stores-near-you" className="bg-ink dark:bg-night py-14 text-white sm:py-16">
             <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
-              <StoresNearYou stores={stores} />
+              <Reveal variant="focus">
+                <StoresNearYou stores={stores} />
+              </Reveal>
             </div>
           </section>
         )}
 
         <section className="bg-bg text-ink py-16 sm:py-20">
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
-            <JoinSection t={t} />
+            <Reveal variant="path">
+              <JoinSection t={t} />
+            </Reveal>
           </div>
         </section>
 
@@ -284,9 +295,9 @@ export async function HomePageContent({
             {/* The phone at 62% of its drawn size: the section stays compact. */}
             <div className="hidden py-6 lg:block">
               <div className="h-[25.5rem]">
-                <div className="origin-top scale-[0.62]">
+                <Reveal variant="phone" className="origin-top scale-[0.62]">
                   <AppPreview />
-                </div>
+                </Reveal>
               </div>
             </div>
           </div>

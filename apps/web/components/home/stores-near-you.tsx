@@ -67,7 +67,7 @@ function StoreCard({ store }: { store: RankedStore }) {
   const area = store.branch_name ? unbracket(store.branch_name) : null;
 
   return (
-    <li className={STORE_CARD}>
+    <li data-reveal-item className={STORE_CARD}>
       <Link
         href={discoverMerchantHref(store.id)}
         className="focus-visible:ring-gold group flex h-full flex-col overflow-hidden rounded-2xl bg-[#17140F] ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2"
