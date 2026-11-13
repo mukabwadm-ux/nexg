@@ -218,6 +218,20 @@ export function DocumentReview({
                       </Button>
                     </>
                   )}
+
+                  {/* A file on record that is not being chased (uploaded or
+                      verified) can still be swapped for a better one. */}
+                  {!chaseable && (
+                    <FileOnTheirBehalf
+                      kind={document.kind}
+                      label={document.label}
+                      storagePrefix={storagePrefix}
+                      disabled={isBusy}
+                      onFiled={onFiled}
+                      onDone={() => router.refresh()}
+                      replacing
+                    />
+                  )}
                 </div>
               )}
 
@@ -355,11 +369,15 @@ function FileOnTheirBehalf({
   disabled,
   onFiled,
   onDone,
+  replacing = false,
 }: {
   kind: string;
   label: string;
   storagePrefix: string;
   disabled: boolean;
+  /* A file is already on record: this one takes its place, and the old
+     one is kept as history rather than overwritten. */
+  replacing?: boolean;
   onFiled: (input: {
     kind: string;
     storagePath: string;
@@ -435,7 +453,7 @@ function FileOnTheirBehalf({
         type="file"
         accept="image/*,application/pdf"
         className="sr-only"
-        aria-label={`Upload ${label} on their behalf`}
+        aria-label={replacing ? `Replace the ${label} on file` : `Upload ${label} on their behalf`}
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) void upload(file);
@@ -448,7 +466,7 @@ function FileOnTheirBehalf({
         disabled={disabled || busy}
         onClick={() => inputRef.current?.click()}
       >
-        Upload for them
+        {replacing ? 'Replace file' : 'Upload for them'}
       </Button>
       <select
         aria-label="How it reached us"

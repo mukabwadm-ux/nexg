@@ -11,7 +11,9 @@ import {
   ApplicationReviewDetail,
   ApplicationReviewUnavailable,
 } from '@/components/merchants/application-review-view';
+import { MerchantDocumentsSection } from '@/components/merchants/documents-section';
 import { MerchantTabs } from '@/components/merchants/shell';
+import { loadMerchantDocuments } from '@/lib/merchant-documents';
 import {
   loadMerchantApplicationReview,
   ReviewSourceError,
@@ -59,6 +61,9 @@ export default async function ManagedMerchantApplicationPage({
         .maybeSingle()
     : { data: null };
   const merchantName = merchant?.trading_name || merchant?.legal_name || '';
+  /* The documents the applicant uploaded, beside the application they
+     belong to: a reviewer should not have to approve first to read them. */
+  const documents = await loadMerchantDocuments(createClient(), params.id);
   return (
     <ApplicationReviewActor key={source.actorId} actorId={source.actorId}>
       <ConsoleShell staff={staff} current="/merchants">
@@ -84,8 +89,26 @@ export default async function ManagedMerchantApplicationPage({
               Manage merchant: documents, Take live, edit
             </Link>
           ) : null}
+          <a
+            href="#documents"
+            className="border-border hover:border-ink ml-4 mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg border px-4 text-sm font-bold"
+          >
+            Documents
+            <span
+              className={`rounded-full px-2 py-0.5 text-[0.6875rem] font-extrabold ${
+                documents.outstanding.length === 0
+                  ? 'bg-success-bg text-success'
+                  : 'bg-warning-bg text-warning'
+              }`}
+            >
+              {documents.onFile} of {documents.review.length} on file
+            </span>
+          </a>
           <ApplicationAgreement merchantId={params.id} />
           <ApplicationReviewDetail {...source} />
+          <div className="mt-10 max-w-4xl">
+            <MerchantDocumentsSection merchantId={params.id} {...documents} />
+          </div>
           {merchant && !merchant.deleted_at && merchantName ? (
             <div className="mt-6 max-w-md">
               <MerchantLifecycleActions

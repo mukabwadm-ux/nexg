@@ -19,6 +19,10 @@ vi.mock('next/link', () => ({
   ),
 }));
 
+/* The search box needs the app router and a server action; this test is
+   about the tab links. */
+vi.mock('./merchant-search', () => ({ MerchantSearch: () => <div data-search /> }));
+
 import { MerchantTabs } from './shell';
 
 describe('merchant console navigation', () => {

@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { MerchantSearch } from './merchant-search';
+
 /**
  * Merchant console sections, including applications and lifecycle records.
  *
@@ -28,6 +30,17 @@ export const MERCHANT_TABS = [
 export type MerchantTab = (typeof MERCHANT_TABS)[number]['key'];
 
 export function MerchantTabs({ current }: { current: string }) {
+  return (
+    <>
+      <div className="mb-4 flex justify-end">
+        <MerchantSearch />
+      </div>
+      <MerchantTabStrip current={current} />
+    </>
+  );
+}
+
+function MerchantTabStrip({ current }: { current: string }) {
   return (
     <nav
       className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:rgb(var(--border-strong-rgb))_transparent] sm:-mx-8 sm:px-8"

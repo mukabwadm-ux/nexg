@@ -3,27 +3,22 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-import {
-  deleteMerchant,
-  goLive,
-  rejectDocument,
-  setMerchantDeactivated,
-  verifyDocument,
-} from '@/app/merchants/actions';
-import { fileDocumentFor, remindToUpload } from '@/app/documents/actions';
+import { deleteMerchant, goLive, setMerchantDeactivated } from '@/app/merchants/actions';
 import { sendFeaturedPitch, unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
-import { DocumentReview, type ReviewDocument } from '@/components/document-review';
 import { FeaturedNow } from '@/components/featured/place-merchant';
 import { MerchantLifecycleActions } from '@/components/merchant-lifecycle-actions';
 import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
-import { DocumentsLive } from '@/components/merchants/documents-live';
+import { MerchantDocumentsSection } from '@/components/merchants/documents-section';
+import { MerchantCatalogue, MerchantOverview } from '@/components/merchants/merchant-overview';
+import { MerchantSearch } from '@/components/merchants/merchant-search';
 import { MerchantPerformance } from '@/components/merchants/performance';
+import { loadMerchantDocuments } from '@/lib/merchant-documents';
 import { isManagedMerchantApplication, ReviewSourceError } from '@/lib/merchant-application-review';
 import {
   rangeFrom,
@@ -113,29 +108,19 @@ export default async function MerchantApplicationPage({
   ).toISOString();
 
   const [
-    { data: requirements },
-    { data: documents },
+    documents,
     { data: branches },
     { data: readiness },
     { data: categoryConfig },
     { data: fleet },
-    { data: chases },
     { count: activeResources },
     { data: performanceOrders, error: performanceError },
     { data: performanceRatings },
+    { data: catalogue, count: catalogueCount },
+    { count: teamCount },
+    { count: liveOfferings },
   ] = await Promise.all([
-    /*
-     * The same function the merchant's own documents step called, rather than
-     * a second copy of the rules here. A reviewer looking at a shorter list
-     * than the applicant was shown is how a licence goes unasked for.
-     */
-    supabase.rpc('fn_merchant_required_docs', { p_merchant_id: params.id }),
-    supabase
-      .from('document')
-      .select('id, requirement_id, status, storage_path, mime, expires_at, rejection_reason')
-      .eq('owner_type', 'merchant')
-      .eq('owner_id', params.id)
-      .is('superseded_at', null),
+    loadMerchantDocuments(supabase, params.id),
     supabase
       .from('merchant_branch')
       .select(
@@ -155,12 +140,6 @@ export default async function MerchantApplicationPage({
       .from('merchant_fleet_rider')
       .select('name, phone, vehicle, plate_no, invite_status, rider_id')
       .eq('merchant_id', params.id),
-    supabase
-      .from('document_request')
-      .select('requirement_id, sent_at, channel')
-      .eq('owner_type', 'merchant')
-      .eq('owner_id', params.id)
-      .is('fulfilled_document_id', null),
     supabase
       .from('bookable_resource')
       .select('id', { count: 'exact', head: true })
@@ -182,75 +161,26 @@ export default async function MerchantApplicationPage({
       .eq('merchant_id', params.id)
       .gte('created_at', performanceSince)
       .limit(5000),
+    /* What they sell: on the menu first, then hidden drafts. */
+    supabase
+      .from('catalogue_item')
+      .select('id, name, price_kes, available, updated_at', { count: 'exact' })
+      .eq('merchant_id', params.id)
+      .order('available', { ascending: false })
+      .order('name', { ascending: true })
+      .limit(12),
+    supabase
+      .from('merchant_user')
+      .select('user_id', { count: 'exact', head: true })
+      .eq('merchant_id', params.id),
+    supabase
+      .from('catalogue_item')
+      .select('id', { count: 'exact', head: true })
+      .eq('merchant_id', params.id)
+      .eq('available', true),
   ]);
 
-  const applicable =
-    (requirements as
-      | {
-          id: string;
-          kind: string;
-          label: string;
-          why_text: string | null;
-          required: boolean;
-          essential: boolean;
-        }[]
-      | null) ?? [];
-  const byRequirement = new Map((documents ?? []).map((d) => [d.requirement_id, d]));
-  const chasedIds = new Set(
-    ((chases as { requirement_id: string }[] | null) ?? []).map((c) => c.requirement_id),
-  );
-
-  /* When each document was last chased, so the button can say
-     something true rather than offering to send a fourth message. */
-  const { data: chaseState } = await supabase.rpc('fn_document_chase_state', {
-    p_owner_type: 'merchant',
-    p_owner_id: params.id,
-  });
-  const chases_ = (chaseState ?? {}) as Record<
-    string,
-    {
-      last_sent_at: string | null;
-      last_channel: string | null;
-      by: string | null;
-      by_applicant: boolean;
-      times: number | null;
-      can_send_again: boolean;
-      next_allowed_at: string | null;
-    }
-  >;
-
-  const review: ReviewDocument[] = await Promise.all(
-    applicable.map(async (requirement) => {
-      const document = byRequirement.get(requirement.id);
-      let url: string | null = null;
-
-      if (document) {
-        const { data } = await supabase.storage
-          .from('partner-documents')
-          .createSignedUrl(document.storage_path, 300);
-        url = data?.signedUrl ?? null;
-      }
-
-      return {
-        id: document?.id ?? null,
-        kind: requirement.kind,
-        label: requirement.label,
-        helpText: chasedIds.has(requirement.id)
-          ? `${requirement.why_text ?? ''} · the merchant asked us to chase this on WhatsApp`.trim()
-          : requirement.why_text,
-        /* Essential is what blocks going live; the rest have a grace period. */
-        required: requirement.essential,
-        status: (document?.status ?? 'missing') as ReviewDocument['status'],
-        expiresAt: document?.expires_at ?? null,
-        rejectionReason: document?.rejection_reason ?? null,
-        url,
-        mime: document?.mime ?? null,
-        chase: chases_[requirement.kind] ?? null,
-      };
-    }),
-  );
-
-  const outstanding = review.filter((d) => d.required && d.status !== 'verified');
+  const { review, outstanding } = documents;
   const city = merchant.city as { name: string } | null;
   const primary = branches?.[0];
   const canManageLifecycle = staff.isSuperAdmin || staff.roles.includes('merchant_ops');
@@ -260,107 +190,115 @@ export default async function MerchantApplicationPage({
     range.days,
     now,
   );
-  /* Trading merchants always; anyone else once they have taken an order. */
-  const showPerformance =
-    ['live', 'paused', 'suspended'].includes(merchant.status) ||
-    (performanceOrders?.length ?? 0) > 0;
+  const trading = ['live', 'paused', 'suspended'].includes(merchant.status);
+  const name = merchant.trading_name || merchant.legal_name || 'Unnamed merchant';
   return (
     <ConsoleShell staff={staff} current="/merchants">
       <ConsoleHeader
-        title={merchant.trading_name}
-        breadcrumb={showPerformance ? 'Merchants → Merchant' : 'Merchants → Application'}
+        title={name}
+        breadcrumb={trading ? 'Merchants → Merchant' : 'Merchants → Application'}
         action={<StatusBadge status={merchant.status as StatusKey} />}
       />
 
       <main className="px-4 py-6 sm:px-8">
-        <Link
-          href="/merchants"
-          className="text-muted hover:text-ink text-xs font-bold transition-colors"
-        >
-          ← Back to the pipeline
-        </Link>
-        {managed ? (
-          <Link
-            prefetch={false}
-            href={`/merchants/applications/${encodeURIComponent(params.id)}`}
-            className="text-gold-text ml-4 text-xs font-bold"
-          >
-            View the approved application
-          </Link>
-        ) : null}
-
-        {showPerformance && (
-          <div className="mt-4">
-            <MerchantPerformance
-              merchantId={params.id}
-              range={range.key}
-              data={performance}
-              failed={!!performanceError}
-            />
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-4">
+            <Link
+              href="/merchants"
+              className="text-muted hover:text-ink text-xs font-bold transition-colors"
+            >
+              ← Back to merchants
+            </Link>
+            {managed ? (
+              <Link
+                prefetch={false}
+                href={`/merchants/applications/${encodeURIComponent(params.id)}`}
+                className="text-gold-text text-xs font-bold"
+              >
+                View the approved application
+              </Link>
+            ) : null}
           </div>
-        )}
+          <MerchantSearch />
+        </div>
 
-        <div
-          className={`grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start ${
-            showPerformance ? 'mt-10' : 'mt-4'
-          }`}
-        >
-          <div className="space-y-6">
-            <div>
-              <DocumentsLive merchantId={params.id} />
-              <h2 className="text-lg font-extrabold tracking-tight">Documents</h2>
-              <p className="text-muted mt-1 text-sm font-semibold">
-                {outstanding.length === 0
-                  ? 'Everything required is verified.'
-                  : `${outstanding.length} of ${review.filter((d) => d.required).length} still to verify.`}
-              </p>
+        <MerchantOverview
+          name={name}
+          legalName={merchant.legal_name}
+          status={merchant.status}
+          category={
+            merchant.category_other ??
+            categoryConfig?.label ??
+            merchant.category?.replace(/_/g, ' ') ??
+            null
+          }
+          city={city?.name ?? null}
+          contactName={merchant.contact_name}
+          phone={merchant.contact_phone}
+          email={merchant.contact_email}
+          phoneVerified={!!merchant.phone_verified_at}
+          joinedAt={merchant.created_at}
+          liveSince={merchant.went_live_at}
+          documents={{
+            onFile: documents.onFile,
+            total: review.length,
+            outstanding: outstanding.length,
+          }}
+          branches={branches?.length ?? 0}
+          offerings={{ live: liveOfferings ?? 0, total: catalogueCount ?? 0 }}
+          team={teamCount ?? null}
+          rating={{ value: performance.rating.value, count: performance.rating.count }}
+        />
 
-              <div className="mt-4">
-                <DocumentReview
-                  documents={review}
-                  onVerify={async (documentId) => {
-                    'use server';
-                    return verifyDocument(documentId, params.id);
-                  }}
-                  onReject={async (documentId, reason) => {
-                    'use server';
-                    return rejectDocument(documentId, params.id, reason);
-                  }}
-                  onRemind={async (kind) => {
-                    'use server';
-                    return remindToUpload('merchant', params.id, kind);
-                  }}
-                  onFiled={async (input) => {
-                    'use server';
-                    return fileDocumentFor('merchant', params.id, input);
-                  }}
-                  storagePrefix={`merchant/${params.id}`}
-                />
-              </div>
-            </div>
+        {/* For every merchant: an applicant with no orders sees "No data"
+            rather than a missing section, so the page always has the same
+            shape. */}
+        <section id="performance" aria-label="Performance" className="mt-8 scroll-mt-24">
+          <MerchantPerformance
+            merchantId={params.id}
+            range={range.key}
+            data={performance}
+            failed={!!performanceError}
+          />
+        </section>
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+          <div className="space-y-10">
+            <MerchantDocumentsSection merchantId={params.id} {...documents} />
+
+            <MerchantCatalogue
+              items={
+                (catalogue as
+                  | { id: string; name: string; price_kes: number | null; available: boolean }[]
+                  | null) ?? []
+              }
+              total={catalogueCount ?? 0}
+            />
 
             {/*
               Everything the merchant answered during onboarding. It lives
               here rather than only in the database because a reviewer on the
               call needs the same picture the applicant was building.
             */}
-            <OnboardingRecord
-              merchant={merchant}
-              config={
-                categoryConfig as {
-                  label: string;
-                  questions: unknown;
-                  subcategories: unknown;
-                  card_kind: string;
-                } | null
-              }
-              branches={(branches as BranchRow[] | null) ?? []}
-              fleet={(fleet as FleetRow[] | null) ?? []}
-              readiness={readiness as Record<string, unknown> | null}
-            />
+            <div id="onboarding" className="scroll-mt-24">
+              <OnboardingRecord
+                merchant={merchant}
+                config={
+                  categoryConfig as {
+                    label: string;
+                    questions: unknown;
+                    subcategories: unknown;
+                    card_kind: string;
+                  } | null
+                }
+                branches={(branches as BranchRow[] | null) ?? []}
+                fleet={(fleet as FleetRow[] | null) ?? []}
+                readiness={readiness as Record<string, unknown> | null}
+              />
+            </div>
           </div>
 
-          <div className="space-y-4">
+          <div id="business" className="scroll-mt-24 space-y-4">
             <Card className="p-5">
               <h2 className="text-sm font-extrabold uppercase tracking-wide">Business</h2>
               <dl className="mt-3 space-y-2 text-sm">
