@@ -183,22 +183,30 @@ export function DocumentReview({
                 )}
               </div>
 
-              {document.url && (
+              {document.id && (
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    {/*
-                     * A new tab, not an inline preview: the URL expires in five
-                     * minutes and a PDF cannot be shown in an <img> anyway.
-                     */}
-                    <a href={document.url} target="_blank" rel="noreferrer">
-                      <span className="inline-flex items-center gap-1.5">
-                        View file
-                        <ExternalLink className="h-3 w-3" />
-                      </span>
-                    </a>
-                  </Button>
+                  {document.url ? (
+                    <Button variant="outline" size="sm" asChild>
+                      {/*
+                       * A new tab, not an inline preview: the URL expires in five
+                       * minutes and a PDF cannot be shown in an <img> anyway.
+                       */}
+                      <a href={document.url} target="_blank" rel="noreferrer">
+                        <span className="inline-flex items-center gap-1.5">
+                          View file
+                          <ExternalLink className="h-3 w-3" />
+                        </span>
+                      </a>
+                    </Button>
+                  ) : (
+                    /* The record is there but its file could not be opened:
+                       say so, and leave Replace file as the way out. */
+                    <span className="text-warning text-xs font-semibold">
+                      The file on record could not be opened.
+                    </span>
+                  )}
 
-                  {reviewable && (
+                  {reviewable && document.url && (
                     <>
                       <Button
                         size="sm"
