@@ -61,7 +61,9 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
   const needsSpot = chip === 'empty' || chip === 'city';
 
   return (
-    <section className="bg-night relative isolate z-30 flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden text-white lg:min-h-[calc(100svh-4.75rem)]">
+    /* Exactly one screen tall. svh rather than vh: on a phone, 100vh is
+       taller than what shows while the browser's address bar is up. */
+    <section className="bg-night relative isolate z-30 flex min-h-[100vh] min-h-[100svh] flex-col overflow-hidden text-white">
       {/* ─────────────────────────────────────────────── the photograph */}
       <div className="absolute inset-x-0 top-0 -z-10 h-[36rem] sm:h-[44rem] lg:inset-y-0 lg:h-auto">
         {/* Three clips in turn: the kitchen, the lobby, the room. */}
