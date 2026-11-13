@@ -29,7 +29,8 @@ export async function importCatalogueCsv(input: {
   csv: string;
 }): Promise<CatalogueImportResult> {
   const { client, merchantId } = await merchantActionClient({
-    access: 'setup',
+    // Live merchants import too: bulk upload is how large catalogues stay current.
+    access: 'workspace-setup',
     merchantId: input?.merchantId,
   });
   if (typeof input?.csv !== 'string' || !input.csv) {
@@ -133,6 +134,7 @@ export async function importCatalogueCsv(input: {
   }
 
   revalidatePath('/merchant/menu');
+  revalidatePath('/merchant/offerings');
   revalidatePath('/discover');
   return {
     ok: true,
