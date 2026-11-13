@@ -61,9 +61,10 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
   const needsSpot = chip === 'empty' || chip === 'city';
 
   return (
-    /* Exactly one screen tall. svh rather than vh: on a phone, 100vh is
-       taller than what shows while the browser's address bar is up. */
-    <section className="bg-night relative isolate z-30 flex min-h-[100svh] min-h-[100vh] flex-col overflow-hidden text-white">
+    /* Exactly one screen tall: 100vh, and 100svh wherever the browser has
+       it, because on a phone 100vh is taller than what shows while the
+       address bar is up. The supports variant is what makes svh win. */
+    <section className="bg-night relative isolate z-30 flex min-h-screen flex-col overflow-hidden text-white supports-[min-height:100svh]:min-h-[100svh]">
       {/* ─────────────────────────────────────────────── the photograph */}
       <div className="absolute inset-x-0 top-0 -z-10 h-[36rem] sm:h-[44rem] lg:inset-y-0 lg:h-auto">
         {/* Three clips in turn: the kitchen, the lobby, the room. */}
