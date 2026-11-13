@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@nexg/ui';
 import { Globe } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -140,64 +139,80 @@ export function WelcomeConsent({
     }
   };
 
+  /* Compact, in NexG ink and gold, in the bottom-left corner so it never
+     sits over the WhatsApp button on the right. */
+  const action =
+    'inline-flex h-8 items-center justify-center rounded-full px-3.5 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] disabled:opacity-60';
+
   return (
     <div
       role="dialog"
       aria-modal="false"
       aria-labelledby="welcome-consent-title"
-      className="fixed inset-x-0 bottom-0 z-50 p-3 sm:p-4"
+      aria-describedby="welcome-consent-body"
+      className="fixed bottom-3 left-3 right-[5.25rem] z-50 sm:bottom-5 sm:left-5 sm:right-auto sm:w-[23rem]"
     >
-      <div className="border-border bg-surface mx-auto max-w-2xl rounded-2xl border p-5 shadow-[0_8px_40px_rgba(20,20,20,0.16)] sm:p-6">
-        <h2 id="welcome-consent-title" className="text-lg font-extrabold tracking-tight">
-          {t('consent.title')}
-        </h2>
-        <p className="text-muted mt-1.5 text-[0.875rem] leading-[1.75]">{t('consent.body')}</p>
-
-        <ul className="mt-4 space-y-3">
-          <li className="flex items-start gap-3">
-            <span
-              aria-hidden="true"
-              className="bg-bg text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+      <div className="rounded-2xl border border-white/10 bg-[#141414] p-4 text-white shadow-[0_18px_48px_-12px_rgba(20,20,20,0.55)]">
+        <div className="flex items-start gap-3">
+          <span
+            aria-hidden="true"
+            className="bg-gold text-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+          >
+            <Globe className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <h2
+              id="welcome-consent-title"
+              className="text-[0.9375rem] font-extrabold leading-tight"
             >
-              <Globe className="h-4 w-4" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[0.875rem] font-extrabold">
-                {t('consent.language.title')}
-              </span>
-              <span className="text-muted-light block text-[0.8125rem] font-semibold leading-[1.7]">
-                {/*
-                 * Said differently when we do not have their language,
-                 * because promising to use it and then not would be the
-                 * more annoying of the two outcomes.
-                 */}
-                {preferred.locale
-                  ? t('consent.language.body', { language: preferred.label })
-                  : t('consent.language.body.unsupported', { language: preferred.label })}
-              </span>
-            </span>
-          </li>
-        </ul>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          <Button loading={busy === 'both'} onClick={() => void accept()}>
-            {t('consent.allow')}
-          </Button>
-          {preferred.locale && preferred.locale !== activeLocale && (
-            <Button
-              variant="outline"
-              loading={busy === 'language'}
-              onClick={() => void languageOnly()}
+              {t('consent.title')}
+            </h2>
+            <p
+              id="welcome-consent-body"
+              className="mt-1 text-[0.75rem] font-semibold leading-[1.55] text-white/65"
             >
-              {t('consent.allowLanguageOnly')}
-            </Button>
-          )}
-          <Button variant="outline" loading={busy === 'dismiss'} onClick={() => void dismiss()}>
-            {t('consent.decline')}
-          </Button>
+              {/*
+               * Said differently when we do not have their language,
+               * because promising to use it and then not would be the
+               * more annoying of the two outcomes.
+               */}
+              {preferred.locale
+                ? t('consent.language.body', { language: preferred.label })
+                : t('consent.language.body.unsupported', { language: preferred.label })}
+            </p>
+          </div>
         </div>
 
-        <p className="text-muted-light mt-3 text-[0.6875rem] font-semibold leading-[1.6]">
+        <div className="mt-3 flex flex-wrap items-center gap-2 pl-11">
+          <button
+            type="button"
+            disabled={busy !== null}
+            onClick={() => void accept()}
+            className={`${action} bg-gold text-ink hover:bg-[#FEDD5C]`}
+          >
+            {busy === 'both' ? '…' : t('consent.allow')}
+          </button>
+          {preferred.locale && preferred.locale !== activeLocale && (
+            <button
+              type="button"
+              disabled={busy !== null}
+              onClick={() => void languageOnly()}
+              className={`${action} border border-white/20 text-white hover:border-white/40`}
+            >
+              {busy === 'language' ? '…' : t('consent.allowLanguageOnly')}
+            </button>
+          )}
+          <button
+            type="button"
+            disabled={busy !== null}
+            onClick={() => void dismiss()}
+            className={`${action} text-white/70 hover:text-white`}
+          >
+            {busy === 'dismiss' ? '…' : t('consent.decline')}
+          </button>
+        </div>
+
+        <p className="mt-2.5 pl-11 text-[0.625rem] font-semibold leading-[1.5] text-white/40">
           {t('consent.footnote')}
         </p>
       </div>
