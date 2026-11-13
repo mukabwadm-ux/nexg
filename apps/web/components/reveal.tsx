@@ -7,8 +7,8 @@ export type RevealVariant = 'rise' | 'iris' | 'wipe' | 'focus' | 'path' | 'phone
 /**
  * Plays a section's entrance the first time it scrolls into view.
  *
- * It only marks the wrapper: `data-state="in"` once the section is about a
- * sixth on screen. The entrance itself is CSS in packages/ui globals.css,
+ * It only marks the wrapper: `data-state="in"` once a quarter of the
+ * section is on screen. The entrance itself is CSS in packages/ui globals.css,
  * keyed on the variant and played by the `data-reveal-item` children.
  * Items are visible by default and only held back while this can bring
  * them in, so nothing stays hidden if the script never runs.
@@ -43,7 +43,9 @@ export function Reveal({
         setState('in');
         observer.disconnect();
       },
-      { threshold: 0.15, rootMargin: '0px 0px -10% 0px' },
+      /* A quarter of the section in view, above the bottom fifth of the
+         screen: it plays where the eye already is, not at the very edge. */
+      { threshold: 0.25, rootMargin: '0px 0px -20% 0px' },
     );
     observer.observe(element);
     return () => observer.disconnect();

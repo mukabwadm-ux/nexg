@@ -398,8 +398,8 @@ div.ui-table-viewport[data-table-viewport] {
 }
 
 [data-reveal][data-state='in'] [data-reveal-item] {
-  animation: reveal-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  animation-delay: calc(var(--reveal-i, 0) * 70ms);
+  animation: reveal-rise 1100ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--reveal-i, 0) * 110ms);
 }
 [data-reveal-item]:nth-child(2) {
   --reveal-i: 1;
@@ -426,57 +426,58 @@ div.ui-table-viewport[data-table-viewport] {
 
 [data-reveal='iris'][data-state='in'] [data-reveal-item] {
   animation-name: reveal-iris;
-  animation-duration: 650ms;
-  animation-delay: calc(var(--reveal-i, 0) * 55ms);
+  animation-duration: 1000ms;
+  animation-delay: calc(var(--reveal-i, 0) * 90ms);
 }
 [data-reveal='wipe'][data-state='in'] [data-reveal-item] {
   animation-name: reveal-wipe;
-  animation-duration: 800ms;
-  animation-delay: calc(var(--reveal-i, 0) * 90ms);
+  animation-duration: 1200ms;
+  animation-delay: calc(var(--reveal-i, 0) * 140ms);
 }
 [data-reveal='focus'][data-state='in'] [data-reveal-item] {
   animation-name: reveal-focus;
-  animation-duration: 650ms;
+  animation-duration: 1100ms;
 }
 
 /* Join: the line first, then the circles in the order the line meets them. */
 [data-reveal='path'][data-state='in'] [data-reveal-line] {
-  animation: reveal-draw 1100ms cubic-bezier(0.65, 0, 0.35, 1) backwards;
+  animation: reveal-draw 1600ms cubic-bezier(0.65, 0, 0.35, 1) backwards;
 }
 [data-reveal='path'][data-state='in'] [data-reveal-item] {
   animation-name: reveal-pop;
-  animation-duration: 600ms;
+  animation-duration: 800ms;
   animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
-  animation-delay: calc(150ms + var(--reveal-i, 0) * 230ms);
+  animation-delay: calc(200ms + var(--reveal-i, 0) * 330ms);
 }
 
 /* App: the phone, then the live update from the left, then M-Pesa. */
 [data-reveal='phone'][data-state='in'] [data-reveal-item] {
   animation-name: reveal-phone;
-  animation-duration: 900ms;
+  animation-duration: 1300ms;
   animation-delay: 0ms;
 }
 [data-reveal='phone'][data-state='in'] [data-reveal-item='left'] {
   animation-name: reveal-from-left;
-  animation-duration: 700ms;
-  animation-delay: 380ms;
+  animation-duration: 1000ms;
+  animation-delay: 600ms;
 }
 [data-reveal='phone'][data-state='in'] [data-reveal-item='right'] {
   animation-name: reveal-from-right;
-  animation-duration: 700ms;
-  animation-delay: 560ms;
+  animation-duration: 1000ms;
+  animation-delay: 850ms;
 }
 
 @keyframes reveal-rise {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(56px);
   }
 }
 @keyframes reveal-iris {
   from {
     opacity: 0;
     clip-path: circle(0% at 50% 38%);
+    transform: scale(0.85);
   }
   to {
     clip-path: circle(150% at 50% 38%);
@@ -484,9 +485,9 @@ div.ui-table-viewport[data-table-viewport] {
 }
 @keyframes reveal-wipe {
   from {
-    opacity: 0.2;
+    opacity: 0;
     clip-path: inset(100% 0 0 0 round 1.5rem);
-    transform: translateY(18px);
+    transform: translateY(48px);
   }
   to {
     clip-path: inset(0 0 0 0 round 1.5rem);
@@ -495,8 +496,8 @@ div.ui-table-viewport[data-table-viewport] {
 @keyframes reveal-focus {
   from {
     opacity: 0;
-    filter: blur(10px);
-    transform: scale(0.97);
+    filter: blur(16px);
+    transform: translateY(32px) scale(0.94);
   }
 }
 @keyframes reveal-draw {
@@ -510,24 +511,24 @@ div.ui-table-viewport[data-table-viewport] {
 @keyframes reveal-pop {
   from {
     opacity: 0;
-    transform: scale(0.8) translateY(14px);
+    transform: scale(0.55) translateY(32px);
   }
 }
 @keyframes reveal-phone {
   from {
     opacity: 0;
-    transform: translateY(56px);
+    transform: translateY(140px);
   }
 }
 @keyframes reveal-from-left {
   from {
     opacity: 0;
-    transform: translateX(-36px);
+    transform: translateX(-110px);
   }
 }
 @keyframes reveal-from-right {
   from {
     opacity: 0;
-    transform: translateX(36px);
+    transform: translateX(110px);
   }
 }
