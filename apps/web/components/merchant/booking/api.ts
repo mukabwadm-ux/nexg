@@ -7,9 +7,19 @@ export class BookingApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
+    /* The engine's problem type, such as
+       `urn:nexg:booking:initialization_required`, when it sent one. */
+    public readonly type: string | null = null,
   ) {
     super(message);
   }
+}
+
+/** The business has no booking workspace yet: nothing booked, nothing set up. */
+export function isBookingNotInitialized(error: unknown) {
+  return (
+    error instanceof BookingApiError && error.type === 'urn:nexg:booking:initialization_required'
+  );
 }
 
 export async function bookingRequest<T>(
@@ -32,6 +42,7 @@ export async function bookingRequest<T>(
     detail?: string;
     message?: string;
     error?: string;
+    type?: string;
   } | null;
   if (!response.ok)
     throw new BookingApiError(
@@ -40,6 +51,7 @@ export async function bookingRequest<T>(
         data?.error ??
         `The request could not be completed (${response.status}).`,
       response.status,
+      typeof data?.type === 'string' ? data.type : null,
     );
   return data as T;
 }

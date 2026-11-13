@@ -2,14 +2,22 @@
 
 import { useMemo } from 'react';
 import { advanceMerchantBooking, loadMerchantWork } from '@/app/merchant/work/actions';
-import { bookingRequest } from '../booking/api';
+import { bookingRequest, isBookingNotInitialized } from '../booking/api';
 import { kenyaDateLabel, kenyaTime, STATUS_LABELS } from '../booking/format';
 import type { BookingWorkspaceData } from '../booking/types';
 import type { WorkRecord, WorkSource } from './model';
 import { WorkWorkspace } from './workspace';
 
 async function loadScheduledWork(): Promise<WorkRecord[]> {
-  const workspace = await bookingRequest<BookingWorkspaceData>('/workspace');
+  let workspace: BookingWorkspaceData;
+  try {
+    workspace = await bookingRequest<BookingWorkspaceData>('/workspace');
+  } catch (error) {
+    /* A business whose booking setup has not been started has no scheduled
+       work yet. That is an empty list, not an error to retry. */
+    if (isBookingNotInitialized(error)) return [];
+    throw error;
+  }
   const resourceNames = new Map(
     workspace.resources.map((resource) => [resource.id, resource.name]),
   );
