@@ -372,163 +372,17 @@ div.ui-table-viewport[data-table-viewport] {
 }
 
 /*
- * Scroll entrances (components/reveal.tsx). A section marked `data-reveal`
- * is `static` as the server sends it, `waiting` once its script is watching
- * it below the fold, and `in` the first time it scrolls into view; its
- * `data-reveal-item` children then play their entrance once, in turn.
- *
- * The visible state is the default. Items are only held back while waiting,
- * which needs the script running, and never for a visitor who asked for
- * reduced motion, so nothing can stay hidden if scripts fail. `backwards` fill only: once an entrance ends the item
- * goes back to its own styles, so hover transforms keep working.
- *
- * Each section has its own entrance, set by the value of `data-reveal`:
- *   iris   category circles open from their centre
- *   wipe   sponsored cards wipe up from the bottom
- *   rise   best-seller cards rise into place
- *   focus  store cards come into focus
- *   path   the Join path draws, then each circle pops as the line reaches it
- *   phone  the phone rises; its notification cards slide in from the sides
+ * Scroll entrances. The motion is anime.js, in apps/web components/reveal.tsx;
+ * all this does is hold a section's items back while it waits below the
+ * fold. A section is `static` as the server sends it, so nothing is hidden
+ * if scripts are slow or fail, and never for a visitor who asked for
+ * reduced motion. Once its timeline starts, anime.js holds each item at its
+ * starting point inline, and clears those styles when it ends.
  */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   [data-reveal][data-state='waiting'] [data-reveal-item],
-  [data-reveal='path'][data-state='waiting'] [data-reveal-line] {
+  [data-reveal='path'][data-state='waiting'] [data-reveal-line],
+  [data-reveal='path'][data-state='waiting'] [data-reveal-glow] {
     opacity: 0;
-  }
-}
-
-[data-reveal][data-state='in'] [data-reveal-item] {
-  animation: reveal-rise 1100ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  animation-delay: calc(var(--reveal-i, 0) * 110ms);
-}
-[data-reveal-item]:nth-child(2) {
-  --reveal-i: 1;
-}
-[data-reveal-item]:nth-child(3) {
-  --reveal-i: 2;
-}
-[data-reveal-item]:nth-child(4) {
-  --reveal-i: 3;
-}
-[data-reveal-item]:nth-child(5) {
-  --reveal-i: 4;
-}
-[data-reveal-item]:nth-child(6) {
-  --reveal-i: 5;
-}
-[data-reveal-item]:nth-child(7) {
-  --reveal-i: 6;
-}
-/* The stagger stops growing after the seventh: a long row arrives together. */
-[data-reveal-item]:nth-child(n + 8) {
-  --reveal-i: 7;
-}
-
-[data-reveal='iris'][data-state='in'] [data-reveal-item] {
-  animation-name: reveal-iris;
-  animation-duration: 1000ms;
-  animation-delay: calc(var(--reveal-i, 0) * 90ms);
-}
-[data-reveal='wipe'][data-state='in'] [data-reveal-item] {
-  animation-name: reveal-wipe;
-  animation-duration: 1200ms;
-  animation-delay: calc(var(--reveal-i, 0) * 140ms);
-}
-[data-reveal='focus'][data-state='in'] [data-reveal-item] {
-  animation-name: reveal-focus;
-  animation-duration: 1100ms;
-}
-
-/* Join: the line first, then the circles in the order the line meets them. */
-[data-reveal='path'][data-state='in'] [data-reveal-line] {
-  animation: reveal-draw 1600ms cubic-bezier(0.65, 0, 0.35, 1) backwards;
-}
-[data-reveal='path'][data-state='in'] [data-reveal-item] {
-  animation-name: reveal-pop;
-  animation-duration: 800ms;
-  animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
-  animation-delay: calc(200ms + var(--reveal-i, 0) * 330ms);
-}
-
-/* App: the phone, then the live update from the left, then M-Pesa. */
-[data-reveal='phone'][data-state='in'] [data-reveal-item] {
-  animation-name: reveal-phone;
-  animation-duration: 1300ms;
-  animation-delay: 0ms;
-}
-[data-reveal='phone'][data-state='in'] [data-reveal-item='left'] {
-  animation-name: reveal-from-left;
-  animation-duration: 1000ms;
-  animation-delay: 600ms;
-}
-[data-reveal='phone'][data-state='in'] [data-reveal-item='right'] {
-  animation-name: reveal-from-right;
-  animation-duration: 1000ms;
-  animation-delay: 850ms;
-}
-
-@keyframes reveal-rise {
-  from {
-    opacity: 0;
-    transform: translateY(56px);
-  }
-}
-@keyframes reveal-iris {
-  from {
-    opacity: 0;
-    clip-path: circle(0% at 50% 38%);
-    transform: scale(0.85);
-  }
-  to {
-    clip-path: circle(150% at 50% 38%);
-  }
-}
-@keyframes reveal-wipe {
-  from {
-    opacity: 0;
-    clip-path: inset(100% 0 0 0 round 1.5rem);
-    transform: translateY(48px);
-  }
-  to {
-    clip-path: inset(0 0 0 0 round 1.5rem);
-  }
-}
-@keyframes reveal-focus {
-  from {
-    opacity: 0;
-    filter: blur(16px);
-    transform: translateY(32px) scale(0.94);
-  }
-}
-@keyframes reveal-draw {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-@keyframes reveal-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.55) translateY(32px);
-  }
-}
-@keyframes reveal-phone {
-  from {
-    opacity: 0;
-    transform: translateY(140px);
-  }
-}
-@keyframes reveal-from-left {
-  from {
-    opacity: 0;
-    transform: translateX(-110px);
-  }
-}
-@keyframes reveal-from-right {
-  from {
-    opacity: 0;
-    transform: translateX(110px);
   }
 }

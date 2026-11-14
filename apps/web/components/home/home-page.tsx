@@ -5,6 +5,7 @@ import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { BestSellers } from '@/components/home/best-sellers';
 import { FeaturedMerchants } from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
+import { JoinParticles } from '@/components/home/join-particles';
 import { Reveal } from '@/components/reveal';
 import { NotifyForm } from '@/components/home/notify-form';
 import { JoinSection } from '@/components/home/join-section';
@@ -262,7 +263,8 @@ export async function HomePageContent({
 
         <section className="bg-bg text-ink py-16 sm:py-20">
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
-            <Reveal variant="path">
+            <Reveal variant="path" className="relative isolate">
+              <JoinParticles />
               <JoinSection t={t} />
             </Reveal>
           </div>
