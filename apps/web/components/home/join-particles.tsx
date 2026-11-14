@@ -190,7 +190,8 @@ function draw(THREE: Three, anime: typeof Anime, element: HTMLElement) {
     if (!frame && visible && !document.hidden) frame = requestAnimationFrame(tick);
   };
 
-  /* The rise: once, when a quarter of the section is in view, slow. */
+  /* The rise: once, when a quarter of the section is in view, settling
+     with the steps. */
   let rising: ReturnType<typeof anime.animate> | null = null;
   const seen = new IntersectionObserver(
     (entries) => {
@@ -198,8 +199,8 @@ function draw(THREE: Three, anime: typeof Anime, element: HTMLElement) {
       if (visible && !rising)
         rising = anime.animate(material.uniforms.uProgress!, {
           value: [0, 1],
-          duration: 4200,
-          ease: 'outSine',
+          duration: 1400,
+          ease: anime.cubicBezier(0.16, 1, 0.3, 1),
         });
       wake();
     },

@@ -111,103 +111,93 @@ type Entrance = (input: {
   line: HTMLElement | null;
 }) => void;
 
-/* Slow on purpose: about two seconds an item, unhurried staggers. */
+/* Real interface timing: under a second an item, short staggers, and the
+   ease-out-expo curve unless a section needs its own. */
+const EXPO = [0.16, 1, 0.3, 1] as const;
+
 const ENTRANCES: Record<RevealVariant, Entrance> = {
-  /* Category circles open from their centre, one after another. */
+  /* Categories: a spring settle, a touch past full size and back. */
   iris: ({ anime, timeline, items }) => {
     timeline.add(items, {
-      opacity: [0, 1],
-      clipPath: ['circle(0% at 50% 38%)', 'circle(75% at 50% 38%)'],
-      scale: [0.82, 1],
-      duration: 1900,
-      ease: 'outQuart',
-      delay: anime.stagger(170),
+      keyframes: {
+        '0%': { opacity: 0, scale: 0.9 },
+        '60%': { opacity: 1, scale: 1.02 },
+        '82%': { scale: 0.995 },
+        '100%': { scale: 1 },
+      },
+      duration: 900,
+      ease: 'outQuad',
+      delay: anime.stagger(60),
     });
   },
-  /* Sponsored cards wipe up from the bottom. */
+  /* Sponsored: a curtain lifts off each card, bottom edge first. */
   wipe: ({ anime, timeline, items }) => {
     timeline.add(items, {
-      opacity: [0, 1],
       clipPath: ['inset(100% 0% 0% 0% round 24px)', 'inset(0% 0% 0% 0% round 24px)'],
-      translateY: [70, 0],
-      duration: 2200,
-      ease: 'outExpo',
-      delay: anime.stagger(240),
+      duration: 900,
+      ease: anime.cubicBezier(0.65, 0, 0.35, 1),
+      delay: anime.stagger(110),
     });
   },
-  /* Best sellers rise into place. */
+  /* Best sellers: a soft rise. */
   rise: ({ anime, timeline, items }) => {
     timeline.add(items, {
       opacity: [0, 1],
-      translateY: [90, 0],
-      duration: 2000,
-      ease: 'outQuart',
-      delay: anime.stagger(170),
+      translateY: [16, 0],
+      duration: 800,
+      ease: anime.cubicBezier(...EXPO),
+      delay: anime.stagger(70),
     });
   },
-  /* Stores come into focus. */
+  /* Stores: a focus pull. */
   focus: ({ anime, timeline, items }) => {
     timeline.add(items, {
       opacity: [0, 1],
-      filter: ['blur(18px)', 'blur(0px)'],
-      translateY: [44, 0],
-      scale: [0.93, 1],
-      duration: 2200,
-      ease: 'outQuart',
-      delay: anime.stagger(170),
+      filter: ['blur(10px)', 'blur(0px)'],
+      scale: [1.03, 1],
+      duration: 900,
+      ease: anime.cubicBezier(...EXPO),
+      delay: anime.stagger(90),
     });
   },
-  /* Join: the dotted line draws across, and each circle pops as the line
-     reaches it. */
-  path: ({ timeline, items, line }) => {
+  /* Join: the steps slide in left to right as the dotted line draws. */
+  path: ({ anime, timeline, items, line }) => {
     if (line)
       timeline.add(
         line,
         {
           opacity: [0, 1],
           clipPath: ['inset(0% 100% 0% 0%)', 'inset(0% 0% 0% 0%)'],
-          duration: 2800,
-          ease: 'inOutSine',
+          duration: 750 + 120 * Math.max(items.length - 1, 0),
+          ease: anime.cubicBezier(...EXPO),
         },
         0,
       );
-    items.forEach((item, index) => {
-      timeline.add(
-        item,
-        {
-          opacity: [0, 1],
-          scale: [0.5, 1],
-          translateY: [40, 0],
-          duration: 1300,
-          ease: 'outBack(1.5)',
-        },
-        250 + index * 650,
-      );
-    });
+    timeline.add(
+      items,
+      {
+        opacity: [0, 1],
+        translateX: [-28, 0],
+        duration: 750,
+        ease: anime.cubicBezier(...EXPO),
+        delay: anime.stagger(120),
+      },
+      0,
+    );
   },
-  /* The app: the phone rises, then the live update slides in from the left
-     and the M-Pesa card from the right. */
-  phone: ({ timeline, items }) => {
-    const phone = items.find((item) => item.dataset.revealItem === '');
-    const left = items.find((item) => item.dataset.revealItem === 'left');
-    const right = items.find((item) => item.dataset.revealItem === 'right');
-    if (phone)
-      timeline.add(
-        phone,
-        { opacity: [0, 1], translateY: [170, 0], duration: 2400, ease: 'outExpo' },
-        0,
-      );
-    if (left)
-      timeline.add(
-        left,
-        { opacity: [0, 1], translateX: [-130, 0], duration: 1800, ease: 'outQuart' },
-        900,
-      );
-    if (right)
-      timeline.add(
-        right,
-        { opacity: [0, 1], translateX: [130, 0], duration: 1800, ease: 'outQuart' },
-        1350,
-      );
+  /* The app: a depth tilt (the perspective is set on the parent), phone
+     first, then the cards beside it. */
+  phone: ({ anime, timeline, items }) => {
+    const ordered = ['', 'left', 'right']
+      .map((key) => items.find((item) => item.dataset.revealItem === key))
+      .filter((item): item is HTMLElement => Boolean(item));
+    timeline.add(ordered, {
+      opacity: [0, 1],
+      rotateX: [28, 0],
+      translateY: [24, 0],
+      duration: 1000,
+      ease: anime.cubicBezier(...EXPO),
+      delay: anime.stagger(80),
+    });
   },
 };

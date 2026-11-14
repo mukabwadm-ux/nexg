@@ -18,7 +18,10 @@ export function AppPreview() {
   ];
 
   return (
-    <div aria-hidden="true" className="relative mx-auto w-full max-w-[34rem] py-6">
+    <div
+      aria-hidden="true"
+      className="relative mx-auto w-full max-w-[34rem] py-6 [perspective:1200px]"
+    >
       {/* The phone. */}
       <div
         data-reveal-item
