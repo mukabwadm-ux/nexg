@@ -133,21 +133,12 @@ const ANSWERS = [
   },
 ] as const;
 
+/* Email only: the page lists no phone numbers. */
 const CHANNELS = [
-  {
-    title: 'The concierge desk',
-    body: 'Fastest for anything live. Published once the desk has a number.',
-    detail: `+254 ${VALUE_PLACEHOLDER}`,
-  },
   {
     title: 'Email',
     body: 'Receipts, refunds and account requests.',
     detail: `help@${VALUE_PLACEHOLDER}`,
-  },
-  {
-    title: 'Rider support',
-    body: 'Payouts, the app, problems on a trip.',
-    detail: `+254 ${VALUE_PLACEHOLDER}`,
   },
   {
     title: 'Merchant success',
@@ -172,8 +163,8 @@ export default function HelpPage() {
               How can we <span className="text-gold">help</span> tonight?
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
-              Read the answers below, or talk to a real person on the concierge desk. Most things
-              are sorted while you are still on the phone.
+              Read the answers below, or write to us and a real person on the concierge desk will
+              get back to you.
             </p>
 
             <ul className="mt-7 flex flex-wrap justify-center gap-2">
@@ -270,13 +261,13 @@ export default function HelpPage() {
         {/* -------------------------------------------------------- channels */}
         <section className="mx-auto max-w-[120rem] px-4 pb-16 sm:px-[30px]">
           <p className="text-gold-text text-[0.625rem] font-extrabold uppercase tracking-[0.18em]">
-            Talk to a person
+            Write to us
           </p>
           <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            The concierge desk is a phone call away.
+            Email the team that can help.
           </h2>
 
-          <ul className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-7 grid max-w-3xl gap-4 sm:grid-cols-2">
             {CHANNELS.map((channel) => (
               <li key={channel.title}>
                 <Card className="h-full p-5">

@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 
 import { WhatsAppButton } from '@/components/chat/whatsapp-button';
 import { isLocaleTag } from '@/lib/i18n/dictionaries';
-import { isBookingPage } from '@/lib/booking/routes';
 
 const PREFERENCES_UPDATED = 'nexg:preferences-updated';
 
@@ -35,9 +34,6 @@ export function PersonalizedChrome() {
     return () => window.removeEventListener(PREFERENCES_UPDATED, update);
   }, []);
 
-  return pathname === '/merchant-live-preview' ||
-    pathname.startsWith('/merchant-live-preview/') ||
-    isBookingPage(pathname) ? null : (
-    <WhatsAppButton />
-  );
+  /* The floating WhatsApp button lives on Help and contact only. */
+  return pathname === '/help' ? <WhatsAppButton /> : null;
 }

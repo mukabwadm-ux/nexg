@@ -196,10 +196,6 @@ export async function HomePageContent({
           searchPlaceholder: t('hero.searchPlaceholder'),
           searchButton: t('hero.search'),
           scroll: t('hero.scroll'),
-          promptTitle: t('hero.prompt.title'),
-          promptBody: t('hero.prompt.body'),
-          promptCta: t('hero.prompt.cta'),
-          promptLater: t('hero.prompt.later'),
         }}
       />
 

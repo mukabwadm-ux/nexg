@@ -43,5 +43,7 @@ export function LocationSheetSlot() {
     pathname.startsWith('/merchant-live-preview/')
   )
     return null;
-  return <LocationSheet autoOpen={pathname !== '/' && pathname !== '/merchant-live-preview'} />;
+  /* The sheet never opens by itself: it is asked for where a place matters,
+     when someone searches from the home page or places an order. */
+  return <LocationSheet autoOpen={false} />;
 }

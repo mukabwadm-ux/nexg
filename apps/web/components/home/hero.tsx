@@ -27,7 +27,8 @@ import { ThemeToggle } from '../theme/theme';
  *     opens the same sheet. On a phone that has already allowed location
  *     it is the exact spot, read when the page opened.
  *   - the search sends what was typed to Discovery (/discover?q=), which
- *     shows the results.
+ *     shows the results. Without an exact spot, the first search of a visit
+ *     asks where they are first, so the results are what is around them.
  */
 
 export interface HeroCopy {
@@ -37,17 +38,10 @@ export interface HeroCopy {
   searchPlaceholder: string;
   searchButton: string;
   scroll: string;
-  promptTitle: string;
-  promptBody: string;
-  promptCta: string;
-  promptLater: string;
 }
 
-/** Session flag: the visitor has answered or dismissed the hero's location prompt. */
-const PROMPT_KEY = 'nexg.loc.heroPrompt';
-
 export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
-  const { place, chip, openSheet, sheetOpen } = useLocation();
+  const { place, chip, openSheet } = useLocation();
 
   /* A place guessed from the connection is a city, not an area: showing its
      zone ("CBD") would claim we know where they are. */
@@ -57,8 +51,6 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
       : chip === 'city'
         ? (place?.city ?? 'Nairobi')
         : (place?.zone ?? place?.city ?? place?.label ?? 'Nairobi');
-  /* No exact spot yet: nothing at all, or only the connection's guess. */
-  const needsSpot = chip === 'empty' || chip === 'city';
 
   return (
     /* Exactly one screen tall: 100vh, and 100svh wherever the browser has
@@ -77,14 +69,7 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
         <div className="from-night absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t to-transparent lg:block" />
       </div>
 
-      <HeroNav
-        where={where}
-        needsSpot={needsSpot}
-        sheetOpen={sheetOpen}
-        onWhere={() => openSheet('hero')}
-        locale={locale}
-        copy={copy}
-      />
+      <HeroNav where={where} onWhere={() => openSheet('hero')} locale={locale} />
 
       {/* ─────────────────────────────────────────────── the message */}
       {/* Centred in what the nav leaves of the hero, then nudged down by about a
@@ -122,18 +107,12 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
 
 function HeroNav({
   where,
-  needsSpot,
-  sheetOpen,
   onWhere,
   locale,
-  copy,
 }: {
   where: string;
-  needsSpot: boolean;
-  sheetOpen: boolean;
   onWhere: () => void;
   locale: Locale;
-  copy: HeroCopy;
 }) {
   /* Transparent on the photograph; a dark ground once it has scrolled away. */
   const [solid, setSolid] = React.useState(false);
@@ -143,40 +122,6 @@ function HeroNav({
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  /*
-   * The first-visit question, asked where the answer lives.
-   *
-   * Instead of a banner above the hero or a sheet over it before the page
-   * has been seen, a small card points at the location pill a moment after
-   * load — only while there is no exact spot, and only until it is used or
-   * dismissed this visit.
-   */
-  const [prompt, setPrompt] = React.useState(false);
-  React.useEffect(() => {
-    let dismissed = false;
-    try {
-      dismissed = window.sessionStorage.getItem(PROMPT_KEY) === '1';
-    } catch {
-      /* ignore */
-    }
-    if (!needsSpot || dismissed) {
-      setPrompt(false);
-      return;
-    }
-    const timer = setTimeout(() => setPrompt(true), 1200);
-    return () => clearTimeout(timer);
-  }, [needsSpot]);
-
-  const dismissPrompt = () => {
-    setPrompt(false);
-    try {
-      window.sessionStorage.setItem(PROMPT_KEY, '1');
-    } catch {
-      /* ignore */
-    }
-  };
-  const showPrompt = prompt && needsSpot && !sheetOpen && !solid;
 
   const round =
     'focus-visible:ring-gold flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/55 backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-12 sm:w-12';
@@ -208,18 +153,9 @@ function HeroNav({
 
         <div className="flex items-center gap-2 sm:gap-4">
           <div className="relative">
-            {showPrompt && (
-              <span
-                aria-hidden="true"
-                className="ring-gold pointer-events-none absolute inset-0 animate-ping rounded-full opacity-60 ring-2"
-              />
-            )}
             <button
               type="button"
-              onClick={() => {
-                dismissPrompt();
-                onWhere();
-              }}
+              onClick={onWhere}
               aria-label={`Deliver to ${where}. Change`}
               className="focus-visible:ring-gold flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-black/55 pl-3.5 pr-3 text-sm font-semibold backdrop-blur transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 sm:h-12 sm:max-w-[16rem] sm:gap-2.5 sm:pl-4 sm:pr-3.5 sm:text-[0.9375rem]"
             >
@@ -232,49 +168,6 @@ function HeroNav({
               <span className="truncate">{where}</span>
               <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
             </button>
-
-            {showPrompt && (
-              <div
-                role="status"
-                className="text-ink absolute right-0 top-full z-50 mt-3 w-[17rem] rounded-2xl bg-white p-4 shadow-2xl sm:w-[19rem]"
-              >
-                <span
-                  aria-hidden="true"
-                  className="absolute -top-1.5 right-8 h-3 w-3 rotate-45 bg-white"
-                />
-                <p className="flex items-center gap-2 text-sm font-extrabold">
-                  <MapPin
-                    className="text-gold h-4 w-4"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    stroke="white"
-                  />
-                  {copy.promptTitle}
-                </p>
-                <p className="mt-1 text-[0.8125rem] leading-snug text-[#6b6560]">
-                  {copy.promptBody}
-                </p>
-                <div className="mt-3 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      dismissPrompt();
-                      onWhere();
-                    }}
-                    className="focus-visible:ring-gold flex-1 rounded-full bg-[#FDD128] px-4 py-2.5 text-[0.8125rem] font-bold text-[#141414] hover:bg-[#FEDD5C] focus-visible:outline-none focus-visible:ring-2"
-                  >
-                    {copy.promptCta}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={dismissPrompt}
-                    className="rounded-full px-3 py-2.5 text-[0.8125rem] font-semibold text-[#6b6560] hover:text-[#141414]"
-                  >
-                    {copy.promptLater}
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           <ThemeToggle className={round} />
@@ -300,9 +193,45 @@ function HeroNav({
 function HeroSearch({ copy }: { copy: HeroCopy }) {
   const [q, setQ] = React.useState('');
 
-  const go = () => {
-    const term = q.trim();
+  const { chip, asked, sheetOpen, openSheet } = useLocation();
+  /* A search waiting for the location sheet to close, and whether it opened. */
+  const pending = React.useRef<string | null>(null);
+  const shown = React.useRef(false);
+
+  const go = (term: string) => {
     window.location.assign(term ? `/discover?q=${encodeURIComponent(term)}` : '/discover');
+  };
+
+  /* The search runs once the sheet closes, whether a spot was set or not. */
+  React.useEffect(() => {
+    if (pending.current === null) return;
+    if (sheetOpen) {
+      shown.current = true;
+      return;
+    }
+    if (!shown.current) return;
+    const term = pending.current;
+    pending.current = null;
+    shown.current = false;
+    go(term);
+  }, [sheetOpen]);
+
+  /*
+   * Nothing asks for a location when the page opens. The first search of a
+   * visit without an exact spot (nothing at all, or only the connection's
+   * guess of a city) opens "Where should we deliver?" first, so the results
+   * are what is around them. After the sheet has been answered or skipped,
+   * searches go straight through.
+   */
+  const search = () => {
+    const term = q.trim();
+    const needsSpot = chip === 'empty' || chip === 'city';
+    if (needsSpot && !asked) {
+      pending.current = term;
+      openSheet('search');
+      return;
+    }
+    go(term);
   };
 
   return (
@@ -310,7 +239,7 @@ function HeroSearch({ copy }: { copy: HeroCopy }) {
       role="search"
       onSubmit={(e) => {
         e.preventDefault();
-        go();
+        search();
       }}
       className="sm:focus-within:ring-gold mt-8 flex w-full flex-col gap-3 sm:w-0 sm:min-w-full sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:bg-white sm:p-1.5 sm:shadow-2xl sm:focus-within:ring-2"
     >
