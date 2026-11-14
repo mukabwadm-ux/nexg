@@ -56,7 +56,9 @@ export function ActivatePanel({
       <Card tone="muted" className="p-5">
         <h2 className="text-sm font-extrabold uppercase tracking-wide">Onboarding</h2>
         <p className="text-muted mt-2 text-sm font-semibold">
-          Already {done}. Suspending or offboarding happens from the directory.
+          {kind === 'merchant'
+            ? 'Already live. Order taking and Discovery are under Status & controls; deactivating is under Merchant access.'
+            : `Already ${done}. Suspending or offboarding happens from the directory.`}
         </p>
       </Card>
     );

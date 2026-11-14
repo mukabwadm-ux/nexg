@@ -28,11 +28,14 @@ export function MerchantControls({
   live,
   state,
   onSave,
+  stacked = false,
 }: {
   merchantId: string;
   live: boolean;
   state: ControlState;
   onSave: (patch: Controls) => Promise<{ ok: boolean; message: string }>;
+  /** One switch per row, for a narrow column. */
+  stacked?: boolean;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -58,7 +61,7 @@ export function MerchantControls({
     : null;
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className={stacked ? 'grid gap-3' : 'grid gap-3 sm:grid-cols-2'}>
       <Switch
         id={`accepting_${merchantId}`}
         label="Accepting orders"

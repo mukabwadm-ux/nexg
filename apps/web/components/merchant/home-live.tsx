@@ -138,14 +138,22 @@ export function HomeLive({
             icon={<FileText />}
             label="Business"
             value={
-              demo && previewState === 'unavailable' ? 'Unavailable' : demo ? 'Approved' : 'Live'
+              demo && previewState === 'unavailable'
+                ? 'Unavailable'
+                : demo
+                  ? 'Approved'
+                  : m.status === 'live'
+                    ? 'Live'
+                    : 'Approved'
             }
             note={
               demo && previewState === 'unavailable'
                 ? 'Current status could not be loaded.'
                 : demo
                   ? 'Your business is all set up.'
-                  : 'Your business is live on NexG.'
+                  : m.status === 'live'
+                    ? 'Your business is live on NexG.'
+                    : 'NexG takes your business live once its final checks are done.'
             }
           />
         )}

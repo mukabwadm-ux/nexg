@@ -158,11 +158,11 @@ export function DashboardSetup({
           <div className="w-full max-w-xs rounded-xl bg-black/35 p-4 backdrop-blur-sm lg:w-auto">
             <p className="text-gold text-[0.9375rem] font-extrabold">Your onboarding guide</p>
             <p className="mt-1.5 text-[0.75rem] font-semibold leading-[1.65] text-white/60">
-              Merchant ops is assigned to you until you go live. Ask anything in Messages, or book a
+              Merchant ops is assigned to you until you go live. Ask anything in Support, or book a
               fifteen-minute setup call.
             </p>
             <Link
-              href={destination('/merchant/messages')}
+              href={destination('/merchant/support')}
               className="bg-gold text-ink mt-3 block rounded-lg px-4 py-2.5 text-center text-[0.8125rem] font-extrabold"
             >
               Message ops →
@@ -393,7 +393,7 @@ export function DashboardSetup({
                 note="Order sounds and the accept screen."
               />
               <QuickAction
-                href={destination('/merchant/messages')}
+                href={destination('/merchant/support')}
                 icon={<MessageSquare className="h-4 w-4" />}
                 title="Book a setup call"
                 note="Fifteen minutes with merchant ops."

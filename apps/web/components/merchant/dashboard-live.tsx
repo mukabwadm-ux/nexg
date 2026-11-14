@@ -317,10 +317,10 @@ export function DashboardLive({
                   note="Stops new orders; current ones finish."
                 />
                 <QuickAction
-                  href="/merchant/messages"
+                  href="/merchant/support"
                   icon={<MessageSquare className="h-4 w-4" />}
                   title="Message merchant ops"
-                  note="A thread about any order or issue."
+                  note="A ticket about any order or issue."
                 />
               </div>
             </section>

@@ -4,7 +4,7 @@ import { AddBranch, OpenBranch, type BranchRow } from '@/components/merchant/bra
 import { Empty, Panel } from '@/components/partner/bits';
 import { Stores, type StoreRow } from '@/components/partner/merchant-stores';
 import { PageHead } from '@/components/merchant/frame';
-import { requireMerchant } from '@/lib/partner';
+import { requireMerchant, setupPageOrWorkspace } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Stores' };
@@ -20,7 +20,10 @@ export const dynamic = 'force-dynamic';
  * just saying no.
  */
 export default async function StoresPage() {
-  const me = await requireMerchant({ access: 'setup' });
+  const me = await setupPageOrWorkspace(
+    () => requireMerchant({ access: 'setup' }),
+    '/merchant/business?tab=locations',
+  );
   const supabase = createClient();
 
   const maps = mapsCapability();

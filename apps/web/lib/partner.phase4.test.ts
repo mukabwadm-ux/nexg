@@ -62,12 +62,23 @@ describe('merchant page entry', () => {
     },
   );
   it('does not turn a blocked session or invalid authority into a rejection decision', async () => {
-    state.access = { state: 'blocked', setup: false, operations: false };
+    state.access = { state: 'blocked', setup: false, operations: false, reason: 'session_expired' };
     await expect(requireMerchant({ access: 'shell' })).rejects.toThrow(
       'redirect:/merchants/sign-in?reason=workspace-session',
     );
     state.access = { state: 'unknown', setup: false, operations: false };
     await expect(requireMerchant({ access: 'shell' })).rejects.toMatchObject({ status: 503 });
+  });
+  it('sends a paused business with a valid session to its status page, not back to sign-in', async () => {
+    // Signing in again would only bring it straight back here.
+    state.access = { state: 'blocked', setup: false, operations: false };
+    await expect(requireMerchant({ access: 'shell' })).rejects.toThrow(
+      'redirect:/merchants/decision',
+    );
+    state.access = { state: 'pending', setup: false, operations: false, expires_at: expiry };
+    await expect(requireMerchant({ access: 'shell' })).rejects.toThrow(
+      'redirect:/merchants/decision',
+    );
   });
   it('requires membership before routing a rejected application to its decision', async () => {
     state.role = null;

@@ -9,6 +9,8 @@ export interface MerchantWorkspaceAccess {
   absolute_expires_at?: string;
   idle_expires_at?: string;
   expires_at?: string;
+  /** Set when the session or membership itself is not valid (for example `session_expired`). */
+  reason?: string | null;
 }
 
 export class MerchantAccessError extends Error {

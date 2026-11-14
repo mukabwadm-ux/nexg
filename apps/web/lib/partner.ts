@@ -85,7 +85,12 @@ export async function requireMerchant(
     // A current rejected application has no workspace capability. Give it a
     // status-only recovery route instead of returning it to sign-in and Home.
     if (access.state === 'rejected') redirect('/merchants/decision');
-    redirect('/merchants/sign-in?reason=workspace-session');
+    // An expired session or a lost membership signs in again. A valid session
+    // with no access (a paused or delisted business, or a manager before
+    // approval) would only be sent straight back here after signing in, so it
+    // gets the status page, which says access is restricted.
+    if (access.reason) redirect('/merchants/sign-in?reason=workspace-session');
+    redirect('/merchants/decision');
   }
   if (isAnonymous && (access.state === 'legacy' || !access.setup || access.operations))
     redirect('/merchant');
@@ -112,6 +117,26 @@ export async function requireMerchant(
 
 export function requireMerchantSetup(): Promise<AuthorizedMerchant> {
   return requireMerchant({ access: 'setup' });
+}
+
+/**
+ * The setup pages from before the merchant workspace (Catalogue, Stores,
+ * Hours, Documents) serve legacy merchants and new-form applications under
+ * review. Once an application is approved those records live in the
+ * workspace (Offerings, Business, Availability), and the setup access check
+ * refuses the page. Older links, the live dashboard and settings still point
+ * here, so send the merchant to the workspace section instead of an error.
+ */
+export async function setupPageOrWorkspace<T>(
+  load: () => Promise<T>,
+  workspaceHref: string,
+): Promise<T> {
+  try {
+    return await load();
+  } catch (error) {
+    if (error instanceof MerchantAccessError && error.status === 403) redirect(workspaceHref);
+    throw error;
+  }
 }
 
 /**

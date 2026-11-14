@@ -3,12 +3,18 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-import { deleteMerchant, goLive, setMerchantDeactivated } from '@/app/merchants/actions';
+import {
+  deleteMerchant,
+  goLive,
+  setControls,
+  setMerchantDeactivated,
+} from '@/app/merchants/actions';
 import { sendFeaturedPitch, unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { FeaturedNow } from '@/components/featured/place-merchant';
+import { MerchantControls } from '@/components/merchant-controls';
 import { MerchantLifecycleActions } from '@/components/merchant-lifecycle-actions';
 import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
@@ -384,6 +390,42 @@ export default async function MerchantApplicationPage({
                 return unfeatureMerchant(params.id, reason);
               }}
             />
+
+            {/*
+              The four switches from the old directory panel. Guests can
+              order only while the business is live and accepting orders, and
+              going live does not switch that on by itself.
+            */}
+            {canManageLifecycle && (
+              <Card id="controls" className="scroll-mt-24 p-5">
+                <h2 className="text-sm font-extrabold uppercase tracking-wide">
+                  Status &amp; controls
+                </h2>
+                <p className="text-muted mt-2 text-sm font-semibold leading-[1.7]">
+                  Guests can order only while the business is live and accepting orders. Each switch
+                  saves on its own.
+                </p>
+                <div className="mt-4">
+                  <MerchantControls
+                    merchantId={params.id}
+                    live={merchant.status === 'live'}
+                    stacked
+                    state={{
+                      accepting_orders: !!merchant.accepting_orders,
+                      explore_visible: !!merchant.explore_visible,
+                      pay_on_delivery: !!merchant.pay_on_delivery,
+                      pay_on_delivery_cap_kes: merchant.pay_on_delivery_cap_kes ?? null,
+                      concierge_pick: !!merchant.concierge_pick,
+                      accepting_orders_changed_at: merchant.accepting_orders_changed_at ?? null,
+                    }}
+                    onSave={async (patch) => {
+                      'use server';
+                      return setControls(params.id, patch);
+                    }}
+                  />
+                </div>
+              </Card>
+            )}
 
             {canManageLifecycle && (
               <MerchantLifecycleActions
