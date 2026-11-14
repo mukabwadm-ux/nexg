@@ -113,9 +113,7 @@ export function HolidayList({
                 type="checkbox"
                 checked={allSelected}
                 onChange={() =>
-                  setSelected(
-                    allSelected ? new Set() : new Set(holidays.map((h) => h.holiday_id)),
-                  )
+                  setSelected(allSelected ? new Set() : new Set(holidays.map((h) => h.holiday_id)))
                 }
                 className="accent-ink h-4 w-4"
               />
